@@ -184,7 +184,7 @@ def _parse_args():
         choices=[100, 500],
         type=int,
         default=500,
-        help="The ``num_class`` in the pre-trained checkpoint. (Default: 500",
+        help="The ``num_class`` in the pre-trained checkpoint. (Default: 500)",
     )
     parser.add_argument(
         "--aux-num-out",

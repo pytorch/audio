@@ -94,7 +94,7 @@ class TriStageLRScheduler(torch.optim.lr_scheduler._LRScheduler):
             return [base_lr * self.final_lr_scale for base_lr in self.base_lrs]
 
 
-def compute_accuracy(logits: torch.Tensor):
+def _compute_accuracy(logits: torch.Tensor):
     with torch.no_grad():
         max = logits.argmax(-1) == 0
         min = logits.argmin(-1) == 0
@@ -102,6 +102,19 @@ def compute_accuracy(logits: torch.Tensor):
         corr = max.long().sum().item() - both.long().sum().item()
         count = max.numel()
     return corr, count
+
+
+def _reset_stats():
+    return {
+        "train": {
+            "correct": 0.0,
+            "count": 0.0,
+        },
+        "val": {
+            "correct": 0.0,
+            "count": 0.0,
+        },
+    }
 
 
 class HuBERTPreTrainModule(LightningModule):
@@ -148,10 +161,8 @@ class HuBERTPreTrainModule(LightningModule):
         self.dataset_path = dataset_path
         self.feature_type = feature_type
         self.seconds_per_batch = seconds_per_batch
-        self.mask_corrects = [0.0, 0.0]
-        self.unmask_corrects = [0.0, 0.0]
-        self.mask_counts = [0.0, 0.0]
-        self.unmask_counts = [0.0, 0.0]
+        self.mask_stats = _reset_stats()
+        self.unmask_stats = _reset_stats()
         self.nan_loss_count = 0.0
 
     def _step(self, batch: Batch, batch_idx, step_type):
@@ -177,44 +188,30 @@ class HuBERTPreTrainModule(LightningModule):
         else:
             self.nan_loss_count += 1
             self.log("nan_loss_count", self.nan_loss_count, on_step=True, on_epoch=True)
-        correct_m, count_m = compute_accuracy(logit_m)
-        correct_u, count_u = compute_accuracy(logit_u)
-        if step_type == "train":
-            self.mask_corrects[0] += correct_m
-            self.unmask_corrects[0] += correct_u
-            self.mask_counts[0] += count_m
-            self.unmask_counts[0] += count_u
-            self.log(
-                f"{step_type}_masked_accuracy",
-                self.mask_corrects[0] / self.mask_counts[0],
-                on_step=True,
-                on_epoch=True,
-                sync_dist=True,
-                prog_bar=True,
-            )
-            self.log(
-                f"{step_type}_unmasked_accuracy",
-                self.unmask_corrects[0] / self.unmask_counts[0],
-                on_step=True,
-                on_epoch=True,
-                sync_dist=True,
-                prog_bar=True,
-            )
-        else:
-            self.mask_corrects[1] += correct_m
-            self.unmask_corrects[1] += correct_u
-            self.mask_counts[1] += count_m
-            self.unmask_counts[1] += count_u
-            self.log(
-                f"{step_type}_masked_accuracy", self.mask_corrects[1] / self.mask_counts[1], on_step=True, on_epoch=True
-            )
-            self.log(
-                f"{step_type}_unmasked_accuracy",
-                self.unmask_corrects[1] / self.unmask_counts[1],
-                on_step=True,
-                on_epoch=True,
-            )
 
+        # log accuracies of masked and unmasked frames
+        correct_m, count_m = _compute_accuracy(logit_m)
+        correct_u, count_u = _compute_accuracy(logit_u)
+        self.mask_stats[step_type]["correct"] += correct_m
+        self.mask_stats[step_type]["count"] += count_m
+        self.unmask_stats[step_type]["correct"] += correct_u
+        self.unmask_stats[step_type]["count"] += count_u
+        self.log(
+            f"{step_type}_masked_accuracy",
+            self.mask_stats[step_type]["correct"] / self.mask_stats[step_type]["count"],
+            on_step=True,
+            on_epoch=True,
+            sync_dist=True,
+            prog_bar=step_type == "train",
+        )
+        self.log(
+            f"{step_type}_unmasked_accuracy",
+            self.unmask_stats[step_type]["correct"] / self.unmask_stats[step_type]["count"],
+            on_step=True,
+            on_epoch=True,
+            sync_dist=True,
+            prog_bar=step_type == "train",
+        )
         return loss, logit_m.size(0)
 
     def configure_optimizers(self):
@@ -279,11 +276,8 @@ class HuBERTPreTrainModule(LightningModule):
         return self._step(batch, batch_idx, "val")[0]
 
     def on_validation_end(self):
-        self.mask_corrects = [0.0, 0.0]
-        self.unmask_corrects = [0.0, 0.0]
-        self.mask_counts = [0.0, 0.0]
-        self.unmask_counts = [0.0, 0.0]
-        self.nan_loss_count = 0.0
+        self.mask_stats = _reset_stats()
+        self.unmask_stats = _reset_stats()
 
     def train_dataloader(self):
         dataset = HuBERTDataSet(self.dataset_path, self.dataset, "train")
