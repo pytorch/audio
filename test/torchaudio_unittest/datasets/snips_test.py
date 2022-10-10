@@ -52,9 +52,10 @@ def _get_mocked_samples(dataset_dir: str, subset: str, seed: int):
             wav_stem = f"{spk}-snips-{subset}-{i}"
             wav_path = os.path.join(subset_dir, f"{wav_stem}.wav")
             waveform = _save_wav(wav_path, seed)
-            label = f"{spk}XXX {spk}YYY {spk}ZZZ"
+            transcript, iob, intent = f"{spk}XXX", f"{spk}YYY", f"{spk}ZZZ"
+            label = "BOS " + transcript + " EOS\tO " + iob + " " + intent
             _save_label(label_path, wav_stem, label)
-            samples.append((waveform, _SAMPLE_RATE, label))
+            samples.append((waveform, _SAMPLE_RATE, transcript, iob, intent))
     return samples
 
 
@@ -99,10 +100,12 @@ class TestSnips(TempDirMixin, TorchaudioTestCase):
 
     def _testSnips(self, dataset, data_samples):
         num_samples = 0
-        for i, (data, sample_rate, transcript) in enumerate(dataset):
+        for i, (data, sample_rate, transcript, iob, intent) in enumerate(dataset):
             self.assertEqual(data, data_samples[i][0])
             assert sample_rate == data_samples[i][1]
             assert transcript == data_samples[i][2]
+            assert iob == data_samples[i][3]
+            assert intent == data_samples[i][4]
             num_samples += 1
 
         assert num_samples == len(data_samples)

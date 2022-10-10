@@ -28,16 +28,29 @@ _SPEAKERS = [
 ]
 
 
-def _load_transcripts(file: Path, subset: str):
-    transcripts = {}
+def _load_labels(file: Path, subset: str):
+    """Load transcirpt, iob, and intent labels for all utterances.
+
+    Args:
+        file (Path): The path to the label file.
+        subset (str): Subset of the dataset to use. Options: [``"train"``, ``"valid"``, ``"test"``].
+
+    Returns:
+        Dictionary of labels, where the key is the filename of the audio,
+            and the label is a Tuple of transcript, Inside–outside–beginning (IOB) label, and intention label.
+    """
+    labels = {}
     with open(file, "r") as f:
         for line in f:
             line = line.strip().split(" ")
             index = line[0]
-            trans = " ".join(line[1:])
+            trans, iob_intent = " ".join(line[1:]).split("\t")
+            trans = " ".join(trans.split(" ")[1:-1])
+            iob = " ".join(iob_intent.split(" ")[1:-1])
+            intent = iob_intent.split(" ")[-1]
             if subset in index:
-                transcripts[index] = trans
-    return transcripts
+                labels[index] = (trans, iob, intent)
+    return labels
 
 
 class Snips(Dataset):
@@ -48,7 +61,7 @@ class Snips(Dataset):
         subset (str): Subset of the dataset to use. Options: [``"train"``, ``"valid"``, ``"test"``].
         speakers (List[str] or None, optional): The speaker list to include in the dataset. If ``None``,
             include all speakers in the subset. (Default: ``None``)
-        audio_format (str, optional): The extention of the audios. Options: [``"mp3"``, ``"wav"``].
+        audio_format (str, optional): The extension of the audios. Options: [``"mp3"``, ``"wav"``].
             (Default: ``"mp3"``)
     """
 
@@ -83,9 +96,9 @@ class Snips(Dataset):
             if speaker in speakers:
                 self.data.append(audio_path)
         transcript_path = self._path / self._trans_file
-        self.transcripts = _load_transcripts(transcript_path, subset)
+        self.labels = _load_labels(transcript_path, subset)
 
-    def get_metadata(self, n: int) -> Tuple[str, int, str]:
+    def get_metadata(self, n: int) -> Tuple[str, int, str, str, str]:
         """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
         but otherwise returns the same fields as :py:func:`__getitem__`.
 
@@ -101,14 +114,18 @@ class Snips(Dataset):
                 Sample rate
             str:
                 Transcription of audio
+            str:
+                Inside–outside–beginning (IOB) label of transcription
+            str:
+                Intention label of the audio.
         """
         audio_path = self.data[n]
         relpath = os.path.relpath(audio_path, self._path)
         file_name = audio_path.with_suffix("").name
-        transcript = self.transcripts[file_name]
-        return relpath, _SAMPLE_RATE, transcript
+        transcript, iob, intent = self.labels[file_name]
+        return relpath, _SAMPLE_RATE, transcript, iob, intent
 
-    def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str]:
+    def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str, str, str]:
         """Load the n-th sample from the dataset.
 
         Args:
@@ -123,6 +140,10 @@ class Snips(Dataset):
                 Sample rate
             str:
                 Transcription of audio
+            str:
+                Inside–outside–beginning (IOB) label of transcription
+            str:
+                Intention label of the audio.
         """
         metadata = self.get_metadata(n)
         waveform = _load_waveform(self._path, metadata[0], metadata[1])
