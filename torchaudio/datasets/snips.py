@@ -48,7 +48,8 @@ class Snips(Dataset):
         subset (str): Subset of the dataset to use. Options: [``"train"``, ``"valid"``, ``"test"``].
         speakers (List[str] or None, optional): The speaker list to include in the dataset. If ``None``,
             include all speakers in the subset. (Default: ``None``)
-        ext_audio (str, optional): The extention of the audios. (Default: ``".mp3"``)
+        audio_format (str, optional): The extention of the audios. Options: [``"mp3"``, ``"wav"``].
+            (Default: ``"mp3"``)
     """
 
     _trans_file = "all.iob.snips.txt"
@@ -58,10 +59,12 @@ class Snips(Dataset):
         root: Union[str, Path],
         subset: str,
         speakers: Optional[List[str]] = None,
-        ext_audio: str = ".mp3",
+        audio_format: str = "mp3",
     ) -> None:
         if subset not in ["train", "valid", "test"]:
-            raise ValueError('`subset` must be one of ["train", "valid", "test"]')
+            raise ValueError('`subset` must be one of ["train", "valid", "test"].')
+        if audio_format not in ["mp3", "wav"]:
+            raise ValueError('`audio_format` must be one of ["mp3", "wav].')
 
         root = Path(root)
         self._path = root / "SNIPS"
@@ -72,7 +75,7 @@ class Snips(Dataset):
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found.")
 
-        self.audio_paths = self.audio_path.glob(f"*{ext_audio}")
+        self.audio_paths = self.audio_path.glob(f"*.{audio_format}")
         self.data = []
         for audio_path in sorted(self.audio_paths):
             audio_name = str(audio_path.name)

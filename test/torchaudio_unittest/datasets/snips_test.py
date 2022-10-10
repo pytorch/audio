@@ -108,13 +108,13 @@ class TestSnips(TempDirMixin, TorchaudioTestCase):
         assert num_samples == len(data_samples)
 
     def testSnipsTrain(self):
-        dataset = snips.Snips(self.root_dir, subset="train", ext_audio=".wav")
+        dataset = snips.Snips(self.root_dir, subset="train", audio_format="wav")
         self._testSnips(dataset, self.train_samples)
 
     def testSnipsValid(self):
-        dataset = snips.Snips(self.root_dir, subset="valid", ext_audio=".wav")
+        dataset = snips.Snips(self.root_dir, subset="valid", audio_format="wav")
         self._testSnips(dataset, self.valid_samples)
 
     def testSnipsTest(self):
-        dataset = snips.Snips(self.root_dir, subset="test", ext_audio=".wav")
+        dataset = snips.Snips(self.root_dir, subset="test", audio_format="wav")
         self._testSnips(dataset, self.test_samples)
