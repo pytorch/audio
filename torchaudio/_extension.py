@@ -102,7 +102,6 @@ def _init_extension():
                 except Exception:
                     pass
 
-
     _load_lib("libtorchaudio")
     # This import is for initializing the methods registered via PyBind11
     # This has to happen after the base library is loaded
