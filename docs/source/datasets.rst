@@ -40,6 +40,7 @@ For example:
    LJSPEECH
    MUSDB_HQ
    QUESST14
+   Snips
    SPEECHCOMMANDS
    TEDLIUM
    VCTK_092

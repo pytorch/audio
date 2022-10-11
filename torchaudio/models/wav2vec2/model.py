@@ -137,12 +137,8 @@ class HuBERTPretrainModel(Module):
         <https://github.com/pytorch/audio/tree/release/0.12/examples/hubert>`__
 
     Args:
-        feature_extractor (torch.nn.Module):
-            Feature extractor that extracts feature vectors from raw audio Tensor.
-
-        encoder (torch.nn.Module):
-            Encoder that converts the audio features into the sequence of probability
-            distribution (in negative log-likelihood) over labels.
+        wav2vec2 (Wav2Vec2Model):
+            Wav2Vec2 encoder that generates the transformer outputs.
 
         mask_generator (torch.nn.Module):
             Mask generator that generates the mask for masked prediction during the training.
