@@ -53,18 +53,6 @@ API References
    kaldi_io
    utils
 
-Prototype API References
-------------------------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Prototype API Reference
-
-   prototype
-   prototype.functional
-   prototype.models
-   prototype.pipelines
-
 Getting Started
 ---------------
     
