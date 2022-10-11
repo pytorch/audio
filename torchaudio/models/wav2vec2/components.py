@@ -302,9 +302,9 @@ class SelfAttention(Module):
         weights = (self.scaling * q) @ k  # B, nH, L, L
         if attention_mask is not None:
             weights += attention_mask
-        # subtract a constant value from the tensor won't change the output of softmax.
+        # subtracting a constant value from the tensor won't change the output of softmax.
         # apply the subtraction to avoid value overflow in torch.nn.functional.softmax.
-        # for more details, please find Equation 7 in https://arxiv.org/abs/2112.08778
+        # for more details, please see Equation 7 in https://arxiv.org/abs/2112.08778
         weights = weights - weights.max(dim=-1, keepdim=True)[0]
 
         weights = torch.nn.functional.softmax(weights, dim=-1)
