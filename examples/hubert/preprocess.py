@@ -64,7 +64,7 @@ def _parse_args():
         "--percent",
         default=-1,
         type=float,
-        help="The number of clusters for KMeans clustering.",
+        help="The percent of data for KMeans clustering. If negative, use all data. (Default: -1)",
     )
     args = parser.parse_args()
     return args

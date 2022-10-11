@@ -146,7 +146,7 @@ def _parse_args():
         "--beam-size-token",
         type=int,
         default=29,
-        help="Number of tokens to consider at each beam search step. (Default: None)",
+        help="Number of tokens to consider at each beam search step. (Default: 29)",
     )
     parser.add_argument(
         "--beam-threshold", type=int, default=100, help="Beam threshold for pruning hypotheses. (Default: 100)"

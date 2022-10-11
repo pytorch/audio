@@ -109,7 +109,7 @@ def _parse_args():
         "--checkpoint",
         type=str,
         required=True,
-        help="Path to the pre-trained HuBERTPretrainModel checpoint as the initialization.",
+        help="Path to the pre-trained HuBERTPretrainModel checkpoint as the initialization.",
     )
     parser.add_argument(
         "--resume-checkpoint",
