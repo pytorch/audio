@@ -1,0 +1,6 @@
+﻿torchaudio.models.hubert\_base
+==============================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hubert_base

@@ -1,0 +1,834 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.models &mdash; Torchaudio nightly documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Conformer" href="generated/torchaudio.models.Conformer.html" />
+    <link rel="prev" title="YESNO" href="generated/torchaudio.datasets.YESNO.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../versions.html">Nightly Build (0.13.0+0f1d13b) &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.io.html">Media IO</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>torchaudio.models</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/models.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <span class="target" id="module-torchaudio.models"></span><div class="section" id="torchaudio-models">
+<h1>torchaudio.models<a class="headerlink" href="#torchaudio-models" title="Permalink to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">torchaudio.models</span></code> subpackage contains definitions of models for addressing common audio tasks.</p>
+<p>For pre-trained models, please refer to <a class="reference internal" href="pipelines.html#module-torchaudio.pipelines" title="torchaudio.pipelines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code></a> module.</p>
+<div class="section" id="model-definitions">
+<h2>Model Definitions<a class="headerlink" href="#model-definitions" title="Permalink to this heading">¶</a></h2>
+<p>Model defintions are responsible for constructing computation graphs and executing them.</p>
+<p>Some models have complex structure and variations.
+For such models, <a class="reference internal" href="#factory-functions">Factory Functions</a> are provided.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.Conformer.html#torchaudio.models.Conformer" title="torchaudio.models.Conformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conformer</span></code></a></p></td>
+<td><p>Conformer architecture introduced in <em>Conformer: Convolution-augmented Transformer for Speech Recognition</em> <span id="id1">[<a class="reference internal" href="references.html#id20" title="Anmol Gulati, James Qin, Chung-Cheng Chiu, Niki Parmar, Yu Zhang, Jiahui Yu, Wei Han, Shibo Wang, Zhengdong Zhang, Yonghui Wu, and Ruoming Pang. Conformer: convolution-augmented transformer for speech recognition. 2020. arXiv:2005.08100.">Gulati <em>et al.</em>, 2020</a>]</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.ConvTasNet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConvTasNet</span></code></a></p></td>
+<td><p>Conv-TasNet architecture introduced in <em>Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation</em> <span id="id2">[<a class="reference internal" href="references.html#id21" title="Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 27(8):1256–1266, Aug 2019. URL: http://dx.doi.org/10.1109/TASLP.2019.2915167, doi:10.1109/taslp.2019.2915167.">Luo and Mesgarani, 2019</a>]</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.DeepSpeech.html#torchaudio.models.DeepSpeech" title="torchaudio.models.DeepSpeech"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepSpeech</span></code></a></p></td>
+<td><p>DeepSpeech architecture introduced in <em>Deep Speech: Scaling up end-to-end speech recognition</em> <span id="id3">[<a class="reference internal" href="references.html#id16" title="Awni Hannun, Carl Case, Jared Casper, Bryan Catanzaro, Greg Diamos, Erich Elsen, Ryan Prenger, Sanjeev Satheesh, Shubho Sengupta, Adam Coates, and Andrew Y. Ng. Deep speech: scaling up end-to-end speech recognition. 2014. arXiv:1412.5567.">Hannun <em>et al.</em>, 2014</a>]</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.Emformer.html#torchaudio.models.Emformer" title="torchaudio.models.Emformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Emformer</span></code></a></p></td>
+<td><p>Emformer architecture introduced in <em>Emformer: Efficient Memory Transformer Based Acoustic Model for Low Latency Streaming Speech Recognition</em> <span id="id4">[<a class="reference internal" href="references.html#id29" title="Yangyang Shi, Yongqiang Wang, Chunyang Wu, Ching-Feng Yeh, Julian Chan, Frank Zhang, Duc Le, and Mike Seltzer. Emformer: efficient memory transformer based acoustic model for low latency streaming speech recognition. In ICASSP 2021 - 2021 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 6783-6787. 2021.">Shi <em>et al.</em>, 2021</a>]</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDemucs</span></code></a></p></td>
+<td><p>Hybrid Demucs model from <em>Hybrid Spectrogram and Waveform Source Separation</em> <span id="id5">[<a class="reference internal" href="references.html#id49" title="Alexandre Défossez. Hybrid spectrogram and waveform source separation. In Proceedings of the ISMIR 2021 Workshop on Music Source Separation. 2021.">Défossez, 2021</a>]</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a></p></td>
+<td><p>HuBERT model used for pretraining in <em>HuBERT</em> <span id="id6">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.RNNT.html#torchaudio.models.RNNT" title="torchaudio.models.RNNT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNT</span></code></a></p></td>
+<td><p>Recurrent neural network transducer (RNN-T) model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.RNNTBeamSearch.html#torchaudio.models.RNNTBeamSearch" title="torchaudio.models.RNNTBeamSearch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNTBeamSearch</span></code></a></p></td>
+<td><p>Beam search decoder for RNN-T model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tacotron2</span></code></a></p></td>
+<td><p>Tacotron2 model from <em>Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions</em> <span id="id7">[<a class="reference internal" href="references.html#id26" title="Jonathan Shen, Ruoming Pang, Ron J Weiss, Mike Schuster, Navdeep Jaitly, Zongheng Yang, Zhifeng Chen, Yu Zhang, Yuxuan Wang, Rj Skerrv-Ryan, and others. Natural tts synthesis by conditioning wavenet on mel spectrogram predictions. In 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 4779–4783. IEEE, 2018.">Shen <em>et al.</em>, 2018</a>]</span> based on the implementation from <a class="reference external" href="https://github.com/NVIDIA/DeepLearningExamples/">Nvidia Deep Learning Examples</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.Wav2Letter.html#torchaudio.models.Wav2Letter" title="torchaudio.models.Wav2Letter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Letter</span></code></a></p></td>
+<td><p>Wav2Letter model architecture from <em>Wav2Letter: an End-to-End ConvNet-based Speech Recognition System</em> <span id="id8">[<a class="reference internal" href="references.html#id18" title="Ronan Collobert, Christian Puhrsch, and Gabriel Synnaeve. Wav2letter: an end-to-end convnet-based speech recognition system. 2016. arXiv:1609.03193.">Collobert <em>et al.</em>, 2016</a>]</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a></p></td>
+<td><p>Acoustic model used in <em>wav2vec 2.0</em> <span id="id9">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WaveRNN</span></code></a></p></td>
+<td><p>WaveRNN model from <em>Efficient Neural Audio Synthesis</em> <span id="id10">[<a class="reference internal" href="references.html#id2" title="Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aäron van den Oord, Sander Dieleman, and Koray Kavukcuoglu. Efficient neural audio synthesis. CoRR, 2018. URL: http://arxiv.org/abs/1802.08435, arXiv:1802.08435.">Kalchbrenner <em>et al.</em>, 2018</a>]</span> based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord/WaveRNN</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="factory-functions">
+<h2>Factory Functions<a class="headerlink" href="#factory-functions" title="Permalink to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.conv_tasnet_base.html#torchaudio.models.conv_tasnet_base" title="torchaudio.models.conv_tasnet_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conv_tasnet_base</span></code></a></p></td>
+<td><p>Builds non-causal version of <a class="reference internal" href="generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.ConvTasNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConvTasNet</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.emformer_rnnt_model.html#torchaudio.models.emformer_rnnt_model" title="torchaudio.models.emformer_rnnt_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emformer_rnnt_model</span></code></a></p></td>
+<td><p>Builds Emformer-based <a class="reference internal" href="generated/torchaudio.models.RNNT.html#torchaudio.models.RNNT" title="torchaudio.models.RNNT"><code class="xref py py-class docutils literal notranslate"><span class="pre">RNNT</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.emformer_rnnt_base.html#torchaudio.models.emformer_rnnt_base" title="torchaudio.models.emformer_rnnt_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emformer_rnnt_base</span></code></a></p></td>
+<td><p>Builds basic version of Emformer-based <a class="reference internal" href="generated/torchaudio.models.RNNT.html#torchaudio.models.RNNT" title="torchaudio.models.RNNT"><code class="xref py py-class docutils literal notranslate"><span class="pre">RNNT</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_model.html#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_model</span></code></a></p></td>
+<td><p>Builds custom <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_base.html#torchaudio.models.wav2vec2_base" title="torchaudio.models.wav2vec2_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_base</span></code></a></p></td>
+<td><p>Builds &quot;base&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id11">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_large.html#torchaudio.models.wav2vec2_large" title="torchaudio.models.wav2vec2_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_large</span></code></a></p></td>
+<td><p>Builds &quot;large&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id12">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_large_lv60k.html#torchaudio.models.wav2vec2_large_lv60k" title="torchaudio.models.wav2vec2_large_lv60k"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_large_lv60k</span></code></a></p></td>
+<td><p>Builds &quot;large lv-60k&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id13">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_base.html#torchaudio.models.hubert_base" title="torchaudio.models.hubert_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_base</span></code></a></p></td>
+<td><p>Builds &quot;base&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id14">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_large.html#torchaudio.models.hubert_large" title="torchaudio.models.hubert_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_large</span></code></a></p></td>
+<td><p>Builds &quot;large&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id15">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_xlarge.html#torchaudio.models.hubert_xlarge" title="torchaudio.models.hubert_xlarge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_xlarge</span></code></a></p></td>
+<td><p>Builds &quot;extra large&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id16">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_model.html#torchaudio.models.hubert_pretrain_model" title="torchaudio.models.hubert_pretrain_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_model</span></code></a></p></td>
+<td><p>Builds custom <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> for training from scratch</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_base.html#torchaudio.models.hubert_pretrain_base" title="torchaudio.models.hubert_pretrain_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_base</span></code></a></p></td>
+<td><p>Builds &quot;base&quot; <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> from <em>HuBERT</em> <span id="id17">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for pretraining.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_large.html#torchaudio.models.hubert_pretrain_large" title="torchaudio.models.hubert_pretrain_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_large</span></code></a></p></td>
+<td><p>Builds &quot;large&quot; <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> from <em>HuBERT</em> <span id="id18">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for pretraining.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_xlarge.html#torchaudio.models.hubert_pretrain_xlarge" title="torchaudio.models.hubert_pretrain_xlarge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_xlarge</span></code></a></p></td>
+<td><p>Builds &quot;extra large&quot; <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> from <em>HuBERT</em> <span id="id19">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for pretraining.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hdemucs_low.html#torchaudio.models.hdemucs_low" title="torchaudio.models.hdemucs_low"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdemucs_low</span></code></a></p></td>
+<td><p>Builds low nfft (1024) version of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>, suitable for sample rates around 8 kHz.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hdemucs_medium.html#torchaudio.models.hdemucs_medium" title="torchaudio.models.hdemucs_medium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdemucs_medium</span></code></a></p></td>
+<td><p>Builds medium nfft (2048) version of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>, suitable for sample rates of 16-32 kHz.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hdemucs_high.html#torchaudio.models.hdemucs_high" title="torchaudio.models.hdemucs_high"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdemucs_high</span></code></a></p></td>
+<td><p>Builds medium nfft (4096) version of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>, suitable for sample rates of 44.1-48 kHz.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utility-functions">
+<h2>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2.utils.import_fairseq_model.html#torchaudio.models.wav2vec2.utils.import_fairseq_model" title="torchaudio.models.wav2vec2.utils.import_fairseq_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_fairseq_model</span></code></a></p></td>
+<td><p>Builds <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from the corresponding model object of <a class="reference external" href="https://github.com/pytorch/fairseq">fairseq</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2.utils.import_huggingface_model.html#torchaudio.models.wav2vec2.utils.import_huggingface_model" title="torchaudio.models.wav2vec2.utils.import_huggingface_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_huggingface_model</span></code></a></p></td>
+<td><p>Builds <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from the corresponding model object of <a class="reference external" href="https://huggingface.co/transformers/">Transformers</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/torchaudio.models.Conformer.html" class="btn btn-neutral float-right" title="Conformer" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="generated/torchaudio.datasets.YESNO.html" class="btn btn-neutral" title="YESNO" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torchaudio.models</a><ul>
+<li><a class="reference internal" href="#model-definitions">Model Definitions</a></li>
+<li><a class="reference internal" href="#factory-functions">Factory Functions</a></li>
+<li><a class="reference internal" href="#utility-functions">Utility Functions</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+    </script>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>
