@@ -15,7 +15,7 @@ This directory contains sample implementations of training and evaluation pipeli
 ### Pipeline Demo
 
 [`pipeline_demo.py`](./pipeline_demo.py) demonstrates how to use the `EMFORMER_RNNT_BASE_LIBRISPEECH`
-or `EMFORMER_RNNT_BASE_TEDLIUM3` bundle that wraps a pre-trained Emformer RNN-T produced by the corresponding recipe below to perform streaming and full-context ASR on several audio samples.
+ bundle that wraps a pre-trained Emformer RNN-T produced by the LibriSpeech recipe below to perform streaming and full-context ASR on several audio samples.
 
 ## Model Types
 
@@ -66,8 +66,6 @@ The table below contains WER results for dev and test subsets of TED-LIUM releas
 |:-----------:|-------------:|
 | dev         |       0.108  |
 | test        |       0.098  |
-
-[`tedlium3/eval_pipeline.py`](./tedlium3/eval_pipeline.py) evaluates the pre-trained `EMFORMER_RNNT_BASE_TEDLIUM3` bundle on the dev and test sets of TED-LIUM release 3. Running the script should produce WER results that are identical to those in the above table.
 
 ### MuST-C release v2.0
 
