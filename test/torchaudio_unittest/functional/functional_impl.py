@@ -127,15 +127,15 @@ class Functional(TestBaseMixin):
         The reference implementation use cascaded second-order filters so is more numerically accurate.
         """
         # create an impulse signal
-        x = torch.zeros(1024, dtype=self.dtype, device=self.device)
+        x = torch.zeros(256, dtype=self.dtype, device=self.device)
         x[0] = 1
 
         # get target impulse response
-        sos = signal.butter(9, 850, "hp", fs=22050, output="sos")
+        sos = signal.butter(9, 250, "hp", fs=22050, output="sos")
         y = torch.from_numpy(signal.sosfilt(sos, x.cpu().numpy())).to(self.dtype).to(self.device)
 
         # get lfilter coefficients
-        b, a = signal.butter(9, 850, "hp", fs=22050, output="ba")
+        b, a = signal.butter(9, 250, "hp", fs=22050, output="ba")
         b, a = torch.from_numpy(b).to(self.dtype).to(self.device), torch.from_numpy(a).to(self.dtype).to(self.device)
 
         # predict impulse response
