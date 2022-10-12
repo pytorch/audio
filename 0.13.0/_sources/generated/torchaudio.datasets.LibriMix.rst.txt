@@ -14,3 +14,10 @@ __getitem__
 .. container:: py attribute
 
    .. automethod:: torchaudio.datasets.LibriMix.__getitem__
+
+get_metadata
+------------
+
+.. container:: py attribute
+
+   .. automethod:: torchaudio.datasets.LibriMix.get_metadata

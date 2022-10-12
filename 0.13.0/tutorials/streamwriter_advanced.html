@@ -1,0 +1,865 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>StreamWriter Advanced Usage &mdash; Torchaudio nightly documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Hardware-Accelerated Video Decoding and Encoding" href="../hw_acceleration_tutorial.html" />
+    <link rel="prev" title="StreamWriter Basic Usage" href="streamwriter_basic_tutorial.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+  <div>
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../versions.html">Nightly Build (0.13.0+0f1d13b) &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.io.html">Media IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+
+      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
+        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+          <div class="pytorch-breadcrumbs-wrapper">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../tutorials.io.html">Media IO</a> &gt;</li>
+        
+      <li>StreamWriter Advanced Usage</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/streamwriter_advanced.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+          </div>
+
+          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+            Shortcuts
+          </div>
+        </div>
+
+        <div class="pytorch-content-left">
+    
+
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">tutorials/streamwriter_advanced</div>
+
+      <div id="google-colab-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+        <div class="call-to-action-desktop-view">Run in Google Colab</div>
+        <div class="call-to-action-mobile-view">Colab</div>
+      </div>
+      <div id="download-notebook-link">
+        <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+        <div class="call-to-action-desktop-view">Download Notebook</div>
+        <div class="call-to-action-mobile-view">Notebook</div>
+      </div>
+      <div id="github-view-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+        <div class="call-to-action-desktop-view">View on GitHub</div>
+        <div class="call-to-action-mobile-view">GitHub</div>
+      </div>
+    </div>
+
+    
+    
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streamwriter-advanced-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="streamwriter-advanced-usage">
+<span id="sphx-glr-tutorials-streamwriter-advanced-py"></span><h1>StreamWriter Advanced Usage<a class="headerlink" href="#streamwriter-advanced-usage" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial shows how to use <a class="reference internal" href="../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter" title="torchaudio.io.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.io.StreamWriter</span></code></a> to
+play audio and video.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial uses hardware devices, thus it is not portable across
+different operating systems.</p>
+<p>The tutorial was written and tested on MacBook Pro (M1, 2020).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial requires torchaudio nightly build and FFmpeg libraries (&gt;=4.1, &lt;4.4).</p>
+<p>To install torchaudio nightly build, please refer to
+<a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a> .</p>
+<p>There are multiple ways to install FFmpeg libraries.
+If you are using Anaconda Python distribution,
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">'ffmpeg&lt;4.4'</span></code> will install the required FFmpeg libraries,
+however, this distribution does not have SDL plugin, so it cannot play
+video.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TorchAudio dynamically loads compatible FFmpeg libraries
+installed on the system.
+The types of supported formats (media format, encoder, encoder
+options etc) depend on the libraries.</p>
+<p>To check the available devices, muxers and encoders, you can use the
+following commands</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ffmpeg -muxers</span>
+<span class="go">ffmpeg -encoders</span>
+<span class="go">ffmpeg -devices</span>
+<span class="go">ffmpeg -protocols</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamWriter</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
+
+<span class="n">AUDIO_PATH</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span><span class="p">)</span>
+<span class="n">VIDEO_PATH</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="device-availability">
+<h2>Device Availability<a class="headerlink" href="#device-availability" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code> takes advantage of FFmpeg’s IO abstraction and
+writes the data to media devices such as speakers and GUI.</p>
+<p>To write to devices, provide <code class="docutils literal notranslate"><span class="pre">format</span></code> option to the constructor
+of <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code>.</p>
+<p>Different OS will have different device options and their availabilities
+depend on the actual installation of FFmpeg.</p>
+<p>To check which device is available, you can use <cite>ffmpeg -devices</cite>
+command.</p>
+<p>“audiotoolbox” (speaker) and “sdl” (video GUI)
+are available.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ffmpeg -devices
+<span class="go">...</span>
+<span class="go">Devices:</span>
+<span class="go"> D. = Demuxing supported</span>
+<span class="go"> .E = Muxing supported</span>
+<span class="go"> --</span>
+<span class="go">  E audiotoolbox    AudioToolbox output device</span>
+<span class="go"> D  avfoundation    AVFoundation input device</span>
+<span class="go"> D  lavfi           Libavfilter virtual input device</span>
+<span class="go">  E opengl          OpenGL output</span>
+<span class="go">  E sdl,sdl2        SDL2 output device</span>
+</pre></div>
+</div>
+<p>For details about what devices are available on which OS, please check
+the official FFmpeg documentation. <a class="reference external" href="https://ffmpeg.org/ffmpeg-devices.html">https://ffmpeg.org/ffmpeg-devices.html</a></p>
+</div>
+<div class="section" id="playing-audio">
+<h2>Playing audio<a class="headerlink" href="#playing-audio" title="Permalink to this heading">¶</a></h2>
+<p>By providing <code class="docutils literal notranslate"><span class="pre">format=&quot;audiotoolbox&quot;</span></code> option, the StreamWriter writes
+data to speaker device.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prepare sample audio</span>
+<span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">AUDIO_PATH</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">num_frames</span><span class="p">,</span> <span class="n">num_channels</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure StreamWriter to write to speaker device</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;audiotoolbox&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;s16&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write audio to the device</span>
+<span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="mi">256</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">waveform</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">256</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Writing to “audiotoolbox” is blocking operation, but it will not
+wait for the aduio playback. The device must be kept open while
+audio is being played.</p>
+<p>The following code will close the device as soon as the audio is
+written and before the playback is completed.
+Adding <a class="reference external" href="https://docs.python.org/3/library/time.html#time.sleep" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">time.sleep()</span></code></a> will help keep the device open until
+the playback is completed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">waveform</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="playing-video">
+<h2>Playing Video<a class="headerlink" href="#playing-video" title="Permalink to this heading">¶</a></h2>
+<p>To play video, you can use <code class="docutils literal notranslate"><span class="pre">format=&quot;sdl&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">format=&quot;opengl&quot;</span></code>.
+Again, you need a version of FFmpeg with corresponding integration
+enabled. The available devices can be checked with <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-devices</span></code>.</p>
+<p>Here, we use SDL device (<a class="reference external" href="https://ffmpeg.org/ffmpeg-devices.html#sdl">https://ffmpeg.org/ffmpeg-devices.html#sdl</a>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># note:</span>
+<span class="c1">#  SDL device does not support specifying frame rate, and it has to</span>
+<span class="c1">#  match the refresh rate of display.</span>
+<span class="n">frame_rate</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">360</span>
+</pre></div>
+</div>
+<p>For we define a helper function that delegates the video loading to
+a background thread and give chunks</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">running</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">def</span> <span class="nf">video_streamer</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">queue</span><span class="o">,</span> <span class="nn">threading</span>
+    <span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
+
+    <span class="n">q</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/queue.html#queue.Queue" title="queue.Queue" class="sphx-glr-backref-module-queue sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span></a><span class="p">()</span>
+
+    <span class="c1"># Streaming process that runs in background thread</span>
+    <span class="k">def</span> <span class="nf">_streamer</span><span class="p">():</span>
+        <span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
+            <span class="n">frame_rate</span><span class="o">=</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">chunk_</span><span class="p">,</span> <span class="p">)</span> <span class="ow">in</span> <span class="n">streamer</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chunk_</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">running</span><span class="p">:</span>
+                <span class="k">break</span>
+
+    <span class="c1"># Start the background thread and fetch chunks</span>
+    <span class="n">t</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/threading.html#threading.Thread" title="threading.Thread" class="sphx-glr-backref-module-threading sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span></a><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_streamer</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">running</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">except</span> <a href="https://docs.python.org/3/library/queue.html#queue.Empty" title="queue.Empty" class="sphx-glr-backref-module-queue sphx-glr-backref-type-py-exception"><span class="n">queue</span><span class="o">.</span><span class="n">Empty</span></a><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now we start streaming. Pressing “Q” will stop the video.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>write_video_chunk</cite> call against SDL device blocks until SDL finishes
+playing the video.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set output device to SDL</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">StreamWriter</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;sdl&quot;</span><span class="p">)</span>
+
+<span class="c1"># Configure video stream (RGB24)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span><span class="p">,</span> <span class="n">encoder_format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span><span class="p">)</span>
+
+<span class="c1"># Play the video</span>
+<span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">video_streamer</span><span class="p">(</span><span class="n">VIDEO_PATH</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="n">running</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">break</span>
+</pre></div>
+</div>
+<video width="490px" controls autoplay loop muted>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-sdl-demo.mp4">
+</video><p>[<a class="reference external" href="https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py">code</a>]</p>
+</div>
+<div class="section" id="streaming-video">
+<h2>Streaming Video<a class="headerlink" href="#streaming-video" title="Permalink to this heading">¶</a></h2>
+<p>So far, we looked at how to write to hardware devices. There are some
+alternative methods for video streaming.</p>
+</div>
+<div class="section" id="rtmp-real-time-messaging-protocol">
+<h2>RTMP (Real-Time Messaging Protocol)<a class="headerlink" href="#rtmp-real-time-messaging-protocol" title="Permalink to this heading">¶</a></h2>
+<p>Using RMTP, you can stream media (video and/or audio) to a single client.
+This does not require a hardware device, but it requires a separate player.</p>
+<p>To use RMTP, specify the protocol and route in <code class="docutils literal notranslate"><span class="pre">dst</span></code> argument in
+StreamWriter constructor, then pass <code class="docutils literal notranslate"><span class="pre">{&quot;listen&quot;:</span> <span class="pre">&quot;1&quot;}</span></code> option when opening
+the destination.</p>
+<p>StreamWriter will listen to the port and wait for a client to request the video.
+The call to <code class="docutils literal notranslate"><span class="pre">open</span></code> is blocked until a request is received.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="o">=</span><span class="s2">&quot;rtmp://localhost:1935/live/app&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;flv&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="s2">&quot;aac&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="o">=</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;listen&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">}):</span>
+    <span class="k">for</span> <span class="n">video_chunk</span><span class="p">,</span> <span class="n">audio_chunk</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">():</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">audio_chunk</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">video_chunk</span><span class="p">)</span>
+</pre></div>
+</div>
+<video width="490px" controls autoplay loop muted>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-rtmp-demo.mp4">
+</video><p>[<a class="reference external" href="https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py">code</a>]</p>
+</div>
+<div class="section" id="udp-user-datagram-protocol">
+<h2>UDP (User Datagram Protocol)<a class="headerlink" href="#udp-user-datagram-protocol" title="Permalink to this heading">¶</a></h2>
+<p>Using UDP, you can stream media (video and/or audio) to socket.
+This does not require a hardware device, but it requires a separate player.</p>
+<p>Unlike RTMP streaming and client processes are disconnected.
+The streaming process are not aware of client process.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="o">=</span><span class="s2">&quot;udp://localhost:48550&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mpegts&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="s2">&quot;aac&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="o">=</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">video_chunk</span><span class="p">,</span> <span class="n">audio_chunk</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">():</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">audio_chunk</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">video_chunk</span><span class="p">)</span>
+</pre></div>
+</div>
+<video width="490px" controls autoplay loop muted>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-udp-demo.mp4">
+</video><p>[<a class="reference external" href="https://download.pytorch.org/torchaudio/tutorial-assets/udp.py">code</a>]</p>
+<p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamwriter-advanced-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/acd5f4d113437b875fa5999e86a2ba3b/streamwriter_advanced.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamwriter_advanced.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/95ad2a02082b86065ac66ebb90a9ad5b/streamwriter_advanced.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">streamwriter_advanced.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../hw_acceleration_tutorial.html" class="btn btn-neutral float-right" title="Hardware-Accelerated Video Decoding and Encoding" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="streamwriter_basic_tutorial.html" class="btn btn-neutral" title="StreamWriter Basic Usage" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Torchaudio Contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">StreamWriter Advanced Usage</a><ul>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#device-availability">Device Availability</a></li>
+<li><a class="reference internal" href="#playing-audio">Playing audio</a></li>
+<li><a class="reference internal" href="#playing-video">Playing Video</a></li>
+<li><a class="reference internal" href="#streaming-video">Streaming Video</a></li>
+<li><a class="reference internal" href="#rtmp-real-time-messaging-protocol">RTMP (Real-Time Messaging Protocol)</a></li>
+<li><a class="reference internal" href="#udp-user-datagram-protocol">UDP (User Datagram Protocol)</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'nightly',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+      <script type="text/javascript" src="../_static/katex_autorenderer.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+      
+    </script>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    mobileMenu.bind();
+    mobileTOC.bind();
+    pytorchAnchors.bind();
+
+    $(window).on("load", function() {
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+    })
+
+    // Add class to links that have code blocks, since we cannot create links in code blocks
+    $("article.pytorch-article a span.pre").each(function(e) {
+      $(this).closest("a").addClass("has-code");
+    });
+  </script>
+</body>
+</html>
