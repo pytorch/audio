@@ -21,7 +21,7 @@
 Forced Alignment with Wav2Vec2
 ==============================
 
-**Author** `Moto Hira <moto@fb.com>`__
+**Author**: `Moto Hira <moto@meta.com>`__
 
 This tutorial shows how to align transcript to speech with
 ``torchaudio``, using CTC segmentation algorithm described in
@@ -52,8 +52,8 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
  .. code-block:: none
 
-    1.14.0.dev20221012
-    0.13.0.dev20221012
+    1.14.0.dev20221016
+    0.13.0.dev20221016
     cpu
 
 
@@ -1210,7 +1210,7 @@ perform CTC segmentation for forced alignment.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.900 seconds)
+   **Total running time of the script:** ( 0 minutes  2.422 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_tutorial.py:

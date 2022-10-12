@@ -2,6 +2,8 @@
 StreamWriter Advanced Usage
 ===========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use :py:class:`torchaudio.io.StreamWriter` to
 play audio and video.
 

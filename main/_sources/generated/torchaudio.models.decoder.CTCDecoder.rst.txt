@@ -12,12 +12,12 @@ CTCDecoder
 Methods
 =======
 
-__init__
+__call__
 --------
 
 .. container:: py attribute
 
-   .. automethod:: torchaudio.models.decoder.CTCDecoder.__init__
+   .. automethod:: torchaudio.models.decoder.CTCDecoder.__call__
 
 idxs_to_tokens
 --------------
@@ -29,6 +29,12 @@ idxs_to_tokens
 Support Structures
 ==================
 
+CTCHypothesis
+-------------
+
+.. autoclass:: torchaudio.models.decoder.CTCHypothesis
+   :members:
+
 CTCDecoderLM
 ------------
 
@@ -39,10 +45,4 @@ CTCDecoderLMState
 -----------------
 
 .. autoclass:: torchaudio.models.decoder.CTCDecoderLMState
-   :members:
-
-CTCHypothesis
--------------
-
-.. autoclass:: torchaudio.models.decoder.CTCHypothesis
    :members:

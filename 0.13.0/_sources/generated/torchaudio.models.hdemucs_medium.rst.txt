@@ -1,0 +1,6 @@
+﻿torchaudio.models.hdemucs\_medium
+=================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hdemucs_medium

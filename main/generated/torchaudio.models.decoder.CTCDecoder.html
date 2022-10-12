@@ -211,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.13.0.dev20221016) &#x25BC</a>
     </div>
     
 
@@ -381,7 +381,7 @@
 <p>To build the decoder, please use the factory function <a class="reference internal" href="torchaudio.models.decoder.ctc_decoder.html#torchaudio.models.decoder.ctc_decoder" title="torchaudio.models.decoder.ctc_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">ctc_decoder()</span></code></a>.</p>
 </div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CTCDecoder</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CTCDecoder</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@meta.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
 <p><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></p>
   <div class="sphx-glr-thumbnail-title">ASR Inference with CTC Decoder</div>
 </div></div></dd>
@@ -391,25 +391,26 @@
 </section>
 <section id="methods">
 <h1>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h1>
-<section id="init">
-<h2>__init__<a class="headerlink" href="#init" title="Permalink to this heading">¶</a></h2>
+<section id="call">
+<h2>__call__<a class="headerlink" href="#call" title="Permalink to this heading">¶</a></h2>
 <div class="py attribute docutils container">
 <dl class="py method">
-<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoder.__init__">
-<span class="sig-prename descclassname"><span class="pre">CTCDecoder.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLM"><span class="pre">CTCDecoderLM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">LexiconDecoderOptions</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LexiconFreeDecoderOptions</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sil_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoder.__call__">
+<span class="sig-prename descclassname"><span class="pre">CTCDecoder.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder._ctc_decoder.CTCHypothesis"><span class="pre">CTCHypothesis</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nbest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – number of best decodings to return</p></li>
-<li><p><strong>lexicon</strong> (<em>Dict</em><em> or </em><em>None</em>) – lexicon mapping of words to spellings, or None for lexicon-free decoder</p></li>
-<li><p><strong>word_dict</strong> (<em>_Dictionary</em>) – dictionary of words</p></li>
-<li><p><strong>tokens_dict</strong> (<em>_Dictionary</em>) – dictionary of tokens</p></li>
-<li><p><strong>lm</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><em>CTCDecoderLM</em></a>) – language model. If using a lexicon, only word level LMs are currently supported</p></li>
-<li><p><strong>decoder_options</strong> (<em>_LexiconDecoderOptions</em><em> or </em><em>_LexiconFreeDecoderOptions</em>) – parameters used for beam search decoding</p></li>
-<li><p><strong>blank_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – token corresopnding to blank</p></li>
-<li><p><strong>sil_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – token corresponding to silence</p></li>
-<li><p><strong>unk_word</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – word corresponding to unknown</p></li>
+<li><p><strong>emissions</strong> (<em>torch.FloatTensor</em>) – CPU tensor of shape <cite>(batch, frame, num_tokens)</cite> storing sequences of
+probability distribution over labels; output of acoustic model.</p></li>
+<li><p><strong>lengths</strong> (<em>Tensor</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – CPU tensor of shape <cite>(batch, )</cite> storing the valid length of
+in time axis of the output Tensor in each batch.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of sorted best hypotheses for each audio sequence in the batch.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[List[<a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder.CTCHypothesis">CTCHypothesis</a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -441,12 +442,63 @@
 </section>
 <section id="support-structures">
 <h1>Support Structures<a class="headerlink" href="#support-structures" title="Permalink to this heading">¶</a></h1>
+<section id="ctchypothesis">
+<h2>CTCHypothesis<a class="headerlink" href="#ctchypothesis" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></span><span class="sig-name descname"><span class="pre">CTCHypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.LongTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.IntTensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCHypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents hypothesis generated by CTC beam search decoder <a class="reference internal" href="#torchaudio.models.decoder.CTCDecoder" title="torchaudio.models.decoder.CTCDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">CTCDecoder</span></code></a>.</p>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CTCHypothesis</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@meta.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">ASR Inference with CTC Decoder</div>
+</div></div></dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.tokens">
+<span class="sig-name descname"><span class="pre">tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LongTensor</span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicted sequence of token IDs. Shape <cite>(L, )</cite>, where <cite>L</cite> is the length of the output sequence</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.words">
+<span class="sig-name descname"><span class="pre">words</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.words" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of predicted words.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This attribute is only applicable if a lexicon is provided to the decoder. If
+decoding without a lexicon, it will be blank. Please refer to <a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis.tokens" title="torchaudio.models.decoder.CTCHypothesis.tokens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">tokens</span></code></a> and
+<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoder.idxs_to_tokens" title="torchaudio.models.decoder.CTCDecoder.idxs_to_tokens"><code class="xref py py-func docutils literal notranslate"><span class="pre">idxs_to_tokens()</span></code></a> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.score">
+<span class="sig-name descname"><span class="pre">score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Score corresponding to hypothesis</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.timesteps">
+<span class="sig-name descname"><span class="pre">timesteps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">IntTensor</span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.timesteps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timesteps corresponding to the tokens. Shape <cite>(L, )</cite>, where <cite>L</cite> is the length of the output sequence</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="ctcdecoderlm">
 <h2>CTCDecoderLM<a class="headerlink" href="#ctcdecoderlm" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoderLM">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></span><span class="sig-name descname"><span class="pre">CTCDecoderLM</span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Language model base class for creating custom language models to use with the decoder.</p>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CTCDecoderLM</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@meta.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">ASR Inference with CTC Decoder</div>
+</div></div></dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoderLM.start">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_with_nothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.start" title="Permalink to this definition">¶</a></dt>
@@ -477,8 +529,12 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>(CTCDecoderLMState, float)</dt><dd><p>CTCDecoderLMState: new LM state
-float: score</p>
+<dt>(CTCDecoderLMState, float)</dt><dd><dl class="simple">
+<dt>CTCDecoderLMState:</dt><dd><p>new LM state</p>
+</dd>
+<dt>float:</dt><dd><p>score</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </p>
@@ -518,6 +574,12 @@ float: score</p>
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoderLMState">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></span><span class="sig-name descname"><span class="pre">CTCDecoderLMState</span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLMState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLMState" title="Permalink to this definition">¶</a></dt>
 <dd><p>Language model state.</p>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CTCDecoderLMState</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@meta.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">ASR Inference with CTC Decoder</div>
+</div></div></dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoderLMState.children">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">children</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLMState.children" title="Permalink to this definition">¶</a></dt>
@@ -557,51 +619,6 @@ is not found.</p>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
 </dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="ctchypothesis">
-<h2>CTCHypothesis<a class="headerlink" href="#ctchypothesis" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></span><span class="sig-name descname"><span class="pre">CTCHypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.LongTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.IntTensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCHypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents hypothesis generated by CTC beam search decoder <a class="reference internal" href="#torchaudio.models.decoder.CTCDecoder" title="torchaudio.models.decoder.CTCDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">CTCDecoder</span></code></a>.</p>
-<dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CTCHypothesis</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@fb.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
-<p><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></p>
-  <div class="sphx-glr-thumbnail-title">ASR Inference with CTC Decoder</div>
-</div></div></dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.tokens">
-<span class="sig-name descname"><span class="pre">tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LongTensor</span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.tokens" title="Permalink to this definition">¶</a></dt>
-<dd><p>Predicted sequence of token IDs. Shape <cite>(L, )</cite>, where <cite>L</cite> is the length of the output sequence</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.words">
-<span class="sig-name descname"><span class="pre">words</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.words" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of predicted words.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This attribute is only applicable if a lexicon is provided to the decoder. If
-decoding without a lexicon, it will be blank. Please refer to <a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis.tokens" title="torchaudio.models.decoder.CTCHypothesis.tokens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">tokens</span></code></a> and
-<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoder.idxs_to_tokens" title="torchaudio.models.decoder.CTCDecoder.idxs_to_tokens"><code class="xref py py-func docutils literal notranslate"><span class="pre">idxs_to_tokens()</span></code></a> instead.</p>
-</div>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.score">
-<span class="sig-name descname"><span class="pre">score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Score corresponding to hypothesis</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="torchaudio.models.decoder.CTCHypothesis.timesteps">
-<span class="sig-name descname"><span class="pre">timesteps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">IntTensor</span></em><a class="headerlink" href="#torchaudio.models.decoder.CTCHypothesis.timesteps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Timesteps corresponding to the tokens. Shape <cite>(L, )</cite>, where <cite>L</cite> is the length of the output sequence</p>
 </dd></dl>
 
 </dd></dl>
@@ -656,14 +673,14 @@ decoding without a lexicon, it will be blank. Please refer to <a class="referenc
               <ul>
 <li><a class="reference internal" href="#">CTCDecoder</a></li>
 <li><a class="reference internal" href="#methods">Methods</a><ul>
-<li><a class="reference internal" href="#init">__init__</a></li>
+<li><a class="reference internal" href="#call">__call__</a></li>
 <li><a class="reference internal" href="#idxs-to-tokens">idxs_to_tokens</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#support-structures">Support Structures</a><ul>
+<li><a class="reference internal" href="#ctchypothesis">CTCHypothesis</a></li>
 <li><a class="reference internal" href="#ctcdecoderlm">CTCDecoderLM</a></li>
 <li><a class="reference internal" href="#ctcdecoderlmstate">CTCDecoderLMState</a></li>
-<li><a class="reference internal" href="#ctchypothesis">CTCHypothesis</a></li>
 </ul>
 </li>
 </ul>

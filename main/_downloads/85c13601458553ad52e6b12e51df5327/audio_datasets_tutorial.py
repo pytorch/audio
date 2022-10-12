@@ -3,6 +3,8 @@
 Audio Datasets
 ==============
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` provides easy access to common, publicly accessible
 datasets. Please refer to the official documentation for the list of
 available datasets.
