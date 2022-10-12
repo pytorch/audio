@@ -1,6 +1,6 @@
 import argparse
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import torch
 import torch.nn.functional as F
@@ -36,10 +36,9 @@ def _viterbi_decode(emission: torch.Tensor, id2token: Dict, blank_idx: int = 0) 
     Returns:
         (List of str): The decoding result. List of string in lower case.
     """
-    hypothesis = F.log_softmax(emission, dim=-1)
-    hypothesis = hypothesis.argmax(-1).unique_consecutive()
+    hypothesis = emission.argmax(-1).unique_consecutive()
     hypothesis = hypothesis[hypothesis != blank_idx]
-    hypothesis = "".join(id2token[int(i)] for i in hypothesis).replace("|", " ")
+    hypothesis = "".join(id2token[int(i)] for i in hypothesis).replace("|", " ").strip()
     return hypothesis.split()
 
 
@@ -47,7 +46,7 @@ def _ctc_decode(emission, decoder: CTCDecoder) -> List[str]:
     """Run CTC decoding with a KenLM language model.
 
     Args:
-        emission (torch.Tensor): Output of CTC layer. Tensor with dimensions (..., time, num_tokens).
+        emission (torch.Tensor): Output of CTC layer. Tensor with dimensions `(..., time, num_tokens)`.
         decoder (CTCDecoder): The initialized CTCDecoder.
 
     Returns:
@@ -55,13 +54,19 @@ def _ctc_decode(emission, decoder: CTCDecoder) -> List[str]:
     """
     hypothesis = decoder(emission)
     hypothesis = hypothesis[0][0].words
+    hypothesis = [word for word in hypothesis if word != " "]
     return hypothesis
 
 
 def run_inference(args):
+    if args.use_gpu:
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+
     # Load the fine-tuned HuBERTPretrainModel from checkpoint.
     model = _load_checkpoint(args.checkpoint)
-    model.eval()
+    model.eval().to(device)
 
     if args.use_lm:
         # get decoder files
@@ -92,13 +97,14 @@ def run_inference(args):
         transcript = transcript.strip().lower().strip().replace("\n", "")
 
         with torch.inference_mode():
-            emission, _ = model(waveform)
+            emission, _ = model(waveform.to(device))
+            emission = F.log_softmax(emission, dim=-1)
         if args.use_lm:
-            hypothesis = _ctc_decode(emission, decoder)
+            hypothesis = _ctc_decode(emission.cpu(), decoder)
         else:
             hypothesis = _viterbi_decode(emission, id2token)
 
-        total_edit_distance += torchaudio.functional.edit_distance(transcript.split(), hypothesis)
+        total_edit_distance += torchaudio.functional.edit_distance(hypothesis, transcript.split())
         total_length += len(transcript.split())
 
         if idx % 100 == 0:
@@ -138,9 +144,9 @@ def _parse_args():
     )
     parser.add_argument(
         "--beam-size-token",
-        type=Optional[int],
-        default=None,
-        help="Number of tokens to consider at each beam search step. (Default: None)",
+        type=int,
+        default=29,
+        help="Number of tokens to consider at each beam search step. (Default: 29)",
     )
     parser.add_argument(
         "--beam-threshold", type=int, default=100, help="Beam threshold for pruning hypotheses. (Default: 100)"
@@ -161,6 +167,7 @@ def _parse_args():
         "--unk-score", type=float, default=float("-inf"), help="Unknown word insertion score. (Default: -inf)"
     )
     parser.add_argument("--sil-score", type=float, default=0, help="Silence insertion score. (Default: 0)")
+    parser.add_argument("--use-gpu", action="store_true", help="Whether to use GPU for decoding.")
     parser.add_argument("--debug", action="store_true", help="Whether to use debug level for logging.")
     return parser.parse_args()
 

@@ -463,6 +463,8 @@ class CollateFnLibriLightLimited:
         label2id = _get_label2id()
         for sample in batch:
             waveform, transcript = sample[0], sample[2]
+            # add one "|" symbol after the end of transcription as the word termination
+            transcript = transcript + "|"
             label = torch.tensor([label2id[e] for e in transcript.replace(" ", "|").upper()])
             audio_length = waveform.size(1)
             label_length = label.size(0)
