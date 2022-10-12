@@ -274,6 +274,8 @@ jobs:
       - attach_workspace:
           at: third_party
       - run:
+          name: Build conda packages
+          no_output_timeout: 30m
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
             packaging/build_conda.sh
@@ -354,6 +356,7 @@ jobs:
           at: third_party
       - run:
           name: Build wheel packages
+          no_output_timeout: 30m
           command: |
             set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
@@ -381,7 +384,7 @@ jobs:
           at: third_party
       - run:
           name: Build conda packages
-          no_output_timeout: 20m
+          no_output_timeout: 30m
           command: |
             set -ex
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"

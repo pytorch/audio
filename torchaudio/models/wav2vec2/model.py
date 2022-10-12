@@ -1,3 +1,4 @@
+import math
 from typing import List, Optional, Tuple
 
 import torch
@@ -137,12 +138,8 @@ class HuBERTPretrainModel(Module):
         <https://github.com/pytorch/audio/tree/release/0.12/examples/hubert>`__
 
     Args:
-        feature_extractor (torch.nn.Module):
-            Feature extractor that extracts feature vectors from raw audio Tensor.
-
-        encoder (torch.nn.Module):
-            Encoder that converts the audio features into the sequence of probability
-            distribution (in negative log-likelihood) over labels.
+        wav2vec2 (Wav2Vec2Model):
+            Wav2Vec2 encoder that generates the transformer outputs.
 
         mask_generator (torch.nn.Module):
             Mask generator that generates the mask for masked prediction during the training.
@@ -685,6 +682,27 @@ def hubert_xlarge(
     )
 
 
+def _init_hubert_pretrain_model(module):
+    if isinstance(module, components.LayerNorm):
+        torch.nn.init.kaiming_normal_(module.conv.weight)
+    elif isinstance(module, components.ConvolutionalPositionalEmbedding):
+        # normalize the weight to normal distribution.
+        std = math.sqrt(4.0 / (module.embed_dim * module.kernel_size))
+        torch.nn.init.normal_(module.conv.weight, mean=0.0, std=std)
+        torch.nn.init.constant_(module.conv.bias, 0.0)
+    elif isinstance(module, components.SelfAttention):
+        # normalize the query, key, value, and out_proj parameters in self attention module.
+        torch.nn.init.xavier_uniform_(module.k_proj.weight, gain=1 / math.sqrt(2))
+        torch.nn.init.xavier_uniform_(module.v_proj.weight, gain=1 / math.sqrt(2))
+        torch.nn.init.xavier_uniform_(module.q_proj.weight, gain=1 / math.sqrt(2))
+        torch.nn.init.xavier_uniform_(module.out_proj.weight)
+        torch.nn.init.constant_(module.out_proj.bias, 0.0)
+    elif isinstance(module, components.Transformer):
+        module.apply(components._init_transformer_params)
+    else:
+        pass
+
+
 def hubert_pretrain_model(
     extractor_mode: str,
     extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]],
@@ -967,12 +985,15 @@ def hubert_pretrain_model(
         skip_masked,
         skip_nomask,
     )
-    return HuBERTPretrainModel(
+    model = HuBERTPretrainModel(
         wav2vec2=wav2vec2,
         mask_generator=mask_generator,
         logit_generator=logit_generator,
         feature_grad_mult=feature_grad_mult,
     )
+    # initialize the model for pre-training
+    model.apply(_init_hubert_pretrain_model)
+    return model
 
 
 def hubert_pretrain_base(
