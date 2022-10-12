@@ -373,6 +373,11 @@ The execution flow of the main process is as follows:
    hello world
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 333-335
+
+Tag: :obj:`torchaudio.io`
+
+
 
 .. rst-class:: sphx-glr-timing
 

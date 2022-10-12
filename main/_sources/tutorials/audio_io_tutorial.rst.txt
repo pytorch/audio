@@ -43,8 +43,8 @@ into PyTorch's Tensor object, and save Tensor objects to audio files.
 
  .. code-block:: none
 
-    1.13.0.dev20221006
-    0.13.0.dev20221006
+    1.14.0.dev20221012
+    0.13.0.dev20221012
 
 
 
@@ -96,8 +96,8 @@ First, we import the modules and download the audio assets we use in this tutori
 
  .. code-block:: none
 
-      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 6.19MB/s]
-      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 46.9MB/s]
+      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 4.40MB/s]
+      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 27.5MB/s]
 
 
 
@@ -451,7 +451,7 @@ The following examples illustrate this.
 
  .. code-block:: none
 
-      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 45.1MB/s]
+      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 6.60MB/s]
 
 
 
@@ -634,7 +634,7 @@ the provided data fit
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmpct0m9x99/save_example_default.wav
+    Source: /tmp/tmp08s9q6nq/save_example_default.wav
     ----------
      - File size: 217658 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=32, encoding=PCM_F)
@@ -667,7 +667,7 @@ The resulting file occupies half the storage but loses precision
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmp0p9p0cln/save_example_PCM_S16.wav
+    Source: /tmp/tmpgal06s9y/save_example_PCM_S16.wav
     ----------
      - File size: 108844 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -723,37 +723,37 @@ To name a few:
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmpvz9929q8/save_example.flac
+    Source: /tmp/tmpunvsh_zr/save_example.flac
     ----------
      - File size: 37141 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=24, encoding=FLAC)
 
     ----------
-    Source: /tmp/tmpvz9929q8/save_example.vorbis
+    Source: /tmp/tmpunvsh_zr/save_example.vorbis
     ----------
      - File size: 12588 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=VORBIS)
 
     ----------
-    Source: /tmp/tmpvz9929q8/save_example.sph
+    Source: /tmp/tmpunvsh_zr/save_example.sph
     ----------
      - File size: 109824 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_S)
 
     ----------
-    Source: /tmp/tmpvz9929q8/save_example.amb
+    Source: /tmp/tmpunvsh_zr/save_example.amb
     ----------
      - File size: 108858 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_F)
 
     ----------
-    Source: /tmp/tmpvz9929q8/save_example.amr-nb
+    Source: /tmp/tmpunvsh_zr/save_example.amr-nb
     ----------
      - File size: 2008 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=AMR_NB)
 
     ----------
-    Source: /tmp/tmpvz9929q8/save_example.gsm
+    Source: /tmp/tmpunvsh_zr/save_example.gsm
     ----------
      - File size: 5610 bytes
      - AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
@@ -802,7 +802,7 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.845 seconds)
+   **Total running time of the script:** ( 0 minutes  2.290 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:

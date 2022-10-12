@@ -380,6 +380,10 @@ The streaming process are not aware of client process.
 [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`_]
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 329-330
+
+Tag: :obj:`torchaudio.io`
+
 
 .. rst-class:: sphx-glr-timing
 

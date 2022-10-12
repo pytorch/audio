@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20221006) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -502,12 +502,8 @@
 <span class="sd">        &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/hubert&gt;`__</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        feature_extractor (torch.nn.Module):</span>
-<span class="sd">            Feature extractor that extracts feature vectors from raw audio Tensor.</span>
-
-<span class="sd">        encoder (torch.nn.Module):</span>
-<span class="sd">            Encoder that converts the audio features into the sequence of probability</span>
-<span class="sd">            distribution (in negative log-likelihood) over labels.</span>
+<span class="sd">        wav2vec2 (Wav2Vec2Model):</span>
+<span class="sd">            Wav2Vec2 encoder that generates the transformer outputs.</span>
 
 <span class="sd">        mask_generator (torch.nn.Module):</span>
 <span class="sd">            Mask generator that generates the mask for masked prediction during the training.</span>

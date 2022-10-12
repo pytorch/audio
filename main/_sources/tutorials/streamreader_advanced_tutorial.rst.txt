@@ -49,8 +49,8 @@ This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
  .. code-block:: none
 
-    1.13.0.dev20221006
-    0.13.0.dev20221006
+    1.14.0.dev20221012
+    0.13.0.dev20221012
 
 
 
@@ -826,12 +826,13 @@ Random rotation
 Pixel manipulation
 ^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 488-490
+.. GENERATED FROM PYTHON SOURCE LINES 488-491
 
 .. code-block:: default
 
 
     _display(4)
+
 
 
 
@@ -850,10 +851,14 @@ Pixel manipulation
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 492-493
+
+Tag: :obj:`torchaudio.io`
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.291 seconds)
+   **Total running time of the script:** ( 0 minutes  9.636 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_advanced_tutorial.py:

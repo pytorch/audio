@@ -48,13 +48,18 @@ They can be serialized using TorchScript.
 
 
 
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_001.png
+   :alt: audio feature extractions tutorial
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_001.png
+   :class: sphx-glr-single-img
+
 
 .. rst-class:: sphx-glr-script-out
 
  .. code-block:: none
 
-    1.13.0.dev20221006
-    0.13.0.dev20221006
+    1.14.0.dev20221012
+    0.13.0.dev20221012
 
 
 
@@ -163,9 +168,9 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_001.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_002.png
    :alt: Original waveform
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_001.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_002.png
    :class: sphx-glr-single-img
 
 
@@ -234,9 +239,9 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_002.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_003.png
    :alt: torchaudio
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_002.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_003.png
    :class: sphx-glr-single-img
 
 
@@ -318,9 +323,9 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_003.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_004.png
    :alt: Reconstructed
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_003.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_004.png
    :class: sphx-glr-single-img
 
 
@@ -385,9 +390,9 @@ equivalent transform in :py:func:`torchaudio.transforms`.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_004.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_005.png
    :alt: Mel Filter Bank - torchaudio
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_004.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_005.png
    :class: sphx-glr-single-img
 
 
@@ -438,9 +443,9 @@ with ``librosa``.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_005.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
    :alt: Mel Filter Bank - librosa
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_005.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
    :class: sphx-glr-single-img
 
 
@@ -507,9 +512,9 @@ this functionality.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
    :alt: MelSpectrogram - torchaudio
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
    :class: sphx-glr-single-img
 
 
@@ -564,9 +569,9 @@ spectrograms with ``librosa``.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
    :alt: MelSpectrogram - librosa
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
    :class: sphx-glr-single-img
 
 
@@ -626,9 +631,9 @@ MFCC
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
    :alt: Spectrogram (db)
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
    :class: sphx-glr-single-img
 
 
@@ -684,9 +689,9 @@ Comparison against librosa
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_010.png
    :alt: Spectrogram (db)
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_010.png
    :class: sphx-glr-single-img
 
 
@@ -731,9 +736,9 @@ LFCC
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_010.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_011.png
    :alt: Spectrogram (db)
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_010.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_011.png
    :class: sphx-glr-single-img
 
 
@@ -787,9 +792,9 @@ Pitch
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_011.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_012.png
    :alt: Pitch Feature
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_011.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_012.png
    :class: sphx-glr-single-img
 
 
@@ -864,9 +869,9 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_012.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_013.png
    :alt: Kaldi Pitch Feature
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_012.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_013.png
    :class: sphx-glr-single-img
 
 
@@ -876,7 +881,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.588 seconds)
+   **Total running time of the script:** ( 0 minutes  5.922 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

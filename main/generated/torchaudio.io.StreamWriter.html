@@ -211,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.13.0.dev20221006) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -422,6 +422,9 @@ Please refer to the ffmpeg documentations for possible values.</p>
 <dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use :py:class:`torchaudio.io.StreamWriter` to play audio and video."><img alt="StreamWriter Advanced Usage" src="../_images/sphx_glr_streamwriter_advanced_thumb.png" />
 <p><a class="reference internal" href="../tutorials/streamwriter_advanced.html#sphx-glr-tutorials-streamwriter-advanced-py"><span class="std std-ref">StreamWriter Advanced Usage</span></a></p>
   <div class="sphx-glr-thumbnail-title">StreamWriter Advanced Usage</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use :py:class:`torchaudio.io.StreamWriter` to encode and save audio/..."><img alt="StreamWriter Basic Usage" src="../_images/sphx_glr_streamwriter_basic_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/streamwriter_basic_tutorial.html#sphx-glr-tutorials-streamwriter-basic-tutorial-py"><span class="std std-ref">StreamWriter Basic Usage</span></a></p>
+  <div class="sphx-glr-thumbnail-title">StreamWriter Basic Usage</div>
 </div></div></dd>
 </dl>
 </dd></dl>
@@ -455,7 +458,7 @@ of the input tensor.</p>
 </p></li>
 <li><p><strong>encoder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The name of the encoder to be used.
 When provided, use the specified encoder instead of the default one.</p>
-<p>To list the available encoders, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">encoders</span></code> command.</p>
+<p>To list the available encoders, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-encoders</span></code> command.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>encoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to encoder.
@@ -506,7 +509,7 @@ the shape must be (frame, channel, height, width).</p>
 </p></li>
 <li><p><strong>encoder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The name of the encoder to be used.
 When provided, use the specified encoder instead of the default one.</p>
-<p>To list the available encoders, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">encoders</span></code> command.</p>
+<p>To list the available encoders, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-encoders</span></code> command.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>encoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to encoder.
@@ -625,13 +628,13 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.write_audio_chunk">
 <span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">write_audio_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.write_audio_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.write_audio_chunk" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the audio data</p>
+<dd><p>Write audio data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Stream index.</p></li>
 <li><p><strong>chunk</strong> (<em>Tensor</em>) – Waveform tensor. Shape: <cite>(frame, channel)</cite>.
-The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must match what was passed to <a class="reference internal" href="#torchaudio.io.StreamWriter.add_audio_stream" title="torchaudio.io.StreamWriter.add_audio_stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_audio_stream()</span></code></a> method.</p></li>
+The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must match what was passed to <a class="reference internal" href="#torchaudio.io.StreamWriter.add_audio_stream" title="torchaudio.io.StreamWriter.add_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_audio_stream()</span></code></a> method.</p></li>
 </ul>
 </dd>
 </dl>
@@ -645,13 +648,16 @@ The <code class="docutils literal notranslate"><span class="pre">dtype</span></c
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.write_video_chunk">
 <span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">write_video_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.write_video_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.write_video_chunk" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the audio data</p>
+<dd><p>Write video/image data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Stream index.</p></li>
-<li><p><strong>chunk</strong> (<em>Tensor</em>) – Waveform tensor. Shape: <cite>(frame, channel, height, width)</cite>.
-<code class="docutils literal notranslate"><span class="pre">dtype</span></code>: <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code>.</p></li>
+<li><p><strong>chunk</strong> (<em>Tensor</em>) – Video/image tensor.
+Shape: <cite>(time, channel, height, width)</cite>.
+The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must be <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code>.
+The shape (height, width and the number of channels) must match
+what was configured when calling <a class="reference internal" href="#torchaudio.io.StreamWriter.add_video_stream" title="torchaudio.io.StreamWriter.add_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_video_stream()</span></code></a></p></li>
 </ul>
 </dd>
 </dl>

@@ -95,8 +95,8 @@ Preparation
 
  .. code-block:: none
 
-    1.13.0.dev20221006
-    0.13.0.dev20221006
+    1.14.0.dev20221012
+    0.13.0.dev20221012
 
 
 
@@ -832,7 +832,7 @@ it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 Let's visualize what we received.
 
-.. GENERATED FROM PYTHON SOURCE LINES 586-615
+.. GENERATED FROM PYTHON SOURCE LINES 586-616
 
 .. code-block:: default
 
@@ -868,6 +868,7 @@ Let's visualize what we received.
 
 
 
+
 .. image-sg:: /tutorials/images/sphx_glr_streamreader_basic_tutorial_001.png
    :alt: Iteration 0, Iteration 1, Iteration 2
    :srcset: /tutorials/images/sphx_glr_streamreader_basic_tutorial_001.png
@@ -877,10 +878,14 @@ Let's visualize what we received.
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 617-618
+
+Tag: :obj:`torchaudio.io`
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.653 seconds)
+   **Total running time of the script:** ( 0 minutes  6.838 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_basic_tutorial.py:

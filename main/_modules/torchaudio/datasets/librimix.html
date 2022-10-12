@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20221006) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
     </div>
     
 
@@ -363,14 +363,20 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.datasets.librimix</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">_load_waveform</span>
 
-<span class="n">SampleType</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span>
+<span class="n">_TASKS_TO_MIXTURE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;sep_clean&quot;</span><span class="p">:</span> <span class="s2">&quot;mix_clean&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;enh_single&quot;</span><span class="p">:</span> <span class="s2">&quot;mix_single&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;enh_both&quot;</span><span class="p">:</span> <span class="s2">&quot;mix_both&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sep_noisy&quot;</span><span class="p">:</span> <span class="s2">&quot;mix_both&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="LibriMix"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LibriMix.html#torchaudio.datasets.LibriMix">[docs]</a><span class="k">class</span> <span class="nc">LibriMix</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -384,12 +390,17 @@
 <span class="sd">        num_speakers (int, optional): The number of speakers, which determines the directories</span>
 <span class="sd">            to traverse. The Dataset will traverse ``s1`` to ``sN`` directories to collect</span>
 <span class="sd">            N source audios. (Default: 2)</span>
-<span class="sd">        sample_rate (int, optional): sample rate of audio files. The ``sample_rate`` determines</span>
+<span class="sd">        sample_rate (int, optional): Sample rate of audio files. The ``sample_rate`` determines</span>
 <span class="sd">            which subdirectory the audio are fetched. If any of the audio has a different sample</span>
 <span class="sd">            rate, raises ``ValueError``. Options: [8000, 16000] (Default: 8000)</span>
-<span class="sd">        task (str, optional): the task of LibriMix.</span>
+<span class="sd">        task (str, optional): The task of LibriMix.</span>
 <span class="sd">            Options: [``&quot;enh_single&quot;``, ``&quot;enh_both&quot;``, ``&quot;sep_clean&quot;``, ``&quot;sep_noisy&quot;``]</span>
 <span class="sd">            (Default: ``&quot;sep_clean&quot;``)</span>
+<span class="sd">        mode (str, optional): The mode when creating the mixture. If set to ``&quot;min&quot;``, the lengths of mixture</span>
+<span class="sd">            and sources are the minimum length of all sources. If set to ``&quot;max&quot;``, the lengths of mixture and</span>
+<span class="sd">            sources are zero padded to the maximum length of all sources.</span>
+<span class="sd">            Options: [``&quot;min&quot;``, ``&quot;max&quot;``]</span>
+<span class="sd">            (Default: ``&quot;min&quot;``)</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        The LibriMix dataset needs to be manually generated. Please check https://github.com/JorisCos/LibriMix</span>
@@ -402,49 +413,73 @@
         <span class="n">num_speakers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">,</span>
         <span class="n">task</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sep_clean&quot;</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;Libri</span><span class="si">{</span><span class="n">num_speakers</span><span class="si">}</span><span class="s2">Mix&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expect ``mode`` to be one in [&quot;min&quot;, &quot;max&quot;]. Found </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">==</span> <span class="mi">8000</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;wav8k/min&quot;</span> <span class="o">/</span> <span class="n">subset</span>
+            <span class="n">mix_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;wav8k&quot;</span> <span class="o">/</span> <span class="n">mode</span> <span class="o">/</span> <span class="n">subset</span>
         <span class="k">elif</span> <span class="n">sample_rate</span> <span class="o">==</span> <span class="mi">16000</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;wav16k/min&quot;</span> <span class="o">/</span> <span class="n">subset</span>
+            <span class="n">mix_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;wav16k&quot;</span> <span class="o">/</span> <span class="n">mode</span> <span class="o">/</span> <span class="n">subset</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported sample rate. Found </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mix_dir</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;mix_</span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">src_dirs</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;s</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_speakers</span><span class="p">)]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mix_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*wav&quot;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mix_dir</span> <span class="o">=</span> <span class="n">mix_dir</span> <span class="o">/</span> <span class="n">_TASKS_TO_MIXTURE</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;enh_both&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_dirs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">mix_dir</span> <span class="o">/</span> <span class="s2">&quot;mix_clean&quot;</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_dirs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">mix_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;s</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_speakers</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mix_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.wav&quot;</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_load_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The dataset contains audio file of sample rate </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;but the requested sample rate is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">waveform</span>
-
-    <span class="k">def</span> <span class="nf">_load_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleType</span><span class="p">:</span>
-        <span class="n">mixed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_audio</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mix_dir</span> <span class="o">/</span> <span class="n">filename</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_load_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">mixed</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">srcs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dir_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_dirs</span><span class="p">):</span>
-            <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_audio</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_</span> <span class="o">/</span> <span class="n">filename</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">path_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">_load_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">path_</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">mixed</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">src</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Different waveform shapes. mixed: </span><span class="si">{</span><span class="n">mixed</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, src[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">]: </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">srcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">mixed</span><span class="p">,</span> <span class="n">srcs</span>
 
+<div class="viewcode-block" id="LibriMix.get_metadata"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LibriMix.html#torchaudio.datasets.LibriMix.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample from the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of the following items;</span>
+
+<span class="sd">            int:</span>
+<span class="sd">                Sample rate</span>
+<span class="sd">            str:</span>
+<span class="sd">                Path to mixed audio</span>
+<span class="sd">            List of str:</span>
+<span class="sd">                List of paths to source audios</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">mixed_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mix_dir</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">srcs_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dir_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_dirs</span><span class="p">:</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">dir_</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+            <span class="n">srcs_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">mixed_path</span><span class="p">,</span> <span class="n">srcs_paths</span></div>
+
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
 
-<div class="viewcode-block" id="LibriMix.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LibriMix.html#torchaudio.datasets.LibriMix.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleType</span><span class="p">:</span>
+<div class="viewcode-block" id="LibriMix.__getitem__"><a class="viewcode-back" href="../../../generated/torchaudio.datasets.LibriMix.html#torchaudio.datasets.LibriMix.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (int): The index of the sample to be loaded</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple of the following items;</span>
 
@@ -452,10 +487,10 @@
 <span class="sd">                Sample rate</span>
 <span class="sd">            Tensor:</span>
 <span class="sd">                Mixture waveform</span>
-<span class="sd">            list of Tensors:</span>
+<span class="sd">            List of Tensors:</span>
 <span class="sd">                List of source waveforms</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sample</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div></div>
 </pre></div>
 
              </article>
