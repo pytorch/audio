@@ -184,18 +184,18 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @factory_funcs
     def test_pretrain_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
-        if factory_func is hubert_xlarge and os.name == "nt" and os.environ.get("CI") == "true":
+        if factory_func is hubert_xlarge and os.environ.get("CI") == "true":
             self.skipTest(
-                "hubert_xlarge is known to fail on Windows CI. " "See https://github.com/pytorch/pytorch/issues/65776"
+                "hubert_xlarge is known to fail on CI. " "See https://github.com/pytorch/pytorch/issues/65776"
             )
         self._test_torchscript(factory_func())
 
     @factory_funcs
     def test_finetune_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
-        if factory_func is hubert_xlarge and os.name == "nt" and os.environ.get("CI") == "true":
+        if factory_func is hubert_xlarge and os.environ.get("CI") == "true":
             self.skipTest(
-                "hubert_xlarge is known to fail on Windows CI. " "See https://github.com/pytorch/pytorch/issues/65776"
+                "hubert_xlarge is known to fail on CI. " "See https://github.com/pytorch/pytorch/issues/65776"
             )
         self._test_torchscript(factory_func(aux_num_out=32))
 
