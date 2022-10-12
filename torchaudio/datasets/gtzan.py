@@ -1004,7 +1004,7 @@ class GTZAN(Dataset):
 
     Note:
         As of October 2022, the download link is not currently working. Setting ``download=True``
-        in this case will result in a URL connection error.
+        in GTZAN dataset will result in a URL connection error.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
