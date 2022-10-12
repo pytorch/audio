@@ -213,7 +213,7 @@ setup_conda_pytorch_constraint() {
       export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-test]' | python3 -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
     fi
   else
-    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-test"
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
   fi
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
