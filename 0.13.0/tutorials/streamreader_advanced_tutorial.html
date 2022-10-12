@@ -6,10 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StreamReader Advanced Usages &mdash; Torchaudio nightly documentation</title>
+  <title>StreamReader Advanced Usages &mdash; Torchaudio 0.13.0 documentation</title>
   
 
   
@@ -40,33 +41,67 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="StreamWriter Basic Usage" href="streamwriter_basic_tutorial.html" />
-    <link rel="prev" title="StreamReader Basic Usages" href="streamreader_basic_tutorial.html" /> 
+    <link rel="prev" title="StreamReader Basic Usages" href="streamreader_basic_tutorial.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
 
   
   <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
 </head>
 
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
   <div class="container">
     <div class="header-container">
-      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
 
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+            <a href="https://pytorch.org/blog/">Blog</a>
           </li>
 
           <li>
@@ -74,30 +109,94 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
    
-  <div>
 
     
 
@@ -112,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.13.0+97baba1) &#x25BC</a>
+      <a href="../../versions.html">0.13.0 &#x25BC</a>
     </div>
     
 
@@ -196,11 +295,9 @@
     </nav>
 
     <div class="pytorch-container">
-
-      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
-        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-          <div class="pytorch-breadcrumbs-wrapper">
-            
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
 
 
 
@@ -246,14 +343,17 @@
 
   
 </div>
-          </div>
-
-          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
-            Shortcuts
-          </div>
         </div>
 
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
     
 
     <div class="pytorch-call-to-action-links">
@@ -282,14 +382,14 @@
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
-             <article itemprop="articleBody" class="pytorch-article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streamreader-advanced-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="streamreader-advanced-usages">
+<section class="sphx-glr-example-title" id="streamreader-advanced-usages">
 <span id="sphx-glr-tutorials-streamreader-advanced-tutorial-py"></span><h1>StreamReader Advanced Usages<a class="headerlink" href="#streamreader-advanced-usages" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial is the continuation of
 <a class="reference external" href="./streamreader_basic_tutorial.html">StreamReader Basic Usages</a>.</p>
@@ -306,8 +406,8 @@ to download the full example code</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.13.0.dev20220728
-0.13.0+0f1d13b
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.13.0
+0.13.0
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
@@ -337,7 +437,7 @@ to download the full example code</p>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;</span>
 </pre></div>
 </div>
-<div class="section" id="audio-video-device-input">
+<section id="audio-video-device-input">
 <h2>Audio / Video device input<a class="headerlink" href="#audio-video-device-input" title="Permalink to this heading">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -397,8 +497,8 @@ streams to a format supported by decoder.</p>
 <span class="go">SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;pcm_f32le&#39;, codec_long_name=&#39;PCM 32-bit floating point little-endian&#39;, format=&#39;flt&#39;, bit_rate=3072000, sample_rate=48000.0, num_channels=2)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="synthetic-source-streams">
+</section>
+<section id="synthetic-source-streams">
 <h2>Synthetic source streams<a class="headerlink" href="#synthetic-source-streams" title="Permalink to this heading">¶</a></h2>
 <p>As a part of device integration, ffmpeg provides a “virtual device”
 interface. This interface provides synthetic audio / video data
@@ -407,9 +507,9 @@ generation using libavfilter.</p>
 to <code class="docutils literal notranslate"><span class="pre">src</span></code>.</p>
 <p>The detail of filter description can be found at
 <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html">https://ffmpeg.org/ffmpeg-filters.html</a></p>
-<div class="section" id="audio-examples">
+<section id="audio-examples">
 <h3>Audio Examples<a class="headerlink" href="#audio-examples" title="Permalink to this heading">¶</a></h3>
-<div class="section" id="sine-wave">
+<section id="sine-wave">
 <h4>Sine wave<a class="headerlink" href="#sine-wave" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#sine">https://ffmpeg.org/ffmpeg-filters.html#sine</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s2">&quot;sine=sample_rate=8000:frequency=360&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -420,8 +520,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </audio>
 <img
  src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/sine.png"
- class="sphx-glr-single-img" style="width:80%"></div>
-<div class="section" id="signal-with-arbitral-expression">
+ class="sphx-glr-single-img" style="width:80%"></section>
+<section id="signal-with-arbitral-expression">
 <h4>Signal with arbitral expression<a class="headerlink" href="#signal-with-arbitral-expression" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#aevalsrc">https://ffmpeg.org/ffmpeg-filters.html#aevalsrc</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5 Hz binaural beats on a 360 Hz carrier</span>
@@ -440,8 +540,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </audio>
 <img
  src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/aevalsrc.png"
- class="sphx-glr-single-img" style="width:80%"></div>
-<div class="section" id="noise">
+ class="sphx-glr-single-img" style="width:80%"></section>
+<section id="noise">
 <h4>Noise<a class="headerlink" href="#noise" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#anoisesrc">https://ffmpeg.org/ffmpeg-filters.html#anoisesrc</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s2">&quot;anoisesrc=color=pink:sample_rate=8000:amplitude=0.5&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -452,11 +552,11 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </audio>
 <img
  src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/anoisesrc.png"
- class="sphx-glr-single-img" style="width:80%"></div>
-</div>
-<div class="section" id="video-examples">
+ class="sphx-glr-single-img" style="width:80%"></section>
+</section>
+<section id="video-examples">
 <h3>Video Examples<a class="headerlink" href="#video-examples" title="Permalink to this heading">¶</a></h3>
-<div class="section" id="cellular-automaton">
+<section id="cellular-automaton">
 <h4>Cellular automaton<a class="headerlink" href="#cellular-automaton" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#cellauto">https://ffmpeg.org/ffmpeg-filters.html#cellauto</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;cellauto&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -464,8 +564,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </div>
 <video controls autoplay loop muted>
     <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/cellauto.mp4">
-</video></div>
-<div class="section" id="mandelbrot">
+</video></section>
+<section id="mandelbrot">
 <h4>Mandelbrot<a class="headerlink" href="#mandelbrot" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#cellauto">https://ffmpeg.org/ffmpeg-filters.html#cellauto</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mandelbrot&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -473,8 +573,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </div>
 <video controls autoplay loop muted>
     <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/mandelbrot.mp4">
-</video></div>
-<div class="section" id="mplayer-test-patterns">
+</video></section>
+<section id="mplayer-test-patterns">
 <h4>MPlayer Test patterns<a class="headerlink" href="#mplayer-test-patterns" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#mptestsrc">https://ffmpeg.org/ffmpeg-filters.html#mptestsrc</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mptestsrc&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -482,8 +582,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </div>
 <video controls autoplay loop muted width=192 height=192>
     <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/mptestsrc.mp4">
-</video></div>
-<div class="section" id="john-conway-s-life-game">
+</video></section>
+<section id="john-conway-s-life-game">
 <h4>John Conway’s life game<a class="headerlink" href="#john-conway-s-life-game" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#life">https://ffmpeg.org/ffmpeg-filters.html#life</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;life&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -491,8 +591,8 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </div>
 <video controls autoplay loop muted>
     <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/life.mp4">
-</video></div>
-<div class="section" id="sierpinski-carpet-triangle-fractal">
+</video></section>
+<section id="sierpinski-carpet-triangle-fractal">
 <h4>Sierpinski carpet/triangle fractal<a class="headerlink" href="#sierpinski-carpet-triangle-fractal" title="Permalink to this heading">¶</a></h4>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#sierpinski">https://ffmpeg.org/ffmpeg-filters.html#sierpinski</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;sierpinski&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
@@ -500,10 +600,10 @@ to <code class="docutils literal notranslate"><span class="pre">src</span></code
 </div>
 <video controls autoplay loop muted>
     <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/sierpinski.mp4">
-</video></div>
-</div>
-</div>
-<div class="section" id="custom-filters">
+</video></section>
+</section>
+</section>
+<section id="custom-filters">
 <h2>Custom filters<a class="headerlink" href="#custom-filters" title="Permalink to this heading">¶</a></h2>
 <p>When defining an output stream, you can use
 <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_audio_stream" title="torchaudio.io.StreamReader.add_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_audio_stream()</span></code></a> and
@@ -531,7 +631,7 @@ filter expression. However, it is possible to split one input
 stream into multiple of them, and merge them later.</p></li>
 </ul>
 </div>
-<div class="section" id="id1">
+<section id="id1">
 <h3>Audio Examples<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fmt: off</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descs</span></a> <span class="o">=</span> <span class="p">[</span>
@@ -583,7 +683,7 @@ stream into multiple of them, and merge them later.</p></li>
     <span class="k">return</span> <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">chunks</span></a><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="original">
+<section id="original">
 <h4>Original<a class="headerlink" href="#original" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -600,8 +700,8 @@ stream into multiple of them, and merge them later.</p></li>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="highpass-lowpass-filter">
+<br /></section>
+<section id="highpass-lowpass-filter">
 <h4>Highpass / lowpass filter<a class="headerlink" href="#highpass-lowpass-filter" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
@@ -618,8 +718,8 @@ stream into multiple of them, and merge them later.</p></li>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="fft-filter-robot">
+<br /></section>
+<section id="fft-filter-robot">
 <h4>FFT filter - Robot 🤖<a class="headerlink" href="#fft-filter-robot" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
@@ -636,8 +736,8 @@ stream into multiple of them, and merge them later.</p></li>
 
 </div>
 <br />
-<br /></div>
-<div class="section" id="fft-filter-whisper">
+<br /></section>
+<section id="fft-filter-whisper">
 <h4>FFT filter - Whisper<a class="headerlink" href="#fft-filter-whisper" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
@@ -654,9 +754,9 @@ stream into multiple of them, and merge them later.</p></li>
 
 </div>
 <br />
-<br /></div>
-</div>
-<div class="section" id="id2">
+<br /></section>
+</section>
+<section id="id2">
 <h3>Video Examples<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fmt: off</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descs</span></a> <span class="o">=</span> <span class="p">[</span>
@@ -701,7 +801,7 @@ stream into multiple of them, and merge them later.</p></li>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id3">
+<section id="id3">
 <h4>Original<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -709,8 +809,8 @@ stream into multiple of them, and merge them later.</p></li>
 <img src="../_images/sphx_glr_streamreader_advanced_tutorial_005.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_005.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,null,format=pix_fmts=rgb24
 </pre></div>
 </div>
-</div>
-<div class="section" id="mirror">
+</section>
+<section id="mirror">
 <h4>Mirror<a class="headerlink" href="#mirror" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
@@ -718,8 +818,8 @@ stream into multiple of them, and merge them later.</p></li>
 <img src="../_images/sphx_glr_streamreader_advanced_tutorial_006.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_006.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,split [main][tmp];[tmp] crop=iw/2:ih:0:0, hflip [flip];[main][flip] overlay=W/2:0,format=pix_fmts=rgb24
 </pre></div>
 </div>
-</div>
-<div class="section" id="edge-detection">
+</section>
+<section id="edge-detection">
 <h4>Edge detection<a class="headerlink" href="#edge-detection" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
@@ -727,8 +827,8 @@ stream into multiple of them, and merge them later.</p></li>
 <img src="../_images/sphx_glr_streamreader_advanced_tutorial_007.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_007.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,edgedetect=mode=canny,format=pix_fmts=rgb24
 </pre></div>
 </div>
-</div>
-<div class="section" id="random-rotation">
+</section>
+<section id="random-rotation">
 <h4>Random rotation<a class="headerlink" href="#random-rotation" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
@@ -736,8 +836,8 @@ stream into multiple of them, and merge them later.</p></li>
 <img src="../_images/sphx_glr_streamreader_advanced_tutorial_008.png" srcset="../_images/sphx_glr_streamreader_advanced_tutorial_008.png" alt="streamreader advanced tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>filter_desc: fps=10,rotate=angle=-random(1)*PI:fillcolor=brown,format=pix_fmts=rgb24
 </pre></div>
 </div>
-</div>
-<div class="section" id="pixel-manipulation">
+</section>
+<section id="pixel-manipulation">
 <h4>Pixel manipulation<a class="headerlink" href="#pixel-manipulation" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_display</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
@@ -746,7 +846,7 @@ stream into multiple of them, and merge them later.</p></li>
 </pre></div>
 </div>
 <p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.563 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.163 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-advanced-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/21502c17878277ad648c064df573f05e/streamreader_advanced_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_advanced_tutorial.py</span></code></a></p>
@@ -756,10 +856,10 @@ stream into multiple of them, and merge them later.</p></li>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -777,7 +877,11 @@ stream into multiple of them, and merge them later.</p></li>
     </div>
   
 
-  <hr/>
+  
+
+    <hr>
+
+  
 
   <div role="contentinfo">
     <p>
@@ -785,7 +889,11 @@ stream into multiple of them, and merge them later.</p></li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
 
 </footer>
 
@@ -844,36 +952,29 @@ stream into multiple of them, and merge them later.</p></li>
         </div>
       </section>
     </div>
-  </div>
-  
-
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'nightly',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/documentation_options.js"></script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-      <script type="text/javascript" src="../_static/katex_autorenderer.js"></script>
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+     
 
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -940,20 +1041,20 @@ stream into multiple of them, and merge them later.</p></li>
       <div class="row">
         <div class="col-md-4 text-center">
           <h2>Docs</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <p>Access comprehensive developer documentation for PyTorch</p>
           <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
         </div>
 
         <div class="col-md-4 text-center">
           <h2>Tutorials</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
           <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
         </div>
 
         <div class="col-md-4 text-center">
           <h2>Resources</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur</p>
-          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
         </div>
       </div>
     </div>
@@ -962,77 +1063,77 @@ stream into multiple of them, and merge them later.</p></li>
   <footer class="site-footer">
     <div class="container footer-container">
       <div class="footer-logo-wrapper">
-        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+        <a href="https://pytorch.org/" class="footer-logo"></a>
       </div>
 
       <div class="footer-links-wrapper">
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Follow Us</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
 
   <!-- End Footer -->
 
@@ -1042,7 +1143,7 @@ stream into multiple of them, and merge them later.</p></li>
     <div class="container-fluid">
       <div class="container">
         <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
           <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
         </div>
       </div>
@@ -1052,32 +1153,88 @@ stream into multiple of them, and merge them later.</p></li>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="#">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="#">Features</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
-            <a href="#">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
           </li>
 
           <li>
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>
@@ -1092,20 +1249,21 @@ stream into multiple of them, and merge them later.</p></li>
   <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
 
   <script type="text/javascript">
-    mobileMenu.bind();
-    mobileTOC.bind();
-    pytorchAnchors.bind();
-
-    $(window).on("load", function() {
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
       sideMenus.bind();
       scrollToAnchor.bind();
       highlightNavigation.bind();
-    })
+      mainMenuDropdown.bind();
+      filterTags.bind();
 
-    // Add class to links that have code blocks, since we cannot create links in code blocks
-    $("article.pytorch-article a span.pre").each(function(e) {
-      $(this).closest("a").addClass("has-code");
-    });
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
   </script>
 </body>
 </html>

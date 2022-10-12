@@ -6,10 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Hardware-Accelerated Video Decoding and Encoding &mdash; Torchaudio nightly documentation</title>
+  <title>Hardware-Accelerated Video Decoding and Encoding &mdash; Torchaudio 0.13.0 documentation</title>
   
 
   
@@ -40,33 +41,67 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Audio Resampling" href="tutorials/audio_resampling_tutorial.html" />
-    <link rel="prev" title="StreamWriter Advanced Usage" href="tutorials/streamwriter_advanced.html" /> 
+    <link rel="prev" title="StreamWriter Advanced Usage" href="tutorials/streamwriter_advanced.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
 
   
   <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
 </head>
 
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
   <div class="container">
     <div class="header-container">
-      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
 
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+            <a href="https://pytorch.org/blog/">Blog</a>
           </li>
 
           <li>
@@ -74,30 +109,94 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
    
-  <div>
 
     
 
@@ -112,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.13.0+97baba1) &#x25BC</a>
+      <a href="../versions.html">0.13.0 &#x25BC</a>
     </div>
     
 
@@ -196,11 +295,9 @@
     </nav>
 
     <div class="pytorch-container">
-
-      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
-        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-          <div class="pytorch-breadcrumbs-wrapper">
-            
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
 
 
 
@@ -246,14 +343,17 @@
 
   
 </div>
-          </div>
-
-          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
-            Shortcuts
-          </div>
         </div>
 
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
     
 
     <div class="pytorch-call-to-action-links">
@@ -282,7 +382,7 @@
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
-             <article itemprop="articleBody" class="pytorch-article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   
 <style>
@@ -532,7 +632,7 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Hardware-Accelerated-Video-Decoding-and-Encoding">
+<section id="Hardware-Accelerated-Video-Decoding-and-Encoding">
 <h1>Hardware-Accelerated Video Decoding and Encoding<a class="headerlink" href="#Hardware-Accelerated-Video-Decoding-and-Encoding" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial shows how to use NVIDIA’s hardware video decoder (NVDEC) and encoder (NVENC) with TorchAudio.</p>
 <p>Using hardware encoder/decoder improves the speed of loading and saving certain types of videos. Using them in TorchAduio requires additional FFmpeg configuration. This tutorial goes over how to compile FFmpeg, and compare the speed it takes to process video.</p>
@@ -558,7 +658,7 @@ div.rendered_html tbody tr:hover {
 <li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg">https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg</a></p></li>
 <li><p><a class="reference external" href="https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/">https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/</a></p></li>
 </ul>
-<div class="section" id="Check-the-available-GPU">
+<section id="Check-the-available-GPU">
 <h2>Check the available GPU<a class="headerlink" href="#Check-the-available-GPU" title="Permalink to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -595,8 +695,8 @@ Fri Oct  7 13:01:26 2022
 +-----------------------------------------------------------------------------+
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Update-PyTorch-and-TorchAudio-with-nightly-builds">
+</section>
+<section id="Update-PyTorch-and-TorchAudio-with-nightly-builds">
 <h2>Update PyTorch and TorchAudio with nightly builds<a class="headerlink" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds" title="Permalink to this heading">¶</a></h2>
 <p>Until TorchAudio 0.13 is released, we need to use the nightly builds of PyTorch and TorchAudio.</p>
 <div class="nbinput docutils container">
@@ -628,10 +728,10 @@ Installing collected packages: torch, torchaudio
 Successfully installed torch-1.13.0.dev20221006+cu116 torchaudio-0.13.0.dev20221006+cu116
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Build-FFmpeg-libraries-with-Nvidia-NVDEC/NVENC-support">
+</section>
+<section id="Build-FFmpeg-libraries-with-Nvidia-NVDEC/NVENC-support">
 <h2>Build FFmpeg libraries with Nvidia NVDEC/NVENC support<a class="headerlink" href="#Build-FFmpeg-libraries-with-Nvidia-NVDEC/NVENC-support" title="Permalink to this heading">¶</a></h2>
-<div class="section" id="Install-NVIDIA-Video-Codec-Headers">
+<section id="Install-NVIDIA-Video-Codec-Headers">
 <h3>Install NVIDIA Video Codec Headers<a class="headerlink" href="#Install-NVIDIA-Video-Codec-Headers" title="Permalink to this heading">¶</a></h3>
 <p>To build FFmpeg with NVDEC/NVENC, we first install the headers that FFmpeg uses to interact with Video Codec SDK.</p>
 <div class="nbinput docutils container">
@@ -675,8 +775,8 @@ install -m 0755 -d &#39;/usr/local/lib/pkgconfig&#39;
 install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Download-FFmpeg-source-code">
+</section>
+<section id="Download-FFmpeg-source-code">
 <h3>Download FFmpeg source code<a class="headerlink" href="#Download-FFmpeg-source-code" title="Permalink to this heading">¶</a></h3>
 <p>Next we download the source code of FFmpeg 4. Any version later than 4.1 should work. We use 4.4.2 here.</p>
 <div class="nbinput nblast docutils container">
@@ -689,8 +789,8 @@ install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Install-FFmpeg-build-and-runtime-dependencies">
+</section>
+<section id="Install-FFmpeg-build-and-runtime-dependencies">
 <h3>Install FFmpeg build and runtime dependencies<a class="headerlink" href="#Install-FFmpeg-build-and-runtime-dependencies" title="Permalink to this heading">¶</a></h3>
 <p>In the later test, we use H264 video codec and HTTPS protocol, so we install the libraries for them here.</p>
 <div class="nbinput docutils container">
@@ -730,8 +830,8 @@ Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
 Processing triggers for libc-bin (2.27-3ubuntu1.6) ...
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support">
+</section>
+<section id="Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support">
 <h3>Configure FFmpeg build with Nvidia CUDA hardware support<a class="headerlink" href="#Configure-FFmpeg-build-with-Nvidia-CUDA-hardware-support" title="Permalink to this heading">¶</a></h3>
 <p>Next we configure FFmpeg build. Note the following:</p>
 <ol class="arabic simple">
@@ -931,8 +1031,8 @@ Enabled outdevs:
 License: nonfree and unredistributable
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Build-and-install-FFmpeg">
+</section>
+<section id="Build-and-install-FFmpeg">
 <h3>Build and install FFmpeg<a class="headerlink" href="#Build-and-install-FFmpeg" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -960,9 +1060,9 @@ INSTALL ffmpeg
 INSTALL ffprobe
 </pre></div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Check-FFmpeg-installation">
+</section>
+</section>
+<section id="Check-FFmpeg-installation">
 <h2>Check FFmpeg installation<a class="headerlink" href="#Check-FFmpeg-installation" title="Permalink to this heading">¶</a></h2>
 <p>Let’s do a quick sanity check to confirm that the FFmpeg we built works.</p>
 <div class="nbinput docutils container">
@@ -1053,8 +1153,8 @@ frame= 6175 fps=1712 q=11.0 Lsize=   37935kB time=00:03:26.01 bitrate=1508.5kbit
 video:34502kB audio:3234kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.526932%
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Benchmarking-GPU-Encoding-and-Decoding">
+</section>
+<section id="Benchmarking-GPU-Encoding-and-Decoding">
 <h2>Benchmarking GPU Encoding and Decoding<a class="headerlink" href="#Benchmarking-GPU-Encoding-and-Decoding" title="Permalink to this heading">¶</a></h2>
 <p>Now that FFmpeg and the resulting libraries are ready to use, we test NVDEC/NVENC with TorchAudio. For the basics of TorchAudio’s streaming APIs, please refer to <a class="reference external" href="https://pytorch.org/audio/main/tutorials.io.html">Media I/O tutorials</a>.</p>
 <p><strong>Note</strong></p>
@@ -1095,8 +1195,8 @@ video:34502kB audio:3234kB subtitle:0kB other streams:0kB global headers:0kB mux
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Benchmark-NVDEC-with-StreamReader">
+</section>
+<section id="Benchmark-NVDEC-with-StreamReader">
 <h2>Benchmark NVDEC with <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code><a class="headerlink" href="#Benchmark-NVDEC-with-StreamReader" title="Permalink to this heading">¶</a></h2>
 <p>First we test hardware decoding, and we fetch video from multiple locations (local file, network file, AWS S3) and use NVDEC to decod them.</p>
 <div class="nbinput docutils container">
@@ -1203,7 +1303,7 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-<div class="section" id="Decode-MP4-from-local-file">
+<section id="Decode-MP4-from-local-file">
 <h3>Decode MP4 from local file<a class="headerlink" href="#Decode-MP4-from-local-file" title="Permalink to this heading">¶</a></h3>
 <p>For the first test, we compare the time it takes for CPU and NVDEC to decode 250MB of MP4 video.</p>
 <div class="nbinput nblast docutils container">
@@ -1216,7 +1316,7 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-<div class="section" id="CPU">
+<section id="CPU">
 <h4>CPU<a class="headerlink" href="#CPU" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
@@ -1255,8 +1355,8 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="CUDA">
+</section>
+<section id="CUDA">
 <h4>CUDA<a class="headerlink" href="#CUDA" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
@@ -1296,9 +1396,9 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Decode-MP4-from-network">
+</section>
+</section>
+<section id="Decode-MP4-from-network">
 <h3>Decode MP4 from network<a class="headerlink" href="#Decode-MP4-from-network" title="Permalink to this heading">¶</a></h3>
 <p>Let’s run the same test on the source retrieved via network on-the-fly.</p>
 <div class="nbinput nblast docutils container">
@@ -1310,7 +1410,7 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-<div class="section" id="id1">
+<section id="id1">
 <h4>CPU<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
@@ -1345,8 +1445,8 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h4>CUDA<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
@@ -1381,9 +1481,9 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Decode-MP4-directly-from-S3">
+</section>
+</section>
+<section id="Decode-MP4-directly-from-S3">
 <h3>Decode MP4 directly from S3<a class="headerlink" href="#Decode-MP4-directly-from-S3" title="Permalink to this heading">¶</a></h3>
 <p>Using file-like object input, we can fetch a video stored on AWS S3 and decode it without saving it on local file system.</p>
 <div class="nbinput nblast docutils container">
@@ -1398,7 +1498,7 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-<div class="section" id="Defining-Helper-class">
+<section id="Defining-Helper-class">
 <h4>Defining Helper class<a class="headerlink" href="#Defining-Helper-class" title="Permalink to this heading">¶</a></h4>
 <p>StreamReader supports file-like objects with <code class="docutils literal notranslate"><span class="pre">read</span></code> method. In addition to this, if the file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader attempts to use it for more reliable detection of media formats.</p>
 <p>However, the seek method of <code class="docutils literal notranslate"><span class="pre">boto3</span></code>’s S3 client response object only raises errors to let users know that seek operation is not supported. Therefore we wrap it with a class that does not have <code class="docutils literal notranslate"><span class="pre">seek</span></code> method. This way, StreamReader won’t try to use the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method.</p>
@@ -1422,8 +1522,8 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h4>CPU<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
@@ -1460,8 +1560,8 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h4>CUDA<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
@@ -1498,9 +1598,9 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Decoding-and-resizing">
+</section>
+</section>
+<section id="Decoding-and-resizing">
 <h3>Decoding and resizing<a class="headerlink" href="#Decoding-and-resizing" title="Permalink to this heading">¶</a></h3>
 <p>In the next test, we add preprocessing. NVDEC supports several preprocessing schemes, which are also performed on the chosen hardware. For CPU, we apply the same kind of software preprocessing through FFmpeg’s filter graph.</p>
 <div class="nbinput nblast docutils container">
@@ -1511,7 +1611,7 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-<div class="section" id="id5">
+<section id="id5">
 <h4>CPU<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
@@ -1551,8 +1651,8 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h4>CUDA<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
@@ -1595,9 +1695,9 @@ Successfully installed boto3-1.24.88 botocore-1.27.88 jmespath-1.0.1 s3transfer-
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Results">
+</section>
+</section>
+<section id="Results">
 <h3>Results<a class="headerlink" href="#Results" title="Permalink to this heading">¶</a></h3>
 <p>The following table summarizes the time it took to decode the same media with CPU and NVDEC. We see significant speedup with NVDEC.</p>
 <div class="nbinput docutils container">
@@ -1680,9 +1780,9 @@ Decoding + Resize                19.082726  4.157032
 <img alt="_images/hw_acceleration_tutorial_68_1.png" src="_images/hw_acceleration_tutorial_68_1.png" />
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="Benchmark-NVENC-with-StreamWriter">
+</section>
+</section>
+<section id="Benchmark-NVENC-with-StreamWriter">
 <h2>Benchmark NVENC with <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code><a class="headerlink" href="#Benchmark-NVENC-with-StreamWriter" title="Permalink to this heading">¶</a></h2>
 <p>Next, we benchmark encoding speed with StreamWriter and NVENC.</p>
 <div class="nbinput nblast docutils container">
@@ -1728,7 +1828,7 @@ Decoding + Resize                19.082726  4.157032
 </pre></div>
 </div>
 </div>
-<div class="section" id="Encode-MP4---360P">
+<section id="Encode-MP4---360P">
 <h3>Encode MP4 - 360P<a class="headerlink" href="#Encode-MP4---360P" title="Permalink to this heading">¶</a></h3>
 <p>For the first test, we compare the time it takes for CPU and NVENC to encode 15 seconds of video with small resolution.</p>
 <div class="nbinput nblast docutils container">
@@ -1746,7 +1846,7 @@ Decoding + Resize                19.082726  4.157032
 </pre></div>
 </div>
 </div>
-<div class="section" id="id7">
+<section id="id7">
 <h4>CPU<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
@@ -1776,8 +1876,8 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="CUDA-(from-CPU-Tensor)">
+</section>
+<section id="CUDA-(from-CPU-Tensor)">
 <h4>CUDA (from CPU Tensor)<a class="headerlink" href="#CUDA-(from-CPU-Tensor)" title="Permalink to this heading">¶</a></h4>
 <p>Now we test NVENC. This time, the data is sent from CPU memory to GPU memory as part of encoding.</p>
 <div class="nbinput docutils container">
@@ -1809,8 +1909,8 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="CUDA-(from-CUDA-Tensor)">
+</section>
+<section id="CUDA-(from-CUDA-Tensor)">
 <h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#CUDA-(from-CUDA-Tensor)" title="Permalink to this heading">¶</a></h4>
 <p>If the data is already present on CUDA, then we can pass it to GPU encoder directly.</p>
 <div class="nbinput docutils container">
@@ -1845,9 +1945,9 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Encode-MP4---720P">
+</section>
+</section>
+<section id="Encode-MP4---720P">
 <h3>Encode MP4 - 720P<a class="headerlink" href="#Encode-MP4---720P" title="Permalink to this heading">¶</a></h3>
 <p>Let’s run the same tests on video with larger resolution.</p>
 <div class="nbinput nblast docutils container">
@@ -1865,7 +1965,7 @@ Decoding + Resize                19.082726  4.157032
 </pre></div>
 </div>
 </div>
-<div class="section" id="id8">
+<section id="id8">
 <h4>CPU<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
@@ -1895,8 +1995,8 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="id9">
+</section>
+<section id="id9">
 <h4>CUDA (from CPU Tensor)<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
@@ -1926,8 +2026,8 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="id10">
+</section>
+<section id="id10">
 <h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
@@ -1961,9 +2061,9 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Encode-MP4---1080P">
+</section>
+</section>
+<section id="Encode-MP4---1080P">
 <h3>Encode MP4 - 1080P<a class="headerlink" href="#Encode-MP4---1080P" title="Permalink to this heading">¶</a></h3>
 <p>We make the video with even larger.</p>
 <div class="nbinput nblast docutils container">
@@ -1981,7 +2081,7 @@ Decoding + Resize                19.082726  4.157032
 </pre></div>
 </div>
 </div>
-<div class="section" id="id11">
+<section id="id11">
 <h4>CPU<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
@@ -2011,8 +2111,8 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="id12">
+</section>
+<section id="id12">
 <h4>CUDA (from CPU Tensor)<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
@@ -2042,8 +2142,8 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="id13">
+</section>
+<section id="id13">
 <h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h4>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
@@ -2077,9 +2177,9 @@ Decoding + Resize                19.082726  4.157032
 
 </pre></div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Result">
+</section>
+</section>
+<section id="Result">
 <h3>Result<a class="headerlink" href="#Result" title="Permalink to this heading">¶</a></h3>
 <p>Here is the result.</p>
 <div class="nbinput docutils container">
@@ -2166,13 +2266,13 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
   </video>
 </div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Conclusion">
+</section>
+</section>
+<section id="Conclusion">
 <h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this heading">¶</a></h2>
 <p>We looked at how to build FFmpeg libraries with NVDEC/NVENC support and use them from TorchAudio. NVDEC/NVENC provide significant speed up when saving/loading a video.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -2190,7 +2290,11 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
     </div>
   
 
-  <hr/>
+  
+
+    <hr>
+
+  
 
   <div role="contentinfo">
     <p>
@@ -2198,7 +2302,11 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
 
 </footer>
 
@@ -2281,36 +2389,29 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
         </div>
       </section>
     </div>
-  </div>
-  
-
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'nightly',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/documentation_options.js"></script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-      <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
 
   
 
   <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -2377,20 +2478,20 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
       <div class="row">
         <div class="col-md-4 text-center">
           <h2>Docs</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <p>Access comprehensive developer documentation for PyTorch</p>
           <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
         </div>
 
         <div class="col-md-4 text-center">
           <h2>Tutorials</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
           <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
         </div>
 
         <div class="col-md-4 text-center">
           <h2>Resources</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur</p>
-          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
         </div>
       </div>
     </div>
@@ -2399,77 +2500,77 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
   <footer class="site-footer">
     <div class="container footer-container">
       <div class="footer-logo-wrapper">
-        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+        <a href="https://pytorch.org/" class="footer-logo"></a>
       </div>
 
       <div class="footer-links-wrapper">
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
-            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Follow Us</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
 
   <!-- End Footer -->
 
@@ -2479,7 +2580,7 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
     <div class="container-fluid">
       <div class="container">
         <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
           <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
         </div>
       </div>
@@ -2489,32 +2590,88 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
       <div class="main-menu">
         <ul>
           <li>
-            <a href="#">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="#">Features</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
-            <a href="#">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
-            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
           </li>
 
           <li>
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>
@@ -2529,20 +2686,21 @@ CUDA (from CUDA Tensor)  0.242452   0.638449   1.410119
   <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
 
   <script type="text/javascript">
-    mobileMenu.bind();
-    mobileTOC.bind();
-    pytorchAnchors.bind();
-
-    $(window).on("load", function() {
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
       sideMenus.bind();
       scrollToAnchor.bind();
       highlightNavigation.bind();
-    })
+      mainMenuDropdown.bind();
+      filterTags.bind();
 
-    // Add class to links that have code blocks, since we cannot create links in code blocks
-    $("article.pytorch-article a span.pre").each(function(e) {
-      $(this).closest("a").addClass("has-code");
-    });
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
   </script>
 </body>
 </html>

@@ -95,8 +95,8 @@ Preparation
 
  .. code-block:: none
 
-    1.13.0.dev20220728
-    0.13.0+0f1d13b
+    1.13.0
+    0.13.0
 
 
 
@@ -885,7 +885,7 @@ Tag: :obj:`torchaudio.io`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.612 seconds)
+   **Total running time of the script:** ( 0 minutes  6.431 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_basic_tutorial.py:

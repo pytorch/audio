@@ -87,12 +87,129 @@ window.utilities = {
   },
 
   headersHeight: function() {
-    return document.getElementById("header-holder").offsetHeight +
-           document.getElementById("pytorch-page-level-bar").offsetHeight;
+    if (document.getElementById("pytorch-left-menu").classList.contains("make-fixed")) {
+      return document.getElementById("pytorch-page-level-bar").offsetHeight;
+    } else {
+      return document.getElementById("header-holder").offsetHeight +
+             document.getElementById("pytorch-page-level-bar").offsetHeight;
+    }
+  },
+
+  windowHeight: function() {
+    return window.innerHeight ||
+           document.documentElement.clientHeight ||
+           document.body.clientHeight;
   }
 }
 
 },{}],2:[function(require,module,exports){
+var cookieBanner = {
+  init: function() {
+    cookieBanner.bind();
+
+    var cookieExists = cookieBanner.cookieExists();
+
+    if (!cookieExists) {
+      cookieBanner.setCookie();
+      cookieBanner.showCookieNotice();
+    }
+  },
+
+  bind: function() {
+    $(".close-button").on("click", cookieBanner.hideCookieNotice);
+  },
+
+  cookieExists: function() {
+    var cookie = localStorage.getItem("returningPytorchUser");
+
+    if (cookie) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+
+  setCookie: function() {
+    localStorage.setItem("returningPytorchUser", true);
+  },
+
+  showCookieNotice: function() {
+    $(".cookie-banner-wrapper").addClass("is-visible");
+  },
+
+  hideCookieNotice: function() {
+    $(".cookie-banner-wrapper").removeClass("is-visible");
+  }
+};
+
+$(function() {
+  cookieBanner.init();
+});
+
+},{}],3:[function(require,module,exports){
+window.filterTags = {
+  bind: function() {
+    var options = {
+      valueNames: [{ data: ["tags"] }],
+      page: "6",
+      pagination: true
+    };
+
+    var tutorialList = new List("tutorial-cards", options);
+
+    function filterSelectedTags(cardTags, selectedTags) {
+      return cardTags.some(function(tag) {
+        return selectedTags.some(function(selectedTag) {
+          return selectedTag == tag;
+        });
+      });
+    }
+
+    function updateList() {
+      var selectedTags = [];
+
+      $(".selected").each(function() {
+        selectedTags.push($(this).data("tag"));
+      });
+
+      tutorialList.filter(function(item) {
+        var cardTags;
+
+        if (item.values().tags == null) {
+          cardTags = [""];
+        } else {
+          cardTags = item.values().tags.split(",");
+        }
+
+        if (selectedTags.length == 0) {
+          return true;
+        } else {
+          return filterSelectedTags(cardTags, selectedTags);
+        }
+      });
+    }
+
+    $(".filter-btn").on("click", function() {
+      if ($(this).data("tag") == "all") {
+        $(this).addClass("all-tag-selected");
+        $(".filter").removeClass("selected");
+      } else {
+        $(this).toggleClass("selected");
+        $("[data-tag='all']").removeClass("all-tag-selected");
+      }
+
+      // If no tags are selected then highlight the 'All' tag
+
+      if (!$(".selected")[0]) {
+        $("[data-tag='all']").addClass("all-tag-selected");
+      }
+
+      updateList();
+    });
+  }
+};
+
+},{}],4:[function(require,module,exports){
 // Modified from https://stackoverflow.com/a/32396543
 window.highlightNavigation = {
   navigationListItems: document.querySelectorAll("#pytorch-right-menu li"),
@@ -165,22 +282,34 @@ window.highlightNavigation = {
   }
 };
 
-},{}],3:[function(require,module,exports){
-MathJax.Hub.Config({
-    messageStyle: "none",
-    scale: 100,
-    "HTML-CSS": {
-        showMathMenu: false,
-        linebreaks: { automatic: true, width: "container" } ,
-        preferredFont: "STIX",
-        availableFonts: ["STIX","TeX"]
-    },
-    SVG: { linebreaks: { automatic: true, width: "container" } }
- });
+},{}],5:[function(require,module,exports){
+window.mainMenuDropdown = {
+  bind: function() {
+    $("[data-toggle='ecosystem-dropdown']").on("click", function() {
+      toggleDropdown($(this).attr("data-toggle"));
+    });
 
- MathJax.Hub.Configured();
+    $("[data-toggle='resources-dropdown']").on("click", function() {
+      toggleDropdown($(this).attr("data-toggle"));
+    });
 
-},{}],4:[function(require,module,exports){
+    function toggleDropdown(menuToggle) {
+      var showMenuClass = "show-menu";
+      var menuClass = "." + menuToggle + "-menu";
+
+      if ($(menuClass).hasClass(showMenuClass)) {
+        $(menuClass).removeClass(showMenuClass);
+      } else {
+        $("[data-toggle=" + menuToggle + "].show-menu").removeClass(
+          showMenuClass
+        );
+        $(menuClass).addClass(showMenuClass);
+      }
+    }
+  }
+};
+
+},{}],6:[function(require,module,exports){
 window.mobileMenu = {
   bind: function() {
     $("[data-behavior='open-mobile-menu']").on('click', function(e) {
@@ -212,7 +341,7 @@ window.mobileMenu = {
   }
 };
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 window.mobileTOC = {
   bind: function() {
     $("[data-behavior='toggle-table-of-contents']").on("click", function(e) {
@@ -233,7 +362,7 @@ window.mobileTOC = {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 window.pytorchAnchors = {
   bind: function() {
     // Replace Sphinx-generated anchors with anchorjs ones
@@ -253,7 +382,7 @@ window.pytorchAnchors = {
   }
 };
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // Modified from https://stackoverflow.com/a/13067009
 // Going for a JS solution to scrolling to an anchor so we can benefit from
 // less hacky css and smooth scrolling.
@@ -269,9 +398,8 @@ window.scrollToAnchor = {
       ANCHOR_REGEX: /^#[^ ]+$/,
       offsetHeightPx: function() {
         var OFFSET_HEIGHT_PADDING = 20;
-        return document.getElementById("header-holder").offsetHeight +
-               document.getElementById("pytorch-page-level-bar").offsetHeight +
-               OFFSET_HEIGHT_PADDING;
+        // TODO: this is a little janky. We should try to not rely on JS for this
+        return utilities.headersHeight() + OFFSET_HEIGHT_PADDING;
       },
 
       /**
@@ -355,133 +483,214 @@ window.scrollToAnchor = {
   }
 };
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 window.sideMenus = {
-  displayRightMenu: document.querySelectorAll("#pytorch-right-menu li").length > 1,
+  rightMenuIsOnScreen: function() {
+    return document.getElementById("pytorch-content-right").offsetParent !== null;
+  },
 
   isFixedToBottom: false,
 
   bind: function() {
     sideMenus.handleLeftMenu();
 
-    if (sideMenus.displayRightMenu) {
-      // Show the right menu container
-      document.getElementById("pytorch-content-right").classList.add("show");
+    var rightMenuLinks = document.querySelectorAll("#pytorch-right-menu li");
+    var rightMenuHasLinks = rightMenuLinks.length > 1;
 
+    if (!rightMenuHasLinks) {
+      for (var i = 0; i < rightMenuLinks.length; i++) {
+        rightMenuLinks[i].style.display = "none";
+      }
+    }
+
+    if (rightMenuHasLinks) {
       // Don't show the Shortcuts menu title text unless there are menu items
       document.getElementById("pytorch-shortcuts-wrapper").style.display = "block";
 
-      // Remove superfluous titles unless there are more than one
-      var titles = document.querySelectorAll("#pytorch-side-scroll-right > ul > li");
+      // We are hiding the titles of the pages in the right side menu but there are a few
+      // pages that include other pages in the right side menu (see 'torch.nn' in the docs)
+      // so if we exclude those it looks confusing. Here we add a 'title-link' class to these
+      // links so we can exclude them from normal right side menu link operations
+      var titleLinks = document.querySelectorAll(
+        "#pytorch-right-menu #pytorch-side-scroll-right \
+         > ul > li > a.reference.internal"
+      );
 
-      if (titles.length === 1) {
-        titles[0].querySelector("a.reference.internal").style.display = "none";
+      for (var i = 0; i < titleLinks.length; i++) {
+        var link = titleLinks[i];
+
+        link.classList.add("title-link");
+
+        if (
+          link.nextElementSibling &&
+          link.nextElementSibling.tagName === "UL" &&
+          link.nextElementSibling.children.length > 0
+        ) {
+          link.classList.add("has-children");
+        }
       }
 
-      // Start the Shortcuts menu at the article's H1 position
-      document.getElementById("pytorch-right-menu").style["margin-top"] = sideMenus.rightMenuInitialTop() + "px";
+      // Add + expansion signifiers to normal right menu links that have sub menus
+      var menuLinks = document.querySelectorAll(
+        "#pytorch-right-menu ul li ul li a.reference.internal"
+      );
+
+      for (var i = 0; i < menuLinks.length; i++) {
+        if (
+          menuLinks[i].nextElementSibling &&
+          menuLinks[i].nextElementSibling.tagName === "UL"
+        ) {
+          menuLinks[i].classList.add("not-expanded");
+        }
+      }
+
+      // If a hash is present on page load recursively expand menu items leading to selected item
+      var linkWithHash =
+        document.querySelector(
+          "#pytorch-right-menu a[href=\"" + window.location.hash + "\"]"
+        );
+
+      if (linkWithHash) {
+        // Expand immediate sibling list if present
+        if (
+          linkWithHash.nextElementSibling &&
+          linkWithHash.nextElementSibling.tagName === "UL" &&
+          linkWithHash.nextElementSibling.children.length > 0
+        ) {
+          linkWithHash.nextElementSibling.style.display = "block";
+          linkWithHash.classList.add("expanded");
+        }
+
+        // Expand ancestor lists if any
+        sideMenus.expandClosestUnexpandedParentList(linkWithHash);
+      }
+
+      // Bind click events on right menu links
+      $("#pytorch-right-menu a.reference.internal").on("click", function() {
+        if (this.classList.contains("expanded")) {
+          this.nextElementSibling.style.display = "none";
+          this.classList.remove("expanded");
+          this.classList.add("not-expanded");
+        } else if (this.classList.contains("not-expanded")) {
+          this.nextElementSibling.style.display = "block";
+          this.classList.remove("not-expanded");
+          this.classList.add("expanded");
+        }
+      });
 
       sideMenus.handleRightMenu();
     }
 
     $(window).on('resize scroll', function(e) {
+      sideMenus.handleNavBar();
+
       sideMenus.handleLeftMenu();
 
-      if (sideMenus.displayRightMenu) {
+      if (sideMenus.rightMenuIsOnScreen()) {
         sideMenus.handleRightMenu();
       }
     });
   },
 
-  rightMenuInitialTop: function() {
-    return utilities.headersHeight();
+  leftMenuIsFixed: function() {
+    return document.getElementById("pytorch-left-menu").classList.contains("make-fixed");
+  },
+
+  handleNavBar: function() {
+    var mainHeaderHeight = document.getElementById('header-holder').offsetHeight;
+
+    // If we are scrolled past the main navigation header fix the sub menu bar to top of page
+    if (utilities.scrollTop() >= mainHeaderHeight) {
+      document.getElementById("pytorch-left-menu").classList.add("make-fixed");
+      document.getElementById("pytorch-page-level-bar").classList.add("left-menu-is-fixed");
+    } else {
+      document.getElementById("pytorch-left-menu").classList.remove("make-fixed");
+      document.getElementById("pytorch-page-level-bar").classList.remove("left-menu-is-fixed");
+    }
+  },
+
+  expandClosestUnexpandedParentList: function (el) {
+    var closestParentList = utilities.closest(el, "ul");
+
+    if (closestParentList) {
+      var closestParentLink = closestParentList.previousElementSibling;
+      var closestParentLinkExists = closestParentLink &&
+                                    closestParentLink.tagName === "A" &&
+                                    closestParentLink.classList.contains("reference");
+
+      if (closestParentLinkExists) {
+        // Don't add expansion class to any title links
+         if (closestParentLink.classList.contains("title-link")) {
+           return;
+         }
+
+        closestParentList.style.display = "block";
+        closestParentLink.classList.remove("not-expanded");
+        closestParentLink.classList.add("expanded");
+        sideMenus.expandClosestUnexpandedParentList(closestParentLink);
+      }
+    }
   },
 
   handleLeftMenu: function () {
-    var windowHeight = window.innerHeight;
+    var windowHeight = utilities.windowHeight();
     var topOfFooterRelativeToWindow = document.getElementById("docs-tutorials-resources").getBoundingClientRect().top;
 
     if (topOfFooterRelativeToWindow >= windowHeight) {
       document.getElementById("pytorch-left-menu").style.height = "100%";
     } else {
       var howManyPixelsOfTheFooterAreInTheWindow = windowHeight - topOfFooterRelativeToWindow;
-      var headerHeight = document.getElementById('header-holder').offsetHeight;
-      var leftMenuDifference = howManyPixelsOfTheFooterAreInTheWindow + headerHeight;
-
+      var leftMenuDifference = howManyPixelsOfTheFooterAreInTheWindow;
       document.getElementById("pytorch-left-menu").style.height = (windowHeight - leftMenuDifference) + "px";
     }
   },
 
   handleRightMenu: function() {
+    var rightMenuWrapper = document.getElementById("pytorch-content-right");
     var rightMenu = document.getElementById("pytorch-right-menu");
-    var scrollPos = utilities.scrollTop();
-
-    if (scrollPos === 0) {
-      rightMenu.style["margin-top"] = sideMenus.rightMenuInitialTop() + "px";
-      return;
-    }
-
     var rightMenuList = rightMenu.getElementsByTagName("ul")[0];
-    var rightMenuBottom = utilities.offset(rightMenuList).top + rightMenuList.offsetHeight;
-    var footerTop = utilities.offset(document.getElementById("docs-tutorials-resources")).top;
-    var isBottomOfMenuPastOrCloseToFooter = rightMenuBottom >= footerTop  || footerTop - rightMenuBottom <= 40
-    var heightOfFooterOnScreen = $(window).height() - document.getElementById("docs-tutorials-resources").getBoundingClientRect().top;
+    var article = document.getElementById("pytorch-article");
+    var articleHeight = article.offsetHeight;
+    var articleBottom = utilities.offset(article).top + articleHeight;
+    var mainHeaderHeight = document.getElementById('header-holder').offsetHeight;
 
-    if (heightOfFooterOnScreen < 0) {
-      heightOfFooterOnScreen = 0;
-    }
-
-    // If the right menu is already fixed to the bottom
-    if (this.isFixedToBottom) {
-      var isFooterOnScreen = isElementInViewport(document.getElementById("docs-tutorials-resources"));
-
-      // If the footer is still on the screen, we want to keep the menu where it is
-      if (isFooterOnScreen) {
-        bottom = heightOfFooterOnScreen;
-        rightMenu.style["margin-top"] = "auto";
-        rightMenu.style.bottom = bottom + "px";
-      } else {
-        // If the footer is not on the screen, we want to break the side menu out of the bottom
-        this.isFixedToBottom = false;
-        rightMenu.style.height = (window.innerHeight - heightOfFooterOnScreen - utilities.headersHeight()) + "px";
-        rightMenu.style["margin-top"] = sideMenus.rightMenuInitialTop() + "px";
-        rightMenu.style.bottom = bottom;
-      }
-
-    // If the side menu is past the footer's top or close to it (by 40 pixels)
-    // we fix the menu to the bottom
-    } else if (isBottomOfMenuPastOrCloseToFooter) {
-      var isFooterOnScreen = isElementInViewport(document.getElementById("docs-tutorials-resources"));
-      var bottom = 0;
-
-      this.isFixedToBottom = true;
-
-      if (isFooterOnScreen) {
-        bottom = heightOfFooterOnScreen;
-        rightMenu.style["margin-top"] = "auto";
-        rightMenu.style.bottom = bottom + "px";
-      } else {
-        rightMenu.style.height = (window.innerHeight - heightOfFooterOnScreen - utilities.headersHeight()) + "px";
-        rightMenu.style["margin-top"] = sideMenus.rightMenuInitialTop() + "px";
-        rightMenu.style.bottom = bottom;
-      }
+    if (utilities.scrollTop() < mainHeaderHeight) {
+      rightMenuWrapper.style.height = "100%";
+      rightMenu.style.top = 0;
+      rightMenu.classList.remove("scrolling-fixed");
+      rightMenu.classList.remove("scrolling-absolute");
     } else {
-      this.isFixedToBottom = false;
-      rightMenu.style.height = (window.innerHeight - heightOfFooterOnScreen - utilities.headersHeight()) + "px";
-      rightMenu.style["margin-top"] = sideMenus.rightMenuInitialTop() + "px";
-      rightMenu.style.bottom = bottom;
+      if (rightMenu.classList.contains("scrolling-fixed")) {
+        var rightMenuBottom =
+          utilities.offset(rightMenuList).top + rightMenuList.offsetHeight;
+
+        if (rightMenuBottom >= articleBottom) {
+          rightMenuWrapper.style.height = articleHeight + mainHeaderHeight + "px";
+          rightMenu.style.top = utilities.scrollTop() - mainHeaderHeight + "px";
+          rightMenu.classList.add("scrolling-absolute");
+          rightMenu.classList.remove("scrolling-fixed");
+        }
+      } else {
+        rightMenuWrapper.style.height = articleHeight + mainHeaderHeight + "px";
+        rightMenu.style.top =
+          articleBottom - mainHeaderHeight - rightMenuList.offsetHeight + "px";
+        rightMenu.classList.add("scrolling-absolute");
+      }
+
+      if (utilities.scrollTop() < articleBottom - rightMenuList.offsetHeight) {
+        rightMenuWrapper.style.height = "100%";
+        rightMenu.style.top = "";
+        rightMenu.classList.remove("scrolling-absolute");
+        rightMenu.classList.add("scrolling-fixed");
+      }
     }
+
+    var rightMenuSideScroll = document.getElementById("pytorch-side-scroll-right");
+    var sideScrollFromWindowTop = rightMenuSideScroll.getBoundingClientRect().top;
+
+    rightMenuSideScroll.style.height = utilities.windowHeight() - sideScrollFromWindowTop + "px";
   }
 };
-
-function isElementInViewport(el) {
-  var rect = el.getBoundingClientRect();
-
-  return rect.bottom > 0 &&
-    rect.right > 0 &&
-    rect.left < (window.innerWidth || document.documentElement.clientWidth) &&
-    rect.top < (window.innerHeight || document.documentElement.clientHeight);
-}
 
 },{}],"pytorch-sphinx-theme":[function(require,module,exports){
 var jQuery = (typeof(window) != 'undefined') ? window.jQuery : require('jquery');
@@ -728,4 +937,192 @@ if (typeof(window) != 'undefined') {
 $(".sphx-glr-thumbcontainer").removeAttr("tooltip");
 $("table").removeAttr("border");
 
-},{"jquery":"jquery"}]},{},[1,2,3,4,5,6,7,8,"pytorch-sphinx-theme"]);
+// This code replaces the default sphinx gallery download buttons
+// with the 3 download buttons at the top of the page
+
+var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+if (downloadNote.length >= 1) {
+    var tutorialUrlArray = $("#tutorial-type").text().split('/');
+        tutorialUrlArray[0] = tutorialUrlArray[0] + "_source"
+
+    var githubLink = "https://github.com/pytorch/tutorials/blob/master/" + tutorialUrlArray.join("/") + ".py",
+        notebookLink = $(".reference.download")[1].href,
+        notebookDownloadPath = notebookLink.split('_downloads')[1],
+        colabLink = "https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads" + notebookDownloadPath;
+
+    $("#google-colab-link").wrap("<a href=" + colabLink + " data-behavior='call-to-action-event' data-response='Run in Google Colab' target='_blank'/>");
+    $("#download-notebook-link").wrap("<a href=" + notebookLink + " data-behavior='call-to-action-event' data-response='Download Notebook'/>");
+    $("#github-view-link").wrap("<a href=" + githubLink + " data-behavior='call-to-action-event' data-response='View on Github' target='_blank'/>");
+} else {
+    $(".pytorch-call-to-action-links").hide();
+}
+
+//This code handles the Expand/Hide toggle for the Docs/Tutorials left nav items
+
+$(document).ready(function() {
+  var caption = "#pytorch-left-menu p.caption";
+  var collapseAdded = $(this).not("checked");
+  $(caption).each(function () {
+    var menuName = this.innerText.replace(/[^\w\s]/gi, "").trim();
+    $(this).find("span").addClass("checked");
+    if (collapsedSections.includes(menuName) == true && collapseAdded && sessionStorage.getItem(menuName) !== "expand" || sessionStorage.getItem(menuName) == "collapse") {
+      $(this.firstChild).after("<span class='expand-menu'>[ + ]</span>");
+      $(this.firstChild).after("<span class='hide-menu collapse'>[ - ]</span>");
+      $(this).next("ul").hide();
+    } else if (collapsedSections.includes(menuName) == false && collapseAdded || sessionStorage.getItem(menuName) == "expand") {
+      $(this.firstChild).after("<span class='expand-menu collapse'>[ + ]</span>");
+      $(this.firstChild).after("<span class='hide-menu'>[ - ]</span>");
+    }
+  });
+
+  $(".expand-menu").on("click", function () {
+    $(this).prev(".hide-menu").toggle();
+    $(this).parent().next("ul").toggle();
+    var menuName = $(this).parent().text().replace(/[^\w\s]/gi, "").trim();
+    if (sessionStorage.getItem(menuName) == "collapse") {
+      sessionStorage.removeItem(menuName);
+    }
+    sessionStorage.setItem(menuName, "expand");
+    toggleList(this);
+  });
+
+  $(".hide-menu").on("click", function () {
+    $(this).next(".expand-menu").toggle();
+    $(this).parent().next("ul").toggle();
+    var menuName = $(this).parent().text().replace(/[^\w\s]/gi, "").trim();
+    if (sessionStorage.getItem(menuName) == "expand") {
+      sessionStorage.removeItem(menuName);
+    }
+    sessionStorage.setItem(menuName, "collapse");
+    toggleList(this);
+  });
+
+  function toggleList(menuCommand) {
+    $(menuCommand).toggle();
+  }
+});
+
+// Build an array from each tag that's present
+
+var tagList = $(".tutorials-card-container").map(function() {
+    return $(this).data("tags").split(",").map(function(item) {
+        return item.trim();
+      });
+}).get();
+
+function unique(value, index, self) {
+      return self.indexOf(value) == index && value != ""
+    }
+
+// Only return unique tags
+
+var tags = tagList.sort().filter(unique);
+
+// Add filter buttons to the top of the page for each tag
+
+function createTagMenu() {
+    tags.forEach(function(item){
+    $(".tutorial-filter-menu").append(" <div class='tutorial-filter filter-btn filter' data-tag='" + item + "'>" + item + "</div>")
+  })
+};
+
+createTagMenu();
+
+// Remove hyphens if they are present in the filter buttons
+
+$(".tags").each(function(){
+    var tags = $(this).text().split(",");
+    tags.forEach(function(tag, i ) {
+       tags[i] = tags[i].replace(/-/, ' ')
+    })
+    $(this).html(tags.join(", "));
+});
+
+// Remove hyphens if they are present in the card body
+
+$(".tutorial-filter").each(function(){
+    var tag = $(this).text();
+    $(this).html(tag.replace(/-/, ' '))
+})
+
+// Remove any empty p tags that Sphinx adds
+
+$("#tutorial-cards p").each(function(index, item) {
+    if(!$(item).text().trim()) {
+        $(item).remove();
+    }
+});
+
+// Jump back to top on pagination click
+
+$(document).on("click", ".page", function() {
+    $('html, body').animate(
+      {scrollTop: $("#dropdown-filter-tags").position().top},
+      'slow'
+    );
+});
+
+var link = $("a[href='intermediate/speech_command_recognition_with_torchaudio.html']");
+
+if (link.text() == "SyntaxError") {
+    console.log("There is an issue with the intermediate/speech_command_recognition_with_torchaudio.html menu item.");
+    link.text("Speech Command Recognition with torchaudio");
+}
+
+$(".stars-outer > i").hover(function() {
+    $(this).prevAll().addBack().toggleClass("fas star-fill");
+});
+
+$(".stars-outer > i").on("click", function() {
+    $(this).prevAll().each(function() {
+        $(this).addBack().addClass("fas star-fill");
+    });
+
+    $(".stars-outer > i").each(function() {
+        $(this).unbind("mouseenter mouseleave").css({
+            "pointer-events": "none"
+        });
+    });
+})
+
+$("#pytorch-side-scroll-right li a").on("click", function (e) {
+  var href = $(this).attr("href");
+  $('html, body').stop().animate({
+    scrollTop: $(href).offset().top - 100
+  }, 850);
+  e.preventDefault;
+});
+
+var lastId,
+  topMenu = $("#pytorch-side-scroll-right"),
+  topMenuHeight = topMenu.outerHeight() + 1,
+  // All sidenav items
+  menuItems = topMenu.find("a"),
+  // Anchors for menu items
+  scrollItems = menuItems.map(function () {
+    var item = $(this).attr("href");
+    if (item.length) {
+      return item;
+    }
+  });
+
+$(window).scroll(function () {
+  var fromTop = $(this).scrollTop() + topMenuHeight;
+  var article = ".section";
+
+  $(article).each(function (i) {
+    var offsetScroll = $(this).offset().top - $(window).scrollTop();
+    if (
+      offsetScroll <= topMenuHeight + 200 &&
+      offsetScroll >= topMenuHeight - 200 &&
+      scrollItems[i] == "#" + $(this).attr("id") &&
+      $(".hidden:visible")
+    ) {
+      $(menuItems).removeClass("side-scroll-highlight");
+      $(menuItems[i]).addClass("side-scroll-highlight");
+    }
+  });
+});
+
+
+},{"jquery":"jquery"}]},{},[1,2,3,4,5,6,7,8,9,10,"pytorch-sphinx-theme"]);
