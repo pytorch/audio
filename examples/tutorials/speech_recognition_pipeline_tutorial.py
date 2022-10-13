@@ -2,7 +2,7 @@
 Speech Recognition with Wav2Vec2
 ================================
 
-**Author**: `Moto Hira <moto@fb.com>`__
+**Author**: `Moto Hira <moto@meta.com>`__
 
 This tutorial shows how to perform speech recognition using using
 pre-trained models from wav2vec 2.0

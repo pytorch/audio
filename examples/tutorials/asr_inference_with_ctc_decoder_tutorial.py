@@ -2,7 +2,7 @@
 ASR Inference with CTC Decoder
 ==============================
 
-**Author**: `Caroline Chen <carolinechen@fb.com>`__
+**Author**: `Caroline Chen <carolinechen@meta.com>`__
 
 This tutorial shows how to perform speech recognition inference using a
 CTC beam search decoder with lexicon constraint and KenLM language model

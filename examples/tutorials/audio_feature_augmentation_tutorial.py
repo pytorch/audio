@@ -2,6 +2,9 @@
 """
 Audio Feature Augmentation
 ==========================
+
+**Author**: `Moto Hira <moto@meta.com>`__
+
 """
 
 # When running this tutorial in Google Colab, install the required packages
