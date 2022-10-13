@@ -2,6 +2,8 @@
 StreamReader Advanced Usages
 ============================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial is the continuation of
 `StreamReader Basic Usages <./streamreader_basic_tutorial.html>`__.
 

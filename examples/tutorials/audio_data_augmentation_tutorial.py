@@ -3,6 +3,8 @@
 Audio Data Augmentation
 =======================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` provides a variety of ways to augment audio data.
 
 In this tutorial, we look into a way to apply effects, filters,

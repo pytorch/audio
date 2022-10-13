@@ -2,8 +2,8 @@
 Text-to-Speech with Tacotron2
 =============================
 
-**Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
-`Moto Hira <moto@fb.com>`__
+**Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
+`Moto Hira <moto@meta.com>`__
 
 """
 
