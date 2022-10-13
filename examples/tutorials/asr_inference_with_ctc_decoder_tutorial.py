@@ -36,8 +36,8 @@ using CTC loss.
 # -  Lexicon: mapping between possible words and their corresponding
 #    tokens sequence
 # -  Language Model (LM): n-gram language model trained with the `KenLM
-#    library <https://kheafield.com/code/kenlm/>`__, or custom languge
-#    model wrapped using :py:class:`~torchaudio.models.decoder.CTCDecoderLM`
+#    library <https://kheafield.com/code/kenlm/>`__, or custom language
+#    model that inherits :py:class:`~torchaudio.models.decoder.CTCDecoderLM`
 #
 
 
@@ -172,8 +172,8 @@ print(tokens)
 # No Language Model
 # ^^^^^^^^^^^^^^^^^
 #
-# To train without a language model, set `lm=None` when initializing
-# the decoder.
+# To create a decoder instance without a language model, set `lm=None`
+# when initializing the decoder.
 
 ######################################################################
 # KenLM
@@ -195,7 +195,7 @@ print(tokens)
 #
 # Users can define their own custom language model in Python, whether
 # it be a statistical or neural network language model, using
-# the :py:class:`~torchaudio.models.decoder.CTCDecoderLM` wrapper and
+# :py:class:`~torchaudio.models.decoder.CTCDecoderLM` and
 # :py:class:`~torchaudio.models.decoder.CTCDecoderLMState`.
 # 
 # For instance, the following code creates a basic wrapper around a PyTorch
