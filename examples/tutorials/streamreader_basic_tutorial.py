@@ -2,6 +2,8 @@
 StreamReader Basic Usages
 =========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use :py:class:`torchaudio.io.StreamReader` to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.

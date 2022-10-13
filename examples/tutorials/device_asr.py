@@ -2,7 +2,7 @@
 Device ASR with Emformer RNN-T
 ==============================
 
-**Author** : `Moto Hira <moto@fb.com>`__, `Jeff Hwang <jeffhwang@fb.com>`__.
+**Author**: `Moto Hira <moto@meta.com>`__, `Jeff Hwang <jeffhwang@fb.com>`__.
 
 This tutorial shows how to use Emformer RNN-T and streaming API
 to perform speech recognition on a streaming device input, i.e. microphone
