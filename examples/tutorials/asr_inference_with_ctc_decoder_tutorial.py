@@ -166,7 +166,7 @@ print(tokens)
 # factoring in a language model score that represents the likelihood of
 # the sequence into the beam search computation. Below, we outline the
 # different forms of language models that are supported for decoding.
-# 
+#
 
 ######################################################################
 # No Language Model
@@ -174,6 +174,7 @@ print(tokens)
 #
 # To create a decoder instance without a language model, set `lm=None`
 # when initializing the decoder.
+#
 
 ######################################################################
 # KenLM
@@ -188,7 +189,6 @@ print(tokens)
 # `LibriSpeech <http://www.openslr.org/11>`__.
 #
 
-
 ######################################################################
 # Custom Language Model
 # ^^^^^^^^^^^^^^^^^^^^^
@@ -197,12 +197,13 @@ print(tokens)
 # it be a statistical or neural network language model, using
 # :py:class:`~torchaudio.models.decoder.CTCDecoderLM` and
 # :py:class:`~torchaudio.models.decoder.CTCDecoderLMState`.
-# 
+#
 # For instance, the following code creates a basic wrapper around a PyTorch
 # ``torch.nn.Module`` language model.
 #
 
 from torchaudio.models.decoder import CTCDecoderLM, CTCDecoderLMState
+
 
 class CustomLM(CTCDecoderLM):
     """Create a Python wrapper around `language_model` to feed to the decoder."""
