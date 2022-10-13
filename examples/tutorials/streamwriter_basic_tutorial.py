@@ -2,6 +2,8 @@
 StreamWriter Basic Usage
 ========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use :py:class:`torchaudio.io.StreamWriter` to
 encode and save audio/video data into various formats/destinations.
 
