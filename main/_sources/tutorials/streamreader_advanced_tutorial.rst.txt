@@ -21,6 +21,8 @@
 StreamReader Advanced Usages
 ============================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial is the continuation of
 `StreamReader Basic Usages <./streamreader_basic_tutorial.html>`__.
 
@@ -30,7 +32,7 @@ This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 - Generating synthetic audio / video
 - Applying preprocessing with custom filter expressions
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-21
+.. GENERATED FROM PYTHON SOURCE LINES 16-23
 
 .. code-block:: default
 
@@ -49,13 +51,13 @@ This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
  .. code-block:: none
 
-    1.14.0.dev20221012
-    0.13.0.dev20221012
+    1.14.0.dev20221013
+    0.13.0.dev20221013
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-50
+.. GENERATED FROM PYTHON SOURCE LINES 25-52
 
 .. code-block:: default
 
@@ -93,7 +95,7 @@ This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-121
+.. GENERATED FROM PYTHON SOURCE LINES 53-123
 
 Audio / Video device input
 --------------------------
@@ -166,7 +168,7 @@ streams to a format supported by decoder.
    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=3072000, sample_rate=48000.0, num_channels=2)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-136
+.. GENERATED FROM PYTHON SOURCE LINES 125-138
 
 Synthetic source streams
 ------------------------
@@ -182,13 +184,13 @@ The detail of filter description can be found at
 https://ffmpeg.org/ffmpeg-filters.html
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-141
+.. GENERATED FROM PYTHON SOURCE LINES 140-143
 
 Audio Examples
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-160
+.. GENERATED FROM PYTHON SOURCE LINES 145-162
 
 Sine wave
 ^^^^^^^^^
@@ -208,7 +210,7 @@ https://ffmpeg.org/ffmpeg-filters.html#sine
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-188
+.. GENERATED FROM PYTHON SOURCE LINES 164-190
 
 Signal with arbitral expression
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -237,7 +239,7 @@ https://ffmpeg.org/ffmpeg-filters.html#aevalsrc
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-207
+.. GENERATED FROM PYTHON SOURCE LINES 192-209
 
 Noise
 ^^^^^
@@ -257,13 +259,13 @@ https://ffmpeg.org/ffmpeg-filters.html#anoisesrc
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-212
+.. GENERATED FROM PYTHON SOURCE LINES 211-214
 
 Video Examples
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-228
+.. GENERATED FROM PYTHON SOURCE LINES 216-230
 
 Cellular automaton
 ^^^^^^^^^^^^^^^^^^
@@ -280,7 +282,7 @@ https://ffmpeg.org/ffmpeg-filters.html#cellauto
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-244
+.. GENERATED FROM PYTHON SOURCE LINES 232-246
 
 Mandelbrot
 ^^^^^^^^^^
@@ -297,7 +299,7 @@ https://ffmpeg.org/ffmpeg-filters.html#cellauto
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 246-260
+.. GENERATED FROM PYTHON SOURCE LINES 248-262
 
 MPlayer Test patterns
 ^^^^^^^^^^^^^^^^^^^^^
@@ -314,7 +316,7 @@ https://ffmpeg.org/ffmpeg-filters.html#mptestsrc
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-276
+.. GENERATED FROM PYTHON SOURCE LINES 264-278
 
 John Conway's life game
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -331,7 +333,7 @@ https://ffmpeg.org/ffmpeg-filters.html#life
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 278-292
+.. GENERATED FROM PYTHON SOURCE LINES 280-294
 
 Sierpinski carpet/triangle fractal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -348,7 +350,7 @@ https://ffmpeg.org/ffmpeg-filters.html#sierpinski
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-324
+.. GENERATED FROM PYTHON SOURCE LINES 296-326
 
 Custom filters
 --------------
@@ -381,14 +383,14 @@ achieved with ``add_(audio|video)_stream``.
      stream into multiple of them, and merge them later.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 326-330
+.. GENERATED FROM PYTHON SOURCE LINES 328-332
 
 Audio Examples
 ~~~~~~~~~~~~~~
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 330-356
+.. GENERATED FROM PYTHON SOURCE LINES 332-358
 
 .. code-block:: default
 
@@ -425,7 +427,7 @@ Audio Examples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 358-383
+.. GENERATED FROM PYTHON SOURCE LINES 360-385
 
 .. code-block:: default
 
@@ -461,13 +463,13 @@ Audio Examples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 384-387
+.. GENERATED FROM PYTHON SOURCE LINES 386-389
 
 Original
 ^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 387-390
+.. GENERATED FROM PYTHON SOURCE LINES 389-392
 
 .. code-block:: default
 
@@ -503,13 +505,13 @@ Original
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 391-394
+.. GENERATED FROM PYTHON SOURCE LINES 393-396
 
 Highpass / lowpass filter
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 394-397
+.. GENERATED FROM PYTHON SOURCE LINES 396-399
 
 .. code-block:: default
 
@@ -545,13 +547,13 @@ Highpass / lowpass filter
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 398-401
+.. GENERATED FROM PYTHON SOURCE LINES 400-403
 
 FFT filter - Robot 🤖
 ^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 401-404
+.. GENERATED FROM PYTHON SOURCE LINES 403-406
 
 .. code-block:: default
 
@@ -587,13 +589,13 @@ FFT filter - Robot 🤖
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 405-408
+.. GENERATED FROM PYTHON SOURCE LINES 407-410
 
 FFT filter - Whisper
 ^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 408-411
+.. GENERATED FROM PYTHON SOURCE LINES 410-413
 
 .. code-block:: default
 
@@ -629,13 +631,13 @@ FFT filter - Whisper
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 412-415
+.. GENERATED FROM PYTHON SOURCE LINES 414-417
 
 Video Examples
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 415-435
+.. GENERATED FROM PYTHON SOURCE LINES 417-437
 
 .. code-block:: default
 
@@ -666,7 +668,7 @@ Video Examples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 437-461
+.. GENERATED FROM PYTHON SOURCE LINES 439-463
 
 .. code-block:: default
 
@@ -701,12 +703,12 @@ Video Examples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 462-464
+.. GENERATED FROM PYTHON SOURCE LINES 464-466
 
 Original
 ^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 464-467
+.. GENERATED FROM PYTHON SOURCE LINES 466-469
 
 .. code-block:: default
 
@@ -731,12 +733,12 @@ Original
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 468-470
+.. GENERATED FROM PYTHON SOURCE LINES 470-472
 
 Mirror
 ^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 470-473
+.. GENERATED FROM PYTHON SOURCE LINES 472-475
 
 .. code-block:: default
 
@@ -761,12 +763,12 @@ Mirror
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 474-476
+.. GENERATED FROM PYTHON SOURCE LINES 476-478
 
 Edge detection
 ^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 476-479
+.. GENERATED FROM PYTHON SOURCE LINES 478-481
 
 .. code-block:: default
 
@@ -791,12 +793,12 @@ Edge detection
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 480-482
+.. GENERATED FROM PYTHON SOURCE LINES 482-484
 
 Random rotation
 ^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 482-485
+.. GENERATED FROM PYTHON SOURCE LINES 484-487
 
 .. code-block:: default
 
@@ -821,12 +823,12 @@ Random rotation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 486-488
+.. GENERATED FROM PYTHON SOURCE LINES 488-490
 
 Pixel manipulation
 ^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 488-491
+.. GENERATED FROM PYTHON SOURCE LINES 490-493
 
 .. code-block:: default
 
@@ -851,14 +853,14 @@ Pixel manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 492-493
+.. GENERATED FROM PYTHON SOURCE LINES 494-495
 
 Tag: :obj:`torchaudio.io`
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.636 seconds)
+   **Total running time of the script:** ( 0 minutes  10.481 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_advanced_tutorial.py:

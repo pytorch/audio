@@ -21,6 +21,8 @@
 Audio Feature Extractions
 =========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` implements feature extractions commonly used in the audio
 domain. They are available in ``torchaudio.functional`` and
 ``torchaudio.transforms``.
@@ -32,7 +34,7 @@ They are stateless.
 using implementations from ``functional`` and ``torch.nn.Module``.
 They can be serialized using TorchScript.
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-26
+.. GENERATED FROM PYTHON SOURCE LINES 19-28
 
 .. code-block:: default
 
@@ -58,13 +60,13 @@ They can be serialized using TorchScript.
 
  .. code-block:: none
 
-    1.14.0.dev20221012
-    0.13.0.dev20221012
+    1.14.0.dev20221013
+    0.13.0.dev20221013
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-38
+.. GENERATED FROM PYTHON SOURCE LINES 29-40
 
 Preparation
 -----------
@@ -78,7 +80,7 @@ Preparation
       !pip install librosa
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-80
+.. GENERATED FROM PYTHON SOURCE LINES 40-82
 
 .. code-block:: default
 
@@ -131,7 +133,7 @@ Preparation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-92
+.. GENERATED FROM PYTHON SOURCE LINES 83-94
 
 Overview of audio features
 --------------------------
@@ -145,7 +147,7 @@ For the complete list of available features, please refer to the
 documentation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-101
+.. GENERATED FROM PYTHON SOURCE LINES 97-103
 
 Spectrogram
 -----------
@@ -154,7 +156,7 @@ To get the frequency make-up of an audio signal as it varies with time,
 you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-108
+.. GENERATED FROM PYTHON SOURCE LINES 103-110
 
 .. code-block:: default
 
@@ -188,7 +190,7 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-125
+.. GENERATED FROM PYTHON SOURCE LINES 112-127
 
 .. code-block:: default
 
@@ -214,7 +216,7 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-131
+.. GENERATED FROM PYTHON SOURCE LINES 129-133
 
 .. code-block:: default
 
@@ -229,7 +231,7 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-136
+.. GENERATED FROM PYTHON SOURCE LINES 135-138
 
 .. code-block:: default
 
@@ -248,7 +250,7 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-142
+.. GENERATED FROM PYTHON SOURCE LINES 139-144
 
 GriffinLim
 ----------
@@ -256,7 +258,7 @@ GriffinLim
 To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-155
+.. GENERATED FROM PYTHON SOURCE LINES 144-157
 
 .. code-block:: default
 
@@ -280,7 +282,7 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-164
+.. GENERATED FROM PYTHON SOURCE LINES 159-166
 
 .. code-block:: default
 
@@ -298,7 +300,7 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-169
+.. GENERATED FROM PYTHON SOURCE LINES 168-171
 
 .. code-block:: default
 
@@ -312,7 +314,7 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-175
+.. GENERATED FROM PYTHON SOURCE LINES 173-177
 
 .. code-block:: default
 
@@ -343,7 +345,7 @@ To recover a waveform from a spectrogram, you can use ``GriffinLim``.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-185
+.. GENERATED FROM PYTHON SOURCE LINES 178-187
 
 Mel Filter Bank
 ---------------
@@ -355,7 +357,7 @@ Since this function does not require input audio/features, there is no
 equivalent transform in :py:func:`torchaudio.transforms`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-199
+.. GENERATED FROM PYTHON SOURCE LINES 187-201
 
 .. code-block:: default
 
@@ -380,7 +382,7 @@ equivalent transform in :py:func:`torchaudio.transforms`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-204
+.. GENERATED FROM PYTHON SOURCE LINES 203-206
 
 .. code-block:: default
 
@@ -399,7 +401,7 @@ equivalent transform in :py:func:`torchaudio.transforms`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-211
+.. GENERATED FROM PYTHON SOURCE LINES 207-213
 
 Comparison against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -408,7 +410,7 @@ For reference, here is the equivalent way to get the mel filter bank
 with ``librosa``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-222
+.. GENERATED FROM PYTHON SOURCE LINES 213-224
 
 .. code-block:: default
 
@@ -430,7 +432,7 @@ with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-230
+.. GENERATED FROM PYTHON SOURCE LINES 226-232
 
 .. code-block:: default
 
@@ -458,7 +460,7 @@ with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-239
+.. GENERATED FROM PYTHON SOURCE LINES 233-241
 
 MelSpectrogram
 --------------
@@ -469,7 +471,7 @@ and performing mel-scale conversion. In ``torchaudio``,
 this functionality.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-261
+.. GENERATED FROM PYTHON SOURCE LINES 241-263
 
 .. code-block:: default
 
@@ -502,7 +504,7 @@ this functionality.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 263-266
+.. GENERATED FROM PYTHON SOURCE LINES 265-268
 
 .. code-block:: default
 
@@ -521,7 +523,7 @@ this functionality.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-273
+.. GENERATED FROM PYTHON SOURCE LINES 269-275
 
 Comparison against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -530,7 +532,7 @@ For reference, here is the equivalent means of generating mel-scale
 spectrograms with ``librosa``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-288
+.. GENERATED FROM PYTHON SOURCE LINES 275-290
 
 .. code-block:: default
 
@@ -556,7 +558,7 @@ spectrograms with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 290-296
+.. GENERATED FROM PYTHON SOURCE LINES 292-298
 
 .. code-block:: default
 
@@ -584,13 +586,13 @@ spectrograms with ``librosa``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-300
+.. GENERATED FROM PYTHON SOURCE LINES 299-302
 
 MFCC
 ----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 300-320
+.. GENERATED FROM PYTHON SOURCE LINES 302-322
 
 .. code-block:: default
 
@@ -621,7 +623,7 @@ MFCC
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 322-325
+.. GENERATED FROM PYTHON SOURCE LINES 324-327
 
 .. code-block:: default
 
@@ -640,13 +642,13 @@ MFCC
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 326-329
+.. GENERATED FROM PYTHON SOURCE LINES 328-331
 
 Comparison against librosa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 329-348
+.. GENERATED FROM PYTHON SOURCE LINES 331-350
 
 .. code-block:: default
 
@@ -676,7 +678,7 @@ Comparison against librosa
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 350-356
+.. GENERATED FROM PYTHON SOURCE LINES 352-358
 
 .. code-block:: default
 
@@ -704,13 +706,13 @@ Comparison against librosa
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 357-360
+.. GENERATED FROM PYTHON SOURCE LINES 359-362
 
 LFCC
 ----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 360-379
+.. GENERATED FROM PYTHON SOURCE LINES 362-381
 
 .. code-block:: default
 
@@ -745,13 +747,13 @@ LFCC
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 380-383
+.. GENERATED FROM PYTHON SOURCE LINES 382-385
 
 Pitch
 -----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 383-386
+.. GENERATED FROM PYTHON SOURCE LINES 385-388
 
 .. code-block:: default
 
@@ -765,7 +767,7 @@ Pitch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 388-408
+.. GENERATED FROM PYTHON SOURCE LINES 390-410
 
 .. code-block:: default
 
@@ -801,7 +803,7 @@ Pitch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 409-427
+.. GENERATED FROM PYTHON SOURCE LINES 411-429
 
 Kaldi Pitch (beta)
 ------------------
@@ -822,7 +824,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
    [`paper <https://danielpovey.com/files/2014_icassp_pitch.pdf>`__]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 427-431
+.. GENERATED FROM PYTHON SOURCE LINES 429-433
 
 .. code-block:: default
 
@@ -837,7 +839,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 433-458
+.. GENERATED FROM PYTHON SOURCE LINES 435-460
 
 .. code-block:: default
 
@@ -881,7 +883,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.922 seconds)
+   **Total running time of the script:** ( 0 minutes  6.047 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

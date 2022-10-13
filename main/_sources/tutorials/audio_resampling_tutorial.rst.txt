@@ -21,9 +21,11 @@
 Audio Resampling
 ================
 
+**Author**: `Caroline Chen <carolinechen@meta.com>`__, `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use torchaudio's resampling API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-17
+.. GENERATED FROM PYTHON SOURCE LINES 10-19
 
 .. code-block:: default
 
@@ -44,13 +46,13 @@ This tutorial shows how to use torchaudio's resampling API.
 
  .. code-block:: none
 
-    1.14.0.dev20221012
-    0.13.0.dev20221012
+    1.14.0.dev20221013
+    0.13.0.dev20221013
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-30
+.. GENERATED FROM PYTHON SOURCE LINES 20-32
 
 Preparation
 -----------
@@ -65,7 +67,7 @@ First, we import the modules and define the helper functions.
 
       !pip install librosa
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-114
+.. GENERATED FROM PYTHON SOURCE LINES 32-116
 
 .. code-block:: default
 
@@ -160,7 +162,7 @@ First, we import the modules and define the helper functions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-151
+.. GENERATED FROM PYTHON SOURCE LINES 117-153
 
 Resampling Overview
 -------------------
@@ -199,7 +201,7 @@ waveform (in log scale), y-axis the frequency of the
 plotted waveform, and color intensity the amplitude.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-158
+.. GENERATED FROM PYTHON SOURCE LINES 153-160
 
 .. code-block:: default
 
@@ -233,14 +235,14 @@ plotted waveform, and color intensity the amplitude.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-163
+.. GENERATED FROM PYTHON SOURCE LINES 161-165
 
 Now we resample (downsample) it.
 
 We see that in the spectrogram of the resampled waveform, there is an
 artifact, which was not present in the original waveform.
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-172
+.. GENERATED FROM PYTHON SOURCE LINES 166-174
 
 .. code-block:: default
 
@@ -275,7 +277,7 @@ artifact, which was not present in the original waveform.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-187
+.. GENERATED FROM PYTHON SOURCE LINES 175-189
 
 Controling resampling quality with parameters
 ---------------------------------------------
@@ -292,7 +294,7 @@ provides a sharper, more precise filter, but is more computationally
 expensive.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-194
+.. GENERATED FROM PYTHON SOURCE LINES 189-196
 
 .. code-block:: default
 
@@ -315,7 +317,7 @@ expensive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-200
+.. GENERATED FROM PYTHON SOURCE LINES 198-202
 
 .. code-block:: default
 
@@ -335,7 +337,7 @@ expensive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-212
+.. GENERATED FROM PYTHON SOURCE LINES 203-214
 
 Rolloff
 ~~~~~~~
@@ -349,7 +351,7 @@ will therefore reduce the amount of aliasing, but it will also reduce
 some of the higher frequencies.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-220
+.. GENERATED FROM PYTHON SOURCE LINES 214-222
 
 .. code-block:: default
 
@@ -373,7 +375,7 @@ some of the higher frequencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-227
+.. GENERATED FROM PYTHON SOURCE LINES 224-229
 
 .. code-block:: default
 
@@ -394,7 +396,7 @@ some of the higher frequencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-238
+.. GENERATED FROM PYTHON SOURCE LINES 230-240
 
 Window function
 ~~~~~~~~~~~~~~~
@@ -407,7 +409,7 @@ filter and width of impulse. This can be controlled using the
 ``resampling_method`` parameter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-246
+.. GENERATED FROM PYTHON SOURCE LINES 240-248
 
 .. code-block:: default
 
@@ -431,7 +433,7 @@ filter and width of impulse. This can be controlled using the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-253
+.. GENERATED FROM PYTHON SOURCE LINES 250-255
 
 .. code-block:: default
 
@@ -452,7 +454,7 @@ filter and width of impulse. This can be controlled using the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 254-260
+.. GENERATED FROM PYTHON SOURCE LINES 256-262
 
 Comparison against librosa
 --------------------------
@@ -461,7 +463,7 @@ Comparison against librosa
 that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-264
+.. GENERATED FROM PYTHON SOURCE LINES 262-266
 
 .. code-block:: default
 
@@ -476,13 +478,13 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-268
+.. GENERATED FROM PYTHON SOURCE LINES 267-270
 
 kaiser_best
 ~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 268-279
+.. GENERATED FROM PYTHON SOURCE LINES 270-281
 
 .. code-block:: default
 
@@ -509,7 +511,7 @@ kaiser_best
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 281-287
+.. GENERATED FROM PYTHON SOURCE LINES 283-289
 
 .. code-block:: default
 
@@ -531,7 +533,7 @@ kaiser_best
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 289-293
+.. GENERATED FROM PYTHON SOURCE LINES 291-295
 
 .. code-block:: default
 
@@ -552,13 +554,13 @@ kaiser_best
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-297
+.. GENERATED FROM PYTHON SOURCE LINES 296-299
 
 kaiser_fast
 ~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-308
+.. GENERATED FROM PYTHON SOURCE LINES 299-310
 
 .. code-block:: default
 
@@ -585,7 +587,7 @@ kaiser_fast
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 310-316
+.. GENERATED FROM PYTHON SOURCE LINES 312-318
 
 .. code-block:: default
 
@@ -607,7 +609,7 @@ kaiser_fast
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 318-322
+.. GENERATED FROM PYTHON SOURCE LINES 320-324
 
 .. code-block:: default
 
@@ -628,7 +630,7 @@ kaiser_fast
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 323-343
+.. GENERATED FROM PYTHON SOURCE LINES 325-345
 
 Performance Benchmarking
 ------------------------
@@ -651,7 +653,7 @@ To elaborate on the results:
   in a simplification that allows for a smaller kernel and faster kernel computation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 343-393
+.. GENERATED FROM PYTHON SOURCE LINES 345-395
 
 .. code-block:: default
 
@@ -712,7 +714,7 @@ To elaborate on the results:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 395-477
+.. GENERATED FROM PYTHON SOURCE LINES 397-479
 
 .. code-block:: default
 
@@ -806,38 +808,38 @@ To elaborate on the results:
 
  .. code-block:: none
 
-    torchaudio: 0.13.0.dev20221012
+    torchaudio: 0.13.0.dev20221013
     librosa: 0.9.2
                     downsample (48 -> 44.1 kHz) time (ms)                      
                                                   librosa functional transforms
-    sinc (width 64)                                   NaN       2.93       0.46
-    sinc (width 16)                                   NaN       1.58       0.46
-    kaiser_best                                     33.34       2.57       0.44
-    kaiser_fast                                      9.67       2.24       0.51
-    torchaudio: 0.13.0.dev20221012
+    sinc (width 64)                                   NaN       3.11       0.44
+    sinc (width 16)                                   NaN       1.55       0.47
+    kaiser_best                                     35.53       2.50       0.41
+    kaiser_fast                                      9.85       2.10       0.47
+    torchaudio: 0.13.0.dev20221013
     librosa: 0.9.2
                     downsample (16 -> 8 kHz) time (ms)                      
                                                librosa functional transforms
-    sinc (width 64)                                NaN       1.27       0.83
-    sinc (width 16)                                NaN       0.73       0.39
-    kaiser_best                                  12.96       1.37       0.84
-    kaiser_fast                                   4.45       0.85       0.42
-    torchaudio: 0.13.0.dev20221012
+    sinc (width 64)                                NaN       1.16       0.80
+    sinc (width 16)                                NaN       0.72       0.38
+    kaiser_best                                  12.67       1.50       0.84
+    kaiser_fast                                   4.40       0.76       0.40
+    torchaudio: 0.13.0.dev20221013
     librosa: 0.9.2
                     upsample (44.1 -> 48 kHz) time (ms)                      
                                                 librosa functional transforms
-    sinc (width 64)                                 NaN       2.81       0.44
-    sinc (width 16)                                 NaN       1.63       0.47
-    kaiser_best                                   33.82       2.63       0.47
-    kaiser_fast                                    9.89       2.28       0.52
-    torchaudio: 0.13.0.dev20221012
+    sinc (width 64)                                 NaN       2.73       0.44
+    sinc (width 16)                                 NaN       1.56       0.53
+    kaiser_best                                   34.31       2.39       0.45
+    kaiser_fast                                    9.98       2.11       0.48
+    torchaudio: 0.13.0.dev20221013
     librosa: 0.9.2
                     upsample (8 -> 16 kHz) time (ms)                      
                                              librosa functional transforms
-    sinc (width 64)                              NaN       0.84       0.41
-    sinc (width 16)                              NaN       0.53       0.26
-    kaiser_best                                13.01       0.94       0.42
-    kaiser_fast                                 4.50       0.68       0.31
+    sinc (width 64)                              NaN       0.66       0.41
+    sinc (width 16)                              NaN       0.44       0.23
+    kaiser_best                                12.98       0.86       0.40
+    kaiser_fast                                 4.57       0.61       0.24
 
 
 
@@ -845,7 +847,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.688 seconds)
+   **Total running time of the script:** ( 0 minutes  3.704 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:

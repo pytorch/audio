@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20221012) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.13.0.dev20221013) &#x25BC</a>
     </div>
     
 
@@ -363,7 +363,8 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.wav2vec2.model</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
@@ -1046,6 +1047,27 @@
     <span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_init_hubert_pretrain_model</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">components</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">):</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_normal_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">components</span><span class="o">.</span><span class="n">ConvolutionalPositionalEmbedding</span><span class="p">):</span>
+        <span class="c1"># normalize the weight to normal distribution.</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">*</span> <span class="n">module</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">))</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">components</span><span class="o">.</span><span class="n">SelfAttention</span><span class="p">):</span>
+        <span class="c1"># normalize the query, key, value, and out_proj parameters in self attention module.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">k_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">v_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">q_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">components</span><span class="o">.</span><span class="n">Transformer</span><span class="p">):</span>
+        <span class="n">module</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">_init_transformer_params</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+
 <div class="viewcode-block" id="hubert_pretrain_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_model.html#torchaudio.models.hubert_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
@@ -1328,12 +1350,15 @@
         <span class="n">skip_masked</span><span class="p">,</span>
         <span class="n">skip_nomask</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">HuBERTPretrainModel</span><span class="p">(</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">HuBERTPretrainModel</span><span class="p">(</span>
         <span class="n">wav2vec2</span><span class="o">=</span><span class="n">wav2vec2</span><span class="p">,</span>
         <span class="n">mask_generator</span><span class="o">=</span><span class="n">mask_generator</span><span class="p">,</span>
         <span class="n">logit_generator</span><span class="o">=</span><span class="n">logit_generator</span><span class="p">,</span>
         <span class="n">feature_grad_mult</span><span class="o">=</span><span class="n">feature_grad_mult</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+    <span class="c1"># initialize the model for pre-training</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_init_hubert_pretrain_model</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
 
 
 <div class="viewcode-block" id="hubert_pretrain_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_base.html#torchaudio.models.hubert_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_base</span><span class="p">(</span>

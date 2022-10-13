@@ -2,8 +2,8 @@
 Text-to-Speech with Tacotron2
 =============================
 
-**Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
-`Moto Hira <moto@fb.com>`__
+**Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
+`Moto Hira <moto@meta.com>`__
 
 """
 
@@ -311,8 +311,8 @@ IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
 # Waveglow
 # ~~~~~~~~
 #
-# Waveglow is a vocoder published by Nvidia. The pretrained weight is
-# publishe on Torch Hub. One can instantiate the model using ``torch.hub``
+# Waveglow is a vocoder published by Nvidia. The pretrained weights are
+# published on Torch Hub. One can instantiate the model using ``torch.hub``
 # module.
 #
 

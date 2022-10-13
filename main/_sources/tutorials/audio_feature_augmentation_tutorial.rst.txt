@@ -21,7 +21,9 @@
 Audio Feature Augmentation
 ==========================
 
-.. GENERATED FROM PYTHON SOURCE LINES 6-18
+**Author**: `Moto Hira <moto@meta.com>`__
+
+.. GENERATED FROM PYTHON SOURCE LINES 9-21
 
 .. code-block:: default
 
@@ -45,19 +47,19 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    1.14.0.dev20221012
-    0.13.0.dev20221012
+    1.14.0.dev20221013
+    0.13.0.dev20221013
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-22
+.. GENERATED FROM PYTHON SOURCE LINES 22-25
 
 Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-87
+.. GENERATED FROM PYTHON SOURCE LINES 25-90
 
 .. code-block:: default
 
@@ -133,7 +135,7 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-98
+.. GENERATED FROM PYTHON SOURCE LINES 91-101
 
 SpecAugment
 -----------
@@ -146,13 +148,13 @@ is a popular spectrogram augmentation technique.
 :py:func:`torchaudio.transforms.FrequencyMasking`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-103
+.. GENERATED FROM PYTHON SOURCE LINES 103-106
 
 TimeStretch
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-118
+.. GENERATED FROM PYTHON SOURCE LINES 106-121
 
 .. code-block:: default
 
@@ -202,13 +204,13 @@ TimeStretch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-122
+.. GENERATED FROM PYTHON SOURCE LINES 122-125
 
 TimeMasking
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-133
+.. GENERATED FROM PYTHON SOURCE LINES 125-136
 
 .. code-block:: default
 
@@ -247,13 +249,13 @@ TimeMasking
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-137
+.. GENERATED FROM PYTHON SOURCE LINES 137-140
 
 FrequencyMasking
 ----------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-148
+.. GENERATED FROM PYTHON SOURCE LINES 140-151
 
 .. code-block:: default
 
@@ -295,7 +297,7 @@ FrequencyMasking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.841 seconds)
+   **Total running time of the script:** ( 0 minutes  1.737 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

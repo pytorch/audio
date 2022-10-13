@@ -3,6 +3,8 @@
 Audio Resampling
 ================
 
+**Author**: `Caroline Chen <carolinechen@meta.com>`__, `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use torchaudio's resampling API.
 """
 

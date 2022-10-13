@@ -21,8 +21,8 @@
 Text-to-Speech with Tacotron2
 =============================
 
-**Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
-`Moto Hira <moto@fb.com>`__
+**Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
+`Moto Hira <moto@meta.com>`__
 
 .. GENERATED FROM PYTHON SOURCE LINES 9-14
 
@@ -120,8 +120,8 @@ encoding.
 
  .. code-block:: none
 
-    1.14.0.dev20221012
-    0.13.0.dev20221012
+    1.14.0.dev20221013
+    0.13.0.dev20221013
     cpu
 
 
@@ -301,7 +301,7 @@ fetched.
 
  .. code-block:: none
 
-      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 48.0k/63.6M [00:00<04:04, 273kB/s]      0%|          | 248k/63.6M [00:00<01:25, 779kB/s]       2%|1         | 1.05M/63.6M [00:00<00:25, 2.58MB/s]      6%|5         | 3.66M/63.6M [00:00<00:08, 7.54MB/s]     10%|#         | 6.66M/63.6M [00:00<00:05, 11.1MB/s]     15%|#5        | 9.66M/63.6M [00:01<00:04, 13.2MB/s]     20%|#9        | 12.7M/63.6M [00:01<00:03, 14.6MB/s]     25%|##4       | 15.7M/63.6M [00:01<00:03, 15.5MB/s]     29%|##9       | 18.7M/63.6M [00:01<00:02, 16.1MB/s]     34%|###4      | 21.7M/63.6M [00:01<00:02, 16.5MB/s]     39%|###8      | 24.7M/63.6M [00:01<00:02, 16.8MB/s]     43%|####3     | 27.7M/63.6M [00:02<00:02, 17.0MB/s]     48%|####8     | 30.7M/63.6M [00:02<00:02, 17.1MB/s]     53%|#####2    | 33.7M/63.6M [00:02<00:01, 17.2MB/s]     58%|#####7    | 36.7M/63.6M [00:02<00:01, 17.3MB/s]     62%|######2   | 39.7M/63.6M [00:02<00:01, 17.3MB/s]     67%|######6   | 42.6M/63.6M [00:02<00:01, 19.8MB/s]     70%|#######   | 44.6M/63.6M [00:03<00:01, 17.3MB/s]     74%|#######4  | 47.2M/63.6M [00:03<00:01, 16.7MB/s]     79%|#######8  | 50.2M/63.6M [00:03<00:00, 16.9MB/s]     84%|########3 | 53.2M/63.6M [00:03<00:00, 17.1MB/s]     88%|########8 | 56.2M/63.6M [00:03<00:00, 17.2MB/s]     93%|#########2| 59.0M/63.6M [00:03<00:00, 19.5MB/s]     96%|#########5| 61.0M/63.6M [00:04<00:00, 17.0MB/s]    100%|##########| 63.6M/63.6M [00:04<00:00, 15.7MB/s]
+      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 56.0k/63.6M [00:00<03:29, 319kB/s]      0%|          | 256k/63.6M [00:00<01:22, 810kB/s]       2%|1         | 1.10M/63.6M [00:00<00:24, 2.71MB/s]      6%|5         | 3.74M/63.6M [00:00<00:08, 7.72MB/s]     11%|#         | 6.74M/63.6M [00:00<00:05, 11.2MB/s]     15%|#5        | 9.74M/63.6M [00:01<00:04, 13.3MB/s]     20%|##        | 12.7M/63.6M [00:01<00:03, 14.6MB/s]     25%|##4       | 15.7M/63.6M [00:01<00:03, 15.6MB/s]     28%|##7       | 17.8M/63.6M [00:01<00:02, 16.8MB/s]     32%|###1      | 20.2M/63.6M [00:01<00:02, 16.2MB/s]     35%|###4      | 22.2M/63.6M [00:01<00:02, 17.1MB/s]     39%|###8      | 24.7M/63.6M [00:01<00:02, 16.5MB/s]     43%|####3     | 27.5M/63.6M [00:02<00:01, 19.4MB/s]     46%|####6     | 29.5M/63.6M [00:02<00:02, 16.7MB/s]     51%|#####     | 32.2M/63.6M [00:02<00:02, 16.4MB/s]     55%|#####5    | 35.2M/63.6M [00:02<00:01, 16.8MB/s]     60%|######    | 38.2M/63.6M [00:02<00:01, 16.9MB/s]     65%|######4   | 41.2M/63.6M [00:02<00:01, 17.1MB/s]     69%|######9   | 44.2M/63.6M [00:03<00:01, 17.4MB/s]     72%|#######2  | 45.9M/63.6M [00:03<00:01, 17.3MB/s]     77%|#######6  | 48.7M/63.6M [00:03<00:00, 17.3MB/s]     79%|#######9  | 50.4M/63.6M [00:03<00:00, 17.5MB/s]     84%|########3 | 53.2M/63.6M [00:03<00:00, 17.3MB/s]     86%|########6 | 54.9M/63.6M [00:03<00:00, 17.3MB/s]     91%|######### | 57.7M/63.6M [00:03<00:00, 17.4MB/s]     93%|#########3| 59.4M/63.6M [00:04<00:00, 17.4MB/s]     98%|#########7| 62.2M/63.6M [00:04<00:00, 17.2MB/s]    100%|##########| 63.6M/63.6M [00:04<00:00, 15.7MB/s]
     tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
              20, 11, 79, 77, 59, 37,  2]])
     tensor([25], dtype=torch.int32)
@@ -393,7 +393,7 @@ For the available bundles, and its usage, please refer to
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     21%|##1       | 22.7M/107M [00:00<00:00, 238MB/s]     52%|#####2    | 56.3M/107M [00:00<00:00, 305MB/s]     79%|#######9  | 85.4M/107M [00:00<00:00, 300MB/s]    100%|##########| 107M/107M [00:00<00:00, 305MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     15%|#4        | 16.0M/107M [00:00<00:01, 92.2MB/s]     30%|##9       | 32.0M/107M [00:00<00:00, 118MB/s]      45%|####4     | 48.0M/107M [00:00<00:00, 124MB/s]     59%|#####9    | 63.7M/107M [00:00<00:00, 120MB/s]     70%|#######   | 75.4M/107M [00:00<00:00, 110MB/s]     80%|#######9  | 86.0M/107M [00:00<00:00, 89.7MB/s]     89%|########9 | 96.0M/107M [00:01<00:00, 83.1MB/s]    100%|#########9| 107M/107M [00:01<00:00, 88.3MB/s]     100%|##########| 107M/107M [00:01<00:00, 97.6MB/s]
 
 
 
@@ -500,7 +500,7 @@ WaveRNN model from the same bundle.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
-      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 389MB/s]
+      0%|          | 0.00/16.7M [00:00<?, ?B/s]     89%|########8 | 14.8M/16.7M [00:00<00:00, 56.8MB/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 53.3MB/s]
 
 
 .. raw:: html
@@ -566,7 +566,7 @@ method and pass the spectrogram.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     38%|###7      | 40.5M/107M [00:00<00:00, 425MB/s]     75%|#######5  | 81.0M/107M [00:00<00:00, 416MB/s]    100%|##########| 107M/107M [00:00<00:00, 419MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     36%|###5      | 38.2M/107M [00:00<00:00, 401MB/s]     71%|#######1  | 76.5M/107M [00:00<00:00, 385MB/s]    100%|##########| 107M/107M [00:00<00:00, 393MB/s] 
 
 
 .. raw:: html
@@ -587,8 +587,8 @@ method and pass the spectrogram.
 Waveglow
 ~~~~~~~~
 
-Waveglow is a vocoder published by Nvidia. The pretrained weight is
-publishe on Torch Hub. One can instantiate the model using ``torch.hub``
+Waveglow is a vocoder published by Nvidia. The pretrained weights are
+published on Torch Hub. One can instantiate the model using ``torch.hub``
 module.
 
 
@@ -664,7 +664,7 @@ module.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  54.706 seconds)
+   **Total running time of the script:** ( 2 minutes  48.741 seconds)
 
 
 .. _sphx_glr_download_tutorials_tacotron2_pipeline_tutorial.py:
