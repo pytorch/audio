@@ -1002,6 +1002,10 @@ class GTZAN(Dataset):
         Please see http://marsyas.info/downloads/datasets.html if you are planning to use
         this dataset to publish results.
 
+    Note:
+        As of October 2022, the download link is not currently working. Setting ``download=True``
+        in GTZAN dataset will result in a URL connection error.
+
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from.
