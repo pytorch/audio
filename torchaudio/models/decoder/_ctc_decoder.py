@@ -173,8 +173,10 @@ class CTCDecoderLM(_LM):
 
         Returns:
             (CTCDecoderLMState, float)
-                CTCDecoderLMState: new LM state
-                float: score
+                CTCDecoderLMState:
+                    new LM state
+                float:
+                    score
         """
         raise NotImplementedError
 
