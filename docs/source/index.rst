@@ -32,6 +32,17 @@ Features described in this documentation are classified by release status:
    supported_features
    references
 
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   tutorials.io
+   tutorials.data
+   tutorials.pipelines
+
 API References
 --------------
 
@@ -64,36 +75,6 @@ Prototype API References
    prototype.functional
    prototype.models
    prototype.pipelines
-
-Getting Started
----------------
-    
-.. toctree::
-   :maxdepth: 1
-   :caption: Getting Started
-
-   tutorials.io
-   tutorials/audio_resampling_tutorial
-   tutorials/audio_data_augmentation_tutorial
-   tutorials/audio_feature_extractions_tutorial
-   tutorials/audio_feature_augmentation_tutorial
-   tutorials/audio_datasets_tutorial
-
-Advanced Usages
----------------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Advanced Usages
-
-   tutorials/speech_recognition_pipeline_tutorial
-   tutorials/online_asr_tutorial
-   tutorials/device_asr
-   tutorials/forced_alignment_tutorial
-   tutorials/tacotron2_pipeline_tutorial
-   tutorials/mvdr_tutorial
-   tutorials/asr_inference_with_ctc_decoder_tutorial
-   tutorials/hybrid_demucs_tutorial
 
 Citing torchaudio
 -----------------
