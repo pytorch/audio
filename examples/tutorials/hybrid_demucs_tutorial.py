@@ -173,6 +173,8 @@ def separate_sources(
         else:
             start += chunk_len
         end += chunk_len
+        if end >= length:
+            fade.fade_out_len = 0
     return final
 
 
