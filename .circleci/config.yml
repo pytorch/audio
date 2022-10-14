@@ -241,6 +241,66 @@ jobs:
           paths:
             - ffmpeg
 
+  build_sox_linux:
+    <<: *binary_common
+    docker:
+      - image: << parameters.wheel_docker_image >>
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+
+          keys:
+            - sox-linux-v0-{{ checksum ".cachekey" }}
+
+      - run:
+          command: |
+            export SOX_ROOT=${PWD}/third_party/sox
+            if [[ ! -d ${SOX_ROOT} ]]; then
+                packaging/sox/build.sh
+            fi
+      - save_cache:
+
+          key: sox-linux-v0-{{ checksum ".cachekey" }}
+
+          paths:
+            - third_party/sox
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - sox
+
+  build_sox_macos:
+    <<: *binary_common
+    macos:
+      xcode: "14.0"
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+
+          keys:
+            - sox-macos-v0-{{ checksum ".cachekey" }}
+
+      - run:
+          command: |
+            export SOX_ROOT=${PWD}/third_party/sox
+            if [[ ! -d ${SOX_ROOT} ]]; then
+                brew install wget
+                packaging/sox/build.sh
+            fi
+      - save_cache:
+
+          key: sox-macos-v0-{{ checksum ".cachekey" }}
+
+          paths:
+            - third_party/sox
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - sox
+
   binary_linux_wheel:
     <<: *binary_common
     docker:
@@ -253,6 +313,7 @@ jobs:
       - run:
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            export SOX_ROOT=${PWD}/third_party/sox
             packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
@@ -278,6 +339,7 @@ jobs:
           no_output_timeout: 30m
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            export SOX_ROOT=${PWD}/third_party/sox
             packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
@@ -306,6 +368,7 @@ jobs:
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
@@ -333,6 +396,7 @@ jobs:
             source $HOME/miniconda3/bin/activate
             conda install -yq conda-build
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
@@ -362,6 +426,7 @@ jobs:
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             bash packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
@@ -391,6 +456,7 @@ jobs:
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             bash packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
@@ -929,12 +995,23 @@ workflows:
           python_version: foo
           requires:
           - download_third_parties
+      - build_sox_linux:
+          name: build_sox_linux
+          python_version: foo
+          requires:
+          - download_third_parties
+      - build_sox_macos:
+          name: build_sox_macos
+          python_version: foo
+          requires:
+          - download_third_parties
       - binary_linux_wheel:
           cuda_version: cpu
           name: binary_linux_wheel_py3.7_cpu
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_pip:
           cuda_version: cpu
           name: binary_linux_wheel_py3.7_cpu_smoke_test_pip
@@ -947,6 +1024,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - smoke_test_linux_pip:
           cuda_version: cu116
@@ -960,6 +1038,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - smoke_test_linux_pip:
           cuda_version: cu117
@@ -973,6 +1052,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - smoke_test_linux_pip:
           cuda_version: rocm5.1.1
@@ -986,6 +1066,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - smoke_test_linux_pip:
           cuda_version: rocm5.2
@@ -1005,6 +1086,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_pip:
           cuda_version: cpu
           filters:
@@ -1023,6 +1105,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - smoke_test_linux_pip:
           cuda_version: cu116
@@ -1036,6 +1119,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - smoke_test_linux_pip:
           cuda_version: cu117
@@ -1049,6 +1133,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - smoke_test_linux_pip:
           cuda_version: rocm5.1.1
@@ -1062,6 +1147,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - smoke_test_linux_pip:
           cuda_version: rocm5.2
@@ -1075,6 +1161,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_pip:
           cuda_version: cpu
           name: binary_linux_wheel_py3.9_cpu_smoke_test_pip
@@ -1087,6 +1174,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - smoke_test_linux_pip:
           cuda_version: cu116
@@ -1100,6 +1188,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - smoke_test_linux_pip:
           cuda_version: cu117
@@ -1113,6 +1202,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - smoke_test_linux_pip:
           cuda_version: rocm5.1.1
@@ -1126,6 +1216,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - smoke_test_linux_pip:
           cuda_version: rocm5.2
@@ -1139,6 +1230,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_pip:
           cuda_version: cpu
           name: binary_linux_wheel_py3.10_cpu_smoke_test_pip
@@ -1151,6 +1243,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - smoke_test_linux_pip:
           cuda_version: cu116
@@ -1164,6 +1257,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - smoke_test_linux_pip:
           cuda_version: cu117
@@ -1177,6 +1271,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - smoke_test_linux_pip:
           cuda_version: rocm5.1.1
@@ -1190,6 +1285,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - smoke_test_linux_pip:
           cuda_version: rocm5.2
@@ -1203,24 +1299,28 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_macos_wheel:
           cuda_version: cpu
           name: binary_macos_wheel_py3.8_cpu
           python_version: '3.8'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_macos_wheel:
           cuda_version: cpu
           name: binary_macos_wheel_py3.9_cpu
           python_version: '3.9'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_macos_wheel:
           cuda_version: cpu
           name: binary_macos_wheel_py3.10_cpu
           python_version: '3.10'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_windows_wheel:
           cuda_version: cpu
           name: binary_windows_wheel_py3.7_cpu
@@ -1380,6 +1480,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda:
           cuda_version: cpu
           name: binary_linux_conda_py3.7_cpu_smoke_test_conda
@@ -1393,6 +1494,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu116
           name: binary_linux_conda_py3.7_cu116_smoke_test_conda
@@ -1406,6 +1508,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu117
           name: binary_linux_conda_py3.7_cu117_smoke_test_conda
@@ -1419,6 +1522,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda:
           cuda_version: cpu
           name: binary_linux_conda_py3.8_cpu_smoke_test_conda
@@ -1432,6 +1536,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu116
           name: binary_linux_conda_py3.8_cu116_smoke_test_conda
@@ -1445,6 +1550,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu117
           name: binary_linux_conda_py3.8_cu117_smoke_test_conda
@@ -1458,6 +1564,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda:
           cuda_version: cpu
           name: binary_linux_conda_py3.9_cpu_smoke_test_conda
@@ -1471,6 +1578,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu116
           name: binary_linux_conda_py3.9_cu116_smoke_test_conda
@@ -1484,6 +1592,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu117
           name: binary_linux_conda_py3.9_cu117_smoke_test_conda
@@ -1497,6 +1606,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda:
           cuda_version: cpu
           name: binary_linux_conda_py3.10_cpu_smoke_test_conda
@@ -1510,6 +1620,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu116
           name: binary_linux_conda_py3.10_cu116_smoke_test_conda
@@ -1523,6 +1634,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - smoke_test_linux_conda_gpu:
           cuda_version: cu117
           name: binary_linux_conda_py3.10_cu117_smoke_test_conda
@@ -1536,6 +1648,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1543,6 +1656,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1550,6 +1664,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1557,6 +1672,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_windows_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1863,6 +1979,28 @@ workflows:
           python_version: foo
           requires:
           - download_third_parties
+      - build_sox_linux:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: build_sox_linux
+          python_version: foo
+          requires:
+          - download_third_parties
+      - build_sox_macos:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: build_sox_macos
+          python_version: foo
+          requires:
+          - download_third_parties
       - binary_linux_wheel:
           cuda_version: cpu
           filters:
@@ -1875,6 +2013,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -1911,6 +2050,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - binary_wheel_upload:
           context: org-member
@@ -1948,6 +2088,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - binary_wheel_upload:
           context: org-member
@@ -1985,6 +2126,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - binary_wheel_upload:
           context: org-member
@@ -2022,6 +2164,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - binary_wheel_upload:
           context: org-member
@@ -2059,6 +2202,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -2095,6 +2239,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - binary_wheel_upload:
           context: org-member
@@ -2132,6 +2277,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - binary_wheel_upload:
           context: org-member
@@ -2169,6 +2315,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - binary_wheel_upload:
           context: org-member
@@ -2206,6 +2353,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - binary_wheel_upload:
           context: org-member
@@ -2243,6 +2391,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -2279,6 +2428,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - binary_wheel_upload:
           context: org-member
@@ -2316,6 +2466,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - binary_wheel_upload:
           context: org-member
@@ -2353,6 +2504,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - binary_wheel_upload:
           context: org-member
@@ -2390,6 +2542,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - binary_wheel_upload:
           context: org-member
@@ -2427,6 +2580,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -2463,6 +2617,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda116
       - binary_wheel_upload:
           context: org-member
@@ -2500,6 +2655,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-cuda117
       - binary_wheel_upload:
           context: org-member
@@ -2537,6 +2693,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.1.1
       - binary_wheel_upload:
           context: org-member
@@ -2574,6 +2731,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
           wheel_docker_image: pytorch/manylinux-rocm:5.2
       - binary_wheel_upload:
           context: org-member
@@ -2611,6 +2769,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -2635,6 +2794,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -2659,6 +2819,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -2683,6 +2844,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -3148,6 +3310,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3184,6 +3347,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3220,6 +3384,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3256,6 +3421,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3292,6 +3458,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3328,6 +3495,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3364,6 +3532,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3400,6 +3569,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3436,6 +3606,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3472,6 +3643,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3508,6 +3680,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3544,6 +3717,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_linux
+          - build_sox_linux
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3580,6 +3754,7 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3604,6 +3779,7 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3628,6 +3804,7 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_conda_upload:
           context: org-member
           filters:
@@ -3652,6 +3829,7 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_macos
+          - build_sox_macos
       - binary_conda_upload:
           context: org-member
           filters:

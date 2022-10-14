@@ -37,6 +37,8 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
     w += build_download_job(filter_branch)
     for os_type in ["linux", "macos", "windows"]:
         w += build_ffmpeg_job(os_type, filter_branch)
+    for os_type in ["linux", "macos"]:
+        w += build_sox_job(os_type, filter_branch)
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
@@ -80,6 +82,18 @@ def build_ffmpeg_job(os_type, filter_branch):
         job["filters"] = gen_filter_branch_tree(filter_branch)
     job["python_version"] = "foo"
     return [{f"build_ffmpeg_{os_type}": job}]
+
+
+def build_sox_job(os_type, filter_branch):
+    job = {
+        "name": f"build_sox_{os_type}",
+        "requires": ["download_third_parties"],
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    job["python_version"] = "foo"
+    return [{f"build_sox_{os_type}": job}]
 
 
 def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix="", upload=False):
@@ -155,6 +169,9 @@ def generate_base_workflow(base_workflow_name, python_version, cu_version, filte
         "cuda_version": cu_version,
         "requires": [f"build_ffmpeg_{os_type}"],
     }
+
+    if os_type in ["linux", "macos"]:
+        d["requires"].append(f"build_sox_{os_type}")
 
     if btype == "conda":
         d["conda_docker_image"] = f'pytorch/conda-builder:{cu_version.replace("cu1","cuda1")}'

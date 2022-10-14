@@ -78,12 +78,8 @@ if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
 endif()
 
-if(BUILD_SOX)
-  list(
-    APPEND
-    LIBTORCHAUDIO_LINK_LIBRARIES
-    libsox
-    )
+if(USE_SOX)
+  find_package(SOX REQUIRED COMPONENTS sox)
   list(
     APPEND
     LIBTORCHAUDIO_SOURCES
@@ -119,12 +115,11 @@ endif()
 #------------------------------------------------------------------------------#
 # END OF CUSTOMIZATION LOGICS
 #------------------------------------------------------------------------------#
-
 torchaudio_library(
   libtorchaudio
   "${LIBTORCHAUDIO_SOURCES}"
-  "${LIBTORCHAUDIO_INCLUDE_DIRS}"
-  "${LIBTORCHAUDIO_LINK_LIBRARIES}"
+  "${LIBTORCHAUDIO_INCLUDE_DIRS};${SOX_INCLUDE_DIRS}"
+  "${LIBTORCHAUDIO_LINK_LIBRARIES};${SOX_LINK_LIBRARIES}"
   "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
   )
 
@@ -178,7 +173,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   #----------------------------------------------------------------------------#
   # START OF CUSTOMIZATION LOGICS
   #----------------------------------------------------------------------------#
-  if(BUILD_SOX)
+  if(USE_SOX)
     list(
       APPEND
       EXTENSION_SOURCES
@@ -194,7 +189,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   torchaudio_extension(
     _torchaudio
     "${EXTENSION_SOURCES}"
-    ""
+    "${SOX_INCLUDE_DIRS}"
     libtorchaudio
     "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
     )

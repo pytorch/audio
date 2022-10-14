@@ -56,7 +56,7 @@ endif()
 
 
 # Options
-option(BUILD_SOX "Build libsox statically" ON)
+option(USE_SOX "Enable SoX features" ON)
 option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
 option(BUILD_CTC_DECODER "Build Flashlight CTC decoder" ON)

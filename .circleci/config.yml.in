@@ -241,6 +241,66 @@ jobs:
           paths:
             - ffmpeg
 
+  build_sox_linux:
+    <<: *binary_common
+    docker:
+      - image: << parameters.wheel_docker_image >>
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - sox-linux-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+      - run:
+          command: |
+            export SOX_ROOT=${PWD}/third_party/sox
+            if [[ ! -d ${SOX_ROOT} ]]; then
+                packaging/sox/build.sh
+            fi
+      - save_cache:
+          {% raw %}
+          key: sox-linux-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+          paths:
+            - third_party/sox
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - sox
+
+  build_sox_macos:
+    <<: *binary_common
+    macos:
+      xcode: "14.0"
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - sox-macos-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+      - run:
+          command: |
+            export SOX_ROOT=${PWD}/third_party/sox
+            if [[ ! -d ${SOX_ROOT} ]]; then
+                brew install wget
+                packaging/sox/build.sh
+            fi
+      - save_cache:
+          {% raw %}
+          key: sox-macos-v0-{{ checksum ".cachekey" }}
+          {% endraw %}
+          paths:
+            - third_party/sox
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - sox
+
   binary_linux_wheel:
     <<: *binary_common
     docker:
@@ -253,6 +313,7 @@ jobs:
       - run:
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            export SOX_ROOT=${PWD}/third_party/sox
             packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
@@ -278,6 +339,7 @@ jobs:
           no_output_timeout: 30m
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
+            export SOX_ROOT=${PWD}/third_party/sox
             packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
@@ -306,6 +368,7 @@ jobs:
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
@@ -333,6 +396,7 @@ jobs:
             source $HOME/miniconda3/bin/activate
             conda install -yq conda-build
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
@@ -362,6 +426,7 @@ jobs:
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate base
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             bash packaging/build_wheel.sh
           environment:
             USE_FFMPEG: true
@@ -391,6 +456,7 @@ jobs:
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
             export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+            export SOX_ROOT="${PWD}/third_party/sox"
             bash packaging/build_conda.sh
           environment:
             USE_FFMPEG: true
