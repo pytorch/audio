@@ -24,7 +24,8 @@
 Methods
 =======
 
-{%- for item in methods %}
+{%- for item in members %}
+{%- if not item.startswith('_') or item == "__call__" %}
 
 {{ item | underline("-") }}
 
@@ -32,12 +33,13 @@ Methods
 
    .. automethod:: {{[fullname, item] | join('.')}}
 
+{%- endif %}
 {%- endfor %}
 
 Support Structures
 ==================
 
-{%- for item in ["CTCDecoderLM", "CTCDecoderLMState", "CTCHypothesis"] %}
+{%- for item in ["CTCHypothesis", "CTCDecoderLM", "CTCDecoderLMState"] %}
 
 {{ item | underline("-") }}
 
