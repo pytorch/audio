@@ -170,10 +170,6 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
       "At least one stream must exist in this context");
 
   int64_t timestamp_av_tb = static_cast<int64_t>(timestamp_s * AV_TIME_BASE);
-  // rescale timestamp to the default stream timebase
-  AVRational default_tb = pFormatContext->streams[0]->time_base;
-  int64_t timestamp_default_tb =
-      av_rescale_q(timestamp_av_tb, AV_TIME_BASE_Q, default_tb);
 
   int flag = AVSEEK_FLAG_BACKWARD;
   switch (mode) {
@@ -193,7 +189,7 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
       TORCH_CHECK(false, "Invalid mode value: ", mode);
   }
 
-  int ret = av_seek_frame(pFormatContext, 0, timestamp_default_tb, flag);
+  int ret = av_seek_frame(pFormatContext, -1, timestamp_av_tb, flag);
 
   if (ret < 0) {
     seek_timestamp = -1;
