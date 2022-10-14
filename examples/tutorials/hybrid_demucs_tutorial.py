@@ -161,7 +161,7 @@ def separate_sources(
 
     final = torch.zeros(batch, len(model.sources), channels, length, device=device)
 
-    while start < length:
+    while start < length - overlap_frames:
         chunk = mix[:, :, start:end]
         with torch.no_grad():
             out = model.forward(chunk)
@@ -173,6 +173,8 @@ def separate_sources(
         else:
             start += chunk_len
         end += chunk_len
+        if end >= length:
+            fade.fade_out_len = 0
     return final
 
 
