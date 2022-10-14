@@ -441,6 +441,39 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         with self.assertRaises(ValueError):
             s.seek(10, "magic_seek")
 
+    def test_seek_modes(self):
+        """Calling expected output for the different types of seek"""
+        s = StreamReader(self.get_src())
+        s.add_basic_audio_stream(-1)
+        s.add_basic_video_stream(-1)
+
+        s.seek(2, "key")
+        achunk_key, vchunk_key = next(s.stream())
+        expected_achunk_key = torch.load(get_asset_path("expected_outputs/seek_key_audio_expected.pkl"))
+        expected_vchunk_key = torch.load(get_asset_path("expected_outputs/seek_key_video_expected.pkl"))
+        assert torch.equal(achunk_key, expected_achunk_key)
+        assert torch.equal(vchunk_key, expected_vchunk_key)
+
+        s.seek(2, "any")
+        achunk_any, vchunk_any = next(s.stream())
+        expected_achunk_any = torch.load(get_asset_path("expected_outputs/seek_any_audio_expected.pkl"))
+        expected_vchunk_any = torch.load(get_asset_path("expected_outputs/seek_any_video_expected.pkl"))
+        assert torch.equal(achunk_any, expected_achunk_any)
+        assert torch.equal(vchunk_any, expected_vchunk_any)
+
+        s.seek(2, "precise")
+        achunk_precise, vchunk_precise = next(s.stream())
+        expected_achunk_precise = torch.load(get_asset_path("expected_outputs/seek_precise_audio_expected.pkl"))
+        expected_vchunk_precise = torch.load(get_asset_path("expected_outputs/seek_precise_video_expected.pkl"))
+        assert torch.equal(achunk_precise, expected_achunk_precise)
+        assert torch.equal(vchunk_precise, expected_vchunk_precise)
+
+        assert not torch.equal(achunk_precise, achunk_any)
+        assert not torch.equal(achunk_any, achunk_key)
+
+        assert not torch.equal(vchunk_precise, vchunk_any)
+        assert not torch.equal(vchunk_any, vchunk_key)
+
 
 def _to_fltp(original):
     """Convert Tensor to float32 with value range [-1, 1]"""
