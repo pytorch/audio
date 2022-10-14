@@ -2,7 +2,7 @@
 Speech Enhancement with MVDR Beamforming
 ========================================
 
-**Author** `Zhaoheng Ni <zni@fb.com>`__
+**Author**: `Zhaoheng Ni <zni@meta.com>`__
 
 """
 
