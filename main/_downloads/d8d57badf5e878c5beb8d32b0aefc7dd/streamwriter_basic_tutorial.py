@@ -654,7 +654,7 @@ with s.open():
             s.write_video_chunk(1, torch.stack(frames))
         i += frame_rate
 
-# sphinx_gallery_defer_figures
+plt.close(fig)
 
 ######################################################################
 #
@@ -666,8 +666,6 @@ with s.open():
 #
 
 Video(get_path("example.mp4"), embed=True)
-
-# sphinx_gallery_defer_figures
 
 ######################################################################
 #
