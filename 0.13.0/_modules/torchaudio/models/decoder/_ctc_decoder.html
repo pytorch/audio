@@ -531,8 +531,10 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (CTCDecoderLMState, float)</span>
-<span class="sd">                CTCDecoderLMState: new LM state</span>
-<span class="sd">                float: score</span>
+<span class="sd">                CTCDecoderLMState:</span>
+<span class="sd">                    new LM state</span>
+<span class="sd">                float:</span>
+<span class="sd">                    score</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
@@ -562,7 +564,7 @@
 <span class="sd">        To build the decoder, please use the factory function :func:`ctc_decoder`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CTCDecoder.__init__"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">nbest</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">lexicon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
@@ -611,7 +613,7 @@
                 <span class="n">token_lm</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">_LexiconFreeDecoder</span><span class="p">(</span><span class="n">decoder_options</span><span class="p">,</span> <span class="n">lm</span><span class="p">,</span> <span class="n">silence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span> <span class="n">transitions</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">_LexiconFreeDecoder</span><span class="p">(</span><span class="n">decoder_options</span><span class="p">,</span> <span class="n">lm</span><span class="p">,</span> <span class="n">silence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span> <span class="n">transitions</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">:</span>
         <span class="n">idxs</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">idxs</span><span class="p">))</span>
@@ -629,7 +631,7 @@
                 <span class="n">timesteps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">(</span><span class="n">timesteps</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+<div class="viewcode-block" id="CTCDecoder.__call__"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">emissions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">CTCHypothesis</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -677,7 +679,7 @@
                 <span class="p">]</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">hypos</span>
+        <span class="k">return</span> <span class="n">hypos</span></div>
 
 <div class="viewcode-block" id="CTCDecoder.idxs_to_tokens"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.idxs_to_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">idxs_to_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>

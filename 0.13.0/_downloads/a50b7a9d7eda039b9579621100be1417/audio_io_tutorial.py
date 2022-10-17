@@ -3,6 +3,8 @@
 Audio I/O
 =========
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use TorchAudio's basic I/O API to load audio files
 into PyTorch's Tensor object, and save Tensor objects to audio files.
 """

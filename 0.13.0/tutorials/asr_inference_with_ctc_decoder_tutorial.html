@@ -389,7 +389,7 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="asr-inference-with-ctc-decoder">
 <span id="sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"></span><h1>ASR Inference with CTC Decoder<a class="headerlink" href="#asr-inference-with-ctc-decoder" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="mailto:carolinechen&#37;&#52;&#48;fb&#46;com">Caroline Chen</a></p>
+<p><strong>Author</strong>: <a class="reference external" href="mailto:carolinechen&#37;&#52;&#48;meta&#46;com">Caroline Chen</a></p>
 <p>This tutorial shows how to perform speech recognition inference using a
 CTC beam search decoder with lexicon constraint and KenLM language model
 support. We demonstrate this on a pretrained wav2vec 2.0 model trained
@@ -406,19 +406,20 @@ can be generated.</p>
 beam search decoder. A mathematical formula for the decoder optimization can be
 found in the <a class="reference external" href="https://arxiv.org/pdf/1609.03193.pdf">Wav2Letter paper</a>, and
 a more detailed algorithm can be found in this <a class="reference external" href="https://towardsdatascience.com/boosting-your-sequence-generation-performance-with-beam-search-language-model-decoding-74ee64de435a">blog</a>.</p>
-<p>Running ASR inference using a CTC Beam Search decoder with a KenLM
-language model and lexicon constraint requires the following components</p>
+<p>Running ASR inference using a CTC Beam Search decoder with a language
+model and lexicon constraint requires the following components</p>
 <ul class="simple">
 <li><p>Acoustic Model: model predicting phonetics from audio waveforms</p></li>
 <li><p>Tokens: the possible predicted tokens from the acoustic model</p></li>
 <li><p>Lexicon: mapping between possible words and their corresponding
 tokens sequence</p></li>
-<li><p>KenLM: n-gram language model trained with the <a class="reference external" href="https://kheafield.com/code/kenlm/">KenLM
-library</a></p></li>
+<li><p>Language Model (LM): n-gram language model trained with the <a class="reference external" href="https://kheafield.com/code/kenlm/">KenLM
+library</a>, or custom language
+model that inherits <a class="reference internal" href="../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CTCDecoderLM</span></code></a></p></li>
 </ul>
 </section>
-<section id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
+<section id="acoustic-model-and-set-up">
+<h2>Acoustic Model and Set Up<a class="headerlink" href="#acoustic-model-and-set-up" title="Permalink to this heading">¶</a></h2>
 <p>First we import the necessary utilities and fetch the data that we are
 working with</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -441,8 +442,6 @@ working with</p>
 <span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 </pre></div>
 </div>
-<section id="acoustic-model-and-data">
-<h3>Acoustic Model and Data<a class="headerlink" href="#acoustic-model-and-data" title="Permalink to this heading">¶</a></h3>
 <p>We use the pretrained <a class="reference external" href="https://arxiv.org/abs/2006.11477">Wav2Vec 2.0</a>
 Base model that is finetuned on 10 min of the <a class="reference external" href="http://www.openslr.org/12">LibriSpeech
 dataset</a>, which can be loaded in using
@@ -457,51 +456,15 @@ tutorial</a>.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ll10m.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ll10m.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
-  2%|2         | 7.30M/360M [00:00&lt;00:04, 75.6MB/s]
-  4%|4         | 15.2M/360M [00:00&lt;00:04, 80.0MB/s]
-  7%|6         | 23.9M/360M [00:00&lt;00:04, 84.8MB/s]
-  9%|8         | 32.0M/360M [00:00&lt;00:04, 82.6MB/s]
- 11%|#1        | 40.1M/360M [00:00&lt;00:04, 83.6MB/s]
- 14%|#3        | 48.7M/360M [00:00&lt;00:03, 85.8MB/s]
- 16%|#5        | 57.0M/360M [00:00&lt;00:03, 86.0MB/s]
- 18%|#8        | 65.6M/360M [00:00&lt;00:03, 87.0MB/s]
- 21%|##        | 74.2M/360M [00:00&lt;00:03, 87.9MB/s]
- 23%|##2       | 82.5M/360M [00:01&lt;00:03, 83.8MB/s]
- 25%|##5       | 90.6M/360M [00:01&lt;00:03, 79.5MB/s]
- 27%|##7       | 98.3M/360M [00:01&lt;00:03, 79.8MB/s]
- 29%|##9       | 106M/360M [00:01&lt;00:03, 78.5MB/s]
- 32%|###1      | 114M/360M [00:01&lt;00:03, 80.4MB/s]
- 34%|###3      | 122M/360M [00:01&lt;00:03, 81.4MB/s]
- 36%|###6      | 130M/360M [00:01&lt;00:03, 79.7MB/s]
- 38%|###8      | 137M/360M [00:01&lt;00:02, 79.3MB/s]
- 40%|####      | 145M/360M [00:01&lt;00:02, 79.1MB/s]
- 42%|####2     | 153M/360M [00:01&lt;00:02, 79.4MB/s]
- 45%|####4     | 160M/360M [00:02&lt;00:03, 65.5MB/s]
- 47%|####6     | 168M/360M [00:02&lt;00:02, 70.4MB/s]
- 49%|####8     | 176M/360M [00:02&lt;00:02, 73.3MB/s]
- 51%|#####1    | 185M/360M [00:02&lt;00:02, 77.5MB/s]
- 53%|#####3    | 193M/360M [00:02&lt;00:02, 79.2MB/s]
- 56%|#####5    | 201M/360M [00:02&lt;00:02, 81.7MB/s]
- 58%|#####7    | 209M/360M [00:02&lt;00:01, 81.9MB/s]
- 60%|######    | 217M/360M [00:02&lt;00:01, 82.5MB/s]
- 62%|######2   | 225M/360M [00:02&lt;00:01, 80.4MB/s]
- 65%|######4   | 233M/360M [00:03&lt;00:01, 80.3MB/s]
- 67%|######6   | 241M/360M [00:03&lt;00:01, 81.8MB/s]
- 69%|######9   | 249M/360M [00:03&lt;00:01, 80.7MB/s]
- 71%|#######1  | 257M/360M [00:03&lt;00:01, 83.1MB/s]
- 74%|#######3  | 265M/360M [00:03&lt;00:01, 81.8MB/s]
- 76%|#######5  | 273M/360M [00:03&lt;00:01, 81.2MB/s]
- 78%|#######8  | 281M/360M [00:03&lt;00:01, 82.1MB/s]
- 80%|########  | 289M/360M [00:03&lt;00:00, 82.6MB/s]
- 83%|########2 | 298M/360M [00:03&lt;00:00, 84.7MB/s]
- 85%|########4 | 306M/360M [00:03&lt;00:00, 81.9MB/s]
- 87%|########7 | 313M/360M [00:04&lt;00:00, 80.6MB/s]
- 89%|########9 | 321M/360M [00:04&lt;00:00, 78.9MB/s]
- 92%|#########1| 330M/360M [00:04&lt;00:00, 81.7MB/s]
- 94%|#########3| 338M/360M [00:04&lt;00:00, 83.9MB/s]
- 96%|#########6| 347M/360M [00:04&lt;00:00, 85.4MB/s]
- 98%|#########8| 355M/360M [00:04&lt;00:00, 83.5MB/s]
-100%|##########| 360M/360M [00:04&lt;00:00, 81.0MB/s]
+ 12%|#1        | 43.0M/360M [00:00&lt;00:00, 451MB/s]
+ 24%|##4       | 87.4M/360M [00:00&lt;00:00, 459MB/s]
+ 37%|###6      | 132M/360M [00:00&lt;00:00, 461MB/s]
+ 49%|####8     | 176M/360M [00:00&lt;00:00, 463MB/s]
+ 61%|######1   | 220M/360M [00:00&lt;00:00, 462MB/s]
+ 73%|#######3  | 264M/360M [00:00&lt;00:00, 460MB/s]
+ 86%|########5 | 308M/360M [00:00&lt;00:00, 461MB/s]
+ 98%|#########7| 352M/360M [00:00&lt;00:00, 460MB/s]
+100%|##########| 360M/360M [00:00&lt;00:00, 458MB/s]
 </pre></div>
 </div>
 <p>We will load a sample from the LibriSpeech test-other dataset.</p>
@@ -511,7 +474,7 @@ tutorial</a>.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/441k [00:00&lt;?, ?B/s]
-100%|##########| 441k/441k [00:00&lt;00:00, 61.0MB/s]
+100%|##########| 441k/441k [00:00&lt;00:00, 92.6MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -535,13 +498,13 @@ tutorial</a>.</p>
 </div>
 </section>
 <section id="files-and-data-for-decoder">
-<h3>Files and Data for Decoder<a class="headerlink" href="#files-and-data-for-decoder" title="Permalink to this heading">¶</a></h3>
-<p>Next, we load in our token, lexicon, and KenLM data, which are used by
-the decoder to predict words from the acoustic model output. Pretrained
+<h2>Files and Data for Decoder<a class="headerlink" href="#files-and-data-for-decoder" title="Permalink to this heading">¶</a></h2>
+<p>Next, we load in our token, lexicon, and language model data, which are used
+by the decoder to predict words from the acoustic model output. Pretrained
 files for the LibriSpeech dataset can be downloaded through torchaudio,
 or the user can provide their own files.</p>
 <section id="tokens">
-<h4>Tokens<a class="headerlink" href="#tokens" title="Permalink to this heading">¶</a></h4>
+<h3>Tokens<a class="headerlink" href="#tokens" title="Permalink to this heading">¶</a></h3>
 <p>The tokens are the possible symbols that the acoustic model can predict,
 including the blank and silent symbols. It can either be passed in as a
 file, where each line consists of the tokens corresponding to the same
@@ -563,7 +526,7 @@ index, or as a list of tokens, each mapping to a unique index.</p>
 </div>
 </section>
 <section id="lexicon">
-<h4>Lexicon<a class="headerlink" href="#lexicon" title="Permalink to this heading">¶</a></h4>
+<h3>Lexicon<a class="headerlink" href="#lexicon" title="Permalink to this heading">¶</a></h3>
 <p>The lexicon is a mapping from words to their corresponding tokens
 sequence, and is used to restrict the search space of the decoder to
 only words from the lexicon. The expected format of the lexicon file is
@@ -577,6 +540,17 @@ a line per word, with a word followed by its space-split tokens.</p>
 </pre></div>
 </div>
 </section>
+<section id="language-model">
+<h3>Language Model<a class="headerlink" href="#language-model" title="Permalink to this heading">¶</a></h3>
+<p>A language model can be used in decoding to improve the results, by
+factoring in a language model score that represents the likelihood of
+the sequence into the beam search computation. Below, we outline the
+different forms of language models that are supported for decoding.</p>
+<section id="no-language-model">
+<h4>No Language Model<a class="headerlink" href="#no-language-model" title="Permalink to this heading">¶</a></h4>
+<p>To create a decoder instance without a language model, set <cite>lm=None</cite>
+when initializing the decoder.</p>
+</section>
 <section id="kenlm">
 <h4>KenLM<a class="headerlink" href="#kenlm" title="Permalink to this heading">¶</a></h4>
 <p>This is an n-gram language model trained with the <a class="reference external" href="https://kheafield.com/code/kenlm/">KenLM
@@ -585,6 +559,49 @@ the binarized <code class="docutils literal notranslate"><span class="pre">.bin<
 recommended for faster loading.</p>
 <p>The language model used in this tutorial is a 4-gram KenLM trained using
 <a class="reference external" href="http://www.openslr.org/11">LibriSpeech</a>.</p>
+</section>
+<section id="custom-language-model">
+<h4>Custom Language Model<a class="headerlink" href="#custom-language-model" title="Permalink to this heading">¶</a></h4>
+<p>Users can define their own custom language model in Python, whether
+it be a statistical or neural network language model, using
+<a class="reference internal" href="../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLM" title="torchaudio.models.decoder.CTCDecoderLM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CTCDecoderLM</span></code></a> and
+<a class="reference internal" href="../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CTCDecoderLMState</span></code></a>.</p>
+<p>For instance, the following code creates a basic wrapper around a PyTorch
+<code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> language model.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.models.decoder</span> <span class="kn">import</span> <span class="n">CTCDecoderLM</span><span class="p">,</span> <span class="n">CTCDecoderLMState</span>
+
+
+<span class="k">class</span> <span class="nc">CustomLM</span><span class="p">(</span><span class="n">CTCDecoderLM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a Python wrapper around `language_model` to feed to the decoder.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language_model</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
+        <span class="n">CTCDecoderLM</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language_model</span> <span class="o">=</span> <span class="n">language_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sil</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># index for silent token in the language model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">language_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_with_nothing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">CTCDecoderLMState</span><span class="p">()</span>
+        <span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+            <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sil</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a>
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CTCDecoderLMState</span><span class="p">,</span> <span class="n">token_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">outstate</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="n">token_index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outstate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_model</span><span class="p">(</span><span class="n">token_index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">outstate</span><span class="p">]</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a>
+        <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">outstate</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">outstate</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a>
+
+    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CTCDecoderLMState</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sil</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="downloading-pretrained-files">
 <h4>Downloading Pretrained Files<a class="headerlink" href="#downloading-pretrained-files" title="Permalink to this heading">¶</a></h4>
@@ -600,272 +617,82 @@ model can be large</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/4.97M [00:00&lt;?, ?B/s]
- 49%|####8     | 2.43M/4.97M [00:00&lt;00:00, 25.4MB/s]
-100%|##########| 4.97M/4.97M [00:00&lt;00:00, 33.8MB/s]
+100%|##########| 4.97M/4.97M [00:00&lt;00:00, 310MB/s]
 
   0%|          | 0.00/57.0 [00:00&lt;?, ?B/s]
-100%|##########| 57.0/57.0 [00:00&lt;00:00, 38.4kB/s]
+100%|##########| 57.0/57.0 [00:00&lt;00:00, 47.1kB/s]
 
   0%|          | 0.00/2.91G [00:00&lt;?, ?B/s]
-  0%|          | 11.9M/2.91G [00:00&lt;00:24, 125MB/s]
-  1%|          | 23.9M/2.91G [00:00&lt;00:28, 109MB/s]
-  1%|1         | 34.4M/2.91G [00:00&lt;00:31, 98.5MB/s]
-  2%|1         | 48.0M/2.91G [00:00&lt;00:35, 87.2MB/s]
-  2%|2         | 64.0M/2.91G [00:00&lt;00:31, 96.3MB/s]
-  3%|2         | 79.7M/2.91G [00:01&lt;00:43, 69.8MB/s]
-  3%|2         | 87.4M/2.91G [00:01&lt;00:55, 55.1MB/s]
-  4%|3         | 104M/2.91G [00:01&lt;00:39, 75.7MB/s]
-  4%|4         | 121M/2.91G [00:01&lt;00:32, 93.7MB/s]
-  4%|4         | 132M/2.91G [00:01&lt;00:37, 79.5MB/s]
-  5%|4         | 144M/2.91G [00:01&lt;00:36, 81.8MB/s]
-  5%|5         | 160M/2.91G [00:02&lt;00:33, 87.8MB/s]
-  6%|5         | 174M/2.91G [00:02&lt;00:29, 99.7MB/s]
-  6%|6         | 185M/2.91G [00:02&lt;00:28, 103MB/s]
-  7%|6         | 196M/2.91G [00:02&lt;00:32, 90.1MB/s]
-  7%|6         | 205M/2.91G [00:02&lt;00:35, 80.9MB/s]
-  8%|7         | 224M/2.91G [00:02&lt;00:31, 92.1MB/s]
-  8%|7         | 238M/2.91G [00:02&lt;00:27, 104MB/s]
-  8%|8         | 249M/2.91G [00:02&lt;00:31, 90.5MB/s]
-  9%|8         | 267M/2.91G [00:03&lt;00:24, 114MB/s]
-  9%|9         | 280M/2.91G [00:03&lt;00:30, 91.9MB/s]
- 10%|9         | 290M/2.91G [00:03&lt;00:39, 70.6MB/s]
- 10%|#         | 299M/2.91G [00:03&lt;00:39, 71.9MB/s]
- 10%|#         | 307M/2.91G [00:03&lt;00:45, 62.0MB/s]
- 11%|#         | 320M/2.91G [00:04&lt;00:36, 76.4MB/s]
- 11%|#1        | 329M/2.91G [00:04&lt;00:34, 80.5MB/s]
- 11%|#1        | 338M/2.91G [00:04&lt;00:45, 60.5MB/s]
- 12%|#1        | 352M/2.91G [00:04&lt;00:36, 76.0MB/s]
- 12%|#2        | 361M/2.91G [00:04&lt;00:39, 68.9MB/s]
- 12%|#2        | 368M/2.91G [00:04&lt;00:42, 64.4MB/s]
- 13%|#2        | 383M/2.91G [00:04&lt;00:33, 80.8MB/s]
- 13%|#3        | 392M/2.91G [00:05&lt;00:51, 53.0MB/s]
- 14%|#3        | 416M/2.91G [00:05&lt;00:34, 77.6MB/s]
- 14%|#4        | 430M/2.91G [00:05&lt;00:29, 90.1MB/s]
- 15%|#4        | 440M/2.91G [00:05&lt;00:31, 84.1MB/s]
- 15%|#5        | 450M/2.91G [00:06&lt;00:49, 53.5MB/s]
- 16%|#5        | 464M/2.91G [00:06&lt;00:43, 61.3MB/s]
- 16%|#6        | 480M/2.91G [00:06&lt;00:37, 70.0MB/s]
- 17%|#6        | 496M/2.91G [00:06&lt;00:36, 72.3MB/s]
- 17%|#7        | 511M/2.91G [00:06&lt;00:35, 72.1MB/s]
- 17%|#7        | 518M/2.91G [00:07&lt;00:37, 68.8MB/s]
- 18%|#7        | 530M/2.91G [00:07&lt;00:32, 79.5MB/s]
- 18%|#8        | 543M/2.91G [00:07&lt;00:28, 90.5MB/s]
- 19%|#8        | 553M/2.91G [00:07&lt;00:34, 73.0MB/s]
- 19%|#8        | 561M/2.91G [00:07&lt;00:40, 62.2MB/s]
- 19%|#9        | 576M/2.91G [00:07&lt;00:35, 70.5MB/s]
- 20%|#9        | 590M/2.91G [00:07&lt;00:29, 85.1MB/s]
- 20%|##        | 599M/2.91G [00:08&lt;00:37, 67.4MB/s]
- 20%|##        | 608M/2.91G [00:08&lt;00:34, 72.6MB/s]
- 21%|##        | 617M/2.91G [00:08&lt;00:33, 73.1MB/s]
- 21%|##        | 625M/2.91G [00:08&lt;00:39, 62.6MB/s]
- 21%|##1       | 632M/2.91G [00:08&lt;00:47, 52.2MB/s]
- 22%|##1       | 643M/2.91G [00:08&lt;00:37, 64.7MB/s]
- 22%|##1       | 655M/2.91G [00:08&lt;00:31, 77.3MB/s]
- 23%|##2       | 672M/2.91G [00:09&lt;00:27, 88.8MB/s]
- 23%|##2       | 681M/2.91G [00:09&lt;00:31, 76.6MB/s]
- 23%|##3       | 694M/2.91G [00:09&lt;00:26, 88.9MB/s]
- 24%|##3       | 706M/2.91G [00:09&lt;00:23, 99.5MB/s]
- 24%|##4       | 717M/2.91G [00:09&lt;00:25, 92.9MB/s]
- 25%|##4       | 731M/2.91G [00:09&lt;00:24, 96.7MB/s]
- 25%|##4       | 741M/2.91G [00:09&lt;00:29, 80.9MB/s]
- 25%|##5       | 749M/2.91G [00:10&lt;00:34, 66.8MB/s]
- 26%|##5       | 764M/2.91G [00:10&lt;00:27, 85.0MB/s]
- 26%|##5       | 773M/2.91G [00:10&lt;00:27, 83.3MB/s]
- 26%|##6       | 784M/2.91G [00:10&lt;00:25, 89.6MB/s]
- 27%|##6       | 796M/2.91G [00:10&lt;00:23, 98.1MB/s]
- 27%|##7       | 808M/2.91G [00:10&lt;00:21, 105MB/s]
- 27%|##7       | 818M/2.91G [00:10&lt;00:24, 92.4MB/s]
- 28%|##7       | 832M/2.91G [00:10&lt;00:22, 101MB/s]
- 28%|##8       | 842M/2.91G [00:11&lt;00:32, 68.2MB/s]
- 29%|##8       | 852M/2.91G [00:11&lt;00:29, 75.5MB/s]
- 29%|##9       | 877M/2.91G [00:11&lt;00:19, 116MB/s]
- 30%|##9       | 891M/2.91G [00:11&lt;00:17, 124MB/s]
- 30%|###       | 905M/2.91G [00:11&lt;00:22, 97.3MB/s]
- 31%|###       | 917M/2.91G [00:11&lt;00:20, 103MB/s]
- 31%|###1      | 929M/2.91G [00:12&lt;00:25, 83.7MB/s]
- 32%|###1      | 944M/2.91G [00:12&lt;00:25, 85.0MB/s]
- 32%|###1      | 953M/2.91G [00:12&lt;00:28, 75.6MB/s]
- 32%|###2      | 961M/2.91G [00:12&lt;00:32, 64.5MB/s]
- 33%|###3      | 984M/2.91G [00:12&lt;00:21, 96.7MB/s]
- 34%|###3      | 0.98G/2.91G [00:12&lt;00:17, 117MB/s]
- 34%|###4      | 0.99G/2.91G [00:13&lt;00:17, 120MB/s]
- 35%|###4      | 1.00G/2.91G [00:13&lt;00:18, 110MB/s]
- 35%|###4      | 1.02G/2.91G [00:13&lt;00:18, 109MB/s]
- 35%|###5      | 1.03G/2.91G [00:13&lt;00:20, 98.1MB/s]
- 36%|###5      | 1.04G/2.91G [00:13&lt;00:21, 95.2MB/s]
- 36%|###5      | 1.05G/2.91G [00:13&lt;00:21, 91.2MB/s]
- 36%|###6      | 1.06G/2.91G [00:14&lt;00:32, 60.9MB/s]
- 37%|###6      | 1.07G/2.91G [00:14&lt;00:24, 81.9MB/s]
- 37%|###7      | 1.09G/2.91G [00:14&lt;00:19, 99.3MB/s]
- 38%|###7      | 1.10G/2.91G [00:14&lt;00:19, 98.6MB/s]
- 38%|###8      | 1.11G/2.91G [00:14&lt;00:21, 90.7MB/s]
- 38%|###8      | 1.12G/2.91G [00:14&lt;00:22, 84.5MB/s]
- 39%|###8      | 1.13G/2.91G [00:14&lt;00:22, 83.3MB/s]
- 39%|###9      | 1.14G/2.91G [00:14&lt;00:21, 87.4MB/s]
- 40%|###9      | 1.16G/2.91G [00:15&lt;00:19, 97.5MB/s]
- 40%|####      | 1.16G/2.91G [00:15&lt;00:31, 58.9MB/s]
- 41%|####      | 1.19G/2.91G [00:15&lt;00:20, 88.9MB/s]
- 41%|####1     | 1.20G/2.91G [00:15&lt;00:19, 92.9MB/s]
- 42%|####1     | 1.22G/2.91G [00:15&lt;00:19, 92.4MB/s]
- 42%|####2     | 1.23G/2.91G [00:15&lt;00:17, 105MB/s]
- 43%|####2     | 1.25G/2.91G [00:16&lt;00:19, 93.6MB/s]
- 43%|####3     | 1.26G/2.91G [00:16&lt;00:20, 87.3MB/s]
- 43%|####3     | 1.27G/2.91G [00:16&lt;00:20, 84.1MB/s]
- 44%|####3     | 1.27G/2.91G [00:16&lt;00:25, 67.6MB/s]
- 44%|####4     | 1.28G/2.91G [00:16&lt;00:29, 60.2MB/s]
- 45%|####4     | 1.30G/2.91G [00:16&lt;00:19, 89.9MB/s]
- 45%|####5     | 1.31G/2.91G [00:17&lt;00:20, 84.8MB/s]
- 45%|####5     | 1.32G/2.91G [00:17&lt;00:22, 75.2MB/s]
- 46%|####5     | 1.33G/2.91G [00:17&lt;00:31, 54.3MB/s]
- 46%|####6     | 1.34G/2.91G [00:17&lt;00:27, 61.7MB/s]
- 47%|####6     | 1.36G/2.91G [00:17&lt;00:22, 75.0MB/s]
- 47%|####6     | 1.37G/2.91G [00:18&lt;00:28, 58.3MB/s]
- 47%|####7     | 1.37G/2.91G [00:18&lt;00:27, 59.2MB/s]
- 48%|####7     | 1.39G/2.91G [00:18&lt;00:22, 72.6MB/s]
- 48%|####7     | 1.40G/2.91G [00:18&lt;00:27, 59.9MB/s]
- 48%|####8     | 1.40G/2.91G [00:18&lt;00:33, 48.6MB/s]
- 49%|####8     | 1.42G/2.91G [00:19&lt;00:21, 73.0MB/s]
- 49%|####9     | 1.44G/2.91G [00:19&lt;00:20, 77.4MB/s]
- 50%|####9     | 1.45G/2.91G [00:19&lt;00:22, 71.0MB/s]
- 50%|####9     | 1.45G/2.91G [00:19&lt;00:23, 66.4MB/s]
- 50%|#####     | 1.47G/2.91G [00:19&lt;00:18, 84.6MB/s]
- 51%|#####     | 1.48G/2.91G [00:19&lt;00:19, 79.2MB/s]
- 51%|#####1    | 1.49G/2.91G [00:19&lt;00:19, 78.6MB/s]
- 51%|#####1    | 1.49G/2.91G [00:20&lt;00:23, 63.8MB/s]
- 52%|#####1    | 1.50G/2.91G [00:20&lt;00:26, 57.0MB/s]
- 52%|#####1    | 1.51G/2.91G [00:20&lt;00:21, 70.5MB/s]
- 52%|#####2    | 1.52G/2.91G [00:20&lt;00:29, 50.9MB/s]
- 52%|#####2    | 1.52G/2.91G [00:20&lt;00:31, 47.8MB/s]
- 53%|#####2    | 1.53G/2.91G [00:20&lt;00:33, 44.4MB/s]
- 53%|#####2    | 1.53G/2.91G [00:21&lt;00:38, 38.8MB/s]
- 53%|#####3    | 1.55G/2.91G [00:21&lt;00:29, 48.9MB/s]
- 54%|#####3    | 1.56G/2.91G [00:21&lt;00:25, 56.0MB/s]
- 54%|#####3    | 1.57G/2.91G [00:21&lt;00:24, 58.9MB/s]
- 54%|#####4    | 1.58G/2.91G [00:21&lt;00:21, 66.4MB/s]
- 54%|#####4    | 1.58G/2.91G [00:21&lt;00:26, 54.6MB/s]
- 55%|#####5    | 1.61G/2.91G [00:22&lt;00:15, 90.8MB/s]
- 56%|#####5    | 1.62G/2.91G [00:22&lt;00:13, 102MB/s]
- 56%|#####6    | 1.63G/2.91G [00:22&lt;00:14, 96.4MB/s]
- 56%|#####6    | 1.64G/2.91G [00:22&lt;00:15, 86.5MB/s]
- 57%|#####6    | 1.65G/2.91G [00:22&lt;00:18, 73.8MB/s]
- 57%|#####6    | 1.66G/2.91G [00:22&lt;00:18, 73.8MB/s]
- 57%|#####7    | 1.67G/2.91G [00:22&lt;00:16, 81.3MB/s]
- 58%|#####7    | 1.68G/2.91G [00:23&lt;00:21, 62.4MB/s]
- 58%|#####8    | 1.69G/2.91G [00:23&lt;00:18, 70.8MB/s]
- 59%|#####8    | 1.70G/2.91G [00:23&lt;00:16, 78.3MB/s]
- 59%|#####9    | 1.72G/2.91G [00:23&lt;00:14, 90.6MB/s]
- 60%|#####9    | 1.73G/2.91G [00:23&lt;00:13, 91.3MB/s]
- 60%|#####9    | 1.74G/2.91G [00:24&lt;00:18, 68.1MB/s]
- 60%|######    | 1.75G/2.91G [00:24&lt;00:26, 46.8MB/s]
- 61%|######    | 1.76G/2.91G [00:24&lt;00:23, 53.0MB/s]
- 61%|######    | 1.77G/2.91G [00:24&lt;00:24, 49.7MB/s]
- 61%|######1   | 1.78G/2.91G [00:24&lt;00:21, 56.2MB/s]
- 62%|######1   | 1.80G/2.91G [00:25&lt;00:16, 71.7MB/s]
- 62%|######2   | 1.81G/2.91G [00:25&lt;00:13, 86.1MB/s]
- 63%|######2   | 1.82G/2.91G [00:25&lt;00:13, 85.2MB/s]
- 63%|######2   | 1.83G/2.91G [00:25&lt;00:20, 55.4MB/s]
- 63%|######3   | 1.84G/2.91G [00:25&lt;00:21, 54.0MB/s]
- 64%|######3   | 1.86G/2.91G [00:26&lt;00:15, 74.0MB/s]
- 64%|######4   | 1.87G/2.91G [00:26&lt;00:17, 64.3MB/s]
- 65%|######4   | 1.88G/2.91G [00:26&lt;00:18, 60.1MB/s]
- 65%|######4   | 1.89G/2.91G [00:26&lt;00:20, 54.0MB/s]
- 65%|######5   | 1.90G/2.91G [00:26&lt;00:21, 49.9MB/s]
- 66%|######5   | 1.91G/2.91G [00:27&lt;00:17, 60.4MB/s]
- 66%|######5   | 1.92G/2.91G [00:27&lt;00:15, 69.4MB/s]
- 67%|######6   | 1.94G/2.91G [00:27&lt;00:11, 87.3MB/s]
- 67%|######7   | 1.95G/2.91G [00:27&lt;00:11, 91.6MB/s]
- 67%|######7   | 1.96G/2.91G [00:27&lt;00:12, 80.5MB/s]
- 68%|######7   | 1.97G/2.91G [00:27&lt;00:15, 64.0MB/s]
- 68%|######8   | 1.98G/2.91G [00:27&lt;00:12, 77.0MB/s]
- 68%|######8   | 1.99G/2.91G [00:28&lt;00:12, 77.3MB/s]
- 69%|######8   | 2.00G/2.91G [00:28&lt;00:16, 59.4MB/s]
- 69%|######9   | 2.01G/2.91G [00:28&lt;00:13, 72.8MB/s]
- 69%|######9   | 2.02G/2.91G [00:28&lt;00:14, 67.1MB/s]
- 70%|######9   | 2.03G/2.91G [00:28&lt;00:14, 67.1MB/s]
- 70%|######9   | 2.04G/2.91G [00:28&lt;00:17, 52.4MB/s]
- 70%|#######   | 2.05G/2.91G [00:29&lt;00:14, 64.8MB/s]
- 71%|#######   | 2.05G/2.91G [00:29&lt;00:14, 62.9MB/s]
- 71%|#######   | 2.06G/2.91G [00:29&lt;00:12, 73.4MB/s]
- 71%|#######1  | 2.08G/2.91G [00:29&lt;00:11, 80.6MB/s]
- 72%|#######1  | 2.09G/2.91G [00:29&lt;00:09, 92.4MB/s]
- 72%|#######2  | 2.10G/2.91G [00:29&lt;00:11, 79.0MB/s]
- 72%|#######2  | 2.11G/2.91G [00:29&lt;00:11, 75.0MB/s]
- 73%|#######2  | 2.12G/2.91G [00:30&lt;00:12, 68.5MB/s]
- 73%|#######3  | 2.12G/2.91G [00:30&lt;00:13, 62.8MB/s]
- 74%|#######3  | 2.14G/2.91G [00:30&lt;00:10, 82.6MB/s]
- 74%|#######3  | 2.15G/2.91G [00:30&lt;00:09, 82.3MB/s]
- 74%|#######4  | 2.16G/2.91G [00:30&lt;00:17, 46.0MB/s]
- 75%|#######4  | 2.17G/2.91G [00:31&lt;00:13, 60.3MB/s]
- 75%|#######4  | 2.18G/2.91G [00:31&lt;00:12, 62.8MB/s]
- 75%|#######5  | 2.19G/2.91G [00:31&lt;00:12, 61.3MB/s]
- 76%|#######5  | 2.20G/2.91G [00:31&lt;00:09, 79.6MB/s]
- 76%|#######6  | 2.21G/2.91G [00:31&lt;00:08, 90.1MB/s]
- 76%|#######6  | 2.22G/2.91G [00:31&lt;00:10, 73.7MB/s]
- 77%|#######6  | 2.23G/2.91G [00:31&lt;00:10, 68.8MB/s]
- 77%|#######7  | 2.24G/2.91G [00:32&lt;00:10, 67.9MB/s]
- 77%|#######7  | 2.25G/2.91G [00:32&lt;00:10, 68.7MB/s]
- 78%|#######7  | 2.26G/2.91G [00:32&lt;00:12, 58.2MB/s]
- 78%|#######7  | 2.27G/2.91G [00:32&lt;00:11, 61.2MB/s]
- 78%|#######8  | 2.28G/2.91G [00:32&lt;00:08, 79.8MB/s]
- 79%|#######8  | 2.29G/2.91G [00:32&lt;00:09, 73.5MB/s]
- 79%|#######8  | 2.30G/2.91G [00:32&lt;00:09, 72.5MB/s]
- 79%|#######9  | 2.30G/2.91G [00:33&lt;00:12, 52.2MB/s]
- 79%|#######9  | 2.31G/2.91G [00:33&lt;00:11, 54.5MB/s]
- 80%|#######9  | 2.32G/2.91G [00:33&lt;00:08, 72.4MB/s]
- 80%|########  | 2.33G/2.91G [00:33&lt;00:07, 83.6MB/s]
- 81%|########  | 2.34G/2.91G [00:33&lt;00:07, 78.9MB/s]
- 81%|########  | 2.35G/2.91G [00:33&lt;00:07, 76.8MB/s]
- 81%|########1 | 2.36G/2.91G [00:33&lt;00:08, 66.1MB/s]
- 82%|########1 | 2.37G/2.91G [00:34&lt;00:06, 84.7MB/s]
- 82%|########2 | 2.39G/2.91G [00:34&lt;00:05, 101MB/s]
- 82%|########2 | 2.40G/2.91G [00:34&lt;00:06, 84.4MB/s]
- 83%|########2 | 2.41G/2.91G [00:34&lt;00:08, 61.4MB/s]
- 83%|########3 | 2.42G/2.91G [00:34&lt;00:06, 75.9MB/s]
- 84%|########3 | 2.44G/2.91G [00:34&lt;00:05, 92.4MB/s]
- 84%|########4 | 2.45G/2.91G [00:35&lt;00:07, 64.0MB/s]
- 84%|########4 | 2.46G/2.91G [00:35&lt;00:07, 61.3MB/s]
- 85%|########4 | 2.47G/2.91G [00:35&lt;00:07, 66.5MB/s]
- 85%|########5 | 2.48G/2.91G [00:35&lt;00:06, 71.3MB/s]
- 85%|########5 | 2.49G/2.91G [00:35&lt;00:05, 78.6MB/s]
- 86%|########5 | 2.50G/2.91G [00:35&lt;00:04, 91.3MB/s]
- 86%|########6 | 2.51G/2.91G [00:35&lt;00:05, 81.9MB/s]
- 86%|########6 | 2.52G/2.91G [00:36&lt;00:05, 71.7MB/s]
- 87%|########6 | 2.53G/2.91G [00:36&lt;00:04, 87.8MB/s]
- 87%|########7 | 2.54G/2.91G [00:36&lt;00:04, 98.5MB/s]
- 88%|########7 | 2.55G/2.91G [00:36&lt;00:06, 56.6MB/s]
- 88%|########8 | 2.57G/2.91G [00:36&lt;00:04, 78.5MB/s]
- 89%|########9 | 2.59G/2.91G [00:36&lt;00:03, 110MB/s]
- 90%|########9 | 2.61G/2.91G [00:37&lt;00:03, 99.2MB/s]
- 90%|######### | 2.62G/2.91G [00:37&lt;00:03, 96.6MB/s]
- 91%|######### | 2.64G/2.91G [00:37&lt;00:03, 93.0MB/s]
- 91%|#########1| 2.66G/2.91G [00:37&lt;00:02, 95.5MB/s]
- 92%|#########1| 2.67G/2.91G [00:37&lt;00:03, 70.8MB/s]
- 92%|#########1| 2.68G/2.91G [00:38&lt;00:03, 78.2MB/s]
- 92%|#########2| 2.69G/2.91G [00:38&lt;00:02, 85.6MB/s]
- 93%|#########2| 2.70G/2.91G [00:38&lt;00:03, 76.1MB/s]
- 93%|#########2| 2.71G/2.91G [00:38&lt;00:03, 62.2MB/s]
- 93%|#########3| 2.72G/2.91G [00:38&lt;00:02, 72.8MB/s]
- 94%|#########3| 2.73G/2.91G [00:38&lt;00:03, 60.9MB/s]
- 94%|#########3| 2.73G/2.91G [00:39&lt;00:02, 67.1MB/s]
- 94%|#########4| 2.74G/2.91G [00:39&lt;00:03, 51.6MB/s]
- 95%|#########4| 2.75G/2.91G [00:39&lt;00:02, 60.3MB/s]
- 95%|#########5| 2.77G/2.91G [00:39&lt;00:02, 74.2MB/s]
- 96%|#########5| 2.78G/2.91G [00:39&lt;00:01, 91.2MB/s]
- 96%|#########5| 2.79G/2.91G [00:39&lt;00:01, 96.0MB/s]
- 96%|#########6| 2.80G/2.91G [00:39&lt;00:01, 74.4MB/s]
- 97%|#########6| 2.81G/2.91G [00:40&lt;00:01, 80.1MB/s]
- 97%|#########6| 2.82G/2.91G [00:40&lt;00:01, 53.8MB/s]
- 97%|#########7| 2.83G/2.91G [00:40&lt;00:01, 51.6MB/s]
- 97%|#########7| 2.83G/2.91G [00:40&lt;00:01, 51.9MB/s]
- 98%|#########7| 2.84G/2.91G [00:40&lt;00:01, 53.3MB/s]
- 98%|#########7| 2.84G/2.91G [00:41&lt;00:01, 39.6MB/s]
- 98%|#########8| 2.86G/2.91G [00:41&lt;00:00, 55.0MB/s]
- 99%|#########8| 2.87G/2.91G [00:41&lt;00:00, 71.8MB/s]
- 99%|#########9| 2.88G/2.91G [00:41&lt;00:00, 66.9MB/s]
- 99%|#########9| 2.89G/2.91G [00:41&lt;00:00, 67.7MB/s]
-100%|#########9| 2.90G/2.91G [00:41&lt;00:00, 60.5MB/s]
-100%|#########9| 2.91G/2.91G [00:41&lt;00:00, 64.6MB/s]
-100%|##########| 2.91G/2.91G [00:42&lt;00:00, 74.1MB/s]
+  1%|1         | 42.6M/2.91G [00:00&lt;00:06, 447MB/s]
+  3%|2         | 86.5M/2.91G [00:00&lt;00:06, 455MB/s]
+  4%|4         | 130M/2.91G [00:00&lt;00:06, 457MB/s]
+  6%|5         | 174M/2.91G [00:00&lt;00:06, 448MB/s]
+  7%|7         | 217M/2.91G [00:00&lt;00:06, 443MB/s]
+  9%|8         | 259M/2.91G [00:00&lt;00:06, 443MB/s]
+ 10%|#         | 301M/2.91G [00:00&lt;00:06, 432MB/s]
+ 11%|#1        | 343M/2.91G [00:00&lt;00:06, 412MB/s]
+ 13%|#2        | 384M/2.91G [00:00&lt;00:06, 420MB/s]
+ 14%|#4        | 428M/2.91G [00:01&lt;00:06, 433MB/s]
+ 16%|#5        | 470M/2.91G [00:01&lt;00:06, 434MB/s]
+ 17%|#7        | 514M/2.91G [00:01&lt;00:05, 441MB/s]
+ 19%|#8        | 558M/2.91G [00:01&lt;00:05, 448MB/s]
+ 20%|##        | 603M/2.91G [00:01&lt;00:05, 454MB/s]
+ 22%|##1       | 648M/2.91G [00:01&lt;00:05, 460MB/s]
+ 23%|##3       | 693M/2.91G [00:01&lt;00:05, 463MB/s]
+ 25%|##4       | 738M/2.91G [00:01&lt;00:05, 466MB/s]
+ 26%|##6       | 782M/2.91G [00:01&lt;00:04, 467MB/s]
+ 28%|##7       | 827M/2.91G [00:01&lt;00:04, 468MB/s]
+ 29%|##9       | 872M/2.91G [00:02&lt;00:04, 468MB/s]
+ 31%|###       | 917M/2.91G [00:02&lt;00:04, 468MB/s]
+ 32%|###2      | 962M/2.91G [00:02&lt;00:04, 470MB/s]
+ 34%|###3      | 0.98G/2.91G [00:02&lt;00:04, 468MB/s]
+ 35%|###5      | 1.03G/2.91G [00:02&lt;00:04, 468MB/s]
+ 37%|###6      | 1.07G/2.91G [00:02&lt;00:04, 445MB/s]
+ 38%|###8      | 1.11G/2.91G [00:02&lt;00:04, 452MB/s]
+ 40%|###9      | 1.16G/2.91G [00:02&lt;00:04, 456MB/s]
+ 41%|####1     | 1.20G/2.91G [00:02&lt;00:04, 447MB/s]
+ 43%|####2     | 1.24G/2.91G [00:02&lt;00:04, 442MB/s]
+ 44%|####4     | 1.28G/2.91G [00:03&lt;00:04, 424MB/s]
+ 45%|####5     | 1.32G/2.91G [00:03&lt;00:04, 426MB/s]
+ 47%|####6     | 1.37G/2.91G [00:03&lt;00:03, 436MB/s]
+ 48%|####8     | 1.41G/2.91G [00:03&lt;00:03, 423MB/s]
+ 50%|####9     | 1.45G/2.91G [00:03&lt;00:03, 436MB/s]
+ 51%|#####1    | 1.49G/2.91G [00:03&lt;00:03, 432MB/s]
+ 53%|#####2    | 1.54G/2.91G [00:03&lt;00:03, 443MB/s]
+ 54%|#####4    | 1.58G/2.91G [00:03&lt;00:03, 448MB/s]
+ 56%|#####5    | 1.62G/2.91G [00:03&lt;00:03, 450MB/s]
+ 57%|#####7    | 1.66G/2.91G [00:04&lt;00:03, 427MB/s]
+ 58%|#####8    | 1.70G/2.91G [00:04&lt;00:03, 418MB/s]
+ 60%|#####9    | 1.74G/2.91G [00:04&lt;00:02, 429MB/s]
+ 61%|######1   | 1.79G/2.91G [00:04&lt;00:02, 438MB/s]
+ 63%|######2   | 1.83G/2.91G [00:04&lt;00:02, 444MB/s]
+ 64%|######4   | 1.87G/2.91G [00:04&lt;00:02, 449MB/s]
+ 66%|######5   | 1.91G/2.91G [00:04&lt;00:02, 449MB/s]
+ 67%|######7   | 1.96G/2.91G [00:04&lt;00:02, 448MB/s]
+ 69%|######8   | 2.00G/2.91G [00:04&lt;00:02, 449MB/s]
+ 70%|#######   | 2.04G/2.91G [00:04&lt;00:02, 438MB/s]
+ 72%|#######1  | 2.08G/2.91G [00:05&lt;00:02, 424MB/s]
+ 73%|#######2  | 2.12G/2.91G [00:05&lt;00:01, 432MB/s]
+ 74%|#######4  | 2.16G/2.91G [00:05&lt;00:01, 428MB/s]
+ 76%|#######5  | 2.20G/2.91G [00:05&lt;00:01, 420MB/s]
+ 77%|#######7  | 2.24G/2.91G [00:05&lt;00:01, 422MB/s]
+ 79%|#######8  | 2.29G/2.91G [00:05&lt;00:01, 431MB/s]
+ 80%|#######9  | 2.33G/2.91G [00:05&lt;00:01, 409MB/s]
+ 81%|########1 | 2.37G/2.91G [00:05&lt;00:01, 414MB/s]
+ 83%|########2 | 2.41G/2.91G [00:05&lt;00:01, 422MB/s]
+ 84%|########4 | 2.45G/2.91G [00:05&lt;00:01, 419MB/s]
+ 85%|########5 | 2.49G/2.91G [00:06&lt;00:01, 414MB/s]
+ 87%|########6 | 2.53G/2.91G [00:06&lt;00:00, 421MB/s]
+ 88%|########8 | 2.57G/2.91G [00:06&lt;00:00, 430MB/s]
+ 90%|########9 | 2.61G/2.91G [00:06&lt;00:00, 437MB/s]
+ 91%|#########1| 2.65G/2.91G [00:06&lt;00:00, 442MB/s]
+ 93%|#########2| 2.69G/2.91G [00:06&lt;00:00, 445MB/s]
+ 94%|#########4| 2.74G/2.91G [00:06&lt;00:00, 446MB/s]
+ 95%|#########5| 2.78G/2.91G [00:06&lt;00:00, 448MB/s]
+ 97%|#########6| 2.82G/2.91G [00:06&lt;00:00, 450MB/s]
+ 98%|#########8| 2.86G/2.91G [00:07&lt;00:00, 370MB/s]
+100%|#########9| 2.90G/2.91G [00:07&lt;00:00, 326MB/s]
+100%|##########| 2.91G/2.91G [00:07&lt;00:00, 431MB/s]
 PretrainedFiles(lexicon=&#39;/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lexicon.txt&#39;, tokens=&#39;/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/tokens.txt&#39;, lm=&#39;/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lm.bin&#39;)
 </pre></div>
 </div>
@@ -944,7 +771,7 @@ waveform is</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">acoustic_model</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p>The greedy decoder give the following result.</p>
+<p>The greedy decoder gives the following result.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">greedy_result</span></a> <span class="o">=</span> <span class="n">greedy_decoder</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">greedy_transcript</span></a> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">greedy_result</span></a><span class="p">)</span>
 <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">greedy_wer</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">edit_distance</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">actual_transcript</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">greedy_result</span></a><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">actual_transcript</span></a><span class="p">)</span>
@@ -1102,10 +929,10 @@ computation time.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;beam size&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_size</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0545 secs)
-beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0535 secs)
-beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2602 secs)
-beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.7556 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.1175 secs)
+beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0575 secs)
+beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2600 secs)
+beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.7102 secs)
 </pre></div>
 </div>
 </section>
@@ -1131,10 +958,10 @@ hypotheses at the cost of computation.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;beam size token&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_size_token</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.2266 secs)
-beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.2496 secs)
-beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.3457 secs)
-beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3149 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.2596 secs)
+beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.2298 secs)
+beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.2879 secs)
+beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3343 secs)
 </pre></div>
 </div>
 </section>
@@ -1161,10 +988,10 @@ threshold such that plausible hypotheses are not pruned.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;beam threshold&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_threshold</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0468 secs)
-beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.1396 secs)
-beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2641 secs)
-beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3468 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.1067 secs)
+beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0848 secs)
+beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3271 secs)
+beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2858 secs)
 </pre></div>
 </div>
 </section>
@@ -1189,9 +1016,9 @@ give more weight to the acoustic model score instead.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;lm weight&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lm_weight</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.3388 secs)
-lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3552 secs)
-lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.3758 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.3170 secs)
+lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3784 secs)
+lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.3323 secs)
 </pre></div>
 </div>
 </section>
@@ -1204,7 +1031,7 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.3
 <li><p><code class="docutils literal notranslate"><span class="pre">sil_score</span></code>: silence appearance score to add</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">log_add</span></code>: whether to use log add for lexicon Trie smearing</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  56.297 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  16.160 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-asr-inference-with-ctc-decoder-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/da151acc525ba1fb468e2a4904659af1/asr_inference_with_ctc_decoder_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">asr_inference_with_ctc_decoder_tutorial.py</span></code></a></p>
@@ -1265,12 +1092,14 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.3
               <ul>
 <li><a class="reference internal" href="#">ASR Inference with CTC Decoder</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#preparation">Preparation</a><ul>
-<li><a class="reference internal" href="#acoustic-model-and-data">Acoustic Model and Data</a></li>
+<li><a class="reference internal" href="#acoustic-model-and-set-up">Acoustic Model and Set Up</a></li>
 <li><a class="reference internal" href="#files-and-data-for-decoder">Files and Data for Decoder</a><ul>
 <li><a class="reference internal" href="#tokens">Tokens</a></li>
 <li><a class="reference internal" href="#lexicon">Lexicon</a></li>
+<li><a class="reference internal" href="#language-model">Language Model</a><ul>
+<li><a class="reference internal" href="#no-language-model">No Language Model</a></li>
 <li><a class="reference internal" href="#kenlm">KenLM</a></li>
+<li><a class="reference internal" href="#custom-language-model">Custom Language Model</a></li>
 <li><a class="reference internal" href="#downloading-pretrained-files">Downloading Pretrained Files</a></li>
 </ul>
 </li>

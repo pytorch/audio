@@ -21,6 +21,8 @@
 Audio Data Augmentation
 =======================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` provides a variety of ways to augment audio data.
 
 In this tutorial, we look into a way to apply effects, filters,
@@ -28,7 +30,7 @@ RIR (room impulse response) and codecs.
 
 At the end, we synthesize noisy speech over phone from clean speech.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-21
+.. GENERATED FROM PYTHON SOURCE LINES 15-23
 
 .. code-block:: default
 
@@ -54,7 +56,7 @@ At the end, we synthesize noisy speech over phone from clean speech.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-27
+.. GENERATED FROM PYTHON SOURCE LINES 24-29
 
 Preparation
 -----------
@@ -62,7 +64,7 @@ Preparation
 First, we import the modules and download the audio assets we use in this tutorial.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-41
+.. GENERATED FROM PYTHON SOURCE LINES 29-43
 
 .. code-block:: default
 
@@ -88,14 +90,14 @@ First, we import the modules and download the audio assets we use in this tutori
 
  .. code-block:: none
 
-      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 51.4MB/s]
-      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 13.4MB/s]
-      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 27.5MB/s]
+      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 66.8MB/s]
+      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 13.3MB/s]
+      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 20.6MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-76
+.. GENERATED FROM PYTHON SOURCE LINES 44-78
 
 Applying effects and filtering
 ------------------------------
@@ -132,7 +134,7 @@ argument ``format`` to specify the format of the audio source.
 **Note** This process is not differentiable.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-96
+.. GENERATED FROM PYTHON SOURCE LINES 78-98
 
 .. code-block:: default
 
@@ -170,14 +172,14 @@ argument ``format`` to specify the format of the audio source.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-101
+.. GENERATED FROM PYTHON SOURCE LINES 99-103
 
 Note that the number of frames and number of channels are different from
 those of the original after the effects are applied. Let’s listen to the
 audio.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-121
+.. GENERATED FROM PYTHON SOURCE LINES 103-123
 
 .. code-block:: default
 
@@ -208,7 +210,7 @@ audio.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-141
+.. GENERATED FROM PYTHON SOURCE LINES 125-143
 
 .. code-block:: default
 
@@ -237,13 +239,13 @@ audio.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-145
+.. GENERATED FROM PYTHON SOURCE LINES 144-147
 
 Original:
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-150
+.. GENERATED FROM PYTHON SOURCE LINES 147-152
 
 .. code-block:: default
 
@@ -287,13 +289,13 @@ Original:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-154
+.. GENERATED FROM PYTHON SOURCE LINES 153-156
 
 Effects applied:
 ~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-159
+.. GENERATED FROM PYTHON SOURCE LINES 156-161
 
 .. code-block:: default
 
@@ -337,12 +339,12 @@ Effects applied:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-162
+.. GENERATED FROM PYTHON SOURCE LINES 162-164
 
 Doesn’t it sound more dramatic?
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-179
+.. GENERATED FROM PYTHON SOURCE LINES 166-181
 
 Simulating room reverberation
 -----------------------------
@@ -360,7 +362,7 @@ dataset, but you can record your own — just turn on your microphone
 and clap your hands.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-185
+.. GENERATED FROM PYTHON SOURCE LINES 181-187
 
 .. code-block:: default
 
@@ -405,13 +407,13 @@ and clap your hands.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-189
+.. GENERATED FROM PYTHON SOURCE LINES 188-191
 
 First, we need to clean up the RIR. We extract the main impulse, normalize
 the signal power, then flip along the time axis.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-196
+.. GENERATED FROM PYTHON SOURCE LINES 191-198
 
 .. code-block:: default
 
@@ -434,12 +436,12 @@ the signal power, then flip along the time axis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-199
+.. GENERATED FROM PYTHON SOURCE LINES 199-201
 
 Then, we convolve the speech signal with the RIR filter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-205
+.. GENERATED FROM PYTHON SOURCE LINES 201-207
 
 .. code-block:: default
 
@@ -456,13 +458,13 @@ Then, we convolve the speech signal with the RIR filter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-209
+.. GENERATED FROM PYTHON SOURCE LINES 208-211
 
 Original:
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-214
+.. GENERATED FROM PYTHON SOURCE LINES 211-216
 
 .. code-block:: default
 
@@ -506,13 +508,13 @@ Original:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-218
+.. GENERATED FROM PYTHON SOURCE LINES 217-220
 
 RIR applied:
 ~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-224
+.. GENERATED FROM PYTHON SOURCE LINES 220-226
 
 .. code-block:: default
 
@@ -557,7 +559,7 @@ RIR applied:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-237
+.. GENERATED FROM PYTHON SOURCE LINES 227-239
 
 Adding background noise
 -----------------------
@@ -572,7 +574,7 @@ $$ \\mathrm{SNR} = \\frac{P_{signal}}{P_{noise}} $$
 $$ \\mathrm{SNR_{dB}} = 10 \\log _{{10}} \\mathrm {SNR} $$
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-252
+.. GENERATED FROM PYTHON SOURCE LINES 239-254
 
 .. code-block:: default
 
@@ -598,13 +600,13 @@ $$ \\mathrm{SNR_{dB}} = 10 \\log _{{10}} \\mathrm {SNR} $$
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-256
+.. GENERATED FROM PYTHON SOURCE LINES 255-258
 
 Background noise:
 ~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 256-261
+.. GENERATED FROM PYTHON SOURCE LINES 258-263
 
 .. code-block:: default
 
@@ -648,13 +650,13 @@ Background noise:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-265
+.. GENERATED FROM PYTHON SOURCE LINES 264-267
 
 SNR 20 dB:
 ~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-271
+.. GENERATED FROM PYTHON SOURCE LINES 267-273
 
 .. code-block:: default
 
@@ -699,13 +701,13 @@ SNR 20 dB:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 272-275
+.. GENERATED FROM PYTHON SOURCE LINES 274-277
 
 SNR 10 dB:
 ~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 275-281
+.. GENERATED FROM PYTHON SOURCE LINES 277-283
 
 .. code-block:: default
 
@@ -750,13 +752,13 @@ SNR 10 dB:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-285
+.. GENERATED FROM PYTHON SOURCE LINES 284-287
 
 SNR 3 dB:
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 285-292
+.. GENERATED FROM PYTHON SOURCE LINES 287-294
 
 .. code-block:: default
 
@@ -802,7 +804,7 @@ SNR 3 dB:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-301
+.. GENERATED FROM PYTHON SOURCE LINES 295-303
 
 Applying codec to Tensor object
 -------------------------------
@@ -813,7 +815,7 @@ a Tensor object.
 **Note** This process is not differentiable.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 301-315
+.. GENERATED FROM PYTHON SOURCE LINES 303-317
 
 .. code-block:: default
 
@@ -838,13 +840,13 @@ a Tensor object.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 316-319
+.. GENERATED FROM PYTHON SOURCE LINES 318-321
 
 Original:
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 319-324
+.. GENERATED FROM PYTHON SOURCE LINES 321-326
 
 .. code-block:: default
 
@@ -888,13 +890,13 @@ Original:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 325-328
+.. GENERATED FROM PYTHON SOURCE LINES 327-330
 
 8 bit mu-law:
 ~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-333
+.. GENERATED FROM PYTHON SOURCE LINES 330-335
 
 .. code-block:: default
 
@@ -938,13 +940,13 @@ Original:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 334-337
+.. GENERATED FROM PYTHON SOURCE LINES 336-339
 
 GSM-FR:
 ~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 337-342
+.. GENERATED FROM PYTHON SOURCE LINES 339-344
 
 .. code-block:: default
 
@@ -988,13 +990,13 @@ GSM-FR:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 343-346
+.. GENERATED FROM PYTHON SOURCE LINES 345-348
 
 Vorbis:
 ~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 346-351
+.. GENERATED FROM PYTHON SOURCE LINES 348-353
 
 .. code-block:: default
 
@@ -1038,7 +1040,7 @@ Vorbis:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 352-359
+.. GENERATED FROM PYTHON SOURCE LINES 354-361
 
 Simulating a phone recoding
 ---------------------------
@@ -1048,7 +1050,7 @@ like a person talking over a phone in a echoey room with people talking
 in the background.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 359-410
+.. GENERATED FROM PYTHON SOURCE LINES 361-412
 
 .. code-block:: default
 
@@ -1148,13 +1150,13 @@ in the background.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 411-414
+.. GENERATED FROM PYTHON SOURCE LINES 413-416
 
 Original speech:
 ~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 414-417
+.. GENERATED FROM PYTHON SOURCE LINES 416-419
 
 .. code-block:: default
 
@@ -1179,13 +1181,13 @@ Original speech:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 418-421
+.. GENERATED FROM PYTHON SOURCE LINES 420-423
 
 RIR applied:
 ~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 421-424
+.. GENERATED FROM PYTHON SOURCE LINES 423-426
 
 .. code-block:: default
 
@@ -1210,13 +1212,13 @@ RIR applied:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 425-428
+.. GENERATED FROM PYTHON SOURCE LINES 427-430
 
 Background noise added:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 428-431
+.. GENERATED FROM PYTHON SOURCE LINES 430-433
 
 .. code-block:: default
 
@@ -1241,13 +1243,13 @@ Background noise added:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 432-435
+.. GENERATED FROM PYTHON SOURCE LINES 434-437
 
 Filtered:
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 435-438
+.. GENERATED FROM PYTHON SOURCE LINES 437-440
 
 .. code-block:: default
 
@@ -1272,13 +1274,13 @@ Filtered:
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 439-442
+.. GENERATED FROM PYTHON SOURCE LINES 441-444
 
 Codec applied:
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 442-444
+.. GENERATED FROM PYTHON SOURCE LINES 444-446
 
 .. code-block:: default
 
@@ -1305,7 +1307,7 @@ Codec applied:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.307 seconds)
+   **Total running time of the script:** ( 0 minutes  13.909 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:

@@ -21,11 +21,13 @@
 StreamReader Basic Usages
 =========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use :py:class:`torchaudio.io.StreamReader` to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-21
+.. GENERATED FROM PYTHON SOURCE LINES 14-23
 
 .. note::
 
@@ -37,7 +39,7 @@ libavfilter provides.
    the required libraries.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-54
+.. GENERATED FROM PYTHON SOURCE LINES 26-56
 
 Overview
 --------
@@ -70,13 +72,13 @@ If you have other forms that can be useful to your usecases,
 please file a feature request.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-59
+.. GENERATED FROM PYTHON SOURCE LINES 58-61
 
 Preparation
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-66
+.. GENERATED FROM PYTHON SOURCE LINES 61-68
 
 .. code-block:: default
 
@@ -101,7 +103,7 @@ Preparation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-94
+.. GENERATED FROM PYTHON SOURCE LINES 70-96
 
 .. code-block:: default
 
@@ -138,7 +140,7 @@ Preparation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-118
+.. GENERATED FROM PYTHON SOURCE LINES 97-120
 
 Opening the source
 ------------------
@@ -164,7 +166,7 @@ For the other streams, please refer to the
    that `ffmpeg` command can handle it.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-142
+.. GENERATED FROM PYTHON SOURCE LINES 122-144
 
 Local files
 ~~~~~~~~~~~
@@ -189,7 +191,7 @@ This works for image file, video file and video streams.
    StreamReader(src="video.mpeg")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-160
+.. GENERATED FROM PYTHON SOURCE LINES 146-162
 
 Network protocols
 ~~~~~~~~~~~~~~~~~
@@ -208,7 +210,7 @@ You can directly pass a URL as well.
    StreamReader(src="rtmp://example.com:1935/live/app")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-214
+.. GENERATED FROM PYTHON SOURCE LINES 164-216
 
 File-like objects
 ~~~~~~~~~~~~~~~~~
@@ -263,7 +265,7 @@ an error, you can write a wrapper class to mask the ``seek`` method.
    without `seek`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-236
+.. GENERATED FROM PYTHON SOURCE LINES 218-238
 
 Headerless media
 ~~~~~~~~~~~~~~~~
@@ -286,7 +288,7 @@ Such audio can be opened like following.
    StreamReader(src="raw.s2", format="s16le", option={"sample_rate": "16000"})
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-262
+.. GENERATED FROM PYTHON SOURCE LINES 240-264
 
 Checking the source streams
 ---------------------------
@@ -313,13 +315,13 @@ a subclass of `SourceStream`, with additional audio-specific attributes.
 Similarly, if a source stream is video type, then the return type is
 :py:class:`~torchaudio.io.StreamReader.SourceVideoStream`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 264-267
+.. GENERATED FROM PYTHON SOURCE LINES 266-269
 
 For regular audio formats and still image formats, such as `WAV`
 and `JPEG`, the number of souorce streams is 1.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-272
+.. GENERATED FROM PYTHON SOURCE LINES 269-274
 
 .. code-block:: default
 
@@ -342,13 +344,13 @@ and `JPEG`, the number of souorce streams is 1.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-276
+.. GENERATED FROM PYTHON SOURCE LINES 275-278
 
 Container formats and playlist formats may contain multiple streams
 of different media type.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-283
+.. GENERATED FROM PYTHON SOURCE LINES 278-285
 
 .. code-block:: default
 
@@ -399,7 +401,7 @@ of different media type.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-292
+.. GENERATED FROM PYTHON SOURCE LINES 286-294
 
 Configuring output streams
 --------------------------
@@ -410,7 +412,7 @@ you can omit them. Or if you want to apply different preprocessing
 to the same source stream, you can duplicate the source stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-306
+.. GENERATED FROM PYTHON SOURCE LINES 296-308
 
 Default streams
 ~~~~~~~~~~~~~~~
@@ -425,7 +427,7 @@ The resulting stream index is exposed via
 :py:attr:`~torchaudio.io.StreamReader.default_video_stream`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-351
+.. GENERATED FROM PYTHON SOURCE LINES 310-353
 
 Configuring output streams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -471,7 +473,7 @@ For video output stream, the following parameters are available.
 - ``width``, ``height``: Change the image size.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 353-371
+.. GENERATED FROM PYTHON SOURCE LINES 355-373
 
 .. code::
 
@@ -492,7 +494,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 374-397
+.. GENERATED FROM PYTHON SOURCE LINES 376-399
 
 .. code::
 
@@ -518,7 +520,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 400-412
+.. GENERATED FROM PYTHON SOURCE LINES 402-414
 
 You can check the resulting output streams in a similar manner as
 checking the source streams.
@@ -533,7 +535,7 @@ fetches the information about the output streams.
        print(streamer.get_out_stream_info(i))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 415-423
+.. GENERATED FROM PYTHON SOURCE LINES 417-425
 
 If you want to remove an output stream, you can do so with
 :py:meth:`~torchaudio.io.StreamReader.remove_stream` method.
@@ -544,7 +546,7 @@ If you want to remove an output stream, you can do so with
    streamer.remove_stream(0)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 426-451
+.. GENERATED FROM PYTHON SOURCE LINES 428-453
 
 Streaming
 ---------
@@ -572,7 +574,7 @@ It is as simple as a ``for`` loop.
        ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 453-475
+.. GENERATED FROM PYTHON SOURCE LINES 455-477
 
 Example
 -------
@@ -597,7 +599,7 @@ NASA's Media Usage Guidelines: https://www.nasa.gov/multimedia/guidelines/index.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 477-482
+.. GENERATED FROM PYTHON SOURCE LINES 479-484
 
 Opening the source media
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -605,7 +607,7 @@ Opening the source media
 Firstly, let's list the available streams and its properties.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 482-487
+.. GENERATED FROM PYTHON SOURCE LINES 484-489
 
 .. code-block:: default
 
@@ -628,14 +630,14 @@ Firstly, let's list the available streams and its properties.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 488-492
+.. GENERATED FROM PYTHON SOURCE LINES 490-494
 
 Now we configure the output stream.
 
 Configuring ouptut streams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 493-526
+.. GENERATED FROM PYTHON SOURCE LINES 495-528
 
 .. code-block:: default
 
@@ -679,7 +681,7 @@ Configuring ouptut streams
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 527-534
+.. GENERATED FROM PYTHON SOURCE LINES 529-536
 
 .. note::
 
@@ -689,12 +691,12 @@ Configuring ouptut streams
    consistent across output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 536-538
+.. GENERATED FROM PYTHON SOURCE LINES 538-540
 
 Checking the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 538-542
+.. GENERATED FROM PYTHON SOURCE LINES 540-544
 
 .. code-block:: default
 
@@ -718,12 +720,12 @@ Checking the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 543-545
+.. GENERATED FROM PYTHON SOURCE LINES 545-547
 
 Remove the second audio stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 545-550
+.. GENERATED FROM PYTHON SOURCE LINES 547-552
 
 .. code-block:: default
 
@@ -747,18 +749,18 @@ Remove the second audio stream.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 551-554
+.. GENERATED FROM PYTHON SOURCE LINES 553-556
 
 Streaming
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 556-558
+.. GENERATED FROM PYTHON SOURCE LINES 558-560
 
 Jump to the 10 second point.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 558-560
+.. GENERATED FROM PYTHON SOURCE LINES 560-562
 
 .. code-block:: default
 
@@ -771,12 +773,12 @@ Jump to the 10 second point.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 561-563
+.. GENERATED FROM PYTHON SOURCE LINES 563-565
 
 Now, let's finally iterate over the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 564-574
+.. GENERATED FROM PYTHON SOURCE LINES 566-576
 
 .. code-block:: default
 
@@ -797,14 +799,14 @@ Now, let's finally iterate over the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 575-579
+.. GENERATED FROM PYTHON SOURCE LINES 577-581
 
 For audio stream, the chunk Tensor will be the shape of
 `(frames_per_chunk, num_channels)`, and for video stream,
 it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 579-584
+.. GENERATED FROM PYTHON SOURCE LINES 581-586
 
 .. code-block:: default
 
@@ -828,11 +830,11 @@ it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 585-586
+.. GENERATED FROM PYTHON SOURCE LINES 587-588
 
 Let's visualize what we received.
 
-.. GENERATED FROM PYTHON SOURCE LINES 586-616
+.. GENERATED FROM PYTHON SOURCE LINES 588-618
 
 .. code-block:: default
 
@@ -878,14 +880,14 @@ Let's visualize what we received.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 617-618
+.. GENERATED FROM PYTHON SOURCE LINES 619-620
 
 Tag: :obj:`torchaudio.io`
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.431 seconds)
+   **Total running time of the script:** ( 0 minutes  5.396 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_basic_tutorial.py:

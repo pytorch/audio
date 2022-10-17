@@ -2,7 +2,7 @@
 Forced Alignment with Wav2Vec2
 ==============================
 
-**Author** `Moto Hira <moto@fb.com>`__
+**Author**: `Moto Hira <moto@meta.com>`__
 
 This tutorial shows how to align transcript to speech with
 ``torchaudio``, using CTC segmentation algorithm described in

@@ -391,6 +391,7 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="audio-i-o">
 <span id="sphx-glr-tutorials-audio-io-tutorial-py"></span><h1>Audio I/O<a class="headerlink" href="#audio-i-o" title="Permalink to this heading">¶</a></h1>
+<p><strong>Author</strong>: <a class="reference external" href="mailto:moto&#37;&#52;&#48;meta&#46;com">Moto Hira</a></p>
 <p>This tutorial shows how to use TorchAudio’s basic I/O API to load audio files
 into PyTorch’s Tensor object, and save Tensor objects to audio files.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -434,10 +435,10 @@ with the following:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/7.99k [00:00&lt;?, ?B/s]
-100%|##########| 7.99k/7.99k [00:00&lt;00:00, 4.72MB/s]
+100%|##########| 7.99k/7.99k [00:00&lt;00:00, 3.98MB/s]
 
   0%|          | 0.00/53.2k [00:00&lt;?, ?B/s]
-100%|##########| 53.2k/53.2k [00:00&lt;00:00, 18.3MB/s]
+100%|##########| 53.2k/53.2k [00:00&lt;00:00, 21.5MB/s]
 </pre></div>
 </div>
 </section>
@@ -608,7 +609,7 @@ The following examples illustrate this.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_io_tutorial_004.png" srcset="../_images/sphx_glr_audio_io_tutorial_004.png" alt="TAR file" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/110k [00:00&lt;?, ?B/s]
-100%|##########| 110k/110k [00:00&lt;00:00, 29.6MB/s]
+100%|##########| 110k/110k [00:00&lt;00:00, 22.0MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load audio from S3</span>
@@ -707,7 +708,7 @@ the provided data fit</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmpdb8on7dk/save_example_default.wav
+Source: /tmp/tmp5v5rdc38/save_example_default.wav
 ----------
  - File size: 217658 bytes
  - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=32, encoding=PCM_F)
@@ -722,7 +723,7 @@ The resulting file occupies half the storage but loses precision</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmpwxs6hadr/save_example_PCM_S16.wav
+Source: /tmp/tmp8yywx5vh/save_example_PCM_S16.wav
 ----------
  - File size: 108844 bytes
  - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -749,37 +750,37 @@ To name a few:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmp1b4dp4mo/save_example.flac
+Source: /tmp/tmpuzehvtep/save_example.flac
 ----------
  - File size: 37141 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=24, encoding=FLAC)
 
 ----------
-Source: /tmp/tmp1b4dp4mo/save_example.vorbis
+Source: /tmp/tmpuzehvtep/save_example.vorbis
 ----------
  - File size: 12588 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=VORBIS)
 
 ----------
-Source: /tmp/tmp1b4dp4mo/save_example.sph
+Source: /tmp/tmpuzehvtep/save_example.sph
 ----------
  - File size: 109824 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_S)
 
 ----------
-Source: /tmp/tmp1b4dp4mo/save_example.amb
+Source: /tmp/tmpuzehvtep/save_example.amb
 ----------
  - File size: 108858 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_F)
 
 ----------
-Source: /tmp/tmp1b4dp4mo/save_example.amr-nb
+Source: /tmp/tmpuzehvtep/save_example.amr-nb
 ----------
  - File size: 2008 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=AMR_NB)
 
 ----------
-Source: /tmp/tmp1b4dp4mo/save_example.gsm
+Source: /tmp/tmpuzehvtep/save_example.gsm
 ----------
  - File size: 5610 bytes
  - AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
@@ -804,7 +805,7 @@ required.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;RIFF2R\x03\x00WAVEfmt &#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.142 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.456 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-io-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a50b7a9d7eda039b9579621100be1417/audio_io_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_io_tutorial.py</span></code></a></p>
