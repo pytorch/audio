@@ -83,8 +83,8 @@ HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
 )
 HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained music source separation pipeline with
 *Hybrid Demucs* :cite:`defossez2021hybrid` trained on both training and test sets of
-MUSDB-HQ :cite:`MUSDB18HQ` and additional 150 extra songs from an internal database
-that were specifically produced for Meta.
+MUSDB-HQ :cite:`MUSDB18HQ` and an additional 150 extra songs from an internal database
+that was specifically produced for Meta.
 
 The model is constructed by :func:`~torchaudio.models.hdemucs_high`.
 
