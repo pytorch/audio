@@ -82,8 +82,9 @@ HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
     _sample_rate=44100,
 )
 HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained music source separation pipeline with
-*Hybrid Demucs* :cite:`defossez2021hybrid` trained on MUSDB-HQ :cite:`MUSDB18HQ`
-and additional internal training data.
+*Hybrid Demucs* :cite:`defossez2021hybrid` trained on both training and test sets of
+MUSDB-HQ :cite:`MUSDB18HQ` and additional 150 extra songs from an internal database
+that were specifically produced for Meta.
 
 The model is constructed by :func:`~torchaudio.models.hdemucs_high`.
 
@@ -99,7 +100,7 @@ HDEMUCS_HIGH_MUSDB = SourceSeparationBundle(
     _sample_rate=44100,
 )
 HDEMUCS_HIGH_MUSDB.__doc__ = """Pre-trained music source separation pipeline with
-*Hybrid Demucs* :cite:`defossez2021hybrid` trained on MUSDB-HQ :cite:`MUSDB18HQ`.
+*Hybrid Demucs* :cite:`defossez2021hybrid` trained on the training set of MUSDB-HQ :cite:`MUSDB18HQ`.
 
 The model is constructed by :func:`~torchaudio.models.hdemucs_high`.
 Training was performed in the original HDemucs repository `here <https://github.com/facebookresearch/demucs/>`__.
