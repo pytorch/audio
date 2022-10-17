@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.13.0.dev20221016) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221021) &#x25BC</a>
     </div>
     
 
@@ -366,7 +366,7 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
@@ -393,18 +393,25 @@
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Root directory where the dataset&#39;s top level directory is found</span>
 <span class="sd">        sessions (Tuple[int]): Tuple of sessions (1-5) to use. (Default: ``(1, 2, 3, 4, 5)``)</span>
+<span class="sd">        utterance_type (str or None, optional): Which type(s) of utterances to include in the dataset.</span>
+<span class="sd">            Options: (&quot;scripted&quot;, &quot;improvised&quot;, ``None``). If ``None``, both scripted and improvised</span>
+<span class="sd">            data are used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">sessions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">utterance_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;IEMOCAP&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Dataset not found.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">utterance_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;scripted&quot;</span><span class="p">,</span> <span class="s2">&quot;improvised&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;utterance_type must be one of [&#39;scripted&#39;, &#39;improvised&#39;, or None]&quot;</span><span class="p">)</span>
 
         <span class="n">all_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
@@ -422,7 +429,12 @@
 
             <span class="c1"># add labels</span>
             <span class="n">label_dir</span> <span class="o">=</span> <span class="n">session_dir</span> <span class="o">/</span> <span class="s2">&quot;dialog&quot;</span> <span class="o">/</span> <span class="s2">&quot;EmoEvaluation&quot;</span>
-            <span class="n">label_paths</span> <span class="o">=</span> <span class="n">label_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.txt&quot;</span><span class="p">)</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;*.txt&quot;</span>
+            <span class="k">if</span> <span class="n">utterance_type</span> <span class="o">==</span> <span class="s2">&quot;scripted&quot;</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;*script*.txt&quot;</span>
+            <span class="k">elif</span> <span class="n">utterance_type</span> <span class="o">==</span> <span class="s2">&quot;improvised&quot;</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;*impro*.txt&quot;</span>
+            <span class="n">label_paths</span> <span class="o">=</span> <span class="n">label_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">label_path</span> <span class="ow">in</span> <span class="n">label_paths</span><span class="p">:</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -432,11 +444,9 @@
                         <span class="n">line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[</span><span class="se">\t\n</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
                         <span class="n">wav_stem</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                         <span class="n">label</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;exc&quot;</span><span class="p">:</span>
-                            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;hap&quot;</span>
                         <span class="k">if</span> <span class="n">wav_stem</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_data</span><span class="p">:</span>
                             <span class="k">continue</span>
-                        <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;neu&quot;</span><span class="p">,</span> <span class="s2">&quot;hap&quot;</span><span class="p">,</span> <span class="s2">&quot;ang&quot;</span><span class="p">,</span> <span class="s2">&quot;sad&quot;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;neu&quot;</span><span class="p">,</span> <span class="s2">&quot;hap&quot;</span><span class="p">,</span> <span class="s2">&quot;ang&quot;</span><span class="p">,</span> <span class="s2">&quot;sad&quot;</span><span class="p">,</span> <span class="s2">&quot;exc&quot;</span><span class="p">,</span> <span class="s2">&quot;fru&quot;</span><span class="p">]:</span>
                             <span class="k">continue</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">wav_stem</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">wav_stem</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
@@ -464,7 +474,7 @@
 <span class="sd">            str:</span>
 <span class="sd">                File name</span>
 <span class="sd">            str:</span>
-<span class="sd">                Label (one of ``&quot;neu&quot;``, ``&quot;hap&quot;``, ``&quot;ang&quot;``, ``&quot;sad&quot;``)</span>
+<span class="sd">                Label (one of ``&quot;neu&quot;``, ``&quot;hap&quot;``, ``&quot;ang&quot;``, ``&quot;sad&quot;``, ``&quot;exc&quot;``, ``&quot;fru&quot;``)</span>
 <span class="sd">            str:</span>
 <span class="sd">                Speaker</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -490,7 +500,7 @@
 <span class="sd">            str:</span>
 <span class="sd">                File name</span>
 <span class="sd">            str:</span>
-<span class="sd">                Label (one of ``&quot;neu&quot;``, ``&quot;hap&quot;``, ``&quot;ang&quot;``, ``&quot;sad&quot;``)</span>
+<span class="sd">                Label (one of ``&quot;neu&quot;``, ``&quot;hap&quot;``, ``&quot;ang&quot;``, ``&quot;sad&quot;``, ``&quot;exc&quot;``, ``&quot;fru&quot;``)</span>
 <span class="sd">            str:</span>
 <span class="sd">                Speaker</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -21,11 +21,13 @@
 Audio Datasets
 ==============
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` provides easy access to common, publicly accessible
 datasets. Please refer to the official documentation for the list of
 available datasets.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-21
+.. GENERATED FROM PYTHON SOURCE LINES 12-23
 
 .. code-block:: default
 
@@ -54,13 +56,13 @@ available datasets.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-25
+.. GENERATED FROM PYTHON SOURCE LINES 24-27
 
 Preparing data and utility functions (skip this section)
 --------------------------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-75
+.. GENERATED FROM PYTHON SOURCE LINES 27-77
 
 .. code-block:: default
 
@@ -121,13 +123,13 @@ Preparing data and utility functions (skip this section)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-79
+.. GENERATED FROM PYTHON SOURCE LINES 78-81
 
 Here, we show how to use the
 :py:class:`torchaudio.datasets.YESNO` dataset.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-87
+.. GENERATED FROM PYTHON SOURCE LINES 81-89
 
 .. code-block:: default
 
@@ -171,7 +173,7 @@ Here, we show how to use the
 
  .. code-block:: none
 
-      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 40.0k/4.49M [00:00<00:20, 223kB/s]      4%|4         | 200k/4.49M [00:00<00:07, 612kB/s]      18%|#8        | 840k/4.49M [00:00<00:01, 1.94MB/s]     64%|######3   | 2.85M/4.49M [00:00<00:00, 6.96MB/s]     93%|#########3| 4.19M/4.49M [00:00<00:00, 7.32MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 5.61MB/s]
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 40.0k/4.49M [00:00<00:20, 229kB/s]      5%|4         | 208k/4.49M [00:00<00:06, 650kB/s]      19%|#8        | 872k/4.49M [00:00<00:01, 2.29MB/s]     39%|###8      | 1.74M/4.49M [00:00<00:00, 3.93MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 10.7MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 6.37MB/s]
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
@@ -182,7 +184,7 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.068 seconds)
+   **Total running time of the script:** ( 0 minutes  1.910 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:

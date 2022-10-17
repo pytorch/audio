@@ -2,7 +2,7 @@
 Online ASR with Emformer RNN-T
 ==============================
 
-**Author**: `Jeff Hwang <jeffhwang@fb.com>`__, `Moto Hira <moto@fb.com>`__
+**Author**: `Jeff Hwang <jeffhwang@meta.com>`__, `Moto Hira <moto@meta.com>`__
 
 This tutorial shows how to use Emformer RNN-T and streaming API
 to perform online speech recognition.
