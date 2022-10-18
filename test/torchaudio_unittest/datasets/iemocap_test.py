@@ -40,19 +40,22 @@ def _get_samples(dataset_dir: str, session: int):
     os.makedirs(wav_folder, exist_ok=True)
     os.makedirs(label_folder, exist_ok=True)
 
-    samples = []
     wav_stems = []
     for i in range(5):
         for g in ["F", "M"]:
-            speaker = f"Ses0{session}{g}"
-            subfolder = f"{speaker}_impro0{i}"
-            subfolder_path = os.path.join(wav_folder, subfolder)
-            os.makedirs(subfolder_path, exist_ok=True)
+            for utt in ["impro", "script"]:
+                speaker = f"Ses0{session}{g}"
+                subfolder = f"{speaker}_{utt}0{i}"
+                subfolder_path = os.path.join(wav_folder, subfolder)
+                os.makedirs(subfolder_path, exist_ok=True)
 
-            for j in range(5):
-                wav_stem = f"{subfolder}_F00{j}"
-                wav_stems.append(wav_stem)
+                for j in range(5):
+                    wav_stem = f"{subfolder}_F00{j}"
+                    wav_stems.append(wav_stem)
 
+    all_samples = []
+    impro_samples = []
+    script_samples = []
     wav_stems = sorted(wav_stems)
     for wav_stem in wav_stems:
         subfolder = wav_stem[:-5]
@@ -64,31 +67,43 @@ def _get_samples(dataset_dir: str, session: int):
         if label == "xxx":
             continue
         sample = (wav, SAMPLE_RATE, wav_stem, label, speaker)
-        samples.append(sample)
+        all_samples.append(sample)
 
-    return samples
+        if "impro" in subfolder:
+            impro_samples.append(sample)
+        else:
+            script_samples.append(sample)
+
+    return all_samples, script_samples, impro_samples
 
 
 def get_mock_dataset(dataset_dir: str):
     os.makedirs(dataset_dir, exist_ok=True)
 
-    samples = []
+    all_samples = []
+    script_samples = []
+    impro_samples = []
     for session in range(1, 4):
-        samples += _get_samples(dataset_dir, session)
-    return samples
+        samples = _get_samples(dataset_dir, session)
+        all_samples += samples[0]
+        script_samples += samples[1]
+        impro_samples += samples[2]
+    return all_samples, script_samples, impro_samples
 
 
 class TestIemocap(TempDirMixin, TorchaudioTestCase):
     root_dir = None
     backend = "default"
 
-    samples = []
+    all_samples = []
+    script_samples = []
+    impro_samples = []
 
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
         dataset_dir = os.path.join(cls.root_dir, "IEMOCAP")
-        cls.samples = get_mock_dataset(dataset_dir)
+        cls.all_samples, cls.script_samples, cls.impro_samples = get_mock_dataset(dataset_dir)
 
     def _testIEMOCAP(self, dataset, samples):
         num_samples = 0
@@ -98,6 +113,14 @@ class TestIemocap(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(samples)
 
-    def testIEMOCAPDataset(self):
+    def testIEMOCAPFullDataset(self):
         dataset = iemocap.IEMOCAP(self.root_dir)
-        self._testIEMOCAP(dataset, self.samples)
+        self._testIEMOCAP(dataset, self.all_samples)
+
+    def testIEMOCAPScriptedDataset(self):
+        dataset = iemocap.IEMOCAP(self.root_dir, utterance_type="scripted")
+        self._testIEMOCAP(dataset, self.script_samples)
+
+    def testIEMOCAPImprovisedDataset(self):
+        dataset = iemocap.IEMOCAP(self.root_dir, utterance_type="improvised")
+        self._testIEMOCAP(dataset, self.impro_samples)
