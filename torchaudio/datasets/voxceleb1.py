@@ -138,14 +138,15 @@ class VoxCeleb1Identification(VoxCeleb1):
 
     Note:
         The file structure of `VoxCeleb1Identification` dataset is as follows:
-            root/
 
-            └── wav/
+        └─ root/
 
-              └── speaker_id folders
+         └─ wav/
 
-            Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
-            the extracted files into the same ``root`` directory.
+         └─ speaker_id folders
+
+        Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
+        the extracted files into the same ``root`` directory.
     """
 
     def __init__(
@@ -229,15 +230,15 @@ class VoxCeleb1Verification(VoxCeleb1):
 
     Note:
         The file structure of `VoxCeleb1Verification` dataset is as follows:
-            root/
 
-            └── wav/
+        └─ root/
 
-              └── speaker_id folders
+         └─ wav/
 
-            Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
-            the extracted files into the same ``root`` directory.
+         └─ speaker_id folders
 
+        Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
+        the extracted files into the same ``root`` directory.
     """
 
     def __init__(self, root: Union[str, Path], meta_url: str = _VERI_TEST_URL, download: bool = False) -> None:
