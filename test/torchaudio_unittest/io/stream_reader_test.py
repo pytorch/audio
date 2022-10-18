@@ -441,38 +441,53 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         with self.assertRaises(ValueError):
             s.seek(10, "magic_seek")
 
-    def test_seek_modes(self):
-        """Calling expected output for the different types of seek"""
-        s = StreamReader(self.get_src())
-        s.add_basic_audio_stream(-1)
-        s.add_basic_video_stream(-1)
+    @parameterized.expand(
+        [
+            # Test keyframe seek
+            # The source video has two key frames the first frame and 203rd frame at 8.08 second.
+            # If the seek time stamp is smaller than 8.08, it will seek into the first frame at 0.0 second.
+            ("nasa_13013.mp4", "key", 0.2, (0, 0)),
+            ("nasa_13013.mp4", "key", 8.04, (0, 0)),
+            ("nasa_13013.mp4", "key", 8.08, (0, 202)),
+            ("nasa_13013.mp4", "key", 8.12, (0, 202)),
+            ("v_SoccerJuggling_g23_c01.avi", "key", 0.0, (0, 0)),
+            ("v_SoccerJuggling_g23_c01.avi", "key", 0.3, (0, 0)),
+            ("v_SoccerJuggling_g23_c01.avi", "key", 0.5, (0, 12)),
+            # Test precise seek
+            ("nasa_13013.mp4", "precise", 0.0, (0, 0)),
+            ("nasa_13013.mp4", "precise", 0.2, (0, 5)),
+            ("nasa_13013.mp4", "precise", 8.04, (0, 201)),
+            ("nasa_13013.mp4", "precise", 8.08, (0, 202)),
+            ("nasa_13013.mp4", "precise", 8.12, (0, 203)),
+            ("v_SoccerJuggling_g23_c01.avi", "precise", 0.0, (0, 0)),
+            ("v_SoccerJuggling_g23_c01.avi", "precise", 0.3, (0, 9)),
+            ("v_SoccerJuggling_g23_c01.avi", "precise", 0.5, (0, 15)),
+            # Test any seek
+            # The source video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            ("v_SoccerJuggling_g23_c01.avi", "any", 0.0, (0, 0)),
+            ("v_SoccerJuggling_g23_c01.avi", "any", 0.4004, (0, 12)),
+            ("v_SoccerJuggling_g23_c01.avi", "any", 0.8008, (0, 24)),
+            ("v_SoccerJuggling_g23_c01.avi", "any", 1.2012, (0, 36)),
+            ("v_SoccerJuggling_g23_c01.avi", "any", 7.6076, (0, 228)),
+        ]
+    )
+    def test_seek_modes(self, src, mode, seek_time, ref_indices):
+        """Testing expected behaviour for the different kinds of seek"""
+        # Using the first video stream (which is not default video stream)
+        stream_index = 0
+        # Decode all frames for reference
+        src_bin = self.get_src(src)
+        s = StreamReader(src_bin)
+        s.add_basic_video_stream(-1, stream_index=stream_index)
+        s.process_all_packets()
+        (ref_frames,) = s.pop_chunks()
 
-        s.seek(2, "key")
-        achunk_key, vchunk_key = next(s.stream())
-        expected_achunk_key = torch.load(get_asset_path("expected_outputs/seek_key_audio_expected.pkl"))
-        expected_vchunk_key = torch.load(get_asset_path("expected_outputs/seek_key_video_expected.pkl"))
-        assert torch.equal(achunk_key, expected_achunk_key)
-        assert torch.equal(vchunk_key, expected_vchunk_key)
+        s.seek(seek_time, mode=mode)
+        s.process_all_packets()
+        (frame,) = s.pop_chunks()
 
-        s.seek(2, "any")
-        achunk_any, vchunk_any = next(s.stream())
-        expected_achunk_any = torch.load(get_asset_path("expected_outputs/seek_any_audio_expected.pkl"))
-        expected_vchunk_any = torch.load(get_asset_path("expected_outputs/seek_any_video_expected.pkl"))
-        assert torch.equal(achunk_any, expected_achunk_any)
-        assert torch.equal(vchunk_any, expected_vchunk_any)
-
-        s.seek(2, "precise")
-        achunk_precise, vchunk_precise = next(s.stream())
-        expected_achunk_precise = torch.load(get_asset_path("expected_outputs/seek_precise_audio_expected.pkl"))
-        expected_vchunk_precise = torch.load(get_asset_path("expected_outputs/seek_precise_video_expected.pkl"))
-        assert torch.equal(achunk_precise, expected_achunk_precise)
-        assert torch.equal(vchunk_precise, expected_vchunk_precise)
-
-        assert not torch.equal(achunk_precise, achunk_any)
-        assert not torch.equal(achunk_any, achunk_key)
-
-        assert not torch.equal(vchunk_precise, vchunk_any)
-        assert not torch.equal(vchunk_any, vchunk_key)
+        hyp_index, ref_index = ref_indices
+        torch.testing.assert_close(frame[hyp_index:], ref_frames[ref_index:])
 
 
 def _to_fltp(original):
