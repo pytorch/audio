@@ -465,13 +465,15 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             # Test any seek
             # The source video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
             ("v_SoccerJuggling_g23_c01.avi", "any", 0.0, (0, 0)),
+            ("v_SoccerJuggling_g23_c01.avi", "any", 0.133467, (0, 4), True),
             ("v_SoccerJuggling_g23_c01.avi", "any", 0.4004, (0, 12)),
+            ("v_SoccerJuggling_g23_c01.avi", "any", 0.567233, (0, 17), True),
             ("v_SoccerJuggling_g23_c01.avi", "any", 0.8008, (0, 24)),
             ("v_SoccerJuggling_g23_c01.avi", "any", 1.2012, (0, 36)),
             ("v_SoccerJuggling_g23_c01.avi", "any", 7.6076, (0, 228)),
         ]
     )
-    def test_seek_modes(self, src, mode, seek_time, ref_indices):
+    def test_seek_modes(self, src, mode, seek_time, ref_indices, assert_different=False):
         """Testing expected behaviour for the different kinds of seek"""
         # Using the first video stream (which is not default video stream)
         stream_index = 0
@@ -487,7 +489,10 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         (frame,) = s.pop_chunks()
 
         hyp_index, ref_index = ref_indices
-        torch.testing.assert_close(frame[hyp_index:], ref_frames[ref_index:])
+        if assert_different:
+            assert not torch.all(torch.isclose(frame[hyp_index:], ref_frames[ref_index:]))
+        else:
+            torch.testing.assert_close(frame[hyp_index:], ref_frames[ref_index:])
 
 
 def _to_fltp(original):
