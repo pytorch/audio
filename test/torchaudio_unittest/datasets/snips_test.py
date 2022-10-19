@@ -55,7 +55,7 @@ def _get_mocked_samples(dataset_dir: str, subset: str, seed: int):
             transcript, iob, intent = f"{spk}XXX", f"{spk}YYY", f"{spk}ZZZ"
             label = "BOS " + transcript + " EOS\tO " + iob + " " + intent
             _save_label(label_path, wav_stem, label)
-            samples.append((waveform, _SAMPLE_RATE, transcript, iob, intent))
+            samples.append((waveform, _SAMPLE_RATE, wav_stem, transcript, iob, intent))
     return samples
 
 
@@ -100,12 +100,13 @@ class TestSnips(TempDirMixin, TorchaudioTestCase):
 
     def _testSnips(self, dataset, data_samples):
         num_samples = 0
-        for i, (data, sample_rate, transcript, iob, intent) in enumerate(dataset):
+        for i, (data, sample_rate, file_name, transcript, iob, intent) in enumerate(dataset):
             self.assertEqual(data, data_samples[i][0])
             assert sample_rate == data_samples[i][1]
-            assert transcript == data_samples[i][2]
-            assert iob == data_samples[i][3]
-            assert intent == data_samples[i][4]
+            assert file_name == data_samples[i][2]
+            assert transcript == data_samples[i][3]
+            assert iob == data_samples[i][4]
+            assert intent == data_samples[i][5]
             num_samples += 1
 
         assert num_samples == len(data_samples)
