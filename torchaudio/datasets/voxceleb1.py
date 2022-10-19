@@ -135,6 +135,18 @@ class VoxCeleb1Identification(VoxCeleb1):
             (Default: ``"https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/iden_split.txt"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
+
+    Note:
+        The file structure of `VoxCeleb1Identification` dataset is as follows:
+
+        └─ root/
+
+         └─ wav/
+
+         └─ speaker_id folders
+
+        Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
+        the extracted files into the same ``root`` directory.
     """
 
     def __init__(
@@ -215,6 +227,18 @@ class VoxCeleb1Verification(VoxCeleb1):
             (Default: ``"https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/veri_test.txt"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
+
+    Note:
+        The file structure of `VoxCeleb1Verification` dataset is as follows:
+
+        └─ root/
+
+         └─ wav/
+
+         └─ speaker_id folders
+
+        Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
+        the extracted files into the same ``root`` directory.
     """
 
     def __init__(self, root: Union[str, Path], meta_url: str = _VERI_TEST_URL, download: bool = False) -> None:
