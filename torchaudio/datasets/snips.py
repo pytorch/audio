@@ -113,6 +113,8 @@ class Snips(Dataset):
             int:
                 Sample rate
             str:
+                File name
+            str:
                 Transcription of audio
             str:
                 Inside–outside–beginning (IOB) label of transcription
@@ -123,7 +125,7 @@ class Snips(Dataset):
         relpath = os.path.relpath(audio_path, self._path)
         file_name = audio_path.with_suffix("").name
         transcript, iob, intent = self.labels[file_name]
-        return relpath, _SAMPLE_RATE, transcript, iob, intent
+        return relpath, _SAMPLE_RATE, file_name, transcript, iob, intent
 
     def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str, str, str]:
         """Load the n-th sample from the dataset.
@@ -138,6 +140,8 @@ class Snips(Dataset):
                 Waveform
             int:
                 Sample rate
+            str:
+                File name
             str:
                 Transcription of audio
             str:
