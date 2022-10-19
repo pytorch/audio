@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -28,18 +28,25 @@ class IEMOCAP(Dataset):
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
         sessions (Tuple[int]): Tuple of sessions (1-5) to use. (Default: ``(1, 2, 3, 4, 5)``)
+        utterance_type (str or None, optional): Which type(s) of utterances to include in the dataset.
+            Options: ("scripted", "improvised", ``None``). If ``None``, both scripted and improvised
+            data are used.
     """
 
     def __init__(
         self,
         root: Union[str, Path],
         sessions: Tuple[str] = (1, 2, 3, 4, 5),
+        utterance_type: Optional[str] = None,
     ):
         root = Path(root)
         self._path = root / "IEMOCAP"
 
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found.")
+
+        if utterance_type not in ["scripted", "improvised", None]:
+            raise ValueError("utterance_type must be one of ['scripted', 'improvised', or None]")
 
         all_data = []
         self.data = []
@@ -57,7 +64,12 @@ class IEMOCAP(Dataset):
 
             # add labels
             label_dir = session_dir / "dialog" / "EmoEvaluation"
-            label_paths = label_dir.glob("*.txt")
+            query = "*.txt"
+            if utterance_type == "scripted":
+                query = "*script*.txt"
+            elif utterance_type == "improvised":
+                query = "*impro*.txt"
+            label_paths = label_dir.glob(query)
 
             for label_path in label_paths:
                 with open(label_path, "r") as f:
@@ -67,11 +79,9 @@ class IEMOCAP(Dataset):
                         line = re.split("[\t\n]", line)
                         wav_stem = line[1]
                         label = line[2]
-                        if label == "exc":
-                            label = "hap"
                         if wav_stem not in all_data:
                             continue
-                        if label not in ["neu", "hap", "ang", "sad"]:
+                        if label not in ["neu", "hap", "ang", "sad", "exc", "fru"]:
                             continue
                         self.mapping[wav_stem] = {}
                         self.mapping[wav_stem]["label"] = label
@@ -99,7 +109,7 @@ class IEMOCAP(Dataset):
             str:
                 File name
             str:
-                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``)
+                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``, ``"exc"``, ``"fru"``)
             str:
                 Speaker
         """
@@ -125,7 +135,7 @@ class IEMOCAP(Dataset):
             str:
                 File name
             str:
-                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``)
+                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``, ``"exc"``, ``"fru"``)
             str:
                 Speaker
         """
