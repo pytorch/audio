@@ -79,11 +79,9 @@ class IEMOCAP(Dataset):
                         line = re.split("[\t\n]", line)
                         wav_stem = line[1]
                         label = line[2]
-                        if label == "exc":
-                            label = "hap"
                         if wav_stem not in all_data:
                             continue
-                        if label not in ["neu", "hap", "ang", "sad"]:
+                        if label not in ["neu", "hap", "ang", "sad", "exc", "fru"]:
                             continue
                         self.mapping[wav_stem] = {}
                         self.mapping[wav_stem]["label"] = label
@@ -111,7 +109,7 @@ class IEMOCAP(Dataset):
             str:
                 File name
             str:
-                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``)
+                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``, ``"exc"``, ``"fru"``)
             str:
                 Speaker
         """
@@ -137,7 +135,7 @@ class IEMOCAP(Dataset):
             str:
                 File name
             str:
-                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``)
+                Label (one of ``"neu"``, ``"hap"``, ``"ang"``, ``"sad"``, ``"exc"``, ``"fru"``)
             str:
                 Speaker
         """

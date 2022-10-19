@@ -4,7 +4,7 @@ import random
 from torchaudio.datasets import iemocap
 from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
 
-LABELS = ["neu", "hap", "ang", "sad", "exc", "xxx"]
+LABELS = ["neu", "hap", "ang", "sad", "exc", "fru", "xxx"]
 SAMPLE_RATE = 16000
 
 
@@ -21,8 +21,6 @@ def _save_wav(filepath: str, seed: int):
 
 def _save_label(label_folder: str, filename: str, wav_stem: str):
     label = random.choice(LABELS)
-    if label == "exc":
-        label = "hap"
     line = f"[xxx]\t{wav_stem}\t{label}\t[yyy]"
     filepath = os.path.join(label_folder, filename)
 
