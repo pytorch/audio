@@ -13,8 +13,8 @@ HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 SAMPLE_RATE = 16000
 _CHECKSUMS = {
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",  # noqa: E501
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",  # noqa: E501
+    "http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",  # noqa: E501
+    "http://download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",  # noqa: E501
 }
 
 
@@ -85,7 +85,7 @@ class SPEECHCOMMANDS(Dataset):
             "speech_commands_v0.01",
             "speech_commands_v0.02",
         ]:
-            base_url = "https://storage.googleapis.com/download.tensorflow.org/data/"
+            base_url = "http://download.tensorflow.org/data/"
             ext_archive = ".tar.gz"
 
             url = os.path.join(base_url, url + ext_archive)
