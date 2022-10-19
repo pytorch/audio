@@ -444,36 +444,37 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
     @parameterized.expand(
         [
             # Test keyframe seek
-            # The source video has two key frames the first frame and 203rd frame at 8.08 second.
+            # The source mp4 video has two key frames the first frame and 203rd frame at 8.08 second.
             # If the seek time stamp is smaller than 8.08, it will seek into the first frame at 0.0 second.
             ("nasa_13013.mp4", "key", 0.2, (0, 0)),
             ("nasa_13013.mp4", "key", 8.04, (0, 0)),
             ("nasa_13013.mp4", "key", 8.08, (0, 202)),
             ("nasa_13013.mp4", "key", 8.12, (0, 202)),
-            ("v_SoccerJuggling_g23_c01.avi", "key", 0.0, (0, 0)),
-            ("v_SoccerJuggling_g23_c01.avi", "key", 0.3, (0, 0)),
-            ("v_SoccerJuggling_g23_c01.avi", "key", 0.5, (0, 12)),
+            # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            # if we seek to a time stamp smaller than 0.4004 it will seek into the first frame at 0.0 second.
+            ("nasa_13013.avi", "key", 0.2, (0, 0)),
+            ("nasa_13013.avi", "key", 1.01, (0, 24)),
+            ("nasa_13013.avi", "key", 7.37, (0, 216)),
+            ("nasa_13013.avi", "key", 7.7, (0, 216)),
             # Test precise seek
             ("nasa_13013.mp4", "precise", 0.0, (0, 0)),
             ("nasa_13013.mp4", "precise", 0.2, (0, 5)),
             ("nasa_13013.mp4", "precise", 8.04, (0, 201)),
             ("nasa_13013.mp4", "precise", 8.08, (0, 202)),
             ("nasa_13013.mp4", "precise", 8.12, (0, 203)),
-            ("v_SoccerJuggling_g23_c01.avi", "precise", 0.0, (0, 0)),
-            ("v_SoccerJuggling_g23_c01.avi", "precise", 0.3, (0, 9)),
-            ("v_SoccerJuggling_g23_c01.avi", "precise", 0.5, (0, 15)),
+            ("nasa_13013.avi", "precise", 0.0, (0, 0)),
+            ("nasa_13013.avi", "precise", 0.2, (0, 1)),
+            ("nasa_13013.avi", "precise", 8.1, (0, 238)),
+            ("nasa_13013.avi", "precise", 8.14, (0, 239)),
+            ("nasa_13013.avi", "precise", 8.17, (0, 240)),
             # Test any seek
-            # The source video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
-            ("v_SoccerJuggling_g23_c01.avi", "any", 0.0, (0, 0)),
-            ("v_SoccerJuggling_g23_c01.avi", "any", 0.133467, (0, 4), True),
-            ("v_SoccerJuggling_g23_c01.avi", "any", 0.4004, (0, 12)),
-            ("v_SoccerJuggling_g23_c01.avi", "any", 0.567233, (0, 17), True),
-            ("v_SoccerJuggling_g23_c01.avi", "any", 0.8008, (0, 24)),
-            ("v_SoccerJuggling_g23_c01.avi", "any", 1.2012, (0, 36)),
-            ("v_SoccerJuggling_g23_c01.avi", "any", 7.6076, (0, 228)),
+            # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            ("nasa_13013.avi", "any", 0.0, (0, 0)),
+            ("nasa_13013.avi", "any", 0.56, (0, 12)),
+            ("nasa_13013.avi", "any", 7.77, (0, 228)),
         ]
     )
-    def test_seek_modes(self, src, mode, seek_time, ref_indices, assert_different=False):
+    def test_seek_modes(self, src, mode, seek_time, ref_indices):
         """Testing expected behaviour for the different kinds of seek"""
         # Using the first video stream (which is not default video stream)
         stream_index = 0
@@ -489,10 +490,8 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         (frame,) = s.pop_chunks()
 
         hyp_index, ref_index = ref_indices
-        if assert_different:
-            assert not torch.all(torch.isclose(frame[hyp_index:], ref_frames[ref_index:]))
-        else:
-            torch.testing.assert_close(frame[hyp_index:], ref_frames[ref_index:])
+
+        torch.testing.assert_close(frame[hyp_index:], ref_frames[ref_index:])
 
 
 def _to_fltp(original):
