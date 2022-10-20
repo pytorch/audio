@@ -425,7 +425,7 @@ class StreamReader:
         """
         return _parse_oi(self._be.get_out_stream_info(i))
 
-    def seek(self, timestamp: float, mode: str = "key"):
+    def seek(self, timestamp: float, mode: str = "precise"):
         """Seek the stream to the given timestamp [second]
 
         Args:

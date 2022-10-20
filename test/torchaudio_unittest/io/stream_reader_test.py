@@ -472,6 +472,9 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             ("nasa_13013.avi", "any", 0.0, (0, 0)),
             ("nasa_13013.avi", "any", 0.56, (0, 12)),
             ("nasa_13013.avi", "any", 7.77, (0, 228)),
+            ("nasa_13013.avi", "any", 0.2002, (11, 12)),
+            ("nasa_13013.avi", "any", 0.233567, (10, 12)),
+            ("nasa_13013.avi", "any", 0.266933, (9, 12)),
         ]
     )
     def test_seek_modes(self, src, mode, seek_time, ref_indices):
