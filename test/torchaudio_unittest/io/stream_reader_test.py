@@ -494,7 +494,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
         hyp_index, ref_index = ref_indices
 
-        torch.testing.assert_close(frame[hyp_index:], ref_frames[ref_index:])
+        self.assertEqual(frame[hyp_index:], ref_frames[ref_index:])
 
 
 def _to_fltp(original):
