@@ -478,7 +478,19 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         ]
     )
     def test_seek_modes(self, src, mode, seek_time, ref_indices):
-        """Testing expected behaviour for the different kinds of seek"""
+        """We expect the following behaviour from the diferent kinds of seek:
+            - `key`: the reader will seek to the first keyframe from the timestamp given
+            - `precise`: the reader will seek to the first keyframe from the timestamp given
+               and start decoding from that position until the given timestmap (discarding all frames in between)
+            - `any`: the  reader will seek to the colsest frame to the timestamp
+               given but if this is not a keyframe, the content will be the delta from other frames
+
+        To thest this behaviour we can parameterize the test with the tupple ref_indices. ref_indices[0]
+        is the expected index on the frames list decoded after seek and ref_indices[1] is exepected index for
+        the list of all frames decoded from the begining (reference frames). This test checks if
+        the reference frame at index ref_indices[1] is the same as ref_indices[0]. Plese note that with `any`
+        and `key` seek we only compare keyframes, but with `precise` seek we can compare any frame content.
+        """
         # Using the first video stream (which is not default video stream)
         stream_index = 0
         # Decode all frames for reference
