@@ -87,7 +87,7 @@ int Sink::process_frame(AVFrame* pFrame, int64_t discard_before_pts) {
     if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
       return 0;
     }
-    if (ret >= 0 and frame->pts >= discard_before_pts) {
+    if (ret >= 0 && frame->pts >= discard_before_pts) {
       buffer->push_frame(frame);
     }
     av_frame_unref(frame);
