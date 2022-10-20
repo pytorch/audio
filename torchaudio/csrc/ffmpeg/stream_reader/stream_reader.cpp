@@ -336,7 +336,7 @@ int StreamReader::process_packet() {
   AVRational stream_tb =
       pFormatContext->streams[pPacket->stream_index]->time_base;
   int64_t seek_timestamp_in_stream_tb =
-      av_rescale_q(seek_timestamp, AV_TIME_BASE_Q, stream_tb);
+      av_rescale_q(seek_timestamp, av_get_time_base_q(), stream_tb);
 
   ret = processor->process_packet(packet, seek_timestamp_in_stream_tb);
 
