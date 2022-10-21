@@ -493,6 +493,18 @@
 <span class="sd">            (Default: ``&quot;https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/iden_split.txt&quot;``)</span>
 <span class="sd">        download (bool, optional):</span>
 <span class="sd">            Whether to download the dataset if it is not found at root path. (Default: ``False``).</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The file structure of `VoxCeleb1Identification` dataset is as follows:</span>
+
+<span class="sd">        └─ root/</span>
+
+<span class="sd">         └─ wav/</span>
+
+<span class="sd">         └─ speaker_id folders</span>
+
+<span class="sd">        Users who pre-downloaded the ``&quot;vox1_dev_wav.zip&quot;`` and ``&quot;vox1_test_wav.zip&quot;`` files need to move</span>
+<span class="sd">        the extracted files into the same ``root`` directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -573,6 +585,18 @@
 <span class="sd">            (Default: ``&quot;https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/veri_test.txt&quot;``)</span>
 <span class="sd">        download (bool, optional):</span>
 <span class="sd">            Whether to download the dataset if it is not found at root path. (Default: ``False``).</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The file structure of `VoxCeleb1Verification` dataset is as follows:</span>
+
+<span class="sd">        └─ root/</span>
+
+<span class="sd">         └─ wav/</span>
+
+<span class="sd">         └─ speaker_id folders</span>
+
+<span class="sd">        Users who pre-downloaded the ``&quot;vox1_dev_wav.zip&quot;`` and ``&quot;vox1_test_wav.zip&quot;`` files need to move</span>
+<span class="sd">        the extracted files into the same ``root`` directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">meta_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_VERI_TEST_URL</span><span class="p">,</span> <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

@@ -440,8 +440,9 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HDEMUCS_HIGH_MUSDB_PLUS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained music source separation pipeline with</span>
-<span class="s2">*Hybrid Demucs* :cite:`defossez2021hybrid` trained on MUSDB-HQ :cite:`MUSDB18HQ`</span>
-<span class="s2">and additional internal training data.</span>
+<span class="s2">*Hybrid Demucs* :cite:`defossez2021hybrid` trained on both training and test sets of</span>
+<span class="s2">MUSDB-HQ :cite:`MUSDB18HQ` and an additional 150 extra songs from an internal database</span>
+<span class="s2">that was specifically produced for Meta.</span>
 
 <span class="s2">The model is constructed by :func:`~torchaudio.models.hdemucs_high`.</span>
 
@@ -457,7 +458,7 @@
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HDEMUCS_HIGH_MUSDB</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Pre-trained music source separation pipeline with</span>
-<span class="s2">*Hybrid Demucs* :cite:`defossez2021hybrid` trained on MUSDB-HQ :cite:`MUSDB18HQ`.</span>
+<span class="s2">*Hybrid Demucs* :cite:`defossez2021hybrid` trained on the training set of MUSDB-HQ :cite:`MUSDB18HQ`.</span>
 
 <span class="s2">The model is constructed by :func:`~torchaudio.models.hdemucs_high`.</span>
 <span class="s2">Training was performed in the original HDemucs repository `here &lt;https://github.com/facebookresearch/demucs/&gt;`__.</span>
