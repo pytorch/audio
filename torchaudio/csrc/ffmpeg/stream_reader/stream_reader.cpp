@@ -255,10 +255,7 @@ void StreamReader::add_stream(
   }
   stream->discard = AVDISCARD_DEFAULT;
   int key = processors[i]->add_stream(
-      frames_per_chunk,
-      num_chunks,
-      filter_desc,
-      device);
+      frames_per_chunk, num_chunks, filter_desc, device);
   stream_indices.push_back(std::make_pair<>(i, key));
 }
 
