@@ -128,11 +128,6 @@ jobs:
     steps:
       - checkout
       - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - tp-nix-v2-{{ checksum ".cachekey" }}
-
       - run:
           command: |
               mkdir -p third_party/archives/
