@@ -644,6 +644,9 @@ void StreamWriter::process_frame(
   while (ret >= 0) {
     ret = filter->get_frame(dst_frame);
     if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+      if (ret == AVERROR_EOF) {
+        encode_frame(nullptr, c, st);
+      }
       break;
     }
     if (ret >= 0) {
@@ -662,6 +665,23 @@ void StreamWriter::encode_frame(
   while (ret >= 0) {
     ret = avcodec_receive_packet(c, pkt);
     if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+      if (ret == AVERROR_EOF) {
+        // Note:
+        // av_interleaved_write_frame buffers the packets internally as needed
+        // to make sure the packets in the output file are properly interleaved
+        // in the order of increasing dts.
+        // https://ffmpeg.org/doxygen/3.4/group__lavf__encoding.html#ga37352ed2c63493c38219d935e71db6c1
+        // Passing nullptr will (forcefully) flush the queue, and this is
+        // necessary if users mal-configure the streams.
+
+        // Possible follow up: Add flush_buffer method?
+        // An alternative is to use `av_write_frame` functoin, but in that case
+        // client code is responsible for ordering packets, which makes it
+        // complicated to use StreamWriter
+        ret = av_interleaved_write_frame(pFormatContext, nullptr);
+        TORCH_CHECK(
+            ret >= 0, "Failed to flush packet (", av_err2string(ret), ").");
+      }
       break;
     } else {
       TORCH_CHECK(
@@ -669,6 +689,14 @@ void StreamWriter::encode_frame(
           "Failed to fetch encoded packet (",
           av_err2string(ret),
           ").");
+    }
+    // https://github.com/pytorch/audio/issues/2790
+    // If this is not set, the last frame is not properly saved, as
+    // the encoder cannot figure out when the packet should finish.
+    if (pkt->duration == 0 && c->codec_type == AVMEDIA_TYPE_VIDEO) {
+      // 1 means that 1 frame (in codec time base, which is the frame rate)
+      // This has to be set before av_packet_rescale_ts bellow.
+      pkt->duration = 1;
     }
     av_packet_rescale_ts(pkt, c->time_base, st->time_base);
     pkt->stream_index = st->index;
@@ -1027,7 +1055,6 @@ void StreamWriter::write_planar_video(
   }
 }
 
-// TODO: probably better to flush output streams in interweaving manner.
 void StreamWriter::flush() {
   for (auto& os : streams) {
     flush_stream(os);
@@ -1037,8 +1064,9 @@ void StreamWriter::flush() {
 void StreamWriter::flush_stream(OutputStream& os) {
   if (os.filter) {
     process_frame(nullptr, os.filter, os.dst_frame, os.codec_ctx, os.stream);
+  } else {
+    encode_frame(nullptr, os.codec_ctx, os.stream);
   }
-  encode_frame(nullptr, os.codec_ctx, os.stream);
 }
 } // namespace ffmpeg
 } // namespace torchaudio
