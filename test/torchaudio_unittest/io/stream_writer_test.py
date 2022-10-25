@@ -17,10 +17,6 @@ if is_ffmpeg_available():
     from torchaudio.io import StreamReader, StreamWriter
 
 
-# TODO:
-# Get rid of StreamReader and use synthetic data.
-
-
 def get_audio_chunk(fmt, sample_rate, num_channels):
     path = get_asset_path("nasa_13013.mp4")
     s = StreamReader(path)
@@ -255,3 +251,79 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 chunk = chunk[:, [2, 1, 0], :, :]
             expected = rgb_to_yuv_ccir(chunk)
         self.assertEqual(expected, result, atol=1, rtol=0)
+
+    @nested_params([25, 30], [(78, 96), (240, 426), (360, 640)], ["yuv444p", "rgb24"])
+    def test_video_num_frames(self, framerate, resolution, format):
+        """Saving video as MP4 properly keep all the frames"""
+
+        ext = "mp4"
+        filename = f"test.{ext}"
+        h, w = resolution
+
+        # Write data
+        dst = self.get_dst(filename)
+        s = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        s.add_video_stream(frame_rate=framerate, height=h, width=w, format=format)
+        chunk = torch.stack([torch.full((3, h, w), i, dtype=torch.uint8) for i in torch.linspace(0, 255, 256)])
+        with s.open():
+            s.write_video_chunk(0, chunk)
+        if self.test_fileobj:
+            dst.flush()
+
+        # Load data
+        s = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        print(s.get_src_stream_info(0))
+        s.add_video_stream(-1)
+        s.process_all_packets()
+        (saved,) = s.pop_chunks()
+
+        assert saved.shape == chunk.shape
+
+        if format == "yuv444p":
+            # The following works if encoder_format is also yuv444p.
+            # Otherwise, the typical encoder format is yuv420p which incurs some data loss,
+            # and assertEqual fails.
+            #
+            # This is the case for libx264 encoder, but it's not always available.
+            # ffmpeg==4.2 from conda-forge (osx-arm64) comes with it but ffmpeg==5.1.2 does not.
+            # Since we do not have function to check the runtime availability of encoders,
+            # commenting it out for now.
+
+            # self.assertEqual(saved, chunk)
+            pass
+
+    @nested_params(
+        ["wav", "mp3", "flac"],
+        [8000, 16000, 44100],
+        [1, 2],
+    )
+    def test_audio_num_frames(self, ext, sample_rate, num_channels):
+        """"""
+        filename = f"test.{ext}"
+
+        # Write data
+        dst = self.get_dst(filename)
+        s = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        s.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels)
+
+        freq = 300
+        duration = 60
+        theta = torch.linspace(0, freq * 2 * 3.14 * duration, sample_rate * duration)
+        if num_channels == 1:
+            chunk = torch.sin(theta).unsqueeze(-1)
+        else:
+            chunk = torch.stack([torch.sin(theta), torch.cos(theta)], dim=-1)
+        with s.open():
+            s.write_audio_chunk(0, chunk)
+        if self.test_fileobj:
+            dst.flush()
+
+        # Load data
+        s = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        s.add_audio_stream(-1)
+        s.process_all_packets()
+        (saved,) = s.pop_chunks()
+
+        assert saved.shape == chunk.shape
+        if format in ["wav", "flac"]:
+            self.assertEqual(saved, chunk)
