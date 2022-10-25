@@ -156,11 +156,6 @@ jobs:
     steps:
       - checkout
       - generate_cache_key
-      - restore_cache:
-          {% raw %}
-          keys:
-            - ffmpeg-linux-v0-{{ checksum ".cachekey" }}
-          {% endraw %}
       - run:
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
