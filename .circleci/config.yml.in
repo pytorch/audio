@@ -128,6 +128,11 @@ jobs:
     steps:
       - checkout
       - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - tp-nix-v2-{{ checksum ".cachekey" }}
+          {% endraw %}
       - run:
           command: |
               mkdir -p third_party/archives/
@@ -151,6 +156,11 @@ jobs:
     steps:
       - checkout
       - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - ffmpeg-linux-v1-{{ checksum ".cachekey" }}
+          {% endraw %}
       - run:
           command: |
             export FFMPEG_ROOT=${PWD}/third_party/ffmpeg
@@ -159,7 +169,7 @@ jobs:
             fi
       - save_cache:
           {% raw %}
-          key: ffmpeg-linux-v0-{{ checksum ".cachekey" }}
+          key: ffmpeg-linux-v1-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - third_party/ffmpeg
