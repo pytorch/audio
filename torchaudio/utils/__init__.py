@@ -1,9 +1,10 @@
-from torchaudio._internal import module_utils as _mod_utils
+import torchaudio
 
 from . import ffmpeg_utils, sox_utils
 from .download import download_asset
 
-if _mod_utils.is_sox_available():
+
+if torchaudio._extension._SOX_INITIALIZED:
     sox_utils.set_verbosity(0)
 
 __all__ = [

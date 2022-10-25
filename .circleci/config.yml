@@ -847,13 +847,17 @@ jobs:
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: .circleci/unittest/linux/scripts/install.sh
+          command: |
+            brew install wget pkg-config
+            .circleci/unittest/linux/scripts/install.sh
           environment:
               USE_FFMPEG: true
               USE_OPENMP: false
       - run:
           name: Run tests
-          command: .circleci/unittest/linux/scripts/run_test.sh
+          command: |
+            brew install wget pkg-config
+            .circleci/unittest/linux/scripts/run_test.sh
           environment:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS: true

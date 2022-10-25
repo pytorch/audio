@@ -274,7 +274,7 @@ def apply_effects_file(
     """
     if not torch.jit.is_scripting():
         if hasattr(path, "read"):
-            ret = torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
+            ret = torchaudio._torchaudio_sox.apply_effects_fileobj(path, effects, normalize, channels_first, format)
             if ret is None:
                 raise RuntimeError("Failed to load audio from {}".format(path))
             return ret

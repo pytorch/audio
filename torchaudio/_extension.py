@@ -55,6 +55,7 @@ def _load_lib(lib: str) -> bool:
 
 
 _FFMPEG_INITIALIZED = False
+_SOX_INITIALIZED = False
 
 
 def _init_ffmpeg():
@@ -81,11 +82,27 @@ def _init_ffmpeg():
     _FFMPEG_INITIALIZED = True
 
 
-def _init_extension():
-    if not _mod_utils.is_module_available("torchaudio._torchaudio"):
-        warnings.warn("torchaudio C++ extension is not available.")
+def _init_sox():
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED:
         return
 
+    if not torch.ops.torchaudio.is_sox_available():
+        raise RuntimeError(
+            "torchaudio is not compiled with SoX integration. Please set USE_SOX=1 when compiling torchaudio."
+        )
+
+    try:
+        _load_lib("libtorchaudio_sox")
+    except OSError as err:
+        raise ImportError("SoX libraries are not found. Please install SoX.") from err
+
+    import torchaudio._torchaudio_sox  # noqa
+
+    _SOX_INITIALIZED = True
+
+
+def _init_extension():
     # On Windows Python-3.8+ has `os.add_dll_directory` call,
     # which is called to configure dll search path.
     # To find cuda related dlls we need to make sure the
@@ -103,9 +120,11 @@ def _init_extension():
                     pass
 
     _load_lib("libtorchaudio")
-    # This import is for initializing the methods registered via PyBind11
-    # This has to happen after the base library is loaded
-    from torchaudio import _torchaudio  # noqa
+
+    try:
+        _init_sox()
+    except Exception:
+        warnings.warn("Failed to initialize SoX. Some features may not be available.")
 
     # Because this part is executed as part of `import torchaudio`, we ignore the
     # initialization failure.

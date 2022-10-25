@@ -1,12 +1,12 @@
 #include <torch/extension.h>
 
-#ifdef INCLUDE_SOX
+#ifdef USE_SOX
 #include <torchaudio/csrc/sox/pybind/effects.h>
 #include <torchaudio/csrc/sox/pybind/io.h>
 #endif
 
-PYBIND11_MODULE(_torchaudio, m) {
-#ifdef INCLUDE_SOX
+PYBIND11_MODULE(_torchaudio_sox, m) {
+#ifdef USE_SOX
   m.def(
       "get_info_fileobj",
       &torchaudio::sox_io::get_info_fileobj,

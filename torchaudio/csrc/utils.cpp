@@ -9,7 +9,7 @@ namespace torchaudio {
 namespace {
 
 bool is_sox_available() {
-#ifdef INCLUDE_SOX
+#ifdef USE_SOX
   return true;
 #else
   return false;

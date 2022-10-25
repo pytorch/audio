@@ -93,7 +93,7 @@ def info(
             # For the special BC for mp3, we handle mp3 differently.
             if format == "mp3":
                 return _fallback_info_fileobj(filepath, format)
-            sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+            sinfo = torchaudio._torchaudio_sox.get_info_fileobj(filepath, format)
             if sinfo is not None:
                 return AudioMetaData(*sinfo)
             return _fallback_info_fileobj(filepath, format)
@@ -212,7 +212,7 @@ def load(
             # For the special BC for mp3, we handle mp3 differently.
             if format == "mp3":
                 return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
-            ret = torchaudio._torchaudio.load_audio_fileobj(
+            ret = torchaudio._torchaudio_sox.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
             if ret is not None:
@@ -384,7 +384,7 @@ def save(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "write"):
-            torchaudio._torchaudio.save_audio_fileobj(
+            torchaudio._torchaudio_sox.save_audio_fileobj(
                 filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample
             )
             return

@@ -47,7 +47,6 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 def get_ext_modules():
     modules = [
         Extension(name="torchaudio.lib.libtorchaudio", sources=[]),
-        Extension(name="torchaudio._torchaudio", sources=[]),
     ]
     if _BUILD_CTC_DECODER:
         modules.extend(
@@ -62,6 +61,13 @@ def get_ext_modules():
             [
                 Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
                 Extension(name="torchaudio._torchaudio_ffmpeg", sources=[]),
+            ]
+        )
+    if _USE_SOX:
+        modules.extend(
+            [
+                Extension(name="torchaudio.lib.libtorchaudio_sox", sources=[]),
+                Extension(name="torchaudio._torchaudio_sox", sources=[]),
             ]
         )
     return modules
@@ -84,10 +90,11 @@ class CMakeBuild(build_ext):
         # However, the following `cmake` command will build all of them at the same time,
         # so, we do not need to perform `cmake` twice.
         # Therefore we call `cmake` only for `torchaudio._torchaudio`.
-        if ext.name != "torchaudio._torchaudio":
+        if ext.name != "torchaudio.lib.libtorchaudio":
             return
 
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        extdir = os.path.dirname(extdir)
 
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
