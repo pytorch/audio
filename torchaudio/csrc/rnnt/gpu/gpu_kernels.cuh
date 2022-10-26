@@ -60,10 +60,17 @@ __global__ void ComputeLogProbs(
     int target = targets[Indexer2D(maxU - 1)(bTgt, u)];
     logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
         CAST_DTYPE(logits[idx * D + target]) - denominators[idx];
+<<<<<<< HEAD
 
     if (!fusedLogSmax) {
       logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
           CAST_DTYPE(logits[idx * D + target]);
+=======
+    
+    if (!fusedLogSmax) {
+      logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
+          CAST_DTYPE(logits[idx * D + target]);      
+>>>>>>> 1a003442... add fused log smax option
     }
   }
 }

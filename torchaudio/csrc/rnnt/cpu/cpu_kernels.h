@@ -335,8 +335,12 @@ void ComputeGradientsOneSequence(
         CAST_DTYPE c = alpha({t, u}) + cost - denom({t, u});
         for (int d = 0; d < D; ++d) {
           CAST_DTYPE g = CAST_DTYPE(logits({t, u, d})) + c;
+<<<<<<< HEAD
           if (d == blank && t == T - 1 &&
               u == U - 1) { // last blank transition.
+=======
+          if (d == blank && t == T - 1 && u == U - 1) { // last blank transition.
+>>>>>>> 1a003442... add fused log smax option
             gradients({t, u, d}) = std::exp(g + beta({t, u})) - std::exp(g);
           } else if (d == blank && t < T - 1) {
             gradients({t, u, d}) =
@@ -367,8 +371,13 @@ void ComputeGradientsOneSequence(
             gradients({t, u, d}) = g + alpha({t, u});
           } else if (d == blank && t < T - 1) {
             gradients({t, u, d}) = g + alpha({t, u}) + beta({t + 1, u});
+<<<<<<< HEAD
           } else if (u < U - 1 && d == targets[u]) {
             gradients({t, u, d}) = g + alpha({t, u}) + beta({t, u + 1});
+=======
+          } else if (t < T - 1 && u < U - 1 && d == targets[u]) {
+            gradients({t, u, d}) = g + alpha({t, u}) + beta({t + 1, u + 1});
+>>>>>>> 1a003442... add fused log smax option
           } else {
             gradients({t, u, d}) = g + CAST_DTYPE(-INFINITY);
           }

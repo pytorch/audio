@@ -188,12 +188,7 @@ def compute_with_numpy_transducer(data):
     return costs, gradients
 
 
-def compute_with_pytorch_transducer(data):
-    fused_log_softmax = data.get("fused_log_softmax", True)
-    input = data["logits"]
-    if not fused_log_softmax:
-        input = torch.nn.functional.log_softmax(input, dim=-1)
-
+def compute_with_pytorch_transducer(data, fused_log_softmax=True):
     costs = rnnt_loss(
         logits=input,
         logit_lengths=data["logit_lengths"],

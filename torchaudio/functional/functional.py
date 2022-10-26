@@ -1872,6 +1872,10 @@ def rnnt_loss(
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
 
+    # TODO: remove this; have users call it themselves outside of rnnt loss function
+    if not fused_log_softmax:
+        logits = torch.nn.functional.log_softmax(logits, dim=-1)
+
     costs, _ = torch.ops.torchaudio.rnnt_loss(
         logits=logits,
         targets=targets,
