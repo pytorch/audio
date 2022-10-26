@@ -11,13 +11,12 @@ on:
 
 jobs:
   generate-matrix:
-    # TODO - change the branch name back to 'main'
-    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@Add-Nova-Workflow-to-Audio-Mac-Wheels
+    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
     with:
       package-type: wheel
       os: macos
       test-infra-repository: pytorch/test-infra
-      test-infra-ref: Add-Nova-Workflow-to-Audio-Mac-Wheels
+      test-infra-ref: main
   build:
     needs: generate-matrix
     strategy:
@@ -30,12 +29,12 @@ jobs:
             smoke-test-script: test/smoke_test/smoke_test.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_macos.yml@Add-Nova-Workflow-to-Audio-Mac-Wheels
+    uses: pytorch/test-infra/.github/workflows/build_wheels_macos.yml@main
     with:
       repository: ${{ matrix.repository }}
       ref: nightly
       test-infra-repository: pytorch/test-infra
-      test-infra-ref: Add-Nova-Workflow-to-Audio-Mac-Wheels
+      test-infra-ref: main
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       pre-script: ${{ matrix.pre-script }}
       post-script: ${{ matrix.post-script }}
@@ -44,8 +43,7 @@ jobs:
       package-name: ${{ matrix.package-name }}
       # Using "development" as trigger event so these binaries are not uploaded
       # to official channels yet
-      # TODO - change it back to "development" before merging.
-      trigger-event: push
+      trigger-event: development
     secrets:
       AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID: ${{ secrets.AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID }}
       AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY: ${{ secrets.AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY }}
