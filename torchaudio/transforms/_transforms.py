@@ -566,8 +566,6 @@ class MelSpectrogram(torch.nn.Module):
             (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
             :attr:`center` is ``True``. (Default: ``"reflect"``)
-        onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy. (Default: ``True``)
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
@@ -599,11 +597,17 @@ class MelSpectrogram(torch.nn.Module):
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
-        onesided: bool = True,
+        onesided: Optional[bool] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
     ) -> None:
         super(MelSpectrogram, self).__init__()
+
+        if onesided is not None:
+            warnings.warn(
+                "Argument 'onesided' has been deprecated and has no influence on the behavior of this module."
+            )
+
         self.sample_rate = sample_rate
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
@@ -625,7 +629,7 @@ class MelSpectrogram(torch.nn.Module):
             wkwargs=wkwargs,
             center=center,
             pad_mode=pad_mode,
-            onesided=onesided,
+            onesided=True,
         )
         self.mel_scale = MelScale(
             self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm, mel_scale
