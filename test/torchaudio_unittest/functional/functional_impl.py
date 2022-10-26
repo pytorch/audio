@@ -48,7 +48,7 @@ class Functional(TestBaseMixin):
 
         self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
 
-    def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2):
+    def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, fused_log_softmax=True, atol=1e-6, rtol=1e-2):
         logits_shape = data["logits"].shape
         costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
 
