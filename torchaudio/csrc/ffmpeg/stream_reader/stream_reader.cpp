@@ -251,16 +251,11 @@ void StreamReader::add_stream(
 
   if (!processors[i]) {
     processors[i] = std::make_unique<StreamProcessor>(
-        stream->codecpar, decoder, decoder_option, device);
+        stream, decoder, decoder_option, device);
   }
   stream->discard = AVDISCARD_DEFAULT;
   int key = processors[i]->add_stream(
-      stream->time_base,
-      stream->codecpar,
-      frames_per_chunk,
-      num_chunks,
-      filter_desc,
-      device);
+      frames_per_chunk, num_chunks, filter_desc, device);
   stream_indices.push_back(std::make_pair<>(i, key));
 }
 
