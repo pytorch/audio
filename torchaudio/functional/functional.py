@@ -1838,6 +1838,7 @@ def rnnt_loss(
     blank: int = -1,
     clamp: float = -1,
     reduction: str = "mean",
+    fused_log_softmax: bool = True,
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
     :cite:`graves2012sequence`.
@@ -1860,6 +1861,7 @@ def rnnt_loss(
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
     Returns:
         Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size `(batch)`,
         otherwise scalar.
@@ -1870,6 +1872,10 @@ def rnnt_loss(
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
 
+    # TODO: remove this; have users call it themselves outside of rnnt loss function
+    if not fused_log_softmax:
+        logits = torch.nn.functional.log_softmax(logits, dim=-1)
+
     costs, _ = torch.ops.torchaudio.rnnt_loss(
         logits=logits,
         targets=targets,
@@ -1877,6 +1883,7 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
+        fused_log_softmax=fused_log_softmax,
     )
 
     if reduction == "mean":
