@@ -188,7 +188,7 @@ def compute_with_numpy_transducer(data):
     return costs, gradients
 
 
-def compute_with_pytorch_transducer(data, fused_log_softmax=True):
+def compute_with_pytorch_transducer(data):
     costs = rnnt_loss(
         logits=data["logits"],
         logit_lengths=data["logit_lengths"],
@@ -196,7 +196,7 @@ def compute_with_pytorch_transducer(data, fused_log_softmax=True):
         targets=data["targets"],
         blank=data["blank"],
         reduction="none",
-        fused_log_softmax=fused_log_softmax,
+        fused_log_softmax=data["fused_log_softmax"] if "fused_log_softmax" in data else True,
     )
 
     loss = torch.sum(costs)
@@ -261,6 +261,7 @@ def get_B1_T10_U3_D4_data(
     data["target_lengths"] = torch.tensor([2, 2], dtype=torch.int32, device=device)
     data["targets"] = torch.tensor([[1, 2], [1, 2]], dtype=torch.int32, device=device)
     data["blank"] = 0
+    data["fused_log_softmax"] = False
 
     return data
 
@@ -553,6 +554,7 @@ def get_random_data(
     max_U=32,
     max_D=40,
     blank=-1,
+    fused_log_softmax=True,
     dtype=torch.float32,
     device=CPU_DEVICE,
     seed=None,
@@ -592,6 +594,7 @@ def get_random_data(
         "logit_lengths": logit_lengths,
         "target_lengths": target_lengths,
         "blank": blank,
+        "fused_log_softmax": fused_log_softmax,
     }
 
 

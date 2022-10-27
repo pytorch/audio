@@ -48,9 +48,10 @@ class Functional(TestBaseMixin):
 
         self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
 
-    def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, fused_log_softmax=True, atol=1e-6, rtol=1e-2):
+    def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2):
         logits_shape = data["logits"].shape
-        costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data, fused_log_softmax=fused_log_softmax)
+        costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
+
         self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
         self.assertEqual(logits_shape, gradients.shape)
         self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
@@ -637,10 +638,12 @@ class Functional(TestBaseMixin):
             rtol=rtol,
         )
 
-    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self):
+    @parameterized.expand([(True,), (False,)])
+    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self, fused_log_softmax):
         seed = 777
         for i in range(5):
             data = rnnt_utils.get_random_data(
+                fused_log_softmax=fused_log_softmax,
                 dtype=torch.float32,
                 device=self.device,
                 seed=(seed + i)
@@ -648,10 +651,14 @@ class Functional(TestBaseMixin):
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
 
-    def test_rnnt_loss_non_fused_softmax(self):
+    def test_rnnt_loss_nonfused_softmax(self):
         data = rnnt_utils.get_B1_T10_U3_D4_data()
         ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
-        self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients, fused_log_softmax=False)
+        self._test_costs_and_gradients(
+            data=data,
+            ref_costs=ref_costs,
+            ref_gradients=ref_gradients,
+        )
 
     def test_psd(self):
         """Verify the ``F.psd`` method by the numpy implementation.
