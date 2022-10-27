@@ -123,7 +123,7 @@ Tutorials
    :tags: I/O,StreamWriter
    
 .. customcarditem::
-   :header: Advanced usage of StreamWriter
+   :header: Playing media with StreamWriter
    :card_description: Learn how to play audio/video with StreamWriter
    :image: /Users/moto/Development/torchaudio/docs/udp.gif
    :link: tutorials/streamwriter_advanced_tutorial.html
@@ -190,14 +190,14 @@ Tutorials
    :card_description: Learn how to perform online ASR with RNN-T and StreamReader
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/emformer_rnnt_streamer_context.png
    :link: tutorials/online_asr_tutorial.html
-   :tags: Pipelines,ASR,RNN-T,StreamReader
+   :tags: Pipelines,ASR,RNNT,StreamReader
    
 .. customcarditem::
    :header: Readl-time microphone ASR with Emformer RNN-T
    :card_description: Learn how to transcribe speech fomr micrphone with RNN-T and StreamReader
    :image: https://3.bp.blogspot.com/-aw5KRAWmnKE/WK7fGITeEqI/AAAAAAABCA4/j5G8qbugxmkdDWhmlAXy7ZYbTYhaaIv1ACLcB/s800/microphone_mark.png
    :link: tutorials/device_asr.html
-   :tags: Pipelines,ASR,RNN-T,StreamReader
+   :tags: Pipelines,ASR,RNNT,StreamReader
 
 .. customcarditem::
    :header: Forced Alignment with Wav2Vec2
@@ -211,7 +211,7 @@ Tutorials
    :card_description: Learn how to generate speech from text with Tacotron2
    :image: _images/sphx_glr_tacotron2_pipeline_tutorial_003.png
    :link: tutorials/tacotron2_pipeline_tutorial.html
-   :tags: Pipelines,Speech-to-Text
+   :tags: Pipelines,TTS-(Text-to-Speech)
    
 .. customcarditem::
    :header: Speech Enhancement with MVDR Beamforming
