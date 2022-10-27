@@ -5,50 +5,52 @@ Torchaudio is a library for audio and signal processing with PyTorch.
 It provides I/O, signal and data processing functions, datasets,
 model implementations and application components.
 
-Features described in this documentation are classified by release status:
-
-  *Stable:*  These features will be maintained long-term and there should generally
-  be no major performance limitations or gaps in documentation.
-  We also expect to maintain backwards compatibility (although
-  breaking changes can happen and notice will be given one release ahead
-  of time).
-
-  *Beta:*  Features are tagged as Beta because the API may change based on
-  user feedback, because the performance needs to improve, or because
-  coverage across operators is not yet complete. For Beta features, we are
-  committing to seeing the feature through to the Stable classification.
-  We are not, however, committing to backwards compatibility.
-
-  *Prototype:*  These features are typically not available as part of
-  binary distributions like PyPI or Conda, except sometimes behind run-time
-  flags, and are at an early stage for feedback and testing.
+..
+   Generate Table Of Contents (left navigation bar)
+   NOTE: If you are adding tutorials, add entries to toctree and customcarditem below
 
 .. toctree::
    :maxdepth: 1
-   :hidden:
    :caption: Torchaudio Documentation
+   :hidden:
 
    Index <self>
    supported_features
+   feature_classifications
    references
-
-Tutorials
----------
 
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials
+   :hidden:
 
-   tutorials.io
-   tutorials.data
-   tutorials.pipelines
+   tutorials/audio_io_tutorial
+   tutorials/streamreader_basic_tutorial
+   tutorials/streamreader_advanced_tutorial
+   tutorials/streamwriter_basic_tutorial
+   tutorials/streamwriter_advanced
+   hw_acceleration_tutorial
 
-API References
---------------
+   tutorials/audio_resampling_tutorial
+   tutorials/audio_data_augmentation_tutorial
+   tutorials/audio_feature_extractions_tutorial
+   tutorials/audio_feature_augmentation_tutorial
+
+   tutorials/audio_datasets_tutorial
+
+   tutorials/speech_recognition_pipeline_tutorial
+   tutorials/asr_inference_with_ctc_decoder_tutorial
+   tutorials/online_asr_tutorial
+   tutorials/device_asr
+   tutorials/forced_alignment_tutorial
+   tutorials/tacotron2_pipeline_tutorial
+   tutorials/mvdr_tutorial
+   tutorials/hybrid_demucs_tutorial
 
 .. toctree::
    :maxdepth: 1
    :caption: API Reference
+   :hidden:
 
    torchaudio
    io
@@ -64,17 +66,149 @@ API References
    kaldi_io
    utils
 
-Prototype API References
-------------------------
-
 .. toctree::
    :maxdepth: 1
    :caption: Prototype API Reference
+   :hidden:
 
    prototype
    prototype.functional
    prototype.models
    prototype.pipelines
+
+.. toctree::
+   :maxdepth: 1
+   :caption: PyTorch Libraries
+   :hidden:
+
+   PyTorch <https://pytorch.org/docs>
+   torchaudio <https://pytorch.org/audio>
+   torchtext <https://pytorch.org/text>
+   torchvision <https://pytorch.org/vision>
+   TorchElastic <https://pytorch.org/elastic/>
+   TorchServe <https://pytorch.org/serve>
+   PyTorch on XLA Devices <http://pytorch.org/xla/>
+
+Tutorials
+---------
+
+.. customcardstart::
+
+.. customcarditem::
+   :header: Loading waveform Tensors from files and saving them
+   :card_description: Learn how to use query/load audio files and save waveform tensors to files.
+   :image: _images/sphx_glr_audio_io_tutorial_001.png
+   :link: tutorials/audio_io_tutorial.html
+   :tags: I/O
+
+.. customcarditem::
+   :header: Streaming media decoding with StreamReader
+   :card_description: Learn how to load audio/video to Tensors with StreamReader
+   :image: _images/sphx_glr_streamreader_basic_tutorial_001.png
+   :link: tutorials/streamreader_basic_tutorial.html
+   :tags: I/O,StreamReader
+   
+.. customcarditem::
+   :header: Advanced usage of StreamReader
+   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and filters.
+   :image: /Users/moto/Development/torchaudio/docs/streamreader.gif
+   :link: tutorials/streamreader_advanced_tutorial.html
+   :tags: I/O,StreamReader
+
+.. customcarditem::
+   :header: Streaming media encoding with StreamWriter
+   :card_description: Learn how to save audio/video with StreamWriter
+   :image: /Users/moto/Development/torchaudio/docs/streamwriter.gif
+   :link: tutorials/streamwriter_basic_tutorial.html
+   :tags: I/O,StreamWriter
+   
+.. customcarditem::
+   :header: Advanced usage of StreamWriter
+   :card_description: Learn how to play audio/video with StreamWriter
+   :image: /Users/moto/Development/torchaudio/docs/udp.gif
+   :link: tutorials/streamwriter_advanced_tutorial.html
+   :tags: I/O,StreamWriter
+
+.. customcarditem::
+   :header: Accelerated video I/O with NVDEC/NVENC
+   :card_description: Learn how to setup HW acceleratoin for video processing
+   :image: _images/hw_acceleration_tutorial_68_1.png
+   :link: hw_acceleration_tutorial.html
+   :tags: I/O,StreamReader,StreamWriter
+
+.. customcarditem::
+   :header: Audio resampling with bandlimited sinc interpolation  
+   :card_description: Learn how to resample audio tensor
+   :image: _images/sphx_glr_audio_resampling_tutorial_001.png
+   :link: tutorials/audio_resampling_tutorial.html
+   :tags: I/O
+
+.. customcarditem::
+   :header: Audio data augmentation
+   :card_description: Learn how to use TorchAudio's functional/transforms modules to perform data augmentation
+   :image: _images/sphx_glr_audio_data_augmentation_tutorial_007.png
+   :link: tutorials/audio_data_augmentation_tutorial.html
+   :tags: I/O
+
+
+.. customcarditem::
+   :header: AM inference with Wav2Vec2
+   :card_description: Learn how to acoustice model inference with Wav2Vec2
+   :image: _images/sphx_glr_speech_recognition_pipeline_tutorial_002.png
+   :link: tutorials/speech_recognition_pipeline_tutorial.html
+   :tags: ASR,wav2vec2
+
+.. customcarditem::
+   :header: LM inference with CTC Beam Seach Decoder
+   :card_description: Learn how to lexicon, language model and beam search decoder in ASR
+   :image: _images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_001.png
+   :link: tutorials/asr_inference_with_ctc_decoder_tutorial.html
+   :tags: ASR,wav2vec2,CTC-Decoder,KenLM
+
+.. customcarditem::
+   :header: Online ASR with Emformer RNN-T
+   :card_description: Learn how to perform online ASR with RNN-T and StreamReader
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/emformer_rnnt_streamer_context.png
+   :link: tutorials/online_asr_tutorial.html
+   :tags: ASR,RNN-T,StreamReader
+   
+.. customcarditem::
+   :header: Readl-time microphone ASR with Emformer RNN-T
+   :card_description: Learn how to transcribe speech fomr micrphone with RNN-T and StreamReader
+   :image: https://3.bp.blogspot.com/-aw5KRAWmnKE/WK7fGITeEqI/AAAAAAABCA4/j5G8qbugxmkdDWhmlAXy7ZYbTYhaaIv1ACLcB/s800/microphone_mark.png
+   :link: tutorials/device_asr.html
+   :tags: ASR,RNN-T,StreamReader
+
+.. customcarditem::
+   :header: Forced Alignment with Wav2Vec2
+   :card_description: Learn how to align text to speech with Wav2Vec 2.0
+   :image: _images/sphx_glr_forced_alignment_tutorial_005.png
+   :link: tutorials/forced_alignment_tutorial.html
+   :tags: Forced-Alignment,wav2vec2
+
+.. customcarditem::
+   :header: Text-to-Speech with Tacotron2
+   :card_description: Learn how to generate speech from text with Tacotron2
+   :image: _images/sphx_glr_tacotron2_pipeline_tutorial_003.png
+   :link: tutorials/tacotron2_pipeline_tutorial.html
+   :tags: Speech-Enhancement
+   
+.. customcarditem::
+   :header: Speech Enhancement with MVDR Beamforming
+   :card_description: Learn how to improve speech quality with MVDR Beamforming
+   :image: _images/sphx_glr_mvdr_tutorial_001.png
+   :link: tutorials/mvdr_tutorial.html
+   :tags: Speech-Enhancement
+
+.. customcarditem::
+   :header: Music Source Separation with Hybrid Demucs
+   :card_description: Learn how to perform music separation with pre-trained Hybrid Demucs
+   :image: _images/sphx_glr_hybrid_demucs_tutorial_001.png
+   :link: tutorials/hybrid_demucs_tutorial.html
+   :tags: Source-Separation
+
+.. customcardend::
+
 
 Citing torchaudio
 -----------------
@@ -92,29 +226,16 @@ In BibTeX format:
 
 .. code-block:: bibtex
 
-    @article{yang2021torchaudio,
-      title={TorchAudio: Building Blocks for Audio and Speech Processing},
-      author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and
-              Anjali Chourdia and Artyom Astafurov and Caroline Chen and
-              Ching-Feng Yeh and Christian Puhrsch and David Pollack and
-              Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and
-              Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and
-              Peter Goldsborough and Prabhat Roy and Sean Narenthiran and
-              Shinji Watanabe and Soumith Chintala and
-              Vincent Quenneville-Bélair and Yangyang Shi},
-      journal={arXiv preprint arXiv:2110.15018},
-      year={2021}
-    }
-
-.. toctree::
-   :maxdepth: 1
-   :caption: PyTorch Libraries
-   :hidden:
-
-   PyTorch <https://pytorch.org/docs>
-   torchaudio <https://pytorch.org/audio>
-   torchtext <https://pytorch.org/text>
-   torchvision <https://pytorch.org/vision>
-   TorchElastic <https://pytorch.org/elastic/>
-   TorchServe <https://pytorch.org/serve>
-   PyTorch on XLA Devices <http://pytorch.org/xla/>
+   @article{yang2021torchaudio,
+     title={TorchAudio: Building Blocks for Audio and Speech Processing},
+     author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and
+             Anjali Chourdia and Artyom Astafurov and Caroline Chen and
+             Ching-Feng Yeh and Christian Puhrsch and David Pollack and
+             Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and
+             Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and
+             Peter Goldsborough and Prabhat Roy and Sean Narenthiran and
+             Shinji Watanabe and Soumith Chintala and
+             Vincent Quenneville-Bélair and Yangyang Shi},
+     journal={arXiv preprint arXiv:2110.15018},
+     year={2021}
+   }
