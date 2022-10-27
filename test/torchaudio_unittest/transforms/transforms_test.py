@@ -292,8 +292,7 @@ class SmokeTest(common_utils.TorchaudioTestCase):
         self.assertEqual(specgram.onesided, False)
 
     def test_melspectrogram(self):
-        melspecgram = transforms.MelSpectrogram(center=True, pad_mode="reflect", onesided=False)
+        melspecgram = transforms.MelSpectrogram(center=True, pad_mode="reflect")
         specgram = melspecgram.spectrogram
         self.assertEqual(specgram.center, True)
         self.assertEqual(specgram.pad_mode, "reflect")
-        self.assertEqual(specgram.onesided, False)
