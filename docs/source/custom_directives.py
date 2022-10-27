@@ -160,8 +160,8 @@ _CARD_TEMPLATE = """
            <div class="card-title-container">
              <h4>{header}</h4>
            </div>
+           <p>Topics: <span class="tags">{tags}</span></p>
            <p class="card-summary">{card_description}</p>
-           <p class="tags" style="visibility: hidden;">{tags}</p>
            <div class="tutorials-image">{image}</div>
          </div>
        </a>

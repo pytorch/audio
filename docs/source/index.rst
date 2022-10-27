@@ -96,14 +96,14 @@ Tutorials
 
 .. customcarditem::
    :header: Loading waveform Tensors from files and saving them
-   :card_description: Learn how to use query/load audio files and save waveform tensors to files.
+   :card_description: Learn how to use query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.
    :image: _images/sphx_glr_audio_io_tutorial_001.png
    :link: tutorials/audio_io_tutorial.html
    :tags: I/O
 
 .. customcarditem::
    :header: Streaming media decoding with StreamReader
-   :card_description: Learn how to load audio/video to Tensors with StreamReader
+   :card_description: Learn how to load audio/video to Tensors using <code>torchaudio.io.StreamReader</code> class.
    :image: _images/sphx_glr_streamreader_basic_tutorial_001.png
    :link: tutorials/streamreader_basic_tutorial.html
    :tags: I/O,StreamReader
@@ -117,14 +117,14 @@ Tutorials
 
 .. customcarditem::
    :header: Streaming media encoding with StreamWriter
-   :card_description: Learn how to save audio/video with StreamWriter
+   :card_description: Learn how to save audio/video with <code>torchaudio.io.StreamWriter</code>
    :image: /Users/moto/Development/torchaudio/docs/streamwriter.gif
    :link: tutorials/streamwriter_basic_tutorial.html
    :tags: I/O,StreamWriter
    
 .. customcarditem::
    :header: Playing media with StreamWriter
-   :card_description: Learn how to play audio/video with StreamWriter
+   :card_description: Learn how to play audio/video with <code>torchaudio.io.StreamWriter</code>
    :image: /Users/moto/Development/torchaudio/docs/udp.gif
    :link: tutorials/streamwriter_advanced_tutorial.html
    :tags: I/O,StreamWriter
@@ -187,14 +187,14 @@ Tutorials
 
 .. customcarditem::
    :header: Online ASR with Emformer RNN-T
-   :card_description: Learn how to perform online ASR with RNN-T and StreamReader
+   :card_description: Learn how to perform online ASR with RNN-T and <code>torchaudio.io.StreamReader</code>.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/emformer_rnnt_streamer_context.png
    :link: tutorials/online_asr_tutorial.html
    :tags: Pipelines,ASR,RNNT,StreamReader
    
 .. customcarditem::
    :header: Readl-time microphone ASR with Emformer RNN-T
-   :card_description: Learn how to transcribe speech fomr micrphone with RNN-T and StreamReader
+   :card_description: Learn how to transcribe speech fomr micrphone with RNN-T and <code>torchaudio.io.StreamReader</code>.
    :image: https://3.bp.blogspot.com/-aw5KRAWmnKE/WK7fGITeEqI/AAAAAAABCA4/j5G8qbugxmkdDWhmlAXy7ZYbTYhaaIv1ACLcB/s800/microphone_mark.png
    :link: tutorials/device_asr.html
    :tags: Pipelines,ASR,RNNT,StreamReader
