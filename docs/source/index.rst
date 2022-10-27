@@ -246,16 +246,16 @@ In BibTeX format:
 
 .. code-block:: bibtex
 
-   @article{yang2021torchaudio,
-     title={TorchAudio: Building Blocks for Audio and Speech Processing},
-     author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and
-             Anjali Chourdia and Artyom Astafurov and Caroline Chen and
-             Ching-Feng Yeh and Christian Puhrsch and David Pollack and
-             Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and
-             Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and
-             Peter Goldsborough and Prabhat Roy and Sean Narenthiran and
-             Shinji Watanabe and Soumith Chintala and
-             Vincent Quenneville-Bélair and Yangyang Shi},
-     journal={arXiv preprint arXiv:2110.15018},
-     year={2021}
-   }
+    @article{yang2021torchaudio,
+      title={TorchAudio: Building Blocks for Audio and Speech Processing},
+      author={Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and
+              Anjali Chourdia and Artyom Astafurov and Caroline Chen and
+              Ching-Feng Yeh and Christian Puhrsch and David Pollack and
+              Dmitriy Genzel and Donny Greenberg and Edward Z. Yang and
+              Jason Lian and Jay Mahadeokar and Jeff Hwang and Ji Chen and
+              Peter Goldsborough and Prabhat Roy and Sean Narenthiran and
+              Shinji Watanabe and Soumith Chintala and
+              Vincent Quenneville-Bélair and Yangyang Shi},
+      journal={arXiv preprint arXiv:2110.15018},
+      year={2021}
+    }

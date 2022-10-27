@@ -55,7 +55,7 @@
 
 {%- block footer %}
     <script type="text/javascript">
-      var collapsedSections = ['Tutorials'];
+    var collapsedSections = ['Tutorials']
     </script>
     {{ super() }}
     <script type="text/javascript">
@@ -101,7 +101,6 @@
                            this.nextElementSibling.style.display = "block";
                            this.classList.remove("not-expanded");
                            this.classList.add("expanded");
-                           console.log("expanding")
                        }
                    });
                    startup = false;

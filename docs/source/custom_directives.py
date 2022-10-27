@@ -148,7 +148,7 @@ _CARDLIST_START = """
      <div class="row">
        <div id="tutorial-cards">
          <div class="list">
-""".split('\n')
+"""
 
 _CARD_TEMPLATE = """
 .. raw:: html
@@ -177,23 +177,23 @@ _CARDLIST_END = """
        </div>
      </div>
    </div>
-""".split("\n")
+"""
 
 
 class CustomCardStart(Directive):
     def run(self):
         para = nodes.paragraph()
-        self.state.nested_parse(StringList(_CARDLIST_START), self.content_offset, para)
+        self.state.nested_parse(StringList(_CARDLIST_START.split("\n")), self.content_offset, para)
         return [para]
 
 
 class CustomCardItem(Directive):
     option_spec = {
-        'header': directives.unchanged,
-        'image': directives.unchanged,
-        'link': directives.unchanged,
-        'card_description': directives.unchanged,
-        'tags': directives.unchanged,
+        "header": directives.unchanged,
+        "image": directives.unchanged,
+        "link": directives.unchanged,
+        "card_description": directives.unchanged,
+        "tags": directives.unchanged,
     }
 
     def run(self):
@@ -201,29 +201,27 @@ class CustomCardItem(Directive):
             if key not in self.options:
                 raise ValueError(f"Key: `{key}` is missing")
 
-        header = self.options['header']
-        link = self.options['link']
-        card_description = self.options['card_description']
-        tags = self.options.get('tags', '')
+        header = self.options["header"]
+        link = self.options["link"]
+        card_description = self.options["card_description"]
+        tags = self.options.get("tags", "")
 
-        if 'image' in self.options:
-            image = "<img src='" + self.options['image'] + "'>"
+        if "image" in self.options:
+            image = "<img src='" + self.options["image"] + "'>"
         else:
-            image = '_static/img/thumbnails/default.png'
+            image = "_static/img/thumbnails/default.png"
 
         card_rst = _CARD_TEMPLATE.format(
-            header=header,
-            image=image,
-            link=link,
-            card_description=card_description,
-            tags=tags)
-        card_list = StringList(card_rst.split('\n'))
+            header=header, image=image, link=link, card_description=card_description, tags=tags
+        )
+        card_list = StringList(card_rst.split("\n"))
         card = nodes.paragraph()
         self.state.nested_parse(card_list, self.content_offset, card)
         return [card]
 
+
 class CustomCardEnd(Directive):
     def run(self):
         para = nodes.paragraph()
-        self.state.nested_parse(StringList(_CARDLIST_END), self.content_offset, para)
+        self.state.nested_parse(StringList(_CARDLIST_END.split("\n")), self.content_offset, para)
         return [para]

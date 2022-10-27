@@ -347,7 +347,7 @@ def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
 
 
-from custom_directives import SupportedDevices, SupportedProperties, CustomCardItem, CustomCardStart, CustomCardEnd
+from custom_directives import CustomCardEnd, CustomCardItem, CustomCardStart, SupportedDevices, SupportedProperties
 
 # Register custom directives
 
