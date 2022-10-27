@@ -2,8 +2,6 @@ name: Trigger MacOS Wheels Build for Nightlies/Release
 
 on:
   pull_request:
-    paths:
-      - .github/workflows/build_wheels_macos.yml
   push:
     branches:
       - nightly
