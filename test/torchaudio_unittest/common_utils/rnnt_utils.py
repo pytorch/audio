@@ -189,6 +189,9 @@ def compute_with_numpy_transducer(data):
 
 
 def compute_with_pytorch_transducer(data):
+    fused_log_softmax = data["fused_log_softmax"] if "fused_log_softmax" in data else True
+    input = data["logits"] if fused_log_softmax else torch.nn.functional.log_softmax(data["logits"], dim=-1)
+
     costs = rnnt_loss(
         logits=input,
         logit_lengths=data["logit_lengths"],
@@ -196,7 +199,7 @@ def compute_with_pytorch_transducer(data):
         targets=data["targets"],
         blank=data["blank"],
         reduction="none",
-        fused_log_softmax=data["fused_log_softmax"] if "fused_log_softmax" in data else True,
+        fused_log_softmax=fused_log_softmax,
     )
 
     loss = torch.sum(costs)

@@ -643,23 +643,11 @@ class Functional(TestBaseMixin):
         seed = 777
         for i in range(5):
             data = rnnt_utils.get_random_data(
-<<<<<<< HEAD
-<<<<<<< HEAD
                 fused_log_softmax=fused_log_softmax, dtype=torch.float32, device=self.device, seed=(seed + i)
-=======
-=======
-                fused_log_softmax=fused_log_softmax,
->>>>>>> b8621e8e... fixes
-                dtype=torch.float32,
-                device=self.device,
-                seed=(seed + i)
->>>>>>> 1a003442... add fused log smax option
             )
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     def test_rnnt_loss_nonfused_softmax(self):
         data = rnnt_utils.get_B1_T10_U3_D4_data()
         ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
@@ -668,22 +656,6 @@ class Functional(TestBaseMixin):
             ref_costs=ref_costs,
             ref_gradients=ref_gradients,
         )
-=======
-    def test_rnnt_loss_non_fused_softmax(self):
-        data = rnnt_utils.get_B1_T10_U3_D4_data()
-        ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
-        self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients, fused_log_softmax=False)
->>>>>>> 1a003442... add fused log smax option
-=======
-    def test_rnnt_loss_nonfused_softmax(self):
-        data = rnnt_utils.get_B1_T10_U3_D4_data()
-        ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
-        self._test_costs_and_gradients(
-            data=data,
-            ref_costs=ref_costs,
-            ref_gradients=ref_gradients,
-        )
->>>>>>> b8621e8e... fixes
 
     def test_psd(self):
         """Verify the ``F.psd`` method by the numpy implementation.
