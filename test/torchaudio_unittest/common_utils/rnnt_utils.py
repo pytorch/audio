@@ -199,7 +199,7 @@ def compute_with_pytorch_transducer(data):
         targets=data["targets"],
         blank=data["blank"],
         reduction="none",
-        fused_log_softmax=fused_log_softmax,
+        fused_log_softmax=data["fused_log_softmax"] if "fused_log_softmax" in data else True,
     )
 
     loss = torch.sum(costs)
