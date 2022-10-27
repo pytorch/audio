@@ -643,10 +643,7 @@ class Functional(TestBaseMixin):
         seed = 777
         for i in range(5):
             data = rnnt_utils.get_random_data(
-                fused_log_softmax=fused_log_softmax,
-                dtype=torch.float32,
-                device=self.device,
-                seed=(seed + i)
+                fused_log_softmax=fused_log_softmax, dtype=torch.float32, device=self.device, seed=(seed + i)
             )
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
