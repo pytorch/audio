@@ -347,7 +347,7 @@ def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
 
 
-from custom_directives import SupportedDevices, SupportedProperties
+from custom_directives import SupportedDevices, SupportedProperties, CustomCardItem, CustomCardStart, CustomCardEnd
 
 # Register custom directives
 
@@ -355,3 +355,6 @@ from docutils.parsers import rst
 
 rst.directives.register_directive("devices", SupportedDevices)
 rst.directives.register_directive("properties", SupportedProperties)
+rst.directives.register_directive("customcardstart", CustomCardStart)
+rst.directives.register_directive("customcarditem", CustomCardItem)
+rst.directives.register_directive("customcardend", CustomCardEnd)
