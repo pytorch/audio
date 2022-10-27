@@ -30,6 +30,7 @@ jobs:
     name: ${{ matrix.repository }}
     uses: pytorch/test-infra/.github/workflows/build_conda_linux.yml@main
     with:
+      conda-package-directory: packaging/torchaudio
       repository: ${{ matrix.repository }}
       ref: nightly
       test-infra-repository: pytorch/test-infra
