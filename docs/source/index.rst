@@ -96,7 +96,7 @@ Tutorials
 
 .. customcarditem::
    :header: Loading waveform Tensors from files and saving them
-   :card_description: Learn how to use query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.
+   :card_description: Learn how to query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.
    :image: _images/sphx_glr_audio_io_tutorial_001.png
    :link: tutorials/audio_io_tutorial.html
    :tags: I/O
@@ -110,7 +110,7 @@ Tutorials
    
 .. customcarditem::
    :header: Advanced usage of StreamReader
-   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and filters.
+   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and filter.
    :image: /Users/moto/Development/torchaudio/docs/streamreader.gif
    :link: tutorials/streamreader_advanced_tutorial.html
    :tags: I/O,StreamReader
@@ -131,7 +131,7 @@ Tutorials
 
 .. customcarditem::
    :header: Accelerated video I/O with NVDEC/NVENC
-   :card_description: Learn how to setup HW acceleratoin for video processing
+   :card_description: Learn how to setup HW acceleration for video processing
    :image: _images/hw_acceleration_tutorial_68_1.png
    :link: hw_acceleration_tutorial.html
    :tags: I/O,StreamReader,StreamWriter
@@ -159,7 +159,7 @@ Tutorials
 
 .. customcarditem::
    :header: Audio feature augmentation
-   :card_description: Learn how to use TorchAudio's functional/transforms modules to peform feature augmentation
+   :card_description: Learn how to use TorchAudio's functional/transforms modules to perform feature augmentation
    :image: _images/sphx_glr_audio_feature_augmentation_tutorial_002.png
    :link: tutorials/audio_feature_augmentations_tutorial.html
    :tags: Preprocessing
@@ -173,17 +173,17 @@ Tutorials
 
 .. customcarditem::
    :header: AM inference with Wav2Vec2
-   :card_description: Learn how to acoustice model inference with Wav2Vec2
+   :card_description: Learn how to perform acoustic model inference with Wav2Vec2
    :image: _images/sphx_glr_speech_recognition_pipeline_tutorial_002.png
    :link: tutorials/speech_recognition_pipeline_tutorial.html
    :tags: ASR,wav2vec2
 
 .. customcarditem::
    :header: LM inference with CTC Beam Seach Decoder
-   :card_description: Learn how to lexicon, language model and beam search decoder in ASR
+   :card_description: Learn how to perform ASR beam search decoding with lexicon and language model
    :image: _images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_001.png
    :link: tutorials/asr_inference_with_ctc_decoder_tutorial.html
-   :tags: Pipelines,ASR,wav2vec2,CTC-Decoder,KenLM
+   :tags: Pipelines,ASR,wav2vec2,CTC-Decoder
 
 .. customcarditem::
    :header: Online ASR with Emformer RNN-T
@@ -193,8 +193,8 @@ Tutorials
    :tags: Pipelines,ASR,RNNT,StreamReader
    
 .. customcarditem::
-   :header: Readl-time microphone ASR with Emformer RNN-T
-   :card_description: Learn how to transcribe speech fomr micrphone with RNN-T and <code>torchaudio.io.StreamReader</code>.
+   :header: Real-time microphone ASR with Emformer RNN-T
+   :card_description: Learn how to transcribe speech fomr microphone with RNN-T and <code>torchaudio.io.StreamReader</code>.
    :image: https://3.bp.blogspot.com/-aw5KRAWmnKE/WK7fGITeEqI/AAAAAAABCA4/j5G8qbugxmkdDWhmlAXy7ZYbTYhaaIv1ACLcB/s800/microphone_mark.png
    :link: tutorials/device_asr.html
    :tags: Pipelines,ASR,RNNT,StreamReader
@@ -222,7 +222,7 @@ Tutorials
 
 .. customcarditem::
    :header: Music Source Separation with Hybrid Demucs
-   :card_description: Learn how to perform music separation with pre-trained Hybrid Demucs
+   :card_description: Learn how to perform music source separation with pre-trained Hybrid Demucs
    :image: _images/sphx_glr_hybrid_demucs_tutorial_001.png
    :link: tutorials/hybrid_demucs_tutorial.html
    :tags: Pipelines,Source-Separation
