@@ -171,14 +171,14 @@ Tutorials
 
 .. customcarditem::
    :header: Audio dataset
-   :card_description: Learn how to use <code>torchaudio.datasets</code> module
+   :card_description: Learn how to use <code>torchaudio.datasets</code> module.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_datasets_tutorial.png
    :link: tutorials/audio_datasets_tutorial.html
    :tags: Dataset
 
 .. customcarditem::
    :header: AM inference with Wav2Vec2
-   :card_description: Learn how to perform acoustic model inference with Wav2Vec2
+   :card_description: Learn how to perform acoustic model inference with Wav2Vec2 (<code>torchaudio.pipelines.Wav2Vec2ASRBundle</code>).
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/speech_recognition_pipeline_tutorial.png
    :link: tutorials/speech_recognition_pipeline_tutorial.html
    :tags: ASR,wav2vec2
@@ -206,28 +206,28 @@ Tutorials
 
 .. customcarditem::
    :header: Forced Alignment with Wav2Vec2
-   :card_description: Learn how to align text to speech with Wav2Vec 2.0
+   :card_description: Learn how to align text to speech with Wav2Vec 2 (<code>torchaudio.pipelines.Wav2Vec2ASRBundle</code>).
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/forced_alignment_tutorial.png
    :link: tutorials/forced_alignment_tutorial.html
    :tags: Pipelines,Forced-Alignment,wav2vec2
 
 .. customcarditem::
    :header: Text-to-Speech with Tacotron2
-   :card_description: Learn how to generate speech from text with Tacotron2
+   :card_description: Learn how to generate speech from text with Tacotron2 (<code>torchaudio.pipelines.Tacotron2TTSBundle</code>).
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/tacotron2_pipeline_tutorial.png
    :link: tutorials/tacotron2_pipeline_tutorial.html
    :tags: Pipelines,TTS-(Text-to-Speech)
    
 .. customcarditem::
    :header: Speech Enhancement with MVDR Beamforming
-   :card_description: Learn how to improve speech quality with MVDR Beamforming
+   :card_description: Learn how to improve speech quality with MVDR Beamforming.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/mvdr_tutorial.png
    :link: tutorials/mvdr_tutorial.html
    :tags: Pipelines,Speech-Enhancement
 
 .. customcarditem::
    :header: Music Source Separation with Hybrid Demucs
-   :card_description: Learn how to perform music source separation with pre-trained Hybrid Demucs
+   :card_description: Learn how to perform music source separation with pre-trained Hybrid Demucs (<code>torchaudio.pipelines.SourceSeparationBundle</code>).
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hybrid_demucs_tutorial.png
    :link: tutorials/hybrid_demucs_tutorial.html
    :tags: Pipelines,Source-Separation
