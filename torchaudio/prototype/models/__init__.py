@@ -10,6 +10,7 @@ from ._emformer_hubert import emformer_hubert_base, emformer_hubert_model
 from .conv_emformer import ConvEmformer
 from .rnnt import conformer_rnnt_base, conformer_rnnt_model
 from .rnnt import conformer_rnnt_biasing, conformer_rnnt_biasing_base
+from .rnnt_decoder import Hypothesis, RNNTBeamSearchBiasing
 
 __all__ = [
     "conformer_rnnt_base",
@@ -26,4 +27,6 @@ __all__ = [
     "ConformerWav2Vec2PretrainModel",
     "emformer_hubert_base",
     "emformer_hubert_model",
+    "Hypothesis",
+    "RNNTBeamSearchBiasing"
 ]

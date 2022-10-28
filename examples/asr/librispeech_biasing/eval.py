@@ -18,7 +18,8 @@ def compute_word_level_distance(seq1, seq2):
 
 def run_eval(args):
     model = ConformerRNNTModule.load_from_checkpoint(args.checkpoint_path, sp_model=str(args.sp_model_path)).eval()
-    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
+    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path),
+                                  biasinglist=args.biasinglist, droprate=args.droprate, maxsize=args.maxsize)
 
     if args.use_cuda:
         model = model.to(device="cuda")
@@ -43,7 +44,7 @@ def run_eval(args):
     with open(os.path.join(args.expdir, 'hyp.trn.txt'), 'w') as fout:
         fout.writelines(hypout)
     with open(os.path.join(args.expdir, 'ref.trn.txt'), 'w') as fout:
-        fout.writelines(hypout)
+        fout.writelines(refout)
 
 
 def cli_main():
@@ -83,6 +84,24 @@ def cli_main():
         action="store_true",
         default=False,
         help="Run using CUDA.",
+    )
+    parser.add_argument(
+        "--biasinglist",
+        type=str,
+        default="",
+        help="Path to the biasing list used for inference.",
+    )
+    parser.add_argument(
+        "--droprate",
+        type=float,
+        default=0.0,
+        help="biasing list true entry drop rate",
+    )
+    parser.add_argument(
+        "--maxsize",
+        type=int,
+        default=0,
+        help="biasing list size",
     )
     args = parser.parse_args()
     run_eval(args)

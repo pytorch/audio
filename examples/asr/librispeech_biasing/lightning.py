@@ -7,7 +7,7 @@ import sentencepiece as spm
 import torch
 import torchaudio
 from pytorch_lightning import LightningModule
-from torchaudio.models import Hypothesis, RNNTBeamSearch
+from torchaudio.prototype.models import Hypothesis, RNNTBeamSearchBiasing
 from torchaudio.prototype.models import conformer_rnnt_biasing_base
 
 
@@ -131,7 +131,7 @@ class ConformerRNNTModule(LightningModule):
         )
 
     def forward(self, batch: Batch):
-        decoder = RNNTBeamSearch(self.model, self.blank_idx)
+        decoder = RNNTBeamSearchBiasing(self.model, self.blank_idx, trie=batch.tries)
         hypotheses = decoder(batch.features.to(self.device), batch.feature_lengths.to(self.device), 10)
         return post_process_hypos(hypotheses, self.sp_model)[0][0]
 

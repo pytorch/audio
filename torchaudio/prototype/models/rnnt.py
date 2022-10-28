@@ -224,23 +224,19 @@ class RNNTBiasing(RNNT):
         tcpgen_dist, p_gen = None, None
         if current_epoch >= self.tcpsche and tries != []:
             ptrdist_mask, p_gen_mask = self.get_tcpgen_step_masks(targets, tries)
-            if self.DBaverage and self.deepbiasing:
-                hptr = self.biasingemb(1 - ptrdist_mask[:,:,:-1].float()).unsqueeze(1)
-            else:
-                query_char = self.predictor.embedding(targets)
-                query_char = self.Qproj_char(query_char).unsqueeze(1) # B * 1 * U * attndim
-                query_acoustic = self.Qproj_acoustic(source_encodings).unsqueeze(2) # B * T * 1 * attndim
-                query = query_char + query_acoustic # B * T * U * attndim
-                hptr, tcpgen_dist = self.get_tcpgen_distribution(query, ptrdist_mask)
+            hptr, tcpgen_dist = self.get_query(targets, ptrdist_mask, source_encodings)
             hptr = self.dropout_tcpgen(hptr)
         else:
             # Hack here to allow unused parameters
-            dummy = source_encodings.new_zeros(1, self.embdim)
-            dummy = self.Qproj_char(dummy).mean()
-            dummy += self.Qproj_acoustic(source_encodings.new_zeros(1, source_encodings.size(-1))).mean()
-            dummy += self.Kproj(source_encodings.new_zeros(1, self.embdim)).mean()
-            dummy += self.pointer_gate(source_encodings.new_zeros(1, self.attndim+self.jointdim)).mean()
-            dummy += self.ooKBemb.weight.mean()
+            if self.DBaverage and self.deepbiasing:
+                dummy = self.biasingemb(source_encodings.new_zeros(1, len(self.char_list))).mean()
+            else:
+                dummy = source_encodings.new_zeros(1, self.embdim)
+                dummy = self.Qproj_char(dummy).mean()
+                dummy += self.Qproj_acoustic(source_encodings.new_zeros(1, source_encodings.size(-1))).mean()
+                dummy += self.Kproj(source_encodings.new_zeros(1, self.embdim)).mean()
+                dummy += self.pointer_gate(source_encodings.new_zeros(1, self.attndim+self.jointdim)).mean()
+                dummy += self.ooKBemb.weight.mean()
             dummy = dummy * 0
             source_encodings += dummy
 
@@ -280,6 +276,18 @@ class RNNTBiasing(RNNT):
         hptr = torch.einsum('ntui,ij->ntuj', tcpgendist[:,:,:,:-1], keyvalues[:-1,:])
         return hptr, tcpgendist
 
+    def get_query(self, targets, ptrdist_mask, source_encodings):
+        tcpgen_dist = None
+        if self.DBaverage and self.deepbiasing:
+            hptr = self.biasingemb(1 - ptrdist_mask[:,:,:-1].float()).unsqueeze(1)
+        else:
+            query_char = self.predictor.embedding(targets)
+            query_char = self.Qproj_char(query_char).unsqueeze(1) # B * 1 * U * attndim
+            query_acoustic = self.Qproj_acoustic(source_encodings).unsqueeze(2) # B * T * 1 * attndim
+            query = query_char + query_acoustic # B * T * U * attndim
+            hptr, tcpgen_dist = self.get_tcpgen_distribution(query, ptrdist_mask)
+        return hptr, tcpgen_dist
+
     def get_tcpgen_step_masks(self, yseqs, resettrie):
         seqlen = len(yseqs[0])
         batch_masks = yseqs.new_ones(len(yseqs), seqlen, len(self.char_list) + 1)
@@ -310,6 +318,21 @@ class RNNTBiasing(RNNT):
             p_gen_masks.append(p_gen_mask + [1] * (seqlen - len(p_gen_mask)))
         p_gen_masks = torch.Tensor(p_gen_masks).to(yseqs.device).byte()
         return batch_masks, p_gen_masks
+
+    def get_tcpgen_step(self, vy, trie, resettrie):
+        new_tree = trie[0]
+        if vy in [self.blank_idx]:
+            new_tree = resettrie
+        elif self.char_list[vy].endswith('▁'):
+            if vy in new_tree and new_tree[vy][0] != {}:
+                new_tree = new_tree[vy]
+            else:
+                new_tree = resettrie
+        elif vy not in new_tree:
+            new_tree = [{}]
+        else:
+            new_tree = new_tree[vy]
+        return new_tree
 
     def join(
         self,
@@ -562,6 +585,6 @@ def conformer_rnnt_biasing_base(charlist=[]) -> RNNT:
         attndim=256,
         charlist=charlist,
         deepbiasing=True,
-        tcpsche=0,
+        tcpsche=50,
         DBaverage=True
     )
