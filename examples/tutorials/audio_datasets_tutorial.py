@@ -3,6 +3,8 @@
 Audio Datasets
 ==============
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` provides easy access to common, publicly accessible
 datasets. Please refer to the official documentation for the list of
 available datasets.
@@ -31,7 +33,6 @@ print(torchaudio.__version__)
 # -------------------------------------------------------------------------------
 # Preparation of data and helper functions.
 # -------------------------------------------------------------------------------
-import multiprocessing
 import os
 
 import matplotlib.pyplot as plt
@@ -46,7 +47,7 @@ os.makedirs(YESNO_DATASET_PATH, exist_ok=True)
 def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
     waveform = waveform.numpy()
 
-    num_channels, num_frames = waveform.shape
+    num_channels, _ = waveform.shape
 
     figure, axes = plt.subplots(num_channels, 1)
     if num_channels == 1:
@@ -64,7 +65,7 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
 def play_audio(waveform, sample_rate):
     waveform = waveform.numpy()
 
-    num_channels, num_frames = waveform.shape
+    num_channels, _ = waveform.shape
     if num_channels == 1:
         display(Audio(waveform[0], rate=sample_rate))
     elif num_channels == 2:
@@ -75,7 +76,7 @@ def play_audio(waveform, sample_rate):
 
 ######################################################################
 # Here, we show how to use the
-# :py:func:`torchaudio.datasets.YESNO` dataset.
+# :py:class:`torchaudio.datasets.YESNO` dataset.
 #
 
 

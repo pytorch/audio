@@ -149,6 +149,10 @@ if(USE_FFMPEG)
     ffmpeg/stream_reader/stream_reader.cpp
     ffmpeg/stream_reader/stream_reader_wrapper.cpp
     ffmpeg/stream_reader/stream_reader_binding.cpp
+    ffmpeg/stream_reader/stream_reader_tensor_binding.cpp
+    ffmpeg/stream_writer/stream_writer.cpp
+    ffmpeg/stream_writer/stream_writer_wrapper.cpp
+    ffmpeg/stream_writer/stream_writer_binding.cpp
     ffmpeg/utils.cpp
     )
   message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
@@ -163,12 +167,13 @@ if(USE_FFMPEG)
 endif()
 
 ################################################################################
+# TODO: Rename this to _torchaudio_sox.so
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   set(
     EXTENSION_SOURCES
-    pybind/pybind.cpp
+    sox/pybind/pybind.cpp
     )
   #----------------------------------------------------------------------------#
   # START OF CUSTOMIZATION LOGICS
@@ -177,10 +182,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     list(
       APPEND
       EXTENSION_SOURCES
-      pybind/sox/effects.cpp
-      pybind/sox/effects_chain.cpp
-      pybind/sox/io.cpp
-      pybind/sox/utils.cpp
+      sox/pybind/effects.cpp
+      sox/pybind/effects_chain.cpp
+      sox/pybind/io.cpp
+      sox/pybind/utils.cpp
       )
   endif()
   #----------------------------------------------------------------------------#
@@ -199,6 +204,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
       ffmpeg/pybind/typedefs.cpp
       ffmpeg/pybind/pybind.cpp
       ffmpeg/pybind/stream_reader.cpp
+      ffmpeg/pybind/stream_writer.cpp
       )
     torchaudio_extension(
       _torchaudio_ffmpeg

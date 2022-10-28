@@ -13,7 +13,6 @@ from losses import LongCrossEntropyLoss, MoLLoss
 from processing import NormalizeDB
 from torch.optim import Adam
 from torch.utils.data import DataLoader
-from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models.wavernn import WaveRNN
 from utils import count_parameters, MetricLogger, save_checkpoint
 
@@ -209,7 +208,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
     metric = MetricLogger("train_iteration")
     metric["epoch"] = epoch
 
-    for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
+    for waveform, specgram, target in data_loader:
 
         start2 = time()
 
@@ -258,7 +257,7 @@ def validate(model, criterion, data_loader, device, epoch):
         sums = defaultdict(lambda: 0.0)
         start = time()
 
-        for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
+        for waveform, specgram, target in data_loader:
 
             waveform = waveform.to(device)
             specgram = specgram.to(device)

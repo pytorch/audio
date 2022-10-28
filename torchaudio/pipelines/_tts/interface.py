@@ -11,16 +11,12 @@ class _TextProcessor(ABC):
     def tokens(self):
         """The tokens that the each value in the processed tensor represent.
 
-        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
-
         :type: List[str]
         """
 
     @abstractmethod
     def __call__(self, texts: Union[str, List[str]]) -> Tuple[Tensor, Tensor]:
         """Encode the given (batch of) texts into numerical tensors
-
-        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.
 
         Args:
             text (str or list of str): The input texts.
@@ -40,16 +36,12 @@ class _Vocoder(ABC):
     def sample_rate(self):
         """The sample rate of the resulting waveform
 
-        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
-
         :type: float
         """
 
     @abstractmethod
     def __call__(self, specgrams: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Optional[Tensor]]:
         """Generate waveform from the given input, such as spectrogram
-
-        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.
 
         Args:
             specgrams (Tensor):
@@ -149,6 +141,7 @@ class Tacotron2TTSBundle(ABC):
     # The thing is, text processing and vocoder are generic and we do not know what kind of
     # new text processing and vocoder will be added in the future, so we want to make these
     # interfaces specific to this Tacotron2TTS pipeline.
+
     class TextProcessor(_TextProcessor):
         """Interface of the text processing part of Tacotron2TTS pipeline
 
@@ -163,10 +156,7 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_text_processor(self, *, dl_kwargs=None) -> TextProcessor:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_text_processor(self, *, dl_kwargs=None) -> torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor
-
-        Create a text processor
+        """Create a text processor
 
         For character-based pipeline, this processor splits the input text by character.
         For phoneme-based pipeline, this processor converts the input text (grapheme) to
@@ -180,7 +170,7 @@ class Tacotron2TTSBundle(ABC):
                 Passed to :func:`torch.hub.download_url_to_file`.
 
         Returns:
-            TTSTextProcessor:
+            TextProcessor:
                 A callable which takes a string or a list of strings as input and
                 returns Tensor of encoded texts and Tensor of valid lengths.
                 The object also has ``tokens`` property, which allows to recover the
@@ -235,10 +225,7 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_vocoder(self, *, dl_kwargs=None) -> Vocoder:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_vocoder(self, *, dl_kwargs=None) -> torchaudio.pipelines.Tacotron2TTSBundle.Vocoder
-
-        Create a vocoder module, based off of either WaveRNN or GriffinLim.
+        """Create a vocoder module, based off of either WaveRNN or GriffinLim.
 
         If a pre-trained weight file is necessary,
         :func:`torch.hub.load_state_dict_from_url` is used to downloaded it.
@@ -248,7 +235,7 @@ class Tacotron2TTSBundle(ABC):
                 Passed to :func:`torch.hub.load_state_dict_from_url`.
 
         Returns:
-            Callable[[Tensor, Optional[Tensor]], Tuple[Tensor, Optional[Tensor]]]:
+            Vocoder:
                 A vocoder module, which takes spectrogram Tensor and an optional
                 length Tensor, then returns resulting waveform Tensor and an optional
                 length Tensor.
@@ -256,10 +243,7 @@ class Tacotron2TTSBundle(ABC):
 
     @abstractmethod
     def get_tacotron2(self, *, dl_kwargs=None) -> Tacotron2:
-        # Overriding the signature so that the return type is correct on Sphinx
-        """get_tacotron2(self, *, dl_kwargs=None) -> torchaudio.models.Tacotron2
-
-        Create a Tacotron2 model with pre-trained weight.
+        """Create a Tacotron2 model with pre-trained weight.
 
         Args:
             dl_kwargs (dictionary of keyword arguments):

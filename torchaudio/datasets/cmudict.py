@@ -104,7 +104,7 @@ def _parse_dictionary(lines: Iterable[str], exclude_punctuations: bool) -> List[
 
 
 class CMUDict(Dataset):
-    """Create a Dataset for *CMU Pronouncing Dictionary* [:footcite:`cmudict`] (CMUDict).
+    """*CMU Pronouncing Dictionary* :cite:`cmudict` (CMUDict) dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -169,8 +169,12 @@ class CMUDict(Dataset):
             n (int): The index of the sample to be loaded.
 
         Returns:
-            (str, List[str]): The corresponding word and phonemes ``(word, [phonemes])``.
+            Tuple of a word and its phonemes
 
+            str:
+                Word
+            List[str]:
+                Phonemes
         """
         return self._dictionary[n]
 
@@ -179,5 +183,5 @@ class CMUDict(Dataset):
 
     @property
     def symbols(self) -> List[str]:
-        """list[str]: A list of phonemes symbols, such as `AA`, `AE`, `AH`."""
+        """list[str]: A list of phonemes symbols, such as ``"AA"``, ``"AE"``, ``"AH"``."""
         return self._symbols.copy()

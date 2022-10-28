@@ -13,7 +13,8 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
     const torch::Tensor& logit_lengths,
     const torch::Tensor& target_lengths,
     int64_t blank,
-    double clamp) {
+    double clamp,
+    bool fused_log_softmax = true) {
   TORCH_CHECK(
       logits.device().type() == targets.device().type(),
       "logits and targets must be on the same device");
@@ -81,6 +82,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   options.numTargets_ = logits.size(3);
   options.blank_ = blank;
   options.clamp_ = clamp;
+  options.fusedLogSmax_ = fused_log_softmax;
 
   TORCH_CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
   options.stream_ = at::cuda::getCurrentCUDAStream();

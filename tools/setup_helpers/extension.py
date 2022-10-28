@@ -7,6 +7,7 @@ from pathlib import Path
 import torch
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
+from torch.utils.cpp_extension import CUDA_HOME
 
 __all__ = [
     "get_ext_modules",
@@ -120,6 +121,10 @@ class CMakeBuild(build_ext):
             _arches = _TORCH_CUDA_ARCH_LIST.replace(".", "").replace(" ", ";").split(";")
             _arches = [arch[:-4] if arch.endswith("+PTX") else f"{arch}-real" for arch in _arches]
             cmake_args += [f"-DCMAKE_CUDA_ARCHITECTURES={';'.join(_arches)}"]
+
+        if platform.system() != "Windows" and CUDA_HOME is not None:
+            cmake_args += [f"-DCMAKE_CUDA_COMPILER='{CUDA_HOME}/bin/nvcc'"]
+            cmake_args += [f"-DCUDA_TOOLKIT_ROOT_DIR='{CUDA_HOME}'"]
 
         # Default to Ninja
         if "CMAKE_GENERATOR" not in os.environ or platform.system() == "Windows":

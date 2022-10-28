@@ -7,11 +7,12 @@ python train.py --dataset-path ./exp/data/mfcc/ --feature-type mfcc --num-classe
 import logging
 import pathlib
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
-from typing import Optional, Tuple
+from typing import Tuple
 
 from lightning import HuBERTPreTrainModule
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.utilities.seed import seed_everything
 
 
 logger = logging.getLogger(__name__)
@@ -25,10 +26,11 @@ class _Formatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
 
 
 def run_train(args):
+    seed_everything(1337)
     checkpoint_dir = args.exp_dir / f"checkpoints_{args.dataset}_{args.model_name}"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
-        monitor="Losses/val_loss",
+        monitor="val_loss",
         mode="min",
         save_top_k=5,
         save_weights_only=False,
@@ -36,7 +38,7 @@ def run_train(args):
     )
     train_checkpoint = ModelCheckpoint(
         checkpoint_dir,
-        monitor="Losses/train_loss",
+        monitor="train_loss",
         mode="min",
         save_top_k=5,
         save_weights_only=False,
@@ -54,7 +56,6 @@ def run_train(args):
         accelerator="gpu",
         strategy="ddp",
         replace_sampler_ddp=False,
-        gradient_clip_val=args.clip_norm,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
     )
@@ -71,6 +72,7 @@ def run_train(args):
         betas=args.betas,
         eps=args.eps,
         weight_decay=args.weight_decay,
+        clip_norm=args.clip_norm,
         warmup_updates=args.warmup_updates,
         max_updates=args.max_updates,
     )
@@ -90,7 +92,7 @@ def _parse_args():
     )
     parser.add_argument(
         "--resume-checkpoint",
-        type=Optional[pathlib.Path],
+        type=pathlib.Path,
         default=None,
         help="Path to the feature and label directories. (Default: None)",
     )
@@ -159,9 +161,9 @@ def _parse_args():
     )
     parser.add_argument(
         "--clip-norm",
-        default=None,
-        type=Optional[float],
-        help="The gradient norm value to clip. (Default: None)",
+        default=10.0,
+        type=float,
+        help="The gradient norm value to clip. (Default: 10.0)",
     )
     parser.add_argument(
         "--num-nodes",

@@ -21,10 +21,12 @@ perform music separation
 # 3. Collect output chunks and combine according to the way they have been
 #    overlapped.
 #
-# The `Hybrid Demucs <https://arxiv.org/pdf/2111.03600.pdf>`__ model is a developed version of the
+# The Hybrid Demucs [`Défossez, 2021 <https://arxiv.org/abs/2111.03600>`__]
+# model is a developed version of the
 # `Demucs <https://github.com/facebookresearch/demucs>`__ model, a
 # waveform based model which separates music into its
-# respective sources, such as vocals, bass, and drums. Hybrid Demucs effectively uses spectrogram to learn
+# respective sources, such as vocals, bass, and drums.
+# Hybrid Demucs effectively uses spectrogram to learn
 # through the frequency domain and also moves to time convolutions.
 #
 
@@ -54,7 +56,7 @@ from torchaudio.utils import download_asset
 import matplotlib.pyplot as plt
 
 try:
-    from torchaudio.prototype.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
+    from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
     from mir_eval import separation
 
 except ModuleNotFoundError:
@@ -81,7 +83,7 @@ except ModuleNotFoundError:
 #
 # Pre-trained model weights and related pipeline components are bundled as
 # :py:func:`torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS`. This is a
-# HDemucs model trained on
+# :py:class:`torchaudio.models.HDemucs` model trained on
 # `MUSDB18-HQ <https://zenodo.org/record/3338373>`__ and additional
 # internal extra training data.
 # This specific model is suited for higher sample rates, around 44.1 kHZ
@@ -159,7 +161,7 @@ def separate_sources(
 
     final = torch.zeros(batch, len(model.sources), channels, length, device=device)
 
-    while start < length:
+    while start < length - overlap_frames:
         chunk = mix[:, :, start:end]
         with torch.no_grad():
             out = model.forward(chunk)
@@ -171,6 +173,8 @@ def separate_sources(
         else:
             start += chunk_len
         end += chunk_len
+        if end >= length:
+            fade.fade_out_len = 0
     return final
 
 

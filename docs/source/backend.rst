@@ -10,10 +10,10 @@ Overview
 
 :mod:`torchaudio.backend` module provides implementations for audio file I/O functionalities, which are ``torchaudio.info``, ``torchaudio.load``, and ``torchaudio.save``.
 
-There are currently four implementations available.
+There are currently two implementations available.
 
-* :ref:`"sox_io" <sox_io_backend>` (default on Linux/macOS)
-* :ref:`"soundfile" <soundfile_backend>` (default on Windows)
+* :py:mod:`"sox_io" <torchaudio.backends.sox_io_backend>` (default on Linux/macOS)
+* :py:mod:`"soundfile" <torchaudio.backends.soundfile_backend>` (default on Windows)
 
 .. note::
    Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torchaudio.load``, and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
@@ -35,7 +35,7 @@ AudioMetaData
 
 .. autoclass:: torchaudio.backend.common.AudioMetaData
 
-.. _sox_io_backend:
+.. py:module:: torchaudio.backend.sox_io_backend
 
 Sox IO Backend
 ~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@ save
 
 .. autofunction:: torchaudio.backend.sox_io_backend.save
 
-.. _soundfile_backend:
+.. py:module:: torchaudio.backend.soundfile_backend
 
 Soundfile Backend
 ~~~~~~~~~~~~~~~~~

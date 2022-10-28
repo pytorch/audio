@@ -2,7 +2,7 @@
 ASR Inference with CTC Decoder
 ==============================
 
-**Author**: `Caroline Chen <carolinechen@fb.com>`__
+**Author**: `Caroline Chen <carolinechen@meta.com>`__
 
 This tutorial shows how to perform speech recognition inference using a
 CTC beam search decoder with lexicon constraint and KenLM language model
@@ -28,24 +28,34 @@ using CTC loss.
 # a more detailed algorithm can be found in this `blog
 # <https://towardsdatascience.com/boosting-your-sequence-generation-performance-with-beam-search-language-model-decoding-74ee64de435a>`__.
 #
-# Running ASR inference using a CTC Beam Search decoder with a KenLM
-# language model and lexicon constraint requires the following components
+# Running ASR inference using a CTC Beam Search decoder with a language
+# model and lexicon constraint requires the following components
 #
 # -  Acoustic Model: model predicting phonetics from audio waveforms
 # -  Tokens: the possible predicted tokens from the acoustic model
 # -  Lexicon: mapping between possible words and their corresponding
 #    tokens sequence
-# -  KenLM: n-gram language model trained with the `KenLM
-#    library <https://kheafield.com/code/kenlm/>`__
+# -  Language Model (LM): n-gram language model trained with the `KenLM
+#    library <https://kheafield.com/code/kenlm/>`__, or custom language
+#    model that inherits :py:class:`~torchaudio.models.decoder.CTCDecoderLM`
 #
 
 
 ######################################################################
-# Preparation
-# -----------
+# Acoustic Model and Set Up
+# -------------------------
 #
 # First we import the necessary utilities and fetch the data that we are
 # working with
+#
+
+import torch
+import torchaudio
+
+print(torch.__version__)
+print(torchaudio.__version__)
+
+######################################################################
 #
 
 import time
@@ -53,40 +63,18 @@ from typing import List
 
 import IPython
 import matplotlib.pyplot as plt
-import torch
-import torchaudio
-
-try:
-    from torchaudio.models.decoder import ctc_decoder
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds by adding the following code block to the top
-            of the notebook before running it:
-
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
+from torchaudio.models.decoder import ctc_decoder
+from torchaudio.utils import download_asset
 
 ######################################################################
-# Acoustic Model and Data
-# ~~~~~~~~~~~~~~~~~~~~~~~
 #
 # We use the pretrained `Wav2Vec 2.0 <https://arxiv.org/abs/2006.11477>`__
 # Base model that is finetuned on 10 min of the `LibriSpeech
 # dataset <http://www.openslr.org/12>`__, which can be loaded in using
-# :py:func:`torchaudio.pipelines`. For more detail on running Wav2Vec 2.0 speech
+# :data:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M`.
+# For more detail on running Wav2Vec 2.0 speech
 # recognition pipelines in torchaudio, please refer to `this
-# tutorial <https://pytorch.org/audio/main/tutorials/speech_recognition_pipeline_tutorial.html>`__.
+# tutorial <./speech_recognition_pipeline_tutorial.html>`__.
 #
 
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M
@@ -97,20 +85,17 @@ acoustic_model = bundle.get_model()
 # We will load a sample from the LibriSpeech test-other dataset.
 #
 
-hub_dir = torch.hub.get_dir()
-
-speech_url = "https://download.pytorch.org/torchaudio/tutorial-assets/ctc-decoding/1688-142285-0007.wav"
-speech_file = f"{hub_dir}/speech.wav"
-
-torch.hub.download_url_to_file(speech_url, speech_file)
+speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 IPython.display.Audio(speech_file)
 
 
 ######################################################################
 # The transcript corresponding to this audio file is
-# ::
-#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
+#
+# .. code-block::
+#
+#    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 waveform, sample_rate = torchaudio.load(speech_file)
@@ -121,10 +106,10 @@ if sample_rate != bundle.sample_rate:
 
 ######################################################################
 # Files and Data for Decoder
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+# --------------------------
 #
-# Next, we load in our token, lexicon, and KenLM data, which are used by
-# the decoder to predict words from the acoustic model output. Pretrained
+# Next, we load in our token, lexicon, and language model data, which are used
+# by the decoder to predict words from the acoustic model output. Pretrained
 # files for the LibriSpeech dataset can be downloaded through torchaudio,
 # or the user can provide their own files.
 #
@@ -132,14 +117,14 @@ if sample_rate != bundle.sample_rate:
 
 ######################################################################
 # Tokens
-# ^^^^^^
+# ~~~~~~
 #
 # The tokens are the possible symbols that the acoustic model can predict,
 # including the blank and silent symbols. It can either be passed in as a
 # file, where each line consists of the tokens corresponding to the same
 # index, or as a list of tokens, each mapping to a unique index.
 #
-# ::
+# .. code-block::
 #
 #    # tokens.txt
 #    _
@@ -155,14 +140,14 @@ print(tokens)
 
 ######################################################################
 # Lexicon
-# ^^^^^^^
+# ~~~~~~~
 #
 # The lexicon is a mapping from words to their corresponding tokens
 # sequence, and is used to restrict the search space of the decoder to
 # only words from the lexicon. The expected format of the lexicon file is
 # a line per word, with a word followed by its space-split tokens.
 #
-# ::
+# .. code-block::
 #
 #    # lexcion.txt
 #    a a |
@@ -172,6 +157,24 @@ print(tokens)
 #    ...
 #
 
+
+######################################################################
+# Language Model
+# ~~~~~~~~~~~~~~
+#
+# A language model can be used in decoding to improve the results, by
+# factoring in a language model score that represents the likelihood of
+# the sequence into the beam search computation. Below, we outline the
+# different forms of language models that are supported for decoding.
+#
+
+######################################################################
+# No Language Model
+# ^^^^^^^^^^^^^^^^^
+#
+# To create a decoder instance without a language model, set `lm=None`
+# when initializing the decoder.
+#
 
 ######################################################################
 # KenLM
@@ -186,13 +189,59 @@ print(tokens)
 # `LibriSpeech <http://www.openslr.org/11>`__.
 #
 
+######################################################################
+# Custom Language Model
+# ^^^^^^^^^^^^^^^^^^^^^
+#
+# Users can define their own custom language model in Python, whether
+# it be a statistical or neural network language model, using
+# :py:class:`~torchaudio.models.decoder.CTCDecoderLM` and
+# :py:class:`~torchaudio.models.decoder.CTCDecoderLMState`.
+#
+# For instance, the following code creates a basic wrapper around a PyTorch
+# ``torch.nn.Module`` language model.
+#
+
+from torchaudio.models.decoder import CTCDecoderLM, CTCDecoderLMState
+
+
+class CustomLM(CTCDecoderLM):
+    """Create a Python wrapper around `language_model` to feed to the decoder."""
+    def __init__(self, language_model: torch.nn.Module):
+        CTCDecoderLM.__init__(self)
+        self.language_model = language_model
+        self.sil = -1  # index for silent token in the language model
+        self.states = {}
+
+        language_model.eval()
+
+    def start(self, start_with_nothing: bool = False):
+        state = CTCDecoderLMState()
+        with torch.no_grad():
+            score = self.language_model(self.sil)
+
+        self.states[state] = score
+        return state
+
+    def score(self, state: CTCDecoderLMState, token_index: int):
+        outstate = state.child(token_index)
+        if outstate not in self.states:
+            score = self.language_model(token_index)
+            self.states[outstate] = score
+        score = self.states[outstate]
+
+        return outstate, score
+
+    def finish(self, state: CTCDecoderLMState):
+        return self.score(state, self.sil)
+
 
 ######################################################################
 # Downloading Pretrained Files
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Pretrained files for the LibriSpeech dataset can be downloaded using
-# :py:func:`download_pretrained_files <torchaudio.models.decoder.download_pretrained_files>`.
+# :py:func:`~torchaudio.models.decoder.download_pretrained_files`.
 #
 # Note: this cell may take a couple of minutes to run, as the language
 # model can be large
@@ -217,15 +266,13 @@ print(files)
 # Beam Search Decoder
 # ~~~~~~~~~~~~~~~~~~~
 # The decoder can be constructed using the factory function
-# :py:func:`ctc_decoder <torchaudio.models.decoder.ctc_decoder>`.
+# :py:func:`~torchaudio.models.decoder.ctc_decoder`.
 # In addition to the previously mentioned components, it also takes in various beam
 # search decoding parameters and token/word parameters.
 #
 # This decoder can also be run without a language model by passing in `None` into the
 # `lm` parameter.
 #
-
-from torchaudio.models.decoder import ctc_decoder
 
 LM_WEIGHT = 3.23
 WORD_SCORE = -0.26
@@ -244,8 +291,6 @@ beam_search_decoder = ctc_decoder(
 ######################################################################
 # Greedy Decoder
 # ~~~~~~~~~~~~~~
-#
-#
 #
 
 
@@ -279,12 +324,14 @@ greedy_decoder = GreedyCTCDecoder(tokens)
 #
 # Now that we have the data, acoustic model, and decoder, we can perform
 # inference. The output of the beam search decoder is of type
-# :py:func:`torchaudio.models.decoder.CTCHypothesis`, consisting of the
+# :py:class:`~torchaudio.models.decoder.CTCHypothesis`, consisting of the
 # predicted token IDs, corresponding words (if a lexicon is provided), hypothesis score,
 # and timesteps corresponding to the token IDs. Recall the transcript corresponding to the
 # waveform is
-# ::
-#   i really was very much afraid of showing him how much shocked i was at some parts of what he said
+#
+# .. code-block::
+#
+#    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
 actual_transcript = "i really was very much afraid of showing him how much shocked i was at some parts of what he said"
@@ -294,7 +341,7 @@ emission, _ = acoustic_model(waveform)
 
 
 ######################################################################
-# The greedy decoder give the following result.
+# The greedy decoder gives the following result.
 #
 
 greedy_result = greedy_decoder(emission[0])
@@ -322,7 +369,8 @@ print(f"WER: {beam_search_wer}")
 ######################################################################
 # .. note::
 #
-#    The ``words`` field of the output hypotheses will be empty if no lexicon
+#    The :py:attr:`~torchaudio.models.decoder.CTCHypothesis.words`
+#    field of the output hypotheses will be empty if no lexicon
 #    is provided to the decoder. To retrieve a transcript with lexicon-free
 #    decoding, you can perform the following to retrieve the token indices,
 #    convert them to original tokens, then join them together.

@@ -31,7 +31,7 @@ _VALIDATION_SET = [
 
 
 class MUSDB_HQ(Dataset):
-    """Create *MUSDB_HQ* [:footcite:`MUSDB18HQ`] Dataset
+    """*MUSDB_HQ* :cite:`MUSDB18HQ` dataset.
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
@@ -122,7 +122,16 @@ class MUSDB_HQ(Dataset):
         Args:
             n (int): The index of the sample to be loaded
         Returns:
-            (Tensor, int, int, str): ``(waveforms, sample_rate, num_frames, track_name)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            int:
+                Num frames
+            str:
+                Track name
         """
         return self._load_sample(n)
 

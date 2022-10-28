@@ -20,12 +20,14 @@ def load_feature(
     feat_dir: Path,
     split: str,
     num_rank: int,
+    percent: float,
 ) -> Tuple[Tensor, Tensor]:
     r"""Loading features from pre-saved `.pt` files.
     Args:
         feat_dir (Path): The directory that stores the feature files.
         split (str): The split of data. Options: [``train``, ``valid``].
         num_rank (int): The number of ranks for multi-processing in feature extraction.
+        percent (float): The percent of data for training k-means model. If negative, use all data for training.
 
     Returns:
         (Tensor, Tensor)
@@ -37,9 +39,23 @@ def load_feature(
     for rank in range(1, num_rank + 1):
         feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
         feat = torch.load(feat_path)
-        length = torch.load(len_path)
-        feats.append(feat)
-        lens.append(length)
+        length = torch.load(len_path).int()
+        if percent < 0:
+            feats.append(feat)
+            lens.append(length)
+        else:
+            offsets = [0] + torch.cumsum(length, dim=0, dtype=torch.int).tolist()
+            nsample = int(length.shape[0] * percent)
+            indices = torch.randperm(length.shape[0])[0:nsample]
+            indices = torch.sort(indices)[0]
+            mask = []
+            for i in range(indices.shape[0]):
+                index = indices[i]
+                mask += list(range(offsets[index], offsets[index] + length[index]))
+            mask = torch.tensor(mask, dtype=torch.int)
+            feat = torch.index_select(feat, 0, mask)
+            feats.append(feat)
+            lens.append(length[indices])
     feats = torch.cat(feats)
     lens = torch.cat(lens)
     return feats, lens
@@ -51,6 +67,7 @@ def learn_kmeans(
     num_rank: int,
     km_dir: Path,
     n_clusters: int,
+    percent: float = -1,
     init: str = "k-means++",
     max_iter: int = 100,
     batch_size: int = 10000,
@@ -66,6 +83,8 @@ def learn_kmeans(
         num_rank (int): The number of ranks for multi-processing in feature extraction.
         km_dir (Path): The directory to store the KMeans clustering model.
         n_clusters (int): The number of clusters.
+        percent (float): The percent of data for training k-means model.
+            If negative, use all data for training. (Default: -1)
         init (str, optional): Method for initialization. Options: [``k-means++``, ``random``].
             (Default: ``k-means++``)
         max_iter (int, optional): Maximum number of iterations over the complete dataset. (Default: 100)
@@ -102,6 +121,7 @@ def learn_kmeans(
         feat_dir,
         split,
         num_rank,
+        percent,
     )
     feats = feats.numpy()
     km_model.fit(feats)
@@ -157,19 +177,16 @@ def get_km_label(
     km_path = _get_model_path(km_dir)
     label_path = label_dir / f"label_{split}.pt"
     apply_kmeans = ApplyKmeans(km_path, device)
-    feats, lens = load_feature(
-        feat_dir,
-        split,
-        num_rank,
-    )
-    feats = feats
-    lens = lens.long()
-    offset = 0
-    assert feats.shape[0] == lens.sum()
     with open(label_path, "w") as f:
-        for i in range(lens.shape[0]):
-            feat = feats[offset : offset + lens[i]].to(device)
-            offset += lens[i]
-            label = apply_kmeans(feat).tolist()
-            f.write(" ".join(map(str, label)) + "\n")
+        for rank in range(1, num_rank + 1):
+            offset = 0
+            feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
+            feats = torch.load(feat_path)
+            length = torch.load(len_path).int()
+            assert feats.shape[0] == length.sum()
+            labels = apply_kmeans(feats.to(device)).tolist()
+            for i in range(length.shape[0]):
+                label = labels[offset : offset + length[i]]
+                offset += length[i]
+                f.write(" ".join(map(str, label)) + "\n")
     _LG.info("Finished predicting labels successfully")

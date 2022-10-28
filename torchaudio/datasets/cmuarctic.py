@@ -49,7 +49,7 @@ def load_cmuarctic_item(line: str, path: str, folder_audio: str, ext_audio: str)
 
 
 class CMUARCTIC(Dataset):
-    """Create a Dataset for *CMU ARCTIC* [:footcite:`Kominek03cmuarctic`].
+    """*CMU ARCTIC* :cite:`Kominek03cmuarctic` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -139,7 +139,16 @@ class CMUARCTIC(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, str): ``(waveform, sample_rate, transcript, utterance_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            str:
+                Utterance ID
         """
         line = self._walker[n]
         return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)

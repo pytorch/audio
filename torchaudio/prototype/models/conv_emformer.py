@@ -444,7 +444,7 @@ class _ConvEmformerLayer(torch.nn.Module):
 class ConvEmformer(_EmformerImpl):
     r"""Implements the convolution-augmented streaming transformer architecture introduced in
     *Streaming Transformer Transducer based Speech Recognition Using Non-Causal Convolution*
-    [:footcite:`9747706`].
+    :cite:`9747706`.
 
     Args:
         input_dim (int): input dimension.

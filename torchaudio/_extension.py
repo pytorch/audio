@@ -1,4 +1,5 @@
 import os
+import sys
 import warnings
 from pathlib import Path
 
@@ -85,6 +86,22 @@ def _init_extension():
         warnings.warn("torchaudio C++ extension is not available.")
         return
 
+    # On Windows Python-3.8+ has `os.add_dll_directory` call,
+    # which is called to configure dll search path.
+    # To find cuda related dlls we need to make sure the
+    # conda environment/bin path is configured Please take a look:
+    # https://stackoverflow.com/questions/59330863/cant-import-dll-module-in-python
+    # Please note: if some path can't be added using add_dll_directory we simply ignore this path
+    if os.name == "nt" and sys.version_info >= (3, 8) and sys.version_info < (3, 9):
+        env_path = os.environ["PATH"]
+        path_arr = env_path.split(";")
+        for path in path_arr:
+            if os.path.exists(path):
+                try:
+                    os.add_dll_directory(path)
+                except Exception:
+                    pass
+
     _load_lib("libtorchaudio")
     # This import is for initializing the methods registered via PyBind11
     # This has to happen after the base library is loaded
@@ -100,4 +117,20 @@ def _init_extension():
         pass
 
 
+def _check_cuda_version():
+    version = torch.ops.torchaudio.cuda_version()
+    if version is not None and torch.version.cuda is not None:
+        version_str = str(version)
+        ta_version = f"{version_str[:-3]}.{version_str[-2]}"
+        t_version = torch.version.cuda.split(".")
+        t_version = f"{t_version[0]}.{t_version[1]}"
+        if ta_version != t_version:
+            raise RuntimeError(
+                "Detected that PyTorch and TorchAudio were compiled with different CUDA versions. "
+                f"PyTorch has CUDA version {t_version} whereas TorchAudio has CUDA version {ta_version}. "
+                "Please install the TorchAudio version that matches your PyTorch version."
+            )
+
+
 _init_extension()
+_check_cuda_version()

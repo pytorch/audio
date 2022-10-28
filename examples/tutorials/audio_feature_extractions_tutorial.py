@@ -3,6 +3,8 @@
 Audio Feature Extractions
 =========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` implements feature extractions commonly used in the audio
 domain. They are available in ``torchaudio.functional`` and
 ``torchaudio.transforms``.

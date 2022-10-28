@@ -2,19 +2,19 @@ import os
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _load_waveform, extract_archive
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
+SAMPLE_RATE = 16000
 _CHECKSUMS = {
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",  # noqa: E501
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",  # noqa: E501
+    "http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "743935421bb51cccdb6bdd152e04c5c70274e935c82119ad7faeec31780d811d",  # noqa: E501
+    "http://download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "af14739ee7dc311471de98f5f9d2c9191b18aedfe957f4a6ff791c709868ff58",  # noqa: E501
 }
 
 
@@ -27,9 +27,10 @@ def _load_list(root, *filenames):
     return output
 
 
-def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
+def _get_speechcommands_metadata(filepath: str, path: str) -> Tuple[str, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
-    label, filename = os.path.split(relpath)
+    reldir, filename = os.path.split(relpath)
+    _, label = os.path.split(reldir)
     # Besides the officially supported split method for datasets defined by "validation_list.txt"
     # and "testing_list.txt" over "speech_commands_v0.0x.tar.gz" archives, an alternative split
     # method referred to in paragraph 2-3 of Section 7.1, references 13 and 14 of the original
@@ -43,13 +44,11 @@ def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str
     speaker_id, utterance_number = speaker.split(HASH_DIVIDER)
     utterance_number = int(utterance_number)
 
-    # Load audio
-    waveform, sample_rate = torchaudio.load(filepath)
-    return waveform, sample_rate, label, speaker_id, utterance_number
+    return relpath, SAMPLE_RATE, label, speaker_id, utterance_number
 
 
 class SPEECHCOMMANDS(Dataset):
-    """Create a Dataset for *Speech Commands* [:footcite:`speechcommandsv2`].
+    """*Speech Commands* :cite:`speechcommandsv2` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -86,13 +85,14 @@ class SPEECHCOMMANDS(Dataset):
             "speech_commands_v0.01",
             "speech_commands_v0.02",
         ]:
-            base_url = "https://storage.googleapis.com/download.tensorflow.org/data/"
+            base_url = "http://download.tensorflow.org/data/"
             ext_archive = ".tar.gz"
 
             url = os.path.join(base_url, url + ext_archive)
 
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
+        self._archive = os.path.join(root, folder_in_archive)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
@@ -131,6 +131,30 @@ class SPEECHCOMMANDS(Dataset):
             walker = sorted(str(p) for p in Path(self._path).glob("*/*.wav"))
             self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
+    def get_metadata(self, n: int) -> Tuple[str, int, str, str, int]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            Tuple of the following items;
+
+            str:
+                Path to the audio
+            int:
+                Sample rate
+            str:
+                Label
+            str:
+                Speaker ID
+            int:
+                Utterance number
+        """
+        fileid = self._walker[n]
+        return _get_speechcommands_metadata(fileid, self._archive)
+
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         """Load the n-th sample from the dataset.
 
@@ -138,11 +162,22 @@ class SPEECHCOMMANDS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, str, int):
-            ``(waveform, sample_rate, label, speaker_id, utterance_number)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Label
+            str:
+                Speaker ID
+            int:
+                Utterance number
         """
-        fileid = self._walker[n]
-        return load_speechcommands_item(fileid, self._path)
+        metadata = self.get_metadata(n)
+        waveform = _load_waveform(self._archive, metadata[0], metadata[1])
+        return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
         return len(self._walker)

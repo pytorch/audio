@@ -37,3 +37,14 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
 
         self._assert_consistency(fn, (x, y))
+
+    def test_add_noise(self):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
+
+        self._assert_consistency(F.add_noise, (waveform, noise, lengths, snr))

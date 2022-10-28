@@ -5,7 +5,8 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio::sox_effects {
+namespace torchaudio {
+namespace sox_effects {
 
 namespace {
 
@@ -152,4 +153,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       &torchaudio::sox_effects::apply_effects_file);
 }
 
-} // namespace torchaudio::sox_effects
+} // namespace sox_effects
+} // namespace torchaudio

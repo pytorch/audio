@@ -47,10 +47,18 @@ void AVFormatInputContextDeleter::operator()(AVFormatContext* p) {
 AVFormatInputContextPtr::AVFormatInputContextPtr(AVFormatContext* p)
     : Wrapper<AVFormatContext, AVFormatInputContextDeleter>(p) {}
 
+void AVFormatOutputContextDeleter::operator()(AVFormatContext* p) {
+  avformat_free_context(p);
+};
+
+AVFormatOutputContextPtr::AVFormatOutputContextPtr(AVFormatContext* p)
+    : Wrapper<AVFormatContext, AVFormatOutputContextDeleter>(p) {}
+
 ////////////////////////////////////////////////////////////////////////////////
 // AVIO
 ////////////////////////////////////////////////////////////////////////////////
 void AVIOContextDeleter::operator()(AVIOContext* p) {
+  avio_flush(p);
   av_freep(&p->buffer);
   av_freep(&p);
 };

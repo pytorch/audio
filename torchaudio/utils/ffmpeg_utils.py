@@ -1,3 +1,7 @@
+"""Module to change the configuration of FFmpeg libraries (such as libavformat).
+
+It affects functionalities in :py:mod:`torchaudio.io` (and indirectly :py:func:`torchaudio.load`).
+"""
 from typing import Dict, Tuple
 
 import torch
