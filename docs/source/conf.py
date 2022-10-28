@@ -189,6 +189,8 @@ todo_include_todos = True
 html_theme = "pytorch_sphinx_theme"
 html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
 
+html_favicon = "_static/img/favicon.ico"
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
