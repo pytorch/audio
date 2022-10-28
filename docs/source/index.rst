@@ -115,7 +115,7 @@ Tutorials
 
 .. customcarditem::
    :header: Device input, synthetic audio/video, and filtering with StreamReader
-   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and filter.
+   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and apply filters to them with <code>torchaudio.io.StreamReader</code>.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamreader_advanced_tutorial.gif
    :link: tutorials/streamreader_advanced_tutorial.html
    :tags: I/O,StreamReader
