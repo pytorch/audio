@@ -55,8 +55,8 @@ They can be serialized using TorchScript.
 
  .. code-block:: none
 
-    1.14.0.dev20221027
-    0.14.0.dev20221027
+    1.14.0.dev20221028
+    0.14.0.dev20221028
 
 
 
@@ -500,7 +500,7 @@ this functionality.
 
  .. code-block:: none
 
-    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/transforms/_transforms.py:607: UserWarning: Argument 'onesided' has been deprecated and has no influence on the behavior of this module.
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/transforms/_transforms.py:608: UserWarning: Argument 'onesided' has been deprecated and has no influence on the behavior of this module.
       warnings.warn(
 
 
@@ -885,7 +885,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.994 seconds)
+   **Total running time of the script:** ( 0 minutes  5.863 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

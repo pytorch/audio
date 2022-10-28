@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ASR Inference with CTC Decoder" href="asr_inference_with_ctc_decoder_tutorial.html" />
+    <link rel="next" title="Music Source Separation with Hybrid Demucs" href="hybrid_demucs_tutorial.html" />
     <link rel="prev" title="Text-to-Speech with Tacotron2" href="tacotron2_pipeline_tutorial.html" />
   <!-- Google Analytics -->
   
@@ -211,7 +211,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.14.0.dev20221027) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.14.0.dev20221028) &#x25BC</a>
     </div>
     
 
@@ -239,7 +239,33 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classifications.html">Feature Classifications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Hardware-Accelerated Video Decoding and Encoding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -263,26 +289,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials.io.html">Media IO</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Advanced Usages</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Speech Enhancement with MVDR Beamforming</a></li>
-<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -423,8 +429,8 @@ relative transfer function (RTF) matrix of the reference microphone.</p></li>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.14.0.dev20221027
-0.14.0.dev20221027
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.14.0.dev20221028
+0.14.0.dev20221028
 </pre></div>
 </div>
 </section>
@@ -474,10 +480,10 @@ International — CC BY 4.0)</p></li>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/0.98M [00:00&lt;?, ?B/s]
-100%|##########| 0.98M/0.98M [00:00&lt;00:00, 52.3MB/s]
+100%|##########| 0.98M/0.98M [00:00&lt;00:00, 108MB/s]
 
   0%|          | 0.00/1.95M [00:00&lt;?, ?B/s]
-100%|##########| 1.95M/1.95M [00:00&lt;00:00, 36.9MB/s]
+100%|##########| 1.95M/1.95M [00:00&lt;00:00, 101MB/s]
 </pre></div>
 </div>
 </section>
@@ -824,7 +830,7 @@ STOI score: 0.8798278458936415
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.542 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.452 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mvdr-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/50de4231f2cfe5d85bac91915f27f92c/mvdr_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">mvdr_tutorial.py</span></code></a></p>
@@ -846,7 +852,7 @@ STOI score: 0.8798278458936415
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="asr_inference_with_ctc_decoder_tutorial.html" class="btn btn-neutral float-right" title="ASR Inference with CTC Decoder" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="hybrid_demucs_tutorial.html" class="btn btn-neutral float-right" title="Music Source Separation with Hybrid Demucs" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="tacotron2_pipeline_tutorial.html" class="btn btn-neutral" title="Text-to-Speech with Tacotron2" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -960,7 +966,7 @@ STOI score: 0.8798278458936415
       });
   </script>
     <script type="text/javascript">
-    var collapsedSections = []
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials']
     </script>
      
     <script type="text/javascript">

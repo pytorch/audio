@@ -26,3 +26,12 @@ article.pytorch-article .sphx-glr-thumbnails .sphx-glr-thumbcontainer {
 article.pytorch-article div.section div.wy-table-responsive tbody td {
     width: 50%;
 }
+/* For customcarditem*/
+article.pytorch-article div.tutorials-card div.card-body code {
+    color:#d14;
+    padding: 2px 4px;
+    border-radius: 6px;
+    border-top: none;
+    border-bottom: none;
+    background-color: #AFB8C133;
+}
