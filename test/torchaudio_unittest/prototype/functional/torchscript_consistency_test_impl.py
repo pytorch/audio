@@ -1,7 +1,6 @@
 import torch
 import torchaudio.prototype.functional as F
-from parameterized import parameterized
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
+from torchaudio_unittest.common_utils import nested_params, TestBaseMixin, torch_script
 
 
 class TorchScriptConsistencyTestImpl(TestBaseMixin):
@@ -24,19 +23,17 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
             output = output.shape
         self.assertEqual(ts_output, output)
 
-    @parameterized.expand(
-        [
-            (F.convolve,),
-            (F.fftconvolve,),
-        ]
+    @nested_params(
+        [F.convolve, F.fftconvolve],
+        ["full", "valid", "same"],
     )
-    def test_convolve(self, fn):
+    def test_convolve(self, fn, mode):
         leading_dims = (2, 3, 2)
         L_x, L_y = 32, 55
         x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
 
-        self._assert_consistency(fn, (x, y))
+        self._assert_consistency(fn, (x, y, mode))
 
     def test_add_noise(self):
         leading_dims = (2, 3)
