@@ -103,7 +103,7 @@ Preparation
 
  .. code-block:: none
 
-      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 73.7MB/s]
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 70.3MB/s]
 
 
 
@@ -188,7 +188,7 @@ fetch the pre-trained weights and load it into the model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]     11%|#         | 38.8M/360M [00:00<00:00, 407MB/s]     22%|##2       | 80.1M/360M [00:00<00:00, 422MB/s]     34%|###3      | 122M/360M [00:00<00:00, 428MB/s]      45%|####5     | 164M/360M [00:00<00:00, 433MB/s]     57%|#####6    | 205M/360M [00:00<00:00, 366MB/s]     67%|######6   | 241M/360M [00:00<00:00, 357MB/s]     77%|#######6  | 276M/360M [00:00<00:00, 354MB/s]     86%|########6 | 310M/360M [00:00<00:00, 352MB/s]     96%|#########5| 344M/360M [00:00<00:00, 353MB/s]    100%|##########| 360M/360M [00:01<00:00, 371MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]     11%|#         | 37.9M/360M [00:00<00:00, 397MB/s]     22%|##2       | 79.5M/360M [00:00<00:00, 420MB/s]     33%|###3      | 120M/360M [00:00<00:00, 378MB/s]      45%|####4     | 161M/360M [00:00<00:00, 399MB/s]     55%|#####5    | 199M/360M [00:00<00:00, 366MB/s]     66%|######6   | 239M/360M [00:00<00:00, 380MB/s]     76%|#######6  | 275M/360M [00:00<00:00, 331MB/s]     88%|########7 | 317M/360M [00:00<00:00, 360MB/s]    100%|##########| 360M/360M [00:00<00:00, 378MB/s]
     <class 'torchaudio.models.wav2vec2.model.Wav2Vec2Model'>
 
 
@@ -548,7 +548,7 @@ a model and getting the emission is as short as two lines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.255 seconds)
+   **Total running time of the script:** ( 0 minutes  4.200 seconds)
 
 
 .. _sphx_glr_download_tutorials_speech_recognition_pipeline_tutorial.py:
