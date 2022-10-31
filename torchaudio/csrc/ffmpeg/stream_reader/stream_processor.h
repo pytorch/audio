@@ -77,7 +77,7 @@ class StreamProcessor {
   void flush();
 
  private:
-  int send_frame(AVFrame* pFrame, int64_t discard_before_pts);
+  int send_frame(AVFrame* pFrame);
 
   //////////////////////////////////////////////////////////////////////////////
   // Retrieval

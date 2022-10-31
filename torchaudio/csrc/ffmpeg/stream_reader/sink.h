@@ -27,7 +27,7 @@ class Sink {
       const torch::Device& device);
 
   std::string get_filter_description() const;
-  int process_frame(AVFrame* frame, int64_t discard_before_pts);
+  int process_frame(AVFrame* frame);
   bool is_buffer_ready() const;
 
   void flush();

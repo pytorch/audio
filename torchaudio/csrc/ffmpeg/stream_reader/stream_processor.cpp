@@ -79,11 +79,13 @@ int StreamProcessor::process_packet(
     if (ret == AVERROR(EAGAIN))
       return 0;
     if (ret == AVERROR_EOF)
-      return send_frame(NULL, discard_before_pts);
+      return send_frame(NULL);
     if (ret < 0)
       return ret;
 
-    send_frame(pFrame1, discard_before_pts);
+    if (pFrame1->pts >= discard_before_pts) {
+      send_frame(pFrame1);
+    }
 
     // else we can just unref the frame and continue
     av_frame_unref(pFrame1);
@@ -100,10 +102,10 @@ void StreamProcessor::flush() {
 
 // 0: some kind of success
 // <0: Some error happened
-int StreamProcessor::send_frame(AVFrame* pFrame, int64_t discard_before_pts) {
+int StreamProcessor::send_frame(AVFrame* pFrame) {
   int ret = 0;
   for (auto& ite : sinks) {
-    int ret2 = ite.second.process_frame(pFrame, discard_before_pts);
+    int ret2 = ite.second.process_frame(pFrame);
     if (ret2 < 0)
       ret = ret2;
   }
