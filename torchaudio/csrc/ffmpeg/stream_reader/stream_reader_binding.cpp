@@ -42,7 +42,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def(
           "find_best_video_stream",
           [](S s) { return s->find_best_video_stream(); })
-      .def("seek", [](S s, double t) { return s->seek(t); })
+      .def("seek", [](S s, double t, int64_t mode) { return s->seek(t, mode); })
       .def(
           "add_audio_stream",
           [](S s,

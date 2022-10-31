@@ -17,6 +17,9 @@ class StreamReader {
   // the second is the map key inside of processor.
   std::vector<std::pair<int, int>> stream_indices;
 
+  // timestamp to seek to expressed in AV_TIME_BASE
+  int64_t seek_timestamp = -1;
+
  public:
   explicit StreamReader(AVFormatInputContextPtr&& p);
   ~StreamReader() = default;
@@ -57,7 +60,7 @@ class StreamReader {
   //////////////////////////////////////////////////////////////////////////////
   // Configure methods
   //////////////////////////////////////////////////////////////////////////////
-  void seek(double timestamp);
+  void seek(double timestamp_s, int64_t mode);
 
   void add_audio_stream(
       int64_t i,
