@@ -36,8 +36,9 @@ def info_audio(
 def info_audio_fileobj(
     src,
     format: Optional[str],
+    buffer_size: int = 4096,
 ) -> AudioMetaData:
-    s = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, 4096)
+    s = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
     return _info_audio(s)
 
 
@@ -110,6 +111,7 @@ def load_audio_fileobj(
     convert: bool = True,
     channels_first: bool = True,
     format: Optional[str] = None,
+    buffer_size: int = 4096,
 ) -> Tuple[torch.Tensor, int]:
-    s = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, 4096)
+    s = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
     return _load_audio(s, frame_offset, num_frames, convert, channels_first)
