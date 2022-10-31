@@ -20,6 +20,7 @@ git checkout gh-pages
 mkdir -p ./"${target}"
 rm -rf ./"${target}"/*
 cp -r "${src}/docs/build/html/"* ./"$target"
+rm ./"$target"/artifact.tar.gz
 if [ "${target}" == "main" ]; then
     mkdir -p ./_static
     rm -rf ./_static/*

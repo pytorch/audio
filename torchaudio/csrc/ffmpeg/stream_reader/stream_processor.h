@@ -14,11 +14,12 @@ class StreamProcessor {
   using KeyType = int;
 
  private:
-  AVFramePtr pFrame1;
-  AVFramePtr pFrame2;
+  // Link to the corresponding stream object
+  const AVStream* stream;
 
   // Components for decoding source media
-  double decoder_time_base; // for debug
+  AVFramePtr pFrame1;
+  AVFramePtr pFrame2;
   Decoder decoder;
 
   KeyType current_key = 0;
@@ -26,7 +27,7 @@ class StreamProcessor {
 
  public:
   StreamProcessor(
-      AVCodecParameters* codecpar,
+      AVStream* stream,
       const c10::optional<std::string>& decoder_name,
       const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);
@@ -48,8 +49,6 @@ class StreamProcessor {
   // 3. Configure a buffer.
   // 4. Return filter ID.
   KeyType add_stream(
-      AVRational input_time_base,
-      AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
       const c10::optional<std::string>& filter_description,

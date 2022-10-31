@@ -10,21 +10,22 @@ class FunctionalTestImpl(TestBaseMixin):
     @nested_params(
         [(10, 4), (4, 3, 1, 2), (2,), ()],
         [(100, 43), (21, 45)],
+        ["full", "valid", "same"],
     )
-    def test_convolve_numerics(self, leading_dims, lengths):
+    def test_convolve_numerics(self, leading_dims, lengths, mode):
         """Check that convolve returns values identical to those that SciPy produces."""
         L_x, L_y = lengths
 
         x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
         y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
 
-        actual = F.convolve(x, y)
+        actual = F.convolve(x, y, mode=mode)
 
         num_signals = torch.tensor(leading_dims).prod() if leading_dims else 1
         x_reshaped = x.reshape((num_signals, L_x))
         y_reshaped = y.reshape((num_signals, L_y))
         expected = [
-            signal.convolve(x_reshaped[i].detach().cpu().numpy(), y_reshaped[i].detach().cpu().numpy())
+            signal.convolve(x_reshaped[i].detach().cpu().numpy(), y_reshaped[i].detach().cpu().numpy(), mode=mode)
             for i in range(num_signals)
         ]
         expected = torch.tensor(np.array(expected))
@@ -35,17 +36,18 @@ class FunctionalTestImpl(TestBaseMixin):
     @nested_params(
         [(10, 4), (4, 3, 1, 2), (2,), ()],
         [(100, 43), (21, 45)],
+        ["full", "valid", "same"],
     )
-    def test_fftconvolve_numerics(self, leading_dims, lengths):
+    def test_fftconvolve_numerics(self, leading_dims, lengths, mode):
         """Check that fftconvolve returns values identical to those that SciPy produces."""
         L_x, L_y = lengths
 
         x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
         y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
 
-        actual = F.fftconvolve(x, y)
+        actual = F.fftconvolve(x, y, mode=mode)
 
-        expected = signal.fftconvolve(x.detach().cpu().numpy(), y.detach().cpu().numpy(), axes=-1)
+        expected = signal.fftconvolve(x.detach().cpu().numpy(), y.detach().cpu().numpy(), axes=-1, mode=mode)
         expected = torch.tensor(expected)
 
         self.assertEqual(expected, actual)
