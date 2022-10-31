@@ -70,7 +70,7 @@ class StreamProcessor {
   // 2. pass the decoded data to filters
   // 3. each filter store the result to the corresponding buffer
   // - Sending NULL will drain (flush) the internal
-  int process_packet(AVPacket* packet);
+  int process_packet(AVPacket* packet, int64_t discard_before_pts = -1);
 
   // flush the internal buffer of decoder.
   // To be use when seeking

@@ -6,7 +6,9 @@ from urllib.parse import quote, urlencode
 
 import requests
 from docutils import nodes
+from docutils.parsers.rst import Directive, directives
 from docutils.parsers.rst.directives.images import Image
+from docutils.statemachine import StringList
 from sphinx.util.docutils import SphinxDirective
 
 
@@ -125,3 +127,101 @@ class SupportedProperties(BaseShield):
             "style": "flat-square",
         }
         return super().run(params, alt, "properties")
+
+
+_CARDLIST_START = """
+.. raw:: html
+
+   <div id="tutorial-cards-container">
+     <nav class="navbar navbar-expand-lg navbar-light tutorials-nav col-12">
+       <div class="tutorial-tags-container">
+         <div id="dropdown-filter-tags">
+           <div class="tutorial-filter-menu">
+             <div class="tutorial-filter filter-btn all-tag-selected" data-tag="all">All</div>
+           </div>
+         </div>
+       </div>
+     </nav>
+
+     <hr class="tutorials-hr">
+
+     <div class="row">
+       <div id="tutorial-cards">
+         <div class="list">
+"""
+
+_CARD_TEMPLATE = """
+.. raw:: html
+
+   <div class="col-md-12 tutorials-card-container" data-tags={tags}>
+     <div class="card tutorials-card">
+       <a href="{link}">
+         <div class="card-body">
+           <div class="card-title-container">
+             <h4>{header}</h4>
+           </div>
+           <p>Topics: <span class="tags">{tags}</span></p>
+           <p class="card-summary">{card_description}</p>
+           <div class="tutorials-image">{image}</div>
+         </div>
+       </a>
+     </div>
+   </div>
+"""
+
+_CARDLIST_END = """
+.. raw:: html
+
+         </div>
+         <div class="pagination d-flex justify-content-center"></div>
+       </div>
+     </div>
+   </div>
+"""
+
+
+class CustomCardStart(Directive):
+    def run(self):
+        para = nodes.paragraph()
+        self.state.nested_parse(StringList(_CARDLIST_START.split("\n")), self.content_offset, para)
+        return [para]
+
+
+class CustomCardItem(Directive):
+    option_spec = {
+        "header": directives.unchanged,
+        "image": directives.unchanged,
+        "link": directives.unchanged,
+        "card_description": directives.unchanged,
+        "tags": directives.unchanged,
+    }
+
+    def run(self):
+        for key in ["header", "card_description", "link"]:
+            if key not in self.options:
+                raise ValueError(f"Key: `{key}` is missing")
+
+        header = self.options["header"]
+        link = self.options["link"]
+        card_description = self.options["card_description"]
+        tags = self.options.get("tags", "")
+
+        if "image" in self.options:
+            image = "<img src='" + self.options["image"] + "'>"
+        else:
+            image = "_static/img/thumbnails/default.png"
+
+        card_rst = _CARD_TEMPLATE.format(
+            header=header, image=image, link=link, card_description=card_description, tags=tags
+        )
+        card_list = StringList(card_rst.split("\n"))
+        card = nodes.paragraph()
+        self.state.nested_parse(card_list, self.content_offset, card)
+        return [card]
+
+
+class CustomCardEnd(Directive):
+    def run(self):
+        para = nodes.paragraph()
+        self.state.nested_parse(StringList(_CARDLIST_END.split("\n")), self.content_offset, para)
+        return [para]
