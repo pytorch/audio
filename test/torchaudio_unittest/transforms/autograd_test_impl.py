@@ -90,6 +90,13 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
+    def test_barkspectrogram(self):
+        
+        sample_rate = 8000
+        transform = T.BarkSpectrogram(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
     @nested_params(
         [0, 0.99],
         [False, True],
