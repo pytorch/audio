@@ -844,7 +844,8 @@ class BarkSpectrogram(torch.nn.Module):
 
     Sources
         * https://www.fon.hum.uva.nl/praat/manual/BarkSpectrogram.html
-        * Traunmüller, Hartmut. "Analytical Expressions for the Tonotopic Sensory Scale." Journal of the Acoustical Society of America. Vol. 88, Issue 1, 1990, pp. 97–100.
+        * Traunmüller, Hartmut. "Analytical Expressions for the Tonotopic Sensory Scale." Journal of the Acoustical 
+        * Society of America. Vol. 88, Issue 1, 1990, pp. 97–100.
         * https://ccrma.stanford.edu/courses/120-fall-2003/lecture-5.html
 
     Args:
