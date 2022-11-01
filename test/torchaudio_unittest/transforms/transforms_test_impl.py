@@ -77,10 +77,11 @@ class TransformsTestBase(TestBaseMixin):
         expected = get_spectrogram(
             get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=2), n_fft=n_fft, power=power
         ).to(self.device, self.dtype)
-        input = T.BarkScale(n_mels=n_barks, sample_rate=sample_rate, n_stft=n_stft).to(self.device, self.dtype)(expected)
+        input = T.BarkScale(
+            n_barks=n_barks, sample_rate=sample_rate, n_stft=n_stft).to(self.device, self.dtype)(expected)
 
         # Run transform
-        transform = T.InverseBarkScale(n_stft, n_mels=n_barks, sample_rate=sample_rate).to(self.device, self.dtype)
+        transform = T.InverseBarkScale(n_stft, n_barks=n_barks, sample_rate=sample_rate).to(self.device, self.dtype)
         result = transform(input)
 
         # Compare
