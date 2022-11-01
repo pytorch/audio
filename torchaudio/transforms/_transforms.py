@@ -648,6 +648,7 @@ class MelSpectrogram(torch.nn.Module):
         mel_specgram = self.mel_scale(specgram)
         return mel_specgram
 
+
 class BarkScale(torch.nn.Module):
     r"""Turn a normal STFT into a bark frequency STFT with triangular filter banks.
 
@@ -713,6 +714,7 @@ class BarkScale(torch.nn.Module):
         bark_specgram = torch.matmul(specgram.transpose(-1, -2), self.fb).transpose(-1, -2)
 
         return bark_specgram
+
 
 class InverseBarkScale(torch.nn.Module):
     r"""Estimate a STFT in normal frequency domain from bark frequency domain.
@@ -828,6 +830,7 @@ class InverseBarkScale(torch.nn.Module):
         # unpack batch
         specgram = specgram.view(shape[:-2] + (freq, time))
         return specgram
+
 
 class BarkSpectrogram(torch.nn.Module):
     r"""Create BarkSpectrogram for a raw audio signal.

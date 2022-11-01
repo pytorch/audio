@@ -91,7 +91,8 @@ class AutogradTestMixin(TestBaseMixin):
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     def test_barkspectrogram(self):
-        
+        # replication_pad1d_backward_cuda is not deteministic and
+        # gives very small (~e-16) difference.
         sample_rate = 8000
         transform = T.BarkSpectrogram(sample_rate=sample_rate)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)

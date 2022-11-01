@@ -497,6 +497,7 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
     elif bark_scale == "Schroeder":
         return 7.0 * math.asinh(freq / 650.0)
     
+    # Traunmuller Bark scale
     barks = ((26.81 * freq) / (1960.0 + freq)) - 0.53
     
     # Bark value correction
@@ -535,9 +536,11 @@ def _bark_to_hz(barks: Tensor, bark_scale: str = "traunmuller") -> Tensor:
         idx = barks > 20.1
         barks[idx] = (barks[idx] + 4.422) / 1.22
 
+    # Traunmuller Bark scale
     freqs = 1960 * ((barks + 0.53) / (26.28 - barks))
 
     return freqs
+
 
 def barkscale_fbanks(
     n_freqs: int,
@@ -598,6 +601,7 @@ def barkscale_fbanks(
         )
 
     return fb
+
 
 def _create_triangular_filterbank(
     all_freqs: Tensor,
