@@ -1,9 +1,11 @@
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
+import math
 
 import torch
 from torch import nn, Tensor
 from torch.nn import Module, Parameter
+from torch.nn import functional as F
 
 _LG = logging.getLogger(__name__)
 
@@ -273,6 +275,7 @@ class SelfAttention(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
+        **kwargs,
     ) -> Tensor:
         """
         Args:
@@ -315,6 +318,427 @@ class SelfAttention(Module):
 
         output = self.out_proj(output)
         return output
+
+
+
+def quant_noise(module, p, block_size):
+    """
+    Wraps modules and applies quantization noise to the weights for
+    subsequent quantization with Iterative Product Quantization as
+    described in "Training with Quantization Noise for Extreme Model Compression"
+    Args:
+        - module: nn.Module
+        - p: amount of Quantization Noise
+        - block_size: size of the blocks for subsequent quantization with iPQ
+    Remarks:
+        - Module weights must have the right sizes wrt the block size
+        - Only Linear, Embedding and Conv2d modules are supported for the moment
+        - For more detail on how to quantize by blocks with convolutional weights,
+          see "And the Bit Goes Down: Revisiting the Quantization of Neural Networks"
+        - We implement the simplest form of noise here as stated in the paper
+          which consists in randomly dropping blocks
+    """
+
+    # if no quantization noise, don't register hook
+    if p <= 0:
+        return module
+
+    # supported modules
+    assert isinstance(module, (nn.Linear, nn.Embedding, nn.Conv2d))
+
+    # test whether module.weight has the right sizes wrt block_size
+    is_conv = module.weight.ndim == 4
+
+    # 2D matrix
+    if not is_conv:
+        assert (
+            module.weight.size(1) % block_size == 0
+        ), "Input features must be a multiple of block sizes"
+
+    # 4D matrix
+    else:
+        # 1x1 convolutions
+        if module.kernel_size == (1, 1):
+            assert (
+                module.in_channels % block_size == 0
+            ), "Input channels must be a multiple of block sizes"
+        # regular convolutions
+        else:
+            k = module.kernel_size[0] * module.kernel_size[1]
+            assert k % block_size == 0, "Kernel size must be a multiple of block size"
+
+    def _forward_pre_hook(mod, input):
+        # no noise for evaluation
+        if mod.training:
+            if not is_conv:
+                # gather weight and sizes
+                weight = mod.weight
+                in_features = weight.size(1)
+                out_features = weight.size(0)
+
+                # split weight matrix into blocks and randomly drop selected blocks
+                mask = torch.zeros(
+                    in_features // block_size * out_features, device=weight.device
+                )
+                mask.bernoulli_(p)
+                mask = mask.repeat_interleave(block_size, -1).view(-1, in_features)
+
+            else:
+                # gather weight and sizes
+                weight = mod.weight
+                in_channels = mod.in_channels
+                out_channels = mod.out_channels
+
+                # split weight matrix into blocks and randomly drop selected blocks
+                if mod.kernel_size == (1, 1):
+                    mask = torch.zeros(
+                        int(in_channels // block_size * out_channels),
+                        device=weight.device,
+                    )
+                    mask.bernoulli_(p)
+                    mask = mask.repeat_interleave(block_size, -1).view(-1, in_channels)
+                else:
+                    mask = torch.zeros(
+                        weight.size(0), weight.size(1), device=weight.device
+                    )
+                    mask.bernoulli_(p)
+                    mask = (
+                        mask.unsqueeze(2)
+                        .unsqueeze(3)
+                        .repeat(1, 1, mod.kernel_size[0], mod.kernel_size[1])
+                    )
+
+            # scale weights and apply mask
+            mask = mask.to(
+                torch.bool
+            )  # x.bool() is not currently supported in TorchScript
+            s = 1 / (1 - p)
+            mod.weight.data = s * weight.masked_fill(mask, 0)
+
+    module.register_forward_pre_hook(_forward_pre_hook)
+    return module
+
+
+class WavLMSelfAttention(nn.Module):
+    """Multi-headed attention.
+    See "Attention Is All You Need" for more details.
+    Source: https://github.com/microsoft/UniSpeech/blob/2e9dde8bf815a5f5fd958e3435e5641f59f96928/WavLM/modules.py
+    """
+
+    def __init__(
+            self,
+            embed_dim,
+            num_heads,
+            kdim=None,
+            vdim=None,
+            dropout=0.0,
+            bias=True,
+            add_bias_kv=False,
+            add_zero_attn=False,
+            self_attention=False,
+            encoder_decoder_attention=False,
+            q_noise=0.0,
+            qn_block_size=8,
+            has_relative_attention_bias=False,
+            num_buckets=32,
+            max_distance=128,
+            gru_rel_pos=True,
+            rescale_init=False,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.kdim = kdim if kdim is not None else embed_dim
+        self.vdim = vdim if vdim is not None else embed_dim
+        self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
+
+        self.num_heads = num_heads
+        self.dropout_module = nn.Dropout(dropout)
+
+        self.has_relative_attention_bias = has_relative_attention_bias
+        self.num_buckets = num_buckets
+        self.max_distance = max_distance
+        if self.has_relative_attention_bias:
+            self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
+
+        self.head_dim = embed_dim // num_heads
+        self.q_head_dim = self.head_dim
+        self.k_head_dim = self.head_dim
+        assert (
+                self.head_dim * num_heads == self.embed_dim
+        ), "embed_dim must be divisible by num_heads"
+        self.scaling = self.head_dim ** -0.5
+
+        self.self_attention = self_attention
+        self.encoder_decoder_attention = encoder_decoder_attention
+
+        assert not self.self_attention or self.qkv_same_dim, (
+            "Self-attention requires query, key and " "value to be of the same size"
+        )
+
+        k_bias = True
+        if rescale_init:
+            k_bias = False
+
+        k_embed_dim = embed_dim
+        q_embed_dim = embed_dim
+
+        self.k_proj = quant_noise(
+            nn.Linear(self.kdim, k_embed_dim, bias=k_bias), q_noise, qn_block_size
+        )
+        self.v_proj = quant_noise(
+            nn.Linear(self.vdim, embed_dim, bias=bias), q_noise, qn_block_size
+        )
+        self.q_proj = quant_noise(
+            nn.Linear(embed_dim, q_embed_dim, bias=bias), q_noise, qn_block_size
+        )
+
+        self.out_proj = quant_noise(
+            nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
+        )
+
+        if add_bias_kv:
+            self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
+            self.bias_v = Parameter(torch.Tensor(1, 1, embed_dim))
+        else:
+            self.bias_k = self.bias_v = None
+
+        self.add_zero_attn = add_zero_attn
+
+        self.gru_rel_pos = gru_rel_pos
+        if self.gru_rel_pos:
+            self.gru_rel_pos_linear = nn.Linear(self.q_head_dim, 8)
+            self.gru_rel_pos_const = nn.Parameter(torch.ones(1, num_heads, 1, 1))
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        if self.qkv_same_dim:
+            # Empirically observed the convergence to be much better with
+            # the scaled initialization
+            nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
+            nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
+            nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
+        else:
+            nn.init.xavier_uniform_(self.k_proj.weight)
+            nn.init.xavier_uniform_(self.v_proj.weight)
+            nn.init.xavier_uniform_(self.q_proj.weight)
+
+        nn.init.xavier_uniform_(self.out_proj.weight)
+        if self.out_proj.bias is not None:
+            nn.init.constant_(self.out_proj.bias, 0.0)
+        if self.bias_k is not None:
+            nn.init.xavier_normal_(self.bias_k)
+        if self.bias_v is not None:
+            nn.init.xavier_normal_(self.bias_v)
+        if self.has_relative_attention_bias:
+            nn.init.xavier_normal_(self.rel_attn_embed.weight)
+
+    def _relative_positions_bucket(self, relative_positions, bidirectional=True):
+        num_buckets = self.num_buckets
+        max_distance = self.max_distance
+        relative_buckets = 0
+
+        if bidirectional:
+            num_buckets = num_buckets // 2
+            relative_buckets += (relative_positions > 0).to(torch.long) * num_buckets
+            relative_positions = torch.abs(relative_positions)
+        else:
+            relative_positions = -torch.min(relative_positions, torch.zeros_like(relative_positions))
+
+        max_exact = num_buckets // 2
+        is_small = relative_positions < max_exact
+
+        relative_postion_if_large = max_exact + (
+                torch.log(relative_positions.float() / max_exact)
+                / math.log(max_distance / max_exact)
+                * (num_buckets - max_exact)
+        ).to(torch.long)
+        relative_postion_if_large = torch.min(
+            relative_postion_if_large, torch.full_like(relative_postion_if_large, num_buckets - 1)
+        )
+
+        relative_buckets += torch.where(is_small, relative_positions, relative_postion_if_large)
+        return relative_buckets
+
+    def compute_bias(self, query_length, key_length):
+        context_position = torch.arange(query_length, dtype=torch.long)[:, None]
+        memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
+        relative_position = memory_position - context_position
+        relative_position_bucket = self._relative_positions_bucket(
+            relative_position,
+            bidirectional=True
+        )
+        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed.weight.device)
+        values = self.rel_attn_embed(relative_position_bucket)
+        values = values.permute([2, 0, 1])
+        return values
+
+    def forward(
+            self,
+            query,
+            key: Optional[Tensor] = None,
+            value: Optional[Tensor] = None,
+            key_padding_mask: Optional[Tensor] = None,
+            need_weights: bool = True,
+            attention_mask: Optional[Tensor] = None,
+            need_head_weights: bool = False,
+            position_bias: Optional[Tensor] = None
+    ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
+        """Input shape: Time x Batch x Channel
+        Args:
+            key_padding_mask (ByteTensor, optional): mask to exclude
+                keys that are pads, of shape `(batch, src_len)`, where
+                padding elements are indicated by 1s.
+            need_weights (bool, optional): return the attention weights,
+                averaged over heads (default: False).
+            attn_mask (ByteTensor, optional): typically used to
+                implement causal attention, where the mask prevents the
+                attention from looking forward in time (default: None).
+            before_softmax (bool, optional): return the raw attention
+                weights and values before the attention softmax.
+            need_head_weights (bool, optional): return the attention
+                weights for each head. Implies *need_weights*. Default:
+                return the average attention weights over all heads.
+        """
+        if need_head_weights:
+            need_weights = True
+        query = query.transpose(0, 1)
+        if key is None:
+            key = query
+        if value is None:
+            value = query
+
+        tgt_len, bsz, embed_dim = query.size()
+        src_len = tgt_len
+        assert embed_dim == self.embed_dim
+        assert list(query.size()) == [tgt_len, bsz, embed_dim]
+        if key is not None:
+            src_len, key_bsz, _ = key.size()
+            if not torch.jit.is_scripting():
+                assert key_bsz == bsz
+                assert value is not None
+                assert src_len, bsz == value.shape[:2]
+
+        if self.has_relative_attention_bias and position_bias is None:
+            position_bias = self.compute_bias(tgt_len, src_len)
+            position_bias = position_bias.unsqueeze(0).repeat(bsz, 1, 1, 1).view(bsz * self.num_heads, tgt_len, src_len)
+
+    
+        assert key is not None and value is not None
+        assert attention_mask is None
+
+        attn_mask_rel_pos = None
+        if position_bias is not None:
+            attn_mask_rel_pos = position_bias
+            if self.gru_rel_pos:
+                query_layer = query.transpose(0, 1)
+                new_x_shape = query_layer.size()[:-1] + (self.num_heads, -1)
+                query_layer = query_layer.view(*new_x_shape)
+                query_layer = query_layer.permute(0, 2, 1, 3)
+                _B, _H, _L, __ = query_layer.size()
+
+                gate_a, gate_b = torch.sigmoid(self.gru_rel_pos_linear(query_layer).view(
+                    _B, _H, _L, 2, 4).sum(-1, keepdim=False)).chunk(2, dim=-1)
+                gate_a_1 = gate_a * (gate_b * self.gru_rel_pos_const - 1.0) + 2.0
+                attn_mask_rel_pos = gate_a_1.view(bsz * self.num_heads, -1, 1) * position_bias
+
+            attn_mask_rel_pos = attn_mask_rel_pos.view((-1, tgt_len, tgt_len))
+        k_proj_bias = self.k_proj.bias
+        if k_proj_bias is None:
+            k_proj_bias = torch.zeros_like(self.q_proj.bias)
+
+        self.bias_k = self.bias_k = None
+        self.add_zero_attn = False
+        x, attn = F.multi_head_attention_forward(
+            query,
+            key,
+            value,
+            self.embed_dim,
+            self.num_heads,
+            torch.empty([0]),
+            torch.cat((self.q_proj.bias, self.k_proj.bias, self.v_proj.bias)),
+            self.bias_k,
+            self.bias_v,
+            self.add_zero_attn,
+            self.dropout_module.p,
+            self.out_proj.weight,
+            self.out_proj.bias,
+            self.training,
+            # self.training or self.dropout_module.apply_during_inference,
+            key_padding_mask,
+            need_weights,
+            attn_mask_rel_pos,
+            use_separate_proj_weight=True,
+            q_proj_weight=self.q_proj.weight,
+            k_proj_weight=self.k_proj.weight,
+            v_proj_weight=self.v_proj.weight,
+        )
+        return x.transpose(0, 1), attn, position_bias
+        
+
+    @staticmethod
+    def _append_prev_key_padding_mask(
+            key_padding_mask: Optional[Tensor],
+            prev_key_padding_mask: Optional[Tensor],
+            batch_size: int,
+            src_len: int,
+            static_kv: bool,
+    ) -> Optional[Tensor]:
+        # saved key padding masks have shape (bsz, seq_len)
+        if prev_key_padding_mask is not None and static_kv:
+            new_key_padding_mask = prev_key_padding_mask
+        elif prev_key_padding_mask is not None and key_padding_mask is not None:
+            new_key_padding_mask = torch.cat(
+                [prev_key_padding_mask.float(), key_padding_mask.float()], dim=1
+            )
+        # During incremental decoding, as the padding token enters and
+        # leaves the frame, there will be a time when prev or current
+        # is None
+        elif prev_key_padding_mask is not None:
+            if src_len > prev_key_padding_mask.size(1):
+                filler = torch.zeros(
+                    (batch_size, src_len - prev_key_padding_mask.size(1)),
+                    device=prev_key_padding_mask.device,
+                )
+                new_key_padding_mask = torch.cat(
+                    [prev_key_padding_mask.float(), filler.float()], dim=1
+                )
+            else:
+                new_key_padding_mask = prev_key_padding_mask.float()
+        elif key_padding_mask is not None:
+            if src_len > key_padding_mask.size(1):
+                filler = torch.zeros(
+                    (batch_size, src_len - key_padding_mask.size(1)),
+                    device=key_padding_mask.device,
+                )
+                new_key_padding_mask = torch.cat(
+                    [filler.float(), key_padding_mask.float()], dim=1
+                )
+            else:
+                new_key_padding_mask = key_padding_mask.float()
+        else:
+            new_key_padding_mask = prev_key_padding_mask
+        return new_key_padding_mask
+
+    def _get_input_buffer(
+            self, incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]]
+    ) -> Dict[str, Optional[Tensor]]:
+        result = self.get_incremental_state(incremental_state, "attn_state")
+        if result is not None:
+            return result
+        else:
+            empty_result: Dict[str, Optional[Tensor]] = {}
+            return empty_result
+
+    def _set_input_buffer(
+            self,
+            incremental_state: Dict[str, Dict[str, Optional[Tensor]]],
+            buffer: Dict[str, Optional[Tensor]],
+    ):
+        return self.set_incremental_state(incremental_state, "attn_state", buffer)
+
+    def apply_sparse_mask(self, attn_weights, tgt_len: int, src_len: int, bsz: int):
+        return attn_weights
 
 
 class FeedForward(Module):
@@ -371,19 +795,25 @@ class EncoderLayer(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
+        **kwargs,
     ):
         """
         Args:
             x (Tensor): shape: `(batch, sequence_length, embed_dim)`
             attention_mask (Tensor or None, optional):
-                shape: `(batch, 1, sequence_length, sequence_length)`
+            shape: `(batch, 1, sequence_length, sequence_length)`
         """
         residual = x
 
         if self.layer_norm_first:
             x = self.layer_norm(x)
 
-        x = self.attention(x, attention_mask)
+        attention_output = self.attention(x, attention_mask=attention_mask, **kwargs)
+        if isinstance(attention_output, tuple):
+            x, _, position_bias = attention_output
+        else:
+            x = attention_output
+            position_bias = None
         x = self.dropout(x)
         x = residual + x
 
@@ -392,7 +822,9 @@ class EncoderLayer(Module):
         else:
             x = self.layer_norm(x)
             x = self.final_layer_norm(x + self.feed_forward(x))
-        return x
+        if position_bias is None:
+            return x
+        return x, position_bias
 
 
 class Transformer(Module):
@@ -425,16 +857,22 @@ class Transformer(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
+        position_bias: Optional[Tensor] = None,
     ):
         x = self._preprocess(x)
         for layer in self.layers:
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
-                x = layer(x, attention_mask)
+                layer_output = layer(x, attention_mask, position_bias=position_bias)
+                if isinstance(layer_output, tuple):
+                    x, position_bias = layer_output
+                else:
+                    x = layer_output
 
         if not self.layer_norm_first:
             x = self.layer_norm(x)
-
-        return x
+        if position_bias is None:
+            return x
+        return x, position_bias
 
     def get_intermediate_outputs(
         self,
@@ -727,6 +1165,186 @@ def _get_encoder(
             embed_dim=embed_dim,
             num_heads=num_heads,
             dropout=attention_dropout,
+        )
+        feed_forward = FeedForward(
+            io_features=embed_dim,
+            intermediate_features=ff_interm_features,
+            intermediate_dropout=ff_interm_dropout,
+            output_dropout=dropout,
+        )
+        encoder_layers.append(
+            EncoderLayer(
+                attention=attention,
+                dropout=dropout,
+                layer_norm_first=layer_norm_first,
+                feed_forward=feed_forward,
+            )
+        )
+    transformer = Transformer(
+        pos_conv_embed=pos_conv,
+        dropout=dropout,
+        layers=encoder_layers,
+        layer_norm_first=not layer_norm_first,
+        layer_drop=layer_drop,
+    )
+    return Encoder(feature_projection, transformer)
+
+
+
+
+def _get_encoder_wavlm(
+    in_features: int,
+    embed_dim: int,
+    dropout_input: float,
+    pos_conv_kernel: int,
+    pos_conv_groups: int,
+    num_layers: int,
+    num_heads: int,
+    num_buckets: int, 
+    max_distance: int, 
+    attention_dropout: float,
+    ff_interm_features: int,
+    ff_interm_dropout: float,
+    dropout: float,
+    layer_norm_first: bool,
+    layer_drop: float,
+) -> Encoder:
+    """
+    Args:
+        in_features (int): The number of input features.
+        embed_dim (int):
+            The dimension of embedding.
+            This option corresponds to "encoder_embed_dim" from fairseq.
+            Expected values are 768 for Base arch, and 1024 for Large arch.
+        dropout_input (float):
+            The dropout probability applied after the input feature is projected
+            to ``embed_dim``.
+            This option corresponds to "dropout_input" from fairseq.
+            Expected values are 0.1 for both Base and Large arch.
+        pos_conv_kernel (int):
+            The kernel size of convolutional positional embeddings.
+            This option corresponds to "conv_pos" from fairseq.
+            Expected values are 128 for both Base and Large arch.
+        pos_conv_groups (int):
+            The number of groups of convolutional positional embeddings.
+            This option corresponds to "conv_pos_groups" from fairseq.
+            Expected values are 16 for both Base and Large arch.
+        num_layers (int):
+            The number of self attention layers in transformer block.
+            This option corresponds to "encoder_layers" from fairseq.
+            Expected values are 12 for Base and 24 for Large arch.
+        num_heads (int):
+            The number of heads in self attention layers.
+            This option corresponds to "encoder_attention_heads" from fairseq.
+            Expected values are 12 for Base and 16 for Large arch.
+        attention_dropout (float):
+            The dropout probability applied after softmax in self-attention layer.
+            This option corresponds to "attention_dropout" from fairseq.
+            Expected values are 0.1 for Base and 0.0 for Large arch.
+        ff_interm_features (int):
+            The dimension of hidden features in feed forward layer.
+            This option corresponds to "encoder_ffn_embed_dim" from fairseq.
+            Expected values are 3072 for Base and 4096 for Large arch.
+        ff_interm_dropout (float):
+            The dropout probability applied in feedforward layer.
+            This option correspinds to "activation_dropout" from fairseq.
+            Expected values are 0.1 for both Base and Large arch.
+        dropout (float):
+            The dropout probability applied at the end of feed forward layer.
+            This option corresponds to "dropout" from fairseq.
+            Expected values are 0.1 for Base and 0.0 for Large arch.
+        layer_norm_first (bool):
+            Control the order of layer norm in transformer layer and each encoder layer.
+            If True, in transformer layer, layer norm is applied before features are fed
+            to encoder layers. In encoder layer, two layer norms are applied before and after
+            self attention.
+            If False, in transformer layer, layer norm is applied after features are fed
+            to encoder layers. In encoder layer, two layer norms are applied after self
+            attention, before and after feed forward.
+            This option corresponds to "layer_norm_first" from fairseq.
+            Expected values are False for Base and True for Large arch.
+        layer_drop (float):
+            Probability to drop each encoder layer during training.
+            This option corresponds to "layerdrop" from fairseq.
+            Expected values are 0.1 for both Base and Large arch.
+
+    See Also:
+        * "encoder_embed_dim"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L49-L51
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L64
+        * "dropout_input"
+          - Def, base and large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L75-L78
+        * "conv_pos"
+          - Def, base and large
+            NOTE: The description is wrong.
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L204-L207
+          - Usage
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L756
+        * "conv_pos_groups"
+          - Def, base and large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L208-L211
+        * "encoder_layers"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L46-L48
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L63
+        * "encoder_attention_heads"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L55-L57
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L66
+        * "attention_dropout"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L66-L68
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L60
+        * "encoder_ffn_embed_dim"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L52-L54
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L65
+        * "activation_dropout"
+          - Def
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L69-L71
+          - Base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/base_960h.yaml#L55
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/vox_960h.yaml#L55
+        * "dropout"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L63-L65
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L59
+        * "layer_norm_first"
+          - Def and base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L91-L93
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L53
+        * "layerdrop"
+          - Def
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L72-L74
+          - Base
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/base_960h.yaml#L54
+          - Large
+            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/vox_960h.yaml#L54
+    """
+    feature_projection = FeatureProjection(in_features, embed_dim, dropout_input)
+    pos_conv = ConvolutionalPositionalEmbedding(embed_dim, pos_conv_kernel, pos_conv_groups)
+
+    # Original impl
+    # https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L768-L782
+    encoder_layers = nn.ModuleList()
+    for i in range(num_layers):
+        attention = WavLMSelfAttention(
+            embed_dim=embed_dim,
+            num_heads=num_heads,
+            num_buckets=num_buckets,
+            max_distance=max_distance,
+            dropout=attention_dropout,
+            has_relative_attention_bias=(i == 0),
         )
         feed_forward = FeedForward(
             io_features=embed_dim,
