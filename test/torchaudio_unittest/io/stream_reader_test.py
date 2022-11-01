@@ -418,21 +418,95 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             if i >= 40:
                 break
 
-    def test_seek(self):
+    @parameterized.expand(["key", "any", "precise"])
+    def test_seek(self, mode):
         """Calling `seek` multiple times should not segfault"""
         s = StreamReader(self.get_src())
         for i in range(10):
-            s.seek(i)
+            s.seek(i, mode)
         for _ in range(0):
-            s.seek(0)
+            s.seek(0, mode)
         for i in range(10, 0, -1):
-            s.seek(i)
+            s.seek(i, mode)
 
     def test_seek_negative(self):
         """Calling `seek` with negative value should raise an exception"""
         s = StreamReader(self.get_src())
         with self.assertRaises(RuntimeError):
             s.seek(-1.0)
+
+    def test_seek_invalid_mode(self):
+        """Calling `seek` with an invalid model should raise an exception"""
+        s = StreamReader(self.get_src())
+        with self.assertRaises(ValueError):
+            s.seek(10, "magic_seek")
+
+    @parameterized.expand(
+        [
+            # Test keyframe seek
+            # The source mp4 video has two key frames the first frame and 203rd frame at 8.08 second.
+            # If the seek time stamp is smaller than 8.08, it will seek into the first frame at 0.0 second.
+            ("nasa_13013.mp4", "key", 0.2, (0, 0)),
+            ("nasa_13013.mp4", "key", 8.04, (0, 0)),
+            ("nasa_13013.mp4", "key", 8.08, (0, 202)),
+            ("nasa_13013.mp4", "key", 8.12, (0, 202)),
+            # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            # if we seek to a time stamp smaller than 0.4004 it will seek into the first frame at 0.0 second.
+            ("nasa_13013.avi", "key", 0.2, (0, 0)),
+            ("nasa_13013.avi", "key", 1.01, (0, 24)),
+            ("nasa_13013.avi", "key", 7.37, (0, 216)),
+            ("nasa_13013.avi", "key", 7.7, (0, 216)),
+            # Test precise seek
+            ("nasa_13013.mp4", "precise", 0.0, (0, 0)),
+            ("nasa_13013.mp4", "precise", 0.2, (0, 5)),
+            ("nasa_13013.mp4", "precise", 8.04, (0, 201)),
+            ("nasa_13013.mp4", "precise", 8.08, (0, 202)),
+            ("nasa_13013.mp4", "precise", 8.12, (0, 203)),
+            ("nasa_13013.avi", "precise", 0.0, (0, 0)),
+            ("nasa_13013.avi", "precise", 0.2, (0, 1)),
+            ("nasa_13013.avi", "precise", 8.1, (0, 238)),
+            ("nasa_13013.avi", "precise", 8.14, (0, 239)),
+            ("nasa_13013.avi", "precise", 8.17, (0, 240)),
+            # Test any seek
+            # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            ("nasa_13013.avi", "any", 0.0, (0, 0)),
+            ("nasa_13013.avi", "any", 0.56, (0, 12)),
+            ("nasa_13013.avi", "any", 7.77, (0, 228)),
+            ("nasa_13013.avi", "any", 0.2002, (11, 12)),
+            ("nasa_13013.avi", "any", 0.233567, (10, 12)),
+            ("nasa_13013.avi", "any", 0.266933, (9, 12)),
+        ]
+    )
+    def test_seek_modes(self, src, mode, seek_time, ref_indices):
+        """We expect the following behaviour from the diferent kinds of seek:
+            - `key`: the reader will seek to the first keyframe from the timestamp given
+            - `precise`: the reader will seek to the first keyframe from the timestamp given
+               and start decoding from that position until the given timestmap (discarding all frames in between)
+            - `any`: the  reader will seek to the colsest frame to the timestamp
+               given but if this is not a keyframe, the content will be the delta from other frames
+
+        To thest this behaviour we can parameterize the test with the tupple ref_indices. ref_indices[0]
+        is the expected index on the frames list decoded after seek and ref_indices[1] is exepected index for
+        the list of all frames decoded from the begining (reference frames). This test checks if
+        the reference frame at index ref_indices[1] is the same as ref_indices[0]. Plese note that with `any`
+        and `key` seek we only compare keyframes, but with `precise` seek we can compare any frame content.
+        """
+        # Using the first video stream (which is not default video stream)
+        stream_index = 0
+        # Decode all frames for reference
+        src_bin = self.get_src(src)
+        s = StreamReader(src_bin)
+        s.add_basic_video_stream(-1, stream_index=stream_index)
+        s.process_all_packets()
+        (ref_frames,) = s.pop_chunks()
+
+        s.seek(seek_time, mode=mode)
+        s.process_all_packets()
+        (frame,) = s.pop_chunks()
+
+        hyp_index, ref_index = ref_indices
+
+        self.assertEqual(frame[hyp_index:], ref_frames[ref_index:])
 
 
 def _to_fltp(original):
