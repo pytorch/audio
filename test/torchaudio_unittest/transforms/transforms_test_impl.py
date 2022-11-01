@@ -94,7 +94,7 @@ class TransformsTestBase(TestBaseMixin):
             print(f"Ratio of relative diff smaller than {tol:e} is " f"{_get_ratio(relative_diff < tol)}")
         assert _get_ratio(relative_diff < 1e-1) > 0.2
         assert _get_ratio(relative_diff < 1e-3) > 2e-3
-        #assert _get_ratio(relative_diff < 1e-5) > 1e-5
+        # assert _get_ratio(relative_diff < 1e-5) > 1e-5
 
     @nested_params(
         ["sinc_interpolation", "kaiser_window"],
