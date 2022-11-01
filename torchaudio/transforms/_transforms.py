@@ -692,12 +692,12 @@ class BarkScale(torch.nn.Module):
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
-        self.mel_scale = bark_scale
+        self.bark_scale = bark_scale
 
         if f_min > self.f_max:
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
 
-        fb = F.barkscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.bark_scale)
+        fb = F.barkscale_fbanks(n_stft, self.f_min, self.f_max, self.n_barks, self.sample_rate, self.bark_scale)
         self.register_buffer("fb", fb)
 
     def forward(self, specgram: Tensor) -> Tensor:

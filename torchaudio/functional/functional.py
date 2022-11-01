@@ -22,6 +22,7 @@ __all__ = [
     "compute_deltas",
     "compute_kaldi_pitch",
     "melscale_fbanks",
+    "barkscale_fbanks",
     "linear_fbanks",
     "create_dct",
     "compute_deltas",
@@ -496,8 +497,8 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
     elif bark_scale == "Schroeder":
         return 7.0 * math.asinh(freq/650.0)
     
-    barks = (26.81 / ((1960/freq) + 1)) - 0.53
-
+    barks = ((26.81 * freq) / (1960.0 + freq)) - 0.53
+    
     # Bark value correction
     if barks < 2:
         barks += 0.15 * (2 - barks)
@@ -527,10 +528,12 @@ def _bark_to_hz(barks: Tensor, bark_scale: str = "traunmuller") -> Tensor:
         return 650.0 * math.sinh(barks/7.0)
     
     # Bark value correction
-    if barks < 2:
-        barks = (barks - 0.3)/0.85
-    elif barks > 20.1:
-        barks = (barks + 4.422)/1.22
+    if any(barks < 2):
+        idx = barks < 2
+        barks[idx] = (barks[idx] - 0.3)/0.85
+    elif any(barks > 20.1):
+        idx = barks > 20.1
+        barks[idx] = (barks[idx] + 4.422)/1.22
 
     freqs = 1960 * ((barks + 0.53)/(26.28 - barks))
 
