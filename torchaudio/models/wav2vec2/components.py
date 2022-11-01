@@ -320,105 +320,6 @@ class SelfAttention(Module):
         return output
 
 
-
-def quant_noise(module, p, block_size):
-    """
-    Wraps modules and applies quantization noise to the weights for
-    subsequent quantization with Iterative Product Quantization as
-    described in "Training with Quantization Noise for Extreme Model Compression"
-    Args:
-        - module: nn.Module
-        - p: amount of Quantization Noise
-        - block_size: size of the blocks for subsequent quantization with iPQ
-    Remarks:
-        - Module weights must have the right sizes wrt the block size
-        - Only Linear, Embedding and Conv2d modules are supported for the moment
-        - For more detail on how to quantize by blocks with convolutional weights,
-          see "And the Bit Goes Down: Revisiting the Quantization of Neural Networks"
-        - We implement the simplest form of noise here as stated in the paper
-          which consists in randomly dropping blocks
-    """
-
-    # if no quantization noise, don't register hook
-    if p <= 0:
-        return module
-
-    # supported modules
-    assert isinstance(module, (nn.Linear, nn.Embedding, nn.Conv2d))
-
-    # test whether module.weight has the right sizes wrt block_size
-    is_conv = module.weight.ndim == 4
-
-    # 2D matrix
-    if not is_conv:
-        assert (
-            module.weight.size(1) % block_size == 0
-        ), "Input features must be a multiple of block sizes"
-
-    # 4D matrix
-    else:
-        # 1x1 convolutions
-        if module.kernel_size == (1, 1):
-            assert (
-                module.in_channels % block_size == 0
-            ), "Input channels must be a multiple of block sizes"
-        # regular convolutions
-        else:
-            k = module.kernel_size[0] * module.kernel_size[1]
-            assert k % block_size == 0, "Kernel size must be a multiple of block size"
-
-    def _forward_pre_hook(mod, input):
-        # no noise for evaluation
-        if mod.training:
-            if not is_conv:
-                # gather weight and sizes
-                weight = mod.weight
-                in_features = weight.size(1)
-                out_features = weight.size(0)
-
-                # split weight matrix into blocks and randomly drop selected blocks
-                mask = torch.zeros(
-                    in_features // block_size * out_features, device=weight.device
-                )
-                mask.bernoulli_(p)
-                mask = mask.repeat_interleave(block_size, -1).view(-1, in_features)
-
-            else:
-                # gather weight and sizes
-                weight = mod.weight
-                in_channels = mod.in_channels
-                out_channels = mod.out_channels
-
-                # split weight matrix into blocks and randomly drop selected blocks
-                if mod.kernel_size == (1, 1):
-                    mask = torch.zeros(
-                        int(in_channels // block_size * out_channels),
-                        device=weight.device,
-                    )
-                    mask.bernoulli_(p)
-                    mask = mask.repeat_interleave(block_size, -1).view(-1, in_channels)
-                else:
-                    mask = torch.zeros(
-                        weight.size(0), weight.size(1), device=weight.device
-                    )
-                    mask.bernoulli_(p)
-                    mask = (
-                        mask.unsqueeze(2)
-                        .unsqueeze(3)
-                        .repeat(1, 1, mod.kernel_size[0], mod.kernel_size[1])
-                    )
-
-            # scale weights and apply mask
-            mask = mask.to(
-                torch.bool
-            )  # x.bool() is not currently supported in TorchScript
-            s = 1 / (1 - p)
-            mod.weight.data = s * weight.masked_fill(mask, 0)
-
-    module.register_forward_pre_hook(_forward_pre_hook)
-    return module
-
-
 class WavLMSelfAttention(nn.Module):
     """Multi-headed attention.
     See "Attention Is All You Need" for more details.
@@ -429,28 +330,16 @@ class WavLMSelfAttention(nn.Module):
             self,
             embed_dim,
             num_heads,
-            kdim=None,
-            vdim=None,
             dropout=0.0,
             bias=True,
-            add_bias_kv=False,
-            add_zero_attn=False,
-            self_attention=False,
-            encoder_decoder_attention=False,
-            q_noise=0.0,
-            qn_block_size=8,
             has_relative_attention_bias=False,
             num_buckets=32,
             max_distance=128,
             gru_rel_pos=True,
-            rescale_init=False,
     ):
         super().__init__()
         self.embed_dim = embed_dim
-        self.kdim = kdim if kdim is not None else embed_dim
-        self.vdim = vdim if vdim is not None else embed_dim
-        self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
-
+        
         self.num_heads = num_heads
         self.dropout_module = nn.Dropout(dropout)
 
@@ -461,77 +350,33 @@ class WavLMSelfAttention(nn.Module):
             self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
 
         self.head_dim = embed_dim // num_heads
-        self.q_head_dim = self.head_dim
-        self.k_head_dim = self.head_dim
         assert (
                 self.head_dim * num_heads == self.embed_dim
         ), "embed_dim must be divisible by num_heads"
-        self.scaling = self.head_dim ** -0.5
+        
+        self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.self_attention = self_attention
-        self.encoder_decoder_attention = encoder_decoder_attention
-
-        assert not self.self_attention or self.qkv_same_dim, (
-            "Self-attention requires query, key and " "value to be of the same size"
-        )
-
-        k_bias = True
-        if rescale_init:
-            k_bias = False
-
-        k_embed_dim = embed_dim
-        q_embed_dim = embed_dim
-
-        self.k_proj = quant_noise(
-            nn.Linear(self.kdim, k_embed_dim, bias=k_bias), q_noise, qn_block_size
-        )
-        self.v_proj = quant_noise(
-            nn.Linear(self.vdim, embed_dim, bias=bias), q_noise, qn_block_size
-        )
-        self.q_proj = quant_noise(
-            nn.Linear(embed_dim, q_embed_dim, bias=bias), q_noise, qn_block_size
-        )
-
-        self.out_proj = quant_noise(
-            nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
-        )
-
-        if add_bias_kv:
-            self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
-            self.bias_v = Parameter(torch.Tensor(1, 1, embed_dim))
-        else:
-            self.bias_k = self.bias_v = None
-
-        self.add_zero_attn = add_zero_attn
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
         self.gru_rel_pos = gru_rel_pos
         if self.gru_rel_pos:
-            self.gru_rel_pos_linear = nn.Linear(self.q_head_dim, 8)
+            self.gru_rel_pos_linear = nn.Linear(self.head_dim, 8)
             self.gru_rel_pos_const = nn.Parameter(torch.ones(1, num_heads, 1, 1))
 
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        if self.qkv_same_dim:
-            # Empirically observed the convergence to be much better with
-            # the scaled initialization
-            nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
-            nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
-            nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
-        else:
-            nn.init.xavier_uniform_(self.k_proj.weight)
-            nn.init.xavier_uniform_(self.v_proj.weight)
-            nn.init.xavier_uniform_(self.q_proj.weight)
-
-        nn.init.xavier_uniform_(self.out_proj.weight)
-        if self.out_proj.bias is not None:
-            nn.init.constant_(self.out_proj.bias, 0.0)
-        if self.bias_k is not None:
-            nn.init.xavier_normal_(self.bias_k)
-        if self.bias_v is not None:
-            nn.init.xavier_normal_(self.bias_v)
-        if self.has_relative_attention_bias:
-            nn.init.xavier_normal_(self.rel_attn_embed.weight)
+    def compute_bias(self, query_length, key_length):
+        context_position = torch.arange(query_length, dtype=torch.long)[:, None]
+        memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
+        relative_position = memory_position - context_position
+        relative_position_bucket = self._relative_positions_bucket(
+            relative_position,
+            bidirectional=True
+        )
+        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed.weight.device)
+        values = self.rel_attn_embed(relative_position_bucket)
+        values = values.permute([2, 0, 1])
+        return values
 
     def _relative_positions_bucket(self, relative_positions, bidirectional=True):
         num_buckets = self.num_buckets
@@ -560,111 +405,67 @@ class WavLMSelfAttention(nn.Module):
         relative_buckets += torch.where(is_small, relative_positions, relative_postion_if_large)
         return relative_buckets
 
-    def compute_bias(self, query_length, key_length):
-        context_position = torch.arange(query_length, dtype=torch.long)[:, None]
-        memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
-        relative_position = memory_position - context_position
-        relative_position_bucket = self._relative_positions_bucket(
-            relative_position,
-            bidirectional=True
-        )
-        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed.weight.device)
-        values = self.rel_attn_embed(relative_position_bucket)
-        values = values.permute([2, 0, 1])
-        return values
-
     def forward(
             self,
             query,
-            key: Optional[Tensor] = None,
-            value: Optional[Tensor] = None,
             key_padding_mask: Optional[Tensor] = None,
             need_weights: bool = True,
             attention_mask: Optional[Tensor] = None,
-            need_head_weights: bool = False,
             position_bias: Optional[Tensor] = None
     ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
         Args:
+            query (Tensor): input query of shape `(batch_size, src_len, embed_dim)`.
             key_padding_mask (ByteTensor, optional): mask to exclude
                 keys that are pads, of shape `(batch, src_len)`, where
                 padding elements are indicated by 1s.
-            need_weights (bool, optional): return the attention weights,
-                averaged over heads (default: False).
-            attn_mask (ByteTensor, optional): typically used to
-                implement causal attention, where the mask prevents the
-                attention from looking forward in time (default: None).
-            before_softmax (bool, optional): return the raw attention
-                weights and values before the attention softmax.
-            need_head_weights (bool, optional): return the attention
-                weights for each head. Implies *need_weights*. Default:
-                return the average attention weights over all heads.
+            need_weights (`bool`, *optional*, defaults to `False`): return the attention weights,
+                averaged over heads.
+            attn_mask (`bool`, *optional*, defaults to `None`): needs to be `None`. The argument exists for compatibility with `EncoderLayer`.
+            position_bias (`Tensor`, *optional*, defaults to `None`): position bias of shape `(batch_size * num_heads, src_len, src_len)`. 
+                When used inside WavML model encoder, will be generated in the first layer and then passed from each encoder layer to the next one.
         """
-        if need_head_weights:
-            need_weights = True
-        query = query.transpose(0, 1)
-        if key is None:
-            key = query
-        if value is None:
-            value = query
-
-        tgt_len, bsz, embed_dim = query.size()
-        src_len = tgt_len
+        bsz, seq_len, embed_dim = query.size()
         assert embed_dim == self.embed_dim
-        assert list(query.size()) == [tgt_len, bsz, embed_dim]
-        if key is not None:
-            src_len, key_bsz, _ = key.size()
-            if not torch.jit.is_scripting():
-                assert key_bsz == bsz
-                assert value is not None
-                assert src_len, bsz == value.shape[:2]
+        assert attention_mask is None
 
         if self.has_relative_attention_bias and position_bias is None:
-            position_bias = self.compute_bias(tgt_len, src_len)
-            position_bias = position_bias.unsqueeze(0).repeat(bsz, 1, 1, 1).view(bsz * self.num_heads, tgt_len, src_len)
-
-    
-        assert key is not None and value is not None
-        assert attention_mask is None
+            position_bias = self.compute_bias(seq_len, seq_len)
+            position_bias = position_bias.unsqueeze(0).repeat(bsz, 1, 1, 1).view(bsz * self.num_heads, seq_len, seq_len)
 
         attn_mask_rel_pos = None
         if position_bias is not None:
             attn_mask_rel_pos = position_bias
+            # Compute gated position bias
             if self.gru_rel_pos:
-                query_layer = query.transpose(0, 1)
-                new_x_shape = query_layer.size()[:-1] + (self.num_heads, -1)
-                query_layer = query_layer.view(*new_x_shape)
+                query_layer = query.view(bsz, seq_len, self.num_heads, -1)
                 query_layer = query_layer.permute(0, 2, 1, 3)
-                _B, _H, _L, __ = query_layer.size()
-
+                
                 gate_a, gate_b = torch.sigmoid(self.gru_rel_pos_linear(query_layer).view(
-                    _B, _H, _L, 2, 4).sum(-1, keepdim=False)).chunk(2, dim=-1)
+                    bsz, self.num_heads, seq_len, 2, 4).sum(-1, keepdim=False)).chunk(2, dim=-1)
                 gate_a_1 = gate_a * (gate_b * self.gru_rel_pos_const - 1.0) + 2.0
                 attn_mask_rel_pos = gate_a_1.view(bsz * self.num_heads, -1, 1) * position_bias
 
-            attn_mask_rel_pos = attn_mask_rel_pos.view((-1, tgt_len, tgt_len))
-        k_proj_bias = self.k_proj.bias
-        if k_proj_bias is None:
-            k_proj_bias = torch.zeros_like(self.q_proj.bias)
+            attn_mask_rel_pos = attn_mask_rel_pos.view((-1, seq_len, seq_len))
 
-        self.bias_k = self.bias_k = None
-        self.add_zero_attn = False
+        bias_k = bias_v = None
+        add_zero_attn = False
+        query = query.transpose(0, 1) # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
         x, attn = F.multi_head_attention_forward(
             query,
-            key,
-            value,
+            query,
+            query,
             self.embed_dim,
             self.num_heads,
             torch.empty([0]),
             torch.cat((self.q_proj.bias, self.k_proj.bias, self.v_proj.bias)),
-            self.bias_k,
-            self.bias_v,
-            self.add_zero_attn,
+            bias_k,
+            bias_v,
+            add_zero_attn,
             self.dropout_module.p,
             self.out_proj.weight,
             self.out_proj.bias,
             self.training,
-            # self.training or self.dropout_module.apply_during_inference,
             key_padding_mask,
             need_weights,
             attn_mask_rel_pos,
@@ -673,72 +474,8 @@ class WavLMSelfAttention(nn.Module):
             k_proj_weight=self.k_proj.weight,
             v_proj_weight=self.v_proj.weight,
         )
-        return x.transpose(0, 1), attn, position_bias
-        
-
-    @staticmethod
-    def _append_prev_key_padding_mask(
-            key_padding_mask: Optional[Tensor],
-            prev_key_padding_mask: Optional[Tensor],
-            batch_size: int,
-            src_len: int,
-            static_kv: bool,
-    ) -> Optional[Tensor]:
-        # saved key padding masks have shape (bsz, seq_len)
-        if prev_key_padding_mask is not None and static_kv:
-            new_key_padding_mask = prev_key_padding_mask
-        elif prev_key_padding_mask is not None and key_padding_mask is not None:
-            new_key_padding_mask = torch.cat(
-                [prev_key_padding_mask.float(), key_padding_mask.float()], dim=1
-            )
-        # During incremental decoding, as the padding token enters and
-        # leaves the frame, there will be a time when prev or current
-        # is None
-        elif prev_key_padding_mask is not None:
-            if src_len > prev_key_padding_mask.size(1):
-                filler = torch.zeros(
-                    (batch_size, src_len - prev_key_padding_mask.size(1)),
-                    device=prev_key_padding_mask.device,
-                )
-                new_key_padding_mask = torch.cat(
-                    [prev_key_padding_mask.float(), filler.float()], dim=1
-                )
-            else:
-                new_key_padding_mask = prev_key_padding_mask.float()
-        elif key_padding_mask is not None:
-            if src_len > key_padding_mask.size(1):
-                filler = torch.zeros(
-                    (batch_size, src_len - key_padding_mask.size(1)),
-                    device=key_padding_mask.device,
-                )
-                new_key_padding_mask = torch.cat(
-                    [filler.float(), key_padding_mask.float()], dim=1
-                )
-            else:
-                new_key_padding_mask = key_padding_mask.float()
-        else:
-            new_key_padding_mask = prev_key_padding_mask
-        return new_key_padding_mask
-
-    def _get_input_buffer(
-            self, incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]]
-    ) -> Dict[str, Optional[Tensor]]:
-        result = self.get_incremental_state(incremental_state, "attn_state")
-        if result is not None:
-            return result
-        else:
-            empty_result: Dict[str, Optional[Tensor]] = {}
-            return empty_result
-
-    def _set_input_buffer(
-            self,
-            incremental_state: Dict[str, Dict[str, Optional[Tensor]]],
-            buffer: Dict[str, Optional[Tensor]],
-    ):
-        return self.set_incremental_state(incremental_state, "attn_state", buffer)
-
-    def apply_sparse_mask(self, attn_weights, tgt_len: int, src_len: int, bsz: int):
-        return attn_weights
+        # Convert back to batch-first
+        return (x.transpose(0, 1), attn, position_bias)
 
 
 class FeedForward(Module):
