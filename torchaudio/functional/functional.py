@@ -489,13 +489,13 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
         barks (float): Frequency in Barks
     """
 
-    if bark_scale not in ["Schroeder","traunmuller", "wang"]:
+    if bark_scale not in ["Schroeder", "traunmuller", "wang"]:
         raise ValueError('bark_scale should be one of "Schroeder", "traunmuller" or "wang".')
 
     if bark_scale == "wang":
-        return 6.0 * math.asinh(freq/600.0)
+        return 6.0 * math.asinh(freq / 600.0)
     elif bark_scale == "Schroeder":
-        return 7.0 * math.asinh(freq/650.0)
+        return 7.0 * math.asinh(freq / 650.0)
     
     barks = ((26.81 * freq) / (1960.0 + freq)) - 0.53
     
@@ -503,7 +503,7 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
     if barks < 2:
         barks += 0.15 * (2 - barks)
     elif barks > 20.1:
-        barks += 0.22*(barks - 20.1)
+        barks += 0.22 * (barks - 20.1)
 
     return barks
 
@@ -519,23 +519,23 @@ def _bark_to_hz(barks: Tensor, bark_scale: str = "traunmuller") -> Tensor:
         freqs (Tensor): Barks converted in Hz
     """
 
-    if bark_scale not in ["Schroeder","traunmuller", "wang"]:
+    if bark_scale not in ["Schroeder", "traunmuller", "wang"]:
         raise ValueError('bark_scale should be one of "traunmuller", "Schroeder" or "wang".')
 
     if bark_scale == "wang":
-        return 600.0 * math.sinh(barks/6.0)
+        return 600.0 * math.sinh(barks / 6.0)
     elif bark_scale == "Schroeder":
-        return 650.0 * math.sinh(barks/7.0)
+        return 650.0 * math.sinh(barks / 7.0)
     
     # Bark value correction
     if any(barks < 2):
         idx = barks < 2
-        barks[idx] = (barks[idx] - 0.3)/0.85
+        barks[idx] = (barks[idx] - 0.3) / 0.85
     elif any(barks > 20.1):
         idx = barks > 20.1
-        barks[idx] = (barks[idx] + 4.422)/1.22
+        barks[idx] = (barks[idx] + 4.422) / 1.22
 
-    freqs = 1960 * ((barks + 0.53)/(26.28 - barks))
+    freqs = 1960 * ((barks + 0.53) / (26.28 - barks))
 
     return freqs
 
