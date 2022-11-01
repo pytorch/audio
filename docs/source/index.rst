@@ -80,6 +80,7 @@ model implementations and application components.
    prototype.functional
    prototype.models
    prototype.pipelines
+   prototype.transforms
 
 .. toctree::
    :maxdepth: 1
