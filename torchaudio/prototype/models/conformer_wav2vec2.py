@@ -1,6 +1,7 @@
 from typing import List, Optional, Tuple, Union
 
 import torch
+
 from torch import nn, Tensor
 from torch.nn import Module
 from torchaudio.models import Wav2Vec2Model
@@ -9,8 +10,8 @@ from torchaudio.models.rnnt import _TimeReduction
 from torchaudio.models.wav2vec2 import components
 
 
-class FeatureEncoder(Module):
-    """Feature Encoder class, consisting of time reduction and linear layer.
+class TimeReduction(Module):
+    """Extract features from input. Consists of time reduction and linear layer.
 
     Args:
         stride (int): number of frames to merge for the output frame
@@ -18,7 +19,7 @@ class FeatureEncoder(Module):
         output_dim (int): output dimension of the tensor
     """
 
-    def __init__(self, input_dim: int, output_dim: int, stride: int):
+    def __init__(self, stride: int, input_dim: int, output_dim: int):
         super().__init__()
         self.time_reduction_layer = _TimeReduction(stride=stride)
         self.linear_layer = nn.Linear(input_dim * stride, output_dim)
@@ -26,31 +27,20 @@ class FeatureEncoder(Module):
     def forward(
         self,
         x: Tensor,
-        lengths: Optional[Tensor],
+        length: Optional[Tensor],
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            x (Tensor): Feature Tensor representing log Mel Spectrogram output. shape ``(B, T, D)``.
-            lengths (Tensor or None):
-                Valid length of each input sample. shape: ``(B, )``.
-
-        Returns:
-            (Tensor, Optional[Tensor]):
-                Tensor: output sequence after undergoing time reduction and linear projection.
-                    Shape ``(B, T // stride, D * stride)
-                Optional[Tensor]: output lengths of shape ``(B,)`` if lengths parameter is provided,
-                    otherwise `None`.
+            x (Tensor):
+                Input Tensor representing Mel Spectrogram output. shape ``[batch, frame, dim]``.
+            length (Tensor or None, optional):
+                Valid length of each input sample. shape: ``[batch, ]``.
         """
-        if lengths is None:
-            B, T, D = x.shape
-            dummy_lengths = torch.full((B,), T)
-            x, _ = self.time_reduction_layer(x, dummy_lengths)
-            x = self.linear_layer(x)
-            return x, None
-
-        x, lengths = self.time_reduction_layer(x, lengths)
+        # TODO: case if length is none?
+        if length is not None:
+            x, length = self.time_reduction_layer(x, length)
         x = self.linear_layer(x)
-        return x, lengths
+        return x, length
 
 
 class ConformerEncoder(Module):
@@ -84,7 +74,18 @@ class ConformerEncoder(Module):
             mask = None
         return x, mask
 
-    def _get_intermediate_outputs(
+    def forward(
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
+    ) -> Tensor:
+        x, mask = self._preprocess(features, lengths)
+        x = x.transpose(0, 1)
+        for layer in self.conformer:
+            x = layer(x, mask)
+        return x.transpose(0, 1)
+
+    def get_intermediate_outputs(
         self,
         x: Tensor,
         mask: Optional[Tensor] = None,
@@ -104,43 +105,14 @@ class ConformerEncoder(Module):
                 return ret
         return ret
 
-    def forward(
-        self,
-        features: Tensor,
-        lengths: Optional[Tensor] = None,
-    ) -> Tensor:
-        """
-        Args:
-            features (Tensor): Tensor of features of shape ``(B, T, D)``
-            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.
-
-        Returns:
-            Tensor: result after applying conformer encoder to features.
-        """
-        x, mask = self._preprocess(features, lengths)
-        x = x.transpose(0, 1)
-        for layer in self.conformer:
-            x = layer(x, mask)
-        return x.transpose(0, 1)
-
     def extract_features(
         self,
         features: Tensor,
         lengths: Optional[Tensor] = None,
         num_layers: Optional[int] = None,
     ) -> List[Tensor]:
-        """Returns the list of outputs from the intermediate layers of conformer block in the encoder.
-
-        Args:
-            features (Tensor): Tensor of features of shape ``(B, T, D)``
-            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.
-
-        Returns:
-            List[Tensor]:
-                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`
-        """
         x, masks = self._preprocess(features, lengths)
-        return self._get_intermediate_outputs(x, mask=masks, num_layers=num_layers)
+        return self.get_intermediate_outputs(x, mask=masks, num_layers=num_layers)
 
 
 class ConformerWav2Vec2PretrainModel(Module):
@@ -200,7 +172,7 @@ def _get_conformer_feature_extractor(
     input_dim: int,
     output_dim: int,
     stride: int,
-) -> FeatureEncoder:
+) -> TimeReduction:
     """Construct Feature Extractor
 
     Args:
@@ -208,10 +180,10 @@ def _get_conformer_feature_extractor(
         output_dim (int): Output dimension after feature extraction
         stride (int): Stride used in Time Reduction layer of feature extractor
 
-    Returns:
-        FeatureEncoder: The resulting feature extraction
+    Result:
+        TimeReduction: The resulting feature extraction
     """
-    return FeatureEncoder(input_dim, output_dim, stride)
+    return TimeReduction(stride, input_dim, output_dim)
 
 
 def _get_conformer_encoder(
