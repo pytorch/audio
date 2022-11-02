@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221101) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221102) &#x25BC</a>
     </div>
     
 
@@ -263,6 +263,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -375,6 +382,7 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
+<span class="kn">from</span> <span class="nn">torchaudio.utils.sox_utils</span> <span class="kn">import</span> <span class="n">get_buffer_size</span>
 
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
@@ -462,12 +470,13 @@
             <span class="c1"># The previous libsox-based implementation required `format=&quot;mp3&quot;`</span>
             <span class="c1"># because internally libsox does not auto-detect the format.</span>
             <span class="c1"># For the special BC for mp3, we handle mp3 differently.</span>
+            <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">get_buffer_size</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
             <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -581,14 +590,31 @@
             <span class="c1"># The previous libsox-based implementation required `format=&quot;mp3&quot;`</span>
             <span class="c1"># because internally libsox does not auto-detect the format.</span>
             <span class="c1"># For the special BC for mp3, we handle mp3 differently.</span>
+            <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">get_buffer_size</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span>
+                    <span class="n">filepath</span><span class="p">,</span>
+                    <span class="n">frame_offset</span><span class="p">,</span>
+                    <span class="n">num_frames</span><span class="p">,</span>
+                    <span class="n">normalize</span><span class="p">,</span>
+                    <span class="n">channels_first</span><span class="p">,</span>
+                    <span class="nb">format</span><span class="p">,</span>
+                    <span class="n">buffer_size</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
                 <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">ret</span>
-            <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span>
+                <span class="n">filepath</span><span class="p">,</span>
+                <span class="n">frame_offset</span><span class="p">,</span>
+                <span class="n">num_frames</span><span class="p">,</span>
+                <span class="n">normalize</span><span class="p">,</span>
+                <span class="n">channels_first</span><span class="p">,</span>
+                <span class="nb">format</span><span class="p">,</span>
+                <span class="n">buffer_size</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
@@ -756,12 +782,26 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
             <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">save_audio_fileobj</span><span class="p">(</span>
-                <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span>
+                <span class="n">filepath</span><span class="p">,</span>
+                <span class="n">src</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="p">,</span>
+                <span class="n">channels_first</span><span class="p">,</span>
+                <span class="n">compression</span><span class="p">,</span>
+                <span class="nb">format</span><span class="p">,</span>
+                <span class="n">encoding</span><span class="p">,</span>
+                <span class="n">bits_per_sample</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">return</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_save_audio_file</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">src</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="p">,</span>
+        <span class="n">compression</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 
@@ -836,7 +876,7 @@
       });
   </script>
     <script type="text/javascript">
-    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials']
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
     </script>
      
     <script type="text/javascript">

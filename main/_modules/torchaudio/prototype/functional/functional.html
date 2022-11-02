@@ -208,7 +208,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221101) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221102) &#x25BC</a>
     </div>
     
 
@@ -263,6 +263,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -411,7 +418,7 @@
 <span class="sd">        x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">        y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
 <span class="sd">            (leading dimensions must match those of ``x``).</span>
-<span class="sd">        mode (bool, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
+<span class="sd">        mode (str, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
 
 <span class="sd">            * &quot;full&quot;: Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)</span>
 <span class="sd">            * &quot;valid&quot;: Returns the segment of the full convolution result corresponding to where</span>
@@ -447,7 +454,7 @@
 <span class="sd">        x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">        y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
 <span class="sd">            (leading dimensions must match those of ``x``).</span>
-<span class="sd">        mode (bool, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
+<span class="sd">        mode (str, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
 
 <span class="sd">            * &quot;full&quot;: Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)</span>
 <span class="sd">            * &quot;valid&quot;: Returns the segment of the full convolution result corresponding to where</span>
@@ -612,7 +619,7 @@
       });
   </script>
     <script type="text/javascript">
-    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials']
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
     </script>
      
     <script type="text/javascript">
