@@ -485,17 +485,17 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
 
     Args:
         freqs (float): Frequencies in Hz
-        bark_scale (str, optional): Scale to use: ``traunmuller``, ``Schroeder`` or ``wang``. (Default: ``traunmuller``)
+        bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
     Returns:
         barks (float): Frequency in Barks
     """
 
-    if bark_scale not in ["Schroeder", "traunmuller", "wang"]:
-        raise ValueError('bark_scale should be one of "Schroeder", "traunmuller" or "wang".')
+    if bark_scale not in ["schroeder", "traunmuller", "wang"]:
+        raise ValueError('bark_scale should be one of "schroeder", "traunmuller" or "wang".')
 
     if bark_scale == "wang":
         return 6.0 * math.asinh(freq / 600.0)
-    elif bark_scale == "Schroeder":
+    elif bark_scale == "schroeder":
         return 7.0 * math.asinh(freq / 650.0)
     # Traunmuller Bark scale
     barks = ((26.81 * freq) / (1960.0 + freq)) - 0.53
@@ -513,19 +513,19 @@ def _bark_to_hz(barks: Tensor, bark_scale: str = "traunmuller") -> Tensor:
 
     Args:
         barks (Tensor): Bark frequencies
-        bark_scale (str, optional): Scale to use: ``traunmuller``,``Schroeder`` or ``wang``. (Default: ``traunmuller``)
+        bark_scale (str, optional): Scale to use: ``traunmuller``,``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Returns:
         freqs (Tensor): Barks converted in Hz
     """
 
-    if bark_scale not in ["Schroeder", "traunmuller", "wang"]:
-        raise ValueError('bark_scale should be one of "traunmuller", "Schroeder" or "wang".')
+    if bark_scale not in ["schroeder", "traunmuller", "wang"]:
+        raise ValueError('bark_scale should be one of "traunmuller", "schroeder" or "wang".')
 
     if bark_scale == "wang":
-        return 600.0 * math.sinh(barks / 6.0)
-    elif bark_scale == "Schroeder":
-        return 650.0 * math.sinh(barks / 7.0)
+        return 600.0 * torch.sinh(barks / 6.0)
+    elif bark_scale == "schroeder":
+        return 650.0 * torch.sinh(barks / 7.0)
     # Bark value correction
     if any(barks < 2):
         idx = barks < 2
@@ -567,7 +567,7 @@ def barkscale_fbanks(
         f_max (float): Maximum frequency (Hz)
         n_barks (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        bark_scale (str, optional): Scale to use: ``traunmuller``,``Schroeder`` or ``wang``. (Default: ``traunmuller``)
+        bark_scale (str, optional): Scale to use: ``traunmuller``,``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Returns:
         Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_barks``)

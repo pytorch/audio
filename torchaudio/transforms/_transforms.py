@@ -664,7 +664,7 @@ class BarkScale(torch.nn.Module):
         n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
         norm (str or None, optional): If ``"slaney"``, divide the triangular bark weights by the width of the bark band
             (area normalization). (Default: ``None``)
-        bark_scale (str, optional): Scale to use: ``traunmuller``, ``Schroeder`` or ``wang``. (Default: ``traunmuller``)
+        bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -734,7 +734,7 @@ class InverseBarkScale(torch.nn.Module):
         tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
-        bark_scale (str, optional): Scale to use: ``traunmuller``, ``Schroeder`` or ``wang``. (Default: ``traunmuller``)
+        bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -868,7 +868,7 @@ class BarkSpectrogram(torch.nn.Module):
             (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
             :attr:`center` is ``True``. (Default: ``"reflect"``)
-        bark_scale (str, optional): Scale to use: ``traunmuller``, ``Schroeder`` or ``wang``. (Default: ``traunmuller``)
+        bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
