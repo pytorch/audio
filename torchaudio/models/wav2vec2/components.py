@@ -1,6 +1,6 @@
 import logging
 import math
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 import torch
 from torch import nn, Tensor
@@ -330,8 +330,8 @@ class WavLMSelfAttention(nn.Module):
         num_heads: The number of heads.
         dropout: Dropout probability on attn_output_weights.
         bias: If ``True``, add bias to projections for queries and values.
-        has_relative_attention_bias: If ``True``, apply relative position embedding. Necessary in the first encoder layer, 
-        but not in the subsequent ones.
+        has_relative_attention_bias: If ``True``, apply relative position embedding. Necessary in the first encoder
+        layer, but not in the subsequent ones.
         num_buckets: Number of buckets for relative position embedding.
         max_distance: Naximum distance for relative position embedding.
         gru_rel_pos: If ``True``, apply gated relative position embedding.
