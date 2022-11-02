@@ -11,6 +11,8 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
+    wavlm_base,
+    wavlm_large,
 )
 from torchaudio_unittest.common_utils import skipIfNoCuda, skipIfNoQengine, torch_script, TorchaudioTestCase
 
@@ -33,6 +35,8 @@ factory_funcs = parameterized.expand(
         (hubert_base,),
         (hubert_large,),
         (hubert_xlarge,),
+        (wavlm_base,),
+        (wavlm_large,),
     ],
     name_func=_name_func,
 )
@@ -107,6 +111,11 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @factory_funcs
     def test_extract_feature(self, factory_func):
         """`extract_features` method does not fail"""
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self.skipTest("WavLM doesn't support lengths")
         self._feature_extractor_test(factory_func(aux_num_out=32))
 
     def _test_batch_consistency(self, model):
@@ -128,15 +137,45 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             # We allow max atol=0.005 -> 0.5%
             self.assertEqual(single_prob, batch_prob, atol=0.005, rtol=0)
 
+    def _test_batch_consistency_wavlm(self, model):
+        model.eval()
+        batch_size, max_frames = 5, 5 * 1024
+        waveforms = torch.randn(batch_size, max_frames)
+
+        # Batch process with lengths
+        batch_logits, _ = model(waveforms)
+        for i in range(batch_size):
+            # Par-sample process without feeding length
+            single_logit, _ = model(waveforms[i : i + 1])
+            batch_logit = batch_logits[i : i + 1]
+
+            # Convert to probability so that it's easier to interpretate the diff
+            single_prob = F.softmax(single_logit, dim=2)
+            batch_prob = F.softmax(batch_logit, dim=2)
+            # We allow max atol=0.005 -> 0.5%
+            self.assertEqual(single_prob, batch_prob, atol=0.005, rtol=0)
+
     @factory_funcs
     def test_pretrain_batch_consistency(self, factory_func):
         """Results from single process and batched process should be reasonably close"""
-        self._test_batch_consistency(factory_func())
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self._test_batch_consistency_wavlm(factory_func())
+        else:
+            self._test_batch_consistency(factory_func())
 
     @factory_funcs
     def test_finetune_batch_consistency(self, factory_func):
         """Results from single process and batched process should be reasonably close"""
-        self._test_batch_consistency(factory_func(aux_num_out=32))
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self._test_batch_consistency_wavlm(factory_func(aux_num_out=32))
+        else:
+            self._test_batch_consistency(factory_func(aux_num_out=32))
 
     def _test_zero_length(self, model):
         model.eval()
@@ -151,11 +190,21 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @factory_funcs
     def test_pretrain_zero_length(self, factory_func):
         """Passing zero length should not fail"""
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self.skipTest("WavLM doesn't support lengths")
         self._test_zero_length(factory_func())
 
     @factory_funcs
     def test_finetune_zero_length(self, factory_func):
         """Passing zero length should not fail"""
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self.skipTest("WavLM doesn't support lengths")
         self._test_zero_length(factory_func(aux_num_out=32))
 
     def _test_torchscript(self, model):
@@ -181,6 +230,22 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         self.assertEqual(hyp_out, ref_out)
         self.assertEqual(hyp_len, ref_len)
 
+    def _test_torchscript_wavlm(self, model):
+        model.eval()
+
+        batch_size, num_frames = 3, 1024
+
+        waveforms = torch.randn(batch_size, num_frames)
+
+        ref_out, ref_len = model(waveforms)
+
+        scripted = torch_script(model)
+
+        hyp_out, hyp_len = scripted(waveforms)
+
+        self.assertEqual(hyp_out, ref_out)
+        self.assertEqual(hyp_len, ref_len)
+
     @factory_funcs
     def test_pretrain_torchscript(self, factory_func):
         """Wav2Vec2Model should be scriptable"""
@@ -188,7 +253,13 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             self.skipTest(
                 "hubert_xlarge is known to fail on CI. " "See https://github.com/pytorch/pytorch/issues/65776"
             )
-        self._test_torchscript(factory_func())
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self._test_torchscript_wavlm(factory_func())
+        else:
+            self._test_torchscript(factory_func())
 
     @factory_funcs
     def test_finetune_torchscript(self, factory_func):
@@ -197,7 +268,13 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             self.skipTest(
                 "hubert_xlarge is known to fail on CI. " "See https://github.com/pytorch/pytorch/issues/65776"
             )
-        self._test_torchscript(factory_func(aux_num_out=32))
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self._test_torchscript_wavlm(factory_func(aux_num_out=32))
+        else:
+            self._test_torchscript(factory_func(aux_num_out=32))
 
     def _test_quantize_smoke_test(self, model):
         model.eval()

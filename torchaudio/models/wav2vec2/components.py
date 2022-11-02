@@ -1,11 +1,10 @@
 import logging
-from typing import List, Optional, Tuple, Union
 import math
+from typing import List, Optional, Tuple, Union
 
 import torch
 from torch import nn, Tensor
-from torch.nn import Module, Parameter
-from torch.nn import functional as F
+from torch.nn import functional as F, Module, Parameter
 
 _LG = logging.getLogger(__name__)
 
@@ -275,14 +274,16 @@ class SelfAttention(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
-        **kwargs,
-    ) -> Tensor:
+        position_bias: Optional[Tensor] = None,
+        key_padding_mask: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
             x (Tensor): shape: ``[batch_size, sequence_length, embed_dim]``.
             attention_mask (Tensor or None, optional):
                 shape: ``[batch_size, 1, sequence_length, sequence_length]``
-
+            position_bias: has to be ``None``, necessary for compatibility with WavLMSelfAttention.
+            key_padding_mask: has to be ``None``, necessary for compatibility with WavLMSelfAttention.
         Returns:
             Tensor: The resulting tensor. shape: ``[batch, sequence_length, embed_dim]``
         """
@@ -317,7 +318,7 @@ class SelfAttention(Module):
         output = output.transpose(2, 1).reshape(batch_size, length, embed_dim)
 
         output = self.out_proj(output)
-        return output
+        return output, None  # Necessary for compatibility with WavLMSelAttention
 
 
 class WavLMSelfAttention(nn.Module):
@@ -329,7 +330,8 @@ class WavLMSelfAttention(nn.Module):
         num_heads: The number of heads.
         dropout: Dropout probability on attn_output_weights.
         bias: If ``True``, add bias to projections for queries and values.
-        has_relative_attention_bias: If ``True``, apply relative position embedding.
+        has_relative_attention_bias: If ``True``, apply relative position embedding. Necessary in the first encoder layer, 
+        but not in the subsequent ones.
         num_buckets: Number of buckets for relative position embedding.
         max_distance: Naximum distance for relative position embedding.
         gru_rel_pos: If ``True``, apply gated relative position embedding.
@@ -355,8 +357,7 @@ class WavLMSelfAttention(nn.Module):
         self.has_relative_attention_bias = has_relative_attention_bias
         self.num_buckets = num_buckets
         self.max_distance = max_distance
-        if self.has_relative_attention_bias:
-            self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
+        self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
 
         self.head_dim = embed_dim // num_heads
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
@@ -371,8 +372,9 @@ class WavLMSelfAttention(nn.Module):
         if self.gru_rel_pos:
             self.gru_rel_pos_linear = nn.Linear(self.head_dim, 8)
             self.gru_rel_pos_const = nn.Parameter(torch.ones(1, num_heads, 1, 1))
+        self.has_position_bias = True
 
-    def compute_bias(self, query_length, key_length):
+    def compute_bias(self, query_length: int, key_length: int):
         context_position = torch.arange(query_length, dtype=torch.long)[:, None]
         memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
         relative_position = memory_position - context_position
@@ -382,10 +384,11 @@ class WavLMSelfAttention(nn.Module):
         values = values.permute([2, 0, 1])
         return values
 
-    def _relative_positions_bucket(self, relative_positions, bidirectional=True):
+    def _relative_positions_bucket(self, relative_positions: Tensor, bidirectional: bool = True):
         num_buckets = self.num_buckets
         max_distance = self.max_distance
-        relative_buckets = 0
+        # Shape (query_length, key_length)
+        relative_buckets = torch.zeros_like(relative_positions, dtype=torch.long)
 
         if bidirectional:
             num_buckets = num_buckets // 2
@@ -413,26 +416,22 @@ class WavLMSelfAttention(nn.Module):
         self,
         query: Tensor,
         key_padding_mask: Optional[Tensor] = None,
-        need_weights: bool = False,
         attention_mask: Optional[Tensor] = None,
         position_bias: Optional[Tensor] = None,
-    ) -> Union[Tensor, Tuple[Tensor, Tensor]]:
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
             query: input of shape `(batch_size, src_len, embed_dim)`.
             key_padding_mask: mask to exclude
                 keys that are pads, of shape `(batch, src_len)`, where
                 padding elements are indicated by 1s.
-            need_weights: return the attention weights,
-                averaged over heads.
             attn_mask: needs to be `None`. The argument exists for compatibility with `EncoderLayer`.
             position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`.
                 When used inside WavLM model encoder, will be generated in the first layer and then passed from each
                 encoder layer to the next one.
         Returns:
             x: attention output of shape `(batch_size, src_len, embed_dim)`
-            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. Only returned if
-            `need_weights` is `True`
+            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`.
         """
         bsz, seq_len, embed_dim = query.size()
         assert embed_dim == self.embed_dim
@@ -442,7 +441,7 @@ class WavLMSelfAttention(nn.Module):
             position_bias = self.compute_bias(seq_len, seq_len)
             position_bias = position_bias.unsqueeze(0).repeat(bsz, 1, 1, 1).view(bsz * self.num_heads, seq_len, seq_len)
 
-        attn_mask_rel_pos = None
+        attn_mask_rel_pos: Optional[Tensor] = None
         if position_bias is not None:
             attn_mask_rel_pos = position_bias
             if self.gru_rel_pos:  # Apply gating on relative position bias
@@ -462,7 +461,7 @@ class WavLMSelfAttention(nn.Module):
         query = query.transpose(
             0, 1
         )  # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
-        x, attn = F.multi_head_attention_forward(
+        x, _ = F.multi_head_attention_forward(
             query,
             query,
             query,
@@ -486,8 +485,6 @@ class WavLMSelfAttention(nn.Module):
             v_proj_weight=self.v_proj.weight,
         )
         x = x.transpose(0, 1)  # Convert back to batch-first
-        if need_weights:
-            return x, attn, position_bias
         return x, position_bias
 
 
@@ -545,26 +542,27 @@ class EncoderLayer(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
-        **kwargs,
-    ):
+        position_bias: Optional[Tensor] = None,
+        key_padding_mask: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
             x (Tensor): shape: `(batch, sequence_length, embed_dim)`
             attention_mask (Tensor or None, optional):
             shape: `(batch, 1, sequence_length, sequence_length)`
-            kwargs: necessary to make this class compatible with both `Wav2Vec2` and `WavLM` models,
-                    since the latter passes position bias as an additional argument
+            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`.
+            Only necessary for WavLM model, `None` otherwise
+            key_padding_mask: key padding mask of shape `(batch_size, src_len)`. Only used for WavLM model,
+            ignored otherwise
         """
         residual = x
 
         if self.layer_norm_first:
             x = self.layer_norm(x)
 
-        attention_output = self.attention(x, attention_mask=attention_mask, **kwargs)
-        if isinstance(attention_output, tuple):
-            x, position_bias = attention_output
-        else:
-            x, position_bias = attention_output, None
+        x, position_bias = self.attention(
+            x, attention_mask=attention_mask, position_bias=position_bias, key_padding_mask=key_padding_mask
+        )
 
         x = self.dropout(x)
         x = residual + x
@@ -574,8 +572,6 @@ class EncoderLayer(Module):
         else:
             x = self.layer_norm(x)
             x = self.final_layer_norm(x + self.feed_forward(x))
-        if position_bias is None:
-            return x
         return x, position_bias
 
 
@@ -610,7 +606,7 @@ class Transformer(Module):
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
         position_bias: Optional[Tensor] = None,
-    ):
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         x = self._preprocess(x)
         for layer in self.layers:
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
@@ -622,8 +618,6 @@ class Transformer(Module):
 
         if not self.layer_norm_first:
             x = self.layer_norm(x)
-        if position_bias is None:
-            return x
         return x, position_bias
 
     def get_intermediate_outputs(
@@ -639,7 +633,7 @@ class Transformer(Module):
         ret: List[Tensor] = []
         x = self._preprocess(x)
         for layer in self.layers:
-            x = layer(x, attention_mask)
+            x, *_ = layer(x, attention_mask)
             ret.append(x)
             if num_layers is not None and len(ret) >= num_layers:
                 return ret
@@ -678,7 +672,7 @@ class Encoder(Module):
         self,
         features: Tensor,
         lengths: Optional[Tensor] = None,
-    ) -> Tensor:
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         x, mask = self._preprocess(features, lengths)
         x = self.transformer(x, attention_mask=mask)
         return x
@@ -971,10 +965,8 @@ def _get_encoder_wavlm(
         pos_conv_groups (int): See :py:func:`_get_encoder`.
         num_layers (int): See :py:func:`_get_encoder`.
         num_heads (int): See :py:func:`_get_encoder`.
-        num_buckets (int):
-            Number of buckets for relative position embedding.
-        max_distance (int):
-            Maximum distance for relative position embedding.
+        num_buckets (int): Number of buckets for relative position embedding.
+        max_distance (int): Maximum distance for relative position embedding.
         attention_dropout (float): See :py:func:`_get_encoder`.
         ff_interm_features (int): See :py:func:`_get_encoder`.
         ff_interm_dropout (float): See :py:func:`_get_encoder`.

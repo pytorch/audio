@@ -8,14 +8,14 @@ from .model import (
     hubert_pretrain_xlarge,
     hubert_xlarge,
     HuBERTPretrainModel,
-    wavlm_model,
-    wavlm_base,
-    wavlm_large,
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
     wav2vec2_model,
     Wav2Vec2Model,
+    wavlm_base,
+    wavlm_large,
+    wavlm_model,
 )
 
 __all__ = [

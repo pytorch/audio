@@ -4,7 +4,7 @@ import logging
 
 from torch.nn import Module
 
-from ..model import wav2vec2_model, wavlm_model, Wav2Vec2Model
+from ..model import wav2vec2_model, Wav2Vec2Model, wavlm_model
 
 _LG = logging.getLogger(__name__)
 
@@ -71,7 +71,11 @@ def _build(config, original):
         imported = wav2vec2_model(**config, aux_num_out=aux_num_out)
     imported.feature_extractor.load_state_dict(wav2vec2.feature_extractor.state_dict())
     imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
-    imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict())
+    # For WavLM we have rel_attn_embed in each layer. It is actually necessary only in the first layer,
+    # but TorchScript requires it to be either present or not present everywhere as a class attribute.
+    # So there is a mismatch between HF weights and our weights, which we solvt by making state loading "not strict":
+    # The unused rel_attn_embed weights won't be loaded from a HF model
+    imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict(), strict=not is_wavlm)
     if is_for_ctc:
         imported.aux.load_state_dict(original.lm_head.state_dict())
     return imported

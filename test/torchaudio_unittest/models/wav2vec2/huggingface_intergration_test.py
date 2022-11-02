@@ -77,7 +77,7 @@ class TestHFIntegration(TorchaudioTestCase):
         # However, somehow, once "transformers" is imported, `is_module_available`
         # starts to fail. Therefore, we defer importing "transformers" until
         # the actual tests are started.
-        from transformers import Wav2Vec2Config, Wav2Vec2ForCTC, Wav2Vec2Model, WavLMModel, WavLMConfig
+        from transformers import Wav2Vec2Config, Wav2Vec2ForCTC, Wav2Vec2Model, WavLMConfig, WavLMModel
 
         if config["architectures"] == ["Wav2Vec2Model"]:
             return Wav2Vec2Model(Wav2Vec2Config(**config))
@@ -108,15 +108,14 @@ class TestHFIntegration(TorchaudioTestCase):
             b, l, e = 16, 3, config["hidden_size"]
             x = torch.randn(b, l, e)
             mask = torch.randn(b, 1, l, l)
-
             (ref,) = original_(x, attention_mask=mask, output_attentions=False)
-            hyp = imported_(x, mask)
+            hyp, *_ = imported_(x, mask)
             self.assertEqual(ref, hyp)
         # The whole Encoder Transformer
         b, l, e = 16, 3, config["hidden_size"]
         x = torch.randn(b, l, e)
         ref = original.encoder(x).last_hidden_state
-        hyp = imported.encoder.transformer(x)
+        hyp, *_ = imported.encoder.transformer(x)
         self.assertEqual(ref, hyp)
 
     def _test_import_pretrain_wavlm(self, original, imported, config):
