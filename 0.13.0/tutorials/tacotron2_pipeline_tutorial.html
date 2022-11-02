@@ -267,6 +267,13 @@
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
@@ -547,28 +554,30 @@ fetched.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/63.6M [00:00&lt;?, ?B/s]
-  0%|          | 56.0k/63.6M [00:00&lt;03:28, 319kB/s]
-  0%|          | 256k/63.6M [00:00&lt;01:23, 798kB/s]
-  2%|1         | 1.06M/63.6M [00:00&lt;00:25, 2.59MB/s]
-  6%|5         | 3.66M/63.6M [00:00&lt;00:08, 7.53MB/s]
- 11%|#         | 6.75M/63.6M [00:00&lt;00:05, 11.3MB/s]
- 16%|#5        | 9.95M/63.6M [00:01&lt;00:04, 13.8MB/s]
- 21%|##        | 13.3M/63.6M [00:01&lt;00:03, 15.7MB/s]
- 26%|##6       | 16.7M/63.6M [00:01&lt;00:02, 16.9MB/s]
- 32%|###1      | 20.2M/63.6M [00:01&lt;00:02, 18.0MB/s]
- 37%|###7      | 23.6M/63.6M [00:01&lt;00:01, 21.4MB/s]
- 41%|####      | 25.8M/63.6M [00:01&lt;00:02, 18.8MB/s]
- 46%|####6     | 29.5M/63.6M [00:02&lt;00:01, 19.9MB/s]
- 52%|#####2    | 33.3M/63.6M [00:02&lt;00:01, 20.6MB/s]
- 58%|#####8    | 37.2M/63.6M [00:02&lt;00:01, 21.1MB/s]
- 65%|######4   | 41.1M/63.6M [00:02&lt;00:01, 21.6MB/s]
- 71%|#######   | 44.9M/63.6M [00:02&lt;00:00, 25.3MB/s]
- 75%|#######4  | 47.5M/63.6M [00:02&lt;00:00, 22.2MB/s]
- 80%|########  | 51.1M/63.6M [00:03&lt;00:00, 21.9MB/s]
- 87%|########6 | 55.2M/63.6M [00:03&lt;00:00, 22.5MB/s]
- 93%|#########3| 59.4M/63.6M [00:03&lt;00:00, 23.0MB/s]
-100%|#########9| 63.6M/63.6M [00:03&lt;00:00, 23.4MB/s]
-100%|##########| 63.6M/63.6M [00:03&lt;00:00, 18.5MB/s]
+  0%|          | 56.0k/63.6M [00:00&lt;03:29, 319kB/s]
+  0%|          | 240k/63.6M [00:00&lt;01:29, 746kB/s]
+  2%|1         | 1.00M/63.6M [00:00&lt;00:26, 2.44MB/s]
+  6%|5         | 3.53M/63.6M [00:00&lt;00:07, 8.09MB/s]
+  8%|8         | 5.09M/63.6M [00:00&lt;00:06, 9.36MB/s]
+ 13%|#3        | 8.36M/63.6M [00:00&lt;00:04, 14.4MB/s]
+ 16%|#5        | 10.0M/63.6M [00:01&lt;00:04, 13.9MB/s]
+ 19%|#9        | 12.2M/63.6M [00:01&lt;00:04, 13.1MB/s]
+ 25%|##4       | 15.6M/63.6M [00:01&lt;00:03, 15.5MB/s]
+ 30%|###       | 19.2M/63.6M [00:01&lt;00:02, 17.3MB/s]
+ 36%|###6      | 23.0M/63.6M [00:01&lt;00:02, 18.7MB/s]
+ 42%|####2     | 26.8M/63.6M [00:01&lt;00:01, 19.9MB/s]
+ 48%|####8     | 30.9M/63.6M [00:02&lt;00:01, 20.9MB/s]
+ 55%|#####5    | 35.1M/63.6M [00:02&lt;00:01, 22.1MB/s]
+ 62%|######1   | 39.5M/63.6M [00:02&lt;00:01, 23.0MB/s]
+ 66%|######5   | 41.8M/63.6M [00:02&lt;00:00, 23.4MB/s]
+ 69%|######9   | 44.1M/63.6M [00:02&lt;00:01, 20.0MB/s]
+ 72%|#######2  | 46.0M/63.6M [00:02&lt;00:01, 17.2MB/s]
+ 77%|#######7  | 49.1M/63.6M [00:03&lt;00:00, 17.4MB/s]
+ 82%|########2 | 52.4M/63.6M [00:03&lt;00:00, 18.0MB/s]
+ 88%|########7 | 55.9M/63.6M [00:03&lt;00:00, 18.6MB/s]
+ 93%|#########3| 59.3M/63.6M [00:03&lt;00:00, 19.0MB/s]
+ 99%|#########8| 62.8M/63.6M [00:03&lt;00:00, 19.5MB/s]
+100%|##########| 63.6M/63.6M [00:03&lt;00:00, 17.1MB/s]
 tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
          20, 11, 79, 77, 59, 37,  2]])
 tensor([25], dtype=torch.int32)
@@ -616,18 +625,9 @@ models and processors together so that it is easy to create the pipeline.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 14%|#3        | 14.8M/107M [00:00&lt;00:01, 86.9MB/s]
- 21%|##1       | 23.1M/107M [00:00&lt;00:01, 77.2MB/s]
- 30%|##9       | 32.0M/107M [00:00&lt;00:01, 71.3MB/s]
- 45%|####4     | 48.0M/107M [00:00&lt;00:00, 81.5MB/s]
- 52%|#####1    | 55.9M/107M [00:00&lt;00:00, 81.8MB/s]
- 59%|#####9    | 63.7M/107M [00:00&lt;00:00, 68.6MB/s]
- 65%|######5   | 70.4M/107M [00:01&lt;00:00, 64.5MB/s]
- 73%|#######3  | 78.8M/107M [00:01&lt;00:00, 69.7MB/s]
- 80%|#######9  | 85.6M/107M [00:01&lt;00:00, 62.3MB/s]
- 89%|########9 | 95.7M/107M [00:01&lt;00:00, 66.4MB/s]
- 95%|#########5| 102M/107M [00:01&lt;00:00, 56.6MB/s]
-100%|##########| 107M/107M [00:01&lt;00:00, 60.7MB/s]
+ 37%|###7      | 39.9M/107M [00:00&lt;00:00, 419MB/s]
+ 75%|#######4  | 80.2M/107M [00:00&lt;00:00, 421MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 413MB/s]
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">Tacotron2.infer</span></code> method perfoms multinomial sampling,
@@ -682,7 +682,8 @@ WaveRNN model from the same bundle.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_003.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_003.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
 
   0%|          | 0.00/16.7M [00:00&lt;?, ?B/s]
-100%|##########| 16.7M/16.7M [00:00&lt;00:00, 358MB/s]
+ 89%|########8 | 14.8M/16.7M [00:00&lt;00:00, 81.4MB/s]
+100%|##########| 16.7M/16.7M [00:00&lt;00:00, 65.8MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -724,18 +725,10 @@ method and pass the spectrogram.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_004.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_004.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 14%|#3        | 14.8M/107M [00:00&lt;00:00, 143MB/s]
- 26%|##6       | 28.4M/107M [00:00&lt;00:00, 89.8MB/s]
- 35%|###5      | 38.0M/107M [00:00&lt;00:01, 67.2MB/s]
- 44%|####3     | 46.8M/107M [00:00&lt;00:00, 65.1MB/s]
- 50%|####9     | 53.5M/107M [00:01&lt;00:01, 37.7MB/s]
- 54%|#####4    | 58.3M/107M [00:01&lt;00:01, 37.9MB/s]
- 60%|#####9    | 64.0M/107M [00:01&lt;00:01, 36.9MB/s]
- 74%|#######4  | 79.7M/107M [00:01&lt;00:00, 59.5MB/s]
- 81%|########  | 86.9M/107M [00:01&lt;00:00, 55.4MB/s]
- 89%|########9 | 96.0M/107M [00:01&lt;00:00, 59.0MB/s]
- 95%|#########5| 102M/107M [00:01&lt;00:00, 57.4MB/s]
-100%|##########| 107M/107M [00:02&lt;00:00, 54.4MB/s]
+ 22%|##1       | 23.4M/107M [00:00&lt;00:00, 245MB/s]
+ 44%|####3     | 46.8M/107M [00:00&lt;00:00, 229MB/s]
+ 84%|########3 | 90.1M/107M [00:00&lt;00:00, 328MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 319MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -802,7 +795,7 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  14.457 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  20.936 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9772cbd0af96f57f17a2da758b365a43/tacotron2_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tacotron2_pipeline_tutorial.py</span></code></a></p>
@@ -916,7 +909,7 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
       });
   </script>
     <script type="text/javascript">
-    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials']
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
     </script>
      
     <script type="text/javascript">

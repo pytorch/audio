@@ -267,6 +267,13 @@
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
@@ -865,10 +872,10 @@ resampy: 0.2.2
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_resampling_tutorial_013.png" srcset="../_images/sphx_glr_audio_resampling_tutorial_013.png" alt="audio resampling tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                 librosa  functional  transforms
-sinc (width 64)      NaN        2.24        0.33
-sinc (width 16)      NaN        1.14        0.31
-kaiser_best        84.94        1.94        0.34
-kaiser_fast        10.07        1.59        0.31
+sinc (width 64)      NaN        2.50        0.35
+sinc (width 16)      NaN        1.18        0.33
+kaiser_best        95.47        3.56        1.02
+kaiser_fast        10.56        2.70        1.12
 </pre></div>
 </div>
 </section>
@@ -879,10 +886,10 @@ kaiser_fast        10.07        1.59        0.31
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_resampling_tutorial_014.png" srcset="../_images/sphx_glr_audio_resampling_tutorial_014.png" alt="audio resampling tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                 librosa  functional  transforms
-sinc (width 64)      NaN        0.98        0.68
-sinc (width 16)      NaN        0.48        0.25
-kaiser_best        13.41        1.04        0.72
-kaiser_fast         4.49        0.55        0.28
+sinc (width 64)      NaN        1.05        0.75
+sinc (width 16)      NaN        0.50        0.29
+kaiser_best        13.94        1.22        0.80
+kaiser_fast         4.61        0.66        0.32
 </pre></div>
 </div>
 </section>
@@ -893,10 +900,10 @@ kaiser_fast         4.49        0.55        0.28
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_resampling_tutorial_015.png" srcset="../_images/sphx_glr_audio_resampling_tutorial_015.png" alt="audio resampling tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                 librosa  functional  transforms
-sinc (width 64)      NaN        2.16        0.34
-sinc (width 16)      NaN        1.10        0.32
-kaiser_best        36.78        1.92        0.33
-kaiser_fast        10.17        1.62        0.33
+sinc (width 64)      NaN        2.36        0.35
+sinc (width 16)      NaN        1.15        0.33
+kaiser_best        41.10        1.74        0.33
+kaiser_fast        10.42        1.51        0.32
 </pre></div>
 </div>
 </section>
@@ -907,10 +914,10 @@ kaiser_fast        10.17        1.62        0.33
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_resampling_tutorial_016.png" srcset="../_images/sphx_glr_audio_resampling_tutorial_016.png" alt="audio resampling tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                 librosa  functional  transforms
-sinc (width 64)      NaN        0.54        0.23
-sinc (width 16)      NaN        0.38        0.15
-kaiser_best        13.44        0.59        0.24
-kaiser_fast         4.40        0.43        0.16
+sinc (width 64)      NaN        0.54        0.24
+sinc (width 16)      NaN        0.37        0.16
+kaiser_best        14.10        0.60        0.25
+kaiser_fast         4.68        0.51        0.17
 </pre></div>
 </div>
 </section>
@@ -927,7 +934,7 @@ window values</p></li>
 <li><p>a large GCD between the sample and resample rate will result
 in a simplification that allows for a smaller kernel and faster kernel computation.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.015 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.321 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-resampling-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59ad7db3945dd23dbc0f8d9eef766370/audio_resampling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_resampling_tutorial.py</span></code></a></p>
@@ -1048,7 +1055,7 @@ in a simplification that allows for a smaller kernel and faster kernel computati
       });
   </script>
     <script type="text/javascript">
-    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials']
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
     </script>
      
     <script type="text/javascript">
