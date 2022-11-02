@@ -1246,9 +1246,9 @@ def wavlm_model(
     Args:
         extractor_mode (str): Operation mode of feature extractor.
             See :py:func:`wav2vec2_model`.
-        
+
         extractor_conv_layer_config (list of integer tuples or None):
-            See :py:func:`wav2vec2_model`. 
+            See :py:func:`wav2vec2_model`.
 
         extractor_conv_bias (bool):
             See :py:func:`wav2vec2_model`.

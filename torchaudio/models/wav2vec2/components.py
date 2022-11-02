@@ -336,19 +336,19 @@ class WavLMSelfAttention(nn.Module):
     """
 
     def __init__(
-            self,
-            embed_dim: int,
-            num_heads: int,
-            dropout: float=0.0,
-            bias: bool=True,
-            has_relative_attention_bias: bool=False,
-            num_buckets: int=32,
-            max_distance: int=128,
-            gru_rel_pos: bool=True,
+        self,
+        embed_dim: int,
+        num_heads: int,
+        dropout: float = 0.0,
+        bias: bool = True,
+        has_relative_attention_bias: bool = False,
+        num_buckets: int = 32,
+        max_distance: int = 128,
+        gru_rel_pos: bool = True,
     ):
         super().__init__()
         self.embed_dim = embed_dim
-        
+
         self.num_heads = num_heads
         self.dropout_module = nn.Dropout(dropout)
 
@@ -359,10 +359,8 @@ class WavLMSelfAttention(nn.Module):
             self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
 
         self.head_dim = embed_dim // num_heads
-        assert (
-                self.head_dim * num_heads == self.embed_dim
-        ), "embed_dim must be divisible by num_heads"
-        
+        assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
+
         self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
@@ -378,10 +376,7 @@ class WavLMSelfAttention(nn.Module):
         context_position = torch.arange(query_length, dtype=torch.long)[:, None]
         memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
         relative_position = memory_position - context_position
-        relative_position_bucket = self._relative_positions_bucket(
-            relative_position,
-            bidirectional=True
-        )
+        relative_position_bucket = self._relative_positions_bucket(relative_position, bidirectional=True)
         relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed.weight.device)
         values = self.rel_attn_embed(relative_position_bucket)
         values = values.permute([2, 0, 1])
@@ -403,9 +398,9 @@ class WavLMSelfAttention(nn.Module):
         is_small = relative_positions < max_exact
 
         relative_postion_if_large = max_exact + (
-                torch.log(relative_positions.float() / max_exact)
-                / math.log(max_distance / max_exact)
-                * (num_buckets - max_exact)
+            torch.log(relative_positions.float() / max_exact)
+            / math.log(max_distance / max_exact)
+            * (num_buckets - max_exact)
         ).to(torch.long)
         relative_postion_if_large = torch.min(
             relative_postion_if_large, torch.full_like(relative_postion_if_large, num_buckets - 1)
@@ -415,12 +410,12 @@ class WavLMSelfAttention(nn.Module):
         return relative_buckets
 
     def forward(
-            self,
-            query: Tensor,
-            key_padding_mask: Optional[Tensor] = None,
-            need_weights: bool = False,
-            attention_mask: Optional[Tensor] = None,
-            position_bias: Optional[Tensor] = None
+        self,
+        query: Tensor,
+        key_padding_mask: Optional[Tensor] = None,
+        need_weights: bool = False,
+        attention_mask: Optional[Tensor] = None,
+        position_bias: Optional[Tensor] = None,
     ) -> Union[Tensor, Tuple[Tensor, Tensor]]:
         """
         Args:
@@ -431,11 +426,13 @@ class WavLMSelfAttention(nn.Module):
             need_weights: return the attention weights,
                 averaged over heads.
             attn_mask: needs to be `None`. The argument exists for compatibility with `EncoderLayer`.
-            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. 
-                When used inside WavML model encoder, will be generated in the first layer and then passed from each encoder layer to the next one.
+            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`.
+                When used inside WavLM model encoder, will be generated in the first layer and then passed from each
+                encoder layer to the next one.
         Returns:
             x: attention output of shape `(batch_size, src_len, embed_dim)`
-            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. Only returned if `need_weights` is `True`
+            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. Only returned if
+            `need_weights` is `True`
         """
         bsz, seq_len, embed_dim = query.size()
         assert embed_dim == self.embed_dim
@@ -448,12 +445,13 @@ class WavLMSelfAttention(nn.Module):
         attn_mask_rel_pos = None
         if position_bias is not None:
             attn_mask_rel_pos = position_bias
-            if self.gru_rel_pos: # Apply gating on relative position bias
+            if self.gru_rel_pos:  # Apply gating on relative position bias
                 query_layer = query.view(bsz, seq_len, self.num_heads, -1)
                 query_layer = query_layer.permute(0, 2, 1, 3)
-                
-                gate_a, gate_b = torch.sigmoid(self.gru_rel_pos_linear(query_layer).view(
-                    bsz, self.num_heads, seq_len, 2, 4).sum(-1, keepdim=False)).chunk(2, dim=-1)
+
+                gate_a, gate_b = torch.sigmoid(
+                    self.gru_rel_pos_linear(query_layer).view(bsz, self.num_heads, seq_len, 2, 4).sum(-1, keepdim=False)
+                ).chunk(2, dim=-1)
                 gate_a_1 = gate_a * (gate_b * self.gru_rel_pos_const - 1.0) + 2.0
                 attn_mask_rel_pos = gate_a_1.view(bsz * self.num_heads, -1, 1) * position_bias
 
@@ -461,7 +459,9 @@ class WavLMSelfAttention(nn.Module):
 
         bias_k = bias_v = None
         add_zero_attn = False
-        query = query.transpose(0, 1) # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
+        query = query.transpose(
+            0, 1
+        )  # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
         x, attn = F.multi_head_attention_forward(
             query,
             query,
@@ -950,8 +950,8 @@ def _get_encoder_wavlm(
     pos_conv_groups: int,
     num_layers: int,
     num_heads: int,
-    num_buckets: int, 
-    max_distance: int, 
+    num_buckets: int,
+    max_distance: int,
     attention_dropout: float,
     ff_interm_features: int,
     ff_interm_dropout: float,
@@ -960,7 +960,7 @@ def _get_encoder_wavlm(
     layer_drop: float,
 ) -> Encoder:
     """
-    Construct encoder for WavLM model :cite:`wavlm2021`. 
+    Construct encoder for WavLM model :cite:`wavlm2021`.
     Most of the argments are the same as in :py:func:`_get_encoder` so refer there
     for documentation.
     Args:

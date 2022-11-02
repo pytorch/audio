@@ -60,6 +60,7 @@ WAVLM_CONFIGS = parameterized.expand(
     name_func=_name_func,
 )
 
+
 @skipIfNoModule("transformers")
 class TestHFIntegration(TorchaudioTestCase):
     """Test the process of importing the models from Hugging Face Transformers
@@ -118,7 +119,6 @@ class TestHFIntegration(TorchaudioTestCase):
         hyp = imported.encoder.transformer(x)
         self.assertEqual(ref, hyp)
 
-
     def _test_import_pretrain_wavlm(self, original, imported, config):
         # FeatureExtractor
         x = torch.randn(3, 1024)
@@ -142,7 +142,7 @@ class TestHFIntegration(TorchaudioTestCase):
             b, l, e = 16, 3, config["hidden_size"]
             x = torch.randn(b, l, e)
             mask = torch.randn(b, l) > 0.5
-            ref, position_bias  = original_(x, attention_mask=mask, output_attentions=False, position_bias=position_bias)
+            ref, position_bias = original_(x, attention_mask=mask, output_attentions=False, position_bias=position_bias)
             hyp, position_bias_imp = imported_(x, key_padding_mask=mask.ne(1), position_bias=position_bias_imp)
             ref_filled = ref.masked_fill(~mask.unsqueeze(2), 0)
             hyp_filled = hyp.masked_fill(~mask.unsqueeze(2), 0)
@@ -154,7 +154,6 @@ class TestHFIntegration(TorchaudioTestCase):
         ref = original.encoder(x).last_hidden_state
         hyp, _ = imported.encoder.transformer(x)
         self.assertEqual(ref, hyp)
-
 
     def _test_import_finetune(self, original, imported, config):
         # Aux
@@ -253,7 +252,6 @@ class TestHFIntegration(TorchaudioTestCase):
         ref, _ = imported(x)
         hyp, _ = reloaded(x)
         self.assertEqual(ref, hyp)
-
 
     def _test_recreate_wavlm(self, imported, reloaded, config):
         # FeatureExtractor

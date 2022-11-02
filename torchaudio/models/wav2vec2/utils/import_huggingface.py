@@ -59,7 +59,9 @@ def _build(config, original):
         aux_num_out = original.config.vocab_size
         wav2vec2 = original.wav2vec2
     else:
-        _LG.warning("The model is not an instance of Wav2Vec2ForCTC or WavLMForCTC. " '"lm_head" module is not imported.')
+        _LG.warning(
+            "The model is not an instance of Wav2Vec2ForCTC or WavLMForCTC. " '"lm_head" module is not imported.'
+        )
         aux_num_out = None
         wav2vec2 = original
     is_wavlm = original.__class__.__name__ in ["WavLMModel", "WavLMForCTC"]
