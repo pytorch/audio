@@ -1204,7 +1204,7 @@ WAVLM_BASE = Wav2Vec2Bundle(
         "encoder_num_heads": 12,
         "encoder_attention_dropout": 0.1,
         "encoder_ff_interm_features": 3072,
-        "encoder_ff_interm_dropout": 0.0,  # TODO
+        "encoder_ff_interm_dropout": 0.0,
         "encoder_dropout": 0.1,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
@@ -1247,7 +1247,7 @@ WAVLM_LARGE = Wav2Vec2Bundle(
         "encoder_num_heads": 16,
         "encoder_attention_dropout": 0.1,
         "encoder_ff_interm_features": 4096,
-        "encoder_ff_interm_dropout": 0.0,  # TODO
+        "encoder_ff_interm_dropout": 0.0,
         "encoder_dropout": 0.1,
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,

@@ -298,11 +298,31 @@ class TestWav2Vec2Model(TorchaudioTestCase):
 
         _, _ = quantized(waveforms, lengths)
 
+    def _test_quantize_smoke_test_wavlm(self, model):
+        model.eval()
+        batch_size, num_frames = 3, 1024
+
+        # Remove the weight normalization forward hook
+        model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
+        quantized = tq.quantize_dynamic(model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
+
+        # A lazy way to check that Modules are different
+        assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
+
+        waveforms = torch.randn(batch_size, num_frames)
+        _, _ = quantized(waveforms)
+
     @factory_funcs
     @skipIfNoQengine
     def test_quantize(self, factory_func):
         """Wav2Vec2Model should support basic quantization"""
-        self._test_quantize_smoke_test(factory_func(aux_num_out=32))
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self._test_quantize_smoke_test_wavlm(factory_func(aux_num_out=32))
+        else:
+            self._test_quantize_smoke_test(factory_func(aux_num_out=32))
 
     def _test_quantize_torchscript(self, model):
         model.eval()
@@ -339,4 +359,10 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
-        self._test_quantize_torchscript(factory_func(aux_num_out=32))
+        if factory_func in (
+            wavlm_base,
+            wavlm_large,
+        ):
+            self._test_quantize_torchscript_wavlm(factory_func(aux_num_out=32))
+        else:
+            self._test_quantize_torchscript(factory_func(aux_num_out=32))
