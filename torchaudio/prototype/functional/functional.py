@@ -40,7 +40,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
-        mode (bool, optional): Must be one of ("full", "valid", "same").
+        mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
             * "valid": Returns the segment of the full convolution result corresponding to where
@@ -76,7 +76,7 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
-        mode (bool, optional): Must be one of ("full", "valid", "same").
+        mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
             * "valid": Returns the segment of the full convolution result corresponding to where

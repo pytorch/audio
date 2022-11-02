@@ -54,6 +54,16 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Training Recipes
+   :hidden:
+
+   Conformer RNN-T ASR <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt>
+   Emformer RNN-T ASR <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>
+   Conv-TasNet Source Separation <https://github.com/pytorch/audio/tree/main/examples/source_separation>
+   HuBERT Pre-training and Fine-tuning (ASR) <https://github.com/pytorch/audio/tree/main/examples/hubert>
+
+.. toctree::
+   :maxdepth: 1
    :caption: API Reference
    :hidden:
 
