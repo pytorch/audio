@@ -1218,7 +1218,6 @@ def hubert_pretrain_xlarge(
     )
 
 
-
 def wavlm_model(
     extractor_mode: str,
     extractor_conv_layer_config: Optional[List[Tuple[int, int, int]]],
@@ -1239,127 +1238,69 @@ def wavlm_model(
     encoder_layer_drop: float,
     aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
-    """Builds custom :class:`~torchaudio.models.Wav2Vec2Model`.
-
-    Note:
-        The "feature extractor" below corresponds to
-        `ConvFeatureExtractionModel <https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L736>`__
-        in the original ``fairseq`` implementation.
-        This is referred as "(convolutional) feature encoder" in the *wav2vec 2.0*
-        :cite:`baevski2020wav2vec` paper.
-
-        The "encoder" below corresponds to `TransformerEncoder <https://github.com/pytorch/fairseq/blob/dd3bd3c0497ae9a7ae7364404a6b0a4c501780b3/fairseq/models/wav2vec/wav2vec2.py#L817>`__,
-        and this is referred as "Transformer" in the paper.
+    """Builds custom WaveLM model :cite:`wavlm2021`. The architecture is compatible
+    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output object is
+    :class:`~torchaudio.models.Wav2Vec2Model`. Most of the argument have the same meaning
+    as in :py:func:`wav2vec2_model` so please refer there for documentation.
 
     Args:
         extractor_mode (str): Operation mode of feature extractor.
-            Valid values are ``"group_norm"`` or ``"layer_norm"``.
-            If ``"group_norm"``, then a single normalization is applied
-            in the first convolution block. Otherwise, all the convolution
-            blocks will have layer normalization.
-
-            This option corresponds to ``extractor_mode`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
+        
         extractor_conv_layer_config (list of integer tuples or None):
-            Configuration of convolution layers in feature extractor.
-            List of convolution configuration,
-            i.e. ``[(output_channel, kernel_size, stride), ...]``
-
-            If ``None`` is provided, then the following default value is used.
-
-            .. code-block:: python
-
-               [
-                 (512, 10, 5),
-                 (512, 3, 2),
-                 (512, 3, 2),
-                 (512, 3, 2),
-                 (512, 3, 2),
-                 (512, 2, 2),
-                 (512, 2, 2),
-               ]
-
-            This option corresponds to ``conv_feature_layers`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`. 
 
         extractor_conv_bias (bool):
-            Whether to include bias term to each convolution operation.
-
-            This option corresponds to ``conv_bias`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_embed_dim (int):
-            The dimension of embedding in encoder.
-
-            This option corresponds to ``encoder_embed_dim`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_projection_dropout (float):
-            The dropout probability applied after the input feature is projected
-            to ``encoder_embed_dim``.
-
-            This option corresponds to ``dropout_input`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_pos_conv_kernel (int):
-            The kernel size of convolutional positional embeddings.
-
-            This option corresponds to ``conv_pos`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_pos_conv_groups (int):
-            The number of groups of convolutional positional embeddings.
-
-            This option corresponds to ``conv_pos_groups`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_num_layers (int):
-            The number of self attention layers in transformer block.
-
-            This option corresponds to ``encoder_layers`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_num_heads (int):
-            The number of heads in self attention layers.
+            See :py:func:`wav2vec2_model`.
 
-            This option corresponds to ``encoder_attention_heads`` from ``fairseq``.
+        encoder_num_buckets (int):
+            Number of buckets for relative position embedding.
+        encoder_max_distance (int):
+            Maximum distance for relative position embedding.
 
         encoder_attention_dropout (float):
-            The dropout probability applied after softmax in self-attention layer.
-
-            This option corresponds to ``attention_dropout`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_ff_interm_features (int):
-            The dimension of hidden features in feed forward layer.
-
-            This option corresponds to ``encoder_ffn_embed_dim`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_ff_interm_dropout (float):
-            The dropout probability applied in feedforward layer.
-
-            This option correspinds to ``activation_dropout`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_dropout (float):
-            The dropout probability applied at the end of feed forward layer.
-
-            This option corresponds to ``dropout`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_layer_norm_first (bool):
-            Control the order of layer norm in transformer layer and each encoder layer.
-            If True, in transformer layer, layer norm is applied before features are fed
-            to encoder layers. In encoder layer, two layer norms are applied before and after
-            self attention.
-            If False, in transformer layer, layer norm is applied after features are fed
-            to encoder layers. In encoder layer, two layer norms are applied after self
-            attention, before and after feed forward.
-
-            This option corresponds to ``layer_norm_first`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         encoder_layer_drop (float):
-            Probability to drop each encoder layer during training.
-
-            This option corresponds to ``layerdrop`` from ``fairseq``.
+            See :py:func:`wav2vec2_model`.
 
         aux_num_out (int or None):
-            When provided, attach an extra linear layer on top of encoder, which can be
-            used for fine-tuning.
+            See :py:func:`wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """  # noqa: E501
+    """
     if extractor_conv_layer_config is None:
         extractor_conv_layer_config = [(512, 10, 5)] + [(512, 3, 2)] * 4 + [(512, 2, 2)] * 2
 
@@ -1397,7 +1338,9 @@ def wavlm_base(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Builds "large" :class:`~torchaudio.models.Wav2Vec2Model` from *wav2vec 2.0* :cite:`baevski2020wav2vec`
+    """Builds "base" WaveLM model :cite:`wavlm2021`. The architecture is compatible
+    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is
+    :class:`~torchaudio.models.Wav2Vec2Model`.
 
     Args:
         encoder_projection_dropout (float):
@@ -1410,13 +1353,13 @@ def wavlm_base(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
-        aux_num_out (int or None, optional):
+        aux_num_out (int, optional):
             See :py:func:`wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """  # noqa: E501
+    """
     return wavlm_model(
         extractor_mode="group_norm",
         extractor_conv_layer_config=None,
@@ -1439,16 +1382,17 @@ def wavlm_base(
     )
 
 
-
 def wavlm_large(
     encoder_projection_dropout: float = 0.1,
     encoder_attention_dropout: float = 0.1,
-    encoder_ff_interm_dropout: float = 0.1,
+    encoder_ff_interm_dropout: float = 0.0,
     encoder_dropout: float = 0.1,
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Builds "large" :class:`~torchaudio.models.Wav2Vec2Model` from *wav2vec 2.0* :cite:`baevski2020wav2vec`
+    """Builds "large" WaveLM model :cite:`wavlm2021`. The architecture is compatible
+    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is
+    :class:`~torchaudio.models.Wav2Vec2Model`.
 
     Args:
         encoder_projection_dropout (float):
@@ -1461,13 +1405,13 @@ def wavlm_large(
             See :py:func:`wav2vec2_model`.
         encoder_layer_drop (float):
             See :py:func:`wav2vec2_model`.
-        aux_num_out (int or None, optional):
+        aux_num_out (int, optional):
             See :py:func:`wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
             The resulting model.
-    """  # noqa: E501
+    """
     return wavlm_model(
         extractor_mode="layer_norm",
         extractor_conv_layer_config=None,

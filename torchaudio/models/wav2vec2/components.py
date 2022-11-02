@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional, Tuple, Union
 import math
 
 import torch
@@ -245,7 +245,7 @@ class SelfAttention(Module):
         embed_dim (int): Total dimension of the model.
         num_heads (int): The number of heads.
         dropout (float, optional):
-            Dropout probabiliry on attn_output_weights. Default: ``0.0``
+            Dropout probability on attn_output_weights. Default: ``0.0``
     """
 
     def __init__(
@@ -321,21 +321,30 @@ class SelfAttention(Module):
 
 
 class WavLMSelfAttention(nn.Module):
-    """Multi-headed attention.
-    See "Attention Is All You Need" for more details.
+    """Multi-headed self-attention for WavLM model :cite:`wavlm2021`.
     Source: https://github.com/microsoft/UniSpeech/blob/2e9dde8bf815a5f5fd958e3435e5641f59f96928/WavLM/modules.py
+
+    Args:
+        embed_dim: Total dimension of the model.
+        num_heads: The number of heads.
+        dropout: Dropout probability on attn_output_weights.
+        bias: If ``True``, add bias to projections for queries and values.
+        has_relative_attention_bias: If ``True``, apply relative position embedding.
+        num_buckets: Number of buckets for relative position embedding.
+        max_distance: Naximum distance for relative position embedding.
+        gru_rel_pos: If ``True``, apply gated relative position embedding.
     """
 
     def __init__(
             self,
-            embed_dim,
-            num_heads,
-            dropout=0.0,
-            bias=True,
-            has_relative_attention_bias=False,
-            num_buckets=32,
-            max_distance=128,
-            gru_rel_pos=True,
+            embed_dim: int,
+            num_heads: int,
+            dropout: float=0.0,
+            bias: bool=True,
+            has_relative_attention_bias: bool=False,
+            num_buckets: int=32,
+            max_distance: int=128,
+            gru_rel_pos: bool=True,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -407,23 +416,26 @@ class WavLMSelfAttention(nn.Module):
 
     def forward(
             self,
-            query,
+            query: Tensor,
             key_padding_mask: Optional[Tensor] = None,
-            need_weights: bool = True,
+            need_weights: bool = False,
             attention_mask: Optional[Tensor] = None,
             position_bias: Optional[Tensor] = None
-    ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
-        """Input shape: Time x Batch x Channel
+    ) -> Union[Tensor, Tuple[Tensor, Tensor]]:
+        """
         Args:
-            query (Tensor): input query of shape `(batch_size, src_len, embed_dim)`.
-            key_padding_mask (ByteTensor, optional): mask to exclude
+            query: input of shape `(batch_size, src_len, embed_dim)`.
+            key_padding_mask: mask to exclude
                 keys that are pads, of shape `(batch, src_len)`, where
                 padding elements are indicated by 1s.
-            need_weights (`bool`, *optional*, defaults to `False`): return the attention weights,
+            need_weights: return the attention weights,
                 averaged over heads.
-            attn_mask (`bool`, *optional*, defaults to `None`): needs to be `None`. The argument exists for compatibility with `EncoderLayer`.
-            position_bias (`Tensor`, *optional*, defaults to `None`): position bias of shape `(batch_size * num_heads, src_len, src_len)`. 
+            attn_mask: needs to be `None`. The argument exists for compatibility with `EncoderLayer`.
+            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. 
                 When used inside WavML model encoder, will be generated in the first layer and then passed from each encoder layer to the next one.
+        Returns:
+            x: attention output of shape `(batch_size, src_len, embed_dim)`
+            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. Only returned if `need_weights` is `True`
         """
         bsz, seq_len, embed_dim = query.size()
         assert embed_dim == self.embed_dim
@@ -436,8 +448,7 @@ class WavLMSelfAttention(nn.Module):
         attn_mask_rel_pos = None
         if position_bias is not None:
             attn_mask_rel_pos = position_bias
-            # Compute gated position bias
-            if self.gru_rel_pos:
+            if self.gru_rel_pos: # Apply gating on relative position bias
                 query_layer = query.view(bsz, seq_len, self.num_heads, -1)
                 query_layer = query_layer.permute(0, 2, 1, 3)
                 
@@ -467,15 +478,17 @@ class WavLMSelfAttention(nn.Module):
             self.out_proj.bias,
             self.training,
             key_padding_mask,
-            need_weights,
-            attn_mask_rel_pos,
+            need_weights=True,
+            attn_mask=attn_mask_rel_pos,
             use_separate_proj_weight=True,
             q_proj_weight=self.q_proj.weight,
             k_proj_weight=self.k_proj.weight,
             v_proj_weight=self.v_proj.weight,
         )
-        # Convert back to batch-first
-        return (x.transpose(0, 1), attn, position_bias)
+        x = x.transpose(0, 1)  # Convert back to batch-first
+        if need_weights:
+            return x, attn, position_bias
+        return x, position_bias
 
 
 class FeedForward(Module):
@@ -539,6 +552,8 @@ class EncoderLayer(Module):
             x (Tensor): shape: `(batch, sequence_length, embed_dim)`
             attention_mask (Tensor or None, optional):
             shape: `(batch, 1, sequence_length, sequence_length)`
+            kwargs: necessary to make this class compatible with both `Wav2Vec2` and `WavLM` models,
+                    since the latter passes position bias as an additional argument
         """
         residual = x
 
@@ -547,10 +562,10 @@ class EncoderLayer(Module):
 
         attention_output = self.attention(x, attention_mask=attention_mask, **kwargs)
         if isinstance(attention_output, tuple):
-            x, _, position_bias = attention_output
+            x, position_bias = attention_output
         else:
-            x = attention_output
-            position_bias = None
+            x, position_bias = attention_output, None
+
         x = self.dropout(x)
         x = residual + x
 
@@ -927,8 +942,6 @@ def _get_encoder(
     return Encoder(feature_projection, transformer)
 
 
-
-
 def _get_encoder_wavlm(
     in_features: int,
     embed_dim: int,
@@ -947,126 +960,28 @@ def _get_encoder_wavlm(
     layer_drop: float,
 ) -> Encoder:
     """
+    Construct encoder for WavLM model :cite:`wavlm2021`. 
+    Most of the argments are the same as in :py:func:`_get_encoder` so refer there
+    for documentation.
     Args:
-        in_features (int): The number of input features.
-        embed_dim (int):
-            The dimension of embedding.
-            This option corresponds to "encoder_embed_dim" from fairseq.
-            Expected values are 768 for Base arch, and 1024 for Large arch.
-        dropout_input (float):
-            The dropout probability applied after the input feature is projected
-            to ``embed_dim``.
-            This option corresponds to "dropout_input" from fairseq.
-            Expected values are 0.1 for both Base and Large arch.
-        pos_conv_kernel (int):
-            The kernel size of convolutional positional embeddings.
-            This option corresponds to "conv_pos" from fairseq.
-            Expected values are 128 for both Base and Large arch.
-        pos_conv_groups (int):
-            The number of groups of convolutional positional embeddings.
-            This option corresponds to "conv_pos_groups" from fairseq.
-            Expected values are 16 for both Base and Large arch.
-        num_layers (int):
-            The number of self attention layers in transformer block.
-            This option corresponds to "encoder_layers" from fairseq.
-            Expected values are 12 for Base and 24 for Large arch.
-        num_heads (int):
-            The number of heads in self attention layers.
-            This option corresponds to "encoder_attention_heads" from fairseq.
-            Expected values are 12 for Base and 16 for Large arch.
-        attention_dropout (float):
-            The dropout probability applied after softmax in self-attention layer.
-            This option corresponds to "attention_dropout" from fairseq.
-            Expected values are 0.1 for Base and 0.0 for Large arch.
-        ff_interm_features (int):
-            The dimension of hidden features in feed forward layer.
-            This option corresponds to "encoder_ffn_embed_dim" from fairseq.
-            Expected values are 3072 for Base and 4096 for Large arch.
-        ff_interm_dropout (float):
-            The dropout probability applied in feedforward layer.
-            This option correspinds to "activation_dropout" from fairseq.
-            Expected values are 0.1 for both Base and Large arch.
-        dropout (float):
-            The dropout probability applied at the end of feed forward layer.
-            This option corresponds to "dropout" from fairseq.
-            Expected values are 0.1 for Base and 0.0 for Large arch.
-        layer_norm_first (bool):
-            Control the order of layer norm in transformer layer and each encoder layer.
-            If True, in transformer layer, layer norm is applied before features are fed
-            to encoder layers. In encoder layer, two layer norms are applied before and after
-            self attention.
-            If False, in transformer layer, layer norm is applied after features are fed
-            to encoder layers. In encoder layer, two layer norms are applied after self
-            attention, before and after feed forward.
-            This option corresponds to "layer_norm_first" from fairseq.
-            Expected values are False for Base and True for Large arch.
-        layer_drop (float):
-            Probability to drop each encoder layer during training.
-            This option corresponds to "layerdrop" from fairseq.
-            Expected values are 0.1 for both Base and Large arch.
+        in_features (int): See :py:func:`_get_encoder`.
+        embed_dim (int): See :py:func:`_get_encoder`.
+        dropout_input (float): See :py:func:`_get_encoder`.
+        pos_conv_kernel (int): See :py:func:`_get_encoder`.
+        pos_conv_groups (int): See :py:func:`_get_encoder`.
+        num_layers (int): See :py:func:`_get_encoder`.
+        num_heads (int): See :py:func:`_get_encoder`.
+        num_buckets (int):
+            Number of buckets for relative position embedding.
+        max_distance (int):
+            Maximum distance for relative position embedding.
+        attention_dropout (float): See :py:func:`_get_encoder`.
+        ff_interm_features (int): See :py:func:`_get_encoder`.
+        ff_interm_dropout (float): See :py:func:`_get_encoder`.
+        dropout (float): See :py:func:`_get_encoder`.
+        layer_norm_first (bool): See :py:func:`_get_encoder`.
+        layer_drop (float): See :py:func:`_get_encoder`.
 
-    See Also:
-        * "encoder_embed_dim"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L49-L51
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L64
-        * "dropout_input"
-          - Def, base and large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L75-L78
-        * "conv_pos"
-          - Def, base and large
-            NOTE: The description is wrong.
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L204-L207
-          - Usage
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L756
-        * "conv_pos_groups"
-          - Def, base and large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L208-L211
-        * "encoder_layers"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L46-L48
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L63
-        * "encoder_attention_heads"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L55-L57
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L66
-        * "attention_dropout"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L66-L68
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L60
-        * "encoder_ffn_embed_dim"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L52-L54
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L65
-        * "activation_dropout"
-          - Def
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L69-L71
-          - Base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/base_960h.yaml#L55
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/vox_960h.yaml#L55
-        * "dropout"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L63-L65
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L59
-        * "layer_norm_first"
-          - Def and base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L91-L93
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/pretraining/wav2vec2_large_librivox.yaml#L53
-        * "layerdrop"
-          - Def
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L72-L74
-          - Base
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/base_960h.yaml#L54
-          - Large
-            https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/examples/wav2vec/config/finetuning/vox_960h.yaml#L54
     """
     feature_projection = FeatureProjection(in_features, embed_dim, dropout_input)
     pos_conv = ConvolutionalPositionalEmbedding(embed_dim, pos_conv_kernel, pos_conv_groups)
