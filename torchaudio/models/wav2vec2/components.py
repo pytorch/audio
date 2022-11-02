@@ -365,8 +365,12 @@ class WavLMSelfAttention(nn.Module):
         self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.k_proj.qconfig = None  # Don't quantize those weights
+        self.v_proj.qconfig = None
+        self.q_proj.qconfig = None
 
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.out_proj.qconfig = None
 
         self.gru_rel_pos = gru_rel_pos
         if self.gru_rel_pos:
@@ -458,9 +462,9 @@ class WavLMSelfAttention(nn.Module):
 
         bias_k = bias_v = None
         add_zero_attn = False
-        query = query.transpose(
-            0, 1
-        )  # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
+        # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
+        query = query.transpose(0, 1)
+        concat_bias = torch.cat((self.q_proj.bias, self.k_proj.bias, self.v_proj.bias))
         x, _ = F.multi_head_attention_forward(
             query,
             query,
@@ -468,7 +472,7 @@ class WavLMSelfAttention(nn.Module):
             self.embed_dim,
             self.num_heads,
             torch.empty([0]),
-            torch.cat((self.q_proj.bias, self.k_proj.bias, self.v_proj.bias)),
+            concat_bias,
             bias_k,
             bias_v,
             add_zero_attn,
