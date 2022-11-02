@@ -62,7 +62,7 @@ class TransformsTestBase(TestBaseMixin):
         Estimated spectrogram has very huge descrepency locally.
         Thus in this test we gauge what percentage of elements are bellow
         certain tolerance.
-        At the moment, the quality of estimated spectrogram is worse than the 
+        At the moment, the quality of estimated spectrogram is worse than the
         one obtained for Inverse MelScale.
         When implementation is changed in a way it makes the quality even worse,
         this test will fail.
