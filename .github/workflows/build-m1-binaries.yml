@@ -1,4 +1,4 @@
-name: Build on M1
+name: Build for M1
 on:
   pull_request:
     paths:
