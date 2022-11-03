@@ -357,7 +357,15 @@ class WavLMSelfAttention(nn.Module):
         self.has_relative_attention_bias = has_relative_attention_bias
         self.num_buckets = num_buckets
         self.max_distance = max_distance
-        self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
+
+        # WavLM applies position embedding rel_attn_embed in the first encoder layer, but not in the subsequent ones.
+        # In order to keep our model TorchScript-able, this attribute needs to be present in all layers, so we create
+        # a dummy identity module when the actual embedding is not needed.
+        self.rel_attn_embed = torch.nn.Identity()
+        self.rel_attn_embed_device = "cpu"
+        if has_relative_attention_bias:
+            self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
+            self.rel_attn_embed_device = self.rel_attn_embed.weight.device
 
         self.head_dim = embed_dim // num_heads
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
@@ -383,7 +391,7 @@ class WavLMSelfAttention(nn.Module):
         memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
         relative_position = memory_position - context_position
         relative_position_bucket = self._relative_positions_bucket(relative_position, bidirectional=True)
-        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed.weight.device)
+        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed_device)
         values = self.rel_attn_embed(relative_position_bucket)
         values = values.permute([2, 0, 1])
         return values

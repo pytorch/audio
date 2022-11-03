@@ -71,12 +71,7 @@ def _build(config, original):
         imported = wav2vec2_model(**config, aux_num_out=aux_num_out)
     imported.feature_extractor.load_state_dict(wav2vec2.feature_extractor.state_dict())
     imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
-    # We import WavLM weights in a non-strict mode for the following reason.
-    # WavLM applies position embedding rel_attn_embed in the first encoder layer, but not in the subsequent ones.
-    # In order to keep our model TorchScript-able, we need to have this attribute present in all layers, even though
-    # it's only used in the first one. HF model, on the other hand, only has it in the first layer.
-    # With non-strict import mode unused weights absent in HF model will be ignored when loading the state.
-    imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict(), strict=not is_wavlm)
+    imported.encoder.transformer.load_state_dict(wav2vec2.encoder.state_dict())
     if is_for_ctc:
         imported.aux.load_state_dict(original.lm_head.state_dict())
     return imported
