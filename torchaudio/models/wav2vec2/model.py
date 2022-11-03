@@ -1240,7 +1240,7 @@ def wavlm_model(
 ) -> Wav2Vec2Model:
     """Builds custom WaveLM model :cite:`wavlm2021`. The architecture is compatible
     with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output object is
-    :class:`~torchaudio.models.Wav2Vec2Model`. Most of the argument have the same meaning
+    :class:`~torchaudio.models.Wav2Vec2Model`. Most of the arguments have the same meaning
     as in :py:func:`wav2vec2_model` so please refer there for documentation.
 
     Args:
