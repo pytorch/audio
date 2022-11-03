@@ -115,7 +115,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             wavlm_base,
             wavlm_large,
         ):
-            self.skipTest("WavLM doesn't support lengths")
+            self.skipTest("WavLM doesn't support custom lengths for each audio in a batch")
         self._feature_extractor_test(factory_func(aux_num_out=32))
 
     def _test_batch_consistency(self, model):
@@ -142,10 +142,10 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         batch_size, max_frames = 5, 5 * 1024
         waveforms = torch.randn(batch_size, max_frames)
 
-        # Batch process with lengths
+        # Batch process
         batch_logits, _ = model(waveforms)
+        # Par-sample process
         for i in range(batch_size):
-            # Par-sample process without feeding length
             single_logit, _ = model(waveforms[i : i + 1])
             batch_logit = batch_logits[i : i + 1]
 
@@ -194,7 +194,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             wavlm_base,
             wavlm_large,
         ):
-            self.skipTest("WavLM doesn't support lengths")
+            self.skipTest("WavLM doesn't support custom lengths for each audio in a batch")
         self._test_zero_length(factory_func())
 
     @factory_funcs
@@ -204,7 +204,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
             wavlm_base,
             wavlm_large,
         ):
-            self.skipTest("WavLM doesn't support lengths")
+            self.skipTest("WavLM doesn't support custom lengths for each audio in a batch")
         self._test_zero_length(factory_func(aux_num_out=32))
 
     def _test_torchscript(self, model):
@@ -234,13 +234,11 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         model.eval()
 
         batch_size, num_frames = 3, 1024
-
         waveforms = torch.randn(batch_size, num_frames)
-
+        # Compute results with original model
         ref_out, ref_len = model(waveforms)
-
+        # Compute results with scripted model
         scripted = torch_script(model)
-
         hyp_out, hyp_len = scripted(waveforms)
 
         self.assertEqual(hyp_out, ref_out)
@@ -368,12 +366,10 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
 
         waveforms = torch.randn(batch_size, num_frames)
-
         ref_out, ref_len = quantized(waveforms)
 
         # Script
         scripted = torch_script(quantized)
-
         hyp_out, hyp_len = scripted(waveforms)
 
         self.assertEqual(hyp_out, ref_out)

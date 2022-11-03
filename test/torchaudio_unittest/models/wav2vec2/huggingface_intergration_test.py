@@ -109,13 +109,13 @@ class TestHFIntegration(TorchaudioTestCase):
             x = torch.randn(b, l, e)
             mask = torch.randn(b, 1, l, l)
             (ref,) = original_(x, attention_mask=mask, output_attentions=False)
-            hyp, *_ = imported_(x, mask)
+            hyp, _ = imported_(x, mask)  # Ignore returned position_bias, which is always None for Wav2Vec2 and HuBERT
             self.assertEqual(ref, hyp)
         # The whole Encoder Transformer
         b, l, e = 16, 3, config["hidden_size"]
         x = torch.randn(b, l, e)
         ref = original.encoder(x).last_hidden_state
-        hyp, *_ = imported.encoder.transformer(x)
+        hyp = imported.encoder.transformer(x)
         self.assertEqual(ref, hyp)
 
     def _test_import_pretrain_wavlm(self, original, imported, config):
@@ -140,9 +140,12 @@ class TestHFIntegration(TorchaudioTestCase):
         for original_, imported_ in zip(original.encoder.layers, imported.encoder.transformer.layers):
             b, l, e = 16, 3, config["hidden_size"]
             x = torch.randn(b, l, e)
-            mask = torch.randn(b, l) > 0.5
+            mask = torch.randn(b, l) > 0.5  # HF WaveLM model expects the mask to be binary
+            # HF WaveLM model (original_) takes in "attention mask" but actually uses it as key padding mask:
+            # https://github.com/huggingface/transformers/blob/b047472650cba259621549ac27b18fd2066ce18e/src/transformers/models/wavlm/modeling_wavlm.py#L495
             ref, position_bias = original_(x, attention_mask=mask, output_attentions=False, position_bias=position_bias)
             hyp, position_bias_imp = imported_(x, key_padding_mask=mask.ne(1), position_bias=position_bias_imp)
+            # Masked-out elements are undefined in the output
             ref_filled = ref.masked_fill(~mask.unsqueeze(2), 0)
             hyp_filled = hyp.masked_fill(~mask.unsqueeze(2), 0)
             self.assertEqual(ref_filled, hyp_filled)
@@ -151,7 +154,7 @@ class TestHFIntegration(TorchaudioTestCase):
         b, l, e = 16, 3, config["hidden_size"]
         x = torch.randn(b, l, e)
         ref = original.encoder(x).last_hidden_state
-        hyp, _ = imported.encoder.transformer(x)
+        hyp = imported.encoder.transformer(x)
         self.assertEqual(ref, hyp)
 
     def _test_import_finetune(self, original, imported, config):
@@ -194,7 +197,7 @@ class TestHFIntegration(TorchaudioTestCase):
 
     @WAVLM_CONFIGS
     def test_import_pretrain_wavlm(self, config, _):
-        """wavlm models from HF transformers can be imported and yields the same results"""
+        """WavLM models from HF transformers can be imported and yield the same results"""
         original = self._get_model(config).eval()
         imported = import_huggingface_model(original).eval()
         self._test_import_pretrain_wavlm(original, imported, config)
@@ -274,7 +277,7 @@ class TestHFIntegration(TorchaudioTestCase):
         for imported_, reloaded_ in zip(imported.encoder.transformer.layers, reloaded.encoder.transformer.layers):
             b, l, e = 16, 3, config["hidden_size"]
             x = torch.randn(b, l, e)
-            mask = torch.randn(b, l) > 0.5  # HugginFace WaveLM expected the mask to be binary
+            mask = torch.randn(b, l) > 0.5  # HugginFace WaveLM expects the mask to be binary
             ref, position_bias_ref = imported_(x, key_padding_mask=mask, position_bias=position_bias_ref)
             hyp, position_bias_hyp = reloaded_(x, key_padding_mask=mask, position_bias=position_bias_hyp)
             self.assertEqual(ref, hyp)

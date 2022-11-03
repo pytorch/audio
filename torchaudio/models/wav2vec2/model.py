@@ -117,7 +117,7 @@ class Wav2Vec2Model(Module):
                 It indicates the valid length in time axis of the output Tensor.
         """
         x, lengths = self.feature_extractor(waveforms, lengths)
-        x, *_ = self.encoder(x, lengths)
+        x = self.encoder(x, lengths)
         if self.aux is not None:
             x = self.aux(x)
         return x, lengths
