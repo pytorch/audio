@@ -326,15 +326,15 @@ class WavLMSelfAttention(nn.Module):
     Source: https://github.com/microsoft/UniSpeech/blob/2e9dde8bf815a5f5fd958e3435e5641f59f96928/WavLM/modules.py
 
     Args:
-        embed_dim: Total dimension of the model.
-        num_heads: The number of heads.
-        dropout: Dropout probability on attn_output_weights.
-        bias: If ``True``, add bias to projections for queries and values.
-        has_relative_attention_bias: If ``True``, apply relative position embedding. Necessary in the first encoder
-        layer, but not in the subsequent ones.
-        num_buckets: Number of buckets for relative position embedding.
-        max_distance: Naximum distance for relative position embedding.
-        gru_rel_pos: If ``True``, apply gated relative position embedding.
+        embed_dim (int): Total dimension of the model.
+        num_heads (int): The number of heads.
+        dropout (float, optional): Dropout probability on attn_output_weights. (Default: to ``0.0``)
+        bias (bool, optional): If ``True``, add bias to projections for queries and values. (Default: ``True``)
+        has_relative_attention_bias (bool, optional): If ``True``, apply relative position embedding.
+            Necessary in the first encoder layer, but not in the subsequent ones. (Default: ``False``)
+        num_buckets (int, optional): Number of buckets for relative position embedding. (Default: ``32``)
+        max_distance (int, optional): Naximum distance for relative position embedding. (Default: ``128``)
+        gru_rel_pos (bool, optional): If ``True``, apply gated relative position embedding. (Default: ``False``)
     """
 
     def __init__(
@@ -386,17 +386,35 @@ class WavLMSelfAttention(nn.Module):
             self.gru_rel_pos_const = nn.Parameter(torch.ones(1, num_heads, 1, 1))
         self.has_position_bias = True
 
-    def compute_bias(self, query_length: int, key_length: int):
+    def compute_bias(self, query_length: int, key_length: int) -> Tensor:
+        """Compute relative position embeddings for WavLM model.
+        Args:
+            query_length (int): Query position can take values between 0 and query_length - 1
+            key_length (int): Key position can take values between 0 and key_length - 1
+        Returns:
+            Tensor of shape `(num_heads, query_length, key_length)`, relative positions embeddings
+        """
         context_position = torch.arange(query_length, dtype=torch.long)[:, None]
         memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
-        relative_position = memory_position - context_position
+        relative_position = memory_position - context_position  # Shape (query_length, key_length)
         relative_position_bucket = self._relative_positions_bucket(relative_position, bidirectional=True)
         relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed_device)
-        values = self.rel_attn_embed(relative_position_bucket)
+        values = self.rel_attn_embed(relative_position_bucket)  # Shape (query_length, key_length, num_heads)
         values = values.permute([2, 0, 1])
         return values
 
     def _relative_positions_bucket(self, relative_positions: Tensor, bidirectional: bool = True):
+        """Compute relative position buckets for WavLM model. Computation similar to formula (5) in WavLM
+           paper :cite:`wavlm2021`.
+        Args:
+            relative_positions (Tensor): Relative offsets between query and key positions,
+                of shape `(query_length, key_length)`
+            bidirectional (bool): If `True`, values will be filled both above and below the diagonal in the resulting
+                matrix. If `False`, the elements above the diagonal (i.e. with negative relative offsets) will be set
+                to zero.
+        Returns:
+            Tensor of shape `(query_length, key_length)` filled bucketed values of with relative positions.
+        """
         num_buckets = self.num_buckets
         max_distance = self.max_distance
         # Shape (query_length, key_length)
@@ -433,16 +451,17 @@ class WavLMSelfAttention(nn.Module):
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            query: input of shape `(batch_size, src_len, embed_dim)`.
-            key_padding_mask: mask to exclude keys that are pads, of shape `(batch, src_len)`, where padding elements
-                are indicated by 1s.
-            attn_mask: needs to be `None`. The argument exists for compatibility with `EncoderLayer`.
-            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`. When used inside WavLM
-                model encoder, will be generated in the first layer and then passed from each encoder layer
-                to the next one.
+            query (Tensor): input of shape `(batch_size, src_len, embed_dim)`.
+            key_padding_mask (Tensor or None, optional): mask to exclude keys that are pads, of shape
+                `(batch, src_len)`, where padding elements are indicated by 1s. (Default: None)
+            attn_mask (Tensor or None, optional): needs to be `None`. The argument exists for compatibility with
+                `EncoderLayer`. (Default: None)
+            position_bias (Tensor or None, optional): position bias of shape
+                `(batch_size * num_heads, src_len, src_len)`. When used inside WavLM model encoder, will be
+                generated in the first layer and then passed from each encoder layer to the next one. (Default: None)
         Returns:
-            attn_output: attention output of shape `(batch_size, src_len, embed_dim)`
-            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`.
+            attn_output (Tensor): attention output of shape `(batch_size, src_len, embed_dim)`
+            position_bias (Tensor or None): position bias of shape `(batch_size * num_heads, src_len, src_len)`.
         """
         bsz, seq_len, embed_dim = query.size()
         assert embed_dim == self.embed_dim
@@ -946,7 +965,7 @@ def _get_encoder(
     return Encoder(feature_projection, transformer)
 
 
-def _get_encoder_wavlm(
+def _get_wavlm_encoder(
     in_features: int,
     embed_dim: int,
     dropout_input: float,

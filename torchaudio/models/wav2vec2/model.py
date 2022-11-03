@@ -1307,7 +1307,7 @@ def wavlm_model(
     feature_extractor = components._get_feature_extractor(
         extractor_mode, extractor_conv_layer_config, extractor_conv_bias
     )
-    encoder = components._get_encoder_wavlm(
+    encoder = components._get_wavlm_encoder(
         in_features=extractor_conv_layer_config[-1][0],
         embed_dim=encoder_embed_dim,
         dropout_input=encoder_projection_dropout,
