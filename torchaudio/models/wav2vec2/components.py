@@ -361,11 +361,10 @@ class WavLMSelfAttention(nn.Module):
         # WavLM applies position embedding rel_attn_embed in the first encoder layer, but not in the subsequent ones.
         # In order to keep our model TorchScript-able, this attribute needs to be present in all layers, so we create
         # a dummy identity module when the actual embedding is not needed.
-        self.rel_attn_embed = torch.nn.Identity()
-        self.rel_attn_embed_device = "cpu"
         if has_relative_attention_bias:
             self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
-            self.rel_attn_embed_device = self.rel_attn_embed.weight.device
+        else:
+            self.rel_attn_embed = None
 
         self.head_dim = embed_dim // num_heads
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
@@ -398,7 +397,7 @@ class WavLMSelfAttention(nn.Module):
         memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
         relative_position = memory_position - context_position  # Shape (query_length, key_length)
         relative_position_bucket = self._relative_positions_bucket(relative_position, bidirectional=True)
-        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed_device)
+        relative_position_bucket = relative_position_bucket.to(self. rel_attn_embed.weight.device)
         values = self.rel_attn_embed(relative_position_bucket)  # Shape (query_length, key_length, num_heads)
         values = values.permute([2, 0, 1])
         return values
@@ -467,7 +466,7 @@ class WavLMSelfAttention(nn.Module):
         assert embed_dim == self.embed_dim
         assert attention_mask is None
 
-        if self.has_relative_attention_bias and position_bias is None:
+        if self.rel_attn_embed is not None and position_bias is None:
             position_bias = self.compute_bias(seq_len, seq_len)
             position_bias = position_bias.unsqueeze(0).repeat(bsz, 1, 1, 1).view(bsz * self.num_heads, seq_len, seq_len)
 
