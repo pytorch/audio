@@ -202,6 +202,16 @@ class AutogradTestMixin(TestBaseMixin):
         )
         self.assert_grad(transform, [spec])
 
+    def test_barkscale(self):
+        sample_rate = 8000
+        n_fft = 400
+        n_barks = n_fft // 2 + 1
+        transform = T.BarkScale(sample_rate=sample_rate, n_barks=n_barks)
+        spec = get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
+        self.assert_grad(transform, [spec])
+
     @parameterized.expand([(1.5, "amplitude"), (2, "power"), (10, "db")])
     def test_vol(self, gain, gain_type):
         sample_rate = 8000
