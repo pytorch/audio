@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Tuple
 
 import torch
-from torchaudio._internal import load_state_dict_from_url
+import torchaudio
 from torchaudio.models import wav2vec2_model, Wav2Vec2Model
 
 from . import utils
@@ -55,19 +55,18 @@ class Wav2Vec2Bundle:
         return self._sample_rate
 
     def _get_state_dict(self, dl_kwargs):
-        url = f"https://download.pytorch.org/torchaudio/models/{self._path}"
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
-        state_dict = load_state_dict_from_url(url, **dl_kwargs)
-        return state_dict
+        path = torchaudio.utils.download_asset(self._path, **dl_kwargs)
+        return torch.load(path)
 
     def get_model(self, *, dl_kwargs=None) -> Wav2Vec2Model:
         """Construct the model and load the pretrained weight.
 
         The weight file is downloaded from the internet and cached with
-        :func:`torch.hub.load_state_dict_from_url`
+        :func:`torchaudio.utils.download_asset`
 
         Args:
-            dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
+            dl_kwargs (dictionary of keyword arguments): Passed to :func:`torchaudio.utils.download_asset`.
         """
         model = wav2vec2_model(**self._params)
         model.load_state_dict(self._get_state_dict(dl_kwargs))
@@ -164,7 +163,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
 
 
 WAV2VEC2_BASE = Wav2Vec2Bundle(
-    _path="wav2vec2_fairseq_base_ls960.pth",
+    _path="models/wav2vec2_fairseq_base_ls960.pth",
     _params={
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -206,7 +205,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_BASE_10M = Wav2Vec2ASRBundle(
-    _path="wav2vec2_fairseq_base_ls960_asr_ll10m.pth",
+    _path="models/wav2vec2_fairseq_base_ls960_asr_ll10m.pth",
     _params={
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -251,7 +250,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_ASR_BASE_100H = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_base_ls960_asr_ls100.pth",
+    "models/wav2vec2_fairseq_base_ls960_asr_ls100.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -296,7 +295,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_ASR_BASE_960H = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_base_ls960_asr_ls960.pth",
+    "models/wav2vec2_fairseq_base_ls960_asr_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -340,7 +339,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_LARGE = Wav2Vec2Bundle(
-    "wav2vec2_fairseq_large_ls960.pth",
+    "models/wav2vec2_fairseq_large_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -382,7 +381,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_10M = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_large_ls960_asr_ll10m.pth",
+    "models/wav2vec2_fairseq_large_ls960_asr_ll10m.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -427,7 +426,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_100H = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_large_ls960_asr_ls100.pth",
+    "models/wav2vec2_fairseq_large_ls960_asr_ls100.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -472,7 +471,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_960H = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_large_ls960_asr_ls960.pth",
+    "models/wav2vec2_fairseq_large_ls960_asr_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -516,7 +515,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa:  E501
 
 WAV2VEC2_LARGE_LV60K = Wav2Vec2Bundle(
-    "wav2vec2_fairseq_large_lv60k.pth",
+    "models/wav2vec2_fairseq_large_lv60k.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -558,7 +557,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_large_lv60k_asr_ll10m.pth",
+    "models/wav2vec2_fairseq_large_lv60k_asr_ll10m.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -601,7 +600,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_large_lv60k_asr_ls100.pth",
+    "models/wav2vec2_fairseq_large_lv60k_asr_ls100.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -645,7 +644,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2ASRBundle(
-    "wav2vec2_fairseq_large_lv60k_asr_ls960.pth",
+    "models/wav2vec2_fairseq_large_lv60k_asr_ls960.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -689,7 +688,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 WAV2VEC2_XLSR53 = Wav2Vec2Bundle(
-    "wav2vec2_fairseq_large_xlsr53.pth",
+    "models/wav2vec2_fairseq_large_xlsr53.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -735,7 +734,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_BASE = Wav2Vec2Bundle(
-    "hubert_fairseq_base_ls960.pth",
+    "models/hubert_fairseq_base_ls960.pth",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -777,7 +776,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_LARGE = Wav2Vec2Bundle(
-    "hubert_fairseq_large_ll60k.pth",
+    "models/hubert_fairseq_large_ll60k.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -819,7 +818,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_XLARGE = Wav2Vec2Bundle(
-    "hubert_fairseq_xlarge_ll60k.pth",
+    "models/hubert_fairseq_xlarge_ll60k.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -861,7 +860,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
 
 HUBERT_ASR_LARGE = Wav2Vec2ASRBundle(
-    "hubert_fairseq_large_ll60k_asr_ls960.pth",
+    "models/hubert_fairseq_large_ll60k_asr_ls960.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -905,7 +904,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 HUBERT_ASR_XLARGE = Wav2Vec2ASRBundle(
-    "hubert_fairseq_xlarge_ll60k_asr_ls960.pth",
+    "models/hubert_fairseq_xlarge_ll60k_asr_ls960.pth",
     {
         "extractor_mode": "layer_norm",
         "extractor_conv_layer_config": [
@@ -952,7 +951,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 
 
 VOXPOPULI_ASR_BASE_10K_DE = Wav2Vec2ASRBundle(
-    "wav2vec2_voxpopuli_base_10k_asr_de.pt",
+    "models/wav2vec2_voxpopuli_base_10k_asr_de.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -998,7 +997,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 
 
 VOXPOPULI_ASR_BASE_10K_EN = Wav2Vec2ASRBundle(
-    "wav2vec2_voxpopuli_base_10k_asr_en.pt",
+    "models/wav2vec2_voxpopuli_base_10k_asr_en.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1044,7 +1043,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 
 
 VOXPOPULI_ASR_BASE_10K_ES = Wav2Vec2ASRBundle(
-    "wav2vec2_voxpopuli_base_10k_asr_es.pt",
+    "models/wav2vec2_voxpopuli_base_10k_asr_es.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1089,7 +1088,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 """  # noqa: E501
 
 VOXPOPULI_ASR_BASE_10K_FR = Wav2Vec2ASRBundle(
-    "wav2vec2_voxpopuli_base_10k_asr_fr.pt",
+    "models/wav2vec2_voxpopuli_base_10k_asr_fr.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [
@@ -1134,7 +1133,7 @@ Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2ASRBundle` for the usage
 
 
 VOXPOPULI_ASR_BASE_10K_IT = Wav2Vec2ASRBundle(
-    "wav2vec2_voxpopuli_base_10k_asr_it.pt",
+    "models/wav2vec2_voxpopuli_base_10k_asr_it.pt",
     {
         "extractor_mode": "group_norm",
         "extractor_conv_layer_config": [

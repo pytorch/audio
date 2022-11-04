@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import torch
 from torch import Tensor
-from torchaudio._internal import load_state_dict_from_url
+import torchaudio
 from torchaudio.functional import mu_law_decoding
 from torchaudio.models import Tacotron2, WaveRNN
 from torchaudio.transforms import GriffinLim, InverseMelScale
@@ -13,9 +13,6 @@ from . import utils
 from .interface import Tacotron2TTSBundle
 
 __all__ = []
-
-_BASE_URL = "https://download.pytorch.org/torchaudio/models"
-
 
 ################################################################################
 # Pipeline implementation - Text Processor
@@ -147,9 +144,9 @@ class _Tacotron2Mixin:
 
     def get_tacotron2(self, *, dl_kwargs=None) -> Tacotron2:
         model = Tacotron2(**self._tacotron2_params)
-        url = f"{_BASE_URL}/{self._tacotron2_path}"
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
-        state_dict = load_state_dict_from_url(url, **dl_kwargs)
+        path = torchaudio.utils.download_asset(self._tacotron2_path, **dl_kwargs)
+        state_dict = torch.load(path)
         model.load_state_dict(state_dict)
         model.eval()
         return model
@@ -166,9 +163,8 @@ class _WaveRNNMixin:
 
     def _get_wavernn(self, *, dl_kwargs=None):
         model = WaveRNN(**self._wavernn_params)
-        url = f"{_BASE_URL}/{self._wavernn_path}"
         dl_kwargs = {} if dl_kwargs is None else dl_kwargs
-        state_dict = load_state_dict_from_url(url, **dl_kwargs)
+        state_dict = torchaudio.utils.download_asset(self._wavernn_path, **dl_kwargs)
         model.load_state_dict(state_dict)
         model.eval()
         return model
@@ -210,7 +206,7 @@ class _Tacotron2GriffinLimPhoneBundle(_GriffinLimMixin, _Tacotron2Mixin, _PhoneM
 
 
 TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH = _Tacotron2GriffinLimCharBundle(
-    _tacotron2_path="tacotron2_english_characters_1500_epochs_ljspeech.pth",
+    _tacotron2_path="models/tacotron2_english_characters_1500_epochs_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=38),
 )
 TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.__doc__ = """Character-based TTS pipeline with :py:class:`~torchaudio.models.Tacotron2` trained on *LJSpeech* :cite:`ljspeech17` for 1,500 epochs, and
@@ -249,7 +245,7 @@ Example - "The examination and testimony of the experts enabled the Commission t
 """  # noqa: E501
 
 TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH = _Tacotron2GriffinLimPhoneBundle(
-    _tacotron2_path="tacotron2_english_phonemes_1500_epochs_ljspeech.pth",
+    _tacotron2_path="models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=96),
 )
 TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH.__doc__ = """Phoneme-based TTS pipeline with :py:class:`~torchaudio.models.Tacotron2` trained on *LJSpeech* :cite:`ljspeech17` for 1,500 epochs and
@@ -293,7 +289,7 @@ Example - "The examination and testimony of the experts enabled the Commission t
 """  # noqa: E501
 
 TACOTRON2_WAVERNN_CHAR_LJSPEECH = _Tacotron2WaveRNNCharBundle(
-    _tacotron2_path="tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth",
+    _tacotron2_path="models/tacotron2_english_characters_1500_epochs_wavernn_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=38),
     _wavernn_path="wavernn_10k_epochs_8bits_ljspeech.pth",
     _wavernn_params=utils._get_wrnn_params(),
@@ -336,7 +332,7 @@ Example - "The examination and testimony of the experts enabled the Commission t
 """  # noqa: E501
 
 TACOTRON2_WAVERNN_PHONE_LJSPEECH = _Tacotron2WaveRNNPhoneBundle(
-    _tacotron2_path="tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth",
+    _tacotron2_path="models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth",
     _tacotron2_params=utils._get_taco_params(n_symbols=96),
     _wavernn_path="wavernn_10k_epochs_8bits_ljspeech.pth",
     _wavernn_params=utils._get_wrnn_params(),

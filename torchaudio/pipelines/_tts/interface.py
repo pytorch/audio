@@ -163,11 +163,11 @@ class Tacotron2TTSBundle(ABC):
         phonemes.
 
         If a pre-trained weight file is necessary,
-        :func:`torch.hub.download_url_to_file` is used to downloaded it.
+        :func:`torchaudio.utils.download_asset` is used to downloaded it.
 
         Args:
             dl_kwargs (dictionary of keyword arguments,):
-                Passed to :func:`torch.hub.download_url_to_file`.
+                Passed to :func:`torch.utils.download_asset`.
 
         Returns:
             TextProcessor:
@@ -228,11 +228,11 @@ class Tacotron2TTSBundle(ABC):
         """Create a vocoder module, based off of either WaveRNN or GriffinLim.
 
         If a pre-trained weight file is necessary,
-        :func:`torch.hub.load_state_dict_from_url` is used to downloaded it.
+        :func:`torchaudio.utils.download_asset` is used to downloaded it.
 
         Args:
             dl_kwargs (dictionary of keyword arguments):
-                Passed to :func:`torch.hub.load_state_dict_from_url`.
+                Passed to :func:`torchaudio.utils.download_asset`.
 
         Returns:
             Vocoder:
@@ -247,7 +247,7 @@ class Tacotron2TTSBundle(ABC):
 
         Args:
             dl_kwargs (dictionary of keyword arguments):
-                Passed to :func:`torch.hub.load_state_dict_from_url`.
+                Passed to :func:`torchaudio.utils.download_asset`.
 
         Returns:
             Tacotron2:
