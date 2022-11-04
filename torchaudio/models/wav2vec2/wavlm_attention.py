@@ -67,9 +67,6 @@ class WavLMSelfAttention(nn.Module):
         self.num_buckets = num_buckets
         self.max_distance = max_distance
 
-        # WavLM applies position embedding rel_attn_embed in the first encoder layer, but not in the subsequent ones.
-        # In order to keep our model TorchScript-able, this attribute needs to be present in all layers, so we create
-        # a dummy identity module when the actual embedding is not needed.
         if has_relative_attention_bias:
             self.rel_attn_embed = nn.Embedding(num_buckets, num_heads)
         else:
