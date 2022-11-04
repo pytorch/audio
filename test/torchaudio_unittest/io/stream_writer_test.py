@@ -351,4 +351,4 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
         # Load data
         reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
-        assert frame_rate == reader.get_src_stream_info(0).frame_rate
+        assert reader.get_src_stream_info(0).frame_rate == frame_rate
