@@ -97,8 +97,8 @@ class WavLMSelfAttention(nn.Module):
     def compute_bias(self, query_length: int, key_length: int) -> Tensor:
         """Compute relative position embeddings for WavLM model.
         Args:
-            query_length (int): Query position can take values between 0 and query_length - 1
-            key_length (int): Key position can take values between 0 and key_length - 1
+            query_length (int): Query position can take values between 0 and ``query_length - 1``.
+            key_length (int): Key position can take values between 0 and ``key_length - 1``.
         Returns:
             Tensor of shape `(num_heads, query_length, key_length)`, relative positions embeddings
         """
@@ -116,12 +116,12 @@ class WavLMSelfAttention(nn.Module):
            paper :cite:`wavlm2021`.
         Args:
             relative_positions (Tensor): Relative offsets between query and key positions,
-                of shape `(query_length, key_length)`
-            bidirectional (bool): If `True`, values will be filled both above and below the diagonal in the resulting
-                matrix. If `False`, the elements above the diagonal (i.e. with negative relative offsets) will be set
-                to zero.
+                of shape ``(query_length, key_length)``.
+            bidirectional (bool): If ``True``, values will be filled both above and below the diagonal in the resulting
+                matrix. If ``False``, the elements above the diagonal (i.e. with negative relative offsets) will be set
+                to zero. (Default ``True``)
         Returns:
-            Tensor of shape `(query_length, key_length)` filled bucketed values of with relative positions.
+            Tensor of shape ``(query_length, key_length)`` filled bucketed values of with relative positions.
         """
         num_buckets = self.num_buckets
         max_distance = self.max_distance
@@ -159,17 +159,18 @@ class WavLMSelfAttention(nn.Module):
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            query (Tensor): input of shape `(batch_size, src_len, embed_dim)`.
-            key_padding_mask (Tensor or None, optional): mask to exclude keys that are pads, of shape
-                `(batch, src_len)`, where padding elements are indicated by 1s. (Default: None)
-            attn_mask (Tensor or None, optional): needs to be `None`. The argument exists for compatibility with
-                `EncoderLayer`. (Default: None)
-            position_bias (Tensor or None, optional): position bias of shape
-                `(batch_size * num_heads, src_len, src_len)`. When used inside WavLM model encoder, will be
-                generated in the first layer and then passed from each encoder layer to the next one. (Default: None)
+            query (Tensor): Input of shape ``(batch_size, src_len, embed_dim)``.
+            key_padding_mask (Tensor or None, optional): Mask to exclude keys that are pads, of shape
+                `(batch, src_len)`, where padding elements are indicated by 1s. (Default: ``None``)
+            attn_mask (Tensor or None, optional): Needs to be ``None``. The argument exists for compatibility with
+                ``EncoderLayer``. (Default: ``None``)
+            position_bias (Tensor or None, optional): Position bias of shape
+                ``(batch_size * num_heads, src_len, src_len)``. When used inside WavLM model encoder, will be
+                generated in the first layer and then passed from each encoder layer to the next one.
+                (Default: ``None``)
         Returns:
-            attn_output (Tensor): attention output of shape `(batch_size, src_len, embed_dim)`
-            position_bias (Tensor or None): position bias of shape `(batch_size * num_heads, src_len, src_len)`.
+            attn_output (Tensor): Attention output of shape ``(batch_size, src_len, embed_dim)``.
+            position_bias (Tensor or None): Position bias of shape ``(batch_size * num_heads, src_len, src_len)``.
         """
         bsz, seq_len, embed_dim = query.size()
         assert embed_dim == self.embed_dim

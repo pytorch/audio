@@ -281,12 +281,16 @@ class SelfAttention(Module):
         """
         Args:
             x (Tensor): shape: ``[batch_size, sequence_length, embed_dim]``.
-            attention_mask (Tensor or None, optional):
+            attention_mask (Tensor or ``None``, optional):
                 shape: ``[batch_size, 1, sequence_length, sequence_length]``
-            position_bias: has to be ``None``, necessary for compatibility with WavLMSelfAttention.
-            key_padding_mask: has to be ``None``, necessary for compatibility with WavLMSelfAttention.
+            position_bias (Tensor or ``None``): Has to be ``None``, necessary for compatibility
+                with :py:class:`WavLMSelfAttention`. (Default: ``None``)
+            key_padding_mask (Tensor or ``None``): Has to be ``None``, necessary for compatibility
+                with :py:class:`WavLMSelfAttention`. (Default: ``None``)
         Returns:
-            Tensor: The resulting tensor. shape: ``[batch, sequence_length, embed_dim]``
+            (Tensor, ``None``): The resulting attention output and ``None`` (necessary for compatibility
+                with :py:class:`WavLMSelAttention`).
+                Attention output shape: ``[batch, sequence_length, embed_dim]``.
         """
         if x.ndim != 3 or x.shape[2] != self.embed_dim:
             raise ValueError(
@@ -381,16 +385,17 @@ class EncoderLayer(Module):
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            x (Tensor): input of shape `(batch, sequence_length, embed_dim)`
-            attention_mask (Tensor or None, optional): attention mask
-                of shape `(batch, 1, sequence_length, sequence_length)`
-            position_bias: position bias of shape `(batch_size * num_heads, src_len, src_len)`.
-                Only necessary for WavLM model, `None` otherwise.
-            key_padding_mask: key padding mask of shape `(batch_size, src_len)`. Only used for
-                WavLM model, ignored otherwise.
+            x (Tensor): Input of shape ``(batch, sequence_length, embed_dim)``.
+            attention_mask (Tensor or ``None``, optional): attention mask
+                of shape ``(batch, 1, sequence_length, sequence_length)``. (Default: ``None``)
+            position_bias (Tensor or ``None``, optional): position bias of shape
+                ``(batch_size * num_heads, src_len, src_len)``.
+                Only necessary for WavLM model, ``None`` otherwise. (Default: ``None``)
+            key_padding_mask (Tensor or ``None``, optional): key padding mask of shape ``(batch_size, src_len)``.
+                Only used for WavLM model, ignored otherwise. (Default: ``None``)
         Returns:
             (x, position_bias): Shapes are the same as in the input. Position bias is only relevant for WaLM model,
-                `None` otherwise.
+                ``None`` otherwise.
         """
         residual = x
 
