@@ -792,10 +792,10 @@ def _get_wavlm_encoder(
     layer_drop: float,
 ) -> Encoder:
     """
-    Construct encoder for WavLM model :cite:`chen2022wavlm`. The structure of the encoder and most of the argments are the
-    same as in :py:func:`_get_encoder` so refer there for documentation. The only difference from Wav2Vec2 encoder is
-    usage of `WavLMSelfAttention` instead of `SelfAttention` and two additional parameters: `num_buckets`
-    and `max_distance`.
+    Construct encoder for WavLM model :cite:`chen2022wavlm`. The structure of the encoder and most of the argments are
+    the same as in :py:func:`_get_encoder` so refer there for documentation. The only difference from Wav2Vec2 encoder
+    is usage of `WavLMSelfAttention` instead of `SelfAttention` and two additional parameters: `num_buckets` and
+    `max_distance`.
     Args:
         in_features (int): See :py:func:`_get_encoder`.
         embed_dim (int): See :py:func:`_get_encoder`.
