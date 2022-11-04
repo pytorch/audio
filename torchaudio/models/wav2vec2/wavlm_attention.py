@@ -31,7 +31,7 @@ from torch.nn import functional as F
 
 
 class WavLMSelfAttention(nn.Module):
-    """Multi-headed self-attention for WavLM model :cite:`wavlm2021`.
+    """Multi-headed self-attention for WavLM model :cite:`chen2022wavlm`.
     Source: https://github.com/microsoft/unilm/blob/2d8302f09c99bca2b82e6e868d81d4281cceebc8/wavlm/modules.py#L303-L763
 
     Args:
@@ -113,7 +113,7 @@ class WavLMSelfAttention(nn.Module):
 
     def _relative_positions_bucket(self, relative_positions: Tensor, bidirectional: bool = True):
         """Compute relative position buckets for WavLM model. Computation similar to formula (5) in WavLM
-           paper :cite:`wavlm2021`.
+           paper :cite:`chen2022wavlm`.
         Args:
             relative_positions (Tensor): Relative offsets between query and key positions,
                 of shape ``(query_length, key_length)``.

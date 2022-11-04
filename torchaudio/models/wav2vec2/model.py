@@ -1238,7 +1238,7 @@ def wavlm_model(
     encoder_layer_drop: float,
     aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
-    """Builds custom WaveLM model :cite:`wavlm2021`. The architecture is compatible
+    """Builds custom WaveLM model :cite:`chen2022wavlm`. The architecture is compatible
     with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output object is
     :class:`~torchaudio.models.Wav2Vec2Model`. Most of the arguments have the same meaning
     as in :py:func:`wav2vec2_model` so please refer there for documentation.
@@ -1338,7 +1338,7 @@ def wavlm_base(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Builds "base" WaveLM model :cite:`wavlm2021`. The architecture is compatible
+    """Builds "base" WaveLM model :cite:`chen2022wavlm`. The architecture is compatible
     with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is
     :class:`~torchaudio.models.Wav2Vec2Model`.
 
@@ -1390,7 +1390,7 @@ def wavlm_large(
     encoder_layer_drop: float = 0.1,
     aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
-    """Builds "large" WaveLM model :cite:`wavlm2021`. The architecture is compatible
+    """Builds "large" WaveLM model :cite:`chen2022wavlm`. The architecture is compatible
     with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is
     :class:`~torchaudio.models.Wav2Vec2Model`.
 
