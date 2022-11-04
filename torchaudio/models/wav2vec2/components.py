@@ -786,6 +786,7 @@ def _compute_mask_indices(
     Returns:
         (Tensor): The mask indices of dimension `[batch, frame]`.
     """
+
     batch_size, frame = shape
     mask = torch.full((batch_size, frame), False)
     # add a random number for probabilistic rounding

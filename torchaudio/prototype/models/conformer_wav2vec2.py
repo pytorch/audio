@@ -1,7 +1,5 @@
 from typing import List, Optional, Tuple, Union
 
-import torch
-
 from torch import nn, Tensor
 from torch.nn import Module
 from torchaudio.models.conformer import ConformerLayer
@@ -34,6 +32,14 @@ class TimeReduction(Module):
                 Input Tensor representing Mel Spectrogram output. shape ``[batch, frame, dim]``.
             length (Tensor or None, optional):
                 Valid length of each input sample. shape: ``[batch, ]``.
+
+        Returns:
+            (Tensor, Optional[Tensor]):
+            Tensor
+                Result of input tensor after passing through time reduction and linear layer
+            Tensor or None
+                If ``length`` is provided, a Tensor of shape `(batch, )` is returned, indicating
+                the valid length of each feature in the Tensor.
         """
         # TODO: case if length is none?
         if length is not None:
@@ -141,7 +147,6 @@ def _get_conformer_encoder(
     depthwise_conv_kernel_size: Union[int, List[int]],
     convolution_first: bool,
     use_group_norm: bool,
-    residual_input: bool,
 ) -> ConformerEncoder:
     """Construct Conformer Encoder
 
@@ -170,9 +175,6 @@ def _get_conformer_encoder(
         use_group_norm (bool):
             Whether to use ``GroupNorm`` rather than ``BatchNorm1d`` in the convolution
             module in each Conformer layer.
-        residual_input (bool):
-            Whether the residual weighting is applied to the input or output of the model
-            in each Conformer layers.
     """
     feature_projection = components.FeatureProjection(in_features, embed_dim, dropout_input)
 
@@ -191,7 +193,6 @@ def _get_conformer_encoder(
             dropout=dropout,
             use_group_norm=use_group_norm,
             convolution_first=convolution_first,
-            residual_input=residual_input,
         )
         conformer_layers.append(layer)
 
@@ -211,7 +212,6 @@ def conformer_wav2vec2_model(
     encoder_dropout: float,
     encoder_convolution_first: bool,
     encoder_use_group_norm: bool,
-    encoder_residual_input: bool,
 ):
     """Build a custom Conformer Wav2Vec2Model
 
@@ -244,9 +244,6 @@ def conformer_wav2vec2_model(
         encoder_use_group_norm (bool):
             Whether to use ``GroupNorm`` rather than ``BatchNorm1d`` in the convolution
             module in each Conformer layer.
-        encoder_residual_input (bool):
-            Whether the residual weighting is applied to the input or output of the model
-            in each Conformer layers.
     """
     feature_extractor = _get_conformer_feature_extractor(
         extractor_input_dim,
@@ -265,7 +262,6 @@ def conformer_wav2vec2_model(
         dropout=encoder_dropout,
         convolution_first=encoder_convolution_first,
         use_group_norm=encoder_use_group_norm,
-        residual_input=encoder_residual_input,
     )
 
     return model.Wav2Vec2Model(feature_extractor, encoder)
@@ -301,5 +297,4 @@ def conformer_wav2vec2_base(
         encoder_dropout=0.1,
         encoder_convolution_first=True,
         encoder_use_group_norm=True,
-        encoder_residual_input=True,
     )
