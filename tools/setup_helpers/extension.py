@@ -110,8 +110,6 @@ class CMakeBuild(build_ext):
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
             f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
-            f"-DCUDNN_LIBRARY=/usr/local/Cluster-Apps/cudnn/8.1_cuda-11.2/lib64",
-            f"-DCUDNN_INCLUDE_DIR=/usr/local/Cluster-Apps/cudnn/8.1_cuda-11.2/include",
         ]
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake
