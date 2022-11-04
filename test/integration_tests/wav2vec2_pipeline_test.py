@@ -24,6 +24,9 @@ from torchaudio.pipelines import (
     WAV2VEC2_LARGE,
     WAV2VEC2_LARGE_LV60K,
     WAV2VEC2_XLSR53,
+    WAVLM_BASE,
+    WAVLM_BASE_PLUS,
+    WAVLM_LARGE,
 )
 
 
@@ -37,6 +40,9 @@ from torchaudio.pipelines import (
         HUBERT_BASE,
         HUBERT_LARGE,
         HUBERT_XLARGE,
+        WAVLM_BASE,
+        WAVLM_BASE_PLUS,
+        WAVLM_LARGE,
     ],
 )
 def test_pretraining_models(bundle):
