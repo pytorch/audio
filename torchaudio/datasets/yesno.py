@@ -19,7 +19,7 @@ _RELEASE_CONFIGS = {
 
 
 class YESNO(Dataset):
-    """Create a Dataset for *YesNo* [:footcite:`YesNo`].
+    """*YesNo* :cite:`YesNo` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -72,7 +72,14 @@ class YESNO(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, List[int]): ``(waveform, sample_rate, labels)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            List[int]:
+                labels
         """
         fileid = self._walker[n]
         item = self._load_item(fileid, self._path)

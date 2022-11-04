@@ -7,9 +7,10 @@ __all__ = [
 
 class Wav2Letter(nn.Module):
     r"""Wav2Letter model architecture from *Wav2Letter: an End-to-End ConvNet-based Speech
-    Recognition System* [:footcite:`collobert2016wav2letter`].
+    Recognition System* :cite:`collobert2016wav2letter`.
 
-     :math:`\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}`
+    See Also:
+        * `Training example <https://github.com/pytorch/audio/tree/release/0.12/examples/pipeline_wav2letter>`__
 
     Args:
         num_classes (int, optional): Number of classes to be classified. (Default: ``40``)
@@ -19,7 +20,7 @@ class Wav2Letter(nn.Module):
     """
 
     def __init__(self, num_classes: int = 40, input_type: str = "waveform", num_features: int = 1) -> None:
-        super(Wav2Letter, self).__init__()
+        super().__init__()
 
         acoustic_num_features = 250 if input_type == "waveform" else num_features
         acoustic_model = nn.Sequential(

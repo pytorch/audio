@@ -4,7 +4,7 @@ import sys
 import pytest
 import torch
 import torchaudio
-from torchaudio.prototype.pipelines import CONVTASNET_BASE_LIBRI2MIX, HDEMUCS_HIGH_MUSDB, HDEMUCS_HIGH_MUSDB_PLUS
+from torchaudio.pipelines import CONVTASNET_BASE_LIBRI2MIX, HDEMUCS_HIGH_MUSDB, HDEMUCS_HIGH_MUSDB_PLUS
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "examples"))

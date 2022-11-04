@@ -3,6 +3,8 @@
 Audio I/O
 =========
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use TorchAudio's basic I/O API to load audio files
 into PyTorch's Tensor object, and save Tensor objects to audio files.
 """
@@ -304,8 +306,8 @@ print("matched!")
 #
 # .. note::
 #
-# Saving data in encodings with a lower bit depth reduces the
-# resulting file size but also precision.
+#    Saving data in encodings with a lower bit depth reduces the
+#    resulting file size but also precision.
 #
 
 waveform, sample_rate = torchaudio.load(SAMPLE_WAV)

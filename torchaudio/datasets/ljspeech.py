@@ -20,7 +20,7 @@ _RELEASE_CONFIGS = {
 
 
 class LJSPEECH(Dataset):
-    """Create a Dataset for *LJSpeech-1.1* [:footcite:`ljspeech17`].
+    """*LJSpeech-1.1* :cite:`ljspeech17` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -78,8 +78,16 @@ class LJSPEECH(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, str):
-            ``(waveform, sample_rate, transcript, normalized_transcript)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            str:
+                Normalized Transcript
         """
         line = self._flist[n]
         fileid, transcript, normalized_transcript = line

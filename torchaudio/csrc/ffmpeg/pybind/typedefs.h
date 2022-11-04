@@ -9,13 +9,16 @@ struct FileObj {
   py::object fileobj;
   int buffer_size;
   AVIOContextPtr pAVIO;
-  FileObj(py::object fileobj, int buffer_size);
+  FileObj(py::object fileobj, int buffer_size, bool writable);
 };
 
-c10::optional<OptionDict> map2dict(
-    const c10::optional<std::map<std::string, std::string>>& src);
+using OptionMap = std::map<std::string, std::string>;
 
-std::map<std::string, std::string> dict2map(const OptionDict& src);
+OptionDict map2dict(const OptionMap& src);
+
+c10::optional<OptionDict> map2dict(const c10::optional<OptionMap>& src);
+
+OptionMap dict2map(const OptionDict& src);
 
 } // namespace ffmpeg
 } // namespace torchaudio

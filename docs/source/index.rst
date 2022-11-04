@@ -30,6 +30,7 @@ Features described in this documentation are classified by release status:
 
    Index <self>
    supported_features
+   references
 
 API References
 --------------
@@ -60,7 +61,6 @@ Prototype API References
    :caption: Prototype API Reference
 
    prototype
-   prototype.ctc_decoder
    prototype.functional
    prototype.models
    prototype.pipelines
@@ -72,9 +72,7 @@ Getting Started
    :maxdepth: 1
    :caption: Getting Started
 
-   tutorials/audio_io_tutorial
-   tutorials/streaming_api_tutorial
-   tutorials/streaming_api2_tutorial
+   tutorials.io
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
@@ -88,7 +86,6 @@ Advanced Usages
    :maxdepth: 1
    :caption: Advanced Usages
 
-   hw_acceleration_tutorial
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr

@@ -269,8 +269,8 @@ def griffinlim(
     .. properties:: Autograd TorchScript
 
     Implementation ported from
-    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
-    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
+    *librosa* :cite:`brian_mcfee-proc-scipy-2015`, *A fast Griffin-Lim algorithm* :cite:`6701851`
+    and *Signal estimation from modified short-time Fourier transform* :cite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension `(..., freq, frames)`
@@ -533,7 +533,7 @@ def melscale_fbanks(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -547,7 +547,7 @@ def melscale_fbanks(
     """
 
     if norm is not None and norm != "slaney":
-        raise ValueError("norm must be one of None or 'slaney'")
+        raise ValueError('norm must be one of None or "slaney"')
 
     # freq bins
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
@@ -634,7 +634,7 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     Args:
         n_mfcc (int): Number of mfc coefficients to retain
         n_mels (int): Number of mel filterbanks
-        norm (str or None): Norm to use (either 'ortho' or None)
+        norm (str or None): Norm to use (either "ortho" or None)
 
     Returns:
         Tensor: The transformation matrix, to be right-multiplied to
@@ -642,7 +642,7 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     """
 
     if norm is not None and norm != "ortho":
-        raise ValueError("norm must be either 'ortho' or None")
+        raise ValueError('norm must be either "ortho" or None')
 
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
     n = torch.arange(float(n_mels))
@@ -1332,7 +1332,7 @@ def compute_kaldi_pitch(
     snip_edges: bool = True,
 ) -> torch.Tensor:
     """Extract pitch based on method described in *A pitch extraction algorithm tuned
-    for automatic speech recognition* [:footcite:`6854049`].
+    for automatic speech recognition* :cite:`6854049`.
 
     .. devices:: CPU
 
@@ -1552,7 +1552,7 @@ def resample(
     resampling_method: str = "sinc_interpolation",
     beta: Optional[float] = None,
 ) -> Tensor:
-    r"""Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.
 
     .. devices:: CPU CUDA
 
@@ -1571,7 +1571,7 @@ def resample(
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+            Options: [``"sinc_interpolation"``, ``"kaiser_window"``] (Default: ``"sinc_interpolation"``)
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
@@ -1838,9 +1838,10 @@ def rnnt_loss(
     blank: int = -1,
     clamp: float = -1,
     reduction: str = "mean",
+    fused_log_softmax: bool = True,
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
-    [:footcite:`graves2012sequence`].
+    :cite:`graves2012sequence`.
 
     .. devices:: CPU CUDA
 
@@ -1859,13 +1860,14 @@ def rnnt_loss(
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
-            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+            ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
     Returns:
-        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size `(batch)`,
+        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size `(batch)`,
         otherwise scalar.
     """
     if reduction not in ["none", "mean", "sum"]:
-        raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
+        raise ValueError('reduction should be one of "none", "mean", or "sum"')
 
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
@@ -1877,6 +1879,7 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
+        fused_log_softmax=fused_log_softmax,
     )
 
     if reduction == "mean":
@@ -2009,8 +2012,8 @@ def mvdr_weights_souden(
     diag_eps: float = 1e-7,
     eps: float = 1e-8,
 ) -> Tensor:
-    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
-    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights
+    by the method proposed by *Souden et, al.* :cite:`souden2009optimal`.
 
     .. devices:: CPU CUDA
 
@@ -2059,7 +2062,7 @@ def mvdr_weights_souden(
         # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
         beamform_weights = torch.einsum("...c,...c->...", [ws, reference_channel[..., None, None, :]])
     else:
-        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+        raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
 
     return beamform_weights
 
@@ -2072,7 +2075,7 @@ def mvdr_weights_rtf(
     diag_eps: float = 1e-7,
     eps: float = 1e-8,
 ) -> Tensor:
-    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights
     based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.
 
     .. devices:: CPU CUDA
@@ -2142,7 +2145,7 @@ def mvdr_weights_rtf(
             reference_channel = reference_channel.to(psd_n.dtype)
             scale = torch.einsum("...c,...c->...", [rtf.conj(), reference_channel[..., None, :]])
         else:
-            raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+            raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
 
         beamform_weights = beamform_weights * scale[..., None]
 
@@ -2220,7 +2223,7 @@ def rtf_power(
         reference_channel = reference_channel.to(psd_n.dtype)
         rtf = torch.einsum("...c,...c->...", [phi, reference_channel[..., None, None, :]])
     else:
-        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+        raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
     rtf = rtf.unsqueeze(-1)  # (..., freq, channel, 1)
     if n_iter >= 2:
         # The number of iterations in the for loop is `n_iter - 2`

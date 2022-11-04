@@ -996,11 +996,15 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 
 
 class GTZAN(Dataset):
-    """Create a Dataset for *GTZAN* [:footcite:`tzanetakis_essl_cook_2001`].
+    """*GTZAN* :cite:`tzanetakis_essl_cook_2001` dataset.
 
     Note:
         Please see http://marsyas.info/downloads/datasets.html if you are planning to use
         this dataset to publish results.
+
+    Note:
+        As of October 2022, the download link is not currently working. Setting ``download=True``
+        in GTZAN dataset will result in a URL connection error.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -1096,7 +1100,14 @@ class GTZAN(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str): ``(waveform, sample_rate, label)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Label
         """
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)

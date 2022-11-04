@@ -4,6 +4,7 @@ from .commonvoice import COMMONVOICE
 from .dr_vctk import DR_VCTK
 from .fluentcommands import FluentSpeechCommands
 from .gtzan import GTZAN
+from .iemocap import IEMOCAP
 from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
@@ -12,6 +13,7 @@ from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
 from .musdb_hq import MUSDB_HQ
 from .quesst14 import QUESST14
+from .snips import Snips
 from .speechcommands import SPEECHCOMMANDS
 from .tedlium import TEDLIUM
 from .vctk import VCTK_092
@@ -40,4 +42,6 @@ __all__ = [
     "FluentSpeechCommands",
     "VoxCeleb1Identification",
     "VoxCeleb1Verification",
+    "IEMOCAP",
+    "Snips",
 ]

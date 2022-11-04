@@ -3,6 +3,8 @@
 Audio Data Augmentation
 =======================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 ``torchaudio`` provides a variety of ways to augment audio data.
 
 In this tutorial, we look into a way to apply effects, filters,
@@ -436,8 +438,8 @@ Audio(bg_added, rate=sample_rate)
 Audio(filtered, rate=sample_rate2)
 
 ######################################################################
-# Codec aplied:
-# ~~~~~~~~~~~~~
+# Codec applied:
+# ~~~~~~~~~~~~~~
 #
 
 Audio(codec_applied, rate=sample_rate2)

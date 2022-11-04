@@ -9,24 +9,23 @@ import torchaudio
 
 @dataclass
 class StreamReaderSourceStream:
-    """StreamReaderSourceStream()
+    """The metadata of a source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
 
-    The metadata of a source stream. This class is used when representing streams of
-    media type other than `audio` or `video`.
+    This class is used when representing streams of media type other than `audio` or `video`.
 
-    When source stream is `audio` or `video` type, :py:class:`SourceAudioStream` and
-    :py:class:`SourceVideoStream`, which reports additional media-specific attributes,
+    When source stream is `audio` or `video` type, :class:`StreamReaderSourceAudioStream` and
+    :class:`StreamReaderSourceVideoStream`, which reports additional media-specific attributes,
     are used respectively.
     """
 
     media_type: str
     """The type of the stream.
-    One of `audio`, `video`, `data`, `subtitle`, `attachment` and empty string.
+    One of ``"audio"``, ``"video"``, ``"data"``, ``"subtitle"``, ``"attachment"`` and empty string.
 
     .. note::
-       Only `audio` and `video` streams are supported for output.
+       Only audio and video streams are supported for output.
     .. note::
-       Still images, such as PNG and JPEG formats are reported as `video`.
+       Still images, such as PNG and JPEG formats are reported as video.
     """
     codec: str
     """Short name of the codec. Such as ``"pcm_s16le"`` and ``"h264"``."""
@@ -67,13 +66,12 @@ class StreamReaderSourceStream:
 
 @dataclass
 class StreamReaderSourceAudioStream(StreamReaderSourceStream):
-    """StreamReaderSourceAudioStream()
+    """The metadata of an audio source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
 
-    The metadata of an audio source stream.
+    This class is used when representing audio stream.
 
-    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,
-    when the source stream is audio type, then the following additional attributes
-    are reported.
+    In addition to the attributes reported by :class:`StreamReaderSourceStream`,
+    the following attributes are reported.
     """
 
     sample_rate: float
@@ -84,13 +82,12 @@ class StreamReaderSourceAudioStream(StreamReaderSourceStream):
 
 @dataclass
 class StreamReaderSourceVideoStream(StreamReaderSourceStream):
-    """StreamReaderSourceVideoStream()
+    """The metadata of a video source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
 
-    The metadata of a video source stream.
+    This class is used when representing video stream.
 
-    In addition to the attributes reported by :py:func:`StreamReaderSourceStream`,
-    when the source stream is audio type, then the following additional attributes
-    are reported.
+    In addition to the attributes reported by :class:`StreamReaderSourceStream`,
+    the following attributes are reported.
     """
 
     width: int
@@ -170,9 +167,8 @@ def _parse_si(i):
 
 @dataclass
 class StreamReaderOutputStream:
-    """OutputStream()
-
-    Output stream configured on :py:class:`StreamReader`.
+    """Output stream configured on :class:`StreamReader`,
+    returned by :meth:`~torchaudio.io.StreamReader.get_out_stream_info`.
     """
 
     source_index: int
@@ -287,7 +283,7 @@ class StreamReader:
     For the detailed usage of this class, please refer to the tutorial.
 
     Args:
-        src (str or file-like object): The media source.
+        src (str, file-like object or Tensor): The media source.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. This includes a file path, URL, device identifier or
             filter expression. The supported value depends on the FFmpeg found
@@ -299,6 +295,9 @@ class StreamReader:
             the method when parsing media metadata. This improves the reliability
             of codec detection. The signagure of `seek` method must be
             `seek(offset: int, whence: int) -> int`.
+
+            If Tensor, it is interpreted as byte buffer.
+            It must be one-dimensional, of type ``torch.uint8``.
 
             Please refer to the following for the expected signature and behavior
             of `read` and `seek` method.
@@ -354,10 +353,12 @@ class StreamReader:
     ):
         if isinstance(src, str):
             self._be = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, option)
+        elif isinstance(src, torch.Tensor):
+            self._be = torch.classes.torchaudio.ffmpeg_StreamReaderTensor(src, format, option, buffer_size)
         elif hasattr(src, "read"):
             self._be = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
-            raise ValueError("`src` must be either string or file-like object.")
+            raise ValueError("`src` must be either string, Tensor or file-like object.")
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i

@@ -17,7 +17,7 @@ SampleType = Tuple[Tensor, int, str, str, str]
 
 
 class VCTK_092(Dataset):
-    """Create *VCTK 0.92* [:footcite:`yamagishi2019vctk`] Dataset
+    """*VCTK 0.92* :cite:`yamagishi2019vctk` dataset
 
     Args:
         root (str): Root directory where the dataset's top level directory is found.
@@ -123,8 +123,18 @@ class VCTK_092(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, str, str):
-            ``(waveform, sample_rate, transcript, speaker_id, utterance_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            str:
+                Speaker ID
+            std:
+                Utterance ID
         """
         speaker_id, utterance_id = self._sample_ids[n]
         return self._load_sample(speaker_id, utterance_id, self._mic_id)

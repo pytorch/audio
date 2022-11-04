@@ -8,6 +8,8 @@ import warnings
 import zipfile
 from typing import Any, Iterable, List, Optional
 
+import torchaudio
+
 from torch.utils.model_zoo import tqdm
 
 
@@ -189,3 +191,15 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
         pass
 
     raise NotImplementedError("We currently only support tar.gz, tgz, and zip achives.")
+
+
+def _load_waveform(
+    root: str,
+    filename: str,
+    exp_sample_rate: int,
+):
+    path = os.path.join(root, filename)
+    waveform, sample_rate = torchaudio.load(path)
+    if exp_sample_rate != sample_rate:
+        raise ValueError(f"sample rate should be {exp_sample_rate}, but got {sample_rate}")
+    return waveform

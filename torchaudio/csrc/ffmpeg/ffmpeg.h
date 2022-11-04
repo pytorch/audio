@@ -93,6 +93,15 @@ struct AVFormatInputContextPtr
   explicit AVFormatInputContextPtr(AVFormatContext* p);
 };
 
+struct AVFormatOutputContextDeleter {
+  void operator()(AVFormatContext* p);
+};
+
+struct AVFormatOutputContextPtr
+    : public Wrapper<AVFormatContext, AVFormatOutputContextDeleter> {
+  explicit AVFormatOutputContextPtr(AVFormatContext* p);
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // AVIO
 ////////////////////////////////////////////////////////////////////////////////

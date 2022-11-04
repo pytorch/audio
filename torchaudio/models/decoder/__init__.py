@@ -2,6 +2,8 @@ _INITIALIZED = False
 _LAZILY_IMPORTED = [
     "CTCHypothesis",
     "CTCDecoder",
+    "CTCDecoderLM",
+    "CTCDecoderLMState",
     "ctc_decoder",
     "download_pretrained_files",
 ]

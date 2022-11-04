@@ -1,5 +1,6 @@
+from ._hdemucs import HDemucs, hdemucs_high, hdemucs_low, hdemucs_medium
 from .conformer import Conformer
-from .conv_tasnet import ConvTasNet
+from .conv_tasnet import conv_tasnet_base, ConvTasNet
 from .deepspeech import DeepSpeech
 from .emformer import Emformer
 from .rnnt import emformer_rnnt_base, emformer_rnnt_model, RNNT
@@ -28,6 +29,7 @@ __all__ = [
     "Wav2Letter",
     "WaveRNN",
     "ConvTasNet",
+    "conv_tasnet_base",
     "DeepSpeech",
     "Wav2Vec2Model",
     "HuBERTPretrainModel",
@@ -50,4 +52,8 @@ __all__ = [
     "RNNTBeamSearch",
     "emformer_rnnt_base",
     "emformer_rnnt_model",
+    "HDemucs",
+    "hdemucs_low",
+    "hdemucs_medium",
+    "hdemucs_high",
 ]

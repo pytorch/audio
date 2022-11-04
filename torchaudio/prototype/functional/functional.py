@@ -19,12 +19,12 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     .. properties:: Autograd TorchScript
 
     Args:
-        x (torch.Tensor): First convolution operand, with shape `(*, N)`.
-        y (torch.Tensor): Second convolution operand, with shape `(*, M)`
+        x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
 
     Returns:
-        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(*, N + M - 1)`, where
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., N + M - 1)`, where
         the leading dimensions match those of ``x``.
 
     .. _convolution:
@@ -48,12 +48,12 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     .. properties:: Autograd TorchScript
 
     Args:
-        x (torch.Tensor): First convolution operand, with shape `(*, N)`.
-        y (torch.Tensor): Second convolution operand, with shape `(*, M)`
+        x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
 
     Returns:
-        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(*, N + M - 1)`, where
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., N + M - 1)`, where
         the leading dimensions match those of ``x``.
 
     .. _convolution:
@@ -76,3 +76,61 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     )
     output_shape = x.shape[:-1] + (-1,)
     return output.reshape(output_shape)
+
+
+def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor) -> torch.Tensor:
+    r"""Scales and adds noise to waveform per signal-to-noise ratio.
+
+    Specifically, for each pair of waveform vector :math:`x \in \mathbb{R}^L` and noise vector
+    :math:`n \in \mathbb{R}^L`, the function computes output :math:`y` as
+
+    .. math::
+        y = x + a n \, \text{,}
+
+    where
+
+    .. math::
+        a = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}}{10}} } \, \text{,}
+
+    with :math:`\text{SNR}` being the desired signal-to-noise ratio between :math:`x` and :math:`n`, in dB.
+
+    Note that this function broadcasts singleton leading dimensions in its inputs in a manner that is
+    consistent with the above formulae and PyTorch's broadcasting semantics.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
+        noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
+        lengths (torch.Tensor): Valid lengths of signals in ``waveform`` and ``noise``, with shape `(...,)`
+            (leading dimensions must match those of ``waveform``).
+        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+
+    Returns:
+        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
+        (same shape as ``waveform``).
+    """
+
+    if not (waveform.ndim - 1 == noise.ndim - 1 == lengths.ndim == snr.ndim):
+        raise ValueError("Input leading dimensions don't match.")
+
+    L = waveform.size(-1)
+
+    if L != noise.size(-1):
+        raise ValueError(f"Length dimensions of waveform and noise don't match (got {L} and {noise.size(-1)}).")
+
+    # compute scale
+    mask = torch.arange(0, L, device=lengths.device).expand(waveform.shape) < lengths.unsqueeze(
+        -1
+    )  # (*, L) < (*, 1) = (*, L)
+    energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
+    energy_noise = torch.linalg.vector_norm(noise * mask, ord=2, dim=-1) ** 2  # (*,)
+    original_snr_db = 10 * (torch.log10(energy_signal) - torch.log10(energy_noise))
+    scale = 10 ** ((original_snr_db - snr) / 20.0)  # (*,)
+
+    # scale noise
+    scaled_noise = scale.unsqueeze(-1) * noise  # (*, 1) * (*, L) = (*, L)
+
+    return waveform + scaled_noise  # (*, L)
