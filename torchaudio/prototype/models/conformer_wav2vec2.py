@@ -17,7 +17,7 @@ class TimeReduction(Module):
         output_dim (int): output dimension of the tensor
     """
 
-    def __init__(self, stride: int, input_dim: int, output_dim: int):
+    def __init__(self, input_dim: int, output_dim: int, stride: int):
         super().__init__()
         self.time_reduction_layer = _TimeReduction(stride=stride)
         self.linear_layer = nn.Linear(input_dim * stride, output_dim)
@@ -25,28 +25,20 @@ class TimeReduction(Module):
     def forward(
         self,
         x: Tensor,
-        length: Optional[Tensor],
+        lengths: Optional[Tensor],
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
             x (Tensor):
-                Input Tensor representing Mel Spectrogram output. shape ``[batch, frame, dim]``.
+                Input Tensor representing log Mel Spectrogram output. shape ``(batch, frame, dim)``.
             length (Tensor or None, optional):
-                Valid length of each input sample. shape: ``[batch, ]``.
-
-        Returns:
-            (Tensor, Optional[Tensor]):
-            Tensor
-                Result of input tensor after passing through time reduction and linear layer
-            Tensor or None
-                If ``length`` is provided, a Tensor of shape `(batch, )` is returned, indicating
-                the valid length of each feature in the Tensor.
+                Valid length of each input sample. shape: ``(batch, )``.
         """
         # TODO: case if length is none?
-        if length is not None:
-            x, length = self.time_reduction_layer(x, length)
+        if lengths is not None:
+            x, lengths = self.time_reduction_layer(x, lengths)
         x = self.linear_layer(x)
-        return x, length
+        return x, lengths
 
 
 class ConformerEncoder(Module):
@@ -137,7 +129,7 @@ def _get_conformer_feature_extractor(
     Result:
         TimeReduction: The resulting feature extraction
     """
-    return TimeReduction(stride, input_dim, output_dim)
+    return TimeReduction(input_dim, output_dim, stride)
 
 
 def _get_conformer_encoder(
