@@ -6,6 +6,7 @@ from lightning import ConformerRNNTModule
 from pytorch_lightning import seed_everything, Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.strategies import DDPStrategy
 from transforms import get_data_module
 
 
@@ -41,7 +42,7 @@ def run_train(args):
             num_nodes=args.nodes,
             gpus=args.gpus,
             accelerator="gpu",
-            strategy=DDPPlugin(find_unused_parameters=False),
+            strategy=DDPStrategy(find_unused_parameters=False),
             callbacks=callbacks,
             reload_dataloaders_every_n_epochs=1,
             resume_from_checkpoint=args.resume
@@ -53,7 +54,7 @@ def run_train(args):
             num_nodes=args.nodes,
             gpus=args.gpus,
             accelerator="gpu",
-            strategy=DDPPlugin(find_unused_parameters=False),
+            strategy=DDPStrategy(find_unused_parameters=False),
             callbacks=callbacks,
             reload_dataloaders_every_n_epochs=1,
         )

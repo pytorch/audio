@@ -94,7 +94,7 @@ class ConformerRNNTModule(LightningModule):
         # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
         # For greater customizability, please refer to ``conformer_rnnt_model``.
         self.model = conformer_rnnt_biasing_base(charlist=self.char_list)
-        self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
+        self.loss = torchaudio.transforms.RNNTLoss(reduction="sum", fused_log_softmax=False)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
