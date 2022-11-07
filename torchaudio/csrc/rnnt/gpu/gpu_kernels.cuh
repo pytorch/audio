@@ -60,10 +60,10 @@ __global__ void ComputeLogProbs(
     int target = targets[Indexer2D(maxU - 1)(bTgt, u)];
     logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
         CAST_DTYPE(logits[idx * D + target]) - denominators[idx];
-    
+
     if (!fusedLogSmax) {
       logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
-          CAST_DTYPE(logits[idx * D + target]);      
+          CAST_DTYPE(logits[idx * D + target]);
     }
   }
 }
