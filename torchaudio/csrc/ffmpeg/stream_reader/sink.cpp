@@ -84,10 +84,12 @@ int Sink::process_frame(AVFrame* pFrame) {
     ret = filter->get_frame(frame);
     //  AVERROR(EAGAIN) means that new input data is required to return new
     //  output.
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
       return 0;
-    if (ret >= 0)
+    }
+    if (ret >= 0) {
       buffer->push_frame(frame);
+    }
     av_frame_unref(frame);
   }
   return ret;

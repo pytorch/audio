@@ -1,12 +1,30 @@
 import torch
 
 
-def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor) -> None:
+def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
     if x.shape[:-1] != y.shape[:-1]:
         raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+    valid_convolve_modes = ["full", "valid", "same"]
+    if mode not in valid_convolve_modes:
+        raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
 
 
-def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
+    valid_convolve_modes = ["full", "valid", "same"]
+    if mode == "full":
+        return conv_result
+    elif mode == "valid":
+        target_length = max(x_length, y_length) - min(x_length, y_length) + 1
+        start_idx = (conv_result.size(-1) - target_length) // 2
+        return conv_result[..., start_idx : start_idx + target_length]
+    elif mode == "same":
+        start_idx = (conv_result.size(-1) - x_length) // 2
+        return conv_result[..., start_idx : start_idx + x_length]
+    else:
+        raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
+
+
+def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tensor:
     r"""
     Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this function
     is generally much faster than :meth:`convolve`.
@@ -22,22 +40,29 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
 
     Returns:
-        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., N + M - 1)`, where
-        the leading dimensions match those of ``x``.
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+        the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
 
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_convolve_inputs(x, y)
+    _check_convolve_inputs(x, y, mode)
 
     n = x.size(-1) + y.size(-1) - 1
     fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
-    return torch.fft.irfft(fresult, n=n)
+    result = torch.fft.irfft(fresult, n=n)
+    return _apply_convolve_mode(result, x.size(-1), y.size(-1), mode)
 
 
-def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tensor:
     r"""
     Convolves inputs along their last dimension using the direct method.
     Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation
@@ -51,15 +76,23 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
 
     Returns:
-        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., N + M - 1)`, where
-        the leading dimensions match those of ``x``.
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+        the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
 
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_convolve_inputs(x, y)
+    _check_convolve_inputs(x, y, mode)
+
+    x_size, y_size = x.size(-1), y.size(-1)
 
     if x.size(-1) < y.size(-1):
         x, y = y, x
@@ -75,7 +108,8 @@ def convolve(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         padding=reshaped_y.size(-1) - 1,
     )
     output_shape = x.shape[:-1] + (-1,)
-    return output.reshape(output_shape)
+    result = output.reshape(output_shape)
+    return _apply_convolve_mode(result, x_size, y_size, mode)
 
 
 def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor) -> torch.Tensor:

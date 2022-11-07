@@ -189,6 +189,8 @@ todo_include_todos = True
 html_theme = "pytorch_sphinx_theme"
 html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
 
+html_favicon = "_static/img/favicon.ico"
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -201,8 +203,6 @@ html_theme_options = {
     "navigation_with_keys": True,
     "analytics_id": "UA-117752657-2",
 }
-
-html_logo = "_static/img/pytorch-logo-dark.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -347,7 +347,7 @@ def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
 
 
-from custom_directives import SupportedDevices, SupportedProperties
+from custom_directives import CustomCardEnd, CustomCardItem, CustomCardStart, SupportedDevices, SupportedProperties
 
 # Register custom directives
 
@@ -355,3 +355,6 @@ from docutils.parsers import rst
 
 rst.directives.register_directive("devices", SupportedDevices)
 rst.directives.register_directive("properties", SupportedProperties)
+rst.directives.register_directive("customcardstart", CustomCardStart)
+rst.directives.register_directive("customcarditem", CustomCardItem)
+rst.directives.register_directive("customcardend", CustomCardEnd)
