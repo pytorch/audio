@@ -255,7 +255,32 @@ class TestHFIntegration(TorchaudioTestCase):
         hyp, _ = reloaded(x)
         self.assertEqual(ref, hyp)
 
-    def _test_recreate_wavlm(self, imported, reloaded, config):
+    @PRETRAIN_CONFIGS
+    def test_recreate_pretrain(self, config, factory_func):
+        """Imported models can be recreated via a factory function without Hugging Face transformers."""
+        imported = import_huggingface_model(self._get_model(config)).eval()
+        reloaded = factory_func()
+        reloaded.load_state_dict(imported.state_dict())
+        reloaded.eval()
+        self._test_recreate(imported, reloaded, config)
+
+    @FINETUNE_CONFIGS
+    def test_recreate_finetune(self, config, factory_func):
+        """Imported models can be recreated via a factory function without Hugging Face transformers."""
+        imported = import_huggingface_model(self._get_model(config)).eval()
+        reloaded = factory_func(aux_num_out=imported.aux.out_features)
+        reloaded.load_state_dict(imported.state_dict())
+        reloaded.eval()
+        self._test_recreate(imported, reloaded, config)
+
+    @WAVLM_CONFIGS
+    def test_recreate_wavlm(self, config, factory_func):
+        """Imported models can be recreated via a factory function without Hugging Face transformers."""
+        imported = import_huggingface_model(self._get_model(config)).eval()
+        reloaded = factory_func()
+        reloaded.load_state_dict(imported.state_dict())
+        reloaded.eval()
+
         # FeatureExtractor
         x = torch.randn(3, 1024)
         ref, _ = imported.feature_extractor(x, None)
@@ -289,41 +314,8 @@ class TestHFIntegration(TorchaudioTestCase):
         ref = imported.encoder.transformer(x)
         hyp = reloaded.encoder.transformer(x)
         self.assertEqual(ref, hyp)
-        # Aux
-        if imported.aux is not None:
-            x = torch.randn(3, 10, config["hidden_size"])
-            ref = imported.aux(x)
-            hyp = reloaded.aux(x)
-            self.assertEqual(ref, hyp)
         # The whole model
         x = torch.randn(3, 1024)
         ref, _ = imported(x)
         hyp, _ = reloaded(x)
         self.assertEqual(ref, hyp)
-
-    @PRETRAIN_CONFIGS
-    def test_recreate_pretrain(self, config, factory_func):
-        """Imported models can be recreated via a factory function without Hugging Face transformers."""
-        imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func()
-        reloaded.load_state_dict(imported.state_dict())
-        reloaded.eval()
-        self._test_recreate(imported, reloaded, config)
-
-    @WAVLM_CONFIGS
-    def test_recreate_wavlm(self, config, factory_func):
-        """Imported models can be recreated via a factory function without Hugging Face transformers."""
-        imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func()
-        reloaded.load_state_dict(imported.state_dict())
-        reloaded.eval()
-        self._test_recreate_wavlm(imported, reloaded, config)
-
-    @FINETUNE_CONFIGS
-    def test_recreate_finetune(self, config, factory_func):
-        """Imported models can be recreated via a factory function without Hugging Face transformers."""
-        imported = import_huggingface_model(self._get_model(config)).eval()
-        reloaded = factory_func(aux_num_out=imported.aux.out_features)
-        reloaded.load_state_dict(imported.state_dict())
-        reloaded.eval()
-        self._test_recreate(imported, reloaded, config)

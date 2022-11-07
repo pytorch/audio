@@ -78,8 +78,13 @@ class WavLMSelfAttention(nn.Module):
         self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.k_proj.qconfig = None  # This tells PyTorch not to quantize these weights.
-        self.v_proj.qconfig = None  # Otherwise torch.cat operation in self.forward breaks for a quantized model.
+        # The lines below tell PyTorch not to quantize linear layers k_proj, v_proj, q_proj. This is needed because
+        # in self.forward we call torch.cat on biases of those layers. However, after quantization the Linear
+        # module is converted to DynamicQuantizedLinear, in which the bias parameter becomes a method, and so using
+        # biases in this way would cause the quantized model to break.
+        # See also https://github.com/pytorch/audio/pull/2822#discussion_r1014431878
+        self.k_proj.qconfig = None
+        self.v_proj.qconfig = None
         self.q_proj.qconfig = None
 
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
