@@ -425,13 +425,34 @@ class StreamReader:
         """
         return _parse_oi(self._be.get_out_stream_info(i))
 
-    def seek(self, timestamp: float):
+    def seek(self, timestamp: float, mode: str = "precise"):
         """Seek the stream to the given timestamp [second]
 
         Args:
             timestamp (float): Target time in second.
+            mode (str): Controls how seek is done.
+                Valid choices are;
+
+                * "key": Seek into the nearest key frame before the given timestamp.
+                * "any": Seek into any frame (including non-key frames) before the given timestamp.
+                * "precise": First seek into the nearest key frame before the given timestamp, then
+                  decode frames until it reaches the closes frame to the given timestamp.
+
+                Note:
+                   All the modes invalidate and reset the internal state of decoder.
+                   When using "any" mode and if it ends up seeking into non-key frame,
+                   the image decoded may be invalid due to lack of key frame.
+                   Using "precise" will workaround this issue by decoding frames from previous
+                   key frame, but will be slower.
         """
-        self._be.seek(timestamp)
+        modes = {
+            "key": 0,
+            "any": 1,
+            "precise": 2,
+        }
+        if mode not in modes:
+            raise ValueError(f"The value of mode must be one of {list(modes.keys())}. Found: {mode}")
+        self._be.seek(timestamp, modes[mode])
 
     @_format_audio_args
     def add_basic_audio_stream(

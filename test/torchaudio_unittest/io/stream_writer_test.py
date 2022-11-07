@@ -327,3 +327,28 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         assert saved.shape == chunk.shape
         if format in ["wav", "flac"]:
             self.assertEqual(saved, chunk)
+
+    def test_preserve_fps(self):
+        """Decimal point frame rate is properly saved
+
+        https://github.com/pytorch/audio/issues/2830
+        """
+        ext = "mp4"
+        filename = f"test.{ext}"
+        frame_rate = 5000 / 167
+        width, height = 96, 128
+
+        # Write data
+        dst = self.get_dst(filename)
+        writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        writer.add_video_stream(frame_rate=frame_rate, width=width, height=height)
+
+        video = torch.randint(256, (90, 3, height, width), dtype=torch.uint8)
+        with writer.open():
+            writer.write_video_chunk(0, video)
+        if self.test_fileobj:
+            dst.flush()
+
+        # Load data
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        assert reader.get_src_stream_info(0).frame_rate == frame_rate
