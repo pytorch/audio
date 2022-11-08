@@ -252,7 +252,7 @@ def zip_equal(*iterables):
     """With the regular Python `zip` function, if one iterable is longer than the other,
     the remainder portions are ignored.This is resolved in Python 3.10 where we can use
     `strict=True` in the `zip` function
-    From https://github.com/pytorch/text/blob/c047efeba813ac943cb8046a49e858a8b529d577/test/torchtext_unittest/common/case_utils.py#L45-L54
+    From https://github.com/pytorch/text/blob/c047efeba813ac943cb8046a49e858a8b529d577/test/torchtext_unittest/common/case_utils.py#L45-L54  # noqa: E501
     """
     sentinel = object()
     for combo in zip_longest(*iterables, fillvalue=sentinel):
