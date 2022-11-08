@@ -7,20 +7,59 @@ from torchaudio.models.rnnt import _TimeReduction
 
 
 class FeatureExtractor(torch.nn.Module):
+    """Extract features from log mel-spectrogram input. Consists of linear layer and time reduction layer.
+
+    Args:
+        input_dim (int): The feature dimension of log mel-spectrogram feature.
+        output_dim (int): The feature dimension after linear layer.
+        use_bias (bool): If ``True``, enable bias parameter in the linear layer.
+        stride (int): Number of frames to merge for the output frame.
+    """
+
     def __init__(self, input_dim: int, output_dim: int, use_bias: bool, stride: int):
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=use_bias)
         self.time_reduction = _TimeReduction(stride)
 
-    def forward(self, input, lengths):
+    def forward(
+        self, input: torch.Tensor, lengths: Optional[torch.Tensor]
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """
+        Args:
+            input (torch.Tensor): The log mel-spectrogram input.
+                Tensor with dimensions `(batch, time, input_dim)`.
+            lengths (torch.Tensor or None): Valid length of each input sample.
+                Tensor with dimension `(batch, )`.
+
+        Returns:
+            (torch.Tensor, torch.Tensor or None):
+                torch.Tensor
+                    Returned feature Tensor after linear layer and time reduction layer.
+                    Tensor with dimensions `(batch, time // stride, output_dim)`.
+                torch.Tensor or None
+                    The reduced lengths Tensor.
+        """
+        batch_size, num_frame, _ = input.shape
         output = self.linear(input)
         if lengths is None:
-            lengths = torch.ones(input.shape[0]) * input.shape[1]
+            lengths = torch.ones(batch_size) * num_frame
         output, lengths = self.time_reduction(output, lengths)
         return output, lengths
 
 
-class _EmformerEncoder(torch.nn.Module):
+class EmformerEncoder(torch.nn.Module):
+    """Emformer Encoder class for HuBERT pre-training. Consists of emformer module,
+        linear layer and layer normalization layer.
+
+    Args:
+        emformer (torch.nn.Module):
+            :py:class:`torchaudio.models.Emformer` module that consists of a list of emformer layers.
+        output_linear (torch.nn.Module):
+            Linear layer after emformer module.
+        layer_norm (torch.nn.Module or None, optional):
+            If ``None``, don't apply layer normalization to the output.
+    """
+
     def __init__(
         self,
         emformer: torch.nn.Module,
@@ -37,6 +76,16 @@ class _EmformerEncoder(torch.nn.Module):
         input: torch.Tensor,
         lengths: Optional[torch.Tensor],
     ) -> torch.Tensor:
+        """
+        Args:
+            input (torch.Tensor): The input feature for emformer encoder.
+                Tensor with dimensions `(batch, time, feature_dim)`.
+            lengths (torch.Tensor or None): Valid length of each input sample.
+                Tensor with dimension `(batch, )`.
+
+        Returns:
+            (torch.Tensor): The feature Tensor after emformer encoder.
+        """
         output, lengths = self.emformer(input, lengths)
         output = self.output_linear(output)
         if self.layer_norm is not None:
@@ -48,7 +97,22 @@ class _EmformerEncoder(torch.nn.Module):
         input: torch.Tensor,
         lengths: Optional[torch.Tensor],
         num_layers: Optional[int] = None,
-    ) -> Tuple[List[torch.Tensor], Optional[torch.Tensor]]:
+    ) -> List[torch.Tensor]:
+        """Extract output Tensors of the emformer layers.
+
+        Args:
+            input (torch.Tensor): The input feature for emformer encoder.
+                Tensor with dimensions `(batch, time, feature_dim)`.
+            lengths (torch.Tensor or None): Valid length of each input sample.
+                Tensor with dimension `(batch, )`.
+            num_layers (int or None, optional): If not ``None``, returns the first
+                `num_layers` layers of Tensors as the output, otherwise returns the
+                Tensors from all emformer layers.
+
+        Returns:
+            (List[torch.Tensor]):
+                Output Tensors of selected emformer layers.
+        """
         if num_layers is not None:
             if not 0 < num_layers <= len(self.emformer.emformer_layers):
                 raise ValueError(f"`num_layers` must be between [1, {len(self.emformer.emformer_layers)}]")
@@ -74,6 +138,17 @@ class _EmformerEncoder(torch.nn.Module):
 
 
 def _get_emformer_feature_extractor(input_dim: int, output_dim: int, use_bias: bool, stride: int) -> FeatureExtractor:
+    """Construct FeatureExtractor for emformer model.
+
+    Args:
+        input_dim (int): The feature dimension of log mel-spectrogram feature.
+        output_dim (int): The feature dimension after linear layer.
+        use_bias (bool): If ``True``, enable bias parameter in the linear layer.
+        stride (int): Number of frames to merge for the output frame.
+
+    Returns:
+        FeatureExtractor: The resulting FeatureExtractor module.
+    """
     return FeatureExtractor(input_dim, output_dim, use_bias, stride)
 
 
@@ -89,9 +164,31 @@ def _get_emformer_encoder(
     dropout: float,
     activation: str,
     max_memory_size: int,
-    weight_init_scale_strategy: str,
+    weight_init_scale_strategy: Optional[str],
     tanh_on_mem: bool,
-) -> _EmformerEncoder:
+) -> EmformerEncoder:
+    """Construct EmformerEncoder for emformer model.
+
+    Args:
+        input_dim (int): The feature dimension of input Tensor.
+        output_dim (int): The feature dimension after EmformerEncoder.
+        num_heads (int): Number of attention heads in each Emformer layer.
+        ffn_dim: (int): Hidden layer dimension of feedforward network.
+        num_layers (int): Number of Emformer layers to instantiate.
+        segment_length (int): Length of each input segment.
+        left_context_length (int): Length of left context.
+        right_context_length (int): Length of right context.
+        dropout (float): Dropout probability.
+        activation (str): Activation function to use in each Emformer layer's
+            feedforward network. Must be one of ("relu", "gelu", "silu").
+        max_memory_size (int): Maximum number of memory elements to use.
+        weight_init_scale_strategy (str or None): Per-layer weight initialization scaling
+            strategy. Must be one of ("depthwise", "constant", ``None``).
+        tanh_on_mem (bool): If ``True``, applies tanh to memory elements.
+
+    Returns:
+        (EmformerEncoder): The resulting EmformerEncoder module.
+    """
     emformer = Emformer(
         input_dim=input_dim,
         num_heads=num_heads,
@@ -107,7 +204,7 @@ def _get_emformer_encoder(
         tanh_on_mem=tanh_on_mem,
     )
     output_linear = torch.nn.Linear(input_dim, output_dim)
-    return _EmformerEncoder(emformer, output_linear)
+    return EmformerEncoder(emformer, output_linear)
 
 
 def emformer_hubert_model(
@@ -126,9 +223,37 @@ def emformer_hubert_model(
     encoder_dropout: float,
     encoder_activation: str,
     encoder_max_memory_size: int,
-    encoder_weight_init_scale_strategy: str,
+    encoder_weight_init_scale_strategy: Optional[str],
     encoder_tanh_on_mem: bool,
 ) -> Wav2Vec2Model:
+    """Build a custom Emformer HuBERT model.
+
+    Args:
+        extractor_input_dim (int): The input dimension for feature extractor.
+        extractor_output_dim (int): The output dimension after feature extractor.
+        extractor_use_bias (bool): If ``True``, enable bias parameter in the linear layer of feature extractor.
+        extractor_stride (int): Number of frames to merge for the output frame in feature extractor.
+        encoder_input_dim (int): The input dimension for Emformer layer.
+        encoder_output_dim (int): The output dimension after EmformerEncoder.
+        encoder_num_heads (int): Number of attention heads in each Emformer layer.
+        encoder_ffn_dim (int): Hidden layer dimension of feedforward network in Emformer.
+        encoder_num_layers (int): Number of Emformer layers to instantiate.
+        encoder_segment_length (int): Length of each input segment.
+        encoder_left_context_length (int): Length of left context.
+        encoder_right_context_length (int): Length of right context.
+        encoder_dropout (float): Dropout probability.
+        encoder_activation (str): Activation function to use in each Emformer layer's
+            feedforward network. Must be one of ("relu", "gelu", "silu").
+        encoder_max_memory_size (int): Maximum number of memory elements to use.
+        encoder_weight_init_scale_strategy (str or None): Per-layer weight initialization scaling
+            strategy. Must be one of ("depthwise", "constant", ``None``).
+        encoder_tanh_on_mem (bool): If ``True``, applies tanh to memory elements.
+
+    Returns:
+        Wav2Vec2Model:
+            The resulting :py:class:`torchaudio.models.Wav2Vec2Model` model
+            with a :py:class:`torchaudio.models.Emformer` encoder.
+    """
     feature_extractor = _get_emformer_feature_extractor(
         extractor_input_dim, extractor_output_dim, extractor_use_bias, extractor_stride
     )
@@ -150,10 +275,26 @@ def emformer_hubert_model(
     return Wav2Vec2Model(feature_extractor, emformer)
 
 
-def emformer_hubert_base():
+def emformer_hubert_base(
+    extractor_input_dim: int = 80,
+    extractor_output_dim: int = 128,
+    encoder_dropout: float = 0.1,
+) -> Wav2Vec2Model:
+    """Build Emformer HuBERT Model with 20 Emformer layers.
+
+    Args:
+        extractor_input_dim (int): The input dimension for feature extractor.
+        extractor_output_dim (int): The output dimension after feature extractor.
+        encoder_dropout (float): Dropout probability in Emformer.
+
+    Returns:
+        Wav2Vec2Model:
+            The resulting :py:class:`torchaudio.models.Wav2Vec2Model` model
+            with a :py:class:`torchaudio.models.Emformer` encoder.
+    """
     return emformer_hubert_model(
-        extractor_input_dim=80,
-        extractor_output_dim=128,
+        extractor_input_dim=extractor_input_dim,
+        extractor_output_dim=extractor_output_dim,
         extractor_use_bias=False,
         extractor_stride=4,
         encoder_input_dim=512,
@@ -164,7 +305,7 @@ def emformer_hubert_base():
         encoder_segment_length=4,
         encoder_left_context_length=30,
         encoder_right_context_length=1,
-        encoder_dropout=0.1,
+        encoder_dropout=encoder_dropout,
         encoder_activation="gelu",
         encoder_max_memory_size=0,
         encoder_weight_init_scale_strategy="depthwise",
