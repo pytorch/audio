@@ -1,4 +1,4 @@
-name: Trigger MacOS Conda Build for Nightlies/Release
+name: Build MacOS Conda
 
 on:
   pull_request:

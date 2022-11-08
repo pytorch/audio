@@ -1,4 +1,4 @@
-name: Trigger Linux Conda Build for Nightlies/Release
+name: Build Linux Conda
 
 on:
   pull_request:
