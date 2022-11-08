@@ -20,3 +20,4 @@ imported explicitly, e.g.
    prototype.functional
    prototype.models
    prototype.pipelines
+   prototype.transforms
