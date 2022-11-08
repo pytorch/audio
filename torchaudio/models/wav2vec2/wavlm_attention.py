@@ -75,20 +75,20 @@ class WavLMSelfAttention(nn.Module):
         self.head_dim = embed_dim // num_heads
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
 
-        self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
-        self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        # The lines below tell PyTorch not to quantize linear layers k_proj, v_proj, q_proj. This is needed because
-        # in self.forward we call torch.cat on biases of those layers. However, after quantization the Linear
-        # module is converted to DynamicQuantizedLinear, in which the bias parameter becomes a method, and so using
-        # biases in this way would cause the quantized model to break.
+        # Define parameters of the linear transoformations. We don't use Linear to avoid problems with quantization.
         # See also https://github.com/pytorch/audio/pull/2822#discussion_r1014431878
-        self.k_proj.qconfig = None
-        self.v_proj.qconfig = None
-        self.q_proj.qconfig = None
-
-        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.out_proj.qconfig = None
+        self.q_proj_weight, self.k_proj_weight, self.v_proj_weight, self.out_proj_weight = [
+            nn.Parameter(torch.empty((embed_dim, embed_dim))) for _ in range(4)
+        ]
+        self.k_proj_bias = nn.Parameter(torch.empty(embed_dim))
+        if bias:
+            self.v_proj_bias, self.q_proj_bias, self.out_proj_bias = [
+                nn.Parameter(torch.empty((embed_dim))) for _ in range(3)
+            ]
+        else:
+            self.register_parameter("v_proj_bias", None)
+            self.register_parameter("q_proj_bias", None)
+            self.register_parameter("out_proj_bias", None)
 
         self.gru_rel_pos = gru_rel_pos
         if self.gru_rel_pos:
@@ -164,7 +164,7 @@ class WavLMSelfAttention(nn.Module):
             query (Tensor): Input of shape ``(batch_size, src_len, embed_dim)``.
             key_padding_mask (Tensor or None, optional): Mask to exclude keys that are pads, of shape
                 `(batch, src_len)`, where padding elements are indicated by 1s. (Default: ``None``)
-            attn_mask (Tensor or None, optional): Needs to be ``None``. The argument exists for compatibility with
+            attn_mask: Needs to be ``None``. The argument exists for compatibility with
                 ``EncoderLayer``. (Default: ``None``)
             position_bias (Tensor or None, optional): Position bias of shape
                 ``(batch_size * num_heads, src_len, src_len)``. When used inside WavLM model encoder, will be
@@ -201,7 +201,7 @@ class WavLMSelfAttention(nn.Module):
         add_zero_attn = False
         # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
         query = query.transpose(0, 1)
-        concat_bias = torch.cat((self.q_proj.bias, self.k_proj.bias, self.v_proj.bias))
+        concat_bias = torch.cat((self.q_proj_bias, self.k_proj_bias, self.v_proj_bias))
         attn_output, _ = F.multi_head_attention_forward(
             query,
             query,
@@ -214,16 +214,16 @@ class WavLMSelfAttention(nn.Module):
             bias_v,
             add_zero_attn,
             self.dropout_module.p,
-            self.out_proj.weight,
-            self.out_proj.bias,
+            self.out_proj_weight,
+            self.out_proj_bias,
             self.training,
             key_padding_mask,
             need_weights=False,
             attn_mask=attn_mask_rel_pos,
             use_separate_proj_weight=True,
-            q_proj_weight=self.q_proj.weight,
-            k_proj_weight=self.k_proj.weight,
-            v_proj_weight=self.v_proj.weight,
+            q_proj_weight=self.q_proj_weight,
+            k_proj_weight=self.k_proj_weight,
+            v_proj_weight=self.v_proj_weight,
         )
         attn_output = attn_output.transpose(0, 1)  # Convert back to batch-first
         return attn_output, position_bias

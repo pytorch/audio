@@ -4,7 +4,7 @@ import torch
 from parameterized import parameterized
 from torchaudio.models.wav2vec2 import wav2vec2_base, wav2vec2_large, wav2vec2_large_lv60k, wavlm_base, wavlm_large
 from torchaudio.models.wav2vec2.utils import import_huggingface_model
-from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase
+from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase, zip_equal
 
 
 def _load_config(*paths):
@@ -188,7 +188,8 @@ class TestHFIntegration(TorchaudioTestCase):
 
         position_bias = None
         position_bias_imp = None
-        for original_, imported_ in zip(original.encoder.layers, imported.encoder.transformer.layers):
+        assert len(original.encoder.layers) > 0
+        for original_, imported_ in zip_equal(original.encoder.layers, imported.encoder.transformer.layers):
             b, l, e = 16, 3, config["hidden_size"]
             x = torch.randn(b, l, e)
             mask = torch.randn(b, l) > 0.5  # HF WaveLM model expects the mask to be binary

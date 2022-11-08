@@ -283,10 +283,9 @@ class SelfAttention(Module):
             x (Tensor): shape: ``[batch_size, sequence_length, embed_dim]``.
             attention_mask (Tensor or ``None``, optional):
                 shape: ``[batch_size, 1, sequence_length, sequence_length]``
-            position_bias (Tensor or ``None``): Has to be ``None``, necessary for compatibility
-                with :py:class:`WavLMSelfAttention`. (Default: ``None``)
-            key_padding_mask (Tensor or ``None``): Has to be ``None``, necessary for compatibility
-                with :py:class:`WavLMSelfAttention`. (Default: ``None``)
+            position_bias: Not used. Only for the compatibility with :py:class:`WavLMSelfAttention`.
+            key_padding_mask (Tensor or ``None``): Not used. Only for the compatibility with
+                :py:class:`WavLMSelfAttention`.
         Returns:
             (Tensor, ``None``): The resulting attention output and ``None`` (necessary for compatibility
                 with :py:class:`WavLMSelAttention`).
