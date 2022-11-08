@@ -486,6 +486,7 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
     Args:
         freqs (float): Frequencies in Hz
         bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
+    
     Returns:
         barks (float): Frequency in Barks
     """
@@ -553,13 +554,6 @@ def barkscale_fbanks(
     .. devices:: CPU
 
     .. properties:: TorchScript
-
-    Note:
-        For the sake of the numerical compatibility with librosa, not all the coefficients
-        in the resulting filter bank has magnitude of 1.
-
-        .. image:: https://download.pytorch.org/torchaudio/doc-assets/bark_fbanks.png
-           :alt: Visualization of generated filter bank
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
