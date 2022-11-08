@@ -1,12 +1,16 @@
 import torch
 
 
-def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
-    if x.shape[:-1] != y.shape[:-1]:
-        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+def _check_convolve_mode(mode: str) -> None:
     valid_convolve_modes = ["full", "valid", "same"]
     if mode not in valid_convolve_modes:
         raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
+
+
+def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
+    if x.shape[:-1] != y.shape[:-1]:
+        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+    _check_convolve_mode(mode)
 
 
 def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
