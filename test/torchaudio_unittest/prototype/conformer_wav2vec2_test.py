@@ -1,6 +1,6 @@
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models.conformer_wav2vec2 import conformer_wav2vec2_base
+from torchaudio.prototype.models import conformer_wav2vec2_base
 from torchaudio_unittest.common_utils import skipIfNoCuda, torch_script, TorchaudioTestCase
 
 

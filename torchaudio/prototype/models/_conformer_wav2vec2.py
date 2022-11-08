@@ -1,5 +1,6 @@
 from typing import List, Optional, Tuple, Union
 
+import torch
 from torch import nn, Tensor
 from torch.nn import Module
 from torchaudio.models import Wav2Vec2Model
@@ -29,14 +30,25 @@ class TimeReduction(Module):
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            x (Tensor):
-                Input Tensor representing log Mel Spectrogram output. shape ``(batch, frame, dim)``.
-            length (Tensor or None, optional):
-                Valid length of each input sample. shape: ``(batch, )``.
+            x (Tensor): Input Tensor representing log Mel Spectrogram output. shape ``(B, T, D)``.
+            lengths (Tensor or None):
+                Valid length of each input sample. shape: ``(B, )``.
+
+        Returns:
+            (Tensor, Optional[Tensor]):
+                Tensor: output sequence after undergoing time reduction and linear projection.
+                    Shape ``(B, T // stride, D * stride)
+                Optional[Tensor]: output lengths of shape ``(B,)`` if lengths parameter is provided,
+                    otherwise `None`.
         """
-        # TODO: case if length is none?
-        if lengths is not None:
-            x, lengths = self.time_reduction_layer(x, lengths)
+        if lengths is None:
+            B, T, D = x.shape
+            dummy_lengths = torch.full((B,), T)
+            x, _ = self.time_reduction_layer(x, dummy_lengths)
+            x = self.linear_layer(x)
+            return x, None
+
+        x, lengths = self.time_reduction_layer(x, lengths)
         x = self.linear_layer(x)
         return x, lengths
 
@@ -72,18 +84,7 @@ class ConformerEncoder(Module):
             mask = None
         return x, mask
 
-    def forward(
-        self,
-        features: Tensor,
-        lengths: Optional[Tensor] = None,
-    ) -> Tensor:
-        x, mask = self._preprocess(features, lengths)
-        x = x.transpose(0, 1)
-        for layer in self.conformer:
-            x = layer(x, mask)
-        return x.transpose(0, 1)
-
-    def get_intermediate_outputs(
+    def _get_intermediate_outputs(
         self,
         x: Tensor,
         mask: Optional[Tensor] = None,
@@ -103,14 +104,43 @@ class ConformerEncoder(Module):
                 return ret
         return ret
 
+    def forward(
+        self,
+        features: Tensor,
+        lengths: Optional[Tensor] = None,
+    ) -> Tensor:
+        """
+        Args:
+            features (Tensor): Tensor of features of shape ``(B, T, D)``
+            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.
+
+        Returns:
+            Tensor: result after applying conformer encoder to features.
+        """
+        x, mask = self._preprocess(features, lengths)
+        x = x.transpose(0, 1)
+        for layer in self.conformer:
+            x = layer(x, mask)
+        return x.transpose(0, 1)
+
     def extract_features(
         self,
         features: Tensor,
         lengths: Optional[Tensor] = None,
         num_layers: Optional[int] = None,
     ) -> List[Tensor]:
+        """Returns the list of outputs from the intermediate layers of conformer block in the encoder.
+
+        Args:
+            features (Tensor): Tensor of features of shape ``(B, T, D)``
+            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.
+
+        Returns:
+            List[Tensor]:
+                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`
+        """
         x, masks = self._preprocess(features, lengths)
-        return self.get_intermediate_outputs(x, mask=masks, num_layers=num_layers)
+        return self._get_intermediate_outputs(x, mask=masks, num_layers=num_layers)
 
 
 ################################################################################
@@ -126,7 +156,7 @@ def _get_conformer_feature_extractor(
         output_dim (int): Output dimension after feature extraction
         stride (int): Stride used in Time Reduction layer of feature extractor
 
-    Result:
+    Returns:
         TimeReduction: The resulting feature extraction
     """
     return TimeReduction(input_dim, output_dim, stride)
