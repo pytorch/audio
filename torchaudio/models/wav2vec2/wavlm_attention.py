@@ -78,12 +78,12 @@ class WavLMSelfAttention(nn.Module):
         # Define parameters of the linear transoformations. We don't use Linear to avoid problems with quantization.
         # See also https://github.com/pytorch/audio/pull/2822#discussion_r1014431878
         self.q_proj_weight, self.k_proj_weight, self.v_proj_weight, self.out_proj_weight = [
-            nn.Parameter(torch.empty((embed_dim, embed_dim))) for _ in range(4)
+            nn.Parameter(torch.zeros((embed_dim, embed_dim))) for _ in range(4)
         ]
-        self.k_proj_bias = nn.Parameter(torch.empty(embed_dim))
+        self.k_proj_bias = nn.Parameter(torch.zeros(embed_dim))
         if bias:
             self.v_proj_bias, self.q_proj_bias, self.out_proj_bias = [
-                nn.Parameter(torch.empty((embed_dim))) for _ in range(3)
+                nn.Parameter(torch.zeros((embed_dim))) for _ in range(3)
             ]
         else:
             self.register_parameter("v_proj_bias", None)
