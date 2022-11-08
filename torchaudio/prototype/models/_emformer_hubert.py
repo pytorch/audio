@@ -1,0 +1,172 @@
+from typing import List, Optional, Tuple
+
+import torch
+from torchaudio.models import Wav2Vec2Model
+from torchaudio.models.emformer import Emformer
+from torchaudio.models.rnnt import _TimeReduction
+
+
+class FeatureExtractor(torch.nn.Module):
+    def __init__(self, input_dim: int, output_dim: int, use_bias: bool, stride: int):
+        super().__init__()
+        self.linear = torch.nn.Linear(input_dim, output_dim, bias=use_bias)
+        self.time_reduction = _TimeReduction(stride)
+
+    def forward(self, input, lengths):
+        output = self.linear(input)
+        if lengths is None:
+            lengths = torch.ones(input.shape[0]) * input.shape[1]
+        output, lengths = self.time_reduction(output, lengths)
+        return output, lengths
+
+
+class _EmformerEncoder(torch.nn.Module):
+    def __init__(
+        self,
+        emformer: torch.nn.Module,
+        output_linear: torch.nn.Module,
+        layer_norm: Optional[torch.nn.Module] = None,
+    ):
+        super().__init__()
+        self.emformer = emformer
+        self.output_linear = output_linear
+        self.layer_norm = layer_norm
+
+    def forward(
+        self,
+        input: torch.Tensor,
+        lengths: Optional[torch.Tensor],
+    ) -> torch.Tensor:
+        output, lengths = self.emformer(input, lengths)
+        output = self.output_linear(output)
+        if self.layer_norm is not None:
+            output = self.layer_norm(output)
+        return output
+
+    def extract_features(
+        self,
+        input: torch.Tensor,
+        lengths: Optional[torch.Tensor],
+        num_layers: Optional[int] = None,
+    ) -> Tuple[List[torch.Tensor], Optional[torch.Tensor]]:
+        if num_layers is not None:
+            if not 0 < num_layers <= len(self.emformer.emformer_layers):
+                raise ValueError(f"`num_layers` must be between [1, {len(self.emformer.emformer_layers)}]")
+
+        ret: List[torch.Tensor] = []
+
+        input = input.permute(1, 0, 2)
+        right_context = self.emforer._gen_right_context(input)
+        utterance = input[: input.size(0) - self.emforer.right_context_length]
+        attention_mask = self.emforer._gen_attention_mask(utterance)
+        mems = (
+            self.emforer.memory_op(utterance.permute(1, 2, 0)).permute(2, 0, 1)[:-1]
+            if self.emforer.use_mem
+            else torch.empty(0).to(dtype=input.dtype, device=input.device)
+        )
+        output = utterance
+        for layer in self.emforer.emformer_layers:
+            output, right_context, mems = layer(output, lengths, right_context, mems, attention_mask)
+            ret.append(output.permute(1, 0, 2))
+            if num_layers is not None and len(ret) >= num_layers:
+                return ret
+        return ret
+
+
+def _get_emformer_feature_extractor(input_dim: int, output_dim: int, use_bias: bool, stride: int) -> FeatureExtractor:
+    return FeatureExtractor(input_dim, output_dim, use_bias, stride)
+
+
+def _get_emformer_encoder(
+    input_dim: int,
+    output_dim: int,
+    num_heads: int,
+    ffn_dim: int,
+    num_layers: int,
+    segment_length: int,
+    left_context_length: int,
+    right_context_length: int,
+    dropout: float,
+    activation: str,
+    max_memory_size: int,
+    weight_init_scale_strategy: str,
+    tanh_on_mem: bool,
+) -> _EmformerEncoder:
+    emformer = Emformer(
+        input_dim=input_dim,
+        num_heads=num_heads,
+        ffn_dim=ffn_dim,
+        num_layers=num_layers,
+        segment_length=segment_length,
+        left_context_length=left_context_length,
+        right_context_length=right_context_length,
+        dropout=dropout,
+        activation=activation,
+        max_memory_size=max_memory_size,
+        weight_init_scale_strategy=weight_init_scale_strategy,
+        tanh_on_mem=tanh_on_mem,
+    )
+    output_linear = torch.nn.Linear(input_dim, output_dim)
+    return _EmformerEncoder(emformer, output_linear)
+
+
+def emformer_hubert_model(
+    extractor_input_dim: int,
+    extractor_output_dim: int,
+    extractor_use_bias: bool,
+    extractor_stride: int,
+    encoder_input_dim: int,
+    encoder_output_dim: int,
+    encoder_num_heads: int,
+    encoder_ffn_dim: int,
+    encoder_num_layers: int,
+    encoder_segment_length: int,
+    encoder_left_context_length: int,
+    encoder_right_context_length: int,
+    encoder_dropout: float,
+    encoder_activation: str,
+    encoder_max_memory_size: int,
+    encoder_weight_init_scale_strategy: str,
+    encoder_tanh_on_mem: bool,
+) -> Wav2Vec2Model:
+    feature_extractor = _get_emformer_feature_extractor(
+        extractor_input_dim, extractor_output_dim, extractor_use_bias, extractor_stride
+    )
+    emformer = _get_emformer_encoder(
+        encoder_input_dim,
+        encoder_output_dim,
+        encoder_num_heads,
+        encoder_ffn_dim,
+        encoder_num_layers,
+        encoder_segment_length,
+        encoder_left_context_length,
+        encoder_right_context_length,
+        encoder_dropout,
+        encoder_activation,
+        encoder_max_memory_size,
+        encoder_weight_init_scale_strategy,
+        encoder_tanh_on_mem,
+    )
+    return Wav2Vec2Model(feature_extractor, emformer)
+
+
+def emformer_hubert_base():
+    return emformer_hubert_model(
+        extractor_input_dim=80,
+        extractor_output_dim=128,
+        extractor_use_bias=False,
+        extractor_stride=4,
+        encoder_input_dim=512,
+        encoder_output_dim=1024,
+        encoder_num_heads=8,
+        encoder_ffn_dim=2048,
+        encoder_num_layers=20,
+        encoder_segment_length=4,
+        encoder_left_context_length=30,
+        encoder_right_context_length=1,
+        encoder_dropout=0.1,
+        encoder_activation="gelu",
+        encoder_max_memory_size=0,
+        encoder_weight_init_scale_strategy="depthwise",
+        encoder_tanh_on_mem="True",
+    )
