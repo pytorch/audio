@@ -486,7 +486,7 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
     Args:
         freqs (float): Frequencies in Hz
         bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
-    
+
     Returns:
         barks (float): Frequency in Barks
     """
