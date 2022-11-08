@@ -10,7 +10,7 @@ def _check_convolve_mode(mode: str) -> None:
 def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
     if x.shape[:-1] != y.shape[:-1]:
         raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
-    _check_convolve_mode
+    _check_convolve_mode(mode)
 
 
 def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
