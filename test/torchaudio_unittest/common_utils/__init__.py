@@ -16,6 +16,7 @@ from .case_utils import (
     TempDirMixin,
     TestBaseMixin,
     TorchaudioTestCase,
+    zip_equal,
 )
 from .data_utils import get_asset_path, get_sinusoid, get_spectrogram, get_whitenoise
 from .func_utils import torch_script
@@ -57,4 +58,5 @@ __all__ = [
     "get_image",
     "rgb_to_gray",
     "rgb_to_yuv_ccir",
+    "zip_equal",
 ]
