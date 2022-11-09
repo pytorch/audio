@@ -480,7 +480,7 @@ def _mel_to_hz(mels: Tensor, mel_scale: str = "htk") -> Tensor:
     return freqs
 
 
-def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
+def _hz_to_bark(freqs: float, bark_scale: str = "traunmuller") -> float:
     r"""Convert Hz to Barks.
 
     Args:
@@ -495,11 +495,11 @@ def _hz_to_bark(freq: float, bark_scale: str = "traunmuller") -> float:
         raise ValueError('bark_scale should be one of "schroeder", "traunmuller" or "wang".')
 
     if bark_scale == "wang":
-        return 6.0 * math.asinh(freq / 600.0)
+        return 6.0 * math.asinh(freqs / 600.0)
     elif bark_scale == "schroeder":
-        return 7.0 * math.asinh(freq / 650.0)
+        return 7.0 * math.asinh(freqs / 650.0)
     # Traunmuller Bark scale
-    barks = ((26.81 * freq) / (1960.0 + freq)) - 0.53
+    barks = ((26.81 * freqs) / (1960.0 + freqs)) - 0.53
     # Bark value correction
     if barks < 2:
         barks += 0.15 * (2 - barks)
