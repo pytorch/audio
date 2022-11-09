@@ -11,6 +11,8 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
+    wavlm_base,
+    wavlm_large,
 )
 from torchaudio_unittest.common_utils import skipIfNoCuda, skipIfNoQengine, torch_script, TorchaudioTestCase
 
@@ -33,6 +35,14 @@ factory_funcs = parameterized.expand(
         (hubert_base,),
         (hubert_large,),
         (hubert_xlarge,),
+    ],
+    name_func=_name_func,
+)
+
+factory_funcs_wavlm = parameterized.expand(
+    [
+        (wavlm_base,),
+        (wavlm_large,),
     ],
     name_func=_name_func,
 )
@@ -262,4 +272,129 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
+        self._test_quantize_torchscript(factory_func(aux_num_out=32))
+
+
+class TestWavLMModel(TorchaudioTestCase):
+    def _smoke_test(self, model, device, dtype):
+        model = model.to(device=device, dtype=dtype)
+        model = model.eval()
+
+        batch_size, num_frames = 3, 1024
+        waveforms = torch.randn(batch_size, num_frames, device=device, dtype=dtype)
+        model(waveforms)
+
+    @parameterized.expand([(torch.float32,), (torch.float64,)])
+    def test_cpu_smoke_test(self, dtype):
+        model = wavlm_base()
+        self._smoke_test(model, torch.device("cpu"), dtype)
+        model = wavlm_base(aux_num_out=32)
+        self._smoke_test(model, torch.device("cpu"), dtype)
+
+    @parameterized.expand([(torch.float32,), (torch.float64,)])
+    @skipIfNoCuda
+    def test_cuda_smoke_test(self, dtype):
+        model = wavlm_base()
+        self._smoke_test(model, torch.device("cuda"), dtype)
+        model = wavlm_base(aux_num_out=32)
+        self._smoke_test(model, torch.device("cuda"), dtype)
+
+    def _test_batch_consistency(self, model):
+        model.eval()
+        batch_size, max_frames = 5, 5 * 1024
+        waveforms = torch.randn(batch_size, max_frames)
+
+        # Batch process
+        batch_logits, _ = model(waveforms)
+        # Par-sample process
+        for i in range(batch_size):
+            single_logit, _ = model(waveforms[i : i + 1])
+            batch_logit = batch_logits[i : i + 1]
+
+            # Convert to probability so that it's easier to interpretate the diff
+            single_prob = F.softmax(single_logit, dim=2)
+            batch_prob = F.softmax(batch_logit, dim=2)
+            # We allow max atol=0.005 -> 0.5%
+            self.assertEqual(single_prob, batch_prob, atol=0.005, rtol=0)
+
+    @factory_funcs_wavlm
+    def test_pretrain_batch_consistency(self, factory_func):
+        """Results from single process and batched process should be reasonably close"""
+        self._test_batch_consistency(factory_func())
+
+    @factory_funcs_wavlm
+    def test_finetune_batch_consistency(self, factory_func):
+        """Results from single process and batched process should be reasonably close"""
+        self._test_batch_consistency(factory_func(aux_num_out=32))
+
+    def _test_torchscript(self, model):
+        model.eval()
+
+        batch_size, num_frames = 3, 1024
+        waveforms = torch.randn(batch_size, num_frames)
+        # Compute results with original model
+        ref_out, ref_len = model(waveforms)
+        # Compute results with scripted model
+        scripted = torch_script(model)
+        hyp_out, hyp_len = scripted(waveforms)
+
+        self.assertEqual(hyp_out, ref_out)
+        self.assertEqual(hyp_len, ref_len)
+
+    @factory_funcs_wavlm
+    def test_pretrain_torchscript(self, factory_func):
+        """WavLM model should be scriptable"""
+        self._test_torchscript(factory_func())
+
+    @factory_funcs_wavlm
+    def test_finetune_torchscript(self, factory_func):
+        """WavLM model with a head should be scriptable"""
+        self._test_torchscript(factory_func(aux_num_out=32))
+
+    def _test_quantize_smoke_test(self, model):
+        model.eval()
+        batch_size, num_frames = 3, 1024
+
+        # Remove the weight normalization forward hook
+        model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
+        quantized = tq.quantize_dynamic(model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
+
+        # A lazy way to check that Modules are different
+        assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
+
+        waveforms = torch.randn(batch_size, num_frames)
+        _, _ = quantized(waveforms)
+
+    @factory_funcs_wavlm
+    @skipIfNoQengine
+    def test_quantize(self, factory_func):
+        """WavLM should support basic quantization"""
+        self._test_quantize_smoke_test(factory_func(aux_num_out=32))
+
+    def _test_quantize_torchscript(self, model):
+        model.eval()
+
+        batch_size, num_frames = 3, 1024
+
+        # Remove the weight normalization forward hook
+        model.encoder.transformer.pos_conv_embed.__prepare_scriptable__()
+        quantized = tq.quantize_dynamic(model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8)
+
+        # A lazy way to check that Modules are different
+        assert str(quantized) != str(model), "Dynamic quantization did not modify the module."
+
+        waveforms = torch.randn(batch_size, num_frames)
+        ref_out, ref_len = quantized(waveforms)
+
+        # Script
+        scripted = torch_script(quantized)
+        hyp_out, hyp_len = scripted(waveforms)
+
+        self.assertEqual(hyp_out, ref_out)
+        self.assertEqual(hyp_len, ref_len)
+
+    @factory_funcs_wavlm
+    @skipIfNoQengine
+    def test_quantize_torchscript(self, factory_func):
+        """Quantized WavLM model should be scriptable"""
         self._test_quantize_torchscript(factory_func(aux_num_out=32))
