@@ -1,9 +1,7 @@
-name: Trigger Linux Wheels Build for Nightlies/Release
+name: Build Linux Wheels
 
 on:
   pull_request:
-    paths:
-      - .github/workflows/build_wheels_linux.yml
   push:
     branches:
       - nightly
