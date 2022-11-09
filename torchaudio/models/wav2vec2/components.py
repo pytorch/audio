@@ -5,6 +5,8 @@ import torch
 from torch import nn, Tensor
 from torch.nn import Module, Parameter
 
+from .wavlm_attention import WavLMSelfAttention
+
 _LG = logging.getLogger(__name__)
 
 
@@ -243,7 +245,7 @@ class SelfAttention(Module):
         embed_dim (int): Total dimension of the model.
         num_heads (int): The number of heads.
         dropout (float, optional):
-            Dropout probabiliry on attn_output_weights. Default: ``0.0``
+            Dropout probability on attn_output_weights. Default: ``0.0``
     """
 
     def __init__(
@@ -273,15 +275,21 @@ class SelfAttention(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
-    ) -> Tensor:
+        position_bias: Optional[Tensor] = None,
+        key_padding_mask: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
             x (Tensor): shape: ``[batch_size, sequence_length, embed_dim]``.
-            attention_mask (Tensor or None, optional):
+            attention_mask (Tensor or ``None``, optional):
                 shape: ``[batch_size, 1, sequence_length, sequence_length]``
-
+            position_bias: Not used. Only for the compatibility with :py:class:`WavLMSelfAttention`.
+            key_padding_mask (Tensor or ``None``): Not used. Only for the compatibility with
+                :py:class:`WavLMSelfAttention`.
         Returns:
-            Tensor: The resulting tensor. shape: ``[batch, sequence_length, embed_dim]``
+            (Tensor, ``None``): The resulting attention output and ``None`` (necessary for compatibility
+                with :py:class:`WavLMSelAttention`).
+                Attention output shape: ``[batch, sequence_length, embed_dim]``.
         """
         if x.ndim != 3 or x.shape[2] != self.embed_dim:
             raise ValueError(
@@ -314,7 +322,7 @@ class SelfAttention(Module):
         output = output.transpose(2, 1).reshape(batch_size, length, embed_dim)
 
         output = self.out_proj(output)
-        return output
+        return output, None  # Necessary for compatibility with WavLMSelAttention
 
 
 class FeedForward(Module):
@@ -371,19 +379,32 @@ class EncoderLayer(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
-    ):
+        position_bias: Optional[Tensor] = None,
+        key_padding_mask: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            x (Tensor): shape: `(batch, sequence_length, embed_dim)`
-            attention_mask (Tensor or None, optional):
-                shape: `(batch, 1, sequence_length, sequence_length)`
+            x (Tensor): Input of shape ``(batch, sequence_length, embed_dim)``.
+            attention_mask (Tensor or ``None``, optional): attention mask
+                of shape ``(batch, 1, sequence_length, sequence_length)``. (Default: ``None``)
+            position_bias (Tensor or ``None``, optional): position bias of shape
+                ``(batch_size * num_heads, src_len, src_len)``.
+                Only necessary for WavLM model, ``None`` otherwise. (Default: ``None``)
+            key_padding_mask (Tensor or ``None``, optional): key padding mask of shape ``(batch_size, src_len)``.
+                Only used for WavLM model, ignored otherwise. (Default: ``None``)
+        Returns:
+            (x, position_bias): Shapes are the same as in the input. Position bias is only relevant for WaLM model,
+                ``None`` otherwise.
         """
         residual = x
 
         if self.layer_norm_first:
             x = self.layer_norm(x)
 
-        x = self.attention(x, attention_mask)
+        x, position_bias = self.attention(
+            x, attention_mask=attention_mask, position_bias=position_bias, key_padding_mask=key_padding_mask
+        )
+
         x = self.dropout(x)
         x = residual + x
 
@@ -392,7 +413,7 @@ class EncoderLayer(Module):
         else:
             x = self.layer_norm(x)
             x = self.final_layer_norm(x + self.feed_forward(x))
-        return x
+        return x, position_bias
 
 
 class Transformer(Module):
@@ -425,15 +446,15 @@ class Transformer(Module):
         self,
         x: Tensor,
         attention_mask: Optional[Tensor] = None,
-    ):
+        position_bias: Optional[Tensor] = None,
+    ) -> Tensor:
         x = self._preprocess(x)
         for layer in self.layers:
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
-                x = layer(x, attention_mask)
+                x, position_bias = layer(x, attention_mask, position_bias=position_bias)
 
         if not self.layer_norm_first:
             x = self.layer_norm(x)
-
         return x
 
     def get_intermediate_outputs(
@@ -449,7 +470,7 @@ class Transformer(Module):
         ret: List[Tensor] = []
         x = self._preprocess(x)
         for layer in self.layers:
-            x = layer(x, attention_mask)
+            x, _ = layer(x, attention_mask)  # Ignore position_bias
             ret.append(x)
             if num_layers is not None and len(ret) >= num_layers:
                 return ret
@@ -727,6 +748,85 @@ def _get_encoder(
             embed_dim=embed_dim,
             num_heads=num_heads,
             dropout=attention_dropout,
+        )
+        feed_forward = FeedForward(
+            io_features=embed_dim,
+            intermediate_features=ff_interm_features,
+            intermediate_dropout=ff_interm_dropout,
+            output_dropout=dropout,
+        )
+        encoder_layers.append(
+            EncoderLayer(
+                attention=attention,
+                dropout=dropout,
+                layer_norm_first=layer_norm_first,
+                feed_forward=feed_forward,
+            )
+        )
+    transformer = Transformer(
+        pos_conv_embed=pos_conv,
+        dropout=dropout,
+        layers=encoder_layers,
+        layer_norm_first=not layer_norm_first,
+        layer_drop=layer_drop,
+    )
+    return Encoder(feature_projection, transformer)
+
+
+def _get_wavlm_encoder(
+    in_features: int,
+    embed_dim: int,
+    dropout_input: float,
+    pos_conv_kernel: int,
+    pos_conv_groups: int,
+    num_layers: int,
+    num_heads: int,
+    num_buckets: int,
+    max_distance: int,
+    attention_dropout: float,
+    ff_interm_features: int,
+    ff_interm_dropout: float,
+    dropout: float,
+    layer_norm_first: bool,
+    layer_drop: float,
+) -> Encoder:
+    """
+    Construct encoder for WavLM model :cite:`chen2022wavlm`. The structure of the encoder and most of the argments are
+    the same as in :py:func:`_get_encoder` so refer there for documentation. The only difference from Wav2Vec2 encoder
+    is usage of `WavLMSelfAttention` instead of `SelfAttention` and two additional parameters: `num_buckets` and
+    `max_distance`.
+    Args:
+        in_features (int): See :py:func:`_get_encoder`.
+        embed_dim (int): See :py:func:`_get_encoder`.
+        dropout_input (float): See :py:func:`_get_encoder`.
+        pos_conv_kernel (int): See :py:func:`_get_encoder`.
+        pos_conv_groups (int): See :py:func:`_get_encoder`.
+        num_layers (int): See :py:func:`_get_encoder`.
+        num_heads (int): See :py:func:`_get_encoder`.
+        num_buckets (int): Number of buckets for relative position embedding.
+        max_distance (int): Maximum distance for relative position embedding.
+        attention_dropout (float): See :py:func:`_get_encoder`.
+        ff_interm_features (int): See :py:func:`_get_encoder`.
+        ff_interm_dropout (float): See :py:func:`_get_encoder`.
+        dropout (float): See :py:func:`_get_encoder`.
+        layer_norm_first (bool): See :py:func:`_get_encoder`.
+        layer_drop (float): See :py:func:`_get_encoder`.
+
+    """
+    feature_projection = FeatureProjection(in_features, embed_dim, dropout_input)
+    pos_conv = ConvolutionalPositionalEmbedding(embed_dim, pos_conv_kernel, pos_conv_groups)
+
+    # Original impl
+    # https://github.com/pytorch/fairseq/blob/425c36eafff535fe7337f8bdd5ace22ebacc78cb/fairseq/models/wav2vec/wav2vec2.py#L768-L782
+    encoder_layers = nn.ModuleList()
+    for i in range(num_layers):
+        attention = WavLMSelfAttention(
+            embed_dim=embed_dim,
+            num_heads=num_heads,
+            num_buckets=num_buckets,
+            max_distance=max_distance,
+            dropout=attention_dropout,
+            has_relative_attention_bias=(i == 0),  # Position embedding is only necessary in the first layer.
         )
         feed_forward = FeedForward(
             io_features=embed_dim,

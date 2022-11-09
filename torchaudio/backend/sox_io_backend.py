@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 import torch
 import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
+from torchaudio.utils.sox_utils import get_buffer_size
 
 from .common import AudioMetaData
 
@@ -91,12 +92,13 @@ def info(
             # The previous libsox-based implementation required `format="mp3"`
             # because internally libsox does not auto-detect the format.
             # For the special BC for mp3, we handle mp3 differently.
+            buffer_size = get_buffer_size()
             if format == "mp3":
-                return _fallback_info_fileobj(filepath, format)
+                return _fallback_info_fileobj(filepath, format, buffer_size)
             sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
             if sinfo is not None:
                 return AudioMetaData(*sinfo)
-            return _fallback_info_fileobj(filepath, format)
+            return _fallback_info_fileobj(filepath, format, buffer_size)
         filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
     if sinfo is not None:
@@ -210,14 +212,31 @@ def load(
             # The previous libsox-based implementation required `format="mp3"`
             # because internally libsox does not auto-detect the format.
             # For the special BC for mp3, we handle mp3 differently.
+            buffer_size = get_buffer_size()
             if format == "mp3":
-                return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
+                return _fallback_load_fileobj(
+                    filepath,
+                    frame_offset,
+                    num_frames,
+                    normalize,
+                    channels_first,
+                    format,
+                    buffer_size,
+                )
             ret = torchaudio._torchaudio.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
             if ret is not None:
                 return ret
-            return _fallback_load_fileobj(filepath, frame_offset, num_frames, normalize, channels_first, format)
+            return _fallback_load_fileobj(
+                filepath,
+                frame_offset,
+                num_frames,
+                normalize,
+                channels_first,
+                format,
+                buffer_size,
+            )
         filepath = os.fspath(filepath)
     ret = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format
@@ -385,10 +404,24 @@ def save(
     if not torch.jit.is_scripting():
         if hasattr(filepath, "write"):
             torchaudio._torchaudio.save_audio_fileobj(
-                filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+                filepath,
+                src,
+                sample_rate,
+                channels_first,
+                compression,
+                format,
+                encoding,
+                bits_per_sample,
             )
             return
         filepath = os.fspath(filepath)
     torch.ops.torchaudio.sox_io_save_audio_file(
-        filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+        filepath,
+        src,
+        sample_rate,
+        channels_first,
+        compression,
+        format,
+        encoding,
+        bits_per_sample,
     )

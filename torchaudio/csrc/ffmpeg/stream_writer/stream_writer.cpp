@@ -111,7 +111,7 @@ void configure_audio_codec(
         ". Supported sample rates are: ",
         c10::Join(", ", rates));
   }();
-  ctx->time_base = AVRational{1, static_cast<int>(sample_rate)};
+  ctx->time_base = av_inv_q(av_d2q(sample_rate, 1 << 24));
   ctx->sample_fmt = [&]() {
     // Use default
     if (!format) {
@@ -177,7 +177,7 @@ void configure_video_codec(
   ctx->width = static_cast<int>(width);
   ctx->height = static_cast<int>(height);
   ctx->time_base = [&]() {
-    AVRational ret = AVRational{1, static_cast<int>(frame_rate)};
+    AVRational ret = av_inv_q(av_d2q(frame_rate, 1 << 24));
     auto rates = get_supported_frame_rates(ctx->codec);
     // Codec does not have constraint on frame rate
     if (rates.empty()) {

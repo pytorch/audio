@@ -1,12 +1,16 @@
 import torch
 
 
-def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
-    if x.shape[:-1] != y.shape[:-1]:
-        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+def _check_convolve_mode(mode: str) -> None:
     valid_convolve_modes = ["full", "valid", "same"]
     if mode not in valid_convolve_modes:
         raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
+
+
+def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
+    if x.shape[:-1] != y.shape[:-1]:
+        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+    _check_convolve_mode(mode)
 
 
 def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
@@ -40,7 +44,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
-        mode (bool, optional): Must be one of ("full", "valid", "same").
+        mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
             * "valid": Returns the segment of the full convolution result corresponding to where
@@ -76,7 +80,7 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
             (leading dimensions must match those of ``x``).
-        mode (bool, optional): Must be one of ("full", "valid", "same").
+        mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
             * "valid": Returns the segment of the full convolution result corresponding to where
