@@ -1745,6 +1745,9 @@ class RNNTLoss(torch.nn.Module):
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
         fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
+        fastemit_lambda (float, optional): FastEmit scaling factor (https://arxiv.org/abs/2010.11148).
+            Setting this to 0 turns off FastEmit regularization. Note that this currently is currently
+            only implemented for the case if ``fused_log_softmax=False``. (Default: 0.0)
 
     Example
         >>> # Hypothetical values
@@ -1770,12 +1773,17 @@ class RNNTLoss(torch.nn.Module):
         clamp: float = -1.0,
         reduction: str = "mean",
         fused_log_softmax: bool = True,
+        fastemit_lambda: float = 0.0,
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
         self.reduction = reduction
         self.fused_log_softmax = fused_log_softmax
+        self.fastemit_lambda = fastemit_lambda
+
+        if fastemit_lambda != 0.0 and fused_log_softmax:
+            raise RuntimeError("FastEmit is only supported with nonfused log softmax option.")
 
     def forward(
         self,
@@ -1804,4 +1812,5 @@ class RNNTLoss(torch.nn.Module):
             self.clamp,
             self.reduction,
             self.fused_log_softmax,
+            self.fastemit_lambda,
         )

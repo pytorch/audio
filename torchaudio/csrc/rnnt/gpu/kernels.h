@@ -18,6 +18,7 @@ HOST_AND_DEVICE void ComputeGradientsElement(
     int numTargets,
     int blank,
     CAST_DTYPE clamp,
+    CAST_DTYPE fastemit_lambda,
     const DTYPE* logits,
     const int* targets,
     const int* srcLengths,
@@ -117,6 +118,10 @@ HOST_AND_DEVICE void ComputeGradientsElement(
         gradients[b_t_u_d] = g + CAST_DTYPE(-INFINITY);
       }
       gradients[b_t_u_d] = -std::exp(gradients[b_t_u_d]);
+
+      if (fastemit_lambda != 0 && d != blank) {
+        gradients[b_t_u_d] = gradients[b_t_u_d] * (1.0 + fastemit_lambda);
+      }
     }
 
     if (clamp > 0) {

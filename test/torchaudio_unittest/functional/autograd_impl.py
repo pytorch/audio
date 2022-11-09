@@ -355,12 +355,13 @@ class AutogradFloat32(TestBaseMixin):
 
     @parameterized.expand(
         [
-            (rnnt_utils.get_B1_T10_U3_D4_data,),
-            (rnnt_utils.get_B2_T4_U3_D3_data,),
-            (rnnt_utils.get_B1_T2_U3_D5_data,),
+            (rnnt_utils.get_B1_T10_U3_D4_data, 0.0),
+            (rnnt_utils.get_B1_T10_U3_D4_data, 100),
+            (rnnt_utils.get_B2_T4_U3_D3_data, 0.0),
+            (rnnt_utils.get_B1_T2_U3_D5_data, 0.0),
         ]
     )
-    def test_rnnt_loss(self, data_func):
+    def test_rnnt_loss(self, data_func, fastemit_lambda):
         def get_data(data_func, device):
             data = data_func()
             if type(data) == tuple:
@@ -375,6 +376,9 @@ class AutogradFloat32(TestBaseMixin):
             data["target_lengths"],  # target_lengths
             data["blank"],  # blank
             -1,  # clamp
+            "none",  # reduction
+            fastemit_lambda,  # fastemit_lambda
+            data.get("fused_log_softmax", False),  # fused_log_softmax
         )
 
         self.assert_grad(F.rnnt_loss, inputs, enable_all_grad=False)

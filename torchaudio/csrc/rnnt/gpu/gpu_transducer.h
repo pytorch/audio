@@ -101,6 +101,7 @@ status_t Compute(
   const int& D = options.numTargets_;
   const int& blank = options.blank_;
   const CAST_DTYPE clamp = options.clamp_;
+  const CAST_DTYPE fastemit_lambda = options.fastemit_lambda_;
 
   const bool& fusedLogSmax = options.fusedLogSmax_;
 
@@ -192,6 +193,7 @@ status_t Compute(
         /*num_targets=*/D,
         /*blank=*/blank,
         /*clamp=*/clamp,
+        /*fastemit_lambda=*/fastemit_lambda,
         /*logits=*/logits,
         /*targets=*/targets,
         /*srcLengths=*/srcLengths,
