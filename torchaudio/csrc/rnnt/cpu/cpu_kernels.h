@@ -96,6 +96,7 @@ void ComputeLogProbsOneSequence(
   const int& T = srcLen;
   const int& U = tgtLen;
   const int& blank = options.blank_;
+  const bool& fusedLogSmax = options.fusedLogSmax_;
 
   for (int t = 0; t < T; ++t) {
     for (int u = 0; u < U; ++u) {
@@ -105,6 +106,13 @@ void ComputeLogProbsOneSequence(
       }
       logProbs({t, u}).skip() =
           CAST_DTYPE(logits({t, u, blank})) - denom({t, u});
+
+      if (!fusedLogSmax) {
+        if (u < U - 1) {
+          logProbs({t, u}).emit() = CAST_DTYPE(logits({t, u, targets[u]}));
+        }
+        logProbs({t, u}).skip() = CAST_DTYPE(logits({t, u, blank}));
+      }
     }
   }
 }
@@ -311,37 +319,68 @@ void ComputeGradientsOneSequence(
   const int& D = options.numTargets_;
   const int& blank = options.blank_;
   const CAST_DTYPE clamp = options.clamp_;
+  const bool& fusedLogSmax = options.fusedLogSmax_;
 
   CAST_DTYPE cost = -beta({0, 0});
 
-  // Note - below gradient is different from numpy_transducer, since we
-  // compute log_softmax more efficiently within the loss, to save memory The
-  // details of the below implementation / equations can be found in Sec 3.2
-  // (function merging) in below paper:
-  // https://www.microsoft.com/en-us/research/uploads/prod/2019/10/RNNT.pdf
+  if (fusedLogSmax) {
+    // Note - below gradient is different from numpy_transducer, since we
+    // compute log_softmax more efficiently within the loss, to save memory The
+    // details of the below implementation / equations can be found in Sec 3.2
+    // (function merging) in below paper:
+    // https://www.microsoft.com/en-us/research/uploads/prod/2019/10/RNNT.pdf
 
-  for (int t = 0; t < T; ++t) {
-    for (int u = 0; u < U; ++u) {
-      CAST_DTYPE c = alpha({t, u}) + cost - denom({t, u});
-      for (int d = 0; d < D; ++d) {
-        CAST_DTYPE g = CAST_DTYPE(logits({t, u, d})) + c;
-        if (d == blank && t == T - 1 && u == U - 1) { // last blank transition.
-          gradients({t, u, d}) = std::exp(g + beta({t, u})) - std::exp(g);
-        } else if (d == blank && t < T - 1) {
-          gradients({t, u, d}) =
-              std::exp(g + beta({t, u})) - std::exp(g + beta({t + 1, u}));
-        } else if (u < U - 1 && d == targets[u]) {
-          gradients({t, u, d}) =
-              std::exp(g + beta({t, u})) - std::exp(g + beta({t, u + 1}));
-        } else {
-          gradients({t, u, d}) = std::exp(g + beta({t, u}));
+    for (int t = 0; t < T; ++t) {
+      for (int u = 0; u < U; ++u) {
+        CAST_DTYPE c = alpha({t, u}) + cost - denom({t, u});
+        for (int d = 0; d < D; ++d) {
+          CAST_DTYPE g = CAST_DTYPE(logits({t, u, d})) + c;
+          if (d == blank && t == T - 1 &&
+              u == U - 1) { // last blank transition.
+            gradients({t, u, d}) = std::exp(g + beta({t, u})) - std::exp(g);
+          } else if (d == blank && t < T - 1) {
+            gradients({t, u, d}) =
+                std::exp(g + beta({t, u})) - std::exp(g + beta({t + 1, u}));
+          } else if (u < U - 1 && d == targets[u]) {
+            gradients({t, u, d}) =
+                std::exp(g + beta({t, u})) - std::exp(g + beta({t, u + 1}));
+          } else {
+            gradients({t, u, d}) = std::exp(g + beta({t, u}));
+          }
+
+          if (clamp > 0) {
+            gradients({t, u, d}) =
+                math::min(CAST_DTYPE(gradients({t, u, d})), clamp);
+            gradients({t, u, d}) =
+                math::max(CAST_DTYPE(gradients({t, u, d})), -clamp);
+          }
         }
+      }
+    }
+  } else {
+    for (int t = 0; t < T; ++t) {
+      for (int u = 0; u < U; ++u) {
+        for (int d = 0; d < D; ++d) {
+          CAST_DTYPE g = cost + CAST_DTYPE(logits({t, u, d}));
+          if (d == blank && t == T - 1 &&
+              u == U - 1) { // last blank transition.
+            gradients({t, u, d}) = g + alpha({t, u});
+          } else if (d == blank && t < T - 1) {
+            gradients({t, u, d}) = g + alpha({t, u}) + beta({t + 1, u});
+          } else if (u < U - 1 && d == targets[u]) {
+            gradients({t, u, d}) = g + alpha({t, u}) + beta({t, u + 1});
+          } else {
+            gradients({t, u, d}) = g + CAST_DTYPE(-INFINITY);
+          }
 
-        if (clamp > 0) {
-          gradients({t, u, d}) =
-              math::min(CAST_DTYPE(gradients({t, u, d})), clamp);
-          gradients({t, u, d}) =
-              math::max(CAST_DTYPE(gradients({t, u, d})), -clamp);
+          gradients({t, u, d}) = -(std::exp(gradients({t, u, d})));
+
+          if (clamp > 0) {
+            gradients({t, u, d}) =
+                math::min(CAST_DTYPE(gradients({t, u, d})), clamp);
+            gradients({t, u, d}) =
+                math::max(CAST_DTYPE(gradients({t, u, d})), -clamp);
+          }
         }
       }
     }

@@ -2036,6 +2036,7 @@ class RNNTLoss(torch.nn.Module):
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
 
     Example
         >>> # Hypothetical values
@@ -2060,11 +2061,13 @@ class RNNTLoss(torch.nn.Module):
         blank: int = -1,
         clamp: float = -1.0,
         reduction: str = "mean",
+        fused_log_softmax: bool = True,
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
         self.reduction = reduction
+        self.fused_log_softmax = fused_log_softmax
 
     def forward(
         self,
@@ -2084,4 +2087,13 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(logits, targets, logit_lengths, target_lengths, self.blank, self.clamp, self.reduction)
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction,
+            self.fused_log_softmax,
+        )
