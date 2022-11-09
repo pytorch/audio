@@ -13,10 +13,17 @@ class RNNTLossFunction : public torch::autograd::Function<RNNTLossFunction> {
       const torch::Tensor& logit_lengths,
       const torch::Tensor& target_lengths,
       int64_t blank,
-      double clamp) {
+      double clamp,
+      bool fused_log_softmax = true) {
     torch::Tensor undef;
-    auto result =
-        rnnt_loss(logits, targets, logit_lengths, target_lengths, blank, clamp);
+    auto result = rnnt_loss(
+        logits,
+        targets,
+        logit_lengths,
+        target_lengths,
+        blank,
+        clamp,
+        fused_log_softmax);
     auto costs = std::get<0>(result);
     auto grads = std::get<1>(result).value_or(undef);
     ctx->save_for_backward({grads});
@@ -41,10 +48,17 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss_autograd(
     const torch::Tensor& logit_lengths,
     const torch::Tensor& target_lengths,
     int64_t blank,
-    double clamp) {
+    double clamp,
+    bool fused_log_softmax = true) {
   at::AutoDispatchBelowADInplaceOrView guard;
   auto results = RNNTLossFunction::apply(
-      logits, targets, logit_lengths, target_lengths, blank, clamp);
+      logits,
+      targets,
+      logit_lengths,
+      target_lengths,
+      blank,
+      clamp,
+      fused_log_softmax);
   return std::make_tuple(results[0], results[1]);
 }
 
