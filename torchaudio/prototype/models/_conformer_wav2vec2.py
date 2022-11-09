@@ -9,8 +9,8 @@ from torchaudio.models.rnnt import _TimeReduction
 from torchaudio.models.wav2vec2 import components
 
 
-class TimeReduction(Module):
-    """Extract features from input. Consists of time reduction and linear layer.
+class FeatureEncoder(Module):
+    """Feature Encoder class, consisting of time reduction and linear layer.
 
     Args:
         stride (int): number of frames to merge for the output frame
@@ -30,7 +30,7 @@ class TimeReduction(Module):
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Args:
-            x (Tensor): Input Tensor representing log Mel Spectrogram output. shape ``(B, T, D)``.
+            x (Tensor): Feature Tensor representing log Mel Spectrogram output. shape ``(B, T, D)``.
             lengths (Tensor or None):
                 Valid length of each input sample. shape: ``(B, )``.
 
@@ -148,7 +148,7 @@ def _get_conformer_feature_extractor(
     input_dim: int,
     output_dim: int,
     stride: int,
-) -> TimeReduction:
+) -> FeatureEncoder:
     """Construct Feature Extractor
 
     Args:
@@ -157,9 +157,9 @@ def _get_conformer_feature_extractor(
         stride (int): Stride used in Time Reduction layer of feature extractor
 
     Returns:
-        TimeReduction: The resulting feature extraction
+        FeatureEncoder: The resulting feature extraction
     """
-    return TimeReduction(input_dim, output_dim, stride)
+    return FeatureEncoder(input_dim, output_dim, stride)
 
 
 def _get_conformer_encoder(
