@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../../versions.html">Nightly Build (0.14.0.dev20221109) &#x25BC</a>
+      <a href="../../../../../../versions.html">Nightly Build (0.14.0.dev20221110) &#x25BC</a>
     </div>
     
 
@@ -385,7 +385,7 @@
 
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
 
-<span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">wav2vec2_model</span><span class="p">,</span> <span class="n">Wav2Vec2Model</span>
+<span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">wav2vec2_model</span><span class="p">,</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">wavlm_model</span>
 
 <span class="n">_LG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -411,21 +411,70 @@
     <span class="k">return</span> <span class="n">config</span>
 
 
+<span class="k">def</span> <span class="nf">_get_config_wavlm</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;extractor_mode&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">feat_extract_norm</span><span class="si">}</span><span class="s2">_norm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_layer_config&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">conv_dim</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">conv_kernel</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">conv_stride</span><span class="p">)),</span>
+        <span class="s2">&quot;extractor_conv_bias&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">conv_bias</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_embed_dim&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_projection_dropout&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">feat_proj_dropout</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_kernel&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_conv_pos_embeddings</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_groups&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_conv_pos_embedding_groups</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_hidden_layers</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_heads&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_attention_heads</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_buckets&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_buckets</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_max_distance&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_bucket_distance</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_attention_dropout&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">attention_dropout</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_features&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">intermediate_size</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_dropout&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">activation_dropout</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hidden_dropout</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">do_stable_layer_norm</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">layerdrop</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
 <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">original</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Wav2Vec2ForCTC&quot;</span><span class="p">:</span>
+    <span class="n">is_for_ctc</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Wav2Vec2ForCTC&quot;</span><span class="p">,</span> <span class="s2">&quot;WavLMForCTC&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">is_for_ctc</span><span class="p">:</span>
         <span class="n">aux_num_out</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">vocab_size</span>
         <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">wav2vec2</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">_LG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The model is not an instance of Wav2Vec2ForCTC. &quot;</span> <span class="s1">&#39;&quot;lm_head&quot; module is not imported.&#39;</span><span class="p">)</span>
+        <span class="n">_LG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;The model is not an instance of Wav2Vec2ForCTC or WavLMForCTC. &quot;</span> <span class="s1">&#39;&quot;lm_head&quot; module is not imported.&#39;</span>
+        <span class="p">)</span>
         <span class="n">aux_num_out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">original</span>
-    <span class="n">imported</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
+    <span class="n">is_wavlm</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;WavLMModel&quot;</span><span class="p">,</span> <span class="s2">&quot;WavLMForCTC&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">is_wavlm</span><span class="p">:</span>
+        <span class="n">imported</span> <span class="o">=</span> <span class="n">wavlm_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">imported</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
-    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Wav2Vec2ForCTC&quot;</span><span class="p">:</span>
+    <span class="n">encoder_state_dict</span> <span class="o">=</span> <span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">is_wavlm</span><span class="p">:</span>  <span class="c1"># Rename paramaters of linear transformations for compatibility with the HF model</span>
+        <span class="n">encoder_state_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">rename_wavlm_key</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="n">encoder_state_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encoder_state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+    <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">encoder_state_dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_for_ctc</span><span class="p">:</span>
         <span class="n">imported</span><span class="o">.</span><span class="n">aux</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">lm_head</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">imported</span>
+
+
+<span class="k">def</span> <span class="nf">rename_wavlm_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rename weights and biases of linear transformations, since we define them directly in WavLMSelfAttention,</span>
+<span class="sd">    as opposed to nesting them in Linear modules</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;k_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;k_proj_weight&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;k_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;k_proj_bias&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;q_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;q_proj_weight&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;q_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;q_proj_bias&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;v_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;v_proj_weight&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;v_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;v_proj_bias&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;out_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;out_proj_weight&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;out_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;out_proj_bias&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="import_huggingface_model"><a class="viewcode-back" href="../../../../../generated/torchaudio.models.wav2vec2.utils.import_huggingface_model.html#torchaudio.models.wav2vec2.utils.import_huggingface_model">[docs]</a><span class="k">def</span> <span class="nf">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
@@ -449,7 +498,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Importing model.&quot;</span><span class="p">)</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading model configuration.&quot;</span><span class="p">)</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">is_wavlm</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;WavLMModel&quot;</span><span class="p">,</span> <span class="s2">&quot;WavLMForCTC&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">is_wavlm</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config_wavlm</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  - config: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">_LG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building model.&quot;</span><span class="p">)</span>
     <span class="n">imported</span> <span class="o">=</span> <span class="n">_build</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">original</span><span class="p">)</span>

@@ -22,3 +22,13 @@ ConvEmformer
   .. automethod:: forward
 
   .. automethod:: infer
+
+conformer_wav2vec2_model
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_model
+
+conformer_wav2vec2_base
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_base
