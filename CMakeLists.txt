@@ -58,6 +58,7 @@ endif()
 # Options
 option(BUILD_SOX "Build libsox statically" ON)
 option(BUILD_KALDI "Build kaldi statically" ON)
+option(BUILD_RAY_TRACING "Enable ray tracing simulation" ON)  # TODO: REMOVE THIS
 option(BUILD_RNNT "Enable RNN transducer" ON)
 option(BUILD_CTC_DECODER "Build Flashlight CTC decoder" ON)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)

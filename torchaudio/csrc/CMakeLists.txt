@@ -53,6 +53,15 @@ if(BUILD_RNNT)
   endif()
 endif()
 
+# TODO: Probably remove or edit this, cond shouldn't be BUILD_RAY_TRACING
+if(BUILD_RAY_TRACING)
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
+    ray_tracing.cpp
+    )
+endif()
+
 if(USE_CUDA)
   list(
     APPEND
