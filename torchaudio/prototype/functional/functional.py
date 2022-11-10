@@ -254,6 +254,9 @@ def barkscale_fbanks(
 
     .. properties:: TorchScript
 
+    .. image:: https://download.pytorch.org/torchaudio/doc-assets/bark_fbanks.png
+        :alt: Visualization of generated filter bank
+
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
         f_min (float): Minimum frequency (Hz)
