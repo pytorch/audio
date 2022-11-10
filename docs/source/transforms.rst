@@ -84,9 +84,6 @@ Utility
 
     AmplitudeToDB
     MelScale
-    InverseMelScale
-    BarkScale
-    InverseBarkScale
     MuLawEncoding
     MuLawDecoding
     Resample
@@ -104,7 +101,6 @@ Feature Extractions
     Spectrogram
     InverseSpectrogram
     MelSpectrogram
-    BarkSpectrogram
     GriffinLim
     MFCC
     LFCC

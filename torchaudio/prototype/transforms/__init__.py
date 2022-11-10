@@ -1,3 +1,9 @@
-from ._transforms import Convolve, FFTConvolve
+from ._transforms import BarkScale, BarkSpectrogram, Convolve, FFTConvolve, InverseBarkScale
 
-__all__ = ["Convolve", "FFTConvolve"]
+__all__ = [
+    "BarkScale",
+    "BarkSpectrogram",
+    "Convolve",
+    "FFTConvolve",
+    "InverseBarkScale",
+]

@@ -45,3 +45,14 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
 
         self._assert_consistency(F.add_noise, (waveform, noise, lengths, snr))
+
+    def test_barkscale_fbanks(self):
+        if self.device != torch.device("cpu"):
+            raise unittest.SkipTest("No need to perform test on device other than CPU")
+
+        n_stft = 100
+        f_min = 0.0
+        f_max = 20.0
+        n_barks = 10
+        sample_rate = 16000
+        self._assert_consistency(F.barkscale_fbanks, (n_stft, f_min, f_max, n_barks, sample_rate, "traunmuller"))
