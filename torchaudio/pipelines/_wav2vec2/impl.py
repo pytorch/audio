@@ -69,7 +69,8 @@ class Wav2Vec2Bundle:
         Args:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
         """
-        if self._params.get("model_class", None) == "WavLM":
+        model_type = self._params.pop("model_type", None)
+        if model_type == "WavLM":
             model = wavlm_model(**self._params)
         else:
             model = wav2vec2_model(**self._params)
@@ -1202,6 +1203,8 @@ WAVLM_BASE = Wav2Vec2Bundle(
         "encoder_pos_conv_groups": 16,
         "encoder_num_layers": 12,
         "encoder_num_heads": 12,
+        "encoder_max_distance": 800,
+        "encoder_num_buckets": 320,
         "encoder_attention_dropout": 0.1,
         "encoder_ff_interm_features": 3072,
         "encoder_ff_interm_dropout": 0.0,
@@ -1209,7 +1212,7 @@ WAVLM_BASE = Wav2Vec2Bundle(
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
-        "model_class": "WavLM",
+        "model_type": "WavLM",
     },
     _sample_rate=16000,
 )
@@ -1245,6 +1248,8 @@ WAVLM_BASE_PLUS = Wav2Vec2Bundle(
         "encoder_pos_conv_groups": 16,
         "encoder_num_layers": 12,
         "encoder_num_heads": 12,
+        "encoder_max_distance": 800,
+        "encoder_num_buckets": 320,
         "encoder_attention_dropout": 0.1,
         "encoder_ff_interm_features": 3072,
         "encoder_ff_interm_dropout": 0.0,
@@ -1252,7 +1257,7 @@ WAVLM_BASE_PLUS = Wav2Vec2Bundle(
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
-        "model_class": "WavLM",
+        "model_type": "WavLM",
     },
     _sample_rate=16000,
 )
@@ -1289,6 +1294,8 @@ WAVLM_LARGE = Wav2Vec2Bundle(
         "encoder_pos_conv_groups": 16,
         "encoder_num_layers": 24,
         "encoder_num_heads": 16,
+        "encoder_max_distance": 800,
+        "encoder_num_buckets": 320,
         "encoder_attention_dropout": 0.1,
         "encoder_ff_interm_features": 4096,
         "encoder_ff_interm_dropout": 0.0,
@@ -1296,7 +1303,7 @@ WAVLM_LARGE = Wav2Vec2Bundle(
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
-        "model_class": "WavLM",
+        "model_type": "WavLM",
     },
     _sample_rate=16000,
 )
