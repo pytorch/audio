@@ -146,6 +146,10 @@ class ConformerEncoder(Module):
 class ConformerWav2Vec2PretrainModel(Module):
     """Conformer Wav2Vec2 pre-train model for training from scratch.
 
+    Note:
+        To build the model, please use one of the factory functions,
+        :py:func:`conformer_wav2vec2_base` or :py:func:`conformer_wav2vec2_large`
+
     Args:
         wav2vec2 (nn.Module):
             Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.
@@ -354,7 +358,7 @@ def conformer_wav2vec2_base(
 
     Returns:
         Wav2Vec2Model:
-             The resulting wav2vec2 model with a conformer encoder and ``base`` configuration.
+            The resulting wav2vec2 model with a conformer encoder and ``base`` configuration.
     """
     return conformer_wav2vec2_model(
         extractor_input_dim=extractor_input_dim,
@@ -397,11 +401,11 @@ def conformer_wav2vec2_pretrain_model(
     mask_channel_length: int,
     no_mask_channel_overlap: bool,
     mask_channel_min_space: int,
-):
+) -> ConformerWav2Vec2PretrainModel:
     """Build a custom Conformer Wav2Vec2 Model for pre-training
 
     Args:
-        extractor_input_dim (int) Input dimension of the features.
+        extractor_input_dim (int): Input dimension of the features.
         extractor_output_dim (int): Output dimension after feature extraction.
         extractor_stride (int):
             Stride used in time reduction layer of feature extraction.
@@ -441,10 +445,9 @@ def conformer_wav2vec2_pretrain_model(
             Minimum space between spans (if no overlap is enabled).
         mask_channel_prob: (float):
             The probability of replacing a feature with 0.
-        mask_channel_prob: (float):
-            The probability of replacing a feature with 0.
         mask_channel_selection (str):
-            How to choose the mask length for channel masking. Options: [``static``, ``uniform``, ``normal``, ``poisson``].
+            How to choose the mask length for channel masking.
+            Options: [``static``, ``uniform``, ``normal``, ``poisson``].
         mask_channel_other (float):
             Secondary mask argument for channel masking (used for more complex distributions).
         mask_channel_length (int):
@@ -453,6 +456,10 @@ def conformer_wav2vec2_pretrain_model(
             Whether to allow channel masks to overlap.
         mask_channel_min_space (int):
             Minimum space between spans for channel masking (if no overlap is enabled).
+
+    Returns:
+        ConformerWav2Vec2PretrainModel:
+            The resulting model.
     """
     wav2vec2 = conformer_wav2vec2_model(
         extractor_input_dim,
@@ -502,7 +509,7 @@ def conformer_wav2vec2_pretrain_base(
     *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`
 
     Args:
-        extractor_input_dim (int) Input dimension of the features. (Default: 64)
+        extractor_input_dim (int): Input dimension of the features. (Default: 64)
         extractor_output_dim (int): Output dimension after feature extraction. (Default: 256)
         encoder_projection_dropout (float):
             The dropout probability applied after the input feature is projected to
@@ -512,6 +519,10 @@ def conformer_wav2vec2_pretrain_base(
             (Default: 0.3)
         mask_length (int):
             The lengths of the mask. (Default: 3)
+
+    Returns:
+        ConformerWav2Vec2PretrainModel:
+            The resulting model.
     """
     return conformer_wav2vec2_pretrain_model(
         extractor_input_dim=extractor_input_dim,
@@ -552,7 +563,7 @@ def conformer_wav2vec2_pretrain_large(
     *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`
 
     Args:
-        extractor_input_dim (int) Input dimension of the features. (Default: 64)
+        extractor_input_dim (int): Input dimension of the features. (Default: 64)
         extractor_output_dim (int): Output dimension after feature extraction. (Default: 256)
         encoder_projection_dropout (float):
             The dropout probability applied after the input feature is projected to
@@ -566,6 +577,10 @@ def conformer_wav2vec2_pretrain_large(
             Number of sampled negatives. (Default: 0)
         cross_sample_negatives (int):
             Number of cross sampled negatives. (Default: 0)
+
+    Returns:
+        ConformerWav2Vec2PretrainModel:
+            The resulting model.
     """
     return conformer_wav2vec2_pretrain_model(
         extractor_input_dim=extractor_input_dim,
