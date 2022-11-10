@@ -58,7 +58,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # exactly same result. For this reason, tolerance is very relaxed here.
         self.assert_batch_consistency(transform, mel_spec, atol=1.0, rtol=1e-5)
 
-
     def test_batch_compute_deltas(self):
         specgram = torch.randn(3, 2, 31, 2786)
         transform = T.ComputeDeltas()

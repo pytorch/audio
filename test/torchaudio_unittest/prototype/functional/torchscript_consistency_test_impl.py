@@ -1,3 +1,5 @@
+import unittest
+
 import torch
 import torchaudio.prototype.functional as F
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin, torch_script

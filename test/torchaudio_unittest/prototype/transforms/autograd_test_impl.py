@@ -45,6 +45,7 @@ class Autograd(TestBaseMixin):
         sample_rate = 8000
         transform = T.BarkSpectrogram(sample_rate=sample_rate)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     def test_barkscale(self):
         sample_rate = 8000
