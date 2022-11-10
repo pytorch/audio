@@ -83,7 +83,7 @@ int StreamProcessor::process_packet(
     if (ret < 0)
       return ret;
 
-    if (pFrame1->pts >= discard_before_pts) {
+    if (discard_before_pts < 0 || pFrame1->pts >= discard_before_pts) {
       send_frame(pFrame1);
     }
 
