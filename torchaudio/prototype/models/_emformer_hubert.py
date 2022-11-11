@@ -39,11 +39,13 @@ class FeatureExtractor(torch.nn.Module):
                 torch.Tensor or None
                     The reduced lengths Tensor.
         """
-        batch_size, num_frame, _ = input.shape
         output = self.linear(input)
         if lengths is None:
-            lengths = torch.ones(batch_size) * num_frame
-        output, lengths = self.time_reduction(output, lengths)
+            B, T, _ = input.shape
+            dummy_lengths = torch.full((B,), T)
+            output, _ = self.time_reduction(output, dummy_lengths)
+        else:
+            output, lengths = self.time_reduction(output, lengths)
         return output, lengths
 
 
@@ -86,7 +88,12 @@ class EmformerEncoder(torch.nn.Module):
         Returns:
             (torch.Tensor): The feature Tensor after emformer encoder.
         """
-        output, lengths = self.emformer(input, lengths)
+        if lengths is None:
+            B, T, _ = input.shape
+            dummy_lengths = torch.full((B,), T)
+            output, _ = self.emformer(input, dummy_lengths)
+        else:
+            output, lengths = self.emformer(input, lengths)
         output = self.output_linear(output)
         if self.layer_norm is not None:
             output = self.layer_norm(output)
@@ -120,16 +127,19 @@ class EmformerEncoder(torch.nn.Module):
         ret: List[torch.Tensor] = []
 
         input = input.permute(1, 0, 2)
-        right_context = self.emforer._gen_right_context(input)
-        utterance = input[: input.size(0) - self.emforer.right_context_length]
-        attention_mask = self.emforer._gen_attention_mask(utterance)
+        right_context = self.emformer._gen_right_context(input)
+        utterance = input[: input.size(0) - self.emformer.right_context_length]
+        attention_mask = self.emformer._gen_attention_mask(utterance)
         mems = (
-            self.emforer.memory_op(utterance.permute(1, 2, 0)).permute(2, 0, 1)[:-1]
-            if self.emforer.use_mem
+            self.emformer.memory_op(utterance.permute(1, 2, 0)).permute(2, 0, 1)[:-1]
+            if self.emformer.use_mem
             else torch.empty(0).to(dtype=input.dtype, device=input.device)
         )
         output = utterance
-        for layer in self.emforer.emformer_layers:
+        if lengths is None:
+            B, T, _ = input.shape
+            lengths = torch.full((B,), T)
+        for layer in self.emformer.emformer_layers:
             output, right_context, mems = layer(output, lengths, right_context, mems, attention_mask)
             ret.append(output.permute(1, 0, 2))
             if num_layers is not None and len(ret) >= num_layers:
