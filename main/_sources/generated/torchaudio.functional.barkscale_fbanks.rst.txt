@@ -1,0 +1,6 @@
+﻿torchaudio.functional.barkscale\_fbanks
+=======================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: barkscale_fbanks
