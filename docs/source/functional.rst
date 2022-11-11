@@ -17,6 +17,7 @@ Utility
    amplitude_to_DB
    DB_to_amplitude
    melscale_fbanks
+   barkscale_fbanks
    linear_fbanks
    create_dct
    mask_along_axis

@@ -18,6 +18,8 @@ class StreamReader {
   std::vector<std::pair<int, int>> stream_indices;
 
   // timestamp to seek to expressed in AV_TIME_BASE
+  // < 0 : No seek
+  // Positive value: Skip AVFrames with timestamps before it
   int64_t seek_timestamp = -1;
 
  public:
