@@ -16,12 +16,13 @@ namespace {
 
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
-#define MAX_DIST \
-  (50.) // TODO:remove. Note: this is the max distance it takes to hit a wall,
-        // not the max distance that a ray can go over
+// TODO:remove. Note: this is the max distance it takes to hit a wall,
+// not the max distance that a ray can go over
+#define MAX_DIST (15.1422)
+// #define MAX_DIST (1000.)
 #define EPS (1e-5) // epsilon is set to 0.1 millimeter (100 um)
-#define MIC_RADIUS (0.15) // TODO: Make this a parameter?
-#define MIC_RADIUS_SQ (0.15 * 0.15) // TODO: Remove
+#define MIC_RADIUS (0.5) // TODO: Make this a parameter?
+#define MIC_RADIUS_SQ (MIC_RADIUS * MIC_RADIUS) // TODO: Remove
 #define SCATTER (0.1) // TODO: Remove
 
 std::tuple<torch::Tensor, int, float> next_wall_hit(
@@ -31,8 +32,10 @@ std::tuple<torch::Tensor, int, float> next_wall_hit(
     bool scattered_ray // TODO: probably remove
 ) {
   int D = room.size(0);
-  const static std::vector<std::vector<int>> shoebox_orders = {
-      {0, 1, 2}, {1, 0, 2}, {2, 0, 1}};
+  // TODO: put back original??
+  //   const static std::vector<std::vector<int>> shoebox_orders = {
+  //       {0, 1, 2}, {1, 0, 2}, {2, 0, 1}};
+  const static std::vector<std::vector<int>> shoebox_orders = {{0, 1}, {1, 0}};
 
   torch::Tensor result = torch::zeros(D, torch::kFloat);
   int next_wall_index = -1;
@@ -54,7 +57,7 @@ std::tuple<torch::Tensor, int, float> next_wall_hit(
     // distance to plane
     double distance = 0.;
 
-    // this wil tell us if the front or back plane is hit
+    // this will tell us if the front or back plane is hit
     int ind_inc = 0;
 
     if (dir[d[0]].item().toDouble() < 0.) {
@@ -67,8 +70,9 @@ std::tuple<torch::Tensor, int, float> next_wall_hit(
       ind_inc = 1;
     }
 
-    if (distance < EPS)
+    if (distance < EPS) {
       continue;
+    }
 
     float ratio = distance / abs_dir0;
 
@@ -94,8 +98,60 @@ std::tuple<torch::Tensor, int, float> next_wall_hit(
   return std::make_tuple(result, next_wall_index, hit_dist);
 }
 
+void log_hist(
+    torch::Tensor& hist,
+    double energy,
+    double travel_dist_at_mic,
+    double sound_speed,
+    double hist_bin_size) {
+  // TODO: Also log counts??
+  double time_at_mic = travel_dist_at_mic / sound_speed;
+  auto bin = floor(time_at_mic / hist_bin_size);
+  hist[bin] += energy;
+}
+
+void scat_ray(
+    torch::Tensor& hist,
+    torch::Tensor mic_array,
+    double sound_speed,
+    double energy_thres,
+    double time_thres,
+    double hist_bin_size,
+    double transmitted,
+    torch::Tensor normal,
+    torch::Tensor hit_point,
+    double travel_dist) {
+  // Convert the energy threshold to transmission threshold (make this more
+  // efficient at some point)
+  double distance_thres = time_thres * sound_speed;
+
+  // As the ray is shot towards the microphone center,
+  // the hop dist can be easily computed
+  torch::Tensor hit_point_to_mic = mic_array - hit_point;
+  double hop_dist = hit_point_to_mic.norm().item().toDouble();
+  double travel_dist_at_mic = travel_dist + hop_dist;
+
+  // compute the scattered energy reaching the microphone
+  double h_sq = hop_dist * hop_dist;
+  double p_hit_equal = 1. - sqrt(1. - MIC_RADIUS_SQ / h_sq);
+  double cosine = hit_point_to_mic.dot(normal).item().toDouble() /
+      hit_point_to_mic.norm().item().toDouble();
+  // cosine angle should be positive, but could be negative if normal is
+  // facing out of room so we take abs
+  float p_lambert = 2. * std::abs(cosine);
+  double scat_trans = SCATTER * transmitted * p_hit_equal * p_lambert;
+
+  if (travel_dist_at_mic < distance_thres && SCATTER > energy_thres) {
+    double r_sq = travel_dist_at_mic * travel_dist_at_mic;
+    auto p_hit = (1. - sqrt(1. - MIC_RADIUS_SQ / std::max(MIC_RADIUS_SQ, r_sq)));
+    double energy = scat_trans / (r_sq * p_hit);
+    log_hist(hist, energy, travel_dist_at_mic, sound_speed, hist_bin_size);
+  }
+}
+
 void simul_ray(
     torch::Tensor& hist,
+    torch::Tensor normals,
     torch::Tensor room,
     torch::Tensor source,
     torch::Tensor mic_array,
@@ -193,27 +249,29 @@ void simul_ray(
             (1 - sqrt(1 - MIC_RADIUS_SQ / std::max(MIC_RADIUS_SQ, r_sq)));
         energy = transmitted / (r_sq * p_hit);
 
-        // microphones[k].log_histogram(travel_dist_at_mic, energy, start);
-        double time_at_mic = travel_dist_at_mic / sound_speed;
-        auto bin = floor(time_at_mic / hist_bin_size);
-        hist[bin] += energy; // TODO: Also log counts??
+        log_hist(hist, energy, travel_dist_at_mic, sound_speed, hist_bin_size);
       }
     }
 
     // Update the characteristics
     travel_dist += hit_distance;
-    // transmitted *= wall.get_energy_reflection();
     transmitted *= (1. - e_absorption);
+
+    auto normal = normals[next_wall_index];
 
     // Let's shoot the scattered ray induced by the rebound on the wall
     if (SCATTER > 0) {
-      // Shoot the scattered ray
-
-      // TODOODODODODODODODODODO
-      //   scat_ray(transmitted, wall, start, hit_point, travel_dist);
-
-      // The overall ray's energy gets decreased by the total
-      // amount of scattered energy
+      scat_ray(
+          hist,
+          mic_array,
+          sound_speed,
+          energy_thres,
+          time_thres,
+          hist_bin_size,
+          transmitted,
+          normal,
+          hit_point,
+          travel_dist);
       transmitted *= (1. - SCATTER);
     }
 
@@ -222,13 +280,67 @@ void simul_ray(
       break;
     }
 
-    // // set up for next iteration
-    // specular_counter += 1;
-    // dir = wall.normal_reflect(dir); // conserves length
-    // start = hit_point;
-
-    break; // TODO: remove!!!!!
+    // set up for next iteration
+    specular_counter += 1;
+    // reflect w.r.t normal while conserving length
+    dir = dir - normal * 2 * dir.dot(normal);
+    start = hit_point;
+    // if (specular_counter == 2) {
+    //   break;
+    // }
   }
+}
+
+// TODO: cleanup and probably remove this helper
+// This shouldn't even be needed since we always have shoebox rooms, we can
+// hard-code all of it.
+void _normal_helper(
+    torch::Tensor& normals,
+    int row, // TODO: ew
+    std::vector<double> corner) {
+  normals[row][0] = corner[3] - corner[2];
+  normals[row][1] = corner[0] - corner[1];
+  normals[row] /= normals[row].norm();
+}
+
+// TODO: Handle 3D rooms
+torch::Tensor make_normals(torch::Tensor room) {
+  // room is defined as Width, Length (x-axis, y-axis)
+  // normals are defined as:
+  // dim 0 = wall in this order: South East North West (this is different from
+  // e_abs order !!)
+  // dim 1 = x, y
+
+  // Note that the normals are facing outwards the room:
+  //
+  //                  ^
+  //                  |
+  //                  |
+  //          -------------------
+  //          |       N         |
+  //   <----- |W               E| ----->
+  //          |       S         |
+  //          -------------------
+  //                  |
+  //                  |
+  //                  v
+
+  double W = room[0].item().toDouble();
+  double L = room[1].item().toDouble();
+
+  torch::Tensor normals = torch::zeros({4, 2}, torch::kFloat);
+
+  std::vector<double> south_corner = {0., W, 0., 0.};
+  std::vector<double> est_corner = {W, W, 0., L};
+  std::vector<double> north_corner = {W, 0., L, L};
+  std::vector<double> west_corner = {0., 0., L, 0.};
+
+  _normal_helper(normals, 0, south_corner);
+  _normal_helper(normals, 1, est_corner);
+  _normal_helper(normals, 2, north_corner);
+  _normal_helper(normals, 3, west_corner);
+
+  return normals;
 }
 
 void ray_tracing_impl(
@@ -245,6 +357,7 @@ void ray_tracing_impl(
   double energy_0 = 2. / num_rays; // TODO: just move that into simul_ray??
   int D = room.size(0);
 
+  torch::Tensor normals = make_normals(room);
   // TODO: Could probably parallelize call over num_rays? We would need
   // `num_threads` histograms and then sum-reduce them into a single histogram.
 
@@ -264,13 +377,27 @@ void ray_tracing_impl(
       auto azimuth = atan2(y, x);
       auto colatitude = atan2(sqrt(x * x + y * y), z);
 
-      //   simul_ray(azimuth, colatitude, source_pos, energy_0);
+      simul_ray(
+          hist,
+          normals,
+          room,
+          source,
+          mic_array,
+          e_absorption,
+          sound_speed,
+          energy_thres,
+          time_thres,
+          hist_bin_size,
+          azimuth,
+          colatitude,
+          energy_0);
     }
   } else if (D == 2) {
     float offset = 2. * M_PI / num_rays;
-    for (auto i = 0; i < num_rays; ++i) {
+    for (int i = 0; i < num_rays; ++i) {
       simul_ray(
           hist,
+          normals,
           room,
           source,
           mic_array,

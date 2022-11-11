@@ -20,6 +20,8 @@ def ray_tracing(
         if mic_array.shape[0] != 1:
             raise ValueError("Only 1 channel supported")  # TODO: remove?
         mic_array = mic_array[0]
+    if room.shape[0] > 2:
+        raise ValueError("Only 2D room supported")  # TODO: support 3D !!
 
     assert time_thres > hist_bin_size  # TODO: raise proper ValueErRor
     return torch.ops.torchaudio.ray_tracing(room, source, mic_array, num_rays, e_absorption, sound_speed, energy_thres, time_thres, hist_bin_size)
