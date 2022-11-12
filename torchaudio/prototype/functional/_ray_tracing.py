@@ -10,6 +10,7 @@ def ray_tracing(
     mic_array: torch.Tensor,
     num_rays: int, # TODO: find good default
     e_absorption: float = 0,  # TODO: accept tensor like in ISM
+    scatter: float = 0,  # TODO: accept tensor like in ISM
     sound_speed: float = 343,
     energy_thres: float = 1e-7,
     time_thres: float = 10,  # 10s
@@ -24,4 +25,4 @@ def ray_tracing(
         raise ValueError("Only 2D room supported")  # TODO: support 3D !!
 
     assert time_thres > hist_bin_size  # TODO: raise proper ValueErRor
-    return torch.ops.torchaudio.ray_tracing(room, source, mic_array, num_rays, e_absorption, sound_speed, energy_thres, time_thres, hist_bin_size)
+    return torch.ops.torchaudio.ray_tracing(room, source, mic_array, num_rays, e_absorption, scatter, sound_speed, energy_thres, time_thres, hist_bin_size)
