@@ -1,12 +1,10 @@
 #include <math.h>
 #include <torch/script.h> // TODO: remove?
 #include <torch/torch.h>
-// TODO: get rid of all the .item().toFloat() and toBool() calls ?
 
 namespace torchaudio {
 namespace rir {
 namespace {
-
 
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
@@ -40,7 +38,7 @@ class RayTracer {
         energy_thres(_energy_thres),
         time_thres(_time_thres),
         hist_bin_size(_hist_bin_size),
-        max_dist(room.norm().item().toFloat() + 1.),
+        max_dist(room.norm().item<scalar_t>() + 1.),
         D(room.size(0)),
         normals(make_normals()),
         origins(make_origins()) {}
@@ -103,7 +101,7 @@ class RayTracer {
     const static std::vector<std::vector<int>> shoebox_orders = {
         {0, 1, 2}, {1, 0, 2}, {2, 0, 1}};
 
-    torch::Tensor result = torch::zeros(D, torch::kFloat);
+    torch::Tensor hit_point = torch::zeros_like(room);
     int next_wall_index = -1;
     auto hit_dist = max_dist;
 
@@ -114,7 +112,7 @@ class RayTracer {
       if (d[0] >= D) { // Happens for 2D rooms
         continue;
       }
-      auto abs_dir0 = std::abs(dir[d[0]].item().toFloat());
+      auto abs_dir0 = std::abs(dir[d[0]].item<scalar_t>());
       if (abs_dir0 < EPS) {
         continue;
       }
@@ -125,13 +123,13 @@ class RayTracer {
       // this will tell us if the front or back plane is hit
       int ind_inc = 0;
 
-      if (dir[d[0]].item().toFloat() < 0.) {
-        result[d[0]] = 0.;
-        distance = start[d[0]].item().toFloat();
+      if (dir[d[0]].item<scalar_t>() < 0.) {
+        hit_point[d[0]] = 0.;
+        distance = start[d[0]].item<scalar_t>();
         ind_inc = 0;
       } else {
-        result[d[0]] = room[d[0]];
-        distance = (room[d[0]] - start[d[0]]).item().toFloat();
+        hit_point[d[0]] = room[d[0]];
+        distance = (room[d[0]] - start[d[0]]).item<scalar_t>();
         ind_inc = 1;
       }
 
@@ -143,24 +141,24 @@ class RayTracer {
 
       // Now compute the intersection point and verify if intersection happens
       for (auto i = 1; i < D; ++i) {
-        result[d[i]] = start[d[i]] + ratio * dir[d[i]];
+        hit_point[d[i]] = start[d[i]] + ratio * dir[d[i]];
         // when there is no intersection, we jump to the next plane
-        if ((result[d[i]] <= -EPS).item().toBool() ||
-            (room[d[i]] + EPS <= result[d[i]]).item().toBool())
-          goto next_plane; // TODO: avoid goto??
+        if ((hit_point[d[i]] <= -EPS).item<bool>() ||
+            (room[d[i]] + EPS <= hit_point[d[i]]).item<bool>())
+          goto next_plane;
       }
 
       // if we get here, there is intersection with this wall
       next_wall_index = 2 * d[0] + ind_inc;
 
-      hit_dist = (result - start).norm().item().toFloat();
+      hit_dist = (hit_point - start).norm().item<scalar_t>();
 
       break;
 
     next_plane:
       (void)0; // no op
     }
-    return std::make_tuple(result, next_wall_index, hit_dist);
+    return std::make_tuple(hit_point, next_wall_index, hit_dist);
   }
 
   void log_hist(
@@ -226,16 +224,16 @@ class RayTracer {
         // and the center of the microphone (mic_pos)
 
         torch::Tensor to_mic = mic_array - start;
-        auto impact_distance = to_mic.dot(dir).item().toFloat();
+        auto impact_distance = to_mic.dot(dir).item<scalar_t>();
 
         bool impacts =
             (-EPS < impact_distance) && (impact_distance < hit_distance + EPS);
 
         // If yes, we compute the ray's transmitted amplitude at the mic and we
         // continue the ray
-        if (impacts &&
-            ((to_mic - dir * impact_distance).norm().item().toFloat() <
-             mic_radius + EPS)) {
+        torch::Tensor diff = (to_mic - dir * impact_distance);
+
+        if (impacts && (diff.norm().item<scalar_t>() < mic_radius + EPS)) {
           // The length of this last hop
           auto distance = std::abs(impact_distance);
 
@@ -291,14 +289,14 @@ class RayTracer {
     // As the ray is shot towards the microphone center,
     // the hop dist can be easily computed
     torch::Tensor hit_point_to_mic = mic_array - hit_point;
-    auto hop_dist = hit_point_to_mic.norm().item().toFloat();
+    auto hop_dist = hit_point_to_mic.norm().item<scalar_t>();
     auto travel_dist_at_mic = travel_dist + hop_dist;
 
     // compute the scattered energy reaching the microphone
     auto h_sq = hop_dist * hop_dist;
     auto p_hit_equal = 1. - sqrt(1. - mic_radius_sq / h_sq);
-    auto cosine = hit_point_to_mic.dot(normal).item().toFloat() /
-        hit_point_to_mic.norm().item().toFloat();
+    auto cosine = hit_point_to_mic.dot(normal).item<scalar_t>() /
+        hit_point_to_mic.norm().item<scalar_t>();
     // cosine angle should be positive, but could be negative if normal is
     // facing out of room so we take abs
     auto p_lambert = 2 * std::abs(cosine);
@@ -314,29 +312,59 @@ class RayTracer {
   }
 
   const torch::Tensor make_normals() {
-    return torch::tensor(
-        {
-            {0, -1}, // South
-            {1, 0}, // East
-            {0, 1}, // North
-            {-1, 0} // West
-        },
-        room.scalar_type());
+    if (D == 2) {
+      return torch::tensor(
+          {
+              {0, -1}, // South
+              {1, 0}, // East
+              {0, 1}, // North
+              {-1, 0} // West
+          },
+          room.scalar_type());
+    } else {
+      return torch::tensor(
+          {
+              {-1, 0, 0}, // West
+              {1, 0, 0}, // East
+              {0, -1, 0}, // South
+              {0, 1, 0}, // North
+              {0, 0, -1}, // Floor
+              {0, 0, 1} // Ceiling
+          },
+          room.scalar_type());
+    }
   }
 
   const torch::Tensor make_origins() {
-    return torch::tensor(
-        {
-            {0.f, 0.f}, // South
-            {room[0].item().toFloat(), 0.f}, // East
-            {room[0].item().toFloat(), room[1].item().toFloat()}, // North
-            {0.f, room[1].item().toFloat()} // West
-        },
-        room.scalar_type());
+    // Origins are somewhat arbitrary, they just need to be one of the corners
+    // of the plane
+    if (D == 2) {
+      return torch::tensor(
+          {
+              {0.f, 0.f}, // South
+              {room[0].item<scalar_t>(), 0.f}, // East
+              {room[0].item<scalar_t>(), room[1].item<scalar_t>()}, // North
+              {0.f, room[1].item<scalar_t>()} // West
+          },
+          room.scalar_type());
+    } else {
+      return torch::tensor(
+          {
+              {0.f, room[1].item<scalar_t>(), 0.f}, // West
+              {room[0].item<scalar_t>(), 0.f, 0.f}, // East
+              {0.f, 0.f, 0.f}, // South
+              {room[0].item<scalar_t>(),
+               room[1].item<scalar_t>(),
+               0.f}, // North
+              {room[0].item<scalar_t>(), 0.f, 0.f}, // Floor
+              {room[0].item<scalar_t>(), 0.f, room[2].item<scalar_t>()} // Ceil
+          },
+          room.scalar_type());
+    }
   }
 
   int side(torch::Tensor normal, torch::Tensor origin, torch::Tensor pos) {
-    auto dot = (pos - origin).dot(normal).item().toFloat();
+    auto dot = (pos - origin).dot(normal).item<scalar_t>();
 
     if (dot > EPS) {
       return 1;
