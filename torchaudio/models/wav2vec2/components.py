@@ -199,6 +199,7 @@ class ConvolutionalPositionalEmbedding(Module):
     ):
         super().__init__()
         self.embed_dim = embed_dim
+        self.kernel_size = kernel_size
         self.conv = nn.Conv1d(
             in_channels=embed_dim,
             out_channels=embed_dim,
