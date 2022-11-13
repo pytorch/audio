@@ -1,210 +1,66 @@
 #include <math.h>
-#include <stdio.h>
 #include <torch/script.h> // TODO: remove?
 #include <torch/torch.h>
-using namespace torch::indexing; // TODO: remove?
+// TODO: get rid of all the .item().toFloat() and toBool() calls ?
 
 namespace torchaudio {
 namespace rir {
-
 namespace {
 
-// TODO: use double verywhere instead of float?
-// TODO: use const where relevant?
-// TODO: get rid of all the .item().toFloat() and toBool() calls ?
-// TODO: is shoebox_size the same as room size?????
 
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
 #define EPS (1e-5) // epsilon is set to 0.1 millimeter (100 um)
-#define MIC_RADIUS (0.5) // TODO: Make this a parameter?
-#define MIC_RADIUS_SQ (MIC_RADIUS * MIC_RADIUS) // TODO: Remove
 
-std::tuple<torch::Tensor, int, float> next_wall_hit(
-    torch::Tensor room,
-    torch::Tensor start,
-    torch::Tensor end,
-    float max_dist) {
-  int D = room.size(0);
-  const static std::vector<std::vector<int>> shoebox_orders = {
-      {0, 1, 2}, {1, 0, 2}, {2, 0, 1}};
-
-  torch::Tensor result = torch::zeros(D, torch::kFloat);
-  int next_wall_index = -1;
-  float hit_dist = max_dist;
-
-  // The direction vector
-  torch::Tensor dir = end - start;
-
-  for (auto& d : shoebox_orders) {
-    if (d[0] >= D) { // Happens for 2D rooms
-      continue;
-    }
-    float abs_dir0 = std::abs(dir[d[0]].item().toFloat());
-    if (abs_dir0 < EPS) {
-      continue;
-    }
-
-    // distance to plane
-    float distance = 0.;
-
-    // this will tell us if the front or back plane is hit
-    int ind_inc = 0;
-
-    if (dir[d[0]].item().toFloat() < 0.) {
-      result[d[0]] = 0.;
-      distance = start[d[0]].item().toFloat();
-      ind_inc = 0;
-    } else {
-      result[d[0]] = room[d[0]];
-      distance = (room[d[0]] - start[d[0]]).item().toFloat();
-      ind_inc = 1;
-    }
-
-    if (distance < EPS) {
-      continue;
-    }
-
-    float ratio = distance / abs_dir0;
-
-    // Now compute the intersection point and verify if intersection happens
-    for (auto i = 1; i < D; ++i) {
-      result[d[i]] = start[d[i]] + ratio * dir[d[i]];
-      // when there is no intersection, we jump to the next plane
-      if ((result[d[i]] <= -EPS).item().toBool() ||
-          (room[d[i]] + EPS <= result[d[i]]).item().toBool())
-        goto next_plane; // TODO: avoid goto??
-    }
-
-    // if we get here, there is intersection with this wall
-    next_wall_index = 2 * d[0] + ind_inc;
-
-    hit_dist = (result - start).norm().item().toFloat();
-
-    break;
-
-  next_plane:
-    (void)0; // no op
-  }
-  return std::make_tuple(result, next_wall_index, hit_dist);
-}
-
-void log_hist(
-    torch::Tensor& hist,
-    float energy,
-    float travel_dist_at_mic,
-    float sound_speed,
-    float hist_bin_size) {
-  // TODO: Also log counts??
-  float time_at_mic = travel_dist_at_mic / sound_speed;
-  auto bin = floor(time_at_mic / hist_bin_size);
-  hist[bin] += energy;
-}
-
-int side(torch::Tensor normal, torch::Tensor origin, torch::Tensor pos) {
-  auto dot = (pos - origin).dot(normal).item().toFloat();
-
-  if (dot > EPS) {
-    return 1;
-  } else if (dot < -EPS) {
-    return -1;
-  } else {
-    return 0;
-  }
-}
-
-// TODO: Handle 3D rooms
-torch::Tensor make_normals(torch::Tensor room) {
-  // Note that the normals are facing outwards the room:
-  //
-  //                  ^
-  //                  |
-  //                  |
-  //          -------------------
-  //          |       N         |
-  //   <----- |W               E| ----->
-  //          |       S         |
-  //          -------------------
-  //                  |
-  //                  |
-  //                  v
-
-  return torch::tensor(
-      {
-          {0, -1}, // South
-          {1, 0}, // East
-          {0, 1}, // North
-          {-1, 0} // West
-      },
-      torch::kFloat);
-}
-
-// See make_normals
-torch::Tensor make_origins(torch::Tensor room) {
-  return torch::tensor(
-      {
-          {0.f, 0.f}, // South
-          {room[0].item().toFloat(), 0.f}, // East
-          {room[0].item().toFloat(), room[1].item().toFloat()}, // North
-          {0.f, room[1].item().toFloat()} // West
-      },
-      torch::kFloat);
-}
-
+template <typename scalar_t>
 class RayTracer {
  public:
   RayTracer(
+      const torch::Tensor _room,
+      const torch::Tensor _source,
+      const torch::Tensor _mic_array,
       int _num_rays,
-      float _e_absorption,
-      float _scatter,
-      float _sound_speed,
-      float _energy_thres,
-      float _time_thres,
-      float _hist_bin_size)
-      : num_rays(_num_rays),
+      scalar_t _e_absorption,
+      scalar_t _scatter,
+      scalar_t _mic_radius,
+      scalar_t _sound_speed,
+      scalar_t _energy_thres,
+      scalar_t _time_thres,
+      scalar_t _hist_bin_size)
+      : room(_room),
+        source(_source),
+        mic_array(_mic_array),
+        num_rays(_num_rays),
+        energy_0(2. / num_rays),
         e_absorption(_e_absorption),
         scatter(_scatter),
+        mic_radius(_mic_radius),
+        mic_radius_sq(mic_radius * mic_radius),
         sound_speed(_sound_speed),
         energy_thres(_energy_thres),
         time_thres(_time_thres),
-        hist_bin_size(_hist_bin_size) {
-    this->energy_0 = 2. / this->num_rays;
+        hist_bin_size(_hist_bin_size),
+        max_dist(room.norm().item().toFloat() + 1.),
+        D(room.size(0)),
+        normals(make_normals()),
+        origins(make_origins()) {}
 
-    this->normals = torch::tensor(
-        {
-            {0, -1}, // South
-            {1, 0}, // East
-            {0, 1}, // North
-            {-1, 0} // West
-        },
-        torch::kFloat);
-  }
-
-  void impl(
-      torch::Tensor& hist,
-      torch::Tensor room,
-      torch::Tensor source,
-      torch::Tensor mic_array) {
-    int D = room.size(0);
-
+  void compute_histogram(torch::Tensor& hist) {
     // Max distance needed to hit a wall = diagonal of room + 1
-    float max_dist = room.norm().item().toFloat() + 1.;
 
-    // torch::Tensor normals = make_normals(room);
-    torch::Tensor origins = make_origins(room);
     // TODO: Could probably parallelize call over num_rays? We would need
     // `num_threads` histograms and then sum-reduce them into a single
     // histogram.
 
     if (D == 3) {
-      auto offset = 2. / this->num_rays;
-      auto increment = M_PI * (3. - sqrt(5.)); // phi increment
+      scalar_t offset = 2. / num_rays;
+      scalar_t increment = M_PI * (3. - sqrt(5.)); // phi increment
 
-      for (auto i = 0; i < this->num_rays; ++i) {
+      for (auto i = 0; i < num_rays; ++i) {
         auto z = (i * offset - 1) + offset / 2.;
         auto rho = sqrt(1. - z * z);
 
-        float phi = i * increment;
+        scalar_t phi = i * increment;
 
         auto x = cos(phi) * rho;
         auto y = sin(phi) * rho;
@@ -212,48 +68,116 @@ class RayTracer {
         auto azimuth = atan2(y, x);
         auto colatitude = atan2(sqrt(x * x + y * y), z);
 
-        simul_ray(
-            hist,
-            origins,
-            room,
-            source,
-            mic_array,
-            azimuth,
-            colatitude,
-            max_dist);
+        simul_ray(hist, origins, azimuth, colatitude);
       }
     } else if (D == 2) {
-      float offset = 2. * M_PI / this->num_rays;
-      for (int i = 0; i < this->num_rays; ++i) {
-        simul_ray(
-            hist, origins, room, source, mic_array, i * offset, 0., max_dist);
+      scalar_t offset = 2. * M_PI / num_rays;
+      for (int i = 0; i < num_rays; ++i) {
+        simul_ray(hist, origins, i * offset, 0.);
       }
     }
   }
 
  private:
+  const torch::Tensor room;
+  const torch::Tensor source;
+  const torch::Tensor mic_array;
   int num_rays;
-  float energy_0;
-  float e_absorption;
-  float scatter;
-  float sound_speed;
-  float energy_thres;
-  float time_thres;
-  float hist_bin_size;
-  torch::Tensor normals;
+  scalar_t energy_0;
+  scalar_t e_absorption;
+  scalar_t scatter;
+  scalar_t mic_radius;
+  double mic_radius_sq;
+  scalar_t sound_speed;
+  scalar_t energy_thres;
+  scalar_t time_thres;
+  scalar_t hist_bin_size;
+  scalar_t max_dist;
+  int D;
+  const torch::Tensor normals;
+  const torch::Tensor origins;
+
+  std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
+      torch::Tensor start,
+      torch::Tensor end) {
+    const static std::vector<std::vector<int>> shoebox_orders = {
+        {0, 1, 2}, {1, 0, 2}, {2, 0, 1}};
+
+    torch::Tensor result = torch::zeros(D, torch::kFloat);
+    int next_wall_index = -1;
+    auto hit_dist = max_dist;
+
+    // The direction vector
+    torch::Tensor dir = end - start;
+
+    for (auto& d : shoebox_orders) {
+      if (d[0] >= D) { // Happens for 2D rooms
+        continue;
+      }
+      auto abs_dir0 = std::abs(dir[d[0]].item().toFloat());
+      if (abs_dir0 < EPS) {
+        continue;
+      }
+
+      // distance to plane
+      auto distance = 0.;
+
+      // this will tell us if the front or back plane is hit
+      int ind_inc = 0;
+
+      if (dir[d[0]].item().toFloat() < 0.) {
+        result[d[0]] = 0.;
+        distance = start[d[0]].item().toFloat();
+        ind_inc = 0;
+      } else {
+        result[d[0]] = room[d[0]];
+        distance = (room[d[0]] - start[d[0]]).item().toFloat();
+        ind_inc = 1;
+      }
+
+      if (distance < EPS) {
+        continue;
+      }
+
+      auto ratio = distance / abs_dir0;
+
+      // Now compute the intersection point and verify if intersection happens
+      for (auto i = 1; i < D; ++i) {
+        result[d[i]] = start[d[i]] + ratio * dir[d[i]];
+        // when there is no intersection, we jump to the next plane
+        if ((result[d[i]] <= -EPS).item().toBool() ||
+            (room[d[i]] + EPS <= result[d[i]]).item().toBool())
+          goto next_plane; // TODO: avoid goto??
+      }
+
+      // if we get here, there is intersection with this wall
+      next_wall_index = 2 * d[0] + ind_inc;
+
+      hit_dist = (result - start).norm().item().toFloat();
+
+      break;
+
+    next_plane:
+      (void)0; // no op
+    }
+    return std::make_tuple(result, next_wall_index, hit_dist);
+  }
+
+  void log_hist(
+      torch::Tensor& hist,
+      scalar_t energy,
+      scalar_t travel_dist_at_mic) {
+    auto time_at_mic = travel_dist_at_mic / sound_speed;
+    auto bin = floor(time_at_mic / hist_bin_size);
+    hist[bin] += energy;
+  }
 
   void simul_ray(
       torch::Tensor& hist,
       torch::Tensor origins,
-      torch::Tensor room,
-      torch::Tensor source,
-      torch::Tensor mic_array,
-      float phi,
-      float theta,
-      float max_dist) {
+      scalar_t phi,
+      scalar_t theta) {
     // TODO: requires_grad of tensors????
-
-    int D = room.size(0);
 
     torch::Tensor start = source.clone();
 
@@ -267,14 +191,12 @@ class RayTracer {
           torch::kFloat);
     }
 
-    // The following initializations are arbitrary and does not count since
-    // we set the boolean to false
-    int next_wall_index = 0;
+    int next_wall_index;
 
     // TODO: handle n_bands
     auto transmitted = energy_0;
-    float energy = 1.;
-    float travel_dist = 0.;
+    auto energy = 1.;
+    auto travel_dist = 0.;
 
     // To count the number of times the ray bounces on the walls
     // For hybrid generation we add a ray to output only if specular_counter
@@ -282,16 +204,16 @@ class RayTracer {
     int specular_counter = 0;
 
     // Convert the energy threshold to transmission threshold
-    float e_thres = energy_0 * energy_thres;
-    float distance_thres = time_thres * sound_speed;
+    auto e_thres = energy_0 * energy_thres;
+    auto distance_thres = time_thres * sound_speed;
 
     torch::Tensor hit_point = torch::zeros(D, torch::kFloat);
 
     while (true) {
       // Find the next hit point
-      float hit_distance = 0;
+      auto hit_distance = 0.;
       std::tie(hit_point, next_wall_index, hit_distance) =
-          next_wall_hit(room, start, start + dir * max_dist, max_dist);
+          next_wall_hit(start, start + dir * max_dist);
 
       // If no wall is hit (rounding errors), stop the ray
       if (next_wall_index == -1)
@@ -304,7 +226,7 @@ class RayTracer {
         // and the center of the microphone (mic_pos)
 
         torch::Tensor to_mic = mic_array - start;
-        float impact_distance = to_mic.dot(dir).item().toFloat();
+        auto impact_distance = to_mic.dot(dir).item().toFloat();
 
         bool impacts =
             (-EPS < impact_distance) && (impact_distance < hit_distance + EPS);
@@ -313,21 +235,20 @@ class RayTracer {
         // continue the ray
         if (impacts &&
             ((to_mic - dir * impact_distance).norm().item().toFloat() <
-             MIC_RADIUS + EPS)) {
+             mic_radius + EPS)) {
           // The length of this last hop
-          float distance = std::abs(impact_distance);
+          auto distance = std::abs(impact_distance);
 
           // Updating travel_time and transmitted amplitude for this ray We
           // DON'T want to modify the variables transmitted amplitude and
           // travel_dist because the ray will continue its way
-          float travel_dist_at_mic = travel_dist + distance;
+          auto travel_dist_at_mic = travel_dist + distance;
           double r_sq = travel_dist_at_mic * travel_dist_at_mic;
           auto p_hit =
-              (1 - sqrt(1 - MIC_RADIUS_SQ / std::max(MIC_RADIUS_SQ, r_sq)));
+              (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
           energy = transmitted / (r_sq * p_hit);
 
-          log_hist(
-              hist, energy, travel_dist_at_mic, sound_speed, hist_bin_size);
+          log_hist(hist, energy, travel_dist_at_mic);
         }
       }
 
@@ -361,47 +282,80 @@ class RayTracer {
   void scat_ray(
       torch::Tensor& hist,
       torch::Tensor mic_array,
-      float transmitted,
+      scalar_t transmitted,
       torch::Tensor normal,
       torch::Tensor hit_point,
-      float travel_dist) {
-    // Convert the energy threshold to transmission threshold (make this more
-    // efficient at some point)
-    float distance_thres = time_thres * sound_speed;
+      scalar_t travel_dist) {
+    auto distance_thres = time_thres * sound_speed;
 
     // As the ray is shot towards the microphone center,
     // the hop dist can be easily computed
     torch::Tensor hit_point_to_mic = mic_array - hit_point;
-    float hop_dist = hit_point_to_mic.norm().item().toFloat();
-    float travel_dist_at_mic = travel_dist + hop_dist;
+    auto hop_dist = hit_point_to_mic.norm().item().toFloat();
+    auto travel_dist_at_mic = travel_dist + hop_dist;
 
     // compute the scattered energy reaching the microphone
-    float h_sq = hop_dist * hop_dist;
-    float p_hit_equal = 1.f - sqrt(1.f - MIC_RADIUS_SQ / h_sq);
-    float cosine = hit_point_to_mic.dot(normal).item().toFloat() /
+    auto h_sq = hop_dist * hop_dist;
+    auto p_hit_equal = 1. - sqrt(1. - mic_radius_sq / h_sq);
+    auto cosine = hit_point_to_mic.dot(normal).item().toFloat() /
         hit_point_to_mic.norm().item().toFloat();
     // cosine angle should be positive, but could be negative if normal is
     // facing out of room so we take abs
-    float p_lambert = 2 * std::abs(cosine);
-    float scat_trans = scatter * transmitted * p_hit_equal * p_lambert;
+    auto p_lambert = 2 * std::abs(cosine);
+    auto scat_trans = scatter * transmitted * p_hit_equal * p_lambert;
 
     if (travel_dist_at_mic < distance_thres && scat_trans > energy_thres) {
       double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
       auto p_hit =
-          (1 - sqrt(1 - MIC_RADIUS_SQ / std::max(MIC_RADIUS_SQ, r_sq)));
-      float energy = scat_trans / (r_sq * p_hit);
-      log_hist(hist, energy, travel_dist_at_mic, sound_speed, hist_bin_size);
+          (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
+      auto energy = scat_trans / (r_sq * p_hit);
+      log_hist(hist, energy, travel_dist_at_mic);
+    }
+  }
+
+  const torch::Tensor make_normals() {
+    return torch::tensor(
+        {
+            {0, -1}, // South
+            {1, 0}, // East
+            {0, 1}, // North
+            {-1, 0} // West
+        },
+        room.scalar_type());
+  }
+
+  const torch::Tensor make_origins() {
+    return torch::tensor(
+        {
+            {0.f, 0.f}, // South
+            {room[0].item().toFloat(), 0.f}, // East
+            {room[0].item().toFloat(), room[1].item().toFloat()}, // North
+            {0.f, room[1].item().toFloat()} // West
+        },
+        room.scalar_type());
+  }
+
+  int side(torch::Tensor normal, torch::Tensor origin, torch::Tensor pos) {
+    auto dot = (pos - origin).dot(normal).item().toFloat();
+
+    if (dot > EPS) {
+      return 1;
+    } else if (dot < -EPS) {
+      return -1;
+    } else {
+      return 0;
     }
   }
 };
 
 torch::Tensor ray_tracing(
-    torch::Tensor room,
-    torch::Tensor source,
-    torch::Tensor mic_array,
+    const torch::Tensor room,
+    const torch::Tensor source,
+    const torch::Tensor mic_array,
     int64_t num_rays,
     double e_absorption,
     double scatter,
+    double mic_radius,
     double sound_speed,
     double energy_thres,
     double time_thres,
@@ -409,26 +363,29 @@ torch::Tensor ray_tracing(
   // TODO: Maybe hist_size should also be bounded from output of ISM, and from
   // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html
   auto hist_size = ceil(time_thres / hist_bin_size);
-  auto hist = torch::zeros(hist_size, torch::kFloat);
-  RayTracer rt(
-      num_rays,
-      e_absorption,
-      scatter,
-      sound_speed,
-      energy_thres,
-      time_thres,
-      hist_bin_size);
+  auto hist = torch::zeros(hist_size, room.options());
 
-  AT_DISPATCH_FLOATING_TYPES(
-      at::ScalarType::Float, "ray_tracing", [&] { // TODO: AND_HALF???
-        rt.impl(hist, room, source, mic_array);
-      });
+  AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
+    RayTracer<scalar_t> rt(
+        room,
+        source,
+        mic_array,
+        num_rays,
+        e_absorption,
+        scatter,
+        mic_radius,
+        sound_speed,
+        energy_thres,
+        time_thres,
+        hist_bin_size);
+    rt.compute_histogram(hist);
+  });
   return hist;
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, float e_absorption, float scatter, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
+      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, float e_absorption, float scatter, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
       &torchaudio::rir::ray_tracing);
 }
 
