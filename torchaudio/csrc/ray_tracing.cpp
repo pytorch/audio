@@ -19,7 +19,7 @@ class RayTracer {
       const torch::Tensor _mic_array,
       int _num_rays,
       scalar_t _e_absorption,
-      scalar_t _scatter,
+      scalar_t _scattering,
       scalar_t _mic_radius,
       scalar_t _sound_speed,
       scalar_t _energy_thres,
@@ -31,7 +31,7 @@ class RayTracer {
         num_rays(_num_rays),
         energy_0(2. / num_rays),
         e_absorption(_e_absorption),
-        scatter(_scatter),
+        scattering(_scattering),
         mic_radius(_mic_radius),
         mic_radius_sq(mic_radius * mic_radius),
         sound_speed(_sound_speed),
@@ -83,7 +83,7 @@ class RayTracer {
   int num_rays;
   scalar_t energy_0;
   scalar_t e_absorption;
-  scalar_t scatter;
+  scalar_t scattering;
   scalar_t mic_radius;
   double mic_radius_sq;
   scalar_t sound_speed;
@@ -182,11 +182,10 @@ class RayTracer {
     // the direction of the ray (unit vector)
     torch::Tensor dir;
     if (D == 2) {
-      dir = torch::tensor({cos(phi), sin(phi)}, torch::kFloat);
+      dir = torch::tensor({cos(phi), sin(phi)}, room.scalar_type());
     } else if (D == 3) {
       dir = torch::tensor(
-          {sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)},
-          torch::kFloat);
+          {sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)}, room.scalar_type());
     }
 
     int next_wall_index;
@@ -218,8 +217,7 @@ class RayTracer {
         break;
 
       // Check if the specular ray hits any of the microphone
-      // if (!(IS_HYBRID_SIM && specular_counter < ISM_ORDER)) {
-      if (true) { // TODO: remove
+      if (!(IS_HYBRID_SIM && specular_counter < ISM_ORDER)) {
         // Compute the distance between the line defined by (start, hit_point)
         // and the center of the microphone (mic_pos)
 
@@ -258,10 +256,10 @@ class RayTracer {
       auto origin = origins[next_wall_index];
 
       // Let's shoot the scattered ray induced by the rebound on the wall
-      if ((scatter > 0) &&
+      if ((scattering > 0) &&
           (side(normal, origin, mic_array) == side(normal, origin, start))) {
         scat_ray(hist, mic_array, transmitted, normal, hit_point, travel_dist);
-        transmitted *= (1. - scatter);
+        transmitted *= (1. - scattering);
       }
 
       // Check if we reach the thresholds for this ray
@@ -300,7 +298,7 @@ class RayTracer {
     // cosine angle should be positive, but could be negative if normal is
     // facing out of room so we take abs
     auto p_lambert = 2 * std::abs(cosine);
-    auto scat_trans = scatter * transmitted * p_hit_equal * p_lambert;
+    auto scat_trans = scattering * transmitted * p_hit_equal * p_lambert;
 
     if (travel_dist_at_mic < distance_thres && scat_trans > energy_thres) {
       double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
@@ -338,26 +336,27 @@ class RayTracer {
   const torch::Tensor make_origins() {
     // Origins are somewhat arbitrary, they just need to be one of the corners
     // of the plane
+    scalar_t zero = 0;
     if (D == 2) {
       return torch::tensor(
           {
-              {0.f, 0.f}, // South
-              {room[0].item<scalar_t>(), 0.f}, // East
+              {zero, zero}, // South
+              {room[0].item<scalar_t>(), zero}, // East
               {room[0].item<scalar_t>(), room[1].item<scalar_t>()}, // North
-              {0.f, room[1].item<scalar_t>()} // West
+              {zero, room[1].item<scalar_t>()} // West
           },
           room.scalar_type());
     } else {
       return torch::tensor(
           {
-              {0.f, room[1].item<scalar_t>(), 0.f}, // West
-              {room[0].item<scalar_t>(), 0.f, 0.f}, // East
-              {0.f, 0.f, 0.f}, // South
+              {zero, room[1].item<scalar_t>(), zero}, // West
+              {room[0].item<scalar_t>(), zero, zero}, // East
+              {zero, zero, zero}, // South
               {room[0].item<scalar_t>(),
                room[1].item<scalar_t>(),
-               0.f}, // North
-              {room[0].item<scalar_t>(), 0.f, 0.f}, // Floor
-              {room[0].item<scalar_t>(), 0.f, room[2].item<scalar_t>()} // Ceil
+               zero}, // North
+              {room[0].item<scalar_t>(), zero, zero}, // Floor
+              {room[0].item<scalar_t>(), zero, room[2].item<scalar_t>()} // Ceil
           },
           room.scalar_type());
     }
@@ -382,16 +381,17 @@ torch::Tensor ray_tracing(
     const torch::Tensor mic_array,
     int64_t num_rays,
     double e_absorption,
-    double scatter,
+    double scattering,
     double mic_radius,
     double sound_speed,
     double energy_thres,
     double time_thres,
     double hist_bin_size) {
   // TODO: Maybe hist_size should also be bounded from output of ISM, and from
-  // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html
+  // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html?
   auto hist_size = ceil(time_thres / hist_bin_size);
   auto hist = torch::zeros(hist_size, room.options());
+//   hist.requires_grad_(true); // TODO is this needed?
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(
@@ -400,7 +400,7 @@ torch::Tensor ray_tracing(
         mic_array,
         num_rays,
         e_absorption,
-        scatter,
+        scattering,
         mic_radius,
         sound_speed,
         energy_thres,
@@ -413,7 +413,7 @@ torch::Tensor ray_tracing(
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, float e_absorption, float scatter, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
+      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, float e_absorption, float scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
       &torchaudio::rir::ray_tracing);
 }
 

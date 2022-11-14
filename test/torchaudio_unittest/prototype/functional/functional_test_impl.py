@@ -3,7 +3,11 @@ import torch
 import torchaudio.prototype.functional as F
 from parameterized import parameterized
 from scipy import signal
-from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
+from torchaudio._internal import module_utils as _mod_utils
+from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, TestBaseMixin
+
+if _mod_utils.is_module_available("pyroomacoustics"):
+    import pyroomacoustics as pra
 
 
 class FunctionalTestImpl(TestBaseMixin):
@@ -109,3 +113,68 @@ class FunctionalTestImpl(TestBaseMixin):
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
+
+
+class FunctionalTestRayTracingImpl(TestBaseMixin):
+    @skipIfNoModule("pyroomacoustics")
+    @parameterized.expand(
+        [
+            ([20, 25], [2, 2], [8, 8], 10_000),  # 2D
+            ([20, 25, 30], [1, 10, 5], [8, 8, 22], 1_000),  # 3D
+        ]
+    )
+    def test_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
+        e_absorption = 0.2
+        scattering = 0.2
+        energy_thres = 1e-7
+        time_thres = 10
+        hist_bin_size = 0.004
+        mic_radius = 0.5
+        sound_speed = 343
+
+        room_dim = torch.tensor(room_dim, dtype=self.dtype)
+        source = torch.tensor(source, dtype=self.dtype)
+        mic_array = torch.tensor(mic_array, dtype=self.dtype)
+
+        room = pra.ShoeBox(
+            room_dim.tolist(),
+            ray_tracing=True,
+            materials=pra.Material(energy_absorption=e_absorption, scattering=scattering),
+            air_absorption=False,
+        )
+        room.add_microphone(mic_array.tolist())
+        room.add_source(source.tolist())
+        room.set_ray_tracing(
+            n_rays=num_rays,
+            energy_thres=energy_thres,
+            time_thres=time_thres,
+            hist_bin_size=hist_bin_size,
+            receiver_radius=mic_radius,
+        )
+        room.set_sound_speed(sound_speed)
+        room.is_hybrid_sim = False
+
+        room.compute_rir()
+        hist_pra = torch.tensor(room.rt_histograms[0][0][0][0])
+
+        hist = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+            sound_speed=sound_speed,
+            mic_radius=mic_radius,
+            energy_thres=energy_thres,
+            time_thres=time_thres,
+            hist_bin_size=hist_bin_size,
+        )
+
+        # Most histogram entries are very very close, but very few of them can
+        # be slightly off. We thus assert that less than 1% entry are off by
+        # more than atol
+        percent = 1 / 100
+        atol = 1e-4
+        diff = abs(hist_pra - hist.to(torch.float32))
+        assert (diff > atol).float().mean() < percent

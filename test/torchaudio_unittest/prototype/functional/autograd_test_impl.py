@@ -28,3 +28,53 @@ class AutogradTestImpl(TestBaseMixin):
 
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
+
+
+class AutogradTestRayTracingImpl(TestBaseMixin):
+    # @parameterized.expand([(2, 1), (3, 4)])
+    def test_simulate_rir_ism(self):
+
+        room_dim = [20, 25]
+        source = [2, 2]
+        mic_array = [8, 8]
+        num_rays = 1_000
+
+        e_absorption = 0.2
+        scattering = 0.2
+
+        room_dim = torch.tensor(room_dim, dtype=self.dtype, requires_grad=True)
+        source = torch.tensor(source, dtype=self.dtype, requires_grad=True)
+        mic_array = torch.tensor(mic_array, dtype=self.dtype, requires_grad=True)
+
+        # TODO: make this work
+        # self.assertTrue(
+        #     gradcheck(
+        #         F.ray_tracing,
+        #         (
+        #             room_dim,
+        #             source,
+        #             mic_array,
+        #             num_rays,
+        #             e_absorption,
+        #             scattering,
+        #         ),
+        #         atol=1e-3,
+        #         rtol=1,
+        #     )
+        # )
+
+        # self.assertTrue(
+        #     gradgradcheck(
+        #         F.ray_tracing,
+        #         (
+        #             room_dim,
+        #             source,
+        #             mic_array,
+        #             num_rays,
+        #             e_absorption,
+        #             scattering,
+        #         ),
+        #         atol=1e-3,
+        #         rtol=1,
+        #     )
+        # )

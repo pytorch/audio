@@ -90,7 +90,8 @@ esac
         unidecode \
         'protobuf<4.21.0' \
         demucs \
-        tinytag
+        tinytag \
+        pyroomacoutics
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
