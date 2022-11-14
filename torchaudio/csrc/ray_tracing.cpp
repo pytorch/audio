@@ -8,7 +8,6 @@ namespace {
 
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
-#define EPS (1e-5)
 
 template <typename scalar_t>
 class RayTracer {
@@ -41,10 +40,10 @@ class RayTracer {
         max_dist(room.norm().item<scalar_t>() + 1.),
         D(room.size(0)),
         normals(make_normals()),
-        origins(make_origins()) {}
+        origins(make_origins()),
+        EPS(1e-5) {}
 
   void compute_histogram(torch::Tensor& hist) {
-
     // TODO: Could probably parallelize call over num_rays? We would need
     // `num_threads` histograms and then sum-reduce them into a single
     // histogram.
@@ -89,10 +88,11 @@ class RayTracer {
   scalar_t energy_thres;
   scalar_t time_thres;
   scalar_t hist_bin_size;
-  scalar_t max_dist;  // Max distance needed to hit a wall = diagonal of room + 1
-  int D;  // Dimension of the room
-  const torch::Tensor normals;  // normal vector to walls
-  const torch::Tensor origins;  // origin (arbitrary reference) of each wall
+  scalar_t max_dist; // Max distance needed to hit a wall = diagonal of room + 1
+  int D; // Dimension of the room
+  const torch::Tensor normals; // normal vector to walls
+  const torch::Tensor origins; // origin (arbitrary reference) of each wall
+  const scalar_t EPS;
 
   std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
       torch::Tensor start,
@@ -141,8 +141,8 @@ class RayTracer {
       for (auto i = 1; i < D; ++i) {
         hit_point[d[i]] = start[d[i]] + ratio * dir[d[i]];
         // when there is no intersection, we jump to the next plane
-        if ((hit_point[d[i]] <= -EPS).item<bool>() ||
-            (room[d[i]] + EPS <= hit_point[d[i]]).item<bool>())
+        if ((hit_point[d[i]] <= -EPS).template item<bool>() ||
+            (room[d[i]] + EPS <= hit_point[d[i]]).template item<bool>())
           goto next_plane;
       }
 
@@ -183,7 +183,8 @@ class RayTracer {
       dir = torch::tensor({cos(phi), sin(phi)}, room.scalar_type());
     } else if (D == 3) {
       dir = torch::tensor(
-          {sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)}, room.scalar_type());
+          {sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)},
+          room.scalar_type());
     }
 
     int next_wall_index;
@@ -227,9 +228,10 @@ class RayTracer {
 
         // If yes, we compute the ray's transmitted amplitude at the mic and we
         // continue the ray
-        torch::Tensor diff = (to_mic - dir * impact_distance);
 
-        if (impacts && (diff.norm().item<scalar_t>() < mic_radius + EPS)) {
+        if (impacts &&
+            ((to_mic - dir * impact_distance).norm().template item<scalar_t>() <
+             mic_radius + EPS)) {
           // The length of this last hop
           auto distance = std::abs(impact_distance);
 
@@ -335,26 +337,27 @@ class RayTracer {
     // Origins are somewhat arbitrary, they just need to be one of the corners
     // of the plane
     scalar_t zero = 0;
+    scalar_t W = room[0].template item<scalar_t>();
+    scalar_t L = room[1].template item<scalar_t>();
     if (D == 2) {
       return torch::tensor(
           {
               {zero, zero}, // South
-              {room[0].item<scalar_t>(), zero}, // East
-              {room[0].item<scalar_t>(), room[1].item<scalar_t>()}, // North
-              {zero, room[1].item<scalar_t>()} // West
+              {W, zero}, // East
+              {W, L}, // North
+              {zero, L} // West
           },
           room.scalar_type());
     } else {
+      scalar_t H = room[2].template item<scalar_t>();
       return torch::tensor(
           {
-              {zero, room[1].item<scalar_t>(), zero}, // West
-              {room[0].item<scalar_t>(), zero, zero}, // East
+              {zero, L, zero}, // West
+              {W, zero, zero}, // East
               {zero, zero, zero}, // South
-              {room[0].item<scalar_t>(),
-               room[1].item<scalar_t>(),
-               zero}, // North
-              {room[0].item<scalar_t>(), zero, zero}, // Floor
-              {room[0].item<scalar_t>(), zero, room[2].item<scalar_t>()} // Ceil
+              {W, L, zero}, // North
+              {W, zero, zero}, // Floor
+              {W, zero, H} // Ceil
           },
           room.scalar_type());
     }
@@ -389,7 +392,7 @@ torch::Tensor ray_tracing(
   // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html?
   auto hist_size = ceil(time_thres / hist_bin_size);
   auto hist = torch::zeros(hist_size, room.options());
-//   hist.requires_grad_(true); // TODO is this needed?
+  //   hist.requires_grad_(true); // TODO is this needed?
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(
