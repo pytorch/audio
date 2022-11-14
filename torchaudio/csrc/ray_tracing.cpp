@@ -8,7 +8,7 @@ namespace {
 
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
-#define EPS (1e-5) // epsilon is set to 0.1 millimeter (100 um)
+#define EPS (1e-5)
 
 template <typename scalar_t>
 class RayTracer {
@@ -44,7 +44,6 @@ class RayTracer {
         origins(make_origins()) {}
 
   void compute_histogram(torch::Tensor& hist) {
-    // Max distance needed to hit a wall = diagonal of room + 1
 
     // TODO: Could probably parallelize call over num_rays? We would need
     // `num_threads` histograms and then sum-reduce them into a single
@@ -90,10 +89,10 @@ class RayTracer {
   scalar_t energy_thres;
   scalar_t time_thres;
   scalar_t hist_bin_size;
-  scalar_t max_dist;
-  int D;
-  const torch::Tensor normals;
-  const torch::Tensor origins;
+  scalar_t max_dist;  // Max distance needed to hit a wall = diagonal of room + 1
+  int D;  // Dimension of the room
+  const torch::Tensor normals;  // normal vector to walls
+  const torch::Tensor origins;  // origin (arbitrary reference) of each wall
 
   std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
       torch::Tensor start,
@@ -105,7 +104,6 @@ class RayTracer {
     int next_wall_index = -1;
     auto hit_dist = max_dist;
 
-    // The direction vector
     torch::Tensor dir = end - start;
 
     for (auto& d : shoebox_orders) {
