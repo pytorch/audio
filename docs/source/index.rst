@@ -38,7 +38,9 @@ model implementations and application components.
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
+
    tutorials/oscillator_tutorial
+   tutorials/additive_synthesis_tutorial
 
    tutorials/audio_datasets_tutorial
 
@@ -189,6 +191,13 @@ Tutorials
    :card_description:
    :image: _images/sphx_glr_oscillator_tutorial_003.png
    :link: tutorials/oscillator_tutorial.html
+   :tags: DSP
+
+.. customcarditem::
+   :header: Additive Synthesis
+   :card_description:
+   :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
+   :link: tutorials/additive_synthesis_tutorial.html
    :tags: DSP
 
 .. customcarditem::
