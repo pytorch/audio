@@ -3,7 +3,7 @@ TorchAudio Logo
 
 If you make your project using TorchAudio and you want to mention TorchAudio, you can use TorchAudio logo. There are couple of variations. You can download them from `here <https://download.pytorch.org/torchaudio/logo/v1.zip>`__.
 
-Please follow `the guideline <https://download.pytorch.org/torchaudio/logo/guidelines.pdf>`__ for the proper usage.
+Please follow `the guideline <https://download.pytorch.org/torchaudio/logo/v1/guidelines.pdf>`__ for the proper usage.
 
 .. warning::
 
