@@ -32,4 +32,5 @@ DSP
    :nosignatures:
 
    adsr_envelope
+   extend_pitch
    oscillator_bank

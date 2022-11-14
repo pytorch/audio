@@ -290,6 +290,27 @@ class FunctionalTestImpl(TestBaseMixin):
         )
         self.assertEqual(out, torch.tensor(expected, device=self.device, dtype=self.dtype))
 
+    def test_extend_pitch(self):
+        num_frames = 5
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
+
+        num_pitches = 7
+        pattern = [i + 1 for i in range(num_pitches)]
+        expected = torch.tensor([pattern] * num_frames).to(dtype=self.dtype, device=self.device)
+
+        # passing int will append harmonic tones
+        output = F.extend_pitch(input, num_pitches)
+        self.assertEqual(output, expected)
+
+        # Same can be done with passing the list of multipliers
+        output = F.extend_pitch(input, pattern)
+        self.assertEqual(output, expected)
+
+        # or with tensor
+        pat = torch.tensor(pattern).to(dtype=self.dtype, device=self.device)
+        output = F.extend_pitch(input, pat)
+        self.assertEqual(output, expected)
+
 
 class Functional64OnlyTestImpl(TestBaseMixin):
     @nested_params(
