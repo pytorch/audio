@@ -3,7 +3,7 @@ from typing import List
 import torch
 import torchaudio.prototype.transforms as T
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
 
 
 class Autograd(TestBaseMixin):
@@ -38,3 +38,21 @@ class Autograd(TestBaseMixin):
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
         convolve = cls(mode=mode).to(dtype=self.dtype, device=self.device)
         self.assert_grad(convolve, [x, y])
+
+    def test_barkspectrogram(self):
+        # replication_pad1d_backward_cuda is not deteministic and
+        # gives very small (~e-16) difference.
+        sample_rate = 8000
+        transform = T.BarkSpectrogram(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
+    def test_barkscale(self):
+        sample_rate = 8000
+        n_fft = 400
+        n_barks = n_fft // 2 + 1
+        transform = T.BarkScale(sample_rate=sample_rate, n_barks=n_barks)
+        spec = get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
+        self.assert_grad(transform, [spec])

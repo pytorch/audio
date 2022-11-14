@@ -11,3 +11,6 @@ torchaudio.prototype.transforms
 
     Convolve
     FFTConvolve
+    BarkScale
+    InverseBarkScale
+    BarkSpectrogram

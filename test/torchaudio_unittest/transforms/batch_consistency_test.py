@@ -58,24 +58,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # exactly same result. For this reason, tolerance is very relaxed here.
         self.assert_batch_consistency(transform, mel_spec, atol=1.0, rtol=1e-5)
 
-    def test_batch_BarkScale(self):
-        specgram = torch.randn(3, 2, 201, 256)
-
-        atol = 1e-4 if os.name == "nt" else 1e-6
-        transform = T.BarkScale()
-
-        self.assert_batch_consistency(transform, specgram, atol=atol)
-
-    def test_batch_InverseBarkScale(self):
-        n_barks = 32
-        n_stft = 5
-        bark_spec = torch.randn(3, 2, n_barks, 32) ** 2
-        transform = T.InverseMelScale(n_stft, n_barks)
-
-        # Because InverseBarkScale runs SGD on randomly initialized values so they do not yield
-        # exactly same result. For this reason, tolerance is very relaxed here.
-        self.assert_batch_consistency(transform, bark_spec, atol=1.0, rtol=1e-5)
-
     def test_batch_compute_deltas(self):
         specgram = torch.randn(3, 2, 31, 2786)
         transform = T.ComputeDeltas()
