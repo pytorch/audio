@@ -46,6 +46,9 @@ class Wav2Vec2Bundle:
     _params: Dict[str, Any]
     _sample_rate: float
 
+    def __post_init__(self) -> None:
+        torch._C._log_api_usage_once(f"torch.audio.pipelines.{self.__class__.__name__}")
+
     @property
     def sample_rate(self) -> float:
         """Sample rate of the audio that the model is trained on.

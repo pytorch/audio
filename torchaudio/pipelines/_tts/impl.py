@@ -145,6 +145,9 @@ class _Tacotron2Mixin:
     _tacotron2_path: str
     _tacotron2_params: Dict[str, Any]
 
+    def __post_init__(self) -> None:
+        torch._C._log_api_usage_once(f"torch.audio.pipelines.{self.__class__.__name__}")
+
     def get_tacotron2(self, *, dl_kwargs=None) -> Tacotron2:
         model = Tacotron2(**self._tacotron2_params)
         url = f"{_BASE_URL}/{self._tacotron2_path}"

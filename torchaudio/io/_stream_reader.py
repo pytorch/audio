@@ -63,6 +63,9 @@ class StreamReaderSourceStream:
     metadata: Dict[str, str]
     """Metadata attached to the source stream."""
 
+    def __post_init__(self) -> None:
+        torch._C._log_api_usage_once(f"torch.audio.io.{self.__class__.__name__}")
+
 
 @dataclass
 class StreamReaderSourceAudioStream(StreamReaderSourceStream):

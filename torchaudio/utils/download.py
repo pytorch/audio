@@ -66,6 +66,7 @@ def download_asset(
     Returns:
         str: The path to the asset on the local file system.
     """
+    torch._C._log_api_usage_once(f"torch.audio.utils.download_asset")
     path = path or _get_local_path(key)
 
     if path.exists():
