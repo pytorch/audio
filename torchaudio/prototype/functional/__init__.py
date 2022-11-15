@@ -1,3 +1,3 @@
-from .functional import add_noise, convolve, fftconvolve
+from .functional import add_noise, barkscale_fbanks, convolve, fftconvolve
 
-__all__ = ["add_noise", "convolve", "fftconvolve"]
+__all__ = ["add_noise", "barkscale_fbanks", "convolve", "fftconvolve"]
