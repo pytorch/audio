@@ -27,18 +27,19 @@ from typing import Optional, Tuple
 
 import torch
 from torch import nn, Tensor
-from torch.nn import functional as F
 
 
 class WavLMSelfAttention(nn.Module):
     """Multi-headed self-attention for WavLM model :cite:`chen2022wavlm`.
+    Wraps around ``torch.nn.MultiheadAttention``, creating relaive position embeddings and passing them to multi-headed
+    attention as a mask.
     Source: https://github.com/microsoft/unilm/blob/2d8302f09c99bca2b82e6e868d81d4281cceebc8/wavlm/modules.py#L303-L763
 
     Args:
         embed_dim (int): Total dimension of the model.
         num_heads (int): The number of heads.
         dropout (float, optional): Dropout probability on attn_output_weights. (Default: to ``0.0``)
-        bias (bool, optional): If ``True``, add bias to projections for queries and values. (Default: ``True``)
+        bias (bool, optional): If ``True``, add bias to input / output projection layers. (Default: ``True``)
         has_relative_attention_bias (bool, optional): If ``True``, apply relative position embedding.
             Necessary in the first encoder layer, but not in the subsequent ones. (Default: ``False``)
         num_buckets (int, optional): Number of buckets for relative position embedding. (Default: ``32``)
@@ -59,10 +60,7 @@ class WavLMSelfAttention(nn.Module):
     ):
         super().__init__()
         self.embed_dim = embed_dim
-
         self.num_heads = num_heads
-        self.dropout_module = nn.Dropout(dropout)
-
         self.has_relative_attention_bias = has_relative_attention_bias
         self.num_buckets = num_buckets
         self.max_distance = max_distance
@@ -75,20 +73,7 @@ class WavLMSelfAttention(nn.Module):
         self.head_dim = embed_dim // num_heads
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
 
-        # Define parameters of the linear transoformations. We don't use Linear to avoid problems with quantization.
-        # See also https://github.com/pytorch/audio/pull/2822#discussion_r1014431878
-        self.q_proj_weight, self.k_proj_weight, self.v_proj_weight, self.out_proj_weight = [
-            nn.Parameter(torch.zeros((embed_dim, embed_dim))) for _ in range(4)
-        ]
-        self.k_proj_bias = nn.Parameter(torch.zeros(embed_dim))
-        if bias:
-            self.v_proj_bias, self.q_proj_bias, self.out_proj_bias = [
-                nn.Parameter(torch.zeros((embed_dim))) for _ in range(3)
-            ]
-        else:
-            self.register_parameter("v_proj_bias", None)
-            self.register_parameter("q_proj_bias", None)
-            self.register_parameter("out_proj_bias", None)
+        self.attention = nn.MultiheadAttention(embed_dim, num_heads, dropout=dropout, bias=bias, batch_first=True)
 
         self.gru_rel_pos = gru_rel_pos
         if self.gru_rel_pos:
@@ -197,33 +182,7 @@ class WavLMSelfAttention(nn.Module):
 
             attn_mask_rel_pos = attn_mask_rel_pos.view((-1, seq_len, seq_len))
 
-        bias_k = bias_v = None
-        add_zero_attn = False
-        # multi_head_attention_forward expects query shape (seq_len, batch_size, embed_dim)
-        query = query.transpose(0, 1)
-        concat_bias = torch.cat((self.q_proj_bias, self.k_proj_bias, self.v_proj_bias))
-        attn_output, _ = F.multi_head_attention_forward(
-            query,
-            query,
-            query,
-            self.embed_dim,
-            self.num_heads,
-            torch.empty([0]),
-            concat_bias,
-            bias_k,
-            bias_v,
-            add_zero_attn,
-            self.dropout_module.p,
-            self.out_proj_weight,
-            self.out_proj_bias,
-            self.training,
-            key_padding_mask,
-            need_weights=False,
-            attn_mask=attn_mask_rel_pos,
-            use_separate_proj_weight=True,
-            q_proj_weight=self.q_proj_weight,
-            k_proj_weight=self.k_proj_weight,
-            v_proj_weight=self.v_proj_weight,
+        attn_output, _ = self.attention(
+            query, query, query, key_padding_mask=key_padding_mask, attn_mask=attn_mask_rel_pos, need_weights=False
         )
-        attn_output = attn_output.transpose(0, 1)  # Convert back to batch-first
         return attn_output, position_bias
