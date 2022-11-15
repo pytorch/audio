@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../../versions.html">Nightly Build (0.14.0.dev20221114) &#x25BC</a>
+      <a href="../../../../../../versions.html">Nightly Build (0.14.0.dev20221115) &#x25BC</a>
     </div>
     
 
@@ -239,6 +239,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../supported_features.html">Supported Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../logo.html">TorchAudio Logo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../references.html">References</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
@@ -382,7 +383,9 @@
 <span></span><span class="sd">&quot;&quot;&quot;Import Hugging Face transformers&#39;s wav2vec2.0 pretrained weights to torchaudios&#39;s format.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
 
 <span class="kn">from</span> <span class="nn">..model</span> <span class="kn">import</span> <span class="n">wav2vec2_model</span><span class="p">,</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">wavlm_model</span>
@@ -454,27 +457,31 @@
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="n">encoder_state_dict</span> <span class="o">=</span> <span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">is_wavlm</span><span class="p">:</span>  <span class="c1"># Rename paramaters of linear transformations for compatibility with the HF model</span>
-        <span class="n">encoder_state_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">rename_wavlm_key</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="n">encoder_state_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encoder_state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="n">transform_wavlm_encoder_state</span><span class="p">(</span><span class="n">encoder_state_dict</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">])</span>
     <span class="n">imported</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">encoder_state_dict</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">is_for_ctc</span><span class="p">:</span>
         <span class="n">imported</span><span class="o">.</span><span class="n">aux</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">lm_head</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">imported</span>
 
 
-<span class="k">def</span> <span class="nf">rename_wavlm_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Rename weights and biases of linear transformations, since we define them directly in WavLMSelfAttention,</span>
-<span class="sd">    as opposed to nesting them in Linear modules</span>
+<span class="k">def</span> <span class="nf">transform_wavlm_encoder_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">encoder_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts WavLM encoder state from HuggingFace format. In particular, concatenates linear projection weights and</span>
+<span class="sd">    biases to align with the structure of ``torch.nn.MultiheadAttention``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;k_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;k_proj_weight&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;k_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;k_proj_bias&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;q_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;q_proj_weight&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;q_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;q_proj_bias&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;v_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;v_proj_weight&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;v_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;v_proj_bias&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;out_proj.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;out_proj_weight&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;out_proj.bias&quot;</span><span class="p">,</span> <span class="s2">&quot;out_proj_bias&quot;</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">encoder_num_layers</span><span class="p">):</span>
+        <span class="n">q_proj_bias</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.q_proj.bias&quot;</span><span class="p">)</span>
+        <span class="n">k_proj_bias</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.k_proj.bias&quot;</span><span class="p">)</span>
+        <span class="n">v_proj_bias</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.v_proj.bias&quot;</span><span class="p">)</span>
+        <span class="n">q_proj_weight</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.q_proj.weight&quot;</span><span class="p">)</span>
+        <span class="n">k_proj_weight</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.k_proj.weight&quot;</span><span class="p">)</span>
+        <span class="n">v_proj_weight</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.v_proj.weight&quot;</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.attention.in_proj_bias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">q_proj_bias</span><span class="p">,</span> <span class="n">k_proj_bias</span><span class="p">,</span> <span class="n">v_proj_bias</span><span class="p">))</span>
+        <span class="n">state</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.attention.in_proj_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">q_proj_weight</span><span class="p">,</span> <span class="n">k_proj_weight</span><span class="p">,</span> <span class="n">v_proj_weight</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">state</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.attention.out_proj.weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.out_proj.weight&quot;</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.attention.out_proj.bias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layers.</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.attention.out_proj.bias&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="import_huggingface_model"><a class="viewcode-back" href="../../../../../generated/torchaudio.models.wav2vec2.utils.import_huggingface_model.html#torchaudio.models.wav2vec2.utils.import_huggingface_model">[docs]</a><span class="k">def</span> <span class="nf">import_huggingface_model</span><span class="p">(</span><span class="n">original</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>

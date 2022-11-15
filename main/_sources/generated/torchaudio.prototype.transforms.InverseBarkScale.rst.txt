@@ -4,5 +4,5 @@
 InverseBarkScale
 ================
 
-.. autoclass:: torchaudio.transforms.InverseBarkScale
+.. autoclass:: torchaudio.prototype.transforms.InverseBarkScale
    :members:

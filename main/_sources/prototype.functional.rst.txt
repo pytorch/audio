@@ -9,6 +9,11 @@ add_noise
 
 .. autofunction:: add_noise
 
+barkscale_fbanks
+~~~~~~~~~~~~~~~~
+
+.. autofunction:: barkscale_fbanks
+
 convolve
 ~~~~~~~~
 

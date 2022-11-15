@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221114) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221115) &#x25BC</a>
     </div>
     
 
@@ -239,6 +239,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../logo.html">TorchAudio Logo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
@@ -403,7 +404,6 @@
     <span class="s2">&quot;compute_deltas&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_kaldi_pitch&quot;</span><span class="p">,</span>
     <span class="s2">&quot;melscale_fbanks&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;barkscale_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;linear_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;create_dct&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_deltas&quot;</span><span class="p">,</span>
@@ -859,121 +859,6 @@
     <span class="n">freqs</span><span class="p">[</span><span class="n">log_t</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_log_hz</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logstep</span> <span class="o">*</span> <span class="p">(</span><span class="n">mels</span><span class="p">[</span><span class="n">log_t</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_log_mel</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">freqs</span>
-
-
-<span class="k">def</span> <span class="nf">_hz_to_bark</span><span class="p">(</span><span class="n">freqs</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">bark_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Hz to Barks.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        freqs (float): Frequencies in Hz</span>
-<span class="sd">        bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        barks (float): Frequency in Barks</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">bark_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;schroeder&quot;</span><span class="p">,</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">,</span> <span class="s2">&quot;wang&quot;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;bark_scale should be one of &quot;schroeder&quot;, &quot;traunmuller&quot; or &quot;wang&quot;.&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">bark_scale</span> <span class="o">==</span> <span class="s2">&quot;wang&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">asinh</span><span class="p">(</span><span class="n">freqs</span> <span class="o">/</span> <span class="mf">600.0</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">bark_scale</span> <span class="o">==</span> <span class="s2">&quot;schroeder&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">7.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">asinh</span><span class="p">(</span><span class="n">freqs</span> <span class="o">/</span> <span class="mf">650.0</span><span class="p">)</span>
-    <span class="c1"># Traunmuller Bark scale</span>
-    <span class="n">barks</span> <span class="o">=</span> <span class="p">((</span><span class="mf">26.81</span> <span class="o">*</span> <span class="n">freqs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1960.0</span> <span class="o">+</span> <span class="n">freqs</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.53</span>
-    <span class="c1"># Bark value correction</span>
-    <span class="k">if</span> <span class="n">barks</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">barks</span> <span class="o">+=</span> <span class="mf">0.15</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">barks</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">barks</span> <span class="o">&gt;</span> <span class="mf">20.1</span><span class="p">:</span>
-        <span class="n">barks</span> <span class="o">+=</span> <span class="mf">0.22</span> <span class="o">*</span> <span class="p">(</span><span class="n">barks</span> <span class="o">-</span> <span class="mf">20.1</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">barks</span>
-
-
-<span class="k">def</span> <span class="nf">_bark_to_hz</span><span class="p">(</span><span class="n">barks</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">bark_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert bark bin numbers to frequencies.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        barks (Tensor): Bark frequencies</span>
-<span class="sd">        bark_scale (str, optional): Scale to use: ``traunmuller``,``schroeder`` or ``wang``. (Default: ``traunmuller``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        freqs (Tensor): Barks converted in Hz</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">bark_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;schroeder&quot;</span><span class="p">,</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">,</span> <span class="s2">&quot;wang&quot;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;bark_scale should be one of &quot;traunmuller&quot;, &quot;schroeder&quot; or &quot;wang&quot;.&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">bark_scale</span> <span class="o">==</span> <span class="s2">&quot;wang&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">600.0</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">barks</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">bark_scale</span> <span class="o">==</span> <span class="s2">&quot;schroeder&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">650.0</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">barks</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
-    <span class="c1"># Bark value correction</span>
-    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">barks</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">barks</span> <span class="o">&lt;</span> <span class="mi">2</span>
-        <span class="n">barks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">barks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.85</span>
-    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">barks</span> <span class="o">&gt;</span> <span class="mf">20.1</span><span class="p">):</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">barks</span> <span class="o">&gt;</span> <span class="mf">20.1</span>
-        <span class="n">barks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">barks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mf">4.422</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.22</span>
-
-    <span class="c1"># Traunmuller Bark scale</span>
-    <span class="n">freqs</span> <span class="o">=</span> <span class="mi">1960</span> <span class="o">*</span> <span class="p">((</span><span class="n">barks</span> <span class="o">+</span> <span class="mf">0.53</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">26.28</span> <span class="o">-</span> <span class="n">barks</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">freqs</span>
-
-
-<div class="viewcode-block" id="barkscale_fbanks"><a class="viewcode-back" href="../../../generated/torchaudio.functional.barkscale_fbanks.html#torchaudio.functional.barkscale_fbanks">[docs]</a><span class="k">def</span> <span class="nf">barkscale_fbanks</span><span class="p">(</span>
-    <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">n_barks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">bark_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
-
-<span class="sd">    .. devices:: CPU</span>
-
-<span class="sd">    .. properties:: TorchScript</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        n_freqs (int): Number of frequencies to highlight/apply</span>
-<span class="sd">        f_min (float): Minimum frequency (Hz)</span>
-<span class="sd">        f_max (float): Maximum frequency (Hz)</span>
-<span class="sd">        n_barks (int): Number of mel filterbanks</span>
-<span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
-<span class="sd">        bark_scale (str, optional): Scale to use: ``traunmuller``,``schroeder`` or ``wang``. (Default: ``traunmuller``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_barks``)</span>
-<span class="sd">        meaning number of frequencies to highlight/apply to x the number of filterbanks.</span>
-<span class="sd">        Each column is a filterbank so that assuming there is a matrix A of</span>
-<span class="sd">        size (..., ``n_freqs``), the applied result would be</span>
-<span class="sd">        ``A * barkscale_fbanks(A.size(-1), ...)``.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># freq bins</span>
-    <span class="n">all_freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">)</span>
-
-    <span class="c1"># calculate bark freq bins</span>
-    <span class="n">m_min</span> <span class="o">=</span> <span class="n">_hz_to_bark</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="n">bark_scale</span><span class="o">=</span><span class="n">bark_scale</span><span class="p">)</span>
-    <span class="n">m_max</span> <span class="o">=</span> <span class="n">_hz_to_bark</span><span class="p">(</span><span class="n">f_max</span><span class="p">,</span> <span class="n">bark_scale</span><span class="o">=</span><span class="n">bark_scale</span><span class="p">)</span>
-
-    <span class="n">m_pts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m_min</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">n_barks</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">f_pts</span> <span class="o">=</span> <span class="n">_bark_to_hz</span><span class="p">(</span><span class="n">m_pts</span><span class="p">,</span> <span class="n">bark_scale</span><span class="o">=</span><span class="n">bark_scale</span><span class="p">)</span>
-
-    <span class="c1"># create filterbank</span>
-    <span class="n">fb</span> <span class="o">=</span> <span class="n">_create_triangular_filterbank</span><span class="p">(</span><span class="n">all_freqs</span><span class="p">,</span> <span class="n">f_pts</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">fb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;At least one bark filterbank has all zero values. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The value for `n_barks` (</span><span class="si">{</span><span class="n">n_barks</span><span class="si">}</span><span class="s2">) may be set too high. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Or, the value for `n_freqs` (</span><span class="si">{</span><span class="n">n_freqs</span><span class="si">}</span><span class="s2">) may be set too low.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">fb</span></div>
 
 
 <span class="k">def</span> <span class="nf">_create_triangular_filterbank</span><span class="p">(</span>

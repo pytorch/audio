@@ -4,5 +4,5 @@
 BarkScale
 =========
 
-.. autoclass:: torchaudio.transforms.BarkScale
+.. autoclass:: torchaudio.prototype.transforms.BarkScale
    :members:
