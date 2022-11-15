@@ -34,3 +34,4 @@ DSP
    adsr_envelope
    extend_pitch
    oscillator_bank
+   sinc_impulse_response
