@@ -319,5 +319,5 @@ def emformer_hubert_base(
         encoder_activation="gelu",
         encoder_max_memory_size=0,
         encoder_weight_init_scale_strategy="depthwise",
-        encoder_tanh_on_mem="True",
+        encoder_tanh_on_mem=True,
     )
