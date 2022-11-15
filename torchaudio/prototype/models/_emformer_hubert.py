@@ -6,7 +6,7 @@ from torchaudio.models.emformer import Emformer
 from torchaudio.models.rnnt import _TimeReduction
 
 
-class FeatureExtractor(torch.nn.Module):
+class FeatureEncoder(torch.nn.Module):
     """Extract features from log mel-spectrogram input. Consists of linear layer and time reduction layer.
 
     Args:
@@ -147,8 +147,8 @@ class EmformerEncoder(torch.nn.Module):
         return ret
 
 
-def _get_emformer_feature_extractor(input_dim: int, output_dim: int, use_bias: bool, stride: int) -> FeatureExtractor:
-    """Construct FeatureExtractor for emformer model.
+def _get_emformer_feature_extractor(input_dim: int, output_dim: int, use_bias: bool, stride: int) -> FeatureEncoder:
+    """Construct FeatureEncoder for emformer model.
 
     Args:
         input_dim (int): The feature dimension of log mel-spectrogram feature.
@@ -157,9 +157,9 @@ def _get_emformer_feature_extractor(input_dim: int, output_dim: int, use_bias: b
         stride (int): Number of frames to merge for the output frame.
 
     Returns:
-        FeatureExtractor: The resulting FeatureExtractor module.
+        FeatureEncoder: The resulting FeatureEncoder module.
     """
-    return FeatureExtractor(input_dim, output_dim, use_bias, stride)
+    return FeatureEncoder(input_dim, output_dim, use_bias, stride)
 
 
 def _get_emformer_encoder(
@@ -293,9 +293,9 @@ def emformer_hubert_base(
     """Build Emformer HuBERT Model with 20 Emformer layers.
 
     Args:
-        extractor_input_dim (int): The input dimension for feature extractor.
-        extractor_output_dim (int): The output dimension after feature extractor.
-        encoder_dropout (float): Dropout probability in Emformer.
+        extractor_input_dim (int, optional): The input dimension for feature extractor. (Default: 80)
+        extractor_output_dim (int, optional): The output dimension after feature extractor. (Default: 128)
+        encoder_dropout (float, optional): Dropout probability in Emformer. (Default: 0.1)
 
     Returns:
         Wav2Vec2Model:
