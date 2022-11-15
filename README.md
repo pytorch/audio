@@ -6,6 +6,8 @@ torchaudio: an audio library for PyTorch
 [![Anaconda Badge](https://anaconda.org/pytorch/torchaudio/badges/downloads.svg)](https://anaconda.org/pytorch/torchaudio)
 [![Anaconda-Server Badge](https://anaconda.org/pytorch/torchaudio/badges/platforms.svg)](https://anaconda.org/pytorch/torchaudio)
 
+![TorchAudio Logo](docs/source/_static/img/logo.png)
+
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
