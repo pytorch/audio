@@ -891,10 +891,10 @@ Downsample (48 -> 44.1 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        2.44        0.35
-    sinc (width 16)      NaN        1.20        0.32
-    kaiser_best        88.72        2.00        0.34
-    kaiser_fast        10.05        1.78        0.35
+    sinc (width 64)      NaN        2.37        0.34
+    sinc (width 16)      NaN        1.15        0.32
+    kaiser_best        88.67        2.08        0.37
+    kaiser_fast        10.35        1.85        0.34
 
 
 
@@ -926,10 +926,10 @@ Downsample (16 -> 8 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        1.04        0.70
-    sinc (width 16)      NaN        0.51        0.26
-    kaiser_best        13.54        1.34        0.77
-    kaiser_fast         4.37        0.67        0.33
+    sinc (width 64)      NaN        1.02        0.69
+    sinc (width 16)      NaN        0.50        0.27
+    kaiser_best        16.64        1.19        0.72
+    kaiser_fast         4.63        0.66        0.31
 
 
 
@@ -961,10 +961,10 @@ Upsample (44.1 -> 48 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        2.23        0.35
-    sinc (width 16)      NaN        1.91        0.33
-    kaiser_best        39.38        1.97        0.34
-    kaiser_fast         9.93        1.64        0.33
+    sinc (width 64)      NaN        2.28        0.34
+    sinc (width 16)      NaN        1.14        0.32
+    kaiser_best        38.46        1.98        0.36
+    kaiser_fast        10.93        1.78        0.33
 
 
 
@@ -996,10 +996,10 @@ Upsample (8 -> 16 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.54        0.24
-    sinc (width 16)      NaN        0.37        0.16
-    kaiser_best        13.68        0.63        0.25
-    kaiser_fast         4.13        0.49        0.17
+    sinc (width 64)      NaN        0.47        0.25
+    sinc (width 16)      NaN        0.38        0.17
+    kaiser_best        15.44        0.64        0.25
+    kaiser_fast         4.61        0.52        0.17
 
 
 
@@ -1024,7 +1024,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.243 seconds)
+   **Total running time of the script:** ( 0 minutes  4.363 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:
