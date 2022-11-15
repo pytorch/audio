@@ -55,7 +55,7 @@ Pretrained Models
    EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
-wav2vec 2.0 / HuBERT - SSL
+wav2vec 2.0 / HuBERT / WavLM - SSL
 --------------------------
 
 Interface
@@ -87,6 +87,9 @@ Pretrained Models
    HUBERT_BASE
    HUBERT_LARGE
    HUBERT_XLARGE
+   WAVLM_BASE
+   WAVLM_BASE_PLUS
+   WAVLM_LARGE
 
 wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
