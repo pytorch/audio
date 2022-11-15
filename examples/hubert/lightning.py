@@ -504,7 +504,7 @@ class HuBERTFineTuneModule(LightningModule):
 
     def train_dataloader(self):
         dataset = torchaudio.datasets.LibriLightLimited(self.dataset_path, self.subset)
-        lengths = _get_lengths_librilightlimited(dataset._fileids_paths)
+        lengths = _get_lengths_librilightlimited(dataset._fileids_paths, dataset._path, dataset._ext_audio)
         sampler = BucketizeBatchSampler(
             lengths, num_buckets=100, max_token_count=self.seconds_per_batch * 16000, shuffle=True
         )
