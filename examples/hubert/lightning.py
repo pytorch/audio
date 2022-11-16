@@ -360,7 +360,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
-        elif model_name == "hubert_large":
+        elif model_name == "hubert_pretrain_large":
             self.model = torchaudio.models.hubert_pretrain_large(
                 encoder_projection_dropout=encoder_projection_dropout,
                 encoder_attention_dropout=encoder_attention_dropout,
@@ -372,7 +372,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
-        elif model_name == "hubert_xlarge":
+        elif model_name == "hubert_pretrain_xlarge":
             self.model = torchaudio.models.hubert_pretrain_xlarge(
                 encoder_projection_dropout=encoder_projection_dropout,
                 encoder_attention_dropout=encoder_attention_dropout,
