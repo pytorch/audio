@@ -2,11 +2,112 @@ from typing import List, Optional, Tuple, Union
 
 import torch
 from torch import nn, Tensor
-from torch.nn import Module
+from torch.nn import Module, ModuleList
 from torchaudio.models import Wav2Vec2Model
 from torchaudio.models.conformer import ConformerLayer
 from torchaudio.models.rnnt import _TimeReduction
 from torchaudio.models.wav2vec2 import components
+
+
+def _buffered_arange(max) -> Tensor:
+    """Compute arange using a buffered tensor across function calls.
+    Produces same result as torch.arange(end=max).
+
+    Args:
+        max (int): Ending value for arange
+    """
+    if not hasattr(_buffered_arange, "buf"):
+        _buffered_arange.buf = torch.LongTensor()
+    if max > _buffered_arange.buf.numel():
+        _buffered_arange.buf.resize_(max)
+        torch.arange(max, out=_buffered_arange.buf)
+    return _buffered_arange.buf[:max]
+
+
+def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives: int) -> Tuple[Tensor, Tensor]:
+    """Sample negative examples from masked input.
+
+    Args:
+        input (Tensor): Tensor of dimension `(batch, frame, dim)`
+        num_negatives (int): Number of sampled negatives
+        cross_sample_negatives (int): Number of cross sampled negatives
+    """
+    if num_negatives == 0 and cross_sample_negatives == 0:
+        return (
+            torch.zeros(0).to(input.device, input.dtype),
+            torch.zeros(0).to(input.device, input.dtype),
+        )
+
+    bsz, tsz, fsz = input.shape
+    input = input.view(-1, fsz)
+
+    cross_high = tsz * bsz
+    high = tsz
+
+    assert high > 1
+
+    if num_negatives > 0:
+        tszs = _buffered_arange(tsz).unsqueeze(-1).expand(-1, num_negatives).flatten()
+
+        neg_idxs = torch.randint(low=0, high=high - 1, size=(bsz, num_negatives * tsz))
+        neg_idxs[neg_idxs >= tszs] += 1
+
+    if cross_sample_negatives > 0:
+        tszs = _buffered_arange(tsz).unsqueeze(-1).expand(-1, cross_sample_negatives).flatten()
+
+        cross_neg_idxs = torch.randint(low=0, high=cross_high - 1, size=(bsz, cross_sample_negatives * tsz))
+        cross_neg_idxs[cross_neg_idxs >= tszs] += 1
+
+    if num_negatives > 0:
+        neg_idxs = neg_idxs + (torch.arange(bsz).unsqueeze(1) * high)
+    else:
+        neg_idxs = cross_neg_idxs
+
+    if cross_sample_negatives > 0 and num_negatives > 0:
+        neg_idxs = torch.cat([neg_idxs, cross_neg_idxs], dim=1)
+
+    negs = input[neg_idxs.view(-1)]
+    negs = negs.view(bsz, tsz, num_negatives + cross_sample_negatives, fsz).permute(2, 0, 1, 3)  # NxBxCxT
+
+    return negs, neg_idxs
+
+
+class _NegativeSampler(Module):
+    r"""Compute negative sampling.
+
+    Args:
+        num_negatives (int): Number of sampled negatives
+        cross_sample_negatives (int): Number of cross sampled negatives
+    """
+
+    def __init__(
+        self,
+        num_negatives: int,
+        cross_sample_negatives: int,
+    ):
+        super().__init__()
+        self.num_negatives = num_negatives
+        self.cross_sample_negatives = cross_sample_negatives
+
+    def forward(self, input: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Tensor, Optional[Tensor]]:
+        """
+        Args:
+            input (Tensor): Tensor of dimension `[batch, frame, dim]`
+            lengths (Tensor or None, optional): Tensor of shape `[batch, ]` representing valid lengths
+                in each time axis.
+
+        Returns:
+            (Tensor, Tensor, Optional[Tensor]):
+            Tensor
+                The negative samples
+            Tensor
+                The indices of the negative samples
+            Tensor or None
+                If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing
+                valid length in time axis is returns.
+        """
+        negs, neg_idxs = _sample_negatives(input, self.num_negatives, self.cross_sample_negatives)
+        return negs, neg_idxs, lengths
 
 
 class FeatureEncoder(Module):
@@ -66,7 +167,7 @@ class ConformerEncoder(Module):
     def __init__(
         self,
         feature_projection: Module,
-        conformer: nn.ModuleList,
+        conformer: ModuleList,
     ):
         super().__init__()
         self.feature_projection = feature_projection
@@ -155,29 +256,46 @@ class ConformerWav2Vec2PretrainModel(Module):
             Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.
         mask_generator (nn.Module):
             Mask generator that generates the mask for masked prediction during training.
+        negative_sampler (nn.Module):
+            Negative sampler to apply after masking.
+
     """
 
     def __init__(
         self,
         wav2vec2: Wav2Vec2Model,
         mask_generator: Module,
+        negative_sampler: Module,
     ):
         super().__init__()
         self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
+        self.negative_sampler = negative_sampler
 
     def forward(
         self,
         features: Tensor,
         audio_lengths: Optional[Tensor] = None,
-    ) -> Tuple[Tensor, Tensor]:
+    ) -> Tuple[Tensor, Optional[Tensor], Tensor, Tensor]:
         """
         Args:
             features (Tensor):
-                Tensor of audio features of shape ``[batch, frame, dim]``.
+                Tensor of audio features of shape `(batch, frame, dim)`.
             audio_lengths (Tensor or None, optional):
                 Tensor of valid length of each valid auidio in the batch.
-                shape: ``[batch, ]`` (Default: ``None``)
+                shape: `(batch, )` (Default: ``None``)
+
+        Returns:
+            (Tensor, Optional[Tensor], Tensor, Tensor):
+            Tensor
+                The masked sequences of probability distribution of shape `(batch, frame dim)`
+            Tensor or None
+                If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing
+                valid length in time axis is returns.
+            Tensor
+                The negative samples
+            Tensor
+                The indices of the negative samples
         """
         x, lengths = self.wav2vec2.feature_extractor(features, audio_lengths)
 
@@ -191,12 +309,14 @@ class ConformerWav2Vec2PretrainModel(Module):
         x, _ = self.mask_generator(x, padding_mask)
         x = self.wav2vec2.encoder.feature_projection.projection(x)
 
+        negs, neg_idxs, _ = self.negative_sampler(x, lengths)
+
         x = x.transpose(0, 1)
         for conformer_layer in self.wav2vec2.encoder.conformer:
             x = conformer_layer(x, padding_mask)
         x = x.transpose(0, 1)
 
-        return x, lengths
+        return x, lengths, negs, neg_idxs
 
 
 ################################################################################
@@ -274,7 +394,7 @@ def _get_conformer_encoder(
         )
         conformer_layers.append(layer)
 
-    return ConformerEncoder(feature_projection, nn.ModuleList(conformer_layers))
+    return ConformerEncoder(feature_projection, ModuleList(conformer_layers))
 
 
 def conformer_wav2vec2_model(
@@ -401,6 +521,8 @@ def conformer_wav2vec2_pretrain_model(
     mask_channel_length: int,
     no_mask_channel_overlap: bool,
     mask_channel_min_space: int,
+    num_negatives: int,
+    cross_sample_negatives: int,
 ) -> ConformerWav2Vec2PretrainModel:
     """Build a custom Conformer Wav2Vec2 Model for pre-training
 
@@ -456,6 +578,10 @@ def conformer_wav2vec2_pretrain_model(
             Whether to allow channel masks to overlap.
         mask_channel_min_space (int):
             Minimum space between spans for channel masking (if no overlap is enabled).
+        num_negatives (int):
+            Number of negatives to sample.
+        cross_sample_negatives (int):
+            Number of cross sampled negatives.
 
     Returns:
         ConformerWav2Vec2PretrainModel:
@@ -492,9 +618,15 @@ def conformer_wav2vec2_pretrain_model(
         mask_channel_min_space,
     )
 
+    negative_sampler = _NegativeSampler(
+        num_negatives,
+        cross_sample_negatives,
+    )
+
     return ConformerWav2Vec2PretrainModel(
         wav2vec2=wav2vec2,
         mask_generator=mask_generator,
+        negative_sampler=negative_sampler,
     )
 
 
@@ -504,6 +636,8 @@ def conformer_wav2vec2_pretrain_base(
     encoder_projection_dropout: float = 0.0,
     mask_prob: float = 0.3,
     mask_length: int = 3,
+    num_negatives: int = 100,
+    cross_sample_negatives: int = 0,
 ) -> ConformerWav2Vec2PretrainModel:
     """Build Conformer Wav2Vec2 Model for pre-training with "small" architecture from
     *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`
@@ -519,6 +653,10 @@ def conformer_wav2vec2_pretrain_base(
             (Default: 0.3)
         mask_length (int):
             The lengths of the mask. (Default: 3)
+        num_negatives (int):
+            Number of sampled negatives. (Default: 0)
+        cross_sample_negatives (int):
+            Number of cross sampled negatives. (Default: 0)
 
     Returns:
         ConformerWav2Vec2PretrainModel:
@@ -549,6 +687,8 @@ def conformer_wav2vec2_pretrain_base(
         mask_channel_length=10,
         no_mask_channel_overlap=False,
         mask_channel_min_space=1,
+        num_negatives=num_negatives,
+        cross_sample_negatives=cross_sample_negatives,
     )
 
 
@@ -558,6 +698,8 @@ def conformer_wav2vec2_pretrain_large(
     encoder_projection_dropout: float = 0.0,
     mask_prob: float = 0.3,
     mask_length: int = 3,
+    num_negatives: int = 100,
+    cross_sample_negatives: int = 0,
 ) -> ConformerWav2Vec2PretrainModel:
     """Build Conformer Wav2Vec2 Model for pre-training with "large" architecture from
     *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`
@@ -607,4 +749,6 @@ def conformer_wav2vec2_pretrain_large(
         mask_channel_length=10,
         no_mask_channel_overlap=False,
         mask_channel_min_space=1,
+        num_negatives=num_negatives,
+        cross_sample_negatives=cross_sample_negatives,
     )
