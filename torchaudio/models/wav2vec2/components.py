@@ -1064,7 +1064,9 @@ class MaskGenerator(Module):
                 min_space=self.mask_min_space,
             )
             mask_indices = mask_indices.to(x.device)
-            x[mask_indices] = self.mask_embedding
+            # change dtype of mask_embedding to x for mixed-precision training.
+            # see https://github.com/pytorch/audio/issues/2847 for details.
+            x[mask_indices] = self.mask_embedding.to(x.dtype)
         else:
             mask_indices = None
 
