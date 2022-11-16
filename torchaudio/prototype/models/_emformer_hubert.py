@@ -86,7 +86,7 @@ class EmformerEncoder(torch.nn.Module):
                 Tensor with dimension `(batch, )`.
 
         Returns:
-            (torch.Tensor): The feature Tensor after emformer encoder.
+            torch.Tensor: The feature Tensor after emformer encoder.
         """
         if lengths is None:
             B, T, _ = input.shape
@@ -117,7 +117,7 @@ class EmformerEncoder(torch.nn.Module):
                 Tensors from all emformer layers.
 
         Returns:
-            (List[torch.Tensor]):
+            List[torch.Tensor]:
                 Output Tensors of selected emformer layers.
         """
         if num_layers is not None:
@@ -197,7 +197,7 @@ def _get_emformer_encoder(
         tanh_on_mem (bool): If ``True``, applies tanh to memory elements.
 
     Returns:
-        (EmformerEncoder): The resulting EmformerEncoder module.
+        EmformerEncoder: The resulting EmformerEncoder module.
     """
     emformer = Emformer(
         input_dim=input_dim,
