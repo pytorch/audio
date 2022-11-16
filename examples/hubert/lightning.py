@@ -360,6 +360,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
+            self.aux = torch.nn.Linear(768, aux_num_out)
         elif model_name == "hubert_pretrain_large":
             self.model = torchaudio.models.hubert_pretrain_large(
                 encoder_projection_dropout=encoder_projection_dropout,
@@ -372,6 +373,7 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
+            self.aux = torch.nn.Linear(1024, aux_num_out)
         elif model_name == "hubert_pretrain_xlarge":
             self.model = torchaudio.models.hubert_pretrain_xlarge(
                 encoder_projection_dropout=encoder_projection_dropout,
@@ -384,9 +386,9 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
+            self.aux = torch.nn.Linear(1280, aux_num_out)
         else:
             raise ValueError(f"Unsupported model name: {model_name}.")
-        self.aux = torch.nn.Linear(768, aux_num_out)
         self._load_checkpoint(checkpoint)
         for p in self.model.wav2vec2.feature_extractor.parameters():
             p.requires_grad = False
