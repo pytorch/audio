@@ -19,7 +19,7 @@ def oscillator_bank(
         The phase information of the output waveform is found by taking the cumulative sum
         of the given instantaneous frequencies (``frequencies``).
         This incurs roundoff error when the data type does not have enough precision.
-        Using ``torch.float64`` can workaround this.
+        Using ``torch.float64`` can work around this.
 
         The following figure shows the difference between ``torch.float32`` and
         ``torch.float64`` when generating a sin wave of constant frequency and amplitude
@@ -30,8 +30,8 @@ def oscillator_bank(
         .. image:: https://download.pytorch.org/torchaudio/doc-assets/oscillator_precision.png
 
     Args:
-        frequencies (Tensor): Sample-wise oscillator frequencies (Hz). Shape `[..., time, N]`.
-        amplitudes (Tensor): Sample-wise oscillator amplitude. Shape: `[..., time, N]`.
+        frequencies (Tensor): Sample-wise oscillator frequencies (Hz). Shape `(..., time, N)`.
+        amplitudes (Tensor): Sample-wise oscillator amplitude. Shape: `(..., time, N)`.
         sample_rate (float): Sample rate
         reduction (str): Reduction to perform.
             Valid values are ``"sum"``, ``"mean"`` or ``"none"``. Default: ``"sum"``
@@ -41,7 +41,7 @@ def oscillator_bank(
             The resulting waveform.
 
             If ``reduction`` is ``"none"``, then the shape is
-            `[..., time, N]`, otherwise the shape is `[..., time]`.
+            `(..., time, N)`, otherwise the shape is `(..., time)`.
     """
     if frequencies.shape != amplitudes.shape:
         raise ValueError(
