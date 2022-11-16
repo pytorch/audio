@@ -247,7 +247,7 @@ class HuBERTPreTrainModule(LightningModule):
         """
         opt = self.optimizers()
         opt.zero_grad()
-        with torch.cuda.amp.autocast(enabled=False):
+        with torch.cuda.amp.autocast(enabled=True):
             loss, num_frame = self._step(batch, batch_idx, "train")
         if torch.isinf(loss) or torch.isnan(loss):
             opt.zero_grad()
@@ -480,7 +480,7 @@ class HuBERTFineTuneModule(LightningModule):
         """
         opt = self.optimizers()
         opt.zero_grad()
-        with torch.cuda.amp.autocast(enabled=False):
+        with torch.cuda.amp.autocast(enabled=True):
             loss = self._step(batch, batch_idx, "train")
 
         # normalize the loss based on the sum of batch_sie across all GPUs
