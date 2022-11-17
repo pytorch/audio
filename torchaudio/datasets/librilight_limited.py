@@ -16,12 +16,24 @@ _CHECKSUM = "5d1efdc777b548194d7e09ba89126e2188026df9fd57aa57eb14408d2b2342af"
 _SUBSET_MAP = {"10min": ["1h/0"], "1h": ["1h/*"], "10h": ["1h/*", "9h"]}
 
 
-def _get_fileids_paths(path, folders, _ext_audio) -> List[Tuple[str, str]]:
+def _get_fileids_paths(path: Path, folders: List[str], _ext_audio: str) -> List[Tuple[str, str]]:
     """Get the file names and the corresponding file paths without `speaker_id`
     and `chapter_id` directories.
     The format of path is like:
         {root}/{_ARCHIVE_NAME}/1h/[0-5]/[clean, other] or
         {root}/{_ARCHIVE_NAME}/9h/[clean, other]
+
+    Args:
+        path (Path): Root path to the dataset.
+        folders (List[str]): Folders that contain the desired audio files.
+        _ext_audio (str): Extension of audio files.
+
+    Returns:
+        List[Tuple[str, str]]:
+            List of tuples where the first element is the relative path to the audio file.
+            The format of relative path is like:
+            1h/[0-5]/[clean, other] or 9h/[clean, other]
+            The second element is the file name without audio extension.
     """
 
     path = Path(path)

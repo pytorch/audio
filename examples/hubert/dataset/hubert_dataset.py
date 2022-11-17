@@ -415,13 +415,13 @@ class CollateFnHubert:
         return waveforms, labels, lengths
 
 
-def _get_lengths_librilightlimited(files: List[str]) -> List[int]:
+def _get_lengths_librilightlimited(files: List[str], path: str, ext_audio: str) -> List[int]:
     lengths = []
     for file_path, fileid in files:
         speaker_id, chapter_id, utterance_id = fileid.split("-")
         # Load audio
-        file_audio = f"{speaker_id}-{chapter_id}-{utterance_id}.flac"
-        file_audio = os.path.join(file_path, speaker_id, chapter_id, file_audio)
+        file_audio = f"{speaker_id}-{chapter_id}-{utterance_id}{ext_audio}"
+        file_audio = os.path.join(path, file_path, speaker_id, chapter_id, file_audio)
         length = torchaudio.info(file_audio).num_frames
         lengths.append(length)
     return lengths
