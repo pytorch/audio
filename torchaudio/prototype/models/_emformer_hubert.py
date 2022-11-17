@@ -7,10 +7,10 @@ from torchaudio.models.rnnt import _TimeReduction
 
 
 class FeatureEncoder(torch.nn.Module):
-    """Extract features from log mel-spectrogram input. Consists of linear layer and time reduction layer.
+    """Extract features from log-mel spectrogram input. Consists of linear layer and time reduction layer.
 
     Args:
-        input_dim (int): The feature dimension of log mel-spectrogram feature.
+        input_dim (int): The feature dimension of log-mel spectrogram feature.
         output_dim (int): The feature dimension after linear layer.
         use_bias (bool): If ``True``, enable bias parameter in the linear layer.
         stride (int): Number of frames to merge for the output frame.
@@ -26,7 +26,7 @@ class FeatureEncoder(torch.nn.Module):
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
         Args:
-            input (torch.Tensor): The log mel-spectrogram input.
+            input (torch.Tensor): The log-mel spectrogram input.
                 Tensor with dimensions `(batch, time, input_dim)`.
             lengths (torch.Tensor or None): Valid length of each input sample.
                 Tensor with dimension `(batch, )`.
@@ -151,7 +151,7 @@ def _get_emformer_feature_extractor(input_dim: int, output_dim: int, use_bias: b
     """Construct FeatureEncoder for emformer model.
 
     Args:
-        input_dim (int): The feature dimension of log mel-spectrogram feature.
+        input_dim (int): The feature dimension of log-mel spectrogram feature.
         output_dim (int): The feature dimension after linear layer.
         use_bias (bool): If ``True``, enable bias parameter in the linear layer.
         stride (int): Number of frames to merge for the output frame.
