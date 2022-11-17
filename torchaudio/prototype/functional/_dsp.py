@@ -119,7 +119,7 @@ def adsr_envelope(
             device for CUDA tensor types.
 
     Returns:
-        Tensor: ADSR Envelope. Shape `[num_frames, ]`
+        Tensor: ADSR Envelope. Shape: `(num_frames, )`
 
     Example
         .. image:: https://download.pytorch.org/torchaudio/doc-assets/adsr_examples.png
