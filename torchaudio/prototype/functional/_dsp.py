@@ -1,5 +1,5 @@
-from typing import Optional
 import warnings
+from typing import Optional
 
 import torch
 
@@ -169,6 +169,6 @@ def adsr_envelope(
 
     # release
     if num_r > 0:
-        torch.linspace(sustain, 0, num_r + 1, out=out[-num_r-1:])
+        torch.linspace(sustain, 0, num_r + 1, out=out[-num_r - 1 :])
 
     return out

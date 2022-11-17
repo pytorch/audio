@@ -182,7 +182,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 expected=[1.0] * 11,
                 hold=1.0,
             ),
-            # Decay (partial - linear, preceeded by attack)
+            # Decay (partial - linear, preceded by attack)
             param(
                 num_frames=11,
                 expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
@@ -190,7 +190,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 decay=0.5,
                 n_decay=1,
             ),
-            # Decay (partial - linear, preceeded by hold)
+            # Decay (partial - linear, preceded by hold)
             param(
                 num_frames=11,
                 expected=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
@@ -226,7 +226,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 decay=1.0,
                 n_decay=2,
             ),
-            # Sustain (partial - preceeded by decay)
+            # Sustain (partial - preceded by decay)
             param(
                 num_frames=11,
                 expected=[1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
@@ -234,7 +234,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 sustain=0.5,
                 n_decay=1,
             ),
-            # Sustain (partial - preceeded by decay)
+            # Sustain (partial - preceded by decay)
             param(
                 num_frames=11,
                 expected=[1.0, 0.8, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
@@ -248,7 +248,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 expected=[0.3] * 11,
                 sustain=0.3,
             ),
-            # Release (partial - preceeded by decay)
+            # Release (partial - preceded by decay)
             param(
                 num_frames=11,
                 expected=[1.0, 0.84, 0.68, 0.52, 0.36, 0.2, 0.16, 0.12, 0.08, 0.04, 0.0],
@@ -257,7 +257,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 release=0.5,
                 n_decay=1,
             ),
-            # Release (partial - preceeded by sustain)
+            # Release (partial - preceded by sustain)
             param(
                 num_frames=11,
                 expected=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0],
