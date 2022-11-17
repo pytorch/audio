@@ -99,16 +99,16 @@ def adsr_envelope(
 
     Args:
         num_frames (int): The number of output frames.
-        attack (float): The relative *time* it takes to reach the maximum level from the start.
-        hold (float): The relative *time* the maximum level is hold before decay.
-        decay (float): The relative *time* it takes to sustain from the maximum level.
-        sustain (float): The relative *level* at which the sound should sustain.
+        attack (float, optional): The relative *time* it takes to reach the maximum level from the start. (Default: ``0.0``)
+        hold (float, optional): The relative *time* the maximum level is held before it starts to decay. (Default: ``0.0``)
+        decay (float, optional): The relative *time* it takes to sustain from the maximum level. (Default: ``0.0``)
+        sustain (float, optional): The relative *level* at which the sound should sustain. (Default: ``1.0``)
 
             .. Note::
                The duration of sustain is derived as `1.0 - (The sum of attack, hold, decay and release)`.
 
-        release (float): The relative *time* it takes for the sound level to reach zero after the sustain.
-        n_decay (int): The degree of polynomial decay. Default: ``2``.
+        release (float, optional): The relative *time* it takes for the sound level to reach zero after the sustain. (Default: ``0.0``)
+        n_decay (int, optional): The degree of polynomial decay. Default: ``2``.
         dtype (torch.dtype, optional): the desired data type of returned tensor.
             Default: if ``None``, uses a global default
             (see :py:func:`torch.set_default_tensor_type`).
