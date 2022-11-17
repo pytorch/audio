@@ -75,6 +75,7 @@ class Spectrogram(torch.nn.Module):
         return_complex: Optional[bool] = None,
     ) -> None:
         super(Spectrogram, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.Spectrogram")
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequencies due to onesided=True in torch.stft
@@ -603,6 +604,7 @@ class MelSpectrogram(torch.nn.Module):
         mel_scale: str = "htk",
     ) -> None:
         super(MelSpectrogram, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.MelSpectrogram")
 
         if onesided is not None:
             warnings.warn(
