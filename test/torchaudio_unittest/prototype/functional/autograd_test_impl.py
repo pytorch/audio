@@ -91,3 +91,8 @@ class AutogradTestImpl(TestBaseMixin):
     def test_freq_ir(self):
         mags = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype, requires_grad=True)
         assert gradcheck(F.frequency_impulse_response, (mags,))
+
+    def test_filter_waveform(self):
+        waveform = torch.rand(3, 1, 2, 10, device=self.device, dtype=self.dtype, requires_grad=True)
+        filters = torch.rand(3, 2, device=self.device, dtype=self.dtype, requires_grad=True)
+        assert gradcheck(F.filter_waveform, (waveform, filters))

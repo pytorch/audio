@@ -3,6 +3,8 @@ from typing import List, Optional, Union
 
 import torch
 
+from .functional import fftconvolve
+
 
 def oscillator_bank(
     frequencies: torch.Tensor,
@@ -306,3 +308,90 @@ def frequency_impulse_response(magnitudes):
     device, dtype = magnitudes.device, magnitudes.dtype
     window = torch.hann_window(ir.size(-1), periodic=False, device=device, dtype=dtype).expand_as(ir)
     return ir * window
+
+
+def _overlap_and_add(waveform, stride):
+    num_frames, frame_size = waveform.shape[-2:]
+    numel = (num_frames - 1) * stride + frame_size
+    buffer = torch.zeros(waveform.shape[:-2] + (numel,), device=waveform.device, dtype=waveform.dtype)
+    for i in range(num_frames):
+        start = i * stride
+        end = start + frame_size
+        buffer[..., start:end] += waveform[..., i, :]
+    return buffer
+
+
+def filter_waveform(waveform: torch.Tensor, filters: torch.Tensor, delay_compensation: int = -1):
+    """Applies filters along time axis of the given waveform.
+
+    This function applies the given filters along time axis in the following manner:
+
+    1. Split the given waveform into chunks of the number of the given filters.
+    2. Filter each chunk with corresponding filter.
+    3. Place the filtered chunks at the original indices while adding up the overlapping parts.
+    4. Crop the resulting waveform so that delay introduced by the filter is removed and its length
+       matches that of the input waveform.
+
+    The following figure illustrates this.
+
+    .. image:: ../_static/img/apply_filter.png
+
+    .. note::
+
+       If the number of filters is one, then the operation becomes stationary.
+       i.e. the same filtering is applied across the time axis.
+
+    Args:
+        waveform (Tensor): Shape `(..., time)`.
+        filters (Tensor): Impulse responses.
+            Valid inputs are 2D tensor with shape `(num_filters, filter_length)` or
+            `N+1` D tensor with shape `(..., num_filters, filter_length)`, where N is
+            the dimension of waveform.
+
+            In case of 2D input, the same set of filters are used across channels and batches.
+            Otherwise, different set of filters are applied. In this case, the shape of
+            the first `N-1` dimensions of filters must match (or broadcastable to) that of waveform.
+
+        delay_compensation (int): Control how the waveform is cropped after full convolution.
+            Positive value denotes the index at which the cropping starts.
+            Negative value will start cropping the waveform at ``(filter_size - 1) // 2 - 1``.
+
+    Returns:
+        Tensor: `(..., time)`.
+    """
+    if filters.ndim not in [2, waveform.ndim + 1]:
+        raise ValueError(
+            "`filters` must be 2 or N+1 dimension where "
+            f"N is the dimension of waveform. Found: {filters.ndim} (N={waveform.ndim})")
+
+    num_filters, filter_size = filters.shape[-2:]
+    num_frames = waveform.size(-1)
+
+    # Transform waveform's time axis into (num_filters x chunk_length) with optional padding
+    chunk_length = num_frames // num_filters
+    if num_frames % num_filters > 0:
+        chunk_length += 1
+        num_pad = chunk_length * num_filters - num_frames
+        waveform = torch.nn.functional.pad(waveform, [0, num_pad], "constant", 0)
+    chunked = waveform.unfold(-1, chunk_length, chunk_length)
+    assert chunked.numel() >= waveform.numel()
+
+    # Broadcast filters
+    if waveform.ndim + 1 > filters.ndim:
+        expand_shape = waveform.shape[:-1] + filters.shape
+        filters = filters.expand(expand_shape)
+
+    convolved = fftconvolve(chunked, filters)
+    restored = _overlap_and_add(convolved, chunk_length)
+
+    # Trim in a way that the number of samples are same as input,
+    # and the filter delay is compensated
+    num_crops = restored.size(-1) - num_frames
+    if delay_compensation >= 0:
+        start = delay_compensation
+    else:
+        start = (filter_size - 1) // 2 - 1
+    end = num_crops - start
+
+    result = restored[..., start:-end]
+    return result

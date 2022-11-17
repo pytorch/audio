@@ -486,6 +486,69 @@ class FunctionalTestImpl(TestBaseMixin):
 
         self.assertEqual(hyp, ref)
 
+    @parameterized.expand(
+        [
+            # fmt: off
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((15, ), (3, 3)),  # filter size (3) is shorter than chunk size (15 // 3 == 5)
+            ((15, ), (3, 5)),  # filter size (5) matches than chunk size
+            ((15, ), (3, 7)),  # filter size (7) is longer than chunk size
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((15, ), (4, 3)),  # filter size (3) is shorter than chunk size (16 // 4 == 4)
+            ((15, ), (4, 4)),  # filter size (4) is shorter than chunk size
+            ((15, ), (4, 5)),  # filter size (5) is longer than chunk size
+            # INPUT: multi-dim waveform and 2D filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (3, 3)),
+            ((7, 2, 15), (3, 5)),
+            ((7, 2, 15), (3, 7)),
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (4, 3)),
+            ((7, 2, 15), (4, 4)),
+            ((7, 2, 15), (4, 5)),
+            # INPUT: multi-dim waveform and multi-dim filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (7, 2, 3, 3)),
+            ((7, 2, 15), (7, 2, 3, 5)),
+            ((7, 2, 15), (7, 2, 3, 7)),
+            # INPUT: multi-dim waveform and multi-dim filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (7, 2, 4, 3)),
+            ((7, 2, 15), (7, 2, 4, 4)),
+            ((7, 2, 15), (7, 2, 4, 5)),
+            # INPUT: multi-dim waveform and (broadcast) multi-dim filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (1, 1, 3, 3)),
+            ((7, 2, 15), (1, 1, 3, 5)),
+            ((7, 2, 15), (1, 1, 3, 7)),
+            # INPUT: multi-dim waveform and (broadcast) multi-dim filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (1, 1, 4, 3)),
+            ((7, 2, 15), (1, 1, 4, 4)),
+            ((7, 2, 15), (1, 1, 4, 5)),
+            # fmt: on
+        ]
+    )
+    def test_filter_waveform_shape(self, waveform_shape, filter_shape):
+        """filter_waveform returns the waveform with the same number of samples"""
+        waveform = torch.randn(waveform_shape, dtype=self.dtype, device=self.device)
+        filters = torch.randn(filter_shape, dtype=self.dtype, device=self.device)
+
+        filtered = F.filter_waveform(waveform, filters)
+
+        assert filtered.shape == waveform.shape
+
 
 class Functional64OnlyTestImpl(TestBaseMixin):
     @nested_params(
