@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221116) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221117) &#x25BC</a>
     </div>
     
 
@@ -398,12 +398,24 @@
 <span class="n">_SUBSET_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;10min&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;1h/0&quot;</span><span class="p">],</span> <span class="s2">&quot;1h&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;1h/*&quot;</span><span class="p">],</span> <span class="s2">&quot;10h&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;1h/*&quot;</span><span class="p">,</span> <span class="s2">&quot;9h&quot;</span><span class="p">]}</span>
 
 
-<span class="k">def</span> <span class="nf">_get_fileids_paths</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="n">_ext_audio</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">_get_fileids_paths</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">folders</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">_ext_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;Get the file names and the corresponding file paths without `speaker_id`</span>
 <span class="sd">    and `chapter_id` directories.</span>
 <span class="sd">    The format of path is like:</span>
 <span class="sd">        {root}/{_ARCHIVE_NAME}/1h/[0-5]/[clean, other] or</span>
 <span class="sd">        {root}/{_ARCHIVE_NAME}/9h/[clean, other]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (Path): Root path to the dataset.</span>
+<span class="sd">        folders (List[str]): Folders that contain the desired audio files.</span>
+<span class="sd">        _ext_audio (str): Extension of audio files.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[Tuple[str, str]]:</span>
+<span class="sd">            List of tuples where the first element is the relative path to the audio file.</span>
+<span class="sd">            The format of relative path is like:</span>
+<span class="sd">            1h/[0-5]/[clean, other] or 9h/[clean, other]</span>
+<span class="sd">            The second element is the file name without audio extension.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
