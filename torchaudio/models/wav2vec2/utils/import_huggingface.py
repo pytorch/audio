@@ -1,7 +1,9 @@
 """Import Hugging Face transformers's wav2vec2.0 pretrained weights to torchaudios's format.
 """
 import logging
+from typing import Any, Dict
 
+import torch
 from torch.nn import Module
 
 from ..model import wav2vec2_model, Wav2Vec2Model, wavlm_model
@@ -73,27 +75,31 @@ def _build(config, original):
     imported.encoder.feature_projection.load_state_dict(wav2vec2.feature_projection.state_dict())
     encoder_state_dict = wav2vec2.encoder.state_dict()
     if is_wavlm:  # Rename paramaters of linear transformations for compatibility with the HF model
-        encoder_state_dict = {rename_wavlm_key(x): encoder_state_dict[x] for x in encoder_state_dict.keys()}
+        transform_wavlm_encoder_state(encoder_state_dict, config["encoder_num_layers"])
     imported.encoder.transformer.load_state_dict(encoder_state_dict)
     if is_for_ctc:
         imported.aux.load_state_dict(original.lm_head.state_dict())
     return imported
 
 
-def rename_wavlm_key(key):
-    """Rename weights and biases of linear transformations, since we define them directly in WavLMSelfAttention,
-    as opposed to nesting them in Linear modules
+def transform_wavlm_encoder_state(state: Dict[str, Any], encoder_num_layers: int):
+    """Converts WavLM encoder state from HuggingFace format. In particular, concatenates linear projection weights and
+    biases to align with the structure of ``torch.nn.MultiheadAttention``.
     """
-    return (
-        key.replace("k_proj.weight", "k_proj_weight")
-        .replace("k_proj.bias", "k_proj_bias")
-        .replace("q_proj.weight", "q_proj_weight")
-        .replace("q_proj.bias", "q_proj_bias")
-        .replace("v_proj.weight", "v_proj_weight")
-        .replace("v_proj.bias", "v_proj_bias")
-        .replace("out_proj.weight", "out_proj_weight")
-        .replace("out_proj.bias", "out_proj_bias")
-    )
+    for i in range(encoder_num_layers):
+        q_proj_bias = state.pop(f"layers.{i}.attention.q_proj.bias")
+        k_proj_bias = state.pop(f"layers.{i}.attention.k_proj.bias")
+        v_proj_bias = state.pop(f"layers.{i}.attention.v_proj.bias")
+        q_proj_weight = state.pop(f"layers.{i}.attention.q_proj.weight")
+        k_proj_weight = state.pop(f"layers.{i}.attention.k_proj.weight")
+        v_proj_weight = state.pop(f"layers.{i}.attention.v_proj.weight")
+        state[f"layers.{i}.attention.attention.in_proj_bias"] = torch.cat((q_proj_bias, k_proj_bias, v_proj_bias))
+        state[f"layers.{i}.attention.attention.in_proj_weight"] = torch.cat(
+            (q_proj_weight, k_proj_weight, v_proj_weight)
+        )
+
+        state[f"layers.{i}.attention.attention.out_proj.weight"] = state.pop(f"layers.{i}.attention.out_proj.weight")
+        state[f"layers.{i}.attention.attention.out_proj.bias"] = state.pop(f"layers.{i}.attention.out_proj.bias")
 
 
 def import_huggingface_model(original: Module) -> Wav2Vec2Model:

@@ -9,6 +9,11 @@ add_noise
 
 .. autofunction:: add_noise
 
+barkscale_fbanks
+~~~~~~~~~~~~~~~~
+
+.. autofunction:: barkscale_fbanks
+
 convolve
 ~~~~~~~~
 
@@ -18,6 +23,15 @@ fftconvolve
 ~~~~~~~~~~~
 
 .. autofunction:: fftconvolve
+
+DSP
+~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   oscillator_bank
 
 ray_tracing
 ~~~~~~~~~~~

@@ -247,7 +247,7 @@ class HuBERTPreTrainModule(LightningModule):
         """
         opt = self.optimizers()
         opt.zero_grad()
-        with torch.cuda.amp.autocast(enabled=False):
+        with torch.cuda.amp.autocast(enabled=True):
             loss, num_frame = self._step(batch, batch_idx, "train")
         if torch.isinf(loss) or torch.isnan(loss):
             opt.zero_grad()
@@ -360,7 +360,8 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
-        elif model_name == "hubert_large":
+            self.aux = torch.nn.Linear(768, aux_num_out)
+        elif model_name == "hubert_pretrain_large":
             self.model = torchaudio.models.hubert_pretrain_large(
                 encoder_projection_dropout=encoder_projection_dropout,
                 encoder_attention_dropout=encoder_attention_dropout,
@@ -372,7 +373,8 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
-        elif model_name == "hubert_xlarge":
+            self.aux = torch.nn.Linear(1024, aux_num_out)
+        elif model_name == "hubert_pretrain_xlarge":
             self.model = torchaudio.models.hubert_pretrain_xlarge(
                 encoder_projection_dropout=encoder_projection_dropout,
                 encoder_attention_dropout=encoder_attention_dropout,
@@ -384,9 +386,9 @@ class HuBERTFineTuneModule(LightningModule):
                 mask_channel_length=mask_channel_length,
                 num_classes=num_classes,
             )
+            self.aux = torch.nn.Linear(1280, aux_num_out)
         else:
             raise ValueError(f"Unsupported model name: {model_name}.")
-        self.aux = torch.nn.Linear(768, aux_num_out)
         self._load_checkpoint(checkpoint)
         for p in self.model.wav2vec2.feature_extractor.parameters():
             p.requires_grad = False
@@ -478,7 +480,7 @@ class HuBERTFineTuneModule(LightningModule):
         """
         opt = self.optimizers()
         opt.zero_grad()
-        with torch.cuda.amp.autocast(enabled=False):
+        with torch.cuda.amp.autocast(enabled=True):
             loss = self._step(batch, batch_idx, "train")
 
         # normalize the loss based on the sum of batch_sie across all GPUs
@@ -504,7 +506,7 @@ class HuBERTFineTuneModule(LightningModule):
 
     def train_dataloader(self):
         dataset = torchaudio.datasets.LibriLightLimited(self.dataset_path, self.subset)
-        lengths = _get_lengths_librilightlimited(dataset._fileids_paths)
+        lengths = _get_lengths_librilightlimited(dataset._fileids_paths, dataset._path, dataset._ext_audio)
         sampler = BucketizeBatchSampler(
             lengths, num_buckets=100, max_token_count=self.seconds_per_batch * 16000, shuffle=True
         )

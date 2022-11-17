@@ -9,6 +9,8 @@ from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, Test
 if _mod_utils.is_module_available("pyroomacoustics"):
     import pyroomacoustics as pra
 
+from .dsp_utils import oscillator_bank as oscillator_bank_np
+
 
 class FunctionalTestImpl(TestBaseMixin):
     @nested_params(
@@ -181,3 +183,89 @@ class FunctionalTestImpl(TestBaseMixin):
         atol = 1e-4
         diff = abs(hist_pra - hist.to(torch.float32))
         assert ((diff > atol).float().mean(axis=1) < percent).all()
+
+    @nested_params(
+        [(2, 3), (2, 3, 5), (2, 3, 5, 7)],
+        ["sum", "mean", "none"],
+    )
+    def test_oscillator_bank_smoke_test(self, shape, reduction):
+        """oscillator_bank supports variable dimension inputs on different device/dtypes"""
+        sample_rate = 8000
+
+        freqs = sample_rate // 2 * torch.rand(shape, dtype=self.dtype, device=self.device)
+        amps = torch.rand(shape, dtype=self.dtype, device=self.device)
+
+        waveform = F.oscillator_bank(freqs, amps, sample_rate, reduction=reduction)
+        expected_shape = shape if reduction == "none" else shape[:-1]
+        assert waveform.shape == expected_shape
+        assert waveform.dtype == self.dtype
+        assert waveform.device == self.device
+
+    def test_oscillator_invalid(self):
+        """oscillator_bank rejects/warns invalid inputs"""
+        valid_shape = [2, 3, 5]
+        sample_rate = 8000
+
+        freqs = torch.ones(*valid_shape, dtype=self.dtype, device=self.device)
+        amps = torch.rand(*valid_shape, dtype=self.dtype, device=self.device)
+
+        # mismatching shapes
+        with self.assertRaises(ValueError):
+            F.oscillator_bank(freqs[0], amps, sample_rate)
+
+        # frequencies out of range
+        nyquist = sample_rate / 2
+        with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
+            F.oscillator_bank(nyquist * freqs, amps, sample_rate)
+
+        with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
+            F.oscillator_bank(-nyquist * freqs, amps, sample_rate)
+
+
+class Functional64OnlyTestImpl(TestBaseMixin):
+    @nested_params(
+        [1, 10, 100, 1000],
+        [1, 2, 4, 8],
+        [8000, 16000],
+    )
+    def test_oscillator_ref(self, f0, num_pitches, sample_rate):
+        """oscillator_bank returns the matching values as reference implementation
+
+        Note: It looks like NumPy performs cumsum on higher precision and thus this test
+        does not pass on float32.
+        """
+        duration = 4.0
+
+        num_frames = int(sample_rate * duration)
+        freq0 = f0 * torch.arange(1, num_pitches + 1, device=self.device, dtype=self.dtype)
+        amps = 1.0 / num_pitches * torch.ones_like(freq0)
+
+        ones = torch.ones([num_frames, num_pitches], device=self.device, dtype=self.dtype)
+        freq = ones * freq0[None, :]
+        amps = ones * amps[None, :]
+
+        wavs_ref = oscillator_bank_np(freq.cpu().numpy(), amps.cpu().numpy(), sample_rate)
+        wavs_hyp = F.oscillator_bank(freq, amps, sample_rate, reduction="none")
+
+        # Debug code to see what goes wrong.
+        # keeping it for future reference
+        def _debug_plot():
+            """
+            import matplotlib.pyplot as plt
+
+            fig, axes = plt.subplots(num_pitches, 3, sharex=True, sharey=True)
+            for p in range(num_pitches):
+                (ax0, ax1, ax2) = axes[p] if num_pitches > 1 else axes
+                spec_ref, ys, xs, _ = ax0.specgram(wavs_ref[:, p])
+                spec_hyp, _, _, _ = ax1.specgram(wavs_hyp[:, p])
+                spec_diff = spec_ref - spec_hyp
+                ax2.imshow(spec_diff, aspect="auto", extent=[xs[0], xs[-1], ys[0], ys[-1]])
+            plt.show()
+            """
+            pass
+
+        try:
+            self.assertEqual(wavs_hyp, wavs_ref)
+        except AssertionError:
+            _debug_plot()
+            raise

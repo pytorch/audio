@@ -1,4 +1,4 @@
-name: Trigger MacOS Wheels Build for Nightlies/Release
+name: Build MacOS Wheels
 
 on:
   pull_request:

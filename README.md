@@ -6,6 +6,8 @@ torchaudio: an audio library for PyTorch
 [![Anaconda Badge](https://anaconda.org/pytorch/torchaudio/badges/downloads.svg)](https://anaconda.org/pytorch/torchaudio)
 [![Anaconda-Server Badge](https://anaconda.org/pytorch/torchaudio/badges/platforms.svg)](https://anaconda.org/pytorch/torchaudio)
 
+![TorchAudio Logo](docs/source/_static/img/logo.png)
+
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
@@ -35,7 +37,6 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ----------- | ------------------------ | ------------------------ | ------------------------------- |
 | Development | ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.7``, ``<=3.10``            |
 | Latest versioned release | ``1.13.0``               | ``0.13.0``               | ``>=3.7``, ``<=3.10``            |
-| LTS | ``1.8.2``               | ``0.8.2``               | ``>=3.6``, ``<=3.9``            |
 
 <details><summary>Previous versions</summary>
 
@@ -47,7 +48,7 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ``1.10.0``               | ``0.10.0``               | ``>=3.6``, ``<=3.9``            |
 | ``1.9.1``                | ``0.9.1``                | ``>=3.6``, ``<=3.9``            |
 | ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
-| ``1.8.2``                | ``0.8.2``                | ``>=3.6``, ``<=3.9``            |
+| ``1.8.1``                | ``0.8.1``                | ``>=3.6``, ``<=3.9``            |
 | ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
@@ -67,8 +68,6 @@ Installation
 Please refer to https://pytorch.org/get-started/locally/ for the details.
 
 **Note** Starting `0.10`, torchaudio has CPU-only and CUDA-enabled binary distributions, each of which requires a matching PyTorch version.
-
-**Note** <ins>LTS versions are distributed through a different channel than the other versioned releases. Please refer to the above page for details.</ins>
 
 **Note** This software was compiled against an unmodified copy of FFmpeg (licensed under [the LGPLv2.1](https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1)), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded [here](https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8).
 

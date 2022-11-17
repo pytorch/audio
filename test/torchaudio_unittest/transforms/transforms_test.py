@@ -131,84 +131,6 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertTrue(fb_matrix_transform.fb.sum(1).ge(0.0).all())
         self.assertEqual(fb_matrix_transform.fb.size(), (400, 100))
 
-    def test_barkscale_load_save(self):
-        specgram = torch.ones(1, 201, 100)
-        barkscale_transform = transforms.BarkScale()
-        barkscale_transform(specgram)
-
-        barkscale_transform_copy = transforms.BarkScale()
-        barkscale_transform_copy.load_state_dict(barkscale_transform.state_dict())
-
-        fb = barkscale_transform.fb
-        fb_copy = barkscale_transform_copy.fb
-
-        self.assertEqual(fb_copy.size(), (201, 128))
-        self.assertEqual(fb, fb_copy)
-
-    def test_barkspectrogram_load_save(self):
-        waveform = self.waveform.float()
-        bark_spectrogram_transform = transforms.BarkSpectrogram()
-        bark_spectrogram_transform(waveform)
-
-        bark_spectrogram_transform_copy = transforms.BarkSpectrogram()
-        bark_spectrogram_transform_copy.load_state_dict(bark_spectrogram_transform.state_dict())
-
-        window = bark_spectrogram_transform.spectrogram.window
-        window_copy = bark_spectrogram_transform_copy.spectrogram.window
-
-        fb = bark_spectrogram_transform.bark_scale.fb
-        fb_copy = bark_spectrogram_transform_copy.bark_scale.fb
-
-        self.assertEqual(window, window_copy)
-        # the default for n_fft = 400 and n_mels = 128
-        self.assertEqual(fb_copy.size(), (201, 128))
-        self.assertEqual(fb, fb_copy)
-
-    def test_bark2(self):
-        top_db = 80.0
-        s2db = transforms.AmplitudeToDB("power", top_db)
-
-        waveform = self.waveform.clone()  # (1, 16000)
-        waveform_scaled = self.scale(waveform)  # (1, 16000)
-        bark_transform = transforms.BarkSpectrogram()
-        # check defaults
-        spectrogram_torch = s2db(bark_transform(waveform_scaled))  # (1, 128, 321)
-        self.assertTrue(spectrogram_torch.dim() == 3)
-        self.assertTrue(spectrogram_torch.ge(spectrogram_torch.max() - top_db).all())
-        self.assertEqual(spectrogram_torch.size(1), bark_transform.n_barks)
-        # check correctness of filterbank conversion matrix
-        self.assertTrue(bark_transform.bark_scale.fb.sum(1).le(1.0).all())
-        self.assertTrue(bark_transform.bark_scale.fb.sum(1).ge(0.0).all())
-        # check options
-        kwargs = {
-            "window_fn": torch.hamming_window,
-            "pad": 10,
-            "win_length": 500,
-            "hop_length": 125,
-            "n_fft": 800,
-            "n_barks": 50,
-        }
-        bark_transform2 = transforms.BarkSpectrogram(**kwargs)
-        spectrogram2_torch = s2db(bark_transform2(waveform_scaled))  # (1, 50, 513)
-        self.assertTrue(spectrogram2_torch.dim() == 3)
-        self.assertTrue(spectrogram_torch.ge(spectrogram_torch.max() - top_db).all())
-        self.assertEqual(spectrogram2_torch.size(1), bark_transform2.n_barks)
-        self.assertTrue(bark_transform2.bark_scale.fb.sum(1).le(1.0).all())
-        self.assertTrue(bark_transform2.bark_scale.fb.sum(1).ge(0.0).all())
-        # check on multi-channel audio
-        filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.wav")
-        x_stereo = common_utils.load_wav(filepath)[0]  # (2, 278756), 44100
-        spectrogram_stereo = s2db(bark_transform(x_stereo))  # (2, 128, 1394)
-        self.assertTrue(spectrogram_stereo.dim() == 3)
-        self.assertTrue(spectrogram_stereo.size(0) == 2)
-        self.assertTrue(spectrogram_torch.ge(spectrogram_torch.max() - top_db).all())
-        self.assertEqual(spectrogram_stereo.size(1), bark_transform.n_barks)
-        # check filterbank matrix creation
-        fb_matrix_transform = transforms.BarkScale(n_barks=100, sample_rate=16000, f_min=0.0, f_max=None, n_stft=400)
-        self.assertTrue(fb_matrix_transform.fb.sum(1).le(1.0).all())
-        self.assertTrue(fb_matrix_transform.fb.sum(1).ge(0.0).all())
-        self.assertEqual(fb_matrix_transform.fb.size(), (400, 100))
-
     def test_mfcc_defaults(self):
         """Check the default configuration of the MFCC transform."""
         sample_rate = 16000
@@ -372,11 +294,5 @@ class SmokeTest(common_utils.TorchaudioTestCase):
     def test_melspectrogram(self):
         melspecgram = transforms.MelSpectrogram(center=True, pad_mode="reflect")
         specgram = melspecgram.spectrogram
-        self.assertEqual(specgram.center, True)
-        self.assertEqual(specgram.pad_mode, "reflect")
-
-    def test_barkspectrogram(self):
-        barkspecgram = transforms.BarkSpectrogram(center=True, pad_mode="reflect")
-        specgram = barkspecgram.spectrogram
         self.assertEqual(specgram.center, True)
         self.assertEqual(specgram.pad_mode, "reflect")

@@ -1,5 +1,6 @@
 import torch
 import torchaudio.prototype.functional as F
+from parameterized import parameterized
 from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
@@ -28,6 +29,31 @@ class AutogradTestImpl(TestBaseMixin):
 
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
+
+    @parameterized.expand(
+        [
+            (8000, (2, 3, 5, 7)),
+            (8000, (8000, 1)),
+        ]
+    )
+    def test_oscillator_bank(self, sample_rate, shape):
+        # can be replaced with math.prod when we drop 3.7 support
+        def prod(iterable):
+            ret = 1
+            for item in iterable:
+                ret *= item
+            return ret
+
+        numel = prod(shape)
+
+        # use 1.9 instead of 2 so as to include values above nyquist frequency
+        fmax = sample_rate / 1.9
+        freq = torch.linspace(-fmax, fmax, numel, dtype=self.dtype, device=self.device, requires_grad=True).reshape(
+            shape
+        )
+        amps = torch.linspace(-5, 5, numel, dtype=self.dtype, device=self.device, requires_grad=True).reshape(shape)
+
+        assert gradcheck(F.oscillator_bank, (freq, amps, sample_rate))
 
     def test_ray_tracing(self):
 

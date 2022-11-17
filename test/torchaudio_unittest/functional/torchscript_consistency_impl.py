@@ -140,17 +140,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         norm = "slaney"
         self._assert_consistency(F.melscale_fbanks, (n_stft, f_min, f_max, n_mels, sample_rate, norm, "htk"))
 
-    def test_barkscale_fbanks(self):
-        if self.device != torch.device("cpu"):
-            raise unittest.SkipTest("No need to perform test on device other than CPU")
-
-        n_stft = 100
-        f_min = 0.0
-        f_max = 20.0
-        n_barks = 10
-        sample_rate = 16000
-        self._assert_consistency(F.barkscale_fbanks, (n_stft, f_min, f_max, n_barks, sample_rate, "traunmuller"))
-
     def test_linear_fbanks(self):
         if self.device != torch.device("cpu"):
             raise unittest.SkipTest("No need to perform test on device other than CPU")
