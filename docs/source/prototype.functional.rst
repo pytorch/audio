@@ -23,3 +23,12 @@ fftconvolve
 ~~~~~~~~~~~
 
 .. autofunction:: fftconvolve
+
+DSP
+~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   oscillator_bank
