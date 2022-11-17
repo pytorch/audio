@@ -26,16 +26,22 @@ def ray_tracing(
     TODO: document args and returns.
 
     """
-    if mic_array.dim() == 2:
-        if mic_array.shape[0] != 1:
-            raise ValueError("Only 1 channel (1 microphone) supported.")
-        mic_array = mic_array[0]
+    if mic_array.dim() == 1:
+        mic_array = mic_array[None, :]
+    if mic_array.dim() != 2:
+        raise ValueError(
+            f"mic_array must be 1D tensor of shape D, or 2D tensor of shape (num_mics, D) where D is 2 or 3. Got shape = {mic_array.shape}."
+        )
     if room.dtype not in (torch.float32, torch.float64):
         raise ValueError(f"room must be of float32 or float64 dtype, got {room.dtype} instead.")
+    if len(set([room.shape[0], source.shape[0], mic_array.shape[1]])) != 1:
+        raise ValueError(
+            f"Room dimension D must match with source and mic_array. Got {room.shape[0]}, {source.shape[0]}, and {mic_array.shape[1]}"
+        )
     if time_thres < hist_bin_size:
         raise ValueError(f"time_thres={time_thres} must be greater than hist_bin_size={hist_bin_size}.")
 
-    return torch.ops.torchaudio.ray_tracing(
+    histograms = torch.ops.torchaudio.ray_tracing(
         room,
         source,
         mic_array,
@@ -48,3 +54,8 @@ def ray_tracing(
         time_thres,
         hist_bin_size,
     )
+
+    if mic_array.shape[0] == 1:
+        histograms = histograms[0]
+
+    return histograms

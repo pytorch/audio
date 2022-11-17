@@ -160,16 +160,17 @@ class RayTracer {
   }
 
   void log_hist(
-      torch::Tensor& hist,
+      torch::Tensor& histograms,
+      int k,
       scalar_t energy,
       scalar_t travel_dist_at_mic) {
     auto time_at_mic = travel_dist_at_mic / sound_speed;
     auto bin = floor(time_at_mic / hist_bin_size);
-    hist[bin] += energy;
+    histograms[k][bin] += energy;
   }
 
   void simul_ray(
-      torch::Tensor& hist,
+      torch::Tensor& histograms,
       torch::Tensor origins,
       scalar_t phi,
       scalar_t theta) {
@@ -220,31 +221,34 @@ class RayTracer {
         // Compute the distance between the line defined by (start, hit_point)
         // and the center of the microphone (mic_pos)
 
-        torch::Tensor to_mic = mic_array - start;
-        auto impact_distance = to_mic.dot(dir).item<scalar_t>();
+        for (auto k = 0; k < mic_array.size(0); k++) {
+          torch::Tensor to_mic = mic_array[k] - start;
+          auto impact_distance = to_mic.dot(dir).item<scalar_t>();
 
-        bool impacts =
-            (-EPS < impact_distance) && (impact_distance < hit_distance + EPS);
+          bool impacts = (-EPS < impact_distance) &&
+              (impact_distance < hit_distance + EPS);
 
-        // If yes, we compute the ray's transmitted amplitude at the mic and we
-        // continue the ray
+          // If yes, we compute the ray's transmitted amplitude at the mic and
+          // we continue the ray
 
-        if (impacts &&
-            ((to_mic - dir * impact_distance).norm().template item<scalar_t>() <
-             mic_radius + EPS)) {
-          // The length of this last hop
-          auto distance = std::abs(impact_distance);
+          if (impacts &&
+              ((to_mic - dir * impact_distance)
+                   .norm()
+                   .template item<scalar_t>() < mic_radius + EPS)) {
+            // The length of this last hop
+            auto distance = std::abs(impact_distance);
 
-          // Updating travel_time and transmitted amplitude for this ray We
-          // DON'T want to modify the variables transmitted amplitude and
-          // travel_dist because the ray will continue its way
-          auto travel_dist_at_mic = travel_dist + distance;
-          double r_sq = travel_dist_at_mic * travel_dist_at_mic;
-          auto p_hit =
-              (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
-          energy = transmitted / (r_sq * p_hit);
+            // Updating travel_time and transmitted amplitude for this ray We
+            // DON'T want to modify the variables transmitted amplitude and
+            // travel_dist because the ray will continue its way
+            auto travel_dist_at_mic = travel_dist + distance;
+            double r_sq = travel_dist_at_mic * travel_dist_at_mic;
+            auto p_hit =
+                (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
+            energy = transmitted / (r_sq * p_hit);
 
-          log_hist(hist, energy, travel_dist_at_mic);
+            log_hist(histograms, k, energy, travel_dist_at_mic);
+          }
         }
       }
 
@@ -256,9 +260,15 @@ class RayTracer {
       auto origin = origins[next_wall_index];
 
       // Let's shoot the scattered ray induced by the rebound on the wall
-      if ((scattering > 0) &&
-          (side(normal, origin, mic_array) == side(normal, origin, start))) {
-        scat_ray(hist, mic_array, transmitted, normal, hit_point, travel_dist);
+      if (scattering > 0) {
+        scat_ray(
+            histograms,
+            transmitted,
+            normal,
+            origin,
+            start,
+            hit_point,
+            travel_dist);
         transmitted *= (1. - scattering);
       }
 
@@ -276,36 +286,45 @@ class RayTracer {
   }
 
   void scat_ray(
-      torch::Tensor& hist,
-      torch::Tensor mic_array,
+      torch::Tensor& histograms,
       scalar_t transmitted,
       torch::Tensor normal,
+      torch::Tensor origin,
+      torch::Tensor prev_hit_point,
       torch::Tensor hit_point,
       scalar_t travel_dist) {
     auto distance_thres = time_thres * sound_speed;
 
-    // As the ray is shot towards the microphone center,
-    // the hop dist can be easily computed
-    torch::Tensor hit_point_to_mic = mic_array - hit_point;
-    auto hop_dist = hit_point_to_mic.norm().item<scalar_t>();
-    auto travel_dist_at_mic = travel_dist + hop_dist;
+    for (auto k = 0; k < mic_array.size(0); k++) {
+      auto mic_pos = mic_array[k];
+      if (side(normal, origin, mic_pos) !=
+          side(normal, origin, prev_hit_point)) {
+        continue;
+      }
 
-    // compute the scattered energy reaching the microphone
-    auto h_sq = hop_dist * hop_dist;
-    auto p_hit_equal = 1. - sqrt(1. - mic_radius_sq / h_sq);
-    auto cosine = hit_point_to_mic.dot(normal).item<scalar_t>() /
-        hit_point_to_mic.norm().item<scalar_t>();
-    // cosine angle should be positive, but could be negative if normal is
-    // facing out of room so we take abs
-    auto p_lambert = 2 * std::abs(cosine);
-    auto scat_trans = scattering * transmitted * p_hit_equal * p_lambert;
+      // As the ray is shot towards the microphone center,
+      // the hop dist can be easily computed
+      torch::Tensor hit_point_to_mic = mic_pos - hit_point;
+      auto hop_dist = hit_point_to_mic.norm().item<scalar_t>();
+      auto travel_dist_at_mic = travel_dist + hop_dist;
 
-    if (travel_dist_at_mic < distance_thres && scat_trans > energy_thres) {
-      double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
-      auto p_hit =
-          (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
-      auto energy = scat_trans / (r_sq * p_hit);
-      log_hist(hist, energy, travel_dist_at_mic);
+      // compute the scattered energy reaching the microphone
+      auto h_sq = hop_dist * hop_dist;
+      auto p_hit_equal = 1. - sqrt(1. - mic_radius_sq / h_sq);
+      auto cosine = hit_point_to_mic.dot(normal).item<scalar_t>() /
+          hit_point_to_mic.norm().item<scalar_t>();
+      // cosine angle should be positive, but could be negative if normal is
+      // facing out of room so we take abs
+      auto p_lambert = 2 * std::abs(cosine);
+      auto scat_trans = scattering * transmitted * p_hit_equal * p_lambert;
+
+      if (travel_dist_at_mic < distance_thres && scat_trans > energy_thres) {
+        double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
+        auto p_hit =
+            (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
+        auto energy = scat_trans / (r_sq * p_hit);
+        log_hist(histograms, k, energy, travel_dist_at_mic);
+      }
     }
   }
 
@@ -339,6 +358,7 @@ class RayTracer {
     scalar_t zero = 0;
     scalar_t W = room[0].template item<scalar_t>();
     scalar_t L = room[1].template item<scalar_t>();
+
     if (D == 2) {
       return torch::tensor(
           {
@@ -390,8 +410,9 @@ torch::Tensor ray_tracing(
     double hist_bin_size) {
   // TODO: Maybe hist_size should also be bounded from output of ISM, and from
   // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html?
-  auto hist_size = ceil(time_thres / hist_bin_size);
-  auto hist = torch::zeros(hist_size, room.options());
+  auto hist_size = (int)ceil(time_thres / hist_bin_size);
+  auto histograms =
+      torch::zeros({mic_array.size(0), hist_size}, room.options());
   //   hist.requires_grad_(true); // TODO is this needed?
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
@@ -407,9 +428,9 @@ torch::Tensor ray_tracing(
         energy_thres,
         time_thres,
         hist_bin_size);
-    rt.compute_histogram(hist);
+    rt.compute_histogram(histograms);
   });
-  return hist;
+  return histograms;
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {

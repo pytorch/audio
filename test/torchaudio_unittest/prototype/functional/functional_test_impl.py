@@ -114,16 +114,14 @@ class FunctionalTestImpl(TestBaseMixin):
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
 
-
-class FunctionalTestRayTracingImpl(TestBaseMixin):
     @skipIfNoModule("pyroomacoustics")
     @parameterized.expand(
         [
-            ([20, 25], [2, 2], [8, 8], 10_000),  # 2D
-            ([20, 25, 30], [1, 10, 5], [8, 8, 22], 1_000),  # 3D
+            ([20, 25], [2, 2], [[8, 8], [7, 6]], 10_000),  # 2D with 2 mics
+            ([20, 25, 30], [1, 10, 5], [8, 8, 22], 1_000),  # 3D with 1 mic
         ]
     )
-    def test_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
+    def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
         e_absorption = 0.2
         scattering = 0.2
         energy_thres = 1e-7
@@ -155,7 +153,7 @@ class FunctionalTestRayTracingImpl(TestBaseMixin):
         room.is_hybrid_sim = False
 
         room.compute_rir()
-        hist_pra = torch.tensor(room.rt_histograms[0][0][0][0])
+        hist_pra = torch.tensor(room.rt_histograms)[:, 0, 0, 0, :]  # shape = (num_mics, hist_size)
 
         hist = F.ray_tracing(
             room=room_dim,
@@ -171,10 +169,15 @@ class FunctionalTestRayTracingImpl(TestBaseMixin):
             hist_bin_size=hist_bin_size,
         )
 
+        if hist.dim() == 2:
+            assert hist.shape[0] == mic_array.shape[0]  # one histogram per mic
+        else:
+            assert hist.dim() == 1
+
         # Most histogram entries are very very close, but very few of them can
         # be slightly off. We thus assert that less than 1% entry are off by
         # more than atol
         percent = 1 / 100
         atol = 1e-4
         diff = abs(hist_pra - hist.to(torch.float32))
-        assert (diff > atol).float().mean() < percent
+        assert ((diff > atol).float().mean(axis=1) < percent).all()

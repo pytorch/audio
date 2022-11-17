@@ -29,10 +29,7 @@ class AutogradTestImpl(TestBaseMixin):
         self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
         self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
 
-
-class AutogradTestRayTracingImpl(TestBaseMixin):
-    # @parameterized.expand([(2, 1), (3, 4)])
-    def test_simulate_rir_ism(self):
+    def test_ray_tracing(self):
 
         room_dim = [20, 25]
         source = [2, 2]

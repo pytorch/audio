@@ -19,7 +19,7 @@ fftconvolve
 
 .. autofunction:: fftconvolve
 
-Ray Tracing
+ray_tracing
 ~~~~~~~~~~~
 
 .. autofunction:: ray_tracing
