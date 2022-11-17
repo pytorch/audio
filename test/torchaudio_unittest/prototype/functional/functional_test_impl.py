@@ -288,8 +288,6 @@ class FunctionalTestImpl(TestBaseMixin):
             device=self.device,
             dtype=self.dtype,
         )
-        print(out)
-        print(expected)
         self.assertEqual(out, torch.tensor(expected, device=self.device, dtype=self.dtype))
 
 
