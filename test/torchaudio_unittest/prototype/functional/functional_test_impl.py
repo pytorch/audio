@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torchaudio.prototype.functional as F
-from parameterized import parameterized
+from parameterized import param, parameterized
 from scipy import signal
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
@@ -148,6 +148,147 @@ class FunctionalTestImpl(TestBaseMixin):
 
         with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
             F.oscillator_bank(-nyquist * freqs, amps, sample_rate)
+
+    @parameterized.expand(
+        [
+            # Attack (full)
+            param(
+                num_frames=11,
+                expected=[i / 10 for i in range(11)],
+                attack=1.0,
+            ),
+            # Attack (partial)
+            param(
+                num_frames=11,
+                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0, 0, 0, 0, 0],
+                attack=0.5,
+            ),
+            # Hold (partial with attack)
+            param(
+                num_frames=11,
+                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                attack=0.5,
+                hold=0.5,
+            ),
+            # Hold (partial without attack)
+            param(
+                num_frames=11,
+                expected=[1.0] * 6 + [0.0] * 5,
+                hold=0.5,
+            ),
+            # Hold (full)
+            param(
+                num_frames=11,
+                expected=[1.0] * 11,
+                hold=1.0,
+            ),
+            # Decay (partial - linear, preceded by attack)
+            param(
+                num_frames=11,
+                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
+                attack=0.5,
+                decay=0.5,
+                n_decay=1,
+            ),
+            # Decay (partial - linear, preceded by hold)
+            param(
+                num_frames=11,
+                expected=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
+                hold=0.5,
+                decay=0.5,
+                n_decay=1,
+            ),
+            # Decay (partial - linear)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.8, 0.6, 0.4, 0.2, 0, 0, 0, 0, 0, 0],
+                decay=0.5,
+                n_decay=1,
+            ),
+            # Decay (partial - polynomial)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.64, 0.36, 0.16, 0.04, 0, 0, 0, 0, 0, 0],
+                decay=0.5,
+                n_decay=2,
+            ),
+            # Decay (full - linear)
+            param(
+                num_frames=11,
+                expected=[1.0 - i / 10 for i in range(11)],
+                decay=1.0,
+                n_decay=1,
+            ),
+            # Decay (full - polynomial)
+            param(
+                num_frames=11,
+                expected=[(1.0 - i / 10) ** 2 for i in range(11)],
+                decay=1.0,
+                n_decay=2,
+            ),
+            # Sustain (partial - preceded by decay)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+                decay=0.5,
+                sustain=0.5,
+                n_decay=1,
+            ),
+            # Sustain (partial - preceded by decay)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.8, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
+                decay=0.3,
+                sustain=0.4,
+                n_decay=1,
+            ),
+            # Sustain (full)
+            param(
+                num_frames=11,
+                expected=[0.3] * 11,
+                sustain=0.3,
+            ),
+            # Release (partial - preceded by decay)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.84, 0.68, 0.52, 0.36, 0.2, 0.16, 0.12, 0.08, 0.04, 0.0],
+                decay=0.5,
+                sustain=0.2,
+                release=0.5,
+                n_decay=1,
+            ),
+            # Release (partial - preceded by sustain)
+            param(
+                num_frames=11,
+                expected=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0],
+                sustain=0.5,
+                release=0.5,
+            ),
+            # Release (full)
+            param(
+                num_frames=11,
+                expected=[1 - i / 10 for i in range(11)],
+                sustain=1.0,
+                release=1.0,
+            ),
+        ]
+    )
+    def test_adsr_envelope(
+        self, num_frames, expected, attack=0.0, hold=0.0, decay=0.0, sustain=0.0, release=0.0, n_decay=2.0
+    ):
+        """the distribution of time are correct"""
+        out = F.adsr_envelope(
+            num_frames,
+            attack=attack,
+            hold=hold,
+            decay=decay,
+            sustain=sustain,
+            release=release,
+            n_decay=n_decay,
+            device=self.device,
+            dtype=self.dtype,
+        )
+        self.assertEqual(out, torch.tensor(expected, device=self.device, dtype=self.dtype))
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):
