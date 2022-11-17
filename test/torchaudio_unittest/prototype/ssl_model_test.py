@@ -44,7 +44,7 @@ class TestSSLModel(TorchaudioTestCase):
     )
     @skipIfNoCuda
     def test_cuda_smoke_test(self, model, dtype, feature_dim):
-        model = conformer_wav2vec2_base()
+        model = model()
         self._smoke_test(model, feature_dim, torch.device("cuda"), dtype)
 
     @parameterized.expand(
