@@ -10,8 +10,8 @@ class HiFiGANGenerator(torch.nn.Module):
     """Generator part of *HiFi GAN* :cite:`kong2020hifigan`.
     From https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
     Note:
-        To build the model, please use one of the factory functions :py:func:`hifigan_model` or :py:func:`hifigan_base`.
-
+        To build the model, please use one of the factory functions: :py:func:`hifigan_model`, :py:func:`hifigan_v1`,
+        :py:func:`hifigan_v2`, :py:func:`hifigan_v3`.
     Args:
         in_channels: (int): Number of channels in the input features.
         upsample_rates (tuple of int): Factors by which each upsampling layer increases the time dimension.
@@ -66,9 +66,9 @@ class HiFiGANGenerator(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x (Tensor): Feature input tensor of shape (batch_size, num_channels, time_dim)
+            x (Tensor): Feature input tensor of shape (batch_size, num_channels, time_length)
         Returns:
-            Tensor of shape ``(batch_size, 1, time_dim * upsample_rate)``, where ``upsample_rate`` is the product
+            Tensor of shape ``(batch_size, 1, time_length * upsample_rate)``, where ``upsample_rate`` is the product
             of upsample rates for all layers.
         """
         x = self.conv_pre(x)
@@ -150,7 +150,7 @@ class ResBlock1(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x (Tensor): input of shape ``(batch_size, channels, time_dim)``.
+            x (Tensor): input of shape ``(batch_size, channels, time_length)``.
         Returns:
             Tensor of the same shape as input.
         """
@@ -201,7 +201,7 @@ class ResBlock2(torch.nn.Module):
     def forward(self, x: torch.Tensor):
         """
         Args:
-            x (Tensor): input of shape ``(batch_size, channels, time_dim)``.
+            x (Tensor): input of shape ``(batch_size, channels, time_length)``.
         Returns:
             Tensor of the same shape as input.
         """
@@ -253,8 +253,44 @@ def hifigan_model(
     )
 
 
-def hifigan_base() -> HiFiGANGenerator:
-    r"""Builds basic version of HiFiGAN Generator :cite:`kong2020hifigan`.
+def hifigan_v1() -> HiFiGANGenerator:
+    r"""Builds HiFiGAN Generator with V1 architecture :cite:`kong2020hifigan`.
+
+    Returns:
+        HiFiGANGenerator: generated model.
+    """
+    return hifigan_model(
+        upsample_rates=(8, 8, 2, 2),
+        upsample_kernel_sizes=(16, 16, 4, 4),
+        upsample_initial_channel=512,
+        resblock_kernel_sizes=(3, 7, 11),
+        resblock_dilation_sizes=((1, 3, 5), (1, 3, 5), (1, 3, 5)),
+        resblock_type=1,
+        in_channels=80,
+        lrelu_slope=0.1,
+    )
+
+
+def hifigan_v2() -> HiFiGANGenerator:
+    r"""Builds HiFiGAN Generator with V2 architecture :cite:`kong2020hifigan`.
+
+    Returns:
+        HiFiGANGenerator: generated model.
+    """
+    return hifigan_model(
+        upsample_rates=(8, 8, 2, 2),
+        upsample_kernel_sizes=(16, 16, 4, 4),
+        upsample_initial_channel=128,
+        resblock_kernel_sizes=(3, 7, 11),
+        resblock_dilation_sizes=((1, 3, 5), (1, 3, 5), (1, 3, 5)),
+        resblock_type=1,
+        in_channels=80,
+        lrelu_slope=0.1,
+    )
+
+
+def hifigan_v3() -> HiFiGANGenerator:
+    r"""Builds HiFiGAN Generator with V3 architecture :cite:`kong2020hifigan`.
 
     Returns:
         HiFiGANGenerator: generated model.
