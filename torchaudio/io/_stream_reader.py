@@ -252,7 +252,7 @@ _hw_accel = """Enable hardware acceleration.
                 When video is decoded on CUDA hardware, for example
                 `decoder="h264_cuvid"`, passing CUDA device indicator to `hw_accel`
                 (i.e. `hw_accel="cuda:0"`) will make StreamReader place the resulting
-                frames directly on the specifiec CUDA device as CUDA tensor.
+                frames directly on the specified CUDA device as CUDA tensor.
 
                 If `None`, the frame will be moved to CPU memory.
                 Default: ``None``."""
