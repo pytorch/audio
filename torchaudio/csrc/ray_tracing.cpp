@@ -8,10 +8,14 @@ namespace {
 
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
+#define EPS ((scalar_t)(1e-5))
 
 template <typename scalar_t>
 class Wall {
  public:
+  torch::Tensor normal;
+  torch::Tensor origin;
+
   torch::Tensor get_absorption() {
     return absorption;
   }
@@ -21,10 +25,36 @@ class Wall {
   torch::Tensor get_scattering() {
     return scattering;
   }
-  Wall(torch::Tensor _absorption, torch::Tensor _scattering)
+  Wall(
+      torch::Tensor _absorption,
+      torch::Tensor _scattering,
+      torch::Tensor _normal,
+      torch::Tensor _origin)
       : absorption(_absorption),
         reflection((scalar_t)1. - _absorption),
-        scattering(_scattering) {}
+        scattering(_scattering),
+        normal(_normal),
+        origin(_origin) {}
+
+  int side(torch::Tensor pos) {
+    auto dot = (pos - origin).dot(normal).item<scalar_t>();
+
+    if (dot > EPS) {
+      return 1;
+    } else if (dot < -EPS) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+  torch::Tensor reflect(torch::Tensor dir) {
+    return dir - normal * 2 * dir.dot(normal);
+  }
+
+  scalar_t cosine(torch::Tensor p) {
+    return p.dot(normal).item<scalar_t>() / p.norm().item<scalar_t>();
+  }
 
  private:
   torch::Tensor absorption;
@@ -62,26 +92,10 @@ class RayTracer {
         hist_bin_size(_hist_bin_size),
         max_dist(room.norm().item<scalar_t>() + 1.),
         D(room.size(0)),
-        normals(make_normals()),
-        origins(make_origins()),
-        EPS(1e-5),
-        do_scattering(_scattering.max().template item<scalar_t>() > 0.) {
+        walls(make_walls(_e_absorption, _scattering)),
+        do_scattering(_scattering.max().template item<scalar_t>() > 0.) {}
 
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 2}),
-        _scattering.index({at::indexing::Slice(), 2}))); // South
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 1}),
-        _scattering.index({at::indexing::Slice(), 1}))); // East
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 3}),
-        _scattering.index({at::indexing::Slice(), 3}))); // North
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 0}),
-        _scattering.index({at::indexing::Slice(), 0}))); // West
-  }
-
-  void compute_histogram(torch::Tensor& hist) {
+  void compute_histograms(torch::Tensor& histograms) {
     // TODO: Could probably parallelize call over num_rays? We would need
     // `num_threads` histograms and then sum-reduce them into a single
     // histogram.
@@ -102,12 +116,12 @@ class RayTracer {
         auto azimuth = atan2(y, x);
         auto colatitude = atan2(sqrt(x * x + y * y), z);
 
-        simul_ray(hist, origins, azimuth, colatitude);
+        simul_ray(histograms, azimuth, colatitude);
       }
     } else if (D == 2) {
       scalar_t offset = 2. * M_PI / num_rays;
       for (int i = 0; i < num_rays; ++i) {
-        simul_ray(hist, origins, i * offset, 0.);
+        simul_ray(histograms, i * offset, 0.);
       }
     }
   }
@@ -128,9 +142,6 @@ class RayTracer {
   scalar_t hist_bin_size;
   scalar_t max_dist; // Max distance needed to hit a wall = diagonal of room + 1
   int D; // Dimension of the room
-  const torch::Tensor normals; // normal vector to walls
-  const torch::Tensor origins; // origin (arbitrary reference) of each wall
-  const scalar_t EPS;
   std::vector<Wall<scalar_t>> walls;
   const bool do_scattering;
 
@@ -206,28 +217,12 @@ class RayTracer {
       scalar_t travel_dist_at_mic) {
     auto time_at_mic = travel_dist_at_mic / sound_speed;
     auto bin = (int)floor(time_at_mic / hist_bin_size);
-    // histograms[mic_idx][0][bin] += energy.item<scalar_t>();
     auto curr_value = histograms.index({mic_idx, at::indexing::Slice(), bin});
-
-    // std::cout << "logging2 " << energy.template item<scalar_t>() << " "
-    //   << mic_idx << std::endl;
-    // std::cout << "curr_value" << std::endl;
-    // std::cout << curr_value.sizes() << std::endl;
-    // std::cout << curr_value << std::endl;
-
-    // std::cout << "energy" << std::endl;
-    // std::cout << energy.sizes() << std::endl;
-    // std::cout << energy << std::endl;
     histograms.index_put_(
         {mic_idx, at::indexing::Slice(), bin}, curr_value + energy);
   }
 
-  void simul_ray(
-      torch::Tensor& histograms,
-      torch::Tensor origins,
-      scalar_t phi,
-      scalar_t theta) {
-    // TODO: requires_grad of tensors????
+  void simul_ray(torch::Tensor& histograms, scalar_t phi, scalar_t theta) {
 
     torch::Tensor start = source.clone();
 
@@ -280,9 +275,6 @@ class RayTracer {
           torch::Tensor to_mic = mic_array[mic_idx] - start;
           auto impact_distance = to_mic.dot(dir).item<scalar_t>();
 
-          //   std::cout << "logging2 dist " << impact_distance << " " <<
-          //   mic_idx << std::endl;
-
           bool impacts = (-EPS < impact_distance) &&
               (impact_distance < hit_distance + EPS);
 
@@ -314,20 +306,9 @@ class RayTracer {
       travel_dist += hit_distance;
       transmitted *= wall.get_reflection();
 
-      auto normal = normals[next_wall_index];
-      auto origin = origins[next_wall_index];
-
       // Let's shoot the scattered ray induced by the rebound on the wall
       if (do_scattering) {
-        scat_ray(
-            histograms,
-            transmitted,
-            normal,
-            origin,
-            start,
-            hit_point,
-            travel_dist,
-            wall.get_scattering());
+        scat_ray(histograms, wall, transmitted, start, hit_point, travel_dist);
         transmitted *= (1. - wall.get_scattering());
       }
 
@@ -339,27 +320,23 @@ class RayTracer {
 
       // set up for next iteration
       specular_counter += 1;
-      // reflect w.r.t normal while conserving length
-      dir = dir - normal * 2 * dir.dot(normal);
+      dir = wall.reflect(dir); // reflect w.r.t normal while conserving length
       start = hit_point;
     }
   }
 
   void scat_ray(
       torch::Tensor& histograms,
+      Wall<scalar_t>& wall,
       torch::Tensor transmitted,
-      torch::Tensor normal,
-      torch::Tensor origin,
       torch::Tensor prev_hit_point,
       torch::Tensor hit_point,
-      scalar_t travel_dist,
-      torch::Tensor scattering) {
+      scalar_t travel_dist) {
     auto distance_thres = time_thres * sound_speed;
 
     for (auto mic_idx = 0; mic_idx < mic_array.size(0); mic_idx++) {
       auto mic_pos = mic_array[mic_idx];
-      if (side(normal, origin, mic_pos) !=
-          side(normal, origin, prev_hit_point)) {
+      if (wall.side(mic_pos) != wall.side(prev_hit_point)) {
         continue;
       }
 
@@ -372,12 +349,11 @@ class RayTracer {
       // compute the scattered energy reaching the microphone
       auto h_sq = hop_dist * hop_dist;
       auto p_hit_equal = 1. - sqrt(1. - mic_radius_sq / h_sq);
-      auto cosine = hit_point_to_mic.dot(normal).item<scalar_t>() /
-          hit_point_to_mic.norm().item<scalar_t>();
       // cosine angle should be positive, but could be negative if normal is
       // facing out of room so we take abs
-      auto p_lambert = 2 * std::abs(cosine);
-      auto scat_trans = scattering * transmitted * p_hit_equal * p_lambert;
+      auto p_lambert = 2 * std::abs(wall.cosine(hit_point_to_mic));
+      auto scat_trans =
+          wall.get_scattering() * transmitted * p_hit_equal * p_lambert;
 
       if (travel_dist_at_mic < distance_thres &&
           scat_trans.max().template item<scalar_t>() > energy_thres) {
@@ -445,16 +421,36 @@ class RayTracer {
     }
   }
 
-  int side(torch::Tensor normal, torch::Tensor origin, torch::Tensor pos) {
-    auto dot = (pos - origin).dot(normal).item<scalar_t>();
+  std::vector<Wall<scalar_t>> make_walls(
+      const torch::Tensor _e_absorption,
+      const torch::Tensor _scattering) {
+    scalar_t zero = 0;
+    scalar_t W = room[0].template item<scalar_t>();
+    scalar_t L = room[1].template item<scalar_t>();
 
-    if (dot > EPS) {
-      return 1;
-    } else if (dot < -EPS) {
-      return -1;
-    } else {
-      return 0;
-    }
+    std::vector<Wall<scalar_t>> walls;
+
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 2}),
+        _scattering.index({at::indexing::Slice(), 2}),
+        torch::tensor({0, -1}, room.scalar_type()),
+        torch::tensor({zero, zero}, room.scalar_type()))); // South
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 1}),
+        _scattering.index({at::indexing::Slice(), 1}),
+        torch::tensor({1, 0}, room.scalar_type()),
+        torch::tensor({W, zero}, room.scalar_type()))); // East
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 3}),
+        _scattering.index({at::indexing::Slice(), 3}),
+        torch::tensor({0, 1}, room.scalar_type()),
+        torch::tensor({W, L}, room.scalar_type()))); // North
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 0}),
+        _scattering.index({at::indexing::Slice(), 0}),
+        torch::tensor({-1, 0}, room.scalar_type()),
+        torch::tensor({zero, L}, room.scalar_type()))); // West
+    return walls;
   }
 };
 
@@ -478,8 +474,6 @@ torch::Tensor ray_tracing(
   auto histograms =
       torch::zeros({num_mics, num_bands, num_bins}, room.options());
   //   hist.requires_grad_(true); // TODO is this needed?
-  std::cout << "histograms" << std::endl;
-  std::cout << histograms.sizes() << std::endl;
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(
@@ -494,7 +488,7 @@ torch::Tensor ray_tracing(
         energy_thres,
         time_thres,
         hist_bin_size);
-    rt.compute_histogram(histograms);
+    rt.compute_histograms(histograms);
   });
   return histograms;
 }
