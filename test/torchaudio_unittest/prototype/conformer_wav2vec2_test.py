@@ -5,7 +5,7 @@ from torchaudio.prototype.models import (
     conformer_wav2vec2_pretrain_base,
     conformer_wav2vec2_pretrain_large,
 )
-from torchaudio_unittest.common_utils import skipIfNoCuda, torch_script, TorchaudioTestCase
+from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
 
 
 class TestConformerWav2Vec2(TorchaudioTestCase):
@@ -37,19 +37,21 @@ class TestConformerWav2Vec2(TorchaudioTestCase):
         model = conformer_wav2vec2_base()
         self._smoke_test(model, torch.device("cuda"), dtype)
 
-    @parameterized.expand([(torch.float32,), (torch.float64,)])
-    def test_pretrain_cpu_smoke_test(self, dtype):
-        model = conformer_wav2vec2_pretrain_base()
-        self._smoke_test(model, torch.device("cpu"), dtype)
-        model = conformer_wav2vec2_pretrain_large()
+    @nested_params(
+        [conformer_wav2vec2_pretrain_base, conformer_wav2vec2_pretrain_large],
+        [torch.float32, torch.float64],
+    )
+    def test_pretrain_cpu_smoke_test(self, model, dtype):
+        model = model()
         self._smoke_test(model, torch.device("cpu"), dtype)
 
-    @parameterized.expand([(torch.float32,), (torch.float64,)])
+    @nested_params(
+        [conformer_wav2vec2_pretrain_base, conformer_wav2vec2_pretrain_large],
+        [torch.float32, torch.float64],
+    )
     @skipIfNoCuda
-    def test_pretrain_cuda_smoke_test(self, dtype):
-        model = conformer_wav2vec2_pretrain_base()
-        self._smoke_test(model, torch.device("cuda"), dtype)
-        model = conformer_wav2vec2_pretrain_large()
+    def test_pretrain_cuda_smoke_test(self, model, dtype):
+        model = model()
         self._smoke_test(model, torch.device("cuda"), dtype)
 
     def test_extract_feature(self):

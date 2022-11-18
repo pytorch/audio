@@ -31,6 +31,13 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
         input (Tensor): Tensor of dimension `(batch, frame, dim)`
         num_negatives (int): Number of sampled negatives
         cross_sample_negatives (int): Number of cross sampled negatives
+
+    Returns:
+        (Tensor, Tensor):
+        Tensor
+            The negative samples
+        Tensor
+            The indices of the negative samples
     """
     if num_negatives == 0 and cross_sample_negatives == 0:
         return (
@@ -38,28 +45,28 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
             torch.zeros(0).to(input.device, input.dtype),
         )
 
-    bsz, tsz, fsz = input.shape
-    input = input.view(-1, fsz)
+    B, T, D = input.shape
+    input = input.view(-1, D)
 
-    cross_high = tsz * bsz
-    high = tsz
+    cross_high = T * B
+    high = T
 
     assert high > 1
 
     if num_negatives > 0:
-        tszs = _buffered_arange(tsz).unsqueeze(-1).expand(-1, num_negatives).flatten()
+        tszs = _buffered_arange(T).unsqueeze(-1).expand(-1, num_negatives).flatten()
 
-        neg_idxs = torch.randint(low=0, high=high - 1, size=(bsz, num_negatives * tsz))
+        neg_idxs = torch.randint(low=0, high=high - 1, size=(B, num_negatives * T))
         neg_idxs[neg_idxs >= tszs] += 1
 
     if cross_sample_negatives > 0:
-        tszs = _buffered_arange(tsz).unsqueeze(-1).expand(-1, cross_sample_negatives).flatten()
+        tszs = _buffered_arange(T).unsqueeze(-1).expand(-1, cross_sample_negatives).flatten()
 
-        cross_neg_idxs = torch.randint(low=0, high=cross_high - 1, size=(bsz, cross_sample_negatives * tsz))
+        cross_neg_idxs = torch.randint(low=0, high=cross_high - 1, size=(B, cross_sample_negatives * T))
         cross_neg_idxs[cross_neg_idxs >= tszs] += 1
 
     if num_negatives > 0:
-        neg_idxs = neg_idxs + (torch.arange(bsz).unsqueeze(1) * high)
+        neg_idxs = neg_idxs + (torch.arange(B).unsqueeze(1) * high)
     else:
         neg_idxs = cross_neg_idxs
 
@@ -67,7 +74,7 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
         neg_idxs = torch.cat([neg_idxs, cross_neg_idxs], dim=1)
 
     negs = input[neg_idxs.view(-1)]
-    negs = negs.view(bsz, tsz, num_negatives + cross_sample_negatives, fsz).permute(2, 0, 1, 3)  # NxBxCxT
+    negs = negs.view(B, T, num_negatives + cross_sample_negatives, D).permute(2, 0, 1, 3)  # NxBxCxT
 
     return negs, neg_idxs
 
@@ -256,6 +263,8 @@ class ConformerWav2Vec2PretrainModel(Module):
             Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.
         mask_generator (nn.Module):
             Mask generator that generates the mask for masked prediction during training.
+        intermediate (nn.Module):
+            Intermediate transformation after masking, prior to performing negative sampling.
         negative_sampler (nn.Module):
             Negative sampler to apply after masking.
 
@@ -265,11 +274,13 @@ class ConformerWav2Vec2PretrainModel(Module):
         self,
         wav2vec2: Wav2Vec2Model,
         mask_generator: Module,
+        intermediate: Module,
         negative_sampler: Module,
     ):
         super().__init__()
         self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
+        self.intermediate = intermediate
         self.negative_sampler = negative_sampler
 
     def forward(
@@ -307,10 +318,11 @@ class ConformerWav2Vec2PretrainModel(Module):
         x = self.wav2vec2.encoder.feature_projection.layer_norm(x)
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
         x, _ = self.mask_generator(x, padding_mask)
+
+        temp = self.intermediate(x)
+        negs, neg_idxs, _ = self.negative_sampler(temp, lengths)
+
         x = self.wav2vec2.encoder.feature_projection.projection(x)
-
-        negs, neg_idxs, _ = self.negative_sampler(x, lengths)
-
         x = x.transpose(0, 1)
         for conformer_layer in self.wav2vec2.encoder.conformer:
             x = conformer_layer(x, padding_mask)
@@ -618,6 +630,11 @@ def conformer_wav2vec2_pretrain_model(
         mask_channel_min_space,
     )
 
+    intermediate_layer = nn.Linear(
+        extractor_output_dim,
+        encoder_embed_dim,
+    )
+
     negative_sampler = _NegativeSampler(
         num_negatives,
         cross_sample_negatives,
@@ -626,6 +643,7 @@ def conformer_wav2vec2_pretrain_model(
     return ConformerWav2Vec2PretrainModel(
         wav2vec2=wav2vec2,
         mask_generator=mask_generator,
+        intermediate=intermediate_layer,
         negative_sampler=negative_sampler,
     )
 
