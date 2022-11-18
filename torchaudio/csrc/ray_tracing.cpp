@@ -223,7 +223,6 @@ class RayTracer {
   }
 
   void simul_ray(torch::Tensor& histograms, scalar_t phi, scalar_t theta) {
-
     torch::Tensor start = source.clone();
 
     // the direction of the ray (unit vector)
@@ -430,26 +429,64 @@ class RayTracer {
 
     std::vector<Wall<scalar_t>> walls;
 
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 2}),
-        _scattering.index({at::indexing::Slice(), 2}),
-        torch::tensor({0, -1}, room.scalar_type()),
-        torch::tensor({zero, zero}, room.scalar_type()))); // South
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 1}),
-        _scattering.index({at::indexing::Slice(), 1}),
-        torch::tensor({1, 0}, room.scalar_type()),
-        torch::tensor({W, zero}, room.scalar_type()))); // East
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 3}),
-        _scattering.index({at::indexing::Slice(), 3}),
-        torch::tensor({0, 1}, room.scalar_type()),
-        torch::tensor({W, L}, room.scalar_type()))); // North
-    walls.push_back(Wall<scalar_t>(
-        _e_absorption.index({at::indexing::Slice(), 0}),
-        _scattering.index({at::indexing::Slice(), 0}),
-        torch::tensor({-1, 0}, room.scalar_type()),
-        torch::tensor({zero, L}, room.scalar_type()))); // West
+    torch::Tensor normals;
+    torch::Tensor origins;
+
+    if (D == 2) {
+      normals = torch::tensor(
+          {
+              {-1, 0}, // West
+              {1, 0}, // East
+              {0, -1}, // South
+              {0, 1}, // North
+          },
+          room.scalar_type());
+
+      origins = torch::tensor(
+          {
+              {zero, L}, // West
+              {W, zero}, // East
+              {zero, zero}, // South
+              {W, L}, // North
+          },
+          room.scalar_type());
+    } else {
+      scalar_t H = room[2].template item<scalar_t>();
+      normals = torch::tensor(
+          {
+              {-1, 0, 0}, // West
+              {1, 0, 0}, // East
+              {0, -1, 0}, // South
+              {0, 1, 0}, // North
+              {0, 0, -1}, // Floor
+              {0, 0, 1} // Ceiling
+          },
+          room.scalar_type());
+      origins = torch::tensor(
+          {
+              {zero, L, zero}, // West
+              {W, zero, zero}, // East
+              {zero, zero, zero}, // South
+              {W, L, zero}, // North
+              {W, zero, zero}, // Floor
+              {W, zero, H} // Ceil
+          },
+          room.scalar_type());
+    }
+
+    for (auto i = 0; i < normals.size(0); i++) {
+      walls.push_back(Wall<scalar_t>(
+          _e_absorption.index({at::indexing::Slice(), i}),
+          _scattering.index({at::indexing::Slice(), i}),
+          normals[i],
+          origins[i]));
+    }
+    if (D == 2) {
+      // For consistency with pyroomacoustits we switch the order of the walls
+      // to South East North West
+      std::swap(walls[0], walls[3]);
+      std::swap(walls[0], walls[2]);
+    }
     return walls;
   }
 };

@@ -2,6 +2,31 @@ import torch
 import torchaudio
 
 
+def _validate_absorption_scattering(v, name, num_walls, D):
+    if isinstance(v, float):
+        out = torch.ones(1, num_walls) * v
+    elif isinstance(v, torch.Tensor) and v.ndim == 1:
+        if v.shape[0] != num_walls:
+            raise ValueError(
+                f"The shape of {name} must be (4,) or (6,) if it is a 1D Tensor."
+                f"Found the shape of room is {D} and shape of {name} is {v.shape}."
+            )
+        out = v[None, :]
+    elif isinstance(v, torch.Tensor) and v.ndim == 2:
+        if v.shape[1] != num_walls:
+            raise ValueError(
+                f"The shape of {name} must be (num_bands, 4) for a 2D room or (num_bands, 6) "
+                "for a 3D room if it is a 2D Tensor. "
+                f"Found the shape of room is {D} and shape of {name} is {v.shape}."
+            )
+        out = v
+    else:
+        out = v
+    assert out.ndim == 2
+
+    return out
+
+
 def ray_tracing(
     room: torch.Tensor,
     source: torch.Tensor,
@@ -27,7 +52,6 @@ def ray_tracing(
 
     """
     D = room.shape[0]
-    num_walls = 4 if D == 2 else 6
 
     if mic_array.ndim == 1:
         mic_array = mic_array[None, :]
@@ -44,33 +68,16 @@ def ray_tracing(
     if time_thres < hist_bin_size:
         raise ValueError(f"time_thres={time_thres} must be greater than hist_bin_size={hist_bin_size}.")
 
-    if isinstance(e_absorption, float):
-        e_abs = torch.ones(1, num_walls) * e_absorption
-    elif isinstance(e_absorption, torch.Tensor) and e_absorption.ndim == 1:
-        if e_absorption.shape[0] != num_walls:
-            raise ValueError(
-                "The shape of e_absorption must be (4,) or (6,) if it is a 1D Tensor."
-                f"Found the shape of room is {D} and shape of e_absorption is {e_absorption.shape}."
-            )
-        e_abs = e_absorption[None, :]
-    elif isinstance(e_absorption, torch.Tensor) and e_absorption.ndim == 2:
-        if e_absorption.shape[1] != num_walls:
-            raise ValueError(
-                "The shape of e_absorption must be (num_bands, 4) for a 2D room or (num_bands, 6) for a 3D room if it is a 2D Tensor."
-                f"Found the shape of room is {D} and shape of e_absorption is {e_absorption.shape}."
-            )
-        e_abs = e_absorption
-    else:
-        e_abs = e_absorption
-
-    assert e_abs.ndim == 2
+    num_walls = 4 if D == 2 else 6
+    e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", num_walls=num_walls)
+    scattering = _validate_absorption_scattering(scattering, name="e_absorption", num_walls=num_walls, D=D)
 
     histograms = torch.ops.torchaudio.ray_tracing(
         room,
         source,
         mic_array,
         num_rays,
-        e_abs,  # shape = (num_bands, num_walls)
+        e_absorption,
         scattering,
         mic_radius,
         sound_speed,
@@ -78,8 +85,5 @@ def ray_tracing(
         time_thres,
         hist_bin_size,
     )
-
-    # if mic_array.shape[0] == 1:
-    #     histograms = histograms[0]
 
     return histograms

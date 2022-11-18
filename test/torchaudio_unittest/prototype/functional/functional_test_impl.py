@@ -116,6 +116,59 @@ class FunctionalTestImpl(TestBaseMixin):
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
 
+    def test_ray_tracing_per_band_per_wall_absorption(self):
+        """Check that when the value of absorption and scattering are the same
+        across walls and frequency bands, the output histograms are:
+        - all equal across frequency bands
+        - equal to simply passing a float value instead of a (num_bands, D) or
+        (D,) tensor.
+        """
+
+        room_dim = torch.tensor([20, 25], dtype=self.dtype)
+        mic_array = torch.tensor([[2, 2], [8, 8]], dtype=self.dtype)
+        source = torch.tensor([7, 6], dtype=self.dtype)
+        num_rays = 10_000
+        ABS, SCAT = 0.1, 0.2
+
+        e_absorption = torch.full(fill_value=ABS, size=(6, 4), dtype=self.dtype)
+        scattering = torch.full(fill_value=SCAT, size=(6, 4), dtype=self.dtype)
+        hist_per_band_per_wall = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+        e_absorption = torch.full(fill_value=ABS, size=(4,), dtype=self.dtype)
+        scattering = torch.full(fill_value=SCAT, size=(4,), dtype=self.dtype)
+        hist_per_wall = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+
+        e_absorption = ABS
+        scattering = SCAT
+        hist_single = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+        assert hist_per_band_per_wall.shape == (2, 6, 2500)
+        assert hist_per_wall.shape == (2, 1, 2500)
+        assert hist_single.shape == (2, 1, 2500)
+        torch.testing.assert_close(hist_single, hist_per_wall)
+
+        hist_single = hist_single.expand(2, 6, 2500)
+        torch.testing.assert_close(hist_single, hist_per_band_per_wall)
+
     @skipIfNoModule("pyroomacoustics")
     @parameterized.expand(
         [
