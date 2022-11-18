@@ -31,4 +31,5 @@ DSP
    :toctree: generated
    :nosignatures:
 
+   adsr_envelope
    oscillator_bank
