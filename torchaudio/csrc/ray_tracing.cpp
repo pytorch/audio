@@ -10,6 +10,29 @@ namespace {
 #define ISM_ORDER (10) // TODO: remove
 
 template <typename scalar_t>
+class Wall {
+ public:
+  torch::Tensor get_absorption() {
+    return absorption;
+  }
+  torch::Tensor get_reflection() {
+    return reflection;
+  }
+  torch::Tensor get_scattering() {
+    return scattering;
+  }
+  Wall(torch::Tensor _absorption, torch::Tensor _scattering)
+      : absorption(_absorption),
+        reflection((scalar_t)1. - _absorption),
+        scattering(_scattering) {}
+
+ private:
+  torch::Tensor absorption;
+  torch::Tensor reflection;
+  torch::Tensor scattering;
+};
+
+template <typename scalar_t>
 class RayTracer {
  public:
   RayTracer(
@@ -17,8 +40,8 @@ class RayTracer {
       const torch::Tensor _source,
       const torch::Tensor _mic_array,
       int _num_rays,
-      scalar_t _e_absorption,
-      scalar_t _scattering,
+      const torch::Tensor _e_absorption,
+      const torch::Tensor _scattering,
       scalar_t _mic_radius,
       scalar_t _sound_speed,
       scalar_t _energy_thres,
@@ -29,8 +52,8 @@ class RayTracer {
         mic_array(_mic_array),
         num_rays(_num_rays),
         energy_0(2. / num_rays),
-        e_absorption(_e_absorption),
-        scattering(_scattering),
+        // e_absorption(_e_absorption),
+        // scattering(_scattering),
         mic_radius(_mic_radius),
         mic_radius_sq(mic_radius * mic_radius),
         sound_speed(_sound_speed),
@@ -41,7 +64,22 @@ class RayTracer {
         D(room.size(0)),
         normals(make_normals()),
         origins(make_origins()),
-        EPS(1e-5) {}
+        EPS(1e-5),
+        do_scattering(_scattering.max().template item<scalar_t>() > 0.) {
+
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 2}),
+        _scattering.index({at::indexing::Slice(), 2}))); // South
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 1}),
+        _scattering.index({at::indexing::Slice(), 1}))); // East
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 3}),
+        _scattering.index({at::indexing::Slice(), 3}))); // North
+    walls.push_back(Wall<scalar_t>(
+        _e_absorption.index({at::indexing::Slice(), 0}),
+        _scattering.index({at::indexing::Slice(), 0}))); // West
+  }
 
   void compute_histogram(torch::Tensor& hist) {
     // TODO: Could probably parallelize call over num_rays? We would need
@@ -80,8 +118,8 @@ class RayTracer {
   const torch::Tensor mic_array;
   int num_rays;
   scalar_t energy_0;
-  scalar_t e_absorption;
-  scalar_t scattering;
+  //   const torch::Tensor e_absorption;
+  //   scalar_t scattering;
   scalar_t mic_radius;
   double mic_radius_sq;
   scalar_t sound_speed;
@@ -93,6 +131,8 @@ class RayTracer {
   const torch::Tensor normals; // normal vector to walls
   const torch::Tensor origins; // origin (arbitrary reference) of each wall
   const scalar_t EPS;
+  std::vector<Wall<scalar_t>> walls;
+  const bool do_scattering;
 
   std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
       torch::Tensor start,
@@ -161,12 +201,25 @@ class RayTracer {
 
   void log_hist(
       torch::Tensor& histograms,
-      int k,
-      scalar_t energy,
+      int mic_idx,
+      torch::Tensor energy,
       scalar_t travel_dist_at_mic) {
     auto time_at_mic = travel_dist_at_mic / sound_speed;
-    auto bin = floor(time_at_mic / hist_bin_size);
-    histograms[k][bin] += energy;
+    auto bin = (int)floor(time_at_mic / hist_bin_size);
+    // histograms[mic_idx][0][bin] += energy.item<scalar_t>();
+    auto curr_value = histograms.index({mic_idx, at::indexing::Slice(), bin});
+
+    // std::cout << "logging2 " << energy.template item<scalar_t>() << " "
+    //   << mic_idx << std::endl;
+    // std::cout << "curr_value" << std::endl;
+    // std::cout << curr_value.sizes() << std::endl;
+    // std::cout << curr_value << std::endl;
+
+    // std::cout << "energy" << std::endl;
+    // std::cout << energy.sizes() << std::endl;
+    // std::cout << energy << std::endl;
+    histograms.index_put_(
+        {mic_idx, at::indexing::Slice(), bin}, curr_value + energy);
   }
 
   void simul_ray(
@@ -190,9 +243,9 @@ class RayTracer {
 
     int next_wall_index;
 
-    // TODO: handle n_bands
-    auto transmitted = energy_0;
-    auto energy = 1.;
+    auto num_bands = histograms.size(1);
+    auto transmitted = torch::ones({num_bands}) * energy_0;
+    auto energy = torch::ones({num_bands});
     auto travel_dist = 0.;
 
     // To count the number of times the ray bounces on the walls
@@ -216,14 +269,19 @@ class RayTracer {
       if (next_wall_index == -1)
         break;
 
+      auto wall = walls[next_wall_index];
+
       // Check if the specular ray hits any of the microphone
       if (!(IS_HYBRID_SIM && specular_counter < ISM_ORDER)) {
         // Compute the distance between the line defined by (start, hit_point)
         // and the center of the microphone (mic_pos)
 
-        for (auto k = 0; k < mic_array.size(0); k++) {
-          torch::Tensor to_mic = mic_array[k] - start;
+        for (auto mic_idx = 0; mic_idx < mic_array.size(0); mic_idx++) {
+          torch::Tensor to_mic = mic_array[mic_idx] - start;
           auto impact_distance = to_mic.dot(dir).item<scalar_t>();
+
+          //   std::cout << "logging2 dist " << impact_distance << " " <<
+          //   mic_idx << std::endl;
 
           bool impacts = (-EPS < impact_distance) &&
               (impact_distance < hit_distance + EPS);
@@ -247,20 +305,20 @@ class RayTracer {
                 (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
             energy = transmitted / (r_sq * p_hit);
 
-            log_hist(histograms, k, energy, travel_dist_at_mic);
+            log_hist(histograms, mic_idx, energy, travel_dist_at_mic);
           }
         }
       }
 
       // Update the characteristics
       travel_dist += hit_distance;
-      transmitted *= (1. - e_absorption);
+      transmitted *= wall.get_reflection();
 
       auto normal = normals[next_wall_index];
       auto origin = origins[next_wall_index];
 
       // Let's shoot the scattered ray induced by the rebound on the wall
-      if (scattering > 0) {
+      if (do_scattering) {
         scat_ray(
             histograms,
             transmitted,
@@ -268,12 +326,14 @@ class RayTracer {
             origin,
             start,
             hit_point,
-            travel_dist);
-        transmitted *= (1. - scattering);
+            travel_dist,
+            wall.get_scattering());
+        transmitted *= (1. - wall.get_scattering());
       }
 
       // Check if we reach the thresholds for this ray
-      if (travel_dist > distance_thres || transmitted < e_thres) {
+      if (travel_dist > distance_thres ||
+          transmitted.max().template item<scalar_t>() < e_thres) {
         break;
       }
 
@@ -287,16 +347,17 @@ class RayTracer {
 
   void scat_ray(
       torch::Tensor& histograms,
-      scalar_t transmitted,
+      torch::Tensor transmitted,
       torch::Tensor normal,
       torch::Tensor origin,
       torch::Tensor prev_hit_point,
       torch::Tensor hit_point,
-      scalar_t travel_dist) {
+      scalar_t travel_dist,
+      torch::Tensor scattering) {
     auto distance_thres = time_thres * sound_speed;
 
-    for (auto k = 0; k < mic_array.size(0); k++) {
-      auto mic_pos = mic_array[k];
+    for (auto mic_idx = 0; mic_idx < mic_array.size(0); mic_idx++) {
+      auto mic_pos = mic_array[mic_idx];
       if (side(normal, origin, mic_pos) !=
           side(normal, origin, prev_hit_point)) {
         continue;
@@ -318,12 +379,13 @@ class RayTracer {
       auto p_lambert = 2 * std::abs(cosine);
       auto scat_trans = scattering * transmitted * p_hit_equal * p_lambert;
 
-      if (travel_dist_at_mic < distance_thres && scat_trans > energy_thres) {
+      if (travel_dist_at_mic < distance_thres &&
+          scat_trans.max().template item<scalar_t>() > energy_thres) {
         double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
         auto p_hit =
             (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
         auto energy = scat_trans / (r_sq * p_hit);
-        log_hist(histograms, k, energy, travel_dist_at_mic);
+        log_hist(histograms, mic_idx, energy, travel_dist_at_mic);
       }
     }
   }
@@ -401,8 +463,8 @@ torch::Tensor ray_tracing(
     const torch::Tensor source,
     const torch::Tensor mic_array,
     int64_t num_rays,
-    double e_absorption,
-    double scattering,
+    const torch::Tensor e_absorption,
+    const torch::Tensor scattering,
     double mic_radius,
     double sound_speed,
     double energy_thres,
@@ -410,10 +472,14 @@ torch::Tensor ray_tracing(
     double hist_bin_size) {
   // TODO: Maybe hist_size should also be bounded from output of ISM, and from
   // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html?
-  auto hist_size = (int)ceil(time_thres / hist_bin_size);
+  auto num_mics = mic_array.size(0);
+  auto num_bands = e_absorption.size(0);
+  auto num_bins = (int)ceil(time_thres / hist_bin_size);
   auto histograms =
-      torch::zeros({mic_array.size(0), hist_size}, room.options());
+      torch::zeros({num_mics, num_bands, num_bins}, room.options());
   //   hist.requires_grad_(true); // TODO is this needed?
+  std::cout << "histograms" << std::endl;
+  std::cout << histograms.sizes() << std::endl;
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(
@@ -435,7 +501,7 @@ torch::Tensor ray_tracing(
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, float e_absorption, float scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
+      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, Tensor e_absorption, Tensor scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
       &torchaudio::rir::ray_tracing);
 }
 

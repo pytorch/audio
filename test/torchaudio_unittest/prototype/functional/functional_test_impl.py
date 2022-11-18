@@ -120,7 +120,7 @@ class FunctionalTestImpl(TestBaseMixin):
     @parameterized.expand(
         [
             ([20, 25], [2, 2], [[8, 8], [7, 6]], 10_000),  # 2D with 2 mics
-            ([20, 25, 30], [1, 10, 5], [8, 8, 22], 1_000),  # 3D with 1 mic
+            ([20, 25, 30], [1, 10, 5], [[8, 8, 22]], 1_000),  # 3D with 1 mic
         ]
     )
     def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
@@ -142,7 +142,7 @@ class FunctionalTestImpl(TestBaseMixin):
             materials=pra.Material(energy_absorption=e_absorption, scattering=scattering),
             air_absorption=False,
         )
-        room.add_microphone(mic_array.tolist())
+        room.add_microphone_array(mic_array.T.tolist())
         room.add_source(source.tolist())
         room.set_ray_tracing(
             n_rays=num_rays,
@@ -155,7 +155,7 @@ class FunctionalTestImpl(TestBaseMixin):
         room.is_hybrid_sim = False
 
         room.compute_rir()
-        hist_pra = torch.tensor(room.rt_histograms)[:, 0, 0, 0, :]  # shape = (num_mics, hist_size)
+        hist_pra = torch.tensor(room.rt_histograms)[:, 0, 0]
 
         hist = F.ray_tracing(
             room=room_dim,
@@ -171,10 +171,8 @@ class FunctionalTestImpl(TestBaseMixin):
             hist_bin_size=hist_bin_size,
         )
 
-        if hist.dim() == 2:
-            assert hist.shape[0] == mic_array.shape[0]  # one histogram per mic
-        else:
-            assert hist.dim() == 1
+        assert hist.ndim == 3
+        assert hist.shape == hist_pra.shape
 
         # Most histogram entries are very very close, but very few of them can
         # be slightly off. We thus assert that less than 1% entry are off by
@@ -182,7 +180,8 @@ class FunctionalTestImpl(TestBaseMixin):
         percent = 1 / 100
         atol = 1e-4
         diff = abs(hist_pra - hist.to(torch.float32))
-        assert ((diff > atol).float().mean(axis=1) < percent).all()
+        bin_axis = -1
+        assert ((diff > atol).float().mean(axis=bin_axis) < percent).all()
 
     @nested_params(
         [(2, 3), (2, 3, 5), (2, 3, 5, 7)],
