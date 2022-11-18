@@ -79,20 +79,23 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     return negs, neg_idxs
 
 
-class _NegativeSampler(Module):
-    r"""Compute negative sampling.
+class NegativeSampler(Module):
+    r"""Applies preprocessing to input and then computes negative sampling.
 
     Args:
-        num_negatives (int): Number of sampled negatives
-        cross_sample_negatives (int): Number of cross sampled negatives
+        preprocessor (nn.Module): Transforms input tensor prior to negative sampling.
+        num_negatives (int): Number of sampled negatives.
+        cross_sample_negatives (int): Number of cross sampled negatives.
     """
 
     def __init__(
         self,
+        preprocessor: Module,
         num_negatives: int,
         cross_sample_negatives: int,
     ):
         super().__init__()
+        self.preprocessor = preprocessor
         self.num_negatives = num_negatives
         self.cross_sample_negatives = cross_sample_negatives
 
@@ -113,6 +116,7 @@ class _NegativeSampler(Module):
                 If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing
                 valid length in time axis is returns.
         """
+        input = self.preprocessor(input)
         negs, neg_idxs = _sample_negatives(input, self.num_negatives, self.cross_sample_negatives)
         return negs, neg_idxs, lengths
 
@@ -263,8 +267,6 @@ class ConformerWav2Vec2PretrainModel(Module):
             Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.
         mask_generator (nn.Module):
             Mask generator that generates the mask for masked prediction during training.
-        intermediate (nn.Module):
-            Intermediate transformation after masking, prior to performing negative sampling.
         negative_sampler (nn.Module):
             Negative sampler to apply after masking.
 
@@ -274,13 +276,11 @@ class ConformerWav2Vec2PretrainModel(Module):
         self,
         wav2vec2: Wav2Vec2Model,
         mask_generator: Module,
-        intermediate: Module,
         negative_sampler: Module,
     ):
         super().__init__()
         self.wav2vec2 = wav2vec2
         self.mask_generator = mask_generator
-        self.intermediate = intermediate
         self.negative_sampler = negative_sampler
 
     def forward(
@@ -319,8 +319,7 @@ class ConformerWav2Vec2PretrainModel(Module):
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
         x, _ = self.mask_generator(x, padding_mask)
 
-        temp = self.intermediate(x)
-        negs, neg_idxs, _ = self.negative_sampler(temp, lengths)
+        negs, neg_idxs, _ = self.negative_sampler(x, lengths)
 
         x = self.wav2vec2.encoder.feature_projection.projection(x)
         x = x.transpose(0, 1)
@@ -407,6 +406,29 @@ def _get_conformer_encoder(
         conformer_layers.append(layer)
 
     return ConformerEncoder(feature_projection, ModuleList(conformer_layers))
+
+
+def _get_conformer_negativer_sampler(
+    input_dim: int,
+    output_dim: int,
+    num_negatives: int,
+    cross_sample_negatives: int,
+) -> NegativeSampler:
+    """Build custom NegativeSampler module, including linear layer and negative sampling.
+
+    Args:
+        input_dim (int): Dimension of input after feature extraction.
+        output_dim (int): Dimension of embedding for use in negative sampling. Same as the
+            embedding in the feature projection.
+        num_negatives (int): Number of negatives to sample.
+        cross_sample_negatives (int): Number of cross sampled negatives.
+
+    Returns:
+        NegativeSampler:
+            The resulting negative sampler module.
+    """
+    preprocessor = nn.Linear(input_dim, output_dim)
+    return NegativeSampler(preprocessor, num_negatives, cross_sample_negatives)
 
 
 def conformer_wav2vec2_model(
@@ -630,12 +652,9 @@ def conformer_wav2vec2_pretrain_model(
         mask_channel_min_space,
     )
 
-    intermediate_layer = nn.Linear(
+    negative_sampler = _get_conformer_negativer_sampler(
         extractor_output_dim,
         encoder_embed_dim,
-    )
-
-    negative_sampler = _NegativeSampler(
         num_negatives,
         cross_sample_negatives,
     )
@@ -643,7 +662,6 @@ def conformer_wav2vec2_pretrain_model(
     return ConformerWav2Vec2PretrainModel(
         wav2vec2=wav2vec2,
         mask_generator=mask_generator,
-        intermediate=intermediate_layer,
         negative_sampler=negative_sampler,
     )
 
