@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.14.0.dev20221118) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.14.0.dev20221119) &#x25BC</a>
     </div>
     
 
@@ -423,8 +423,8 @@ into PyTorch’s Tensor object, and save Tensor objects to audio files.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.14.0.dev20221118
-0.14.0.dev20221118
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.14.0.dev20221119
+0.14.0.dev20221119
 </pre></div>
 </div>
 <section id="preparation">
@@ -457,10 +457,10 @@ with the following:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/7.99k [00:00&lt;?, ?B/s]
-100%|##########| 7.99k/7.99k [00:00&lt;00:00, 4.46MB/s]
+100%|##########| 7.99k/7.99k [00:00&lt;00:00, 6.18MB/s]
 
   0%|          | 0.00/53.2k [00:00&lt;?, ?B/s]
-100%|##########| 53.2k/53.2k [00:00&lt;00:00, 25.2MB/s]
+100%|##########| 53.2k/53.2k [00:00&lt;00:00, 35.7MB/s]
 </pre></div>
 </div>
 </section>
@@ -631,7 +631,7 @@ The following examples illustrate this.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_io_tutorial_004.png" srcset="../_images/sphx_glr_audio_io_tutorial_004.png" alt="TAR file" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/110k [00:00&lt;?, ?B/s]
-100%|##########| 110k/110k [00:00&lt;00:00, 31.5MB/s]
+100%|##########| 110k/110k [00:00&lt;00:00, 17.9MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load audio from S3</span>
@@ -730,7 +730,7 @@ the provided data fit</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmpg1yqerp3/save_example_default.wav
+Source: /tmp/tmpsknd_aqj/save_example_default.wav
 ----------
  - File size: 217658 bytes
  - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=32, encoding=PCM_F)
@@ -745,7 +745,7 @@ The resulting file occupies half the storage but loses precision</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmpcgp3c90u/save_example_PCM_S16.wav
+Source: /tmp/tmpsyaqewsq/save_example_PCM_S16.wav
 ----------
  - File size: 108844 bytes
  - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -772,37 +772,37 @@ To name a few:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmpuldq2shy/save_example.flac
+Source: /tmp/tmp_5uu5nk_/save_example.flac
 ----------
  - File size: 37141 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=24, encoding=FLAC)
 
 ----------
-Source: /tmp/tmpuldq2shy/save_example.vorbis
+Source: /tmp/tmp_5uu5nk_/save_example.vorbis
 ----------
  - File size: 12588 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=VORBIS)
 
 ----------
-Source: /tmp/tmpuldq2shy/save_example.sph
+Source: /tmp/tmp_5uu5nk_/save_example.sph
 ----------
  - File size: 109824 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_S)
 
 ----------
-Source: /tmp/tmpuldq2shy/save_example.amb
+Source: /tmp/tmp_5uu5nk_/save_example.amb
 ----------
  - File size: 108858 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_F)
 
 ----------
-Source: /tmp/tmpuldq2shy/save_example.amr-nb
+Source: /tmp/tmp_5uu5nk_/save_example.amr-nb
 ----------
  - File size: 2008 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=AMR_NB)
 
 ----------
-Source: /tmp/tmpuldq2shy/save_example.gsm
+Source: /tmp/tmp_5uu5nk_/save_example.gsm
 ----------
  - File size: 5610 bytes
  - AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
@@ -827,7 +827,7 @@ required.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;RIFF2R\x03\x00WAVEfmt &#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.928 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.933 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-io-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a50b7a9d7eda039b9579621100be1417/audio_io_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_io_tutorial.py</span></code></a></p>

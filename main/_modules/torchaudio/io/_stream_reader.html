@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221118) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221119) &#x25BC</a>
     </div>
     
 
@@ -632,9 +632,9 @@
 <span class="n">_hw_accel</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Enable hardware acceleration.</span>
 
 <span class="s2">                When video is decoded on CUDA hardware, for example</span>
-<span class="s2">                `decode=&quot;h264_cuvid&quot;`, passing CUDA device indicator to `hw_accel`</span>
-<span class="s2">                (i.e. `hw_accel=&quot;cuda:0&quot;`) will place the resulting frames</span>
-<span class="s2">                directly on the specifiec CUDA device.</span>
+<span class="s2">                `decoder=&quot;h264_cuvid&quot;`, passing CUDA device indicator to `hw_accel`</span>
+<span class="s2">                (i.e. `hw_accel=&quot;cuda:0&quot;`) will make StreamReader place the resulting</span>
+<span class="s2">                frames directly on the specified CUDA device as CUDA tensor.</span>
 
 <span class="s2">                If `None`, the frame will be moved to CPU memory.</span>
 <span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
@@ -706,12 +706,16 @@
 <span class="sd">               This option roughly corresponds to ``-f`` option of ``ffmpeg`` command.</span>
 <span class="sd">               Please refer to the ffmpeg documentations for the possible values.</span>
 
-<span class="sd">               https://ffmpeg.org/ffmpeg-formats.html</span>
+<span class="sd">               https://ffmpeg.org/ffmpeg-formats.html#Demuxers</span>
+
+<span class="sd">               Use `ffmpeg -demuxers` to list the values available in the current environment.</span>
 
 <span class="sd">               For device access, the available values vary based on hardware (AV device) and</span>
 <span class="sd">               software configuration (ffmpeg build).</span>
 
-<span class="sd">               https://ffmpeg.org/ffmpeg-devices.html</span>
+<span class="sd">               https://ffmpeg.org/ffmpeg-devices.html#Input-Devices</span>
+
+<span class="sd">               Use `ffmpeg -devices` to list the values available in the current environment.</span>
 
 <span class="sd">        option (dict of str to str, optional):</span>
 <span class="sd">            Custom option passed when initializing format context (opening source).</span>

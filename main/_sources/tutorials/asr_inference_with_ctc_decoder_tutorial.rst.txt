@@ -86,8 +86,8 @@ working with
 
  .. code-block:: none
 
-    1.14.0.dev20221118
-    0.14.0.dev20221118
+    1.14.0.dev20221119
+    0.14.0.dev20221119
 
 
 
@@ -141,7 +141,7 @@ tutorial <./speech_recognition_pipeline_tutorial.html>`__.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ll10m.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ll10m.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      9%|8         | 30.9M/360M [00:00<00:01, 323MB/s]     19%|#9        | 69.6M/360M [00:00<00:00, 372MB/s]     31%|###1      | 113M/360M [00:00<00:00, 408MB/s]      43%|####3     | 155M/360M [00:00<00:00, 423MB/s]     55%|#####4    | 197M/360M [00:00<00:00, 430MB/s]     67%|######6   | 241M/360M [00:00<00:00, 438MB/s]     79%|#######8  | 283M/360M [00:00<00:00, 439MB/s]     90%|######### | 325M/360M [00:00<00:00, 438MB/s]    100%|##########| 360M/360M [00:00<00:00, 426MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]     11%|#1        | 40.5M/360M [00:00<00:00, 425MB/s]     22%|##2       | 81.0M/360M [00:00<00:00, 408MB/s]     34%|###4      | 123M/360M [00:00<00:00, 425MB/s]      46%|####6     | 166M/360M [00:00<00:00, 433MB/s]     58%|#####7    | 209M/360M [00:00<00:00, 439MB/s]     70%|######9   | 251M/360M [00:00<00:00, 420MB/s]     81%|########  | 291M/360M [00:00<00:00, 420MB/s]     92%|#########2| 332M/360M [00:00<00:00, 423MB/s]    100%|##########| 360M/360M [00:00<00:00, 425MB/s]
 
 
 
@@ -169,7 +169,7 @@ We will load a sample from the LibriSpeech test-other dataset.
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 47.3MB/s]
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 60.1MB/s]
 
 
 .. raw:: html
@@ -411,9 +411,9 @@ model can be large
 
  .. code-block:: none
 
-      0%|          | 0.00/4.97M [00:00<?, ?B/s]     85%|########5 | 4.23M/4.97M [00:00<00:00, 43.9MB/s]    100%|##########| 4.97M/4.97M [00:00<00:00, 48.7MB/s]
-      0%|          | 0.00/57.0 [00:00<?, ?B/s]    100%|##########| 57.0/57.0 [00:00<00:00, 60.8kB/s]
-      0%|          | 0.00/2.91G [00:00<?, ?B/s]      1%|1         | 39.5M/2.91G [00:00<00:07, 414MB/s]      3%|2         | 79.0M/2.91G [00:00<00:07, 403MB/s]      4%|3         | 118M/2.91G [00:00<00:07, 407MB/s]       5%|5         | 157M/2.91G [00:00<00:09, 326MB/s]      7%|6         | 195M/2.91G [00:00<00:08, 347MB/s]      8%|7         | 234M/2.91G [00:00<00:07, 368MB/s]      9%|9         | 279M/2.91G [00:00<00:07, 397MB/s]     11%|#         | 317M/2.91G [00:00<00:07, 390MB/s]     12%|#1        | 355M/2.91G [00:01<00:27, 99.8MB/s]     13%|#2        | 383M/2.91G [00:02<00:25, 108MB/s]      14%|#4        | 425M/2.91G [00:02<00:18, 146MB/s]     16%|#5        | 468M/2.91G [00:02<00:14, 188MB/s]     17%|#7        | 511M/2.91G [00:02<00:11, 231MB/s]     19%|#8        | 554M/2.91G [00:02<00:09, 273MB/s]     20%|#9        | 592M/2.91G [00:02<00:08, 296MB/s]     21%|##1       | 634M/2.91G [00:02<00:07, 328MB/s]     23%|##2       | 676M/2.91G [00:02<00:06, 358MB/s]     24%|##4       | 720M/2.91G [00:02<00:06, 383MB/s]     26%|##5       | 763M/2.91G [00:03<00:05, 403MB/s]     27%|##7       | 806M/2.91G [00:03<00:05, 417MB/s]     29%|##8       | 850M/2.91G [00:03<00:05, 430MB/s]     30%|###       | 894M/2.91G [00:03<00:04, 439MB/s]     31%|###1      | 938M/2.91G [00:03<00:05, 428MB/s]     33%|###2      | 982M/2.91G [00:03<00:04, 439MB/s]     34%|###4      | 1.00G/2.91G [00:03<00:04, 446MB/s]     36%|###5      | 1.04G/2.91G [00:03<00:04, 445MB/s]     37%|###7      | 1.09G/2.91G [00:03<00:04, 450MB/s]     39%|###8      | 1.13G/2.91G [00:03<00:04, 444MB/s]     40%|####      | 1.17G/2.91G [00:04<00:04, 445MB/s]     42%|####1     | 1.21G/2.91G [00:04<00:04, 441MB/s]     43%|####3     | 1.25G/2.91G [00:04<00:04, 426MB/s]     44%|####4     | 1.29G/2.91G [00:04<00:04, 430MB/s]     46%|####5     | 1.34G/2.91G [00:04<00:03, 435MB/s]     47%|####7     | 1.38G/2.91G [00:04<00:03, 437MB/s]     49%|####8     | 1.42G/2.91G [00:04<00:03, 429MB/s]     50%|#####     | 1.46G/2.91G [00:04<00:03, 400MB/s]     51%|#####1    | 1.50G/2.91G [00:04<00:03, 402MB/s]     53%|#####2    | 1.54G/2.91G [00:05<00:03, 415MB/s]     54%|#####4    | 1.58G/2.91G [00:05<00:03, 420MB/s]     56%|#####5    | 1.62G/2.91G [00:05<00:03, 430MB/s]     57%|#####7    | 1.66G/2.91G [00:05<00:03, 431MB/s]     58%|#####8    | 1.70G/2.91G [00:05<00:03, 406MB/s]     60%|#####9    | 1.74G/2.91G [00:05<00:03, 396MB/s]     61%|######1   | 1.78G/2.91G [00:05<00:02, 407MB/s]     63%|######2   | 1.82G/2.91G [00:05<00:02, 412MB/s]     64%|######3   | 1.86G/2.91G [00:05<00:02, 419MB/s]     65%|######5   | 1.90G/2.91G [00:05<00:02, 430MB/s]     67%|######6   | 1.94G/2.91G [00:06<00:02, 435MB/s]     68%|######8   | 1.99G/2.91G [00:06<00:02, 437MB/s]     70%|######9   | 2.03G/2.91G [00:06<00:02, 442MB/s]     71%|#######1  | 2.07G/2.91G [00:06<00:02, 443MB/s]     73%|#######2  | 2.11G/2.91G [00:06<00:01, 446MB/s]     74%|#######3  | 2.15G/2.91G [00:06<00:02, 398MB/s]     75%|#######5  | 2.19G/2.91G [00:06<00:02, 369MB/s]     76%|#######6  | 2.23G/2.91G [00:06<00:01, 369MB/s]     78%|#######7  | 2.27G/2.91G [00:06<00:01, 392MB/s]     79%|#######9  | 2.31G/2.91G [00:07<00:01, 407MB/s]     81%|########  | 2.35G/2.91G [00:07<00:01, 410MB/s]     82%|########2 | 2.39G/2.91G [00:07<00:01, 421MB/s]     84%|########3 | 2.43G/2.91G [00:07<00:01, 428MB/s]     85%|########4 | 2.47G/2.91G [00:07<00:01, 429MB/s]     86%|########6 | 2.51G/2.91G [00:07<00:00, 435MB/s]     88%|########7 | 2.55G/2.91G [00:07<00:00, 430MB/s]     89%|########9 | 2.60G/2.91G [00:07<00:00, 436MB/s]     91%|######### | 2.64G/2.91G [00:07<00:00, 438MB/s]     92%|#########2| 2.68G/2.91G [00:07<00:00, 441MB/s]     94%|#########3| 2.72G/2.91G [00:08<00:00, 447MB/s]     95%|#########4| 2.76G/2.91G [00:08<00:00, 445MB/s]     96%|#########6| 2.81G/2.91G [00:08<00:00, 449MB/s]     98%|#########7| 2.85G/2.91G [00:08<00:00, 447MB/s]     99%|#########9| 2.89G/2.91G [00:08<00:00, 438MB/s]    100%|##########| 2.91G/2.91G [00:08<00:00, 367MB/s]
+      0%|          | 0.00/4.97M [00:00<?, ?B/s]    100%|##########| 4.97M/4.97M [00:00<00:00, 289MB/s]
+      0%|          | 0.00/57.0 [00:00<?, ?B/s]    100%|##########| 57.0/57.0 [00:00<00:00, 60.6kB/s]
+      0%|          | 0.00/2.91G [00:00<?, ?B/s]      1%|1         | 30.3M/2.91G [00:00<00:09, 317MB/s]      2%|2         | 70.1M/2.91G [00:00<00:08, 377MB/s]      4%|3         | 112M/2.91G [00:00<00:07, 406MB/s]       5%|5         | 154M/2.91G [00:00<00:07, 420MB/s]      7%|6         | 196M/2.91G [00:00<00:06, 425MB/s]      8%|7         | 238M/2.91G [00:00<00:06, 430MB/s]      9%|9         | 279M/2.91G [00:00<00:06, 416MB/s]     11%|#         | 321M/2.91G [00:00<00:06, 424MB/s]     12%|#2        | 363M/2.91G [00:00<00:06, 429MB/s]     14%|#3        | 404M/2.91G [00:01<00:06, 432MB/s]     15%|#4        | 446M/2.91G [00:01<00:06, 422MB/s]     16%|#6        | 487M/2.91G [00:01<00:06, 426MB/s]     18%|#7        | 530M/2.91G [00:01<00:05, 432MB/s]     19%|#9        | 571M/2.91G [00:01<00:05, 433MB/s]     21%|##        | 613M/2.91G [00:01<00:05, 436MB/s]     22%|##1       | 655M/2.91G [00:01<00:05, 437MB/s]     23%|##3       | 697M/2.91G [00:01<00:05, 438MB/s]     25%|##4       | 739M/2.91G [00:01<00:05, 439MB/s]     26%|##6       | 781M/2.91G [00:01<00:05, 437MB/s]     28%|##7       | 823M/2.91G [00:02<00:05, 436MB/s]     29%|##9       | 865M/2.91G [00:02<00:05, 438MB/s]     30%|###       | 907M/2.91G [00:02<00:04, 438MB/s]     32%|###1      | 949M/2.91G [00:02<00:04, 438MB/s]     33%|###3      | 992M/2.91G [00:02<00:04, 440MB/s]     35%|###4      | 1.01G/2.91G [00:02<00:04, 442MB/s]     36%|###6      | 1.05G/2.91G [00:02<00:04, 441MB/s]     38%|###7      | 1.09G/2.91G [00:02<00:04, 441MB/s]     39%|###8      | 1.13G/2.91G [00:02<00:04, 438MB/s]     40%|####      | 1.17G/2.91G [00:02<00:04, 425MB/s]     42%|####1     | 1.21G/2.91G [00:03<00:04, 429MB/s]     43%|####3     | 1.26G/2.91G [00:03<00:04, 430MB/s]     45%|####4     | 1.30G/2.91G [00:03<00:04, 432MB/s]     46%|####5     | 1.34G/2.91G [00:03<00:03, 434MB/s]     47%|####7     | 1.38G/2.91G [00:03<00:03, 435MB/s]     49%|####8     | 1.42G/2.91G [00:03<00:03, 437MB/s]     50%|#####     | 1.46G/2.91G [00:03<00:03, 437MB/s]     52%|#####1    | 1.50G/2.91G [00:03<00:03, 437MB/s]     53%|#####2    | 1.54G/2.91G [00:03<00:03, 436MB/s]     54%|#####4    | 1.58G/2.91G [00:03<00:03, 436MB/s]     56%|#####5    | 1.62G/2.91G [00:04<00:03, 436MB/s]     57%|#####7    | 1.66G/2.91G [00:04<00:03, 437MB/s]     59%|#####8    | 1.70G/2.91G [00:04<00:03, 425MB/s]     60%|#####9    | 1.74G/2.91G [00:04<00:02, 429MB/s]     61%|######1   | 1.78G/2.91G [00:04<00:02, 425MB/s]     63%|######2   | 1.83G/2.91G [00:04<00:02, 429MB/s]     64%|######4   | 1.87G/2.91G [00:04<00:02, 434MB/s]     66%|######5   | 1.91G/2.91G [00:04<00:02, 437MB/s]     67%|######6   | 1.95G/2.91G [00:04<00:02, 438MB/s]     68%|######8   | 1.99G/2.91G [00:04<00:02, 438MB/s]     70%|######9   | 2.03G/2.91G [00:05<00:02, 438MB/s]     71%|#######1  | 2.07G/2.91G [00:05<00:02, 438MB/s]     73%|#######2  | 2.11G/2.91G [00:05<00:01, 438MB/s]     74%|#######3  | 2.15G/2.91G [00:05<00:01, 437MB/s]     75%|#######5  | 2.19G/2.91G [00:05<00:01, 437MB/s]     77%|#######6  | 2.23G/2.91G [00:05<00:01, 436MB/s]     78%|#######8  | 2.27G/2.91G [00:05<00:01, 434MB/s]     80%|#######9  | 2.32G/2.91G [00:05<00:01, 432MB/s]     81%|########  | 2.36G/2.91G [00:05<00:01, 430MB/s]     82%|########2 | 2.40G/2.91G [00:05<00:01, 428MB/s]     84%|########3 | 2.44G/2.91G [00:06<00:01, 420MB/s]     85%|########5 | 2.48G/2.91G [00:06<00:01, 424MB/s]     86%|########6 | 2.52G/2.91G [00:06<00:00, 425MB/s]     88%|########7 | 2.55G/2.91G [00:06<00:00, 415MB/s]     89%|########9 | 2.59G/2.91G [00:06<00:00, 414MB/s]     90%|######### | 2.63G/2.91G [00:06<00:00, 417MB/s]     92%|#########1| 2.67G/2.91G [00:06<00:00, 421MB/s]     93%|#########3| 2.71G/2.91G [00:06<00:00, 421MB/s]     95%|#########4| 2.75G/2.91G [00:06<00:00, 424MB/s]     96%|#########5| 2.79G/2.91G [00:06<00:00, 426MB/s]     97%|#########7| 2.83G/2.91G [00:07<00:00, 427MB/s]     99%|#########8| 2.87G/2.91G [00:07<00:00, 413MB/s]    100%|##########| 2.91G/2.91G [00:07<00:00, 429MB/s]
     PretrainedFiles(lexicon='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lexicon.txt', tokens='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/tokens.txt', lm='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lm.bin')
 
 
@@ -843,10 +843,10 @@ computation time.
 
  .. code-block:: none
 
-    beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.1572 secs)
-    beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0557 secs)
-    beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2317 secs)
-    beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.6613 secs)
+    beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0484 secs)
+    beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0568 secs)
+    beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2382 secs)
+    beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.6471 secs)
 
 
 
@@ -891,10 +891,10 @@ hypotheses at the cost of computation.
 
  .. code-block:: none
 
-    beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.2596 secs)
-    beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.2106 secs)
-    beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.2539 secs)
-    beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2973 secs)
+    beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.2641 secs)
+    beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.2137 secs)
+    beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.2321 secs)
+    beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2851 secs)
 
 
 
@@ -940,10 +940,10 @@ threshold such that plausible hypotheses are not pruned.
 
  .. code-block:: none
 
-    beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0531 secs)
-    beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0734 secs)
-    beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2694 secs)
-    beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2912 secs)
+    beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0401 secs)
+    beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0782 secs)
+    beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2345 secs)
+    beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2869 secs)
 
 
 
@@ -987,9 +987,9 @@ give more weight to the acoustic model score instead.
 
  .. code-block:: none
 
-    lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.3254 secs)
-    lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.3012 secs)
-    lm weight 15 : was there in his was at some of what he said (score: 2918.98; 0.3190 secs)
+    lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.2972 secs)
+    lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2880 secs)
+    lm weight 15 : was there in his was at some of what he said (score: 2918.98; 0.2897 secs)
 
 
 
@@ -1010,7 +1010,7 @@ Additional parameters that can be optimized include the following
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  12.244 seconds)
+   **Total running time of the script:** ( 2 minutes  8.019 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_ctc_decoder_tutorial.py:

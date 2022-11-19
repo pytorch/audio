@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (0.14.0.dev20221118) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (0.14.0.dev20221119) &#x25BC</a>
     </div>
     
 
@@ -430,10 +430,12 @@ such as microphone, camera and screen, or a virtual device.</p></li>
 <p class="admonition-title">Note</p>
 <p>This option roughly corresponds to <code class="docutils literal notranslate"><span class="pre">-f</span></code> option of <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> command.
 Please refer to the ffmpeg documentations for the possible values.</p>
-<p><a class="reference external" href="https://ffmpeg.org/ffmpeg-formats.html">https://ffmpeg.org/ffmpeg-formats.html</a></p>
+<p><a class="reference external" href="https://ffmpeg.org/ffmpeg-formats.html#Demuxers">https://ffmpeg.org/ffmpeg-formats.html#Demuxers</a></p>
+<p>Use <cite>ffmpeg -demuxers</cite> to list the values available in the current environment.</p>
 <p>For device access, the available values vary based on hardware (AV device) and
 software configuration (ffmpeg build).</p>
-<p><a class="reference external" href="https://ffmpeg.org/ffmpeg-devices.html">https://ffmpeg.org/ffmpeg-devices.html</a></p>
+<p><a class="reference external" href="https://ffmpeg.org/ffmpeg-devices.html#Input-Devices">https://ffmpeg.org/ffmpeg-devices.html#Input-Devices</a></p>
+<p>Use <cite>ffmpeg -devices</cite> to list the values available in the current environment.</p>
 </div>
 </p></li>
 <li><p><strong>option</strong> (<em>dict of str to str</em><em>, </em><em>optional</em>) – <p>Custom option passed when initializing format context (opening source).</p>
@@ -665,9 +667,9 @@ Mapping from str to str.</p>
 </p></li>
 <li><p><strong>hw_accel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Enable hardware acceleration.</p>
 <p>When video is decoded on CUDA hardware, for example
-<cite>decode=”h264_cuvid”</cite>, passing CUDA device indicator to <cite>hw_accel</cite>
-(i.e. <cite>hw_accel=”cuda:0”</cite>) will place the resulting frames
-directly on the specifiec CUDA device.</p>
+<cite>decoder=”h264_cuvid”</cite>, passing CUDA device indicator to <cite>hw_accel</cite>
+(i.e. <cite>hw_accel=”cuda:0”</cite>) will make StreamReader place the resulting
+frames directly on the specified CUDA device as CUDA tensor.</p>
 <p>If <cite>None</cite>, the frame will be moved to CPU memory.
 Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
@@ -723,9 +725,9 @@ Mapping from str to str.</p>
 </p></li>
 <li><p><strong>hw_accel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Enable hardware acceleration.</p>
 <p>When video is decoded on CUDA hardware, for example
-<cite>decode=”h264_cuvid”</cite>, passing CUDA device indicator to <cite>hw_accel</cite>
-(i.e. <cite>hw_accel=”cuda:0”</cite>) will place the resulting frames
-directly on the specifiec CUDA device.</p>
+<cite>decoder=”h264_cuvid”</cite>, passing CUDA device indicator to <cite>hw_accel</cite>
+(i.e. <cite>hw_accel=”cuda:0”</cite>) will make StreamReader place the resulting
+frames directly on the specified CUDA device as CUDA tensor.</p>
 <p>If <cite>None</cite>, the frame will be moved to CPU memory.
 Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
