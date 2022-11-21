@@ -58,3 +58,10 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         n_barks = 10
         sample_rate = 16000
         self._assert_consistency(F.barkscale_fbanks, (n_stft, f_min, f_max, n_barks, sample_rate, "traunmuller"))
+
+    def test_oscillator_bank(self):
+        num_frames, num_pitches, sample_rate = 8000, 8, 8000
+        freq = torch.rand((num_frames, num_pitches), dtype=self.dtype, device=self.device)
+        amps = torch.ones_like(freq)
+
+        self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum"))

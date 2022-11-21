@@ -71,7 +71,7 @@ def oscillator_bank(
     # We might add angular_cumsum if it turned out to be undesirable.
     pi2 = 2.0 * torch.pi
     freqs = frequencies * pi2 / sample_rate % pi2
-    phases = torch.cumsum(freqs, axis=-2)
+    phases = torch.cumsum(freqs, dim=-2)
 
     waveform = amplitudes * torch.sin(phases)
     if reduction == "sum":
