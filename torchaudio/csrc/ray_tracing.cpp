@@ -13,18 +13,6 @@ namespace {
 template <typename scalar_t>
 class Wall {
  public:
-  torch::Tensor normal;
-  torch::Tensor origin;
-
-  torch::Tensor get_absorption() {
-    return absorption;
-  }
-  torch::Tensor get_reflection() {
-    return reflection;
-  }
-  torch::Tensor get_scattering() {
-    return scattering;
-  }
   Wall(
       torch::Tensor _absorption,
       torch::Tensor _scattering,
@@ -35,6 +23,16 @@ class Wall {
         scattering(_scattering),
         normal(_normal),
         origin(_origin) {}
+
+  torch::Tensor get_absorption() {
+    return absorption;
+  }
+  torch::Tensor get_reflection() {
+    return reflection;
+  }
+  torch::Tensor get_scattering() {
+    return scattering;
+  }
 
   int side(torch::Tensor pos) {
     auto dot = (pos - origin).dot(normal).item<scalar_t>();
@@ -60,6 +58,8 @@ class Wall {
   torch::Tensor absorption;
   torch::Tensor reflection;
   torch::Tensor scattering;
+  torch::Tensor normal;
+  torch::Tensor origin;
 };
 
 template <typename scalar_t>
@@ -92,8 +92,8 @@ class RayTracer {
         hist_bin_size(_hist_bin_size),
         max_dist(room.norm().item<scalar_t>() + 1.),
         D(room.size(0)),
-        walls(make_walls(_e_absorption, _scattering)),
-        do_scattering(_scattering.max().template item<scalar_t>() > 0.) {}
+        do_scattering(_scattering.max().template item<scalar_t>() > 0.),
+        walls(make_walls(_e_absorption, _scattering)) {}
 
   void compute_histograms(torch::Tensor& histograms) {
     // TODO: Could probably parallelize call over num_rays? We would need
@@ -142,8 +142,8 @@ class RayTracer {
   scalar_t hist_bin_size;
   scalar_t max_dist; // Max distance needed to hit a wall = diagonal of room + 1
   int D; // Dimension of the room
-  std::vector<Wall<scalar_t>> walls;
   const bool do_scattering;
+  std::vector<Wall<scalar_t>> walls;
 
   std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
       torch::Tensor start,
@@ -305,7 +305,7 @@ class RayTracer {
       travel_dist += hit_distance;
       transmitted *= wall.get_reflection();
 
-      // Let's shoot the scattered ray induced by the rebound on the wall
+      //   Let's shoot the scattered ray induced by the rebound on the wall
       if (do_scattering) {
         scat_ray(histograms, wall, transmitted, start, hit_point, travel_dist);
         transmitted *= (1. - wall.get_scattering());
@@ -362,61 +362,6 @@ class RayTracer {
         auto energy = scat_trans / (r_sq * p_hit);
         log_hist(histograms, mic_idx, energy, travel_dist_at_mic);
       }
-    }
-  }
-
-  const torch::Tensor make_normals() {
-    if (D == 2) {
-      return torch::tensor(
-          {
-              {0, -1}, // South
-              {1, 0}, // East
-              {0, 1}, // North
-              {-1, 0} // West
-          },
-          room.scalar_type());
-    } else {
-      return torch::tensor(
-          {
-              {-1, 0, 0}, // West
-              {1, 0, 0}, // East
-              {0, -1, 0}, // South
-              {0, 1, 0}, // North
-              {0, 0, -1}, // Floor
-              {0, 0, 1} // Ceiling
-          },
-          room.scalar_type());
-    }
-  }
-
-  const torch::Tensor make_origins() {
-    // Origins are somewhat arbitrary, they just need to be one of the corners
-    // of the plane
-    scalar_t zero = 0;
-    scalar_t W = room[0].template item<scalar_t>();
-    scalar_t L = room[1].template item<scalar_t>();
-
-    if (D == 2) {
-      return torch::tensor(
-          {
-              {zero, zero}, // South
-              {W, zero}, // East
-              {W, L}, // North
-              {zero, L} // West
-          },
-          room.scalar_type());
-    } else {
-      scalar_t H = room[2].template item<scalar_t>();
-      return torch::tensor(
-          {
-              {zero, L, zero}, // West
-              {W, zero, zero}, // East
-              {zero, zero, zero}, // South
-              {W, L, zero}, // North
-              {W, zero, zero}, // Floor
-              {W, zero, H} // Ceil
-          },
-          room.scalar_type());
     }
   }
 

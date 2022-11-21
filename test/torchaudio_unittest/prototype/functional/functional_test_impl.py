@@ -177,8 +177,15 @@ class FunctionalTestImpl(TestBaseMixin):
         ]
     )
     def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
-        e_absorption = 0.2
-        scattering = 0.2
+        walls = ["west", "east", "south", "north"]
+        if len(room_dim) == 3:
+            walls += ["floor", "ceiling"]
+        num_walls = len(walls)
+
+        num_bands = 6  # Note: in ray tracing, we don't need to restrict the number of bands to 7
+
+        e_absorption = torch.rand(num_bands, num_walls, dtype=torch.float32)
+        scattering = torch.rand(num_bands, num_walls, dtype=torch.float32)
         energy_thres = 1e-7
         time_thres = 10
         hist_bin_size = 0.004
@@ -192,7 +199,19 @@ class FunctionalTestImpl(TestBaseMixin):
         room = pra.ShoeBox(
             room_dim.tolist(),
             ray_tracing=True,
-            materials=pra.Material(energy_absorption=e_absorption, scattering=scattering),
+            materials={
+                walls[i]: pra.Material(
+                    energy_absorption={
+                        "coeffs": e_absorption[:, i].reshape(-1).detach().numpy(),
+                        "center_freqs": 125 * 2 ** np.arange(num_bands),
+                    },
+                    scattering={
+                        "coeffs": scattering[:, i].reshape(-1).detach().numpy(),
+                        "center_freqs": 125 * 2 ** np.arange(num_bands),
+                    },
+                )
+                for i in range(num_walls)
+            },
             air_absorption=False,
         )
         room.add_microphone_array(mic_array.T.tolist())
@@ -208,7 +227,7 @@ class FunctionalTestImpl(TestBaseMixin):
         room.is_hybrid_sim = False
 
         room.compute_rir()
-        hist_pra = torch.tensor(room.rt_histograms)[:, 0, 0]
+        hist_pra = torch.tensor(np.array(room.rt_histograms))[:, 0, 0]
 
         hist = F.ray_tracing(
             room=room_dim,
@@ -227,14 +246,11 @@ class FunctionalTestImpl(TestBaseMixin):
         assert hist.ndim == 3
         assert hist.shape == hist_pra.shape
 
-        # Most histogram entries are very very close, but very few of them can
-        # be slightly off. We thus assert that less than 1% entry are off by
-        # more than atol
-        percent = 1 / 100
-        atol = 1e-4
-        diff = abs(hist_pra - hist.to(torch.float32))
-        bin_axis = -1
-        assert ((diff > atol).float().mean(axis=bin_axis) < percent).all()
+        hist = hist.to(torch.float32)
+        atol = 1e-4 if self.dtype == torch.float32 else 1e-2
+        rtol = 1e-3
+        self.assertEqual(hist.sum(), hist_pra.sum(), atol=atol, rtol=rtol)
+        self.assertEqual(hist, hist_pra, atol=atol, rtol=rtol)
 
     @nested_params(
         [(2, 3), (2, 3, 5), (2, 3, 5, 7)],

@@ -69,7 +69,7 @@ def ray_tracing(
         raise ValueError(f"time_thres={time_thres} must be greater than hist_bin_size={hist_bin_size}.")
 
     num_walls = 4 if D == 2 else 6
-    e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", num_walls=num_walls)
+    e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", num_walls=num_walls, D=D)
     scattering = _validate_absorption_scattering(scattering, name="e_absorption", num_walls=num_walls, D=D)
 
     histograms = torch.ops.torchaudio.ray_tracing(
