@@ -1,5 +1,4 @@
 import importlib
-import math
 import os
 import subprocess
 import sys
@@ -104,10 +103,14 @@ class HiFiGANTestImpl(TestBaseMixin):
         inputs = self._get_inputs()
         model = self._get_model()
 
+        total_upsample_rate = 1  # Use loop instead of math.prod for compatibility with Python 3.7
+        for upsample_rate in model_config["upsample_rates"]:
+            total_upsample_rate *= upsample_rate
+
         for _ in range(2):
             out = model(inputs)
             self.assertEqual(
-                (batch_size, 1, math.prod(model_config["upsample_rates"]) * time_length),
+                (batch_size, 1, total_upsample_rate * time_length),
                 out.shape,
             )
 
