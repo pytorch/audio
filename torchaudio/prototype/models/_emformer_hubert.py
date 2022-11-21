@@ -58,15 +58,15 @@ class EmformerEncoder(torch.nn.Module):
             :py:class:`torchaudio.models.Emformer` module that consists of a list of emformer layers.
         output_linear (torch.nn.Module):
             Linear layer after emformer module.
-        layer_norm (torch.nn.Module or None, optional):
-            If ``None``, don't apply layer normalization to the output.
+        layer_norm (torch.nn.Module):
+            Apply layer normalization to the output.
     """
 
     def __init__(
         self,
         emformer: torch.nn.Module,
         output_linear: torch.nn.Module,
-        layer_norm: Optional[torch.nn.Module] = None,
+        layer_norm: torch.nn.Module,
     ):
         super().__init__()
         self.emformer = emformer
@@ -95,8 +95,7 @@ class EmformerEncoder(torch.nn.Module):
         else:
             output, lengths = self.emformer(input, lengths)
         output = self.output_linear(output)
-        if self.layer_norm is not None:
-            output = self.layer_norm(output)
+        output = self.layer_norm(output)
         return output
 
     def extract_features(
@@ -214,7 +213,8 @@ def _get_emformer_encoder(
         tanh_on_mem=tanh_on_mem,
     )
     output_linear = torch.nn.Linear(input_dim, output_dim)
-    return EmformerEncoder(emformer, output_linear)
+    layer_norm = torch.nn.LayerNorm(output_dim)
+    return EmformerEncoder(emformer, output_linear, layer_norm)
 
 
 def emformer_hubert_model(
@@ -235,6 +235,7 @@ def emformer_hubert_model(
     encoder_max_memory_size: int,
     encoder_weight_init_scale_strategy: Optional[str],
     encoder_tanh_on_mem: bool,
+    aux_num_out: Optional[int],
 ) -> Wav2Vec2Model:
     """Build a custom Emformer HuBERT model.
 
@@ -258,6 +259,9 @@ def emformer_hubert_model(
         encoder_weight_init_scale_strategy (str or None): Per-layer weight initialization scaling
             strategy. Must be one of ("depthwise", "constant", ``None``).
         encoder_tanh_on_mem (bool): If ``True``, applies tanh to memory elements.
+        aux_num_out (int or None):
+            When provided, attach an extra linear layer on top of encoder, which can be
+            used for fine-tuning.
 
     Returns:
         Wav2Vec2Model:
@@ -282,13 +286,17 @@ def emformer_hubert_model(
         encoder_weight_init_scale_strategy,
         encoder_tanh_on_mem,
     )
-    return Wav2Vec2Model(feature_extractor, emformer)
+    aux = None
+    if aux_num_out is not None:
+        aux = torch.nn.Linear(in_features=encoder_output_dim, out_features=aux_num_out)
+    return Wav2Vec2Model(feature_extractor, emformer, aux)
 
 
 def emformer_hubert_base(
     extractor_input_dim: int = 80,
     extractor_output_dim: int = 128,
     encoder_dropout: float = 0.1,
+    aux_num_out: Optional[int] = None,
 ) -> Wav2Vec2Model:
     """Build Emformer HuBERT Model with 20 Emformer layers.
 
@@ -296,6 +304,7 @@ def emformer_hubert_base(
         extractor_input_dim (int, optional): The input dimension for feature extractor. (Default: 80)
         extractor_output_dim (int, optional): The output dimension after feature extractor. (Default: 128)
         encoder_dropout (float, optional): Dropout probability in Emformer. (Default: 0.1)
+        aux_num_out (int or None, optional): Output dimension of aux layer for fine-tuning. (Default: ``None``)
 
     Returns:
         Wav2Vec2Model:
@@ -320,4 +329,5 @@ def emformer_hubert_base(
         encoder_max_memory_size=0,
         encoder_weight_init_scale_strategy="depthwise",
         encoder_tanh_on_mem=True,
+        aux_num_out=aux_num_out,
     )
