@@ -302,13 +302,13 @@ class RayTracer {
       }
 
       // Update the characteristics
-      travel_dist += hit_distance;
-      transmitted *= wall.get_reflection();
+      travel_dist = travel_dist + hit_distance;
+      transmitted = transmitted * wall.get_reflection();
 
       //   Let's shoot the scattered ray induced by the rebound on the wall
       if (do_scattering) {
         scat_ray(histograms, wall, transmitted, start, hit_point, travel_dist);
-        transmitted *= (1. - wall.get_scattering());
+        transmitted = transmitted * (1. - wall.get_scattering());
       }
 
       // Check if we reach the thresholds for this ray
@@ -318,7 +318,7 @@ class RayTracer {
       }
 
       // set up for next iteration
-      specular_counter += 1;
+      specular_counter = specular_counter + 1;
       dir = wall.reflect(dir); // reflect w.r.t normal while conserving length
       start = hit_point;
     }
@@ -455,7 +455,7 @@ torch::Tensor ray_tracing(
   auto num_bins = (int)ceil(time_thres / hist_bin_size);
   auto histograms =
       torch::zeros({num_mics, num_bands, num_bins}, room.options());
-  //   hist.requires_grad_(true); // TODO is this needed?
+  //   histograms.requires_grad_(true); // TODO is this needed?
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(

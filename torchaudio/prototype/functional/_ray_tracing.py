@@ -1,9 +1,13 @@
+from numbers import Number
+
 import torch
 import torchaudio
 
 
 def _validate_absorption_scattering(v, name, num_walls, D):
-    if isinstance(v, float):
+    if v is None:
+        v = 0
+    if isinstance(v, Number):
         out = torch.ones(1, num_walls) * v
     elif isinstance(v, torch.Tensor) and v.ndim == 1:
         if v.shape[0] != num_walls:
@@ -70,7 +74,7 @@ def ray_tracing(
 
     num_walls = 4 if D == 2 else 6
     e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", num_walls=num_walls, D=D)
-    scattering = _validate_absorption_scattering(scattering, name="e_absorption", num_walls=num_walls, D=D)
+    scattering = _validate_absorption_scattering(scattering, name="scattering", num_walls=num_walls, D=D)
 
     histograms = torch.ops.torchaudio.ray_tracing(
         room,
