@@ -96,13 +96,15 @@ def ray_tracing(
         mic_array = mic_array[None, :]
     if mic_array.ndim != 2:
         raise ValueError(
-            f"mic_array must be 1D tensor of shape D, or 2D tensor of shape (num_mics, D) where D is 2 or 3. Got shape = {mic_array.shape}."
+            f"mic_array must be 1D tensor of shape D, or 2D tensor of shape (num_mics, D) "
+            f"where D is 2 or 3. Got shape = {mic_array.shape}."
         )
     if room.dtype not in (torch.float32, torch.float64):
         raise ValueError(f"room must be of float32 or float64 dtype, got {room.dtype} instead.")
     if not (D == source.shape[0] == mic_array.shape[1]):
         raise ValueError(
-            f"Room dimension D must match with source and mic_array. Got {D}, {source.shape[0]}, and {mic_array.shape[1]}"
+            "Room dimension D must match with source and mic_array. "
+            f"Got {D}, {source.shape[0]}, and {mic_array.shape[1]}"
         )
     if time_thres < hist_bin_size:
         raise ValueError(f"time_thres={time_thres} must be greater than hist_bin_size={hist_bin_size}.")

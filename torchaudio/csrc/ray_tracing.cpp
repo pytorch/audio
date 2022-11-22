@@ -80,7 +80,6 @@ class Wall {
   torch::Tensor normal; // The normal to the wall: 2D or 3D vector
   torch::Tensor
       origin; // The origin of the wall: corresponds to an arbitrary corner.
-
 };
 
 /**
@@ -478,7 +477,7 @@ class RayTracer {
           origins[i]));
     }
     if (D == 2) {
-      // For consistency with pyroomacoustits we switch the order of the walls
+      // For consistency with pyroomacoustics we switch the order of the walls
       // to South East North West
       std::swap(walls[0], walls[3]);
       std::swap(walls[0], walls[2]);
