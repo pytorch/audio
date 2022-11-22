@@ -13,6 +13,7 @@ namespace {
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
 #define EPS ((scalar_t)(1e-5))
+#define VAL(t) ((t).template item<scalar_t>())
 
 /**
  * Wall helper class. A wall records its own absorption, reflection and
@@ -47,7 +48,7 @@ class Wall {
    * Returns the side (-1, 1 or 0) on which a point lies w.r.t. the wall.
    */
   int side(torch::Tensor pos) {
-    auto dot = (pos - origin).dot(normal).item<scalar_t>();
+    auto dot = VAL((pos - origin).dot(normal));
 
     if (dot > EPS) {
       return 1;
@@ -69,7 +70,7 @@ class Wall {
    * Returns the cosine angle of a ray (dir) with the normal of the wall
    */
   scalar_t cosine(torch::Tensor dir) {
-    return dir.dot(normal).item<scalar_t>() / dir.norm().item<scalar_t>();
+    return VAL(dir.dot(normal) / dir.norm());
   }
 
  private:
@@ -79,6 +80,7 @@ class Wall {
   torch::Tensor normal; // The normal to the wall: 2D or 3D vector
   torch::Tensor
       origin; // The origin of the wall: corresponds to an arbitrary corner.
+
 };
 
 /**
@@ -113,9 +115,9 @@ class RayTracer {
         energy_thres(_energy_thres),
         time_thres(_time_thres),
         hist_bin_size(_hist_bin_size),
-        max_dist(room.norm().item<scalar_t>() + 1.),
+        max_dist(VAL(room.norm()) + 1.),
         D(room.size(0)),
-        do_scattering(_scattering.max().template item<scalar_t>() > 0.),
+        do_scattering(VAL(_scattering.max()) > 0.),
         walls(make_walls(_e_absorption, _scattering)) {}
 
   /**
@@ -195,7 +197,7 @@ class RayTracer {
       if (d[0] >= D) { // Happens for 2D rooms
         continue;
       }
-      auto abs_dir0 = std::abs(dir[d[0]].item<scalar_t>());
+      auto abs_dir0 = std::abs(VAL(dir[d[0]]));
       if (abs_dir0 < EPS) {
         continue;
       }
@@ -206,13 +208,13 @@ class RayTracer {
       // this will tell us if the front or back plane is hit
       int ind_inc = 0;
 
-      if (dir[d[0]].item<scalar_t>() < 0.) {
+      if (VAL(dir[d[0]]) < 0.) {
         hit_point[d[0]] = 0.;
-        distance = start[d[0]].item<scalar_t>();
+        distance = VAL(start[d[0]]);
         ind_inc = 0;
       } else {
         hit_point[d[0]] = room[d[0]];
-        distance = (room[d[0]] - start[d[0]]).item<scalar_t>();
+        distance = VAL(room[d[0]] - start[d[0]]);
         ind_inc = 1;
       }
 
@@ -234,7 +236,7 @@ class RayTracer {
       // if we get here, there is intersection with this wall
       next_wall_index = 2 * d[0] + ind_inc;
 
-      hit_dist = (hit_point - start).norm().item<scalar_t>();
+      hit_dist = VAL((hit_point - start).norm());
 
       break;
 
@@ -318,7 +320,7 @@ class RayTracer {
 
         for (auto mic_idx = 0; mic_idx < mic_array.size(0); mic_idx++) {
           torch::Tensor to_mic = mic_array[mic_idx] - start;
-          auto impact_distance = to_mic.dot(dir).item<scalar_t>();
+          scalar_t impact_distance = VAL(to_mic.dot(dir));
 
           bool impacts = (-EPS < impact_distance) &&
               (impact_distance < hit_distance + EPS);
@@ -326,9 +328,8 @@ class RayTracer {
           // If yes, we compute the ray's transmitted amplitude at the mic and
           // we continue the ray
           if (impacts &&
-              ((to_mic - dir * impact_distance)
-                   .norm()
-                   .template item<scalar_t>() < mic_radius + EPS)) {
+              (VAL((to_mic - dir * impact_distance).norm()) <
+               mic_radius + EPS)) {
             // The length of this last hop
             auto distance = std::abs(impact_distance);
 
@@ -353,8 +354,7 @@ class RayTracer {
       }
 
       // Check if we reach the thresholds for this ray
-      if (travel_dist > distance_thres ||
-          transmitted.max().template item<scalar_t>() < e_thres) {
+      if (travel_dist > distance_thres || VAL(transmitted.max()) < e_thres) {
         break;
       }
 
@@ -387,7 +387,7 @@ class RayTracer {
       // As the ray is shot towards the microphone center,
       // the hop dist can be easily computed
       torch::Tensor hit_point_to_mic = mic_pos - hit_point;
-      auto hop_dist = hit_point_to_mic.norm().item<scalar_t>();
+      auto hop_dist = VAL(hit_point_to_mic.norm());
       auto travel_dist_at_mic = travel_dist + hop_dist;
 
       // compute the scattered energy reaching the microphone
@@ -400,7 +400,7 @@ class RayTracer {
           wall.get_scattering() * transmitted * p_hit_equal * p_lambert;
 
       if (travel_dist_at_mic < distance_thres &&
-          scat_trans.max().template item<scalar_t>() > energy_thres) {
+          VAL(scat_trans.max()) > energy_thres) {
         double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
         auto p_hit =
             (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
@@ -420,8 +420,8 @@ class RayTracer {
       const torch::Tensor _e_absorption,
       const torch::Tensor _scattering) {
     scalar_t zero = 0;
-    scalar_t W = room[0].template item<scalar_t>();
-    scalar_t L = room[1].template item<scalar_t>();
+    scalar_t W = VAL(room[0]);
+    scalar_t L = VAL(room[1]);
 
     std::vector<Wall<scalar_t>> walls;
 
@@ -447,7 +447,7 @@ class RayTracer {
           },
           room.scalar_type());
     } else {
-      scalar_t H = room[2].template item<scalar_t>();
+      scalar_t H = VAL(room[2]);
       normals = torch::tensor(
           {
               {-1, 0, 0}, // West
