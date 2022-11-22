@@ -76,8 +76,8 @@ Preparation
 
  .. code-block:: none
 
-    1.14.0.dev20221121
-    0.14.0.dev20221121
+    1.14.0.dev20221122
+    0.14.0.dev20221122
     cpu
 
 
@@ -103,7 +103,7 @@ Preparation
 
  .. code-block:: none
 
-      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 43.4MB/s]
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 49.6MB/s]
 
 
 
@@ -188,7 +188,7 @@ fetch the pre-trained weights and load it into the model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]     10%|9         | 35.2M/360M [00:00<00:00, 369MB/s]     21%|##1       | 76.8M/360M [00:00<00:00, 409MB/s]     33%|###2      | 119M/360M [00:00<00:00, 423MB/s]      45%|####4     | 161M/360M [00:00<00:00, 429MB/s]     56%|#####6    | 203M/360M [00:00<00:00, 434MB/s]     68%|######8   | 245M/360M [00:00<00:00, 437MB/s]     80%|#######9  | 287M/360M [00:00<00:00, 439MB/s]     91%|#########1| 329M/360M [00:00<00:00, 429MB/s]    100%|##########| 360M/360M [00:00<00:00, 428MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]     12%|#2        | 43.5M/360M [00:00<00:00, 456MB/s]     24%|##4       | 87.0M/360M [00:00<00:00, 399MB/s]     35%|###4      | 126M/360M [00:00<00:00, 380MB/s]      47%|####6     | 168M/360M [00:00<00:00, 403MB/s]     57%|#####7    | 206M/360M [00:00<00:00, 393MB/s]     68%|######7   | 244M/360M [00:00<00:00, 368MB/s]     80%|#######9  | 288M/360M [00:00<00:00, 396MB/s]     92%|#########2| 332M/360M [00:00<00:00, 416MB/s]    100%|##########| 360M/360M [00:00<00:00, 405MB/s]
     <class 'torchaudio.models.wav2vec2.model.Wav2Vec2Model'>
 
 
@@ -548,7 +548,7 @@ a model and getting the emission is as short as two lines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.324 seconds)
+   **Total running time of the script:** ( 0 minutes  4.300 seconds)
 
 
 .. _sphx_glr_download_tutorials_speech_recognition_pipeline_tutorial.py:
