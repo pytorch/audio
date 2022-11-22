@@ -227,8 +227,7 @@ class RayTracer {
       for (auto i = 1; i < D; ++i) {
         hit_point[d[i]] = start[d[i]] + ratio * dir[d[i]];
         // when there is no intersection, we jump to the next plane
-        if ((hit_point[d[i]] <= -EPS).template item<bool>() ||
-            (room[d[i]] + EPS <= hit_point[d[i]]).template item<bool>())
+        if ((VAL(hit_point[d[i]]) <= -EPS) || (VAL(room[d[i]]) + EPS <= VAL(hit_point[d[i]])))
           goto next_plane;
       }
 
