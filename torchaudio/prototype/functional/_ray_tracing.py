@@ -1,14 +1,13 @@
 from numbers import Number
+from typing import Optional, Tuple, Union
 
 import torch
 import torchaudio
 
 
-def _validate_absorption_scattering(v, name, num_walls, D):
-    if v is None:
-        v = 0
-    if isinstance(v, Number):
-        out = torch.ones(1, num_walls) * v
+def _validate_absorption_scattering(v: Union[float, torch.Tensor], name: str, num_walls: int, D: int) -> torch.Tensor:
+    if isinstance(v, float):
+        out = torch.full(size=(num_walls,), fill_value=v)
     elif isinstance(v, torch.Tensor) and v.ndim == 1:
         if v.shape[0] != num_walls:
             raise ValueError(
@@ -36,8 +35,8 @@ def ray_tracing(
     source: torch.Tensor,
     mic_array: torch.Tensor,
     num_rays: int,  # TODO: find good default
-    e_absorption: float = 0,  # TODO: accept tensor like in ISM
-    scattering: float = 0,  # TODO: accept tensor like in ISM
+    e_absorption: Union[float, torch.Tensor] = 0.0,
+    scattering: Union[float, torch.Tensor] = 0.0,
     mic_radius: float = 0.5,
     sound_speed: float = 343,
     energy_thres: float = 1e-7,
@@ -50,7 +49,7 @@ def ray_tracing(
 
     .. devices:: CPU
 
-    .. properties:: Autograd TorchScript
+    .. properties:: TorchScript
 
     TODO: document args and returns.
 
@@ -65,7 +64,7 @@ def ray_tracing(
         )
     if room.dtype not in (torch.float32, torch.float64):
         raise ValueError(f"room must be of float32 or float64 dtype, got {room.dtype} instead.")
-    if len(set([D, source.shape[0], mic_array.shape[1]])) != 1:
+    if not (D == source.shape[0] == mic_array.shape[1]):
         raise ValueError(
             f"Room dimension D must match with source and mic_array. Got {D}, {source.shape[0]}, and {mic_array.shape[1]}"
         )

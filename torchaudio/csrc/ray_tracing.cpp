@@ -1,5 +1,5 @@
 #include <math.h>
-#include <torch/script.h> // TODO: remove?
+#include <torch/script.h>
 #include <torch/torch.h>
 
 namespace torchaudio {
@@ -302,8 +302,8 @@ class RayTracer {
       }
 
       // Update the characteristics
-      travel_dist = travel_dist + hit_distance;
-      transmitted = transmitted * wall.get_reflection();
+      travel_dist += hit_distance;
+      transmitted *= wall.get_reflection();
 
       //   Let's shoot the scattered ray induced by the rebound on the wall
       if (do_scattering) {
@@ -455,7 +455,6 @@ torch::Tensor ray_tracing(
   auto num_bins = (int)ceil(time_thres / hist_bin_size);
   auto histograms =
       torch::zeros({num_mics, num_bands, num_bins}, room.options());
-  //   histograms.requires_grad_(true); // TODO is this needed?
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(
