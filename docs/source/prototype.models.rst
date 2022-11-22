@@ -14,6 +14,16 @@ conformer_rnnt_base
 
 .. autofunction:: conformer_rnnt_base
 
+emformer_hubert_model
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: emformer_hubert_model
+
+emformer_hubert_base
+~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: emformer_hubert_base
+
 ConvEmformer
 ~~~~~~~~~~~~
 

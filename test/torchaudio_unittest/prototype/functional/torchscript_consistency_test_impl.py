@@ -99,3 +99,10 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
                 hist_bin_size,
             ),
         )
+
+    def test_oscillator_bank(self):
+        num_frames, num_pitches, sample_rate = 8000, 8, 8000
+        freq = torch.rand((num_frames, num_pitches), dtype=self.dtype, device=self.device)
+        amps = torch.ones_like(freq)
+
+        self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum"))

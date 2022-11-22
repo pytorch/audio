@@ -250,9 +250,9 @@ _decoder_option = """Options passed to decoder.
 _hw_accel = """Enable hardware acceleration.
 
                 When video is decoded on CUDA hardware, for example
-                `decode="h264_cuvid"`, passing CUDA device indicator to `hw_accel`
-                (i.e. `hw_accel="cuda:0"`) will place the resulting frames
-                directly on the specifiec CUDA device.
+                `decoder="h264_cuvid"`, passing CUDA device indicator to `hw_accel`
+                (i.e. `hw_accel="cuda:0"`) will make StreamReader place the resulting
+                frames directly on the specified CUDA device as CUDA tensor.
 
                 If `None`, the frame will be moved to CPU memory.
                 Default: ``None``."""
@@ -324,12 +324,16 @@ class StreamReader:
                This option roughly corresponds to ``-f`` option of ``ffmpeg`` command.
                Please refer to the ffmpeg documentations for the possible values.
 
-               https://ffmpeg.org/ffmpeg-formats.html
+               https://ffmpeg.org/ffmpeg-formats.html#Demuxers
+
+               Use `ffmpeg -demuxers` to list the values available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
                software configuration (ffmpeg build).
 
-               https://ffmpeg.org/ffmpeg-devices.html
+               https://ffmpeg.org/ffmpeg-devices.html#Input-Devices
+
+               Use `ffmpeg -devices` to list the values available in the current environment.
 
         option (dict of str to str, optional):
             Custom option passed when initializing format context (opening source).
