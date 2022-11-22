@@ -114,7 +114,7 @@ class RayTracer {
         energy_thres(_energy_thres),
         time_thres(_time_thres),
         hist_bin_size(_hist_bin_size),
-        max_dist(VAL(room.norm()) + 1.),
+        max_dist(VAL(room.norm()) + (scalar_t)1.),
         D(room.size(0)),
         do_scattering(VAL(_scattering.max()) > 0.),
         walls(make_walls(_e_absorption, _scattering)) {}
@@ -192,11 +192,16 @@ class RayTracer {
 
     torch::Tensor dir = end - start;
 
+    auto dir_a = dir.accessor<scalar_t, 1>();
+    auto hit_point_a = hit_point.accessor<scalar_t, 1>();
+    auto start_a = start.accessor<scalar_t, 1>();
+    auto room_a = room.accessor<scalar_t, 1>();
+
     for (auto& d : shoebox_orders) {
       if (d[0] >= D) { // Happens for 2D rooms
         continue;
       }
-      auto abs_dir0 = std::abs(VAL(dir[d[0]]));
+      auto abs_dir0 = std::abs(dir_a[d[0]]);
       if (abs_dir0 < EPS) {
         continue;
       }
@@ -207,13 +212,13 @@ class RayTracer {
       // this will tell us if the front or back plane is hit
       int ind_inc = 0;
 
-      if (VAL(dir[d[0]]) < 0.) {
+      if (dir_a[d[0]] < 0.) {
         hit_point[d[0]] = 0.;
-        distance = VAL(start[d[0]]);
+        distance = start_a[d[0]];
         ind_inc = 0;
       } else {
-        hit_point[d[0]] = room[d[0]];
-        distance = VAL(room[d[0]] - start[d[0]]);
+        hit_point_a[d[0]] = room_a[d[0]];
+        distance = room_a[d[0]] - start_a[d[0]];
         ind_inc = 1;
       }
 
@@ -225,9 +230,10 @@ class RayTracer {
 
       // Now compute the intersection point and verify if intersection happens
       for (auto i = 1; i < D; ++i) {
-        hit_point[d[i]] = start[d[i]] + ratio * dir[d[i]];
+        hit_point_a[d[i]] = start_a[d[i]] + ratio * dir_a[d[i]];
         // when there is no intersection, we jump to the next plane
-        if ((VAL(hit_point[d[i]]) <= -EPS) || (VAL(room[d[i]]) + EPS <= VAL(hit_point[d[i]])))
+        if ((hit_point_a[d[i]] <= -EPS) ||
+            (room_a[d[i]] + EPS <= hit_point_a[d[i]]))
           goto next_plane;
       }
 
@@ -255,6 +261,7 @@ class RayTracer {
       scalar_t travel_dist_at_mic) {
     auto time_at_mic = travel_dist_at_mic / sound_speed;
     auto bin = (int)floor(time_at_mic / hist_bin_size);
+    // histograms[mic_idx, :, bin] += energy
     auto curr_value = histograms.index({mic_idx, at::indexing::Slice(), bin});
     histograms.index_put_(
         {mic_idx, at::indexing::Slice(), bin}, curr_value + energy);
@@ -417,9 +424,10 @@ class RayTracer {
   std::vector<Wall<scalar_t>> make_walls(
       const torch::Tensor _e_absorption,
       const torch::Tensor _scattering) {
+    auto room_a = room.accessor<scalar_t, 1>();
     scalar_t zero = 0;
-    scalar_t W = VAL(room[0]);
-    scalar_t L = VAL(room[1]);
+    scalar_t W = room_a[0];
+    scalar_t L = room_a[1];
 
     std::vector<Wall<scalar_t>> walls;
 
@@ -445,7 +453,7 @@ class RayTracer {
           },
           room.scalar_type());
     } else {
-      scalar_t H = VAL(room[2]);
+      scalar_t H = room_a[2];
       normals = torch::tensor(
           {
               {-1, 0, 0}, // West
