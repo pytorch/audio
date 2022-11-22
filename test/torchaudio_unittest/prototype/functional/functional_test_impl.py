@@ -116,6 +116,36 @@ class FunctionalTestImpl(TestBaseMixin):
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
 
+    @parameterized.expand(
+        [
+            (0.1, 0.2, (2, 1, 2500)),  # both float
+            # Per-wall
+            (torch.rand(4), 0.2, (2, 1, 2500)),
+            (0.1, torch.rand(4), (2, 1, 2500)),
+            (torch.rand(4), torch.rand(4), (2, 1, 2500)),
+            # Per-band and per-wall
+            (torch.rand(6, 4), 0.2, (2, 6, 2500)),
+            (0.1, torch.rand(6, 4), (2, 6, 2500)),
+            (torch.rand(6, 4), torch.rand(6, 4), (2, 6, 2500)),
+        ]
+    )
+    def test_ray_tracing_output_shape(self, e_absorption, scattering, expected_shape):
+        room_dim = torch.tensor([20, 25], dtype=self.dtype)
+        mic_array = torch.tensor([[2, 2], [8, 8]], dtype=self.dtype)
+        source = torch.tensor([7, 6], dtype=self.dtype)
+        num_rays = 100
+
+        hist = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+
+        assert hist.shape == expected_shape
+
     def test_ray_tracing_per_band_per_wall_absorption(self):
         """Check that when the value of absorption and scattering are the same
         across walls and frequency bands, the output histograms are:
@@ -127,7 +157,7 @@ class FunctionalTestImpl(TestBaseMixin):
         room_dim = torch.tensor([20, 25], dtype=self.dtype)
         mic_array = torch.tensor([[2, 2], [8, 8]], dtype=self.dtype)
         source = torch.tensor([7, 6], dtype=self.dtype)
-        num_rays = 10_000
+        num_rays = 1_000
         ABS, SCAT = 0.1, 0.2
 
         e_absorption = torch.full(fill_value=ABS, size=(6, 4), dtype=self.dtype)

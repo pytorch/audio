@@ -1,3 +1,7 @@
+/**
+ * Ray tracing implementation. This is heavily based on PyRoomAcoustics:
+ * https://github.com/LCAV/pyroomacoustics
+ */
 #include <math.h>
 #include <torch/script.h>
 #include <torch/torch.h>
@@ -10,6 +14,11 @@ namespace {
 #define ISM_ORDER (10) // TODO: remove
 #define EPS ((scalar_t)(1e-5))
 
+/**
+ * Wall helper class. A wall records its own absorption, reflection and
+ * scattering coefficient, and exposes a few methods for geometrical operations
+ * (e.g. reflection of a ray)
+ */
 template <typename scalar_t>
 class Wall {
  public:
@@ -34,6 +43,9 @@ class Wall {
     return scattering;
   }
 
+  /**
+   * Returns the side (-1, 1 or 0) on which a point lies w.r.t. the wall.
+   */
   int side(torch::Tensor pos) {
     auto dot = (pos - origin).dot(normal).item<scalar_t>();
 
@@ -46,22 +58,33 @@ class Wall {
     }
   }
 
+  /**
+   * Reflects a ray (dir) on the wall. Preserves norm of vector.
+   */
   torch::Tensor reflect(torch::Tensor dir) {
     return dir - normal * 2 * dir.dot(normal);
   }
 
-  scalar_t cosine(torch::Tensor p) {
-    return p.dot(normal).item<scalar_t>() / p.norm().item<scalar_t>();
+  /**
+   * Returns the cosine angle of a ray (dir) with the normal of the wall
+   */
+  scalar_t cosine(torch::Tensor dir) {
+    return dir.dot(normal).item<scalar_t>() / dir.norm().item<scalar_t>();
   }
 
  private:
   torch::Tensor absorption;
-  torch::Tensor reflection;
+  torch::Tensor reflection; // == 1 - absorption
   torch::Tensor scattering;
-  torch::Tensor normal;
-  torch::Tensor origin;
+  torch::Tensor normal; // The normal to the wall: 2D or 3D vector
+  torch::Tensor
+      origin; // The origin of the wall: corresponds to an arbitrary corner.
 };
 
+/**
+ * RayTracer class helper for ray tracing. For attribute description, please see
+ * declarations below as well as Python wrapper.
+ */
 template <typename scalar_t>
 class RayTracer {
  public:
@@ -95,6 +118,12 @@ class RayTracer {
         do_scattering(_scattering.max().template item<scalar_t>() > 0.),
         walls(make_walls(_e_absorption, _scattering)) {}
 
+  /**
+   * The main (and only) public entry point of this class. The histograms Tensor
+   * reference is passed along and modified in the subsequent private method
+   * calls. This method spawns num_rays rays in all directions from the source
+   * and calls simul_ray() on each of them.
+   */
   void compute_histograms(torch::Tensor& histograms) {
     // TODO: Could probably parallelize call over num_rays? We would need
     // `num_threads` histograms and then sum-reduce them into a single
@@ -131,9 +160,7 @@ class RayTracer {
   const torch::Tensor source;
   const torch::Tensor mic_array;
   int num_rays;
-  scalar_t energy_0;
-  //   const torch::Tensor e_absorption;
-  //   scalar_t scattering;
+  scalar_t energy_0; // initial energy of each ray
   scalar_t mic_radius;
   double mic_radius_sq;
   scalar_t sound_speed;
@@ -142,9 +169,16 @@ class RayTracer {
   scalar_t hist_bin_size;
   scalar_t max_dist; // Max distance needed to hit a wall = diagonal of room + 1
   int D; // Dimension of the room
-  const bool do_scattering;
-  std::vector<Wall<scalar_t>> walls;
+  const bool do_scattering; // Whether scattering is needed (scattering != 0)
+  std::vector<Wall<scalar_t>> walls; // The walls of the room
 
+  /**
+   * From a ray vector defined by its start and end, returns the next wall hit
+   * as a 3-tuple:
+   * - the hit point on the wall: 2D or 3D tensor
+   * - the index of the wall (as in the .walls vector attribute)
+   * - the distance from the start to the wall
+   */
   std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
       torch::Tensor start,
       torch::Tensor end) {
@@ -210,6 +244,10 @@ class RayTracer {
     return std::make_tuple(hit_point, next_wall_index, hit_dist);
   }
 
+  /**
+   * Add energy level to the output histogram for a given microphone and a given
+   * time-bin (computed from travel_dist_at_mic)
+   */
   void log_hist(
       torch::Tensor& histograms,
       int mic_idx,
@@ -222,6 +260,14 @@ class RayTracer {
         {mic_idx, at::indexing::Slice(), bin}, curr_value + energy);
   }
 
+  /**
+   * Traces a single ray. phi (horizontal) and theta (vectorical) are the angles
+   * of the ray from the source. Theta is 0 for 2D rooms.  When a ray intersects
+   * a wall, it is reflected and part of its energy is absorbed. It is also
+   * scattered (sent directly to the microphone(s)) according to the scattering
+   * coefficient. When a ray is close to the microphone, its current energy is
+   * recoreded in the output histogram for that given time slot.
+   */
   void simul_ray(torch::Tensor& histograms, scalar_t phi, scalar_t theta) {
     torch::Tensor start = source.clone();
 
@@ -279,7 +325,6 @@ class RayTracer {
 
           // If yes, we compute the ray's transmitted amplitude at the mic and
           // we continue the ray
-
           if (impacts &&
               ((to_mic - dir * impact_distance)
                    .norm()
@@ -287,9 +332,6 @@ class RayTracer {
             // The length of this last hop
             auto distance = std::abs(impact_distance);
 
-            // Updating travel_time and transmitted amplitude for this ray We
-            // DON'T want to modify the variables transmitted amplitude and
-            // travel_dist because the ray will continue its way
             auto travel_dist_at_mic = travel_dist + distance;
             double r_sq = travel_dist_at_mic * travel_dist_at_mic;
             auto p_hit =
@@ -301,7 +343,6 @@ class RayTracer {
         }
       }
 
-      // Update the characteristics
       travel_dist += hit_distance;
       transmitted *= wall.get_reflection();
 
@@ -324,6 +365,10 @@ class RayTracer {
     }
   }
 
+  /**
+   * Scatters a ray towards the microphone(s), i.e. records its scattered energy
+   * in the histogram. Called when a ray hits a wall.
+   */
   void scat_ray(
       torch::Tensor& histograms,
       Wall<scalar_t>& wall,
@@ -365,6 +410,12 @@ class RayTracer {
     }
   }
 
+  /**
+   * Creates the walls based on the input to the constructor.
+   * Since the room is always a shoebox we can hard-code values.
+   * Normals are vectors facing *outwards* the room, and origins are arbitrary
+   * corners of each wall.
+   */
   std::vector<Wall<scalar_t>> make_walls(
       const torch::Tensor _e_absorption,
       const torch::Tensor _scattering) {
@@ -436,6 +487,10 @@ class RayTracer {
   }
 };
 
+/**
+ * @brief Compute energy histogram via ray tracing. See Python wrapper for
+ * detail about parameters and output.
+ */
 torch::Tensor ray_tracing(
     const torch::Tensor room,
     const torch::Tensor source,
@@ -448,8 +503,6 @@ torch::Tensor ray_tracing(
     double energy_thres,
     double time_thres,
     double hist_bin_size) {
-  // TODO: Maybe hist_size should also be bounded from output of ISM, and from
-  // eq (4) from https://reuk.github.io/wayverb/ray_tracer.html?
   auto num_mics = mic_array.size(0);
   auto num_bands = e_absorption.size(0);
   auto num_bins = (int)ceil(time_thres / hist_bin_size);
