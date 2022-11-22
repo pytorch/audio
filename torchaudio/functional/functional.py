@@ -379,6 +379,7 @@ def amplitude_to_DB(
     """
     x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
     x_db -= multiplier * db_multiplier
+    # ignore this !
 
     if top_db is not None:
         # Expand batch
