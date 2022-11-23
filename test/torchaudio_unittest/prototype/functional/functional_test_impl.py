@@ -341,6 +341,7 @@ class FunctionalTestImpl(TestBaseMixin):
 
         self.assertEqual(hist, hist_pra)  # check all bin values with default atol and rtol
         Note: need to set max_order=0 and air_absorption=False in PRA for consistent checks.
+        max_order=0 makes sure PRA doesn't use the hybrid method and only does ray-tracing.
         """
         num_walls = 4 if len(room_dim) == 2 else 6
         num_bands = 6  # Note: in ray tracing, we don't need to restrict the number of bands to 7
