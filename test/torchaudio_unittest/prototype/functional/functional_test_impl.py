@@ -372,6 +372,7 @@ class FunctionalTestImpl(TestBaseMixin):
                 for i in range(num_walls)
             },
             air_absorption=False,
+            max_order=0,
         )
         room.add_microphone_array(mic_array.T.tolist())
         room.add_source(source.tolist())
@@ -383,7 +384,6 @@ class FunctionalTestImpl(TestBaseMixin):
             receiver_radius=mic_radius,
         )
         room.set_sound_speed(sound_speed)
-        room.is_hybrid_sim = False
 
         room.compute_rir()
         hist_pra = torch.tensor(np.array(room.rt_histograms))[:, 0, 0]
