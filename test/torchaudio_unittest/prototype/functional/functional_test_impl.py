@@ -214,8 +214,8 @@ class FunctionalTestImpl(TestBaseMixin):
 
         num_bands = 6  # Note: in ray tracing, we don't need to restrict the number of bands to 7
 
-        e_absorption = torch.rand(num_bands, num_walls, dtype=torch.float32)
-        scattering = torch.rand(num_bands, num_walls, dtype=torch.float32)
+        e_absorption = torch.rand(num_bands, num_walls, dtype=self.dtype)
+        scattering = torch.rand(num_bands, num_walls, dtype=self.dtype)
         energy_thres = 1e-7
         time_thres = 10
         hist_bin_size = 0.004

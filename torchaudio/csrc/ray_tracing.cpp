@@ -13,7 +13,7 @@ namespace {
 #define IS_HYBRID_SIM (false) // TODO: remove
 #define ISM_ORDER (10) // TODO: remove
 #define EPS ((scalar_t)(1e-5))
-#define VAL(t) ((t).template item<scalar_t>())
+#define VAL(t) (*((t).template data_ptr<scalar_t>()))
 
 /**
  * Wall helper class. A wall records its own absorption, reflection and
@@ -116,7 +116,7 @@ class RayTracer {
         hist_bin_size(_hist_bin_size),
         max_dist(VAL(room.norm()) + (scalar_t)1.),
         D(room.size(0)),
-        do_scattering(VAL(_scattering.max()) > 0.),
+        do_scattering(VAL(_scattering.max()) > (scalar_t)0.),
         walls(make_walls(_e_absorption, _scattering)) {}
 
   /**
@@ -304,7 +304,7 @@ class RayTracer {
     auto e_thres = energy_0 * energy_thres;
     auto distance_thres = time_thres * sound_speed;
 
-    torch::Tensor hit_point = torch::zeros(D, torch::kFloat);
+    torch::Tensor hit_point = torch::zeros(D, room.scalar_type());
 
     while (true) {
       // Find the next hit point

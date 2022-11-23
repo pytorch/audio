@@ -3,7 +3,9 @@ from typing import Union
 import torch
 
 
-def _validate_absorption_scattering(v: Union[float, torch.Tensor], name: str, num_walls: int, D: int) -> torch.Tensor:
+def _validate_absorption_scattering(
+    v: Union[float, torch.Tensor], name: str, num_walls: int, D: int, dtype: torch.dtype
+) -> torch.Tensor:
     """Validates and converts e_absorption or scattering parameters to a tensor with appropriate shape"""
     if isinstance(v, float):
         out = torch.full(
@@ -31,6 +33,7 @@ def _validate_absorption_scattering(v: Union[float, torch.Tensor], name: str, nu
     else:
         out = v
     assert out.ndim == 2
+    out = out.to(dtype)
 
     return out
 
@@ -110,8 +113,12 @@ def ray_tracing(
         raise ValueError(f"time_thres={time_thres} must be greater than hist_bin_size={hist_bin_size}.")
 
     num_walls = 4 if D == 2 else 6
-    e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", num_walls=num_walls, D=D)
-    scattering = _validate_absorption_scattering(scattering, name="scattering", num_walls=num_walls, D=D)
+    e_absorption = _validate_absorption_scattering(
+        e_absorption, name="e_absorption", num_walls=num_walls, D=D, dtype=room.dtype
+    )
+    scattering = _validate_absorption_scattering(
+        scattering, name="scattering", num_walls=num_walls, D=D, dtype=room.dtype
+    )
 
     # Bring e_absorption and scattering to the same shape
     if e_absorption.shape[0] == 1 and scattering.shape[0] > 1:
