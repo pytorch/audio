@@ -146,6 +146,135 @@ class FunctionalTestImpl(TestBaseMixin):
 
         assert hist.shape == expected_shape
 
+    def test_ray_tracing_input_errors(self):
+        with self.assertRaisesRegex(ValueError, "mic_array must be 1D tensor of shape D, or 2D tensor"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5]), source=torch.tensor([0, 0]), mic_array=torch.tensor([[[3, 4]]]), num_rays=10
+            )
+        with self.assertRaisesRegex(ValueError, "room must be of float32 or float64 dtype"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5]).to(torch.int),
+                source=torch.tensor([0, 0]),
+                mic_array=torch.tensor([3, 4]),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "dtype of room, source and mic_array must be the same"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5]).to(torch.float64),
+                source=torch.tensor([0, 0]).to(torch.float32),
+                mic_array=torch.tensor([3, 4]),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "Room dimension D must match with source and mic_array"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5, 10], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "Room dimension D must match with source and mic_array"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "Room dimension D must match with source and mic_array"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5, 10], dtype=torch.float),
+                source=torch.tensor([0, 0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "time_thres=10 must be greater than hist_bin_size=11"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                time_thres=10,
+                hist_bin_size=11,
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of e_absorption must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                e_absorption=torch.rand(5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of scattering must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                scattering=torch.rand(5, 5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of e_absorption must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                e_absorption=torch.rand(5, 5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of scattering must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                scattering=torch.rand(5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(
+            ValueError, "e_absorption and scattering must have the same number of bands and walls"
+        ):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                e_absorption=torch.rand(6, 4, dtype=torch.float),
+                scattering=torch.rand(5, 4, dtype=torch.float),
+            )
+
+        # Make sure passing different shapes for e_abs or scattering doesn't raise an error
+        # float and tensor
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=0.1,
+            scattering=torch.rand(5, 4, dtype=torch.float),
+        )
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=torch.rand(5, 4, dtype=torch.float),
+            scattering=0.1,
+        )
+        # per-wall only and per-band + per-wall
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=torch.rand(4, dtype=torch.float),
+            scattering=torch.rand(6, 4, dtype=torch.float),
+        )
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=torch.rand(6, 4, dtype=torch.float),
+            scattering=torch.rand(4, dtype=torch.float),
+        )
+
     def test_ray_tracing_per_band_per_wall_absorption(self):
         """Check that when the value of absorption and scattering are the same
         across walls and frequency bands, the output histograms are:

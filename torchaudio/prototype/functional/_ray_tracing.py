@@ -104,6 +104,11 @@ def ray_tracing(
         )
     if room.dtype not in (torch.float32, torch.float64):
         raise ValueError(f"room must be of float32 or float64 dtype, got {room.dtype} instead.")
+    if not (room.dtype == source.dtype == mic_array.dtype):
+        raise ValueError(
+            "dtype of room, source and mic_array must be the same. "
+            f"Got {room.dtype}, {source.dtype}, and {mic_array.dtype}"
+        )
     if not (D == source.shape[0] == mic_array.shape[1]):
         raise ValueError(
             "Room dimension D must match with source and mic_array. "
