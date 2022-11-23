@@ -4,8 +4,7 @@ import warnings
 from typing import Tuple
 
 import torch
-from torchaudio.functional import resample
-
+from torchaudio.functional import lfilter, resample
 from torchaudio.functional.functional import _create_triangular_filterbank
 
 
@@ -345,3 +344,43 @@ def speed(
     return resample(waveform, source_sample_rate, target_sample_rate), torch.ceil(
         lengths * target_sample_rate / source_sample_rate
     ).to(lengths.dtype)
+
+
+def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+    r"""Pre-emphasizes a waveform along its last dimension, i.e.
+    for each signal :math:`x` in ``waveform``, computes
+    output :math:`y` as
+
+    .. math::
+        y[i] = x[i] - \text{coeff} \cdot x[i - 1]
+
+    Args:
+        waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+        coeff (float, optional): Pre-emphasis coefficient. (Default: 0.97)
+
+    Returns:
+        torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
+    """
+    a_coeffs = torch.tensor([1.0, 0.0])
+    b_coeffs = torch.tensor([1.0, -coeff])
+    return lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+
+
+def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+    r"""De-emphasizes a waveform along its last dimension.
+    Inverse of :meth:`preemphasis`. Concretely, for each signal
+    :math:`x` in ``waveform``, computes output :math:`y` as
+
+    .. math::
+        y[i] = x[i] + \text{coeff} \cdot y[i - 1]
+
+    Args:
+        waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+        coeff (float, optional): De-emphasis coefficient. (Default: 0.97)
+
+    Returns:
+        torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+    """
+    a_coeffs = torch.tensor([1.0, -coeff])
+    b_coeffs = torch.tensor([1.0, 0.0])
+    return lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
