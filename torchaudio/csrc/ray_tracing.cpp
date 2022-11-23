@@ -261,10 +261,7 @@ class RayTracer {
       scalar_t travel_dist_at_mic) {
     auto time_at_mic = travel_dist_at_mic / sound_speed;
     auto bin = (int)floor(time_at_mic / hist_bin_size);
-    // histograms[mic_idx, :, bin] += energy
-    auto curr_value = histograms.index({mic_idx, at::indexing::Slice(), bin});
-    histograms.index_put_(
-        {mic_idx, at::indexing::Slice(), bin}, curr_value + energy);
+    histograms[mic_idx][bin] += energy;
   }
 
   /**
@@ -290,7 +287,7 @@ class RayTracer {
 
     int next_wall_index;
 
-    auto num_bands = histograms.size(1);
+    auto num_bands = histograms.size(2);
     auto transmitted = torch::ones({num_bands}) * energy_0;
     auto energy = torch::ones({num_bands});
     auto travel_dist = 0.;
@@ -512,8 +509,11 @@ torch::Tensor ray_tracing(
   auto num_mics = mic_array.size(0);
   auto num_bands = e_absorption.size(0);
   auto num_bins = (int)ceil(time_thres / hist_bin_size);
+  // Output shape will actually be (num_mics, num_bands, num_bins). We let
+  // num_bands be the last dim during computation to make indexing cleaner in
+  // log_hist(), and to optimize for cache line hit.
   auto histograms =
-      torch::zeros({num_mics, num_bands, num_bins}, room.options());
+      torch::zeros({num_mics, num_bins, num_bands}, room.options());
 
   AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing", [&] {
     RayTracer<scalar_t> rt(
@@ -530,6 +530,8 @@ torch::Tensor ray_tracing(
         hist_bin_size);
     rt.compute_histograms(histograms);
   });
+  histograms = histograms.transpose(
+      1, 2); // back into shape (num_mics, num_bands, num_bins)
   return histograms;
 }
 
