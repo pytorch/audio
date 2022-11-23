@@ -229,23 +229,22 @@ class RayTracer {
       auto ratio = distance / abs_dir0;
 
       // Now compute the intersection point and verify if intersection happens
+      auto intersection_found = true;
       for (auto i = 1; i < D; ++i) {
         hit_point_a[d[i]] = start_a[d[i]] + ratio * dir_a[d[i]];
         // when there is no intersection, we jump to the next plane
         if ((hit_point_a[d[i]] <= -EPS) ||
-            (room_a[d[i]] + EPS <= hit_point_a[d[i]]))
-          goto next_plane;
+            (room_a[d[i]] + EPS <= hit_point_a[d[i]])) {
+          intersection_found = false;
+          break; // check next plane
+        }
       }
 
-      // if we get here, there is intersection with this wall
-      next_wall_index = 2 * d[0] + ind_inc;
-
-      hit_dist = VAL((hit_point - start).norm());
-
-      break;
-
-    next_plane:
-      (void)0; // no op
+      if (intersection_found) {
+        next_wall_index = 2 * d[0] + ind_inc;
+        hit_dist = VAL((hit_point - start).norm());
+        break;
+      }
     }
     return std::make_tuple(hit_point, next_wall_index, hit_dist);
   }
