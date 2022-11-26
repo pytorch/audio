@@ -6,16 +6,25 @@ import torch
 from torchaudio.functional.functional import _create_triangular_filterbank
 
 
+def _check_shape_compatible(x: torch.Tensor, y: torch.Tensor, allow_broadcast: bool) -> None:
+    if x.ndim != y.ndim:
+        raise ValueError(f"The operands must be the same dimension (got {x.ndim} and {y.ndim}).")
+    if not allow_broadcast:
+        if x.shape[:-1] != y.shape[:-1]:
+            raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+    else:
+        for i in range(x.ndim - 1):
+            xi = x.size(i)
+            yi = y.size(i)
+            if xi == yi or xi == 1 or yi == 1:
+                continue
+            raise ValueError(f"Leading dimensions of x and y are not broadcastable (got {x.shape} and {y.shape}).")
+
+
 def _check_convolve_mode(mode: str) -> None:
     valid_convolve_modes = ["full", "valid", "same"]
     if mode not in valid_convolve_modes:
         raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
-
-
-def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
-    if x.shape[:-1] != y.shape[:-1]:
-        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
-    _check_convolve_mode(mode)
 
 
 def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
@@ -48,7 +57,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
     Args:
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
-            (leading dimensions must match those of ``x``).
+            (leading dimensions must be broadcast-able to those of ``x``).
         mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
@@ -63,7 +72,8 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_convolve_inputs(x, y, mode)
+    _check_shape_compatible(x, y, allow_broadcast=True)
+    _check_convolve_mode(mode)
 
     n = x.size(-1) + y.size(-1) - 1
     fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
@@ -99,7 +109,8 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_convolve_inputs(x, y, mode)
+    _check_shape_compatible(x, y, allow_broadcast=False)
+    _check_convolve_mode(mode)
 
     x_size, y_size = x.size(-1), y.size(-1)
 

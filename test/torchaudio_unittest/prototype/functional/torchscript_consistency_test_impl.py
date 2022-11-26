@@ -26,7 +26,7 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         self.assertEqual(ts_output, output)
 
     @nested_params(
-        [F.convolve, F.fftconvolve],
+        ["convolve", "fftconvolve"],
         ["full", "valid", "same"],
     )
     def test_convolve(self, fn, mode):
@@ -35,7 +35,7 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
 
-        self._assert_consistency(fn, (x, y, mode))
+        self._assert_consistency(getattr(F, fn), (x, y, mode))
 
     def test_add_noise(self):
         leading_dims = (2, 3)

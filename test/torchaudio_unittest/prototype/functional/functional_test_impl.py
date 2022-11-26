@@ -54,16 +54,66 @@ class FunctionalTestImpl(TestBaseMixin):
 
         self.assertEqual(expected, actual)
 
-    @nested_params(
-        [F.convolve, F.fftconvolve],
-        [(4, 3, 1, 2), (1,)],
-        [(10, 4), (2, 2, 2)],
+    @parameterized.expand(
+        [
+            # fmt: off
+            ((5, 2, 3), (5, 1, 3)),
+            ((5, 2, 3), (1, 2, 3)),
+            ((5, 2, 3), (1, 1, 3)),
+            # fmt: on
+        ]
     )
-    def test_convolve_input_leading_dim_check(self, fn, x_shape, y_shape):
+    def test_fftconvolve_broadcast(self, x_shape, y_shape):
+        """fftconvolve works for Tensors for different shapes if they are broadcast-able"""
+        # 1. Test broad cast case
+        x = torch.rand(x_shape, dtype=self.dtype, device=self.device)
+        y = torch.rand(y_shape, dtype=self.dtype, device=self.device)
+        out1 = F.fftconvolve(x, y)
+        # 2. Test without broadcast
+        y_clone = y.expand(x_shape).clone()
+        assert y is not y_clone
+        assert y_clone.shape == x.shape
+        out2 = F.fftconvolve(x, y_clone)
+        # check that they are same
+        self.assertEqual(out1, out2)
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            # different ndim
+            (0, F.convolve, (4, 3, 1, 2), (10, 4)),
+            (0, F.convolve, (4, 3, 1, 2), (2, 2, 2)),
+            (0, F.convolve, (1, ), (10, 4)),
+            (0, F.convolve, (1, ), (2, 2, 2)),
+            (0, F.fftconvolve, (4, 3, 1, 2), (10, 4)),
+            (0, F.fftconvolve, (4, 3, 1, 2), (2, 2, 2)),
+            (0, F.fftconvolve, (1, ), (10, 4)),
+            (0, F.fftconvolve, (1, ), (2, 2, 2)),
+            # incompatible shape except the last dim
+            (1, F.convolve, (5, 2, 3), (5, 3, 3)),
+            (1, F.convolve, (5, 2, 3), (5, 3, 4)),
+            (1, F.convolve, (5, 2, 3), (5, 3, 5)),
+            (2, F.fftconvolve, (5, 2, 3), (5, 3, 3)),
+            (2, F.fftconvolve, (5, 2, 3), (5, 3, 4)),
+            (2, F.fftconvolve, (5, 2, 3), (5, 3, 5)),
+            # broadcast-able (only for convolve)
+            (1, F.convolve, (5, 2, 3), (5, 1, 3)),
+            (1, F.convolve, (5, 2, 3), (5, 1, 4)),
+            (1, F.convolve, (5, 2, 3), (5, 1, 5)),
+            # fmt: on
+        ],
+    )
+    def test_convolve_input_leading_dim_check(self, case, fn, x_shape, y_shape):
         """Check that convolve properly rejects inputs with different leading dimensions."""
         x = torch.rand(*x_shape, dtype=self.dtype, device=self.device)
         y = torch.rand(*y_shape, dtype=self.dtype, device=self.device)
-        with self.assertRaisesRegex(ValueError, "Leading dimensions"):
+
+        message = [
+            "The operands must be the same dimension",
+            "Leading dimensions of x and y don't match",
+            "Leading dimensions of x and y are not broadcastable",
+        ][case]
+        with self.assertRaisesRegex(ValueError, message):
             fn(x, y)
 
     def test_add_noise_broadcast(self):

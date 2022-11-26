@@ -5,7 +5,7 @@ from torchaudio_unittest.common_utils import nested_params, TestBaseMixin, torch
 
 class Transforms(TestBaseMixin):
     @nested_params(
-        [T.Convolve, T.FFTConvolve],
+        ["Convolve", "FFTConvolve"],
         ["full", "valid", "same"],
     )
     def test_Convolve(self, cls, mode):
@@ -14,7 +14,7 @@ class Transforms(TestBaseMixin):
         x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
 
-        convolve = cls(mode=mode).to(device=self.device, dtype=self.dtype)
+        convolve = getattr(T, cls)(mode=mode).to(device=self.device, dtype=self.dtype)
         output = convolve(x, y)
         ts_output = torch_script(convolve)(x, y)
         self.assertEqual(ts_output, output)
