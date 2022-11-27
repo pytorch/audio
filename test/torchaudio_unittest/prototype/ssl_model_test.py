@@ -1,6 +1,10 @@
 import torch
 from parameterized import parameterized
+<<<<<<< HEAD
 from torchaudio.prototype.models import conformer_wav2vec2_base, emformer_hubert_base
+=======
+from torchaudio.prototype.models import conformer_wav2vec2_base, conformer_wav2vec2_pretrain_base, emformer_hubert_base
+>>>>>>> 1b59ec7be (add to return)
 from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
 
 

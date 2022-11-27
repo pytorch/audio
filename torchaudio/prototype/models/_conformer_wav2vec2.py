@@ -14,7 +14,7 @@ def _buffered_arange(max) -> Tensor:
     Produces same result as torch.arange(end=max).
 
     Args:
-        max (int): Ending value for arange
+        max (int): Ending value for arange.
     """
     if not hasattr(_buffered_arange, "buf"):
         _buffered_arange.buf = torch.LongTensor()
@@ -28,16 +28,16 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     """Sample negative examples from masked input.
 
     Args:
-        input (Tensor): Tensor of dimension `(batch, frame, dim)`
-        num_negatives (int): Number of sampled negatives
-        cross_sample_negatives (int): Number of cross sampled negatives
+        input (Tensor): Tensor of dimension `(batch, frame, dim)`.
+        num_negatives (int): Number of negative examples to sample.
+        cross_sample_negatives (int): Number of negative examples to cross sample.
 
     Returns:
         (Tensor, Tensor):
         Tensor
-            The negative samples
+            The negative samples.
         Tensor
-            The indices of the negative samples
+            The indices of the negative samples.
     """
     if num_negatives == 0 and cross_sample_negatives == 0:
         return (
@@ -84,8 +84,8 @@ class NegativeSampler(Module):
 
     Args:
         preprocessor (nn.Module): Transforms input tensor prior to negative sampling.
-        num_negatives (int): Number of sampled negatives.
-        cross_sample_negatives (int): Number of cross sampled negatives.
+        num_negatives (int): Number of negative examples to sample.
+        cross_sample_negatives (int): Number of negative examples to cross sample.
     """
 
     def __init__(
@@ -99,35 +99,32 @@ class NegativeSampler(Module):
         self.num_negatives = num_negatives
         self.cross_sample_negatives = cross_sample_negatives
 
-    def forward(self, input: Tensor, lengths: Optional[Tensor] = None) -> Tuple[Tensor, Tensor, Optional[Tensor]]:
+    def forward(self, input: Tensor) -> Tuple[Tensor, Tensor, Optional[Tensor]]:
         """
         Args:
-            input (Tensor): Tensor of dimension `[batch, frame, dim]`
-            lengths (Tensor or None, optional): Tensor of shape `[batch, ]` representing valid lengths
-                in each time axis.
+            input (Tensor): Tensor of dimension `(B, T, D)`.
 
         Returns:
             (Tensor, Tensor, Optional[Tensor]):
             Tensor
-                The negative samples
+                The input tensor after preprocessing, prior to being sampled.
             Tensor
-                The indices of the negative samples
-            Tensor or None
-                If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing
-                valid length in time axis is returns.
+                The negative samples.
+            Tensor
+                The indices of the negative samples.
         """
-        input = self.preprocessor(input)
-        negs, neg_idxs = _sample_negatives(input, self.num_negatives, self.cross_sample_negatives)
-        return negs, neg_idxs, lengths
+        preprocessed = self.preprocessor(input)
+        negs, neg_idxs = _sample_negatives(preprocessed, self.num_negatives, self.cross_sample_negatives)
+        return preprocessed, negs, neg_idxs
 
 
 class FeatureEncoder(Module):
     """Feature Encoder class, consisting of time reduction and linear layer.
 
     Args:
-        stride (int): number of frames to merge for the output frame
-        input_dim (int): input dimension of the tensor
-        output_dim (int): output dimension of the tensor
+        stride (int): Number of frames to merge for the output frame.
+        input_dim (int): Input dimension of the tensor.
+        output_dim (int): Output dimension of the tensor.
     """
 
     def __init__(self, input_dim: int, output_dim: int, stride: int):
@@ -149,7 +146,7 @@ class FeatureEncoder(Module):
         Returns:
             (Tensor, Optional[Tensor]):
                 Tensor: output sequence after undergoing time reduction and linear projection.
-                    Shape ``(B, T // stride, D * stride)
+                    Shape ``(B, T // stride, D * stride).
                 Optional[Tensor]: output lengths of shape ``(B,)`` if lengths parameter is provided,
                     otherwise `None`.
         """
@@ -170,9 +167,9 @@ class ConformerEncoder(Module):
 
     Args:
         feature_projection (nn.Module):
-            Projects feature to encoder dimension
+            Projects feature to encoder dimension.
         conformer (nn.ModuleList)
-            List of Conformer layers
+            List of Conformer layers.
     """
 
     def __init__(
@@ -223,7 +220,7 @@ class ConformerEncoder(Module):
     ) -> Tensor:
         """
         Args:
-            features (Tensor): Tensor of features of shape ``(B, T, D)``
+            features (Tensor): Tensor of features of shape ``(B, T, D)``.
             lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.
 
         Returns:
@@ -244,12 +241,12 @@ class ConformerEncoder(Module):
         """Returns the list of outputs from the intermediate layers of conformer block in the encoder.
 
         Args:
-            features (Tensor): Tensor of features of shape ``(B, T, D)``
+            features (Tensor): Tensor of features of shape ``(B, T, D)``.
             lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.
 
         Returns:
             List[Tensor]:
-                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`
+                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`.
         """
         x, masks = self._preprocess(features, lengths)
         return self._get_intermediate_outputs(x, mask=masks, num_layers=num_layers)
@@ -297,16 +294,20 @@ class ConformerWav2Vec2PretrainModel(Module):
                 shape: `(batch, )` (Default: ``None``)
 
         Returns:
-            (Tensor, Optional[Tensor], Tensor, Tensor):
+            (Tensor, Optional[Tensor], Tensor, Tensor, Tensor, Tensor):
             Tensor
-                The masked sequences of probability distribution of shape `(batch, frame dim)`
+                The masked sequences of probability distribution of shape `(batch, frame dim)`.
             Tensor or None
                 If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing
                 valid length in time axis is returns.
             Tensor
-                The negative samples
+                The mask indices.
             Tensor
-                The indices of the negative samples
+                The targets, prior to negative sampling.
+            Tensor
+                The negative samples.
+            Tensor
+                The indices of the negative samples.
         """
         x, lengths = self.wav2vec2.feature_extractor(features, audio_lengths)
 
@@ -317,9 +318,9 @@ class ConformerWav2Vec2PretrainModel(Module):
 
         x = self.wav2vec2.encoder.feature_projection.layer_norm(x)
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
-        x, _ = self.mask_generator(x, padding_mask)
+        x, mask_idxs = self.mask_generator(x, padding_mask)
 
-        negs, neg_idxs, _ = self.negative_sampler(x, lengths)
+        targets, negs, neg_idxs = self.negative_sampler(x)
 
         x = self.wav2vec2.encoder.feature_projection.projection(x)
         x = x.transpose(0, 1)
@@ -327,7 +328,7 @@ class ConformerWav2Vec2PretrainModel(Module):
             x = conformer_layer(x, padding_mask)
         x = x.transpose(0, 1)
 
-        return x, lengths, negs, neg_idxs
+        return x, lengths, mask_idxs, targets, negs, neg_idxs
 
 
 ################################################################################
@@ -339,12 +340,12 @@ def _get_conformer_feature_extractor(
     """Construct Feature Extractor
 
     Args:
-        input_dim (int): Input dimension of features
-        output_dim (int): Output dimension after feature extraction
-        stride (int): Stride used in Time Reduction layer of feature extractor
+        input_dim (int): Input dimension of features.
+        output_dim (int): Output dimension after feature extraction.
+        stride (int): Stride used in Time Reduction layer of feature extractor.
 
     Returns:
-        FeatureEncoder: The resulting feature extraction
+        FeatureEncoder: The resulting feature extraction.
     """
     return FeatureEncoder(input_dim, output_dim, stride)
 
