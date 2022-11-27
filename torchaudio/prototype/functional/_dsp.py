@@ -204,7 +204,7 @@ def extend_pitch(
             up to `pattern`-th overtones of the given series.
 
             If list of float or ``torch.Tensor``, it must be one dimensional,
-            representng the custom multiplier of the fundamental fundamental frequency.
+            representing the custom multiplier of the fundamental frequency.
 
     Returns:
         Tensor: Oscillator frequencies (Hz). Shape: `(..., time, num_tones)`.
@@ -228,7 +228,7 @@ def extend_pitch(
                 [ 3.,  6.,  9.],
                 [ 4.,  8., 12.],
                 [ 5., 10., 15.]])
-        >>> # Add custom (inharmonic) patrials.
+        >>> # Add custom (inharmonic) partials.
         >>> f = extend_pitch(f0, torch.tensor([1, 2.1, 3.3, 4.5]))
         >>> f.shape
         torch.Size([5, 4])
