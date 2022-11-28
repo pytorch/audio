@@ -556,12 +556,16 @@ torch::Tensor ray_tracing(
   return histograms;
 }
 
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def(
-      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, Tensor e_absorption, Tensor scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor",
-      &torchaudio::rir::ray_tracing);
+} // Anonymous namespace
+
+TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
+  m.impl("torchaudio::ray_tracing", torchaudio::rir::ray_tracing);
 }
 
-} // Anonymous namespace
 } // namespace rir
 } // namespace torchaudio
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def(
+      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, Tensor e_absorption, Tensor scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor");
+}
