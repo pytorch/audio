@@ -54,3 +54,11 @@ class AutogradTestImpl(TestBaseMixin):
         amps = torch.linspace(-5, 5, numel, dtype=self.dtype, device=self.device, requires_grad=True).reshape(shape)
 
         assert gradcheck(F.oscillator_bank, (freq, amps, sample_rate))
+
+    def test_extend_pitch(self):
+        num_frames, num_pitches = 5, 7
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype, requires_grad=True)
+        pattern = torch.linspace(1, num_pitches, num_pitches, device=self.device, dtype=self.dtype, requires_grad=True)
+
+        assert gradcheck(F.extend_pitch, (input, num_pitches))
+        assert gradcheck(F.extend_pitch, (input, pattern))
