@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.extend\_pitch
+=============================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: extend_pitch

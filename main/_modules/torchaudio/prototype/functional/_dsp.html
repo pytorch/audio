@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221127) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221128) &#x25BC</a>
     </div>
     
 
@@ -381,7 +381,7 @@
               
   <h1>Source code for torchaudio.prototype.functional._dsp</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
@@ -562,6 +562,73 @@
         <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">sustain</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="n">num_r</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:])</span>
 
     <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="extend_pitch"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.extend_pitch.html#torchaudio.prototype.functional.extend_pitch">[docs]</a><span class="k">def</span> <span class="nf">extend_pitch</span><span class="p">(</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extend the given time series values with multipliers of them.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Given a series of fundamental frequencies (pitch), this function appends</span>
+<span class="sd">    its harmonic overtones or inharmonic partials.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base (torch.Tensor):</span>
+<span class="sd">            Base time series, like fundamental frequencies (Hz). Shape: `(..., time, 1)`.</span>
+<span class="sd">        pattern (int, list of floats or torch.Tensor):</span>
+<span class="sd">            If ``int``, the number of pitch series after the operation.</span>
+<span class="sd">            `pattern - 1` tones are added, so that the resulting Tensor contains</span>
+<span class="sd">            up to `pattern`-th overtones of the given series.</span>
+
+<span class="sd">            If list of float or ``torch.Tensor``, it must be one dimensional,</span>
+<span class="sd">            representing the custom multiplier of the fundamental frequency.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Oscillator frequencies (Hz). Shape: `(..., time, num_tones)`.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; # fundamental frequency</span>
+<span class="sd">        &gt;&gt;&gt; f0 = torch.linspace(1, 5, 5).unsqueeze(-1)</span>
+<span class="sd">        &gt;&gt;&gt; f0</span>
+<span class="sd">        tensor([[1.],</span>
+<span class="sd">                [2.],</span>
+<span class="sd">                [3.],</span>
+<span class="sd">                [4.],</span>
+<span class="sd">                [5.]])</span>
+<span class="sd">        &gt;&gt;&gt; # Add harmonic overtones, up to 3rd.</span>
+<span class="sd">        &gt;&gt;&gt; f = extend_pitch(f0, 3)</span>
+<span class="sd">        &gt;&gt;&gt; f.shape</span>
+<span class="sd">        torch.Size([5, 3])</span>
+<span class="sd">        &gt;&gt;&gt; f</span>
+<span class="sd">        tensor([[ 1.,  2.,  3.],</span>
+<span class="sd">                [ 2.,  4.,  6.],</span>
+<span class="sd">                [ 3.,  6.,  9.],</span>
+<span class="sd">                [ 4.,  8., 12.],</span>
+<span class="sd">                [ 5., 10., 15.]])</span>
+<span class="sd">        &gt;&gt;&gt; # Add custom (inharmonic) partials.</span>
+<span class="sd">        &gt;&gt;&gt; f = extend_pitch(f0, torch.tensor([1, 2.1, 3.3, 4.5]))</span>
+<span class="sd">        &gt;&gt;&gt; f.shape</span>
+<span class="sd">        torch.Size([5, 4])</span>
+<span class="sd">        &gt;&gt;&gt; f</span>
+<span class="sd">        tensor([[ 1.0000,  2.1000,  3.3000,  4.5000],</span>
+<span class="sd">                [ 2.0000,  4.2000,  6.6000,  9.0000],</span>
+<span class="sd">                [ 3.0000,  6.3000,  9.9000, 13.5000],</span>
+<span class="sd">                [ 4.0000,  8.4000, 13.2000, 18.0000],</span>
+<span class="sd">                [ 5.0000, 10.5000, 16.5000, 22.5000]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="n">pattern</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">pattern</span><span class="p">),</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">h_freq</span> <span class="o">=</span> <span class="n">base</span> <span class="o">@</span> <span class="n">mult</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">h_freq</span></div>
 </pre></div>
 
              </article>
