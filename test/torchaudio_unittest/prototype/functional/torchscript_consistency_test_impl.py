@@ -65,3 +65,14 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         amps = torch.ones_like(freq)
 
         self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum"))
+
+    def test_extend_pitch(self):
+        num_frames = 5
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
+
+        num_pitches = 7
+        pattern = [i + 1.0 for i in range(num_pitches)]
+
+        self._assert_consistency(F.extend_pitch, (input, num_pitches))
+        self._assert_consistency(F.extend_pitch, (input, pattern))
+        self._assert_consistency(F.extend_pitch, (input, torch.tensor(pattern)))
