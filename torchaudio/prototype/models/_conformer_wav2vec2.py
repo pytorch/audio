@@ -680,19 +680,18 @@ def conformer_wav2vec2_pretrain_base(
     *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`
 
     Args:
-        extractor_input_dim (int): Input dimension of the features. (Default: 64)
-        extractor_output_dim (int): Output dimension after feature extraction. (Default: 256)
-        encoder_projection_dropout (float):
+        extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)
+        extractor_output_dim (int, optional): Output dimension after feature extraction. (Default: 256)
+        encoder_projection_dropout (float, optional):
             The dropout probability applied after the input feature is projected to
             ``embed_dim`. (Default: 0.0)
-        mask_prob (float):
-            Probability for each token to be chosen as start of the span to be masked.
-            (Default: 0.3)
-        mask_length (int):
+        mask_prob (float, optional):
+            Probability for each token to be chosen as start of the span to be masked. (Default: 0.3)
+        mask_length (int, optional):
             The lengths of the mask. (Default: 3)
-        num_negatives (int):
+        num_negatives (int, optional):
             Number of sampled negatives. (Default: 0)
-        cross_sample_negatives (int):
+        cross_sample_negatives (int, optional):
             Number of cross sampled negatives. (Default: 0)
 
     Returns:
@@ -742,19 +741,18 @@ def conformer_wav2vec2_pretrain_large(
     *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`
 
     Args:
-        extractor_input_dim (int): Input dimension of the features. (Default: 64)
-        extractor_output_dim (int): Output dimension after feature extraction. (Default: 256)
-        encoder_projection_dropout (float):
+        extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)
+        extractor_output_dim (int, optional): Output dimension after feature extraction. (Default: 256)
+        encoder_projection_dropout (float, optional):
             The dropout probability applied after the input feature is projected to
             ``embed_dim`. (Default: 0.0)
-        mask_prob (float):
-            Probability for each token to be chosen as start of the span to be masked.
-            (Default: 0.3)
-        mask_length (int):
+        mask_prob (float, optional):
+            Probability for each token to be chosen as start of the span to be masked. (Default: 0.3)
+        mask_length (int, optional):
             The lengths of the mask. (Default: 3)
-        num_negatives (int):
+        num_negatives (int, optional):
             Number of sampled negatives. (Default: 0)
-        cross_sample_negatives (int):
+        cross_sample_negatives (int, optional):
             Number of cross sampled negatives. (Default: 0)
 
     Returns:
