@@ -341,4 +341,3 @@ show(freq, amp, waveform, SAMPLE_RATE)
 # - https://www.edmprod.com/adsr-envelopes/
 # - https://pages.mtu.edu/~suits/notefreq432.html
 # - https://alijamieson.co.uk/2021/12/19/forgive-me-lord-for-i-have-synth-a-guide-to-subtractive-synthesis/
-# - 
