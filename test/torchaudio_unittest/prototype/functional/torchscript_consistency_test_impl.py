@@ -60,6 +60,26 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         sample_rate = 16000
         self._assert_consistency(F.barkscale_fbanks, (n_stft, f_min, f_max, n_barks, sample_rate, "traunmuller"))
 
+    def test_oscillator_bank(self):
+        num_frames, num_pitches, sample_rate = 8000, 8, 8000
+        freq = torch.rand((num_frames, num_pitches), dtype=self.dtype, device=self.device)
+        amps = torch.ones_like(freq)
+
+        self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum"))
+
+    def test_extend_pitch(self):
+        num_frames = 5
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
+
+        num_pitches = 7
+        pattern = [i + 1.0 for i in range(num_pitches)]
+
+        self._assert_consistency(F.extend_pitch, (input, num_pitches))
+        self._assert_consistency(F.extend_pitch, (input, pattern))
+        self._assert_consistency(F.extend_pitch, (input, torch.tensor(pattern)))
+
+
+class TorchScriptConsistencyCPUOnlyTestImpl(TorchScriptConsistencyTestImpl, TestBaseMixin):
     @parameterized.expand(
         [
             ([20, 25], [2, 2], [[8, 8], [7, 6]], 1_000),  # 2D with 2 mics
@@ -99,21 +119,3 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
                 hist_bin_size,
             ),
         )
-
-    def test_oscillator_bank(self):
-        num_frames, num_pitches, sample_rate = 8000, 8, 8000
-        freq = torch.rand((num_frames, num_pitches), dtype=self.dtype, device=self.device)
-        amps = torch.ones_like(freq)
-
-        self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum"))
-
-    def test_extend_pitch(self):
-        num_frames = 5
-        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
-
-        num_pitches = 7
-        pattern = [i + 1.0 for i in range(num_pitches)]
-
-        self._assert_consistency(F.extend_pitch, (input, num_pitches))
-        self._assert_consistency(F.extend_pitch, (input, pattern))
-        self._assert_consistency(F.extend_pitch, (input, torch.tensor(pattern)))

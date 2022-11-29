@@ -112,6 +112,256 @@ class FunctionalTestImpl(TestBaseMixin):
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
             F.add_noise(waveform, noise, lengths, snr)
 
+    @nested_params(
+        [(2, 3), (2, 3, 5), (2, 3, 5, 7)],
+        ["sum", "mean", "none"],
+    )
+    def test_oscillator_bank_smoke_test(self, shape, reduction):
+        """oscillator_bank supports variable dimension inputs on different device/dtypes"""
+        sample_rate = 8000
+
+        freqs = sample_rate // 2 * torch.rand(shape, dtype=self.dtype, device=self.device)
+        amps = torch.rand(shape, dtype=self.dtype, device=self.device)
+
+        waveform = F.oscillator_bank(freqs, amps, sample_rate, reduction=reduction)
+        expected_shape = shape if reduction == "none" else shape[:-1]
+        assert waveform.shape == expected_shape
+        assert waveform.dtype == self.dtype
+        assert waveform.device == self.device
+
+    def test_oscillator_invalid(self):
+        """oscillator_bank rejects/warns invalid inputs"""
+        valid_shape = [2, 3, 5]
+        sample_rate = 8000
+
+        freqs = torch.ones(*valid_shape, dtype=self.dtype, device=self.device)
+        amps = torch.rand(*valid_shape, dtype=self.dtype, device=self.device)
+
+        # mismatching shapes
+        with self.assertRaises(ValueError):
+            F.oscillator_bank(freqs[0], amps, sample_rate)
+
+        # frequencies out of range
+        nyquist = sample_rate / 2
+        with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
+            F.oscillator_bank(nyquist * freqs, amps, sample_rate)
+
+        with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
+            F.oscillator_bank(-nyquist * freqs, amps, sample_rate)
+
+    @parameterized.expand(
+        [
+            # Attack (full)
+            param(
+                num_frames=11,
+                expected=[i / 10 for i in range(11)],
+                attack=1.0,
+            ),
+            # Attack (partial)
+            param(
+                num_frames=11,
+                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0, 0, 0, 0, 0],
+                attack=0.5,
+            ),
+            # Hold (partial with attack)
+            param(
+                num_frames=11,
+                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                attack=0.5,
+                hold=0.5,
+            ),
+            # Hold (partial without attack)
+            param(
+                num_frames=11,
+                expected=[1.0] * 6 + [0.0] * 5,
+                hold=0.5,
+            ),
+            # Hold (full)
+            param(
+                num_frames=11,
+                expected=[1.0] * 11,
+                hold=1.0,
+            ),
+            # Decay (partial - linear, preceded by attack)
+            param(
+                num_frames=11,
+                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
+                attack=0.5,
+                decay=0.5,
+                n_decay=1,
+            ),
+            # Decay (partial - linear, preceded by hold)
+            param(
+                num_frames=11,
+                expected=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
+                hold=0.5,
+                decay=0.5,
+                n_decay=1,
+            ),
+            # Decay (partial - linear)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.8, 0.6, 0.4, 0.2, 0, 0, 0, 0, 0, 0],
+                decay=0.5,
+                n_decay=1,
+            ),
+            # Decay (partial - polynomial)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.64, 0.36, 0.16, 0.04, 0, 0, 0, 0, 0, 0],
+                decay=0.5,
+                n_decay=2,
+            ),
+            # Decay (full - linear)
+            param(
+                num_frames=11,
+                expected=[1.0 - i / 10 for i in range(11)],
+                decay=1.0,
+                n_decay=1,
+            ),
+            # Decay (full - polynomial)
+            param(
+                num_frames=11,
+                expected=[(1.0 - i / 10) ** 2 for i in range(11)],
+                decay=1.0,
+                n_decay=2,
+            ),
+            # Sustain (partial - preceded by decay)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+                decay=0.5,
+                sustain=0.5,
+                n_decay=1,
+            ),
+            # Sustain (partial - preceded by decay)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.8, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
+                decay=0.3,
+                sustain=0.4,
+                n_decay=1,
+            ),
+            # Sustain (full)
+            param(
+                num_frames=11,
+                expected=[0.3] * 11,
+                sustain=0.3,
+            ),
+            # Release (partial - preceded by decay)
+            param(
+                num_frames=11,
+                expected=[1.0, 0.84, 0.68, 0.52, 0.36, 0.2, 0.16, 0.12, 0.08, 0.04, 0.0],
+                decay=0.5,
+                sustain=0.2,
+                release=0.5,
+                n_decay=1,
+            ),
+            # Release (partial - preceded by sustain)
+            param(
+                num_frames=11,
+                expected=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0],
+                sustain=0.5,
+                release=0.5,
+            ),
+            # Release (full)
+            param(
+                num_frames=11,
+                expected=[1 - i / 10 for i in range(11)],
+                sustain=1.0,
+                release=1.0,
+            ),
+        ]
+    )
+    def test_adsr_envelope(
+        self, num_frames, expected, attack=0.0, hold=0.0, decay=0.0, sustain=0.0, release=0.0, n_decay=2.0
+    ):
+        """the distribution of time are correct"""
+        out = F.adsr_envelope(
+            num_frames,
+            attack=attack,
+            hold=hold,
+            decay=decay,
+            sustain=sustain,
+            release=release,
+            n_decay=n_decay,
+            device=self.device,
+            dtype=self.dtype,
+        )
+        self.assertEqual(out, torch.tensor(expected, device=self.device, dtype=self.dtype))
+
+    def test_extend_pitch(self):
+        num_frames = 5
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
+
+        num_pitches = 7
+        pattern = [i + 1 for i in range(num_pitches)]
+        expected = torch.tensor([pattern] * num_frames).to(dtype=self.dtype, device=self.device)
+
+        # passing int will append harmonic tones
+        output = F.extend_pitch(input, num_pitches)
+        self.assertEqual(output, expected)
+
+        # Same can be done with passing the list of multipliers
+        output = F.extend_pitch(input, pattern)
+        self.assertEqual(output, expected)
+
+        # or with tensor
+        pat = torch.tensor(pattern).to(dtype=self.dtype, device=self.device)
+        output = F.extend_pitch(input, pat)
+        self.assertEqual(output, expected)
+
+
+class Functional64OnlyTestImpl(TestBaseMixin):
+    @nested_params(
+        [1, 10, 100, 1000],
+        [1, 2, 4, 8],
+        [8000, 16000],
+    )
+    def test_oscillator_ref(self, f0, num_pitches, sample_rate):
+        """oscillator_bank returns the matching values as reference implementation
+
+        Note: It looks like NumPy performs cumsum on higher precision and thus this test
+        does not pass on float32.
+        """
+        duration = 4.0
+
+        num_frames = int(sample_rate * duration)
+        freq0 = f0 * torch.arange(1, num_pitches + 1, device=self.device, dtype=self.dtype)
+        amps = 1.0 / num_pitches * torch.ones_like(freq0)
+
+        ones = torch.ones([num_frames, num_pitches], device=self.device, dtype=self.dtype)
+        freq = ones * freq0[None, :]
+        amps = ones * amps[None, :]
+
+        wavs_ref = oscillator_bank_np(freq.cpu().numpy(), amps.cpu().numpy(), sample_rate)
+        wavs_hyp = F.oscillator_bank(freq, amps, sample_rate, reduction="none")
+
+        # Debug code to see what goes wrong.
+        # keeping it for future reference
+        def _debug_plot():
+            """
+            import matplotlib.pyplot as plt
+
+            fig, axes = plt.subplots(num_pitches, 3, sharex=True, sharey=True)
+            for p in range(num_pitches):
+                (ax0, ax1, ax2) = axes[p] if num_pitches > 1 else axes
+                spec_ref, ys, xs, _ = ax0.specgram(wavs_ref[:, p])
+                spec_hyp, _, _, _ = ax1.specgram(wavs_hyp[:, p])
+                spec_diff = spec_ref - spec_hyp
+                ax2.imshow(spec_diff, aspect="auto", extent=[xs[0], xs[-1], ys[0], ys[-1]])
+            plt.show()
+            """
+            pass
+
+        try:
+            self.assertEqual(wavs_hyp, wavs_ref)
+        except AssertionError:
+            _debug_plot()
+            raise
+
+
+class FunctionalCPUOnlyTestImpl(TestBaseMixin):
     @parameterized.expand(
         [
             (0.1, 0.2, (2, 1, 2500)),  # both float
@@ -370,250 +620,260 @@ class FunctionalTestImpl(TestBaseMixin):
         assert hist.ndim == 3
         self.assertEqual(hist.sum(), expected_sum)
 
-    @nested_params(
-        [(2, 3), (2, 3, 5), (2, 3, 5, 7)],
-        ["sum", "mean", "none"],
+    @parameterized.expand(
+        [
+            (0.1, 0.2, (2, 1, 2500)),  # both float
+            # Per-wall
+            (torch.rand(4), 0.2, (2, 1, 2500)),
+            (0.1, torch.rand(4), (2, 1, 2500)),
+            (torch.rand(4), torch.rand(4), (2, 1, 2500)),
+            # Per-band and per-wall
+            (torch.rand(6, 4), 0.2, (2, 6, 2500)),
+            (0.1, torch.rand(6, 4), (2, 6, 2500)),
+            (torch.rand(6, 4), torch.rand(6, 4), (2, 6, 2500)),
+        ]
     )
-    def test_oscillator_bank_smoke_test(self, shape, reduction):
-        """oscillator_bank supports variable dimension inputs on different device/dtypes"""
-        sample_rate = 8000
+    def test_ray_tracing_output_shape(self, e_absorption, scattering, expected_shape):
+        room_dim = torch.tensor([20, 25], dtype=self.dtype)
+        mic_array = torch.tensor([[2, 2], [8, 8]], dtype=self.dtype)
+        source = torch.tensor([7, 6], dtype=self.dtype)
+        num_rays = 100
 
-        freqs = sample_rate // 2 * torch.rand(shape, dtype=self.dtype, device=self.device)
-        amps = torch.rand(shape, dtype=self.dtype, device=self.device)
+        hist = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
 
-        waveform = F.oscillator_bank(freqs, amps, sample_rate, reduction=reduction)
-        expected_shape = shape if reduction == "none" else shape[:-1]
-        assert waveform.shape == expected_shape
-        assert waveform.dtype == self.dtype
-        assert waveform.device == self.device
+        assert hist.shape == expected_shape
 
-    def test_oscillator_invalid(self):
-        """oscillator_bank rejects/warns invalid inputs"""
-        valid_shape = [2, 3, 5]
-        sample_rate = 8000
+    def test_ray_tracing_input_errors(self):
+        with self.assertRaisesRegex(ValueError, "mic_array must be 1D tensor of shape D, or 2D tensor"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5]), source=torch.tensor([0, 0]), mic_array=torch.tensor([[[3, 4]]]), num_rays=10
+            )
+        with self.assertRaisesRegex(ValueError, "room must be of float32 or float64 dtype"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5]).to(torch.int),
+                source=torch.tensor([0, 0]),
+                mic_array=torch.tensor([3, 4]),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "dtype of room, source and mic_array must be the same"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5]).to(torch.float64),
+                source=torch.tensor([0, 0]).to(torch.float32),
+                mic_array=torch.tensor([3, 4]),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "Room dimension D must match with source and mic_array"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5, 10], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "Room dimension D must match with source and mic_array"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "Room dimension D must match with source and mic_array"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5, 10], dtype=torch.float),
+                source=torch.tensor([0, 0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, "time_thres=10 must be greater than hist_bin_size=11"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                time_thres=10,
+                hist_bin_size=11,
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of e_absorption must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                e_absorption=torch.rand(5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of scattering must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                scattering=torch.rand(5, 5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of e_absorption must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                e_absorption=torch.rand(5, 5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(ValueError, "The shape of scattering must be"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                scattering=torch.rand(5, dtype=torch.float),
+            )
+        with self.assertRaisesRegex(
+            ValueError, "e_absorption and scattering must have the same number of bands and walls"
+        ):
+            F.ray_tracing(
+                room=torch.tensor([4, 5], dtype=torch.float),
+                source=torch.tensor([0, 0], dtype=torch.float),
+                mic_array=torch.tensor([3, 4], dtype=torch.float),
+                num_rays=10,
+                e_absorption=torch.rand(6, 4, dtype=torch.float),
+                scattering=torch.rand(5, 4, dtype=torch.float),
+            )
 
-        freqs = torch.ones(*valid_shape, dtype=self.dtype, device=self.device)
-        amps = torch.rand(*valid_shape, dtype=self.dtype, device=self.device)
+        # Make sure passing different shapes for e_abs or scattering doesn't raise an error
+        # float and tensor
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=0.1,
+            scattering=torch.rand(5, 4, dtype=torch.float),
+        )
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=torch.rand(5, 4, dtype=torch.float),
+            scattering=0.1,
+        )
+        # per-wall only and per-band + per-wall
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=torch.rand(4, dtype=torch.float),
+            scattering=torch.rand(6, 4, dtype=torch.float),
+        )
+        F.ray_tracing(
+            room=torch.tensor([4, 5], dtype=torch.float),
+            source=torch.tensor([0, 0], dtype=torch.float),
+            mic_array=torch.tensor([3, 4], dtype=torch.float),
+            num_rays=10,
+            e_absorption=torch.rand(6, 4, dtype=torch.float),
+            scattering=torch.rand(4, dtype=torch.float),
+        )
 
-        # mismatching shapes
-        with self.assertRaises(ValueError):
-            F.oscillator_bank(freqs[0], amps, sample_rate)
+    def test_ray_tracing_per_band_per_wall_absorption(self):
+        """Check that when the value of absorption and scattering are the same
+        across walls and frequency bands, the output histograms are:
+        - all equal across frequency bands
+        - equal to simply passing a float value instead of a (num_bands, D) or
+        (D,) tensor.
+        """
 
-        # frequencies out of range
-        nyquist = sample_rate / 2
-        with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
-            F.oscillator_bank(nyquist * freqs, amps, sample_rate)
+        room_dim = torch.tensor([20, 25], dtype=self.dtype)
+        mic_array = torch.tensor([[2, 2], [8, 8]], dtype=self.dtype)
+        source = torch.tensor([7, 6], dtype=self.dtype)
+        num_rays = 1_000
+        ABS, SCAT = 0.1, 0.2
 
-        with self.assertWarnsRegex(UserWarning, r"above nyquist frequency"):
-            F.oscillator_bank(-nyquist * freqs, amps, sample_rate)
+        e_absorption = torch.full(fill_value=ABS, size=(6, 4), dtype=self.dtype)
+        scattering = torch.full(fill_value=SCAT, size=(6, 4), dtype=self.dtype)
+        hist_per_band_per_wall = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+        e_absorption = torch.full(fill_value=ABS, size=(4,), dtype=self.dtype)
+        scattering = torch.full(fill_value=SCAT, size=(4,), dtype=self.dtype)
+        hist_per_wall = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+
+        e_absorption = ABS
+        scattering = SCAT
+        hist_single = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
+        assert hist_per_band_per_wall.shape == (2, 6, 2500)
+        assert hist_per_wall.shape == (2, 1, 2500)
+        assert hist_single.shape == (2, 1, 2500)
+        torch.testing.assert_close(hist_single, hist_per_wall)
+
+        hist_single = hist_single.expand(2, 6, 2500)
+        torch.testing.assert_close(hist_single, hist_per_band_per_wall)
 
     @parameterized.expand(
         [
-            # Attack (full)
-            param(
-                num_frames=11,
-                expected=[i / 10 for i in range(11)],
-                attack=1.0,
-            ),
-            # Attack (partial)
-            param(
-                num_frames=11,
-                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0, 0, 0, 0, 0],
-                attack=0.5,
-            ),
-            # Hold (partial with attack)
-            param(
-                num_frames=11,
-                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-                attack=0.5,
-                hold=0.5,
-            ),
-            # Hold (partial without attack)
-            param(
-                num_frames=11,
-                expected=[1.0] * 6 + [0.0] * 5,
-                hold=0.5,
-            ),
-            # Hold (full)
-            param(
-                num_frames=11,
-                expected=[1.0] * 11,
-                hold=1.0,
-            ),
-            # Decay (partial - linear, preceded by attack)
-            param(
-                num_frames=11,
-                expected=[0, 0.2, 0.4, 0.6, 0.8, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
-                attack=0.5,
-                decay=0.5,
-                n_decay=1,
-            ),
-            # Decay (partial - linear, preceded by hold)
-            param(
-                num_frames=11,
-                expected=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.8, 0.6, 0.4, 0.2, 0],
-                hold=0.5,
-                decay=0.5,
-                n_decay=1,
-            ),
-            # Decay (partial - linear)
-            param(
-                num_frames=11,
-                expected=[1.0, 0.8, 0.6, 0.4, 0.2, 0, 0, 0, 0, 0, 0],
-                decay=0.5,
-                n_decay=1,
-            ),
-            # Decay (partial - polynomial)
-            param(
-                num_frames=11,
-                expected=[1.0, 0.64, 0.36, 0.16, 0.04, 0, 0, 0, 0, 0, 0],
-                decay=0.5,
-                n_decay=2,
-            ),
-            # Decay (full - linear)
-            param(
-                num_frames=11,
-                expected=[1.0 - i / 10 for i in range(11)],
-                decay=1.0,
-                n_decay=1,
-            ),
-            # Decay (full - polynomial)
-            param(
-                num_frames=11,
-                expected=[(1.0 - i / 10) ** 2 for i in range(11)],
-                decay=1.0,
-                n_decay=2,
-            ),
-            # Sustain (partial - preceded by decay)
-            param(
-                num_frames=11,
-                expected=[1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-                decay=0.5,
-                sustain=0.5,
-                n_decay=1,
-            ),
-            # Sustain (partial - preceded by decay)
-            param(
-                num_frames=11,
-                expected=[1.0, 0.8, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
-                decay=0.3,
-                sustain=0.4,
-                n_decay=1,
-            ),
-            # Sustain (full)
-            param(
-                num_frames=11,
-                expected=[0.3] * 11,
-                sustain=0.3,
-            ),
-            # Release (partial - preceded by decay)
-            param(
-                num_frames=11,
-                expected=[1.0, 0.84, 0.68, 0.52, 0.36, 0.2, 0.16, 0.12, 0.08, 0.04, 0.0],
-                decay=0.5,
-                sustain=0.2,
-                release=0.5,
-                n_decay=1,
-            ),
-            # Release (partial - preceded by sustain)
-            param(
-                num_frames=11,
-                expected=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0],
-                sustain=0.5,
-                release=0.5,
-            ),
-            # Release (full)
-            param(
-                num_frames=11,
-                expected=[1 - i / 10 for i in range(11)],
-                sustain=1.0,
-                release=1.0,
-            ),
+            ([20, 25], [2, 2], [[8, 8], [7, 6]], 10_000, 5.563379765),  # 2D with 2 mics
+            ([20, 25, 30], [1, 10, 5], [[8, 8, 22]], 1_000, 0.038723841),  # 3D with 1 mic
         ]
     )
-    def test_adsr_envelope(
-        self, num_frames, expected, attack=0.0, hold=0.0, decay=0.0, sustain=0.0, release=0.0, n_decay=2.0
-    ):
-        """the distribution of time are correct"""
-        out = F.adsr_envelope(
-            num_frames,
-            attack=attack,
-            hold=hold,
-            decay=decay,
-            sustain=sustain,
-            release=release,
-            n_decay=n_decay,
-            device=self.device,
-            dtype=self.dtype,
-        )
-        self.assertEqual(out, torch.tensor(expected, device=self.device, dtype=self.dtype))
+    def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays, expected_sum):
+        """Ideally we would be checking the histogram directly against
+        pyroomacoustics, but unfortunately PRA may randomly segfault during the
+        ray-tracing. So instead we check the overlall sum of the histrogram
+        values.
 
-    def test_extend_pitch(self):
-        num_frames = 5
-        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
+        The sums have been validated *on each bin* against PRA with high
+        precision, i.e. this was passing:
 
-        num_pitches = 7
-        pattern = [i + 1 for i in range(num_pitches)]
-        expected = torch.tensor([pattern] * num_frames).to(dtype=self.dtype, device=self.device)
-
-        # passing int will append harmonic tones
-        output = F.extend_pitch(input, num_pitches)
-        self.assertEqual(output, expected)
-
-        # Same can be done with passing the list of multipliers
-        output = F.extend_pitch(input, pattern)
-        self.assertEqual(output, expected)
-
-        # or with tensor
-        pat = torch.tensor(pattern).to(dtype=self.dtype, device=self.device)
-        output = F.extend_pitch(input, pat)
-        self.assertEqual(output, expected)
-
-
-class Functional64OnlyTestImpl(TestBaseMixin):
-    @nested_params(
-        [1, 10, 100, 1000],
-        [1, 2, 4, 8],
-        [8000, 16000],
-    )
-    def test_oscillator_ref(self, f0, num_pitches, sample_rate):
-        """oscillator_bank returns the matching values as reference implementation
-
-        Note: It looks like NumPy performs cumsum on higher precision and thus this test
-        does not pass on float32.
+        self.assertEqual(hist, hist_pra)  # check all bin values with default atol and rtol
+        Note: need to set max_order=0 and air_absorption=False in PRA for consistent checks.
+        max_order=0 makes sure PRA doesn't use the hybrid method and only does ray-tracing.
         """
-        duration = 4.0
+        num_walls = 4 if len(room_dim) == 2 else 6
+        num_bands = 6  # Note: in ray tracing, we don't need to restrict the number of bands to 7
 
-        num_frames = int(sample_rate * duration)
-        freq0 = f0 * torch.arange(1, num_pitches + 1, device=self.device, dtype=self.dtype)
-        amps = 1.0 / num_pitches * torch.ones_like(freq0)
+        torch.manual_seed(0)
+        # We don't do torch.rand(dtype=self.dtype). This would generate different
+        # numbers for float32 and float64, thus leading to a different output!
+        # Instead, we do the dtype conversion after the random values were
+        # generated as float32.
+        e_absorption = torch.rand(num_bands, num_walls).to(self.dtype)
+        scattering = torch.rand(num_bands, num_walls).to(self.dtype)
 
-        ones = torch.ones([num_frames, num_pitches], device=self.device, dtype=self.dtype)
-        freq = ones * freq0[None, :]
-        amps = ones * amps[None, :]
+        room_dim = torch.tensor(room_dim, dtype=self.dtype)
+        source = torch.tensor(source, dtype=self.dtype)
+        mic_array = torch.tensor(mic_array, dtype=self.dtype)
 
-        wavs_ref = oscillator_bank_np(freq.cpu().numpy(), amps.cpu().numpy(), sample_rate)
-        wavs_hyp = F.oscillator_bank(freq, amps, sample_rate, reduction="none")
+        hist = F.ray_tracing(
+            room=room_dim,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            e_absorption=e_absorption,
+            scattering=scattering,
+        )
 
-        # Debug code to see what goes wrong.
-        # keeping it for future reference
-        def _debug_plot():
-            """
-            import matplotlib.pyplot as plt
-
-            fig, axes = plt.subplots(num_pitches, 3, sharex=True, sharey=True)
-            for p in range(num_pitches):
-                (ax0, ax1, ax2) = axes[p] if num_pitches > 1 else axes
-                spec_ref, ys, xs, _ = ax0.specgram(wavs_ref[:, p])
-                spec_hyp, _, _, _ = ax1.specgram(wavs_hyp[:, p])
-                spec_diff = spec_ref - spec_hyp
-                ax2.imshow(spec_diff, aspect="auto", extent=[xs[0], xs[-1], ys[0], ys[-1]])
-            plt.show()
-            """
-            pass
-
-        try:
-            self.assertEqual(wavs_hyp, wavs_ref)
-        except AssertionError:
-            _debug_plot()
-            raise
+        assert hist.ndim == 3
+        self.assertEqual(hist.sum(), expected_sum)
