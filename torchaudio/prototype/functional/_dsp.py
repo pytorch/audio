@@ -259,9 +259,10 @@ def sinc_impulse_response(cutoff: torch.Tensor, window_size: int = 513, high_pas
     Args:
         cutoff (Tensor): Cutoff frequencies for low-pass sinc filter.
 
-        window_size (int): Size of the Hamming window to apply. Must be odd.
+        window_size (int, optional): Size of the Hamming window to apply. Must be odd.
+        (Default: 513)
 
-        high_pass:
+        high_pass (bool, optional):
             If ``True``, convert the resulting filter to high-pass.
             Otherwise low-pass filter is returned. Default: ``False``.
 
