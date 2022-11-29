@@ -1,6 +1,6 @@
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models import conformer_wav2vec2_base, emformer_hubert_base
+from torchaudio.prototype.models import conformer_wav2vec2_base, conformer_wav2vec2_pretrain_base, emformer_hubert_base
 from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
 
 
@@ -23,7 +23,7 @@ class TestSSLModel(TorchaudioTestCase):
         model(features, lengths)
 
     @nested_params(
-        [(conformer_wav2vec2_base, 64), (emformer_hubert_base, 80)],
+        [(conformer_wav2vec2_base, 64), (conformer_wav2vec2_pretrain_base, 64), (emformer_hubert_base, 80)],
         [torch.float32, torch.float64],
     )
     def test_cpu_smoke_test(self, model_feature_dim, dtype):
@@ -32,7 +32,7 @@ class TestSSLModel(TorchaudioTestCase):
         self._smoke_test(model, feature_dim, torch.device("cpu"), dtype)
 
     @nested_params(
-        [(conformer_wav2vec2_base, 64), (emformer_hubert_base, 80)],
+        [(conformer_wav2vec2_base, 64), (conformer_wav2vec2_pretrain_base, 64), (emformer_hubert_base, 80)],
         [torch.float32, torch.float64],
     )
     @skipIfNoCuda
