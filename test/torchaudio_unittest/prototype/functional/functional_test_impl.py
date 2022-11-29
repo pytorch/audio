@@ -5,7 +5,14 @@ from parameterized import param, parameterized
 from scipy import signal
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
-from .dsp_utils import oscillator_bank as oscillator_bank_np
+from .dsp_utils import oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
+
+
+def _prod(l):
+    r = 1
+    for p in l:
+        r *= p
+    return r
 
 
 class FunctionalTestImpl(TestBaseMixin):
@@ -360,6 +367,49 @@ class FunctionalTestImpl(TestBaseMixin):
         pat = torch.tensor(pattern).to(dtype=self.dtype, device=self.device)
         output = F.extend_pitch(input, pat)
         self.assertEqual(output, expected)
+
+    @nested_params(
+        # fmt: off
+        [(1,), (10,), (2, 5), (3, 5, 7)],
+        [1, 3, 65, 129, 257, 513, 1025],
+        [True, False],
+        # fmt: on
+    )
+    def test_sinc_ir_shape(self, input_shape, window_size, high_pass):
+        """The shape of sinc_impulse_response is correct"""
+        numel = _prod(input_shape)
+        cutoff = torch.linspace(1, numel, numel).reshape(input_shape)
+        cutoff = cutoff.to(dtype=self.dtype, device=self.device)
+
+        filt = F.sinc_impulse_response(cutoff, window_size, high_pass)
+        assert filt.shape == input_shape + (window_size,)
+
+    @nested_params([True, False])
+    def test_sinc_ir_size(self, high_pass):
+        """Increasing window size expand the filter at the ends. Core parts must stay same"""
+        cutoff = torch.tensor([200, 300, 400, 500, 600, 700])
+        cutoff = cutoff.to(dtype=self.dtype, device=self.device)
+
+        filt_5 = F.sinc_impulse_response(cutoff, 5, high_pass)
+        filt_3 = F.sinc_impulse_response(cutoff, 3, high_pass)
+
+        self.assertEqual(filt_3, filt_5[..., 1:-1])
+
+    @nested_params(
+        # fmt: off
+        [0, 0.1, 0.5, 0.9, 1.0],
+        [1, 3, 5, 65, 129, 257, 513, 1025, 2049],
+        [False, True],
+        # fmt: on
+    )
+    def test_sinc_ir_reference(self, cutoff, window_size, high_pass):
+        """sinc_impulse_response produces the same result as reference implementation"""
+        cutoff = torch.tensor([cutoff], device=self.device, dtype=self.dtype)
+
+        hyp = F.sinc_impulse_response(cutoff, window_size, high_pass)
+        ref = sinc_ir_np(cutoff.cpu().numpy(), window_size, high_pass)
+
+        self.assertEqual(hyp, ref)
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):

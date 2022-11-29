@@ -62,3 +62,8 @@ class AutogradTestImpl(TestBaseMixin):
 
         assert gradcheck(F.extend_pitch, (input, num_pitches))
         assert gradcheck(F.extend_pitch, (input, pattern))
+
+    def test_sinc_ir(self):
+        cutoff = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype, requires_grad=True)
+        assert gradcheck(F.sinc_impulse_response, (cutoff, 513, False))
+        assert gradcheck(F.sinc_impulse_response, (cutoff, 513, True))

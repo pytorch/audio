@@ -76,3 +76,8 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         self._assert_consistency(F.extend_pitch, (input, num_pitches))
         self._assert_consistency(F.extend_pitch, (input, pattern))
         self._assert_consistency(F.extend_pitch, (input, torch.tensor(pattern)))
+
+    def test_sinc_ir(self):
+        cutoff = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype)
+        self._assert_consistency(F.sinc_impulse_response, (cutoff, 513, False))
+        self._assert_consistency(F.sinc_impulse_response, (cutoff, 513, True))
