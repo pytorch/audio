@@ -1,7 +1,7 @@
 import torch
 from parameterized import parameterized
 from torchaudio.prototype.models import conformer_wav2vec2_base, emformer_hubert_base
-from torchaudio_unittest.common_utils import skipIfNoCuda, torch_script, TorchaudioTestCase
+from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
 
 
 class TestSSLModel(TorchaudioTestCase):
@@ -22,39 +22,37 @@ class TestSSLModel(TorchaudioTestCase):
 
         model(features, lengths)
 
-    @parameterized.expand(
-        [
-            (conformer_wav2vec2_base, torch.float32, 64),
-            (conformer_wav2vec2_base, torch.float64, 64),
-            (emformer_hubert_base, torch.float32, 80),
-            (emformer_hubert_base, torch.float64, 80),
-        ]
+    @nested_params(
+        [(conformer_wav2vec2_base, 64), (emformer_hubert_base, 80)],
+        [torch.float32, torch.float64],
     )
-    def test_cpu_smoke_test(self, model, dtype, feature_dim):
+    def test_cpu_smoke_test(self, model_feature_dim, dtype):
+        model, feature_dim = model_feature_dim
         model = model()
         self._smoke_test(model, feature_dim, torch.device("cpu"), dtype)
 
-    @parameterized.expand(
-        [
-            (conformer_wav2vec2_base, torch.float32, 64),
-            (conformer_wav2vec2_base, torch.float64, 64),
-            (emformer_hubert_base, torch.float32, 80),
-            (emformer_hubert_base, torch.float64, 80),
-        ]
+    @nested_params(
+        [(conformer_wav2vec2_base, 64), (emformer_hubert_base, 80)],
+        [torch.float32, torch.float64],
     )
     @skipIfNoCuda
-    def test_cuda_smoke_test(self, model, dtype, feature_dim):
+    def test_cuda_smoke_test(self, model_feature_dim, dtype):
+        model, feature_dim = model_feature_dim
         model = model()
         self._smoke_test(model, feature_dim, torch.device("cuda"), dtype)
 
     @parameterized.expand(
         [
-            (conformer_wav2vec2_base, 64),
-            (emformer_hubert_base, 80),
+            (conformer_wav2vec2_base, 64, None),
+            (emformer_hubert_base, 80, None),
+            (emformer_hubert_base, 80, 512),
         ]
     )
-    def test_extract_feature(self, model, feature_dim):
-        model = model()
+    def test_extract_feature(self, model, feature_dim, aux_num_out):
+        if aux_num_out is not None:
+            model = model(aux_num_out=aux_num_out)
+        else:
+            model = model()
         model.eval()
 
         batch_size, num_frames = 3, 1024
@@ -88,12 +86,16 @@ class TestSSLModel(TorchaudioTestCase):
 
     @parameterized.expand(
         [
-            (conformer_wav2vec2_base, 64),
-            (emformer_hubert_base, 80),
+            (conformer_wav2vec2_base, 64, None),
+            (emformer_hubert_base, 80, None),
+            (emformer_hubert_base, 80, 512),
         ]
     )
-    def test_zero_length(self, model, feature_dim):
-        model = model()
+    def test_zero_length(self, model, feature_dim, aux_num_out):
+        if aux_num_out is not None:
+            model = model(aux_num_out=aux_num_out)
+        else:
+            model = model()
         model.eval()
 
         batch_size, num_frames = 3, 1024
@@ -107,12 +109,16 @@ class TestSSLModel(TorchaudioTestCase):
 
     @parameterized.expand(
         [
-            (conformer_wav2vec2_base, 64),
-            (emformer_hubert_base, 80),
+            (conformer_wav2vec2_base, 64, None),
+            (emformer_hubert_base, 80, None),
+            (emformer_hubert_base, 80, 512),
         ]
     )
-    def test_torchscript_consistency(self, model, feature_dim):
-        model = model()
+    def test_torchscript_consistency(self, model, feature_dim, aux_num_out):
+        if aux_num_out is not None:
+            model = model(aux_num_out=aux_num_out)
+        else:
+            model = model()
         model.eval()
 
         batch_size, num_frames = 3, 1024
