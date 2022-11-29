@@ -356,14 +356,15 @@ def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
 
     Args:
         waveform (torch.Tensor): Waveform, with shape `(..., N)`.
-        coeff (float, optional): Pre-emphasis coefficient. (Default: 0.97)
+        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
 
     Returns:
         torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
     """
-    a_coeffs = torch.tensor([1.0, 0.0])
-    b_coeffs = torch.tensor([1.0, -coeff])
-    return lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+    waveform = waveform.clone()
+    waveform[..., 1:] -= coeff * waveform[..., :-1]
+    return waveform
 
 
 def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
@@ -376,11 +377,12 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
 
     Args:
         waveform (torch.Tensor): Waveform, with shape `(..., N)`.
-        coeff (float, optional): De-emphasis coefficient. (Default: 0.97)
+        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
 
     Returns:
         torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
     """
-    a_coeffs = torch.tensor([1.0, -coeff])
-    b_coeffs = torch.tensor([1.0, 0.0])
+    a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
+    b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
     return lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)

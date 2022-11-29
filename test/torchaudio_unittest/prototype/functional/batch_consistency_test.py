@@ -67,3 +67,25 @@ class BatchConsistencyTest(TorchaudioTestCase):
         for idx in range(len(unbatched_output)):
             w, l = output[idx], output_lengths[idx]
             self.assertEqual(unbatched_output[idx], w[:l])
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        actual = F.preemphasis(waveform, coeff=coeff)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            expected.append(F.preemphasis(waveform[i], coeff=coeff))
+
+        self.assertEqual(torch.stack(expected), actual)
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        actual = F.deemphasis(waveform, coeff=coeff)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            expected.append(F.deemphasis(waveform[i], coeff=coeff))
+
+        self.assertEqual(torch.stack(expected), actual)
