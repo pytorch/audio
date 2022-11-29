@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221128) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221129) &#x25BC</a>
     </div>
     
 
@@ -254,6 +254,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -440,15 +441,15 @@
 <span class="sd">            :py:class:`torchaudio.models.Emformer` module that consists of a list of emformer layers.</span>
 <span class="sd">        output_linear (torch.nn.Module):</span>
 <span class="sd">            Linear layer after emformer module.</span>
-<span class="sd">        layer_norm (torch.nn.Module or None, optional):</span>
-<span class="sd">            If ``None``, don&#39;t apply layer normalization to the output.</span>
+<span class="sd">        layer_norm (torch.nn.Module):</span>
+<span class="sd">            Apply layer normalization to the output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">emformer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">output_linear</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
-        <span class="n">layer_norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_norm</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">emformer</span> <span class="o">=</span> <span class="n">emformer</span>
@@ -477,8 +478,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">output</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">emformer</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_linear</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span>
 
     <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
@@ -596,7 +596,8 @@
         <span class="n">tanh_on_mem</span><span class="o">=</span><span class="n">tanh_on_mem</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">output_linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">EmformerEncoder</span><span class="p">(</span><span class="n">emformer</span><span class="p">,</span> <span class="n">output_linear</span><span class="p">)</span>
+    <span class="n">layer_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">output_dim</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">EmformerEncoder</span><span class="p">(</span><span class="n">emformer</span><span class="p">,</span> <span class="n">output_linear</span><span class="p">,</span> <span class="n">layer_norm</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="emformer_hubert_model"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.emformer_hubert_model">[docs]</a><span class="k">def</span> <span class="nf">emformer_hubert_model</span><span class="p">(</span>
@@ -617,6 +618,7 @@
     <span class="n">encoder_max_memory_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">encoder_weight_init_scale_strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">encoder_tanh_on_mem</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build a custom Emformer HuBERT model.</span>
 
@@ -640,6 +642,9 @@
 <span class="sd">        encoder_weight_init_scale_strategy (str or None): Per-layer weight initialization scaling</span>
 <span class="sd">            strategy. Must be one of (&quot;depthwise&quot;, &quot;constant&quot;, ``None``).</span>
 <span class="sd">        encoder_tanh_on_mem (bool): If ``True``, applies tanh to memory elements.</span>
+<span class="sd">        aux_num_out (int or None):</span>
+<span class="sd">            When provided, attach an extra linear layer on top of encoder, which can be</span>
+<span class="sd">            used for fine-tuning.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
@@ -664,13 +669,17 @@
         <span class="n">encoder_weight_init_scale_strategy</span><span class="p">,</span>
         <span class="n">encoder_tanh_on_mem</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">emformer</span><span class="p">)</span></div>
+    <span class="n">aux</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">aux_num_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_output_dim</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">emformer</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="emformer_hubert_base"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.emformer_hubert_base">[docs]</a><span class="k">def</span> <span class="nf">emformer_hubert_base</span><span class="p">(</span>
     <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
     <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Build Emformer HuBERT Model with 20 Emformer layers.</span>
 
@@ -678,6 +687,7 @@
 <span class="sd">        extractor_input_dim (int, optional): The input dimension for feature extractor. (Default: 80)</span>
 <span class="sd">        extractor_output_dim (int, optional): The output dimension after feature extractor. (Default: 128)</span>
 <span class="sd">        encoder_dropout (float, optional): Dropout probability in Emformer. (Default: 0.1)</span>
+<span class="sd">        aux_num_out (int or None, optional): Output dimension of aux layer for fine-tuning. (Default: ``None``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
@@ -702,6 +712,7 @@
         <span class="n">encoder_max_memory_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">encoder_weight_init_scale_strategy</span><span class="o">=</span><span class="s2">&quot;depthwise&quot;</span><span class="p">,</span>
         <span class="n">encoder_tanh_on_mem</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

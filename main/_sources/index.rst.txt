@@ -38,6 +38,7 @@ model implementations and application components.
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
+   tutorials/oscillator_tutorial
 
    tutorials/audio_datasets_tutorial
 
@@ -182,6 +183,13 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_feature_augmentation_tutorial.png
    :link: tutorials/audio_feature_augmentation_tutorial.html
    :tags: Preprocessing
+
+.. customcarditem::
+   :header: Generating waveforms with oscillator
+   :card_description:
+   :image: _images/sphx_glr_oscillator_tutorial_003.png
+   :link: tutorials/oscillator_tutorial.html
+   :tags: DSP
 
 .. customcarditem::
    :header: Audio dataset
