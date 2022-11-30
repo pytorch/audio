@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221129) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221130) &#x25BC</a>
     </div>
     
 
@@ -255,6 +255,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -385,20 +386,129 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">ModuleList</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models.conformer</span> <span class="kn">import</span> <span class="n">ConformerLayer</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models.rnnt</span> <span class="kn">import</span> <span class="n">_TimeReduction</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2</span> <span class="kn">import</span> <span class="n">components</span>
 
 
+<span class="k">def</span> <span class="nf">_buffered_arange</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute arange using a buffered tensor across function calls.</span>
+<span class="sd">    Produces same result as torch.arange(end=max).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        max (int): Ending value for arange.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_buffered_arange</span><span class="p">,</span> <span class="s2">&quot;buf&quot;</span><span class="p">):</span>
+        <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">max</span> <span class="o">&gt;</span> <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">numel</span><span class="p">():</span>
+        <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">resize_</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">max</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="p">[:</span><span class="nb">max</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_sample_negatives</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Sample negative examples from masked input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input (Tensor): Tensor of dimension `(batch, frame, dim)`.</span>
+<span class="sd">        num_negatives (int): Number of negative examples to sample.</span>
+<span class="sd">        cross_sample_negatives (int): Number of negative examples to cross sample.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (Tensor, Tensor):</span>
+<span class="sd">        Tensor</span>
+<span class="sd">            The negative samples.</span>
+<span class="sd">        Tensor</span>
+<span class="sd">            The indices of the negative samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_negatives</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cross_sample_negatives</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+
+    <span class="n">cross_high</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
+    <span class="n">high</span> <span class="o">=</span> <span class="n">T</span>
+
+    <span class="k">assert</span> <span class="n">high</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">num_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">tszs</span> <span class="o">=</span> <span class="n">_buffered_arange</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">num_negatives</span> <span class="o">*</span> <span class="n">T</span><span class="p">))</span>
+        <span class="n">neg_idxs</span><span class="p">[</span><span class="n">neg_idxs</span> <span class="o">&gt;=</span> <span class="n">tszs</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">cross_sample_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">tszs</span> <span class="o">=</span> <span class="n">_buffered_arange</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">cross_neg_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">cross_high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">cross_sample_negatives</span> <span class="o">*</span> <span class="n">T</span><span class="p">))</span>
+        <span class="n">cross_neg_idxs</span><span class="p">[</span><span class="n">cross_neg_idxs</span> <span class="o">&gt;=</span> <span class="n">tszs</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">num_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">neg_idxs</span> <span class="o">+</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">high</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">cross_neg_idxs</span>
+
+    <span class="k">if</span> <span class="n">cross_sample_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">neg_idxs</span><span class="p">,</span> <span class="n">cross_neg_idxs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">negs</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="n">neg_idxs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">negs</span> <span class="o">=</span> <span class="n">negs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">num_negatives</span> <span class="o">+</span> <span class="n">cross_sample_negatives</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># NxBxCxT</span>
+
+    <span class="k">return</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span>
+
+
+<span class="k">class</span> <span class="nc">NegativeSampler</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies preprocessing to input and then computes negative sampling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        preprocessor (nn.Module): Transforms input tensor prior to negative sampling.</span>
+<span class="sd">        num_negatives (int): Number of negative examples to sample.</span>
+<span class="sd">        cross_sample_negatives (int): Number of negative examples to cross sample.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">preprocessor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="n">preprocessor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_negatives</span> <span class="o">=</span> <span class="n">num_negatives</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_sample_negatives</span> <span class="o">=</span> <span class="n">cross_sample_negatives</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            input (Tensor): Tensor of dimension `(B, T, D)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Tensor, Optional[Tensor]):</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The input tensor after preprocessing, prior to being sampled.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The negative samples.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The indices of the negative samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">preprocessed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">_sample_negatives</span><span class="p">(</span><span class="n">preprocessed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_negatives</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_sample_negatives</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">preprocessed</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span>
+
+
 <span class="k">class</span> <span class="nc">FeatureEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Feature Encoder class, consisting of time reduction and linear layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        stride (int): number of frames to merge for the output frame</span>
-<span class="sd">        input_dim (int): input dimension of the tensor</span>
-<span class="sd">        output_dim (int): output dimension of the tensor</span>
+<span class="sd">        stride (int): Number of frames to merge for the output frame.</span>
+<span class="sd">        input_dim (int): Input dimension of the tensor.</span>
+<span class="sd">        output_dim (int): Output dimension of the tensor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -420,7 +530,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (Tensor, Optional[Tensor]):</span>
 <span class="sd">                Tensor: output sequence after undergoing time reduction and linear projection.</span>
-<span class="sd">                    Shape ``(B, T // stride, D * stride)</span>
+<span class="sd">                    Shape ``(B, T // stride, D * stride).</span>
 <span class="sd">                Optional[Tensor]: output lengths of shape ``(B,)`` if lengths parameter is provided,</span>
 <span class="sd">                    otherwise `None`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -441,15 +551,15 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        feature_projection (nn.Module):</span>
-<span class="sd">            Projects feature to encoder dimension</span>
+<span class="sd">            Projects feature to encoder dimension.</span>
 <span class="sd">        conformer (nn.ModuleList)</span>
-<span class="sd">            List of Conformer layers</span>
+<span class="sd">            List of Conformer layers.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">feature_projection</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
-        <span class="n">conformer</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">,</span>
+        <span class="n">conformer</span><span class="p">:</span> <span class="n">ModuleList</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_projection</span> <span class="o">=</span> <span class="n">feature_projection</span>
@@ -494,7 +604,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``</span>
+<span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``.</span>
 <span class="sd">            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.</span>
 
 <span class="sd">        Returns:</span>
@@ -515,15 +625,94 @@
         <span class="sd">&quot;&quot;&quot;Returns the list of outputs from the intermediate layers of conformer block in the encoder.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``</span>
+<span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``.</span>
 <span class="sd">            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Tensor]:</span>
-<span class="sd">                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`</span>
+<span class="sd">                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_intermediate_outputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">masks</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">[docs]</a><span class="k">class</span> <span class="nc">ConformerWav2Vec2PretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Conformer Wav2Vec2 pre-train model for training from scratch.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        To build the model, please use one of the factory functions,</span>
+<span class="sd">        :py:func:`conformer_wav2vec2_base` or :py:func:`conformer_wav2vec2_large`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        wav2vec2 (nn.Module):</span>
+<span class="sd">            Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.</span>
+<span class="sd">        mask_generator (nn.Module):</span>
+<span class="sd">            Mask generator that generates the mask for masked prediction during training.</span>
+<span class="sd">        negative_sampler (nn.Module):</span>
+<span class="sd">            Negative sampler to apply after masking.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">wav2vec2</span><span class="p">:</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">negative_sampler</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">wav2vec2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span> <span class="o">=</span> <span class="n">mask_generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">negative_sampler</span>
+
+<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel.forward"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">audio_lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            features (Tensor):</span>
+<span class="sd">                Tensor of audio features of shape `(batch, frame, dim)`.</span>
+<span class="sd">            audio_lengths (Tensor or None, optional):</span>
+<span class="sd">                Tensor of valid length of each valid auidio in the batch.</span>
+<span class="sd">                shape: `(batch, )` (Default: ``None``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Optional[Tensor], Tensor, Tensor, Tensor, Tensor):</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The masked sequences of probability distribution of shape `(batch, frame dim)`.</span>
+<span class="sd">            Tensor or None</span>
+<span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing</span>
+<span class="sd">                valid length in time axis is returns.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The mask indices.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The targets, prior to negative sampling.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The negative samples.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The indices of the negative samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">audio_lengths</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">padding_mask</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">_get_padding_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">padding_mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">mask_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
+
+        <span class="n">targets</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">conformer_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">conformer</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">conformer_layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">mask_idxs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span></div></div>
 
 
 <span class="c1">################################################################################</span>
@@ -535,12 +724,12 @@
     <span class="sd">&quot;&quot;&quot;Construct Feature Extractor</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        input_dim (int): Input dimension of features</span>
-<span class="sd">        output_dim (int): Output dimension after feature extraction</span>
-<span class="sd">        stride (int): Stride used in Time Reduction layer of feature extractor</span>
+<span class="sd">        input_dim (int): Input dimension of features.</span>
+<span class="sd">        output_dim (int): Output dimension after feature extraction.</span>
+<span class="sd">        stride (int): Stride used in Time Reduction layer of feature extractor.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        FeatureEncoder: The resulting feature extraction</span>
+<span class="sd">        FeatureEncoder: The resulting feature extraction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">FeatureEncoder</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">,</span> <span class="n">stride</span><span class="p">)</span>
 
@@ -601,7 +790,30 @@
         <span class="p">)</span>
         <span class="n">conformer_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">ConformerEncoder</span><span class="p">(</span><span class="n">feature_projection</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">conformer_layers</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ConformerEncoder</span><span class="p">(</span><span class="n">feature_projection</span><span class="p">,</span> <span class="n">ModuleList</span><span class="p">(</span><span class="n">conformer_layers</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_get_conformer_negativer_sampler</span><span class="p">(</span>
+    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NegativeSampler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build custom NegativeSampler module, including linear layer and negative sampling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dim (int): Dimension of input after feature extraction.</span>
+<span class="sd">        output_dim (int): Dimension of embedding for use in negative sampling. Same as the</span>
+<span class="sd">            embedding in the feature projection.</span>
+<span class="sd">        num_negatives (int): Number of negatives to sample.</span>
+<span class="sd">        cross_sample_negatives (int): Number of cross sampled negatives.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        NegativeSampler:</span>
+<span class="sd">            The resulting negative sampler module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">NegativeSampler</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="conformer_wav2vec2_model"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_model</span><span class="p">(</span>
@@ -685,7 +897,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
-<span class="sd">             The resulting wav2vec2 model with a conformer encoder and ``base`` configuration.</span>
+<span class="sd">            The resulting wav2vec2 model with a conformer encoder and ``base`` configuration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">conformer_wav2vec2_model</span><span class="p">(</span>
         <span class="n">extractor_input_dim</span><span class="o">=</span><span class="n">extractor_input_dim</span><span class="p">,</span>
@@ -700,6 +912,264 @@
         <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
         <span class="n">encoder_convolution_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">encoder_use_group_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_model"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">extractor_stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_depthwise_conv_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_convolution_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">encoder_use_group_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">mask_prob</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_selection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mask_other</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">no_mask_overlap</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">mask_min_space</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">mask_channel_prob</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_channel_selection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mask_channel_other</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_channel_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">no_mask_channel_overlap</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">mask_channel_min_space</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2 Model for pre-training</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int): Input dimension of the features.</span>
+<span class="sd">        extractor_output_dim (int): Output dimension after feature extraction.</span>
+<span class="sd">        extractor_stride (int):</span>
+<span class="sd">            Stride used in time reduction layer of feature extraction.</span>
+<span class="sd">        encoder_embed_dim (int):</span>
+<span class="sd">            The dimension of the embedding in the feature projection.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to</span>
+<span class="sd">            ``embed_dim``</span>
+<span class="sd">        encoder_num_layers (int):</span>
+<span class="sd">            Number of Conformer layers in the encoder.</span>
+<span class="sd">        encoder_num_heads (int):</span>
+<span class="sd">            Number of heads in each Conformer layer.</span>
+<span class="sd">        encoder_ff_interm_features (int):</span>
+<span class="sd">            Hidden layer dimension of the feedforward network in each Conformer layer.</span>
+<span class="sd">        encoder_depthwise_conv_kernel_size (int or List[int]):</span>
+<span class="sd">            List of kernel sizes corresponding to each of the Conformer layers.</span>
+<span class="sd">            If int is provided, all layers will have the same kernel size.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            Dropout probability in each Conformer layer.</span>
+<span class="sd">        encoder_convolution_first (bool):</span>
+<span class="sd">            Whether to apply the convolution module ahead of the attention module</span>
+<span class="sd">            in each Conformer layer.</span>
+<span class="sd">        encoder_use_group_norm (bool):</span>
+<span class="sd">            Whether to use ``GroupNorm`` rather than ``BatchNorm1d`` in the convolution</span>
+<span class="sd">            module in each Conformer layer.</span>
+<span class="sd">        mask_prob (float):</span>
+<span class="sd">            Probability for each token to be chosen as start of the span to be masked.</span>
+<span class="sd">        mask_selection (str)</span>
+<span class="sd">            How to choose the mask length. Options: [``static``, ``uniform``, ``normal``, ``poisson``].</span>
+<span class="sd">        mask_other (float):</span>
+<span class="sd">            Secondary mask argument (used for more complex distributions).</span>
+<span class="sd">        mask_length (int):</span>
+<span class="sd">            The lengths of the mask.</span>
+<span class="sd">        no_mask_overlap (bool):</span>
+<span class="sd">            Whether to allow masks to overlap.</span>
+<span class="sd">        mask_min_space (int):</span>
+<span class="sd">            Minimum space between spans (if no overlap is enabled).</span>
+<span class="sd">        mask_channel_prob: (float):</span>
+<span class="sd">            The probability of replacing a feature with 0.</span>
+<span class="sd">        mask_channel_selection (str):</span>
+<span class="sd">            How to choose the mask length for channel masking.</span>
+<span class="sd">            Options: [``static``, ``uniform``, ``normal``, ``poisson``].</span>
+<span class="sd">        mask_channel_other (float):</span>
+<span class="sd">            Secondary mask argument for channel masking (used for more complex distributions).</span>
+<span class="sd">        mask_channel_length (int):</span>
+<span class="sd">            Minimum space between spans (if no overlap is enabled) for channel masking.</span>
+<span class="sd">        no_mask_channel_overlap (bool):</span>
+<span class="sd">            Whether to allow channel masks to overlap.</span>
+<span class="sd">        mask_channel_min_space (int):</span>
+<span class="sd">            Minimum space between spans for channel masking (if no overlap is enabled).</span>
+<span class="sd">        num_negatives (int):</span>
+<span class="sd">            Number of negatives to sample.</span>
+<span class="sd">        cross_sample_negatives (int):</span>
+<span class="sd">            Number of cross sampled negatives.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerWav2Vec2PretrainModel:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">conformer_wav2vec2_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">mask_generator</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">MaskGenerator</span><span class="p">(</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">mask_prob</span><span class="p">,</span>
+        <span class="n">mask_selection</span><span class="p">,</span>
+        <span class="n">mask_other</span><span class="p">,</span>
+        <span class="n">mask_length</span><span class="p">,</span>
+        <span class="n">no_mask_overlap</span><span class="p">,</span>
+        <span class="n">mask_min_space</span><span class="p">,</span>
+        <span class="n">mask_channel_prob</span><span class="p">,</span>
+        <span class="n">mask_channel_selection</span><span class="p">,</span>
+        <span class="n">mask_channel_other</span><span class="p">,</span>
+        <span class="n">mask_channel_length</span><span class="p">,</span>
+        <span class="n">no_mask_channel_overlap</span><span class="p">,</span>
+        <span class="n">mask_channel_min_space</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">_get_conformer_negativer_sampler</span><span class="p">(</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">(</span>
+        <span class="n">wav2vec2</span><span class="o">=</span><span class="n">wav2vec2</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="o">=</span><span class="n">mask_generator</span><span class="p">,</span>
+        <span class="n">negative_sampler</span><span class="o">=</span><span class="n">negative_sampler</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_base"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_base</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">mask_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">mask_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;small&quot; architecture from</span>
+<span class="sd">    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)</span>
+<span class="sd">        extractor_output_dim (int, optional): Output dimension after feature extraction. (Default: 256)</span>
+<span class="sd">        encoder_projection_dropout (float, optional):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to</span>
+<span class="sd">            ``embed_dim`. (Default: 0.0)</span>
+<span class="sd">        mask_prob (float, optional):</span>
+<span class="sd">            Probability for each token to be chosen as start of the span to be masked. (Default: 0.3)</span>
+<span class="sd">        mask_length (int, optional):</span>
+<span class="sd">            The lengths of the mask. (Default: 3)</span>
+<span class="sd">        num_negatives (int, optional):</span>
+<span class="sd">            Number of sampled negatives. (Default: 0)</span>
+<span class="sd">        cross_sample_negatives (int, optional):</span>
+<span class="sd">            Number of cross sampled negatives. (Default: 0)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerWav2Vec2PretrainModel:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="o">=</span><span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="o">=</span><span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">*</span> <span class="mi">11</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mask_prob</span><span class="o">=</span><span class="n">mask_prob</span><span class="p">,</span>
+        <span class="n">mask_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_other</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mask_length</span><span class="o">=</span><span class="n">mask_length</span><span class="p">,</span>
+        <span class="n">no_mask_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_min_space</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_prob</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_channel_other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">no_mask_channel_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_channel_min_space</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="o">=</span><span class="n">num_negatives</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="o">=</span><span class="n">cross_sample_negatives</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_large"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_large</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">mask_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">mask_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;large&quot; architecture from</span>
+<span class="sd">    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`conformerssl`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)</span>
+<span class="sd">        extractor_output_dim (int, optional): Output dimension after feature extraction. (Default: 256)</span>
+<span class="sd">        encoder_projection_dropout (float, optional):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to</span>
+<span class="sd">            ``embed_dim`. (Default: 0.0)</span>
+<span class="sd">        mask_prob (float, optional):</span>
+<span class="sd">            Probability for each token to be chosen as start of the span to be masked. (Default: 0.3)</span>
+<span class="sd">        mask_length (int, optional):</span>
+<span class="sd">            The lengths of the mask. (Default: 3)</span>
+<span class="sd">        num_negatives (int, optional):</span>
+<span class="sd">            Number of sampled negatives. (Default: 0)</span>
+<span class="sd">        cross_sample_negatives (int, optional):</span>
+<span class="sd">            Number of cross sampled negatives. (Default: 0)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerWav2Vec2PretrainModel:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="o">=</span><span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="o">=</span><span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">*</span> <span class="mi">11</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mask_prob</span><span class="o">=</span><span class="n">mask_prob</span><span class="p">,</span>
+        <span class="n">mask_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_other</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mask_length</span><span class="o">=</span><span class="n">mask_length</span><span class="p">,</span>
+        <span class="n">no_mask_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_min_space</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_prob</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_channel_other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">no_mask_channel_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_channel_min_space</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="o">=</span><span class="n">num_negatives</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="o">=</span><span class="n">cross_sample_negatives</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

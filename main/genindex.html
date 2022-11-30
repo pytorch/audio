@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.14.0.dev20221129) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.14.0.dev20221130) &#x25BC</a>
     </div>
     
 
@@ -255,6 +255,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -587,11 +588,19 @@
 </li>
       <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_rnnt_model">conformer_rnnt_model() (in module torchaudio.prototype.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_base">conformer_wav2vec2_base() (in module torchaudio.prototype.models)</a>
 </li>
       <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_model">conformer_wav2vec2_model() (in module torchaudio.prototype.models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base">conformer_wav2vec2_pretrain_base() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_large">conformer_wav2vec2_pretrain_large() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_model">conformer_wav2vec2_pretrain_model() (in module torchaudio.prototype.models)</a>
+</li>
+      <li><a href="prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">ConformerWav2Vec2PretrainModel (class in torchaudio.prototype.models)</a>
 </li>
       <li><a href="generated/torchaudio.functional.contrast.html#torchaudio.functional.contrast">contrast() (in module torchaudio.functional)</a>
 </li>
@@ -736,6 +745,8 @@
 </li>
         <li><a href="generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN.forward">(torchaudio.models.WaveRNN method)</a>
 </li>
+        <li><a href="prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward">(torchaudio.prototype.models.ConformerWav2Vec2PretrainModel method)</a>
+</li>
         <li><a href="prototype.models.html#torchaudio.prototype.models.ConvEmformer.forward">(torchaudio.prototype.models.ConvEmformer method)</a>
 </li>
         <li><a href="generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale.forward">(torchaudio.prototype.transforms.BarkScale method)</a>
@@ -747,6 +758,10 @@
         <li><a href="generated/torchaudio.prototype.transforms.FFTConvolve.html#torchaudio.prototype.transforms.FFTConvolve.forward">(torchaudio.prototype.transforms.FFTConvolve method)</a>
 </li>
         <li><a href="generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale.forward">(torchaudio.prototype.transforms.InverseBarkScale method)</a>
+</li>
+        <li><a href="generated/torchaudio.prototype.transforms.Speed.html#torchaudio.prototype.transforms.Speed.forward">(torchaudio.prototype.transforms.Speed method)</a>
+</li>
+        <li><a href="generated/torchaudio.prototype.transforms.SpeedPerturbation.html#torchaudio.prototype.transforms.SpeedPerturbation.forward">(torchaudio.prototype.transforms.SpeedPerturbation method)</a>
 </li>
         <li><a href="generated/torchaudio.transforms.AmplitudeToDB.html#torchaudio.transforms.AmplitudeToDB.forward">(torchaudio.transforms.AmplitudeToDB method)</a>
 </li>
@@ -1284,10 +1299,12 @@
 </li>
       <li><a href="generated/torchaudio.sox_effects.shutdown_sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">shutdown_sox_effects() (in module torchaudio.sox_effects)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/torchaudio.prototype.functional.sinc_impulse_response.html#torchaudio.prototype.functional.sinc_impulse_response">sinc_impulse_response() (in module torchaudio.prototype.functional)</a>
+</li>
       <li><a href="generated/torchaudio.functional.sliding_window_cmn.html#torchaudio.functional.sliding_window_cmn">sliding_window_cmn() (in module torchaudio.functional)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/torchaudio.transforms.SlidingWindowCmn.html#torchaudio.transforms.SlidingWindowCmn">SlidingWindowCmn (class in torchaudio.transforms)</a>
 </li>
       <li><a href="generated/torchaudio.datasets.Snips.html#torchaudio.datasets.Snips">Snips (class in torchaudio.datasets)</a>
@@ -1311,6 +1328,12 @@
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.datasets.SPEECHCOMMANDS.html#torchaudio.datasets.SPEECHCOMMANDS">SPEECHCOMMANDS (class in torchaudio.datasets)</a>
+</li>
+      <li><a href="generated/torchaudio.prototype.transforms.Speed.html#torchaudio.prototype.transforms.Speed">Speed (class in torchaudio.prototype.transforms)</a>
+</li>
+      <li><a href="prototype.functional.html#torchaudio.prototype.functional.speed">speed() (in module torchaudio.prototype.functional)</a>
+</li>
+      <li><a href="generated/torchaudio.prototype.transforms.SpeedPerturbation.html#torchaudio.prototype.transforms.SpeedPerturbation">SpeedPerturbation (class in torchaudio.prototype.transforms)</a>
 </li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLM.start">start() (torchaudio.models.decoder.CTCDecoderLM method)</a>
 </li>

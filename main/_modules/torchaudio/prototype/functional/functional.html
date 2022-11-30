@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221129) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221130) &#x25BC</a>
     </div>
     
 
@@ -255,6 +255,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -384,21 +385,33 @@
 <span></span><span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torchaudio.functional</span> <span class="kn">import</span> <span class="n">resample</span>
 
 <span class="kn">from</span> <span class="nn">torchaudio.functional.functional</span> <span class="kn">import</span> <span class="n">_create_triangular_filterbank</span>
+
+
+<span class="k">def</span> <span class="nf">_check_shape_compatible</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">allow_broadcast</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The operands must be the same dimension (got </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_broadcast</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Leading dimensions of x and y don&#39;t match (got </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">xi</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">yi</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">xi</span> <span class="o">==</span> <span class="n">yi</span> <span class="ow">or</span> <span class="n">xi</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">yi</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Leading dimensions of x and y are not broadcastable (got </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_check_convolve_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">valid_convolve_modes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;same&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_convolve_modes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized mode value &#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&#39;. Please specify one of </span><span class="si">{</span><span class="n">valid_convolve_modes</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_check_convolve_inputs</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Leading dimensions of x and y don&#39;t match (got </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
-    <span class="n">_check_convolve_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_apply_convolve_mode</span><span class="p">(</span><span class="n">conv_result</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">x_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
@@ -431,7 +444,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">        y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
-<span class="sd">            (leading dimensions must match those of ``x``).</span>
+<span class="sd">            (leading dimensions must be broadcast-able to those of ``x``).</span>
 <span class="sd">        mode (str, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
 
 <span class="sd">            * &quot;full&quot;: Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)</span>
@@ -446,7 +459,8 @@
 <span class="sd">    .. _convolution:</span>
 <span class="sd">        https://en.wikipedia.org/wiki/Convolution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_check_convolve_inputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+    <span class="n">_check_shape_compatible</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">allow_broadcast</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_check_convolve_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
     <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">fresult</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
@@ -482,7 +496,8 @@
 <span class="sd">    .. _convolution:</span>
 <span class="sd">        https://en.wikipedia.org/wiki/Convolution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_check_convolve_inputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+    <span class="n">_check_shape_compatible</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">allow_broadcast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_check_convolve_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
     <span class="n">x_size</span><span class="p">,</span> <span class="n">y_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
@@ -678,6 +693,42 @@
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fb</span></div>
+
+
+<div class="viewcode-block" id="speed"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.speed">[docs]</a><span class="k">def</span> <span class="nf">speed</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (torch.Tensor): Input signals, with shape `(..., time)`.</span>
+<span class="sd">        lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
+<span class="sd">        orig_freq (int): Original frequency of the signals in ``waveform``.</span>
+<span class="sd">        factor (float): Factor by which to adjust speed of input. Values greater than 1.0</span>
+<span class="sd">            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor, torch.Tensor):</span>
+<span class="sd">            torch.Tensor</span>
+<span class="sd">                Speed-adjusted waveform, with shape `(..., new_time).`</span>
+<span class="sd">            torch.Tensor</span>
+<span class="sd">                Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">source_sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="n">orig_freq</span><span class="p">)</span>
+    <span class="n">target_sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span>
+
+    <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">target_sample_rate</span><span class="p">)</span>
+    <span class="n">source_sample_rate</span> <span class="o">=</span> <span class="n">source_sample_rate</span> <span class="o">//</span> <span class="n">gcd</span>
+    <span class="n">target_sample_rate</span> <span class="o">=</span> <span class="n">target_sample_rate</span> <span class="o">//</span> <span class="n">gcd</span>
+
+    <span class="k">return</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">target_sample_rate</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+        <span class="n">lengths</span> <span class="o">*</span> <span class="n">target_sample_rate</span> <span class="o">/</span> <span class="n">source_sample_rate</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
 </pre></div>
 
              </article>

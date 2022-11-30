@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221129) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221130) &#x25BC</a>
     </div>
     
 
@@ -255,6 +255,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -630,6 +631,45 @@
         <span class="n">mult</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="n">h_freq</span> <span class="o">=</span> <span class="n">base</span> <span class="o">@</span> <span class="n">mult</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">h_freq</span></div>
+
+
+<div class="viewcode-block" id="sinc_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.sinc_impulse_response.html#torchaudio.prototype.functional.sinc_impulse_response">[docs]</a><span class="k">def</span> <span class="nf">sinc_impulse_response</span><span class="p">(</span><span class="n">cutoff</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">513</span><span class="p">,</span> <span class="n">high_pass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create windowed-sinc impulse response for given cutoff frequencies.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cutoff (Tensor): Cutoff frequencies for low-pass sinc filter.</span>
+
+<span class="sd">        window_size (int, optional): Size of the Hamming window to apply. Must be odd.</span>
+<span class="sd">        (Default: 513)</span>
+
+<span class="sd">        high_pass (bool, optional):</span>
+<span class="sd">            If ``True``, convert the resulting filter to high-pass.</span>
+<span class="sd">            Otherwise low-pass filter is returned. Default: ``False``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: A series of impulse responses. Shape: `(..., window_size)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">window_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`window_size` must be odd. Given: </span><span class="si">{</span><span class="n">window_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">half</span> <span class="o">=</span> <span class="n">window_size</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">cutoff</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">half</span><span class="p">,</span> <span class="n">half</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">filt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">cutoff</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">filt</span> <span class="o">=</span> <span class="n">filt</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">hamming_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">filt</span> <span class="o">=</span> <span class="n">filt</span> <span class="o">/</span> <span class="n">filt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+
+    <span class="c1"># High pass IR is obtained by subtracting low_pass IR from delta function.</span>
+    <span class="c1"># https://courses.engr.illinois.edu/ece401/fa2020/slides/lec10.pdf</span>
+    <span class="k">if</span> <span class="n">high_pass</span><span class="p">:</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="o">-</span><span class="n">filt</span>
+        <span class="n">filt</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">half</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">filt</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">half</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">filt</span></div>
 </pre></div>
 
              </article>

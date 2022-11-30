@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221129) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221130) &#x25BC</a>
     </div>
     
 
@@ -255,6 +255,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -382,9 +383,11 @@
               
   <h1>Source code for torchaudio.pipelines._wav2vec2.impl</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span><span class="p">,</span> <span class="n">Module</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">wav2vec2_model</span><span class="p">,</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span> <span class="n">wavlm_model</span>
 
@@ -392,6 +395,31 @@
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">_Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper class for :py:class:`~torchaudio.models.Wav2Vec2Model`.</span>
+
+<span class="sd">    This is used for layer normalization at the input</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Wav2Vec2Model</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+        <span class="n">waveforms</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">waveforms</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+        <span class="n">waveforms</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">waveforms</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Wav2Vec2Bundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle">[docs]</a><span class="nd">@dataclass</span>
@@ -428,6 +456,7 @@
     <span class="n">_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">_sample_rate</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">_normalize_waveform</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -443,7 +472,7 @@
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">dl_kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state_dict</span>
 
-<div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Construct the model and load the pretrained weight.</span>
 
 <span class="sd">        The weight file is downloaded from the internet and cached with</span>
@@ -451,6 +480,24 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Variation of :py:class:`~torchaudio.models.Wav2Vec2Model`.</span>
+
+<span class="sd">            For the models listed below, an additional layer normalization is performed on the input.</span>
+
+<span class="sd">            For all other models, a :py:class:`~torchaudio.models.Wav2Vec2Model` instance is returned.</span>
+
+<span class="sd">            - WAV2VEC2_LARGE_LV60K</span>
+<span class="sd">            - WAV2VEC2_ASR_LARGE_LV60K_10M</span>
+<span class="sd">            - WAV2VEC2_ASR_LARGE_LV60K_100H</span>
+<span class="sd">            - WAV2VEC2_ASR_LARGE_LV60K_960H</span>
+<span class="sd">            - WAV2VEC2_XLSR53</span>
+<span class="sd">            - HUBERT_LARGE</span>
+<span class="sd">            - HUBERT_XLARGE</span>
+<span class="sd">            - HUBERT_ASR_LARGE</span>
+<span class="sd">            - HUBERT_ASR_XLARGE</span>
+<span class="sd">            - WAVLM_LARGE</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">model_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;model_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;WavLM&quot;</span><span class="p">:</span>
@@ -458,6 +505,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">wav2vec2_model</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">)</span>
         <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_state_dict</span><span class="p">(</span><span class="n">dl_kwargs</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_waveform</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_Wav2Vec2Model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">model</span></div></div>
 
@@ -579,6 +628,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -622,6 +672,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_BASE_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -667,6 +718,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">WAV2VEC2_ASR_BASE_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module),</span>
@@ -712,6 +764,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_BASE_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -755,6 +808,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -798,6 +852,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_LARGE_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -843,6 +898,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_LARGE_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -888,6 +944,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_LARGE_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -931,6 +988,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_LARGE_LV60K</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,</span>
@@ -974,6 +1032,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_10M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and</span>
@@ -1017,6 +1076,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_100H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and</span>
@@ -1061,6 +1121,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_ASR_LARGE_LV60K_960H</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* :cite:`librilight` dataset, and</span>
@@ -1104,6 +1165,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAV2VEC2_XLSR53</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Wav2vec 2.0 model (&quot;base&quot; architecture),</span>
 <span class="s2">pre-trained on 56,000 hours of unlabeled audio from multiple datasets (</span>
@@ -1150,6 +1212,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HUBERT_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;base&quot; architecture),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`</span>
@@ -1192,6 +1255,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HUBERT_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;large&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,</span>
@@ -1234,6 +1298,7 @@
         <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HUBERT_XLARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;extra large&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,</span>
@@ -1277,6 +1342,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HUBERT_ASR_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;large&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and</span>
@@ -1321,6 +1387,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">HUBERT_ASR_XLARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;HuBERT model (&quot;extra large&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of unlabeled audio from</span>
@@ -1368,6 +1435,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_de_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">VOXPOPULI_ASR_BASE_10K_DE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
@@ -1414,6 +1482,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_vp_en_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">VOXPOPULI_ASR_BASE_10K_EN</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
@@ -1460,6 +1529,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_es_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">VOXPOPULI_ASR_BASE_10K_ES</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
@@ -1505,6 +1575,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_fr_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">VOXPOPULI_ASR_BASE_10K_FR</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
 <span class="s2">pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`</span>
@@ -1550,6 +1621,7 @@
     <span class="p">},</span>
     <span class="n">_labels</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">_get_it_labels</span><span class="p">(),</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">_remove_aux_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">VOXPOPULI_ASR_BASE_10K_IT</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;wav2vec 2.0 model (&quot;base&quot; architecture),</span>
@@ -1598,6 +1670,7 @@
         <span class="s2">&quot;model_type&quot;</span><span class="p">:</span> <span class="s2">&quot;WavLM&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAVLM_BASE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;WavLM Base model (&quot;base&quot; architecture),</span>
 <span class="s2">pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`, not fine-tuned.</span>
@@ -1643,6 +1716,7 @@
         <span class="s2">&quot;model_type&quot;</span><span class="p">:</span> <span class="s2">&quot;WavLM&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAVLM_BASE_PLUS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;WavLM Base+ model (&quot;base&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of Libri-Light dataset :cite:`librilight`, 10,000 hours of GigaSpeech :cite:`GigaSpeech2021`,</span>
@@ -1689,6 +1763,7 @@
         <span class="s2">&quot;model_type&quot;</span><span class="p">:</span> <span class="s2">&quot;WavLM&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">WAVLM_LARGE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;WavLM Large model (&quot;large&quot; architecture),</span>
 <span class="s2">pre-trained on 60,000 hours of Libri-Light dataset :cite:`librilight`, 10,000 hours of GigaSpeech :cite:`GigaSpeech2021`,</span>
