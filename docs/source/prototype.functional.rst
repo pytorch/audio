@@ -22,3 +22,8 @@ DSP
    oscillator_bank
    sinc_impulse_response
    frequency_impulse_response
+
+simulate_rir_ism
+~~~~~~~~~~~~~~~~
+
+.. autofunction:: simulate_rir_ism

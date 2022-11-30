@@ -41,6 +41,14 @@ if(BUILD_RNNT)
   endif()
 endif()
 
+if(BUILD_RIR)
+  list(
+    APPEND
+    LIBTORCHAUDIO_SOURCES
+    build_rir.cpp
+    )
+endif()
+
 if(USE_CUDA)
   list(
     APPEND
