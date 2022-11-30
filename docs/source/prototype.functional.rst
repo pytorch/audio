@@ -24,6 +24,11 @@ fftconvolve
 
 .. autofunction:: fftconvolve
 
+speed
+~~~~~
+
+.. autofunction:: speed
+
 DSP
 ~~~
 

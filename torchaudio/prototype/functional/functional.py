@@ -1,7 +1,10 @@
 import math
 import warnings
 
+from typing import Tuple
+
 import torch
+from torchaudio.functional import resample
 
 from torchaudio.functional.functional import _create_triangular_filterbank
 
@@ -306,3 +309,39 @@ def barkscale_fbanks(
         )
 
     return fb
+
+
+def speed(
+    waveform: torch.Tensor, lengths: torch.Tensor, orig_freq: int, factor: float
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    r"""Adjusts waveform speed.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+        lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factor (float): Factor by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+
+    Returns:
+        (torch.Tensor, torch.Tensor):
+            torch.Tensor
+                Speed-adjusted waveform, with shape `(..., new_time).`
+            torch.Tensor
+                Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+    """
+
+    source_sample_rate = int(factor * orig_freq)
+    target_sample_rate = int(orig_freq)
+
+    gcd = math.gcd(source_sample_rate, target_sample_rate)
+    source_sample_rate = source_sample_rate // gcd
+    target_sample_rate = target_sample_rate // gcd
+
+    return resample(waveform, source_sample_rate, target_sample_rate), torch.ceil(
+        lengths * target_sample_rate / source_sample_rate
+    ).to(lengths.dtype)
