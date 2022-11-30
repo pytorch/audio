@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import torch
 import torchaudio.prototype.functional as F
@@ -410,6 +412,39 @@ class FunctionalTestImpl(TestBaseMixin):
         ref = sinc_ir_np(cutoff.cpu().numpy(), window_size, high_pass)
 
         self.assertEqual(hyp, ref)
+
+    def test_speed_identity(self):
+        """speed of 1.0 does not alter input waveform and length"""
+        leading_dims = (5, 4, 2)
+        T = 1000
+        waveform = torch.rand(*leading_dims, T)
+        lengths = torch.randint(1, 1000, leading_dims)
+        actual_waveform, actual_lengths = F.speed(waveform, lengths, orig_freq=1000, factor=1.0)
+        self.assertEqual(waveform, actual_waveform)
+        self.assertEqual(lengths, actual_lengths)
+
+    @nested_params(
+        [0.8, 1.1, 1.2],
+    )
+    def test_speed_accuracy(self, factor):
+        """sinusoidal waveform is properly compressed by factor"""
+        n_to_trim = 20
+
+        sample_rate = 1000
+        freq = 2
+        times = torch.arange(0, 5, 1.0 / sample_rate)
+        waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
+        lengths = torch.tensor([waveform.size(1)])
+
+        output, output_lengths = F.speed(waveform, lengths, orig_freq=sample_rate, factor=factor)
+        self.assertEqual(output.size(1), output_lengths[0])
+
+        new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
+        expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)
+
+        self.assertEqual(
+            expected_waveform[..., n_to_trim:-n_to_trim], output[..., n_to_trim:-n_to_trim], atol=1e-1, rtol=1e-4
+        )
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):

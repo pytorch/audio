@@ -1,9 +1,10 @@
-from typing import Callable, Optional
+import math
+from typing import Callable, Optional, Sequence, Tuple
 
 import torch
 from torchaudio.prototype.functional import barkscale_fbanks, convolve, fftconvolve
 from torchaudio.prototype.functional.functional import _check_convolve_mode
-from torchaudio.transforms import Spectrogram
+from torchaudio.transforms import Resample, Spectrogram
 
 
 class Convolve(torch.nn.Module):
@@ -384,3 +385,101 @@ class BarkSpectrogram(torch.nn.Module):
         specgram = self.spectrogram(waveform)
         bark_specgram = self.bark_scale(specgram)
         return bark_specgram
+
+
+def _source_target_sample_rate(orig_freq: int, speed: float) -> Tuple[int, int]:
+    source_sample_rate = int(speed * orig_freq)
+    target_sample_rate = int(orig_freq)
+    gcd = math.gcd(source_sample_rate, target_sample_rate)
+    return source_sample_rate // gcd, target_sample_rate // gcd
+
+
+class Speed(torch.nn.Module):
+    r"""Adjusts waveform speed.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factor (float): Factor by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+    """
+
+    def __init__(self, orig_freq, factor) -> None:
+        super().__init__()
+
+        self.orig_freq = orig_freq
+        self.factor = factor
+
+        self.source_sample_rate, self.target_sample_rate = _source_target_sample_rate(orig_freq, factor)
+        self.resampler = Resample(orig_freq=self.source_sample_rate, new_freq=self.target_sample_rate)
+
+    def forward(self, waveform, lengths) -> Tuple[torch.Tensor, torch.Tensor]:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
+
+        Returns:
+            (torch.Tensor, torch.Tensor):
+                torch.Tensor
+                    Speed-adjusted waveform, with shape `(..., new_time).`
+                torch.Tensor
+                    Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+        """
+        return (
+            self.resampler(waveform),
+            torch.ceil(lengths * self.target_sample_rate / self.source_sample_rate).to(lengths.dtype),
+        )
+
+
+class SpeedPerturbation(torch.nn.Module):
+    r"""Applies the speed perturbation augmentation introduced in
+    *Audio augmentation for speech recognition* :cite:`ko15_interspeech`. For a given input,
+    the module samples a speed-up factor from ``factors`` uniformly at random and adjusts
+    the speed of the input by that factor.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factors (Sequence[float]): Factors by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+
+    Example
+        >>> speed_perturb = SpeedPerturbation(16000, [0.9, 1.1, 1.0, 1.0, 1.0])
+        >>> # waveform speed will be adjusted by factor 0.9 with 20% probability,
+        >>> # 1.1 with 20% probability, and 1.0 (i.e. kept the same) with 60% probability.
+        >>> speed_perturbed_waveform = speed_perturb(waveform, lengths)
+    """
+
+    def __init__(self, orig_freq: int, factors: Sequence[float]) -> None:
+        super().__init__()
+
+        self.speeders = torch.nn.ModuleList([Speed(orig_freq=orig_freq, factor=factor) for factor in factors])
+
+    def forward(self, waveform: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
+
+        Returns:
+            (torch.Tensor, torch.Tensor):
+                torch.Tensor
+                    Speed-adjusted waveform, with shape `(..., new_time).`
+                torch.Tensor
+                    Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+        """
+
+        idx = int(torch.randint(len(self.speeders), ()))
+        # NOTE: we do this because TorchScript doesn't allow for
+        # indexing ModuleList instances with non-literals.
+        for speeder_idx, speeder in enumerate(self.speeders):
+            if idx == speeder_idx:
+                return speeder(waveform, lengths)
+        raise RuntimeError("Speeder not found; execution should have never reached here.")

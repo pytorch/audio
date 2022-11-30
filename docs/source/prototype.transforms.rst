@@ -14,3 +14,5 @@ torchaudio.prototype.transforms
     BarkScale
     InverseBarkScale
     BarkSpectrogram
+    Speed
+    SpeedPerturbation

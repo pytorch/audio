@@ -18,3 +18,25 @@ class Transforms(TestBaseMixin):
         output = convolve(x, y)
         ts_output = torch_script(convolve)(x, y)
         self.assertEqual(ts_output, output)
+
+    def test_Speed(self):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims, dtype=self.dtype, device=self.device)
+
+        speed = T.Speed(1000, 0.9).to(self.device, self.dtype)
+        output = speed(waveform, lengths)
+        ts_output = torch_script(speed)(waveform, lengths)
+        self.assertEqual(ts_output, output)
+
+    def test_SpeedPerturbation(self):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims, dtype=self.dtype, device=self.device)
+
+        speed = T.SpeedPerturbation(1000, [0.9]).to(self.device, self.dtype)
+        output = speed(waveform, lengths)
+        ts_output = torch_script(speed)(waveform, lengths)
+        self.assertEqual(ts_output, output)
