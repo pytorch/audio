@@ -62,3 +62,16 @@ class AutogradTestImpl(TestBaseMixin):
 
         assert gradcheck(F.extend_pitch, (input, num_pitches))
         assert gradcheck(F.extend_pitch, (input, pattern))
+
+    def test_sinc_ir(self):
+        cutoff = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype, requires_grad=True)
+        assert gradcheck(F.sinc_impulse_response, (cutoff, 513, False))
+        assert gradcheck(F.sinc_impulse_response, (cutoff, 513, True))
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        self.assertTrue(gradcheck(F.speed, (waveform, lengths, 1000, 1.1)))
+        self.assertTrue(gradgradcheck(F.speed, (waveform, lengths, 1000, 1.1)))

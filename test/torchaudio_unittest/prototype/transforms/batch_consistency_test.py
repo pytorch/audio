@@ -63,3 +63,53 @@ class BatchConsistencyTest(TorchaudioTestCase):
         # Because InverseBarkScale runs SGD on randomly initialized values so they do not yield
         # exactly same result. For this reason, tolerance is very relaxed here.
         self.assert_batch_consistency(transform, bark_spec, atol=1.0, rtol=1e-5)
+
+    def test_Speed(self):
+        B = 5
+        orig_freq = 100
+        factor = 0.8
+        input_lengths = torch.randint(1, 1000, (B,), dtype=torch.int32)
+
+        speed = T.Speed(orig_freq, factor)
+
+        unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
+        batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
+
+        output, output_lengths = speed(batched_input, input_lengths)
+
+        unbatched_output = []
+        unbatched_output_lengths = []
+        for idx in range(len(unbatched_input)):
+            w, l = speed(unbatched_input[idx], input_lengths[idx])
+            unbatched_output.append(w)
+            unbatched_output_lengths.append(l)
+
+        self.assertEqual(output_lengths, torch.stack(unbatched_output_lengths))
+        for idx in range(len(unbatched_output)):
+            w, l = output[idx], output_lengths[idx]
+            self.assertEqual(unbatched_output[idx], w[:l])
+
+    def test_SpeedPerturbation(self):
+        B = 5
+        orig_freq = 100
+        factor = 0.8
+        input_lengths = torch.randint(1, 1000, (B,), dtype=torch.int32)
+
+        speed = T.SpeedPerturbation(orig_freq, [factor])
+
+        unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
+        batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
+
+        output, output_lengths = speed(batched_input, input_lengths)
+
+        unbatched_output = []
+        unbatched_output_lengths = []
+        for idx in range(len(unbatched_input)):
+            w, l = speed(unbatched_input[idx], input_lengths[idx])
+            unbatched_output.append(w)
+            unbatched_output_lengths.append(l)
+
+        self.assertEqual(output_lengths, torch.stack(unbatched_output_lengths))
+        for idx in range(len(unbatched_output)):
+            w, l = output[idx], output_lengths[idx]
+            self.assertEqual(unbatched_output[idx], w[:l])

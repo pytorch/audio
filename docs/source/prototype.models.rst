@@ -33,6 +33,13 @@ ConvEmformer
 
   .. automethod:: infer
 
+ConformerWav2Vec2PretrainModel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ConformerWav2Vec2PretrainModel
+
+  .. automethod:: forward
+
 conformer_wav2vec2_model
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -42,3 +49,18 @@ conformer_wav2vec2_base
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: conformer_wav2vec2_base
+
+conformer_wav2vec2_pretrain_model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_pretrain_model
+
+conformer_wav2vec2_pretrain_base
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_pretrain_base
+
+conformer_wav2vec2_pretrain_large
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_pretrain_large
