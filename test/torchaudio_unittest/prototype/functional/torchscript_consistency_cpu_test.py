@@ -1,7 +1,7 @@
 import torch
 from torchaudio_unittest.common_utils import PytorchTestCase
 
-from .torchscript_consistency_test_impl import TorchScriptConsistencyTestImpl, TorchScriptConsistencyCPUOnlyTestImpl
+from .torchscript_consistency_test_impl import TorchScriptConsistencyCPUOnlyTestImpl, TorchScriptConsistencyTestImpl
 
 
 class TorchScriptConsistencyCPUFloat32Test(TorchScriptConsistencyTestImpl, PytorchTestCase):
