@@ -441,7 +441,11 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         mic_array = torch.rand(channel, D, dtype=self.dtype, device=self.device) + 1
         source = torch.rand(D, dtype=self.dtype, device=self.device) + 4
         max_order = 3
+        # e_absorption is set as a float value indicating absorption coefficients are the same for every wall.
         e_absorption = 0.5
+        # compute rir signal by torchaudio implementation
+        actual = F.simulate_rir_ism(room_dim, source, mic_array, max_order, e_absorption)
+        # compute rir signal by pyroomacoustics
         room = pra.ShoeBox(
             room_dim.detach().numpy(),
             fs=16000,
@@ -450,7 +454,8 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             ray_tracing=False,
             air_absorption=False,
         )
-        mic_locs = np.asarray([mic_array[i].tolist() for i in range(channel)]).swapaxes(0, 1)
+        # mic_locs is a numpy array of dimension `(D, channel)`.
+        mic_locs = mic_array.transpose(0, 1).double().detach().numpy()
         room.add_microphone_array(mic_locs)
         room.add_source(source.tolist())
         room.compute_rir()
@@ -458,8 +463,8 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         expected = torch.zeros(channel, max_len, dtype=self.dtype, device=self.device)
         for i in range(channel):
             expected[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
-        actual = F.simulate_rir_ism(room_dim, source, mic_array, max_order, e_absorption)
-        self.assertEqual(expected, actual, atol=1e-3, rtol=2)
+
+        self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)
 
     @skipIfNoModule("pyroomacoustics")
     @parameterized.expand([(2, 1), (3, 4)])
@@ -470,9 +475,13 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         source = torch.rand(D, dtype=self.dtype, device=self.device) + 4
         max_order = 3
         if D == 2:
+            # e_absorption is set as a Tensor with dimensions (7, 4) for a 2D room indicating there are
+            # 4 walls and each wall has 7 absorption coefficients corresponds to 7 octave bands, respectively.
             e_absorption = torch.rand(7, 4, dtype=self.dtype, device=self.device)
             walls = ["west", "east", "south", "north"]
         else:
+            # e_absorption is set as a Tensor with dimensions (7, 6) for a 3D room indicating there are
+            # 6 walls and each wall has 7 absorption coefficients corresponds to 7 octave bands, respectively.
             e_absorption = torch.rand(7, 6, dtype=self.dtype, device=self.device)
             walls = ["west", "east", "south", "north", "floor", "ceiling"]
         room = pra.ShoeBox(
@@ -496,7 +505,8 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             ray_tracing=False,
             air_absorption=False,
         )
-        mic_locs = np.asarray([mic_array[i].tolist() for i in range(channel)]).swapaxes(0, 1)
+        # mic_locs is a numpy array of dimension `(D, channel)`.
+        mic_locs = mic_array.transpose(0, 1).double().detach().numpy()
         room.add_microphone_array(mic_locs)
         room.add_source(source.tolist())
         room.compute_rir()
@@ -505,4 +515,4 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         for i in range(channel):
             expected[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
         actual = F.simulate_rir_ism(room_dim, source, mic_array, max_order, e_absorption)
-        self.assertEqual(expected, actual, atol=1e-3, rtol=2)
+        self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)

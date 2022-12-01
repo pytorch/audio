@@ -1,3 +1,26 @@
+/*
+Copyright (c) 2014-2017 EPFL-LCAV
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+/**
+ * Image source method implementation based on PyRoomAcoustics:
+ * https://github.com/LCAV/pyroomacoustics
+ */
 #include <math.h>
 #include <torch/script.h>
 #include <torch/torch.h>
@@ -37,7 +60,7 @@ void build_rir_impl(
   const scalar_t* input_data = irs.data_ptr<scalar_t>();
   const int* delay_data = delay.data_ptr<int>();
   scalar_t* output_data = rirs.data_ptr<scalar_t>();
-for (auto i = 0; i < num_band * num_image * num_mic; i++) {
+  for (auto i = 0; i < num_band * num_image * num_mic; i++) {
     int64_t offset_input = i * ir_length;
     int64_t mic = i % num_mic;
     int64_t image = ((i - mic) / num_mic) % num_image;
@@ -45,10 +68,10 @@ for (auto i = 0; i < num_band * num_image * num_mic; i++) {
     int64_t offset_output = (band * num_mic + mic) * rir_length;
     int64_t offset_delay = image * num_mic + mic;
     for (auto j = 0; j < ir_length; j++) {
-    output_data[offset_output + j + delay_data[offset_delay]] +=
-        input_data[offset_input + j];
+      output_data[offset_output + j + delay_data[offset_delay]] +=
+          input_data[offset_input + j];
     }
-}
+  }
 }
 
 /**
@@ -103,18 +126,18 @@ void make_rir_filter_impl(
   torch::Tensor new_bands = torch::zeros({n, 2}, centers.dtype());
   scalar_t* newband_data = new_bands.data_ptr<scalar_t>();
   const scalar_t* centers_data = centers.data_ptr<scalar_t>();
-for (int64_t i = 0; i < n; i++) {
+  for (int64_t i = 0; i < n; i++) {
     if (i == 0) {
-    newband_data[i * 2] = centers_data[0] / 2;
-    newband_data[i * 2 + 1] = centers_data[1];
+      newband_data[i * 2] = centers_data[0] / 2;
+      newband_data[i * 2 + 1] = centers_data[1];
     } else if (i == n - 1) {
-    newband_data[i * 2] = centers_data[n - 2];
-    newband_data[i * 2 + 1] = sample_rate / 2;
+      newband_data[i * 2] = centers_data[n - 2];
+      newband_data[i * 2 + 1] = sample_rate / 2;
     } else {
-    newband_data[i * 2] = centers_data[i - 1];
-    newband_data[i * 2 + 1] = centers_data[i + 1];
+      newband_data[i * 2] = centers_data[i - 1];
+      newband_data[i * 2 + 1] = centers_data[i + 1];
     }
-}
+  }
   auto n_freq = n_fft / 2 + 1;
   torch::Tensor freq_resp = torch::zeros({n_freq, n}, centers.dtype());
   torch::Tensor freq =
@@ -122,23 +145,23 @@ for (int64_t i = 0; i < n; i++) {
   const scalar_t* freq_data = freq.data_ptr<scalar_t>();
   scalar_t* freqreq_data = freq_resp.data_ptr<scalar_t>();
 
-for (auto i = 0; i < n; i++) {
+  for (auto i = 0; i < n; i++) {
     for (auto j = 0; j < n_freq; j++) {
-    if (freq_data[j] >= newband_data[i * 2] &&
-        freq_data[j] < centers_data[i]) {
+      if (freq_data[j] >= newband_data[i * 2] &&
+          freq_data[j] < centers_data[i]) {
         freqreq_data[j * n + i] =
             0.5 * (1 + cos(2 * M_PI * freq_data[j] / centers_data[i]));
-    }
-    if (i != n - 1 && freq_data[j] >= centers_data[i] &&
-        freq_data[j] < newband_data[i * 2 + 1]) {
-        freqreq_data[j * n + i] = 0.5 *
-            (1 - cos(2 * M_PI * freq_data[j] / newband_data[i * 2 + 1]));
-    }
-    if (i == n - 1 && centers_data[i] <= freq_data[j]) {
+      }
+      if (i != n - 1 && freq_data[j] >= centers_data[i] &&
+          freq_data[j] < newband_data[i * 2 + 1]) {
+        freqreq_data[j * n + i] =
+            0.5 * (1 - cos(2 * M_PI * freq_data[j] / newband_data[i * 2 + 1]));
+      }
+      if (i == n - 1 && centers_data[i] <= freq_data[j]) {
         freqreq_data[j * n + i] = 1.0;
+      }
     }
-    }
-}
+  }
   filters = torch::fft::fftshift(torch::fft::irfft(freq_resp, n_fft, 0), 0);
   filters = filters.index({Slice(1)}).transpose(0, 1);
 }
