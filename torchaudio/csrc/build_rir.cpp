@@ -21,7 +21,7 @@ SOFTWARE.
  * Image source method implementation based on PyRoomAcoustics:
  * https://github.com/LCAV/pyroomacoustics
  */
-#include <math.h>
+#include <cmath>
 #include <torch/script.h>
 #include <torch/torch.h>
 using namespace torch::indexing;
@@ -87,8 +87,8 @@ void build_rir_impl(
  * dimensions `(num_band, num_mic, rir_length)`.
  */
 torch::Tensor build_rir(
-    const torch::Tensor irs,
-    const torch::Tensor delay,
+    const torch::Tensor& irs,
+    const torch::Tensor& delay,
     const int64_t rir_length) {
   const int64_t num_band = irs.size(0);
   const int64_t num_image = irs.size(1);
@@ -138,6 +138,7 @@ void make_rir_filter_impl(
       newband_data[i * 2 + 1] = centers_data[i + 1];
     }
   }
+  const auto half = 0.5;
   auto n_freq = n_fft / 2 + 1;
   torch::Tensor freq_resp = torch::zeros({n_freq, n}, centers.dtype());
   torch::Tensor freq =
@@ -150,12 +151,12 @@ void make_rir_filter_impl(
       if (freq_data[j] >= newband_data[i * 2] &&
           freq_data[j] < centers_data[i]) {
         freqreq_data[j * n + i] =
-            0.5 * (1 + cos(2 * M_PI * freq_data[j] / centers_data[i]));
+            half * (1 + cos(2 * M_PI * freq_data[j] / centers_data[i]));
       }
       if (i != n - 1 && freq_data[j] >= centers_data[i] &&
           freq_data[j] < newband_data[i * 2 + 1]) {
         freqreq_data[j * n + i] =
-            0.5 * (1 - cos(2 * M_PI * freq_data[j] / newband_data[i * 2 + 1]));
+            half * (1 - cos(2 * M_PI * freq_data[j] / newband_data[i * 2 + 1]));
       }
       if (i == n - 1 && centers_data[i] <= freq_data[j]) {
         freqreq_data[j * n + i] = 1.0;

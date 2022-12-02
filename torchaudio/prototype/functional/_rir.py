@@ -14,6 +14,7 @@ def _compute_image_sources(
     e_scatter: Optional[torch.Tensor] = None,
 ) -> Tuple[Tensor, Tensor]:
     """Compute image sources in a shoebox-like room.
+
     Args:
         room (torch.Tensor): The 1D Tensor to determine the room size. The shape is
             `(D,)`, where ``D`` is 2 if room is a 2D room, or 3 if room is a 3D room.
@@ -33,6 +34,7 @@ def _compute_image_sources(
         e_scatter (torch.Tensor): The scattering coefficients of wall materials.
             The shape of ``e_scatter`` must match that of ``e_absorption``. If ``None``, it is not
             used in image source computation. (Default: ``None``)
+
     Returns:
         (torch.Tensor): The coordinates of all image sources within ``max_order`` number of reflections.
             Tensor with dimensions `(num_image_source, D)`.
@@ -89,10 +91,12 @@ def _hann(x: torch.Tensor, T: int):
 
 def _frac_delay(delay: torch.Tensor, delay_i: torch.Tensor, delay_filter_length: int):
     """Compute fractional delay of impulse response signal.
+
     Args:
         delay (torch.Tensor): The time delay Tensor in samples.
         delay_i (torch.Tensor): The integer part of delay.
         delay_filter_length (int): The window length for sinc function.
+
     Returns:
         (torch.Tensor): The impulse response Tensor for all image sources.
     """
@@ -120,8 +124,11 @@ def simulate_rir_ism(
 ) -> Tensor:
     r"""Compute Room Impulse Response (RIR) based on the image source method.
     The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.
+
     .. devices:: CPU
+
     .. properties:: Autograd TorchScript
+
     Args:
         room (torch.Tensor): The 1D Tensor to determine the room size. The shape is
             `(D,)`, where ``D`` is 2 if room is a 2D room, or 3 if room is a 3D room.
@@ -142,8 +149,10 @@ def simulate_rir_ism(
             or `(7, 6)` if the room is a 3D room, where 7 represents the number of octave bands.
         output_length (int or None, optional): The output length of simulated RIR signal. If ``None``,
             the length is defined as
+
             .. math::
                 \frac{\text{max\_d} \cdot \text{sample\_rate}}{\text{sound\_speed}} + \text{delay\_filter\_length}
+
             where ``max_d`` is the maximum distance between image sources and microphones.
         delay_filter_length (int, optional): The filter length for computing sinc function. (Default: ``81``)
         center_frequency (torch.Tensor, optional): The center frequencies of octive bands for multi-band walls.
@@ -151,9 +160,11 @@ def simulate_rir_ism(
         sound_speed (float, optional): The speed of sound. (Default: ``343.0``)
         sample_rate (float, optional): The sample rate of the generated room impulse response signal.
             (Default: ``16000.0``)
+
     Returns:
         (torch.Tensor): The simulated room impulse response waveform. Tensor with dimensions
         `(channel, rir_length)`.
+
     Note:
         If ``e_absorption`` is a 2D Tensor and ``center_frequency`` is set to ``None``, the center frequencies
         of octive bands are fixed to ``[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]``.
