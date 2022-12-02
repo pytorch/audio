@@ -88,3 +88,13 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
         lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
         self._assert_consistency(F.speed, (waveform, lengths, 1000, 1.1))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.preemphasis, (waveform, coeff))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.deemphasis, (waveform, coeff))

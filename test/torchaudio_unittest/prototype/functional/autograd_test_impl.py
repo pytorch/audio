@@ -75,3 +75,15 @@ class AutogradTestImpl(TestBaseMixin):
         lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
         self.assertTrue(gradcheck(F.speed, (waveform, lengths, 1000, 1.1)))
         self.assertTrue(gradgradcheck(F.speed, (waveform, lengths, 1000, 1.1)))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assertTrue(gradcheck(F.preemphasis, (waveform, coeff)))
+        self.assertTrue(gradgradcheck(F.preemphasis, (waveform, coeff)))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assertTrue(gradcheck(F.deemphasis, (waveform, coeff)))
+        self.assertTrue(gradgradcheck(F.deemphasis, (waveform, coeff)))

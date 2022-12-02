@@ -5,6 +5,7 @@ import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
 from scipy import signal
+from torchaudio.functional import lfilter
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
 from .dsp_utils import oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
@@ -445,6 +446,29 @@ class FunctionalTestImpl(TestBaseMixin):
         self.assertEqual(
             expected_waveform[..., n_to_trim:-n_to_trim], output[..., n_to_trim:-n_to_trim], atol=1e-1, rtol=1e-4
         )
+
+    @nested_params(
+        [(3, 2, 100), (95,)],
+        [0.97, 0.9, 0.68],
+    )
+    def test_preemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
+        actual = F.preemphasis(waveform, coeff=coeff)
+
+        a_coeffs = torch.tensor([1.0, 0.0], device=self.device, dtype=self.dtype)
+        b_coeffs = torch.tensor([1.0, -coeff], device=self.device, dtype=self.dtype)
+        expected = lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+        self.assertEqual(actual, expected)
+
+    @nested_params(
+        [(3, 2, 100), (95,)],
+        [0.97, 0.9, 0.68],
+    )
+    def test_preemphasis_deemphasis_roundtrip(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
+        preemphasized = F.preemphasis(waveform, coeff=coeff)
+        deemphasized = F.deemphasis(preemphasized, coeff=coeff)
+        self.assertEqual(deemphasized, waveform)
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):
