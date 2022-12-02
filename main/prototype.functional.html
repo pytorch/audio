@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.14.0.dev20221201) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.14.0.dev20221202) &#x25BC</a>
     </div>
     
 
@@ -504,6 +504,36 @@ the leading dimensions match those of <code class="docutils literal notranslate"
 </dd></dl>
 
 </section>
+<section id="deemphasis">
+<h2>deemphasis<a class="headerlink" href="#deemphasis" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.prototype.functional.deemphasis">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.functional.</span></span><span class="sig-name descname"><span class="pre">deemphasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.97</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="_modules/torchaudio/prototype/functional/functional.html#deemphasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.functional.deemphasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>De-emphasizes a waveform along its last dimension.
+Inverse of <a class="reference internal" href="#torchaudio.prototype.functional.preemphasis" title="torchaudio.prototype.functional.preemphasis"><code class="xref py py-meth docutils literal notranslate"><span class="pre">preemphasis()</span></code></a>. Concretely, for each signal
+<span class="math">\(x\)</span> in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, computes output <span class="math">\(y\)</span> as</p>
+<div class="math">
+\[y[i] = x[i] + \text{coeff} \cdot y[i - 1]
+
+\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Waveform, with shape <cite>(…, N)</cite>.</p></li>
+<li><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – De-emphasis coefficient. Typically between 0.0 and 1.0.
+(Default: 0.97)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>De-emphasized waveform, with shape <cite>(…, N)</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="fftconvolve">
 <h2>fftconvolve<a class="headerlink" href="#fftconvolve" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
@@ -535,6 +565,36 @@ the two inputs overlap completely, with shape <cite>(…, max(N, M) - min(N, M) 
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Result of convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, with shape <cite>(…, L)</cite>, where
 the leading dimensions match those of <code class="docutils literal notranslate"><span class="pre">x</span></code> and <cite>L</cite> is dictated by <code class="docutils literal notranslate"><span class="pre">mode</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="preemphasis">
+<h2>preemphasis<a class="headerlink" href="#preemphasis" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.prototype.functional.preemphasis">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.functional.</span></span><span class="sig-name descname"><span class="pre">preemphasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.97</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="_modules/torchaudio/prototype/functional/functional.html#preemphasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.functional.preemphasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-emphasizes a waveform along its last dimension, i.e.
+for each signal <span class="math">\(x\)</span> in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, computes
+output <span class="math">\(y\)</span> as</p>
+<div class="math">
+\[y[i] = x[i] - \text{coeff} \cdot x[i - 1]
+
+\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Waveform, with shape <cite>(…, N)</cite>.</p></li>
+<li><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+(Default: 0.97)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pre-emphasized waveform, with shape <cite>(…, N)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a></p>
@@ -647,7 +707,9 @@ compress <code class="docutils literal notranslate"><span class="pre">waveform</
 <li><a class="reference internal" href="#add-noise">add_noise</a></li>
 <li><a class="reference internal" href="#barkscale-fbanks">barkscale_fbanks</a></li>
 <li><a class="reference internal" href="#convolve">convolve</a></li>
+<li><a class="reference internal" href="#deemphasis">deemphasis</a></li>
 <li><a class="reference internal" href="#fftconvolve">fftconvolve</a></li>
+<li><a class="reference internal" href="#preemphasis">preemphasis</a></li>
 <li><a class="reference internal" href="#speed">speed</a></li>
 <li><a class="reference internal" href="#dsp">DSP</a></li>
 </ul>

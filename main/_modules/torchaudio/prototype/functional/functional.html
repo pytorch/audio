@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221201) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221202) &#x25BC</a>
     </div>
     
 
@@ -388,8 +388,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchaudio.functional</span> <span class="kn">import</span> <span class="n">resample</span>
-
+<span class="kn">from</span> <span class="nn">torchaudio.functional</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span> <span class="n">resample</span>
 <span class="kn">from</span> <span class="nn">torchaudio.functional.functional</span> <span class="kn">import</span> <span class="n">_create_triangular_filterbank</span>
 
 
@@ -729,6 +728,48 @@
     <span class="k">return</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">target_sample_rate</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
         <span class="n">lengths</span> <span class="o">*</span> <span class="n">target_sample_rate</span> <span class="o">/</span> <span class="n">source_sample_rate</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="preemphasis"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.preemphasis">[docs]</a><span class="k">def</span> <span class="nf">preemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pre-emphasizes a waveform along its last dimension, i.e.</span>
+<span class="sd">    for each signal :math:`x` in ``waveform``, computes</span>
+<span class="sd">    output :math:`y` as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        y[i] = x[i] - \text{coeff} \cdot x[i - 1]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (torch.Tensor): Waveform, with shape `(..., N)`.</span>
+<span class="sd">        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.</span>
+<span class="sd">            (Default: 0.97)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+    <span class="n">waveform</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">-=</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">waveform</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">waveform</span></div>
+
+
+<div class="viewcode-block" id="deemphasis"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.deemphasis">[docs]</a><span class="k">def</span> <span class="nf">deemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;De-emphasizes a waveform along its last dimension.</span>
+<span class="sd">    Inverse of :meth:`preemphasis`. Concretely, for each signal</span>
+<span class="sd">    :math:`x` in ``waveform``, computes output :math:`y` as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        y[i] = x[i] + \text{coeff} \cdot y[i - 1]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (torch.Tensor): Waveform, with shape `(..., N)`.</span>
+<span class="sd">        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.</span>
+<span class="sd">            (Default: 0.97)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: De-emphasized waveform, with shape `(..., N)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a_coeffs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="n">coeff</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">b_coeffs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="o">=</span><span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="o">=</span><span class="n">b_coeffs</span><span class="p">)</span></div>
 </pre></div>
 
              </article>

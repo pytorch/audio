@@ -19,10 +19,20 @@ convolve
 
 .. autofunction:: convolve
 
+deemphasis
+~~~~~~~~~~
+
+.. autofunction:: deemphasis
+
 fftconvolve
 ~~~~~~~~~~~
 
 .. autofunction:: fftconvolve
+
+preemphasis
+~~~~~~~~~~~
+
+.. autofunction:: preemphasis
 
 speed
 ~~~~~
