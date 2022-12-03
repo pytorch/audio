@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
+from torchaudio._internal import module_utils as _mod_utils
 
 
 def _compute_image_sources(
@@ -110,6 +111,7 @@ def _frac_delay(delay: torch.Tensor, delay_i: torch.Tensor, delay_filter_length:
     return torch.special.sinc(n - delay) * _hann(n - delay, 2 * pad)
 
 
+@_mod_utils.requires_rir()
 def simulate_rir_ism(
     room: torch.Tensor,
     source: torch.Tensor,

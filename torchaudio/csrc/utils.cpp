@@ -15,6 +15,15 @@ bool is_kaldi_available() {
 #endif
 }
 
+
+bool is_rir_available() {
+#ifdef BUILD_RIR
+  return true;
+#else
+  return false;
+#endif
+}
+
 c10::optional<int64_t> cuda_version() {
 #ifdef USE_CUDA
   return CUDA_VERSION;
@@ -24,3 +33,7 @@ c10::optional<int64_t> cuda_version() {
 }
 
 } // namespace torchaudio
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("torchaudio::is_rir_available", &is_rir_available);
+}

@@ -80,3 +80,27 @@ def fail_with_message(message):
 def no_op(func):
     """Op-op decorator. Used in place of fail_with_message when a functionality that requires extension works fine."""
     return func
+
+
+def is_rir_available():
+    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_rir_available()
+
+
+def requires_rir():
+    if is_rir_available():
+
+        def decorator(func):
+            return func
+
+    else:
+
+        def decorator(func):
+            @wraps(func)
+            def wrapped(*args, **kwargs):
+                raise RuntimeError(
+                    f"{func.__module__}.{func.__name__} requires BUILD_RIR to True when building torchaudio"
+                )
+
+            return wrapped
+
+    return decorator
