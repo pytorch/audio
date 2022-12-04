@@ -59,7 +59,8 @@ def run_train(args):
             reload_dataloaders_every_n_epochs=1,
         )
 
-    model = ConformerRNNTModule(str(args.sp_model_path))
+    usebiasing = True if args.biasing == 'true' else False
+    model = ConformerRNNTModule(str(args.sp_model_path), usebiasing)
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path),
                                   subset="clean100", biasinglist=args.biasinglist, droprate=args.droprate,
                                   maxsize=args.maxsize)
@@ -115,6 +116,12 @@ def cli_main():
         default=120,
         type=int,
         help="Number of epochs to train for. (Default: 120)",
+    )
+    parser.add_argument(
+        "--biasing",
+        type=str,
+        help="Use biasing",
+        required=True,
     )
     parser.add_argument(
         "--biasinglist",
