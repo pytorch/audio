@@ -16,6 +16,7 @@ _gain = pow(10, 0.05 * _decibel)
 
 _spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160)
 
+random.seed(999)
 
 def _piecewise_linear_log(x):
     x = x * _gain
@@ -49,7 +50,11 @@ class GlobalStatsNormalization(torch.nn.Module):
 
 def _extract_labels(sp_model, samples: List):
     targets = [sp_model.encode(sample[2].lower()) for sample in samples]
-    biasingwords = set().union(*[sample[6] for sample in samples])
+    biasingwords = []
+    for sample in samples:
+        for word in sample[6]:
+            if word not in biasingwords:
+                biasingwords.append(word)
     lengths = torch.tensor([len(elem) for elem in targets]).to(dtype=torch.int32)
     targets = torch.nn.utils.rnn.pad_sequence(
         [torch.tensor(elem) for elem in targets],
@@ -67,36 +72,35 @@ def _extract_features(data_pipeline, samples: List):
     return features, lengths
 
 def _extract_tries(sp_model, biasingwords, blist, droprate, maxsize):
-    if len(biasingwords) > 0:
+    if len(biasingwords) > 0 and droprate > 0:
         biasingwords = random.sample(biasingwords, k=int(len(biasingwords) * (1 - droprate)))
-        biasingwords = set(biasingwords)
     if len(biasingwords) < maxsize:
         distractors = random.sample(blist, k=max(0, maxsize-len(biasingwords)))
         for word in distractors:
             if word not in biasingwords:
-                biasingwords.add(word)
+                biasingwords.append(word)
     biasingwords = [sp_model.encode(word.lower()) for word in biasingwords]
     biasingwords = sorted(biasingwords)
     worddict = {tuple(word):i+1 for i, word in enumerate(biasingwords)}
     lextree = make_lexical_tree(worddict, -1)
-    return lextree
+    return lextree, biasingwords
 
 def make_lexical_tree(word_dict, word_unk):
     """Make a prefix tree"""
     # node [dict(subword_id -> node), word_id, word_set[start-1, end]]
     root = [{}, -1, None]
     for w, wid in word_dict.items():
-        if wid > 0 and wid != word_unk:  # skip <blank> and <unk>
-            succ = root[0]  # get successors from root node
+        if wid > 0 and wid != word_unk:
+            succ = root[0]
             for i, cid in enumerate(w):
-                if cid not in succ:  # if next node does not exist, make a new node
+                if cid not in succ:
                     succ[cid] = [{}, -1, (wid - 1, wid)]
                 else:
                     prev = succ[cid][2]
                     succ[cid][2] = (min(prev[0], wid - 1), max(prev[1], wid))
-                if i == len(w) - 1:  # if word end, set word id
+                if i == len(w) - 1:
                     succ[cid][1] = wid
-                succ = succ[cid][0]  # move to the child successors
+                succ = succ[cid][0]
     return root
 
 
@@ -121,7 +125,7 @@ class TrainTransform:
     def __call__(self, samples: List):
         features, feature_lengths = _extract_features(self.train_data_pipeline, samples)
         targets, target_lengths, biasingwords = _extract_labels(self.sp_model, samples)
-        tries = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
+        tries, biasingwords = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
         return Batch(features, feature_lengths, targets, target_lengths, tries)
 
 
@@ -141,10 +145,9 @@ class ValTransform:
         features, feature_lengths = _extract_features(self.valid_data_pipeline, samples)
         targets, target_lengths, biasingwords = _extract_labels(self.sp_model, samples)
         if self.blist != []:
-            tries = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
+            tries, biasingwords = _extract_tries(self.sp_model, biasingwords, self.blist, self.droprate, self.maxsize)
         else:
             tries = []
-        # tries = [tries for _ in feature_lengths]
         return Batch(features, feature_lengths, targets, target_lengths, tries)
 
 
