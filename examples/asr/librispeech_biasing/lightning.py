@@ -13,7 +13,7 @@ from torchaudio.prototype.models import conformer_rnnt_biasing_base
 
 logger = logging.getLogger()
 
-_expected_spm_vocab_size = 1023
+_expected_spm_vocab_size = 600
 
 Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths", "tries"])
 
@@ -76,7 +76,7 @@ def post_process_hypos(
 
 
 class ConformerRNNTModule(LightningModule):
-    def __init__(self, sp_model):
+    def __init__(self, sp_model, biasing=False):
         super().__init__()
 
         self.sp_model = sp_model
@@ -93,10 +93,12 @@ class ConformerRNNTModule(LightningModule):
 
         # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
         # For greater customizability, please refer to ``conformer_rnnt_model``.
-        self.model = conformer_rnnt_biasing_base(charlist=self.char_list)
+        self.biasing = biasing
+        self.model = conformer_rnnt_biasing_base(charlist=self.char_list, biasing=self.biasing)
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum", fused_log_softmax=False)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
-        self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
+        self.warmup_lr_scheduler = WarmupLR(self.optimizer, 35, 60, 0.92)
+        self.tcpsche = self.model.tcpsche
 
         self.automatic_optimization = False
 
@@ -116,10 +118,19 @@ class ConformerRNNTModule(LightningModule):
             batch.tries,
             self.current_epoch
         )
-        loss = self.loss(output, batch.targets, src_lengths, batch.target_lengths)
-        if tcpgen_dist is not None and p_gen is not None:
-            loss += tcpgen_dist.mean() * 0
-            loss += p_gen.mean() * 0
+        if self.biasing and self.current_epoch >= self.tcpsche and p_gen is not None:
+            # Assuming blank is the last token
+            model_output = torch.softmax(output, dim=-1)
+            p_not_null = 1.0 - model_output[:, :, :, -1:]
+            # exclude blank prob
+            ptr_dist_fact = torch.cat([tcpgen_dist[:, :, :, :-2], tcpgen_dist[:, :, :, -1:]], dim=-1) * p_not_null
+            ptr_gen_complement  = tcpgen_dist[:, :, :, -1:] * p_gen
+            p_partial = ptr_dist_fact[:, :, :, :-1] * p_gen + model_output[:, :, :, :-1] * (1 - p_gen + ptr_gen_complement)
+            p_final = torch.cat([p_partial, model_output[:, :, :, -1:]], dim=-1)
+            logsmax_output = torch.log(p_final+1e-12)
+        else:
+            logsmax_output = torch.log_softmax(output, dim=-1)
+        loss = self.loss(logsmax_output, batch.targets, src_lengths, batch.target_lengths)
         self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True, batch_size=batch.targets.size(0))
 
         return loss
@@ -131,7 +142,7 @@ class ConformerRNNTModule(LightningModule):
         )
 
     def forward(self, batch: Batch):
-        decoder = RNNTBeamSearchBiasing(self.model, self.blank_idx, trie=batch.tries)
+        decoder = RNNTBeamSearchBiasing(self.model, self.blank_idx, trie=batch.tries, biasing=self.biasing)
         hypotheses = decoder(batch.features.to(self.device), batch.feature_lengths.to(self.device), 10)
         return post_process_hypos(hypotheses, self.sp_model)[0][0]
 
