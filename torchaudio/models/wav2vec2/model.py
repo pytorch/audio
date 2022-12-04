@@ -683,7 +683,7 @@ def hubert_xlarge(
 
 
 def _init_hubert_pretrain_model(module):
-    if isinstance(module, components.LayerNorm):
+    if isinstance(module, components.ConvLayerBlock):
         torch.nn.init.kaiming_normal_(module.conv.weight)
     elif isinstance(module, components.ConvolutionalPositionalEmbedding):
         # normalize the weight to normal distribution.
