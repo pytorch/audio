@@ -53,8 +53,8 @@ This tutorial shows how to synthesize various waveforms using
 
  .. code-block:: none
 
-    1.14.0.dev20221203
-    0.14.0.dev20221203
+    1.14.0.dev20221204
+    0.14.0.dev20221204
 
 
 
@@ -643,7 +643,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  45.381 seconds)
+   **Total running time of the script:** ( 0 minutes  45.771 seconds)
 
 
 .. _sphx_glr_download_tutorials_oscillator_tutorial.py:
