@@ -65,11 +65,12 @@ class _JoinerBiasing(torch.nn.Module):
     """
 
     def __init__(self, input_dim: int, output_dim: int, activation: str = "relu",
-                 deepbiasing: bool = False, attndim: int = 1) -> None:
+                 biasing: bool = False, deepbiasing: bool = False, attndim: int = 1) -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
+        self.biasing = biasing
         self.deepbiasing = deepbiasing
-        if self.deepbiasing:
+        if self.biasing and self.deepbiasing:
             self.biasinglinear = torch.nn.Linear(attndim, input_dim, bias=True)
             self.attndim = attndim
         if activation == "relu":
@@ -115,10 +116,10 @@ class _JoinerBiasing(torch.nn.Module):
                     number of valid elements along dim 2 for i-th batch element in joint network output.
         """
         joint_encodings = source_encodings.unsqueeze(2).contiguous() + target_encodings.unsqueeze(1).contiguous()
-        if self.deepbiasing and hptr is not None:
+        if self.biasing and self.deepbiasing and hptr is not None:
             hptr = self.biasinglinear(hptr)
             joint_encodings += hptr
-        elif self.deepbiasing:
+        elif self.biasing and self.deepbiasing:
             # Hack here for unused parameters
             joint_encodings += self.biasinglinear(joint_encodings.new_zeros(1, self.attndim)).mean() * 0
         activation_out = self.activation(joint_encodings)
@@ -141,7 +142,7 @@ class RNNTBiasing(RNNT):
     """
 
     def __init__(self, transcriber: _Transcriber, predictor: _Predictor, joiner: _Joiner,
-                 attndim: int, deepbiasing: bool, embdim: int, jointdim: int, charlist: list,
+                 attndim: int, biasing:bool, deepbiasing: bool, embdim: int, jointdim: int, charlist: list,
                  encoutdim: int, dropout_tcpgen: float, tcpsche: int, DBaverage: bool) -> None:
         super().__init__(transcriber, predictor, joiner)
         self.attndim = attndim
@@ -153,14 +154,16 @@ class RNNTBiasing(RNNT):
         self.blank_idx = self.char_list.index('<blank>')
         self.nchars = len(charlist)
         self.DBaverage = DBaverage
-        if self.deepbiasing and self.DBaverage:
-            self.biasingemb = torch.nn.Linear(self.nchars, self.attndim, bias=False)
-        else:
-            self.ooKBemb = torch.nn.Embedding(1, self.embdim)
-            self.Qproj_char = torch.nn.Linear(self.embdim, self.attndim)
-            self.Qproj_acoustic = torch.nn.Linear(self.encoutdim, self.attndim)
-            self.Kproj = torch.nn.Linear(self.embdim, self.attndim)
-            self.pointer_gate = torch.nn.Linear(self.attndim+self.jointdim, 1)
+        self.biasing = biasing
+        if self.biasing:
+            if self.deepbiasing and self.DBaverage:
+                self.biasingemb = torch.nn.Linear(self.nchars, self.attndim, bias=False)
+            else:
+                self.ooKBemb = torch.nn.Embedding(1, self.embdim)
+                self.Qproj_char = torch.nn.Linear(self.embdim, self.attndim)
+                self.Qproj_acoustic = torch.nn.Linear(self.encoutdim, self.attndim)
+                self.Kproj = torch.nn.Linear(self.embdim, self.attndim)
+                self.pointer_gate = torch.nn.Linear(self.attndim+self.jointdim, 1)
         self.dropout_tcpgen = torch.nn.Dropout(dropout_tcpgen)
         self.tcpsche = tcpsche
 
@@ -222,12 +225,12 @@ class RNNTBiasing(RNNT):
         # Forward TCPGen
         hptr = None
         tcpgen_dist, p_gen = None, None
-        if current_epoch >= self.tcpsche and tries != []:
+        if self.biasing and current_epoch >= self.tcpsche and tries != []:
             ptrdist_mask, p_gen_mask = self.get_tcpgen_step_masks(targets, tries)
-            hptr, tcpgen_dist = self.get_query(targets, ptrdist_mask, source_encodings)
+            hptr, tcpgen_dist = self.forward_tcpgen(targets, ptrdist_mask, source_encodings)
             hptr = self.dropout_tcpgen(hptr)
-        else:
-            # Hack here to allow unused parameters
+        elif self.biasing:
+            # Hack here to bypass unused parameters
             if self.DBaverage and self.deepbiasing:
                 dummy = self.biasingemb(source_encodings.new_zeros(1, len(self.char_list))).mean()
             else:
@@ -249,8 +252,11 @@ class RNNTBiasing(RNNT):
         )
 
         # Calculate Generation Probability
-        if hptr is not None and tcpgen_dist is not None:
+        if self.biasing and hptr is not None and tcpgen_dist is not None:
             p_gen = torch.sigmoid(self.pointer_gate(torch.cat((jointer_activation, hptr), dim=-1)))
+            # avoid collapsing to ooKB token in the first few updates
+            # if current_epoch == self.tcpsche:
+            #     p_gen = p_gen * 0.1
             p_gen = p_gen.masked_fill(p_gen_mask.bool().unsqueeze(1).unsqueeze(-1), 0)
 
         return (
@@ -276,7 +282,7 @@ class RNNTBiasing(RNNT):
         hptr = torch.einsum('ntui,ij->ntuj', tcpgendist[:,:,:,:-1], keyvalues[:-1,:])
         return hptr, tcpgendist
 
-    def get_query(self, targets, ptrdist_mask, source_encodings):
+    def forward_tcpgen(self, targets, ptrdist_mask, source_encodings):
         tcpgen_dist = None
         if self.DBaverage and self.deepbiasing:
             hptr = self.biasingemb(1 - ptrdist_mask[:,:,:-1].float()).unsqueeze(1)
@@ -314,7 +320,11 @@ class RNNTBiasing(RNNT):
                     new_tree = new_tree[vy]
                     p_gen_mask.append(0)
                 batch_masks[i, j, list(new_tree[0].keys())] = 0
-                batch_masks[i, j, -1] = 0
+                # In the original paper, ooKB node was not masked
+                # In this implementation, if not masking ooKB, ooKB probability
+                # would quickly collapse to 1.0 in the first few updates.
+                # Haven't found out why this happened.
+                # batch_masks[i, j, -1] = 0
             p_gen_masks.append(p_gen_mask + [1] * (seqlen - len(p_gen_mask)))
         p_gen_masks = torch.Tensor(p_gen_masks).to(yseqs.device).byte()
         return batch_masks, p_gen_masks
@@ -498,6 +508,7 @@ def conformer_rnnt_biasing(
     lstm_dropout: int,
     joiner_activation: str,
     attndim: int,
+    biasing: bool,
     charlist: list,
     deepbiasing: bool,
     tcpsche: int,
@@ -552,12 +563,12 @@ def conformer_rnnt_biasing(
         lstm_dropout=lstm_dropout,
     )
     joiner = _JoinerBiasing(encoding_dim, num_symbols, activation=joiner_activation,
-                            deepbiasing=deepbiasing, attndim=attndim)
-    return RNNTBiasing(encoder, predictor, joiner, attndim, deepbiasing, symbol_embedding_dim,
+                            deepbiasing=deepbiasing, attndim=attndim, biasing=biasing)
+    return RNNTBiasing(encoder, predictor, joiner, attndim, biasing, deepbiasing, symbol_embedding_dim,
                        encoding_dim, charlist, encoding_dim, conformer_dropout,
                        tcpsche, DBaverage)
 
-def conformer_rnnt_biasing_base(charlist=[]) -> RNNT:
+def conformer_rnnt_biasing_base(charlist=[], biasing=True) -> RNNT:
     r"""Builds basic version of Conformer RNN-T model.
 
     Returns:
@@ -566,25 +577,26 @@ def conformer_rnnt_biasing_base(charlist=[]) -> RNNT:
     """
     return conformer_rnnt_biasing(
         input_dim=80,
-        encoding_dim=1024,
+        encoding_dim=576,
         time_reduction_stride=4,
-        conformer_input_dim=256,
-        conformer_ffn_dim=1024,
+        conformer_input_dim=144,
+        conformer_ffn_dim=576,
         conformer_num_layers=16,
         conformer_num_heads=4,
         conformer_depthwise_conv_kernel_size=31,
         conformer_dropout=0.1,
-        num_symbols=1024,
+        num_symbols=601,
         symbol_embedding_dim=256,
-        num_lstm_layers=2,
-        lstm_hidden_dim=512,
+        num_lstm_layers=1,
+        lstm_hidden_dim=320,
         lstm_layer_norm=True,
         lstm_layer_norm_epsilon=1e-5,
         lstm_dropout=0.3,
         joiner_activation="tanh",
         attndim=256,
+        biasing=biasing,
         charlist=charlist,
-        deepbiasing=True,
-        tcpsche=50,
-        DBaverage=True
+        deepbiasing=False,
+        tcpsche=30,
+        DBaverage=False
     )
