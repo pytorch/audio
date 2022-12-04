@@ -1,6 +1,6 @@
-# Conformer RNN-T ASR Example
+# Contextual Conformer RNN-T with TCPGen Example
 
-This directory contains sample implementations of training and evaluation pipelines for a Conformer RNN-T ASR model.
+This directory contains sample implementations of training and evaluation pipelines for the Conformer RNN-T model with tree-constrained pointer generator (TCPGen) for contextual biasing.
 
 ## Setup
 ### Install PyTorch and TorchAudio nightly or from source
@@ -25,25 +25,15 @@ pip install pytorch-lightning sentencepiece
 - SentencePiece model to be used to encode targets; the model can be generated using [`train_spm.py`](./train_spm.py).
 - File (--global_stats_path) that contains training set feature statistics; this file can be generated using [`global_stats.py`](../emformer_rnnt/global_stats.py).
 
-Sample SLURM command:
-```
-srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.py --exp_dir ./experiments --librispeech_path ./librispeech/ --global_stats_path ./global_stats.json --sp_model_path ./spm_unigram_1023.model --epochs 160
-```
+Sample local training script: `train.sh`
+
+Training options:
 
 ### Evaluation
 
 [`eval.py`](./eval.py) evaluates a trained Conformer RNN-T model on LibriSpeech test-clean.
 
-Sample SLURM command:
-```
-srun python eval.py --checkpoint_path ./experiments/checkpoints/epoch=159.ckpt --librispeech_path ./librispeech/ --sp_model_path ./spm_unigram_1023.model --use_cuda
-```
+Sample decoding script: `eval.sh`
 
-The table below contains WER results for various splits.
+Decoding options:
 
-|                     |          WER |
-|:-------------------:|-------------:|
-| test-clean          |       0.0310 |
-| test-other          |       0.0805 |
-| dev-clean           |       0.0314 |
-| dev-other           |       0.0827 |
