@@ -45,5 +45,11 @@ Other decoding options:
 - `--maxsize` is the size of the biasing list used for decoding, where 1000 was used in the paper.
 
 ### Scoring
-Example scoring script using sclite is in `score.sh`
+Example scoring script using sclite is in [`score.sh`](./score.sh). Note that this will generate a file named `results.wrd.txt` which is in the format that will be used in the following script to calculate rare word error rate. Follow these steps to calculate rare word error rate:
 
+```bash
+cd error_analysis
+python get_error_word_count.py <path_to_results.wrd.txt>
+```
+
+Note that the `word_freq.txt` file contains word frequencies for train-clean-100 only. For the full set it should be calculated again, which will only slightly affect OOV word error rate calculation in this case.
