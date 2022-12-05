@@ -104,7 +104,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
         hypo_sort_key: Optional[Callable[[Hypothesis], float]] = None,
         step_max_tokens: int = 100,
         trie: list = [],
-        biasing: bool = False
+        biasing: bool = False,
     ) -> None:
         super().__init__()
         self.model = model
@@ -130,13 +130,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
 
         one_tensor = torch.tensor([1], device=device)
         pred_out, _, pred_state = self.model.predict(torch.tensor([[token]], device=device), one_tensor, state)
-        init_hypo = (
-            [token],
-            pred_out[0].detach(),
-            pred_state,
-            0.0,
-            self.resettrie
-        )
+        init_hypo = ([token], pred_out[0].detach(), pred_state, 0.0, self.resettrie)
         return [init_hypo]
 
     def _get_trie_mask(self, trie):
@@ -159,9 +153,9 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
         if self.dobiasing:
             # Get valid subset of wordpieces
             trie_masks = torch.stack([self._get_trie_mask(_get_hypo_trie(h)) for h in hypos], dim=0)
-            trie_masks = trie_masks.to(enc_out.device).unsqueeze(1) # beam_width, 1, nchars
+            trie_masks = trie_masks.to(enc_out.device).unsqueeze(1)  # beam_width, 1, nchars
             # Determine if there is any paths on the trie
-            genprob_masks = torch.tensor([self._get_generation_prob(_get_hypo_trie(h)) for h in hypos]) # beam_width
+            genprob_masks = torch.tensor([self._get_generation_prob(_get_hypo_trie(h)) for h in hypos])  # beam_width
             genprob_masks = genprob_masks.to(enc_out.device)
             # Forward TCPGen component
             last_tokens = torch.tensor([_get_hypo_tokens(h)[-1] for h in hypos]).unsqueeze(-1).to(enc_out.device)
@@ -183,7 +177,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
             # assuming last token is blank
             p_not_null = 1.0 - model_tu[:, :, :, -1:]
             ptr_dist_fact = torch.cat([tcpgen_dist[:, :, :, :-2], tcpgen_dist[:, :, :, -1:]], dim=-1) * p_not_null
-            ptr_gen_complement  = tcpgen_dist[:, :, :, -1:] * p_gen
+            ptr_gen_complement = tcpgen_dist[:, :, :, -1:] * p_gen
             p_partial = ptr_dist_fact[:, :, :, :-1] * p_gen + model_tu[:, :, :, :-1] * (1 - p_gen + ptr_gen_complement)
             p_final = torch.cat([p_partial, model_tu[:, :, :, -1:]], dim=-1)
             joined_out = torch.log(p_final)
@@ -212,7 +206,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
                 _get_hypo_predictor_out(h_a),
                 _get_hypo_state(h_a),
                 score,
-                _get_hypo_trie(h_a)
+                _get_hypo_trie(h_a),
             )
             b_hypos.append(h_b)
             key_to_b_hypo[_get_hypo_key(h_b)] = h_b
@@ -279,7 +273,9 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
                 new_trie = self.model.get_tcpgen_step(tokens[i], _get_hypo_trie(h_a), self.resettrie)
             else:
                 new_trie = self.resettrie
-            new_hypos.append((new_tokens, pred_out[i].detach(), _slice_state(pred_states, i, device), scores[i], new_trie))
+            new_hypos.append(
+                (new_tokens, pred_out[i].detach(), _slice_state(pred_states, i, device), scores[i], new_trie)
+            )
         return new_hypos
 
     def _search(
