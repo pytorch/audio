@@ -21,9 +21,9 @@ SOFTWARE.
  * Image source method implementation based on PyRoomAcoustics:
  * https://github.com/LCAV/pyroomacoustics
  */
-#include <cmath>
 #include <torch/script.h>
 #include <torch/torch.h>
+#include <cmath>
 using namespace torch::indexing;
 
 namespace torchaudio {
