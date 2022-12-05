@@ -61,7 +61,7 @@ def parse_args():
     parser.add_argument(
         "--suffix",
         action='store_true',
-        help=f"whether to use suffix-based wordpieces"
+        help="whether to use suffix-based wordpieces",
     )
     return parser.parse_args()
 

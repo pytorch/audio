@@ -5,7 +5,6 @@ from argparse import ArgumentParser
 from lightning import ConformerRNNTModule
 from pytorch_lightning import seed_everything, Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
-from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.strategies import DDPStrategy
 from transforms import get_data_module
 

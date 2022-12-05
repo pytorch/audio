@@ -1,4 +1,4 @@
-import sys, os
+import sys
 
 error_words_freqs = {}
 infile = sys.argv[1]
@@ -27,7 +27,7 @@ for i, line in enumerate(lines):
         project = line.strip(')\n').split('-')[-3:]
         project = '-'.join(project)
     if "REF:" in line:
-        nextline = lines[i+1].split()
+        nextline = lines[i + 1].split()
         for j, word in enumerate(line.split()):
             if '*' in word:
                 insert_error += 1
@@ -88,13 +88,16 @@ for word, error in error_words_freqs.items():
 
 total_words = common_freq + rare_freq + oov_freq
 insert_common = insert_error - insert_rare
-total_errors = common_error+rare_error+oov_error + insert_error
+total_errors = common_error + rare_error + oov_error + insert_error
 WER = total_errors / total_words
-print('='*89)
-print('Common words error freq: {} / {} = {}'.format(common_error+insert_common, common_freq, (common_error+insert_common)/common_freq))
-print('Rare words error freq: {} / {} = {}'.format(rare_error+insert_rare, rare_freq, (rare_error + insert_rare)/rare_freq))
-print('OOV words error freq: {} / {} = {}'.format(oov_error, oov_freq, oov_error/max(oov_freq, 1)))
+print('=' * 89)
+print('Common words error freq: {} / {} = {}'.format(
+    common_error+insert_common, common_freq, (common_error + insert_common) / common_freq))
+print('Rare words error freq: {} / {} = {}'.format(
+    rare_error+insert_rare, rare_freq, (rare_error + insert_rare) / rare_freq))
+print('OOV words error freq: {} / {} = {}'.format(oov_error, oov_freq, oov_error / max(oov_freq, 1)))
 print('WER estimate: {} / {} = {}'.format(total_errors, total_words, WER))
-print('Insert error: {} / {} = {}'.format(insert_error - insert_rare, total_words, (insert_error - insert_rare)/total_words))
+print('Insert error: {} / {} = {}'.format(
+    insert_error - insert_rare, total_words, (insert_error - insert_rare) / total_words))
 print('Insertion + OOV error {}'.format((insert_error + oov_error - insert_rare) / total_words))
-print('='*89)
+print('=' * 89)

@@ -18,6 +18,7 @@ _spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000,
 
 random.seed(999)
 
+
 def _piecewise_linear_log(x):
     x = x * _gain
     x[x > math.e] = torch.log(x[x > math.e])
@@ -71,19 +72,21 @@ def _extract_features(data_pipeline, samples: List):
     lengths = torch.tensor([elem.shape[0] for elem in mel_features], dtype=torch.int32)
     return features, lengths
 
+
 def _extract_tries(sp_model, biasingwords, blist, droprate, maxsize):
     if len(biasingwords) > 0 and droprate > 0:
         biasingwords = random.sample(biasingwords, k=int(len(biasingwords) * (1 - droprate)))
     if len(biasingwords) < maxsize:
-        distractors = random.sample(blist, k=max(0, maxsize-len(biasingwords)))
+        distractors = random.sample(blist, k=max(0, maxsize - len(biasingwords)))
         for word in distractors:
             if word not in biasingwords:
                 biasingwords.append(word)
     biasingwords = [sp_model.encode(word.lower()) for word in biasingwords]
     biasingwords = sorted(biasingwords)
-    worddict = {tuple(word):i+1 for i, word in enumerate(biasingwords)}
+    worddict = {tuple(word): i + 1 for i, word in enumerate(biasingwords)}
     lextree = make_lexical_tree(worddict, -1)
     return lextree, biasingwords
+
 
 def make_lexical_tree(word_dict, word_unk):
     """Make a prefix tree"""
@@ -153,7 +156,7 @@ class ValTransform:
 
 class TestTransform:
     def __init__(self, global_stats_path: str, sp_model_path: str, blist: list,
-                 droprate:float, maxsize: int):
+                 droprate: float, maxsize: int):
         self.val_transforms = ValTransform(global_stats_path, sp_model_path, blist, droprate, maxsize)
 
     def __call__(self, sample):
@@ -169,9 +172,9 @@ def get_data_module(librispeech_path, global_stats_path, sp_model_path, subset="
     train_transform = TrainTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path,
                                      blist=fullbiasinglist, droprate=droprate, maxsize=maxsize)
     val_transform = ValTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path,
-                                     blist=fullbiasinglist, droprate=droprate, maxsize=maxsize)
+                                 blist=fullbiasinglist, droprate=droprate, maxsize=maxsize)
     test_transform = TestTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path,
-                                     blist=fullbiasinglist, droprate=droprate, maxsize=maxsize)
+                                   blist=fullbiasinglist, droprate=droprate, maxsize=maxsize)
     return LibriSpeechDataModule(
         librispeech_path=librispeech_path,
         train_transform=train_transform,
