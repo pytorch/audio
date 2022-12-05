@@ -70,15 +70,7 @@ def load_librispeech_item(
             # Translation not found
             raise FileNotFoundError(f"Translation not found for {fileid_audio}")
 
-    return (
-        waveform,
-        sample_rate,
-        transcript,
-        int(speaker_id),
-        int(chapter_id),
-        int(utterance_id),
-        wordlist
-    )
+    return (waveform, sample_rate, transcript, int(speaker_id), int(chapter_id), int(utterance_id), wordlist)
 
 
 class LIBRISPEECH_BIASING(Dataset):
@@ -106,7 +98,7 @@ class LIBRISPEECH_BIASING(Dataset):
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
-        blist: list = []
+        blist: list = [],
     ) -> None:
         if url not in _DATA_SUBSETS:
             raise ValueError(f"Invalid url '{url}' given; please provide one of {_DATA_SUBSETS}.")

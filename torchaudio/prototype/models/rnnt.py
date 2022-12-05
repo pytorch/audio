@@ -1,5 +1,5 @@
-from typing import List, Optional, Tuple
 import math
+from typing import List, Optional, Tuple
 
 import torch
 from torchaudio.models import Conformer, RNNT
@@ -67,8 +67,15 @@ class _JoinerBiasing(torch.nn.Module):
 
     """
 
-    def __init__(self, input_dim: int, output_dim: int, activation: str = "relu",
-                 biasing: bool = False, deepbiasing: bool = False, attndim: int = 1) -> None:
+    def __init__(
+        self, 
+        input_dim: int, 
+        output_dim: int, 
+        activation: str = "relu",
+        biasing: bool = False, 
+        deepbiasing: bool = False, 
+        attndim: int = 1
+    ) -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
         self.biasing = biasing
@@ -147,9 +154,22 @@ class RNNTBiasing(RNNT):
         joiner (torch.nn.Module): joint network.
     """
 
-    def __init__(self, transcriber: _Transcriber, predictor: _Predictor, joiner: _Joiner,
-                 attndim: int, biasing:bool, deepbiasing: bool, embdim: int, jointdim: int, charlist: list,
-                 encoutdim: int, dropout_tcpgen: float, tcpsche: int, DBaverage: bool) -> None:
+    def __init__(
+        self, 
+        transcriber: _Transcriber, 
+        predictor: _Predictor, 
+        joiner: _Joiner,
+        attndim: int, 
+        biasing:bool, 
+        deepbiasing: bool, 
+        embdim: int, 
+        jointdim: int, 
+        charlist: list,
+        encoutdim: int, 
+        dropout_tcpgen: float, 
+        tcpsche: int, 
+        DBaverage: bool
+    ) -> None:
         super().__init__(transcriber, predictor, joiner)
         self.attndim = attndim
         self.deepbiasing = deepbiasing
@@ -157,7 +177,7 @@ class RNNTBiasing(RNNT):
         self.embdim = embdim
         self.encoutdim = encoutdim
         self.char_list = charlist
-        self.blank_idx = self.char_list.index('<blank>')
+        self.blank_idx = self.char_list.index("<blank>")
         self.nchars = len(charlist)
         self.DBaverage = DBaverage
         self.biasing = biasing
@@ -171,7 +191,7 @@ class RNNTBiasing(RNNT):
                 self.Qproj_char = torch.nn.Linear(self.embdim, self.attndim)
                 self.Qproj_acoustic = torch.nn.Linear(self.encoutdim, self.attndim)
                 self.Kproj = torch.nn.Linear(self.embdim, self.attndim)
-                self.pointer_gate = torch.nn.Linear(self.attndim+self.jointdim, 1)
+                self.pointer_gate = torch.nn.Linear(self.attndim + self.jointdim, 1)
         self.dropout_tcpgen = torch.nn.Dropout(dropout_tcpgen)
         self.tcpsche = tcpsche
 
@@ -255,7 +275,7 @@ class RNNTBiasing(RNNT):
                 dummy = self.Qproj_char(dummy).mean()
                 dummy += self.Qproj_acoustic(source_encodings.new_zeros(1, source_encodings.size(-1))).mean()
                 dummy += self.Kproj(source_encodings.new_zeros(1, self.embdim)).mean()
-                dummy += self.pointer_gate(source_encodings.new_zeros(1, self.attndim+self.jointdim)).mean()
+                dummy += self.pointer_gate(source_encodings.new_zeros(1, self.attndim + self.jointdim)).mean()
                 dummy += self.ooKBemb.weight.mean()
             dummy = dummy * 0
             source_encodings += dummy
@@ -265,7 +285,7 @@ class RNNTBiasing(RNNT):
             source_lengths=source_lengths,
             target_encodings=target_encodings,
             target_lengths=target_lengths,
-            hptr=hptr
+            hptr=hptr,
         )
 
         # Calculate Generation Probability
@@ -276,38 +296,31 @@ class RNNTBiasing(RNNT):
             #     p_gen = p_gen * 0.1
             p_gen = p_gen.masked_fill(p_gen_mask.bool().unsqueeze(1).unsqueeze(-1), 0)
 
-        return (
-            output,
-            source_lengths,
-            target_lengths,
-            predictor_state,
-            tcpgen_dist,
-            p_gen
-        )
+        return (output, source_lengths, target_lengths, predictor_state, tcpgen_dist, p_gen)
 
     def get_tcpgen_distribution(self, query, ptrdist_mask):
         # Make use of the predictor embedding matrix
         keyvalues = torch.cat([self.predictor.embedding.weight.data, self.ooKBemb.weight], dim=0)
         keyvalues = self.dropout_tcpgen(self.Kproj(keyvalues))
         # B * T * U * attndim, nbpe * attndim -> B * T * U * nbpe
-        tcpgendist = torch.einsum('ntuj,ij->ntui', query, keyvalues)
+        tcpgendist = torch.einsum("ntuj,ij->ntui", query, keyvalues)
         tcpgendist = tcpgendist / math.sqrt(query.size(-1))
         ptrdist_mask = ptrdist_mask.unsqueeze(1).repeat(1, tcpgendist.size(1), 1, 1)
         tcpgendist.masked_fill_(ptrdist_mask.bool(), -1e9)
         tcpgendist = torch.nn.functional.softmax(tcpgendist, dim=-1)
         # B * T * U * nbpe, nbpe * attndim -> B * T * U * attndim
-        hptr = torch.einsum('ntui,ij->ntuj', tcpgendist[:,:,:,:-1], keyvalues[:-1,:])
+        hptr = torch.einsum("ntui,ij->ntuj", tcpgendist[:,:,:,:-1], keyvalues[:-1,:])
         return hptr, tcpgendist
 
     def forward_tcpgen(self, targets, ptrdist_mask, source_encodings):
         tcpgen_dist = None
         if self.DBaverage and self.deepbiasing:
-            hptr = self.biasingemb(1 - ptrdist_mask[:,:,:-1].float()).unsqueeze(1)
+            hptr = self.biasingemb(1 - ptrdist_mask[:, :, :-1].float()).unsqueeze(1)
         else:
             query_char = self.predictor.embedding(targets)
-            query_char = self.Qproj_char(query_char).unsqueeze(1) # B * 1 * U * attndim
-            query_acoustic = self.Qproj_acoustic(source_encodings).unsqueeze(2) # B * T * 1 * attndim
-            query = query_char + query_acoustic # B * T * U * attndim
+            query_char = self.Qproj_char(query_char).unsqueeze(1)  # B * 1 * U * attndim
+            query_acoustic = self.Qproj_acoustic(source_encodings).unsqueeze(2)  # B * T * 1 * attndim
+            query = query_char + query_acoustic  # B * T * U * attndim
             hptr, tcpgen_dist = self.get_tcpgen_distribution(query, ptrdist_mask)
         return hptr, tcpgen_dist
 
@@ -324,7 +337,7 @@ class RNNTBiasing(RNNT):
                 if vy in [self.blank_idx]:
                     new_tree = resettrie
                     p_gen_mask.append(0)
-                elif self.char_list[vy].endswith('▁'):
+                elif self.char_list[vy].endswith("▁"):
                     if vy in new_tree and new_tree[vy][0] != {}:
                         new_tree = new_tree[vy]
                     else:
@@ -360,7 +373,7 @@ class RNNTBiasing(RNNT):
                 if vy in [self.blank_idx]:
                     new_tree = resettrie
                     batch_masks[i, j, list(new_tree[0].keys())] = 0
-                elif self.char_list[vy].startswith('▁'):
+                elif self.char_list[vy].startswith("▁"):
                     new_tree = resettrie
                     if vy not in new_tree[0]:
                         batch_masks[i, j, list(new_tree[0].keys())] = 0
@@ -389,7 +402,7 @@ class RNNTBiasing(RNNT):
         new_tree = trie[0]
         if vy in [self.blank_idx]:
             new_tree = resettrie
-        elif self.char_list[vy].endswith('▁'):
+        elif self.char_list[vy].endswith("▁"):
             if vy in new_tree and new_tree[vy][0] != {}:
                 new_tree = new_tree[vy]
             else:
@@ -441,7 +454,7 @@ class RNNTBiasing(RNNT):
             source_lengths=source_lengths,
             target_encodings=target_encodings,
             target_lengths=target_lengths,
-            hptr=hptr
+            hptr=hptr,
         )
         return output, source_lengths, jointer_activation
 
@@ -545,6 +558,7 @@ def conformer_rnnt_base() -> RNNT:
         joiner_activation="tanh",
     )
 
+
 def conformer_rnnt_biasing(
     *,
     input_dim: int,
@@ -569,7 +583,7 @@ def conformer_rnnt_biasing(
     charlist: list,
     deepbiasing: bool,
     tcpsche: int,
-    DBaverage: bool
+    DBaverage: bool,
 ) -> RNNTBiasing:
     r"""Builds Conformer-based recurrent neural network transducer (RNN-T) model.
 
@@ -625,11 +639,30 @@ def conformer_rnnt_biasing(
         lstm_layer_norm_epsilon=lstm_layer_norm_epsilon,
         lstm_dropout=lstm_dropout,
     )
-    joiner = _JoinerBiasing(encoding_dim, num_symbols, activation=joiner_activation,
-                            deepbiasing=deepbiasing, attndim=attndim, biasing=biasing)
-    return RNNTBiasing(encoder, predictor, joiner, attndim, biasing, deepbiasing, symbol_embedding_dim,
-                       encoding_dim, charlist, encoding_dim, conformer_dropout,
-                       tcpsche, DBaverage)
+    joiner = _JoinerBiasing(
+        encoding_dim,
+        num_symbols,
+        activation=joiner_activation,
+        deepbiasing=deepbiasing,
+        attndim=attndim,
+        biasing=biasing,
+    )
+    return RNNTBiasing(
+        encoder,
+        predictor,
+        joiner,
+        attndim,
+        biasing,
+        deepbiasing,
+        symbol_embedding_dim,
+        encoding_dim,
+        charlist,
+        encoding_dim,
+        conformer_dropout,
+        tcpsche,
+        DBaverage,
+    )
+
 
 def conformer_rnnt_biasing_base(charlist=[], biasing=True) -> RNNT:
     r"""Builds basic version of Conformer RNN-T model with TCPGen.
@@ -661,5 +694,5 @@ def conformer_rnnt_biasing_base(charlist=[], biasing=True) -> RNNT:
         charlist=charlist,
         deepbiasing=False,
         tcpsche=30,
-        DBaverage=False
+        DBaverage=False,
     )
