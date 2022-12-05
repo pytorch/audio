@@ -61,6 +61,9 @@ class _JoinerBiasing(torch.nn.Module):
         output_dim (int): output dimension.
         activation (str, optional): activation function to use in the joiner.
             Must be one of ("relu", "tanh"). (Default: "relu")
+        biasing (bool): perform biasing
+        deepbiasing (bool): perform deep biasing
+        attndim (int): dimension of the biasing vector hptr
 
     """
 
@@ -103,6 +106,7 @@ class _JoinerBiasing(torch.nn.Module):
             target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.
             target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 valid sequence length of i-th batch element in ``target_encodings``.
+            hptr (torch.Tensor): deep biasing vector with shape `(B, T, U, A)`.
 
         Returns:
             (torch.Tensor, torch.Tensor, torch.Tensor):
@@ -114,6 +118,8 @@ class _JoinerBiasing(torch.nn.Module):
                 torch.Tensor
                     output target lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 2 for i-th batch element in joint network output.
+                torch.Tensor
+                    joint network second last layer output (i.e. before self.linear), with shape `(B, T, U, D)`.
         """
         joint_encodings = source_encodings.unsqueeze(2).contiguous() + target_encodings.unsqueeze(1).contiguous()
         if self.biasing and self.deepbiasing and hptr is not None:
@@ -157,8 +163,10 @@ class RNNTBiasing(RNNT):
         self.biasing = biasing
         if self.biasing:
             if self.deepbiasing and self.DBaverage:
+                # Deep biasing without TCPGen
                 self.biasingemb = torch.nn.Linear(self.nchars, self.attndim, bias=False)
             else:
+                # TCPGen parameters
                 self.ooKBemb = torch.nn.Embedding(1, self.embdim)
                 self.Qproj_char = torch.nn.Linear(self.embdim, self.attndim)
                 self.Qproj_acoustic = torch.nn.Linear(self.encoutdim, self.attndim)
@@ -193,6 +201,9 @@ class RNNTBiasing(RNNT):
                 mapping to a target symbol.
             target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 number of valid frames for i-th batch element in ``targets``.
+            tries (List): wordpiece prefix trees representing the biasing list to be searched
+            current_epoch (Int): the current epoch number to determine if TCPGen should be trained
+                at this epoch
             predictor_state (List[List[torch.Tensor]] or None, optional): list of lists of tensors
                 representing prediction network internal state generated in preceding invocation
                 of ``forward``. (Default: ``None``)
@@ -212,6 +223,12 @@ class RNNTBiasing(RNNT):
                     output states; list of lists of tensors
                     representing prediction network internal state generated in current invocation
                     of ``forward``.
+                torch.Tensor
+                    TCPGen distribution, with shape
+                    `(B, max output source length, max output target length, output_dim (number of target symbols))`.
+                torch.Tensor
+                    Generation probability (or copy probability), with shape
+                    `(B, max output source length, max output target length, 1)`.
         """
         source_encodings, source_lengths = self.transcriber(
             input=sources,
@@ -329,6 +346,45 @@ class RNNTBiasing(RNNT):
         p_gen_masks = torch.Tensor(p_gen_masks).to(yseqs.device).byte()
         return batch_masks, p_gen_masks
 
+    def get_tcpgen_step_masks_prefix(self, yseqs, resettrie):
+        # Implemented for prefix-based wordpieces, not tested yet
+        seqlen = len(yseqs[0])
+        batch_masks = yseqs.new_ones(len(yseqs), seqlen, len(self.char_list) + 1)
+        p_gen_masks = []
+        for i, yseq in enumerate(yseqs):
+            p_gen_mask = []
+            new_tree = resettrie
+            for j, vy in enumerate(yseq):
+                vy = vy.item()
+                new_tree = new_tree[0]
+                if vy in [self.blank_idx]:
+                    new_tree = resettrie
+                    batch_masks[i, j, list(new_tree[0].keys())] = 0
+                elif self.char_list[vy].startswith('▁'):
+                    new_tree = resettrie
+                    if vy not in new_tree[0]:
+                        batch_masks[i, j, list(new_tree[0].keys())] = 0
+                    else:
+                        new_tree = new_tree[0][vy]
+                        batch_masks[i, j, list(new_tree[0].keys())] = 0
+                        if new_tree[1] != -1:
+                            batch_masks[i, j, list(resettrie[0].keys())] = 0
+                else:
+                    if vy not in new_tree:
+                        new_tree = resettrie
+                        batch_masks[i, j, list(new_tree[0].keys())] = 0
+                    else:
+                        new_tree = new_tree[vy]
+                        batch_masks[i, j, list(new_tree[0].keys())] = 0
+                        if new_tree[1] != -1:
+                            batch_masks[i, j, list(resettrie[0].keys())] = 0
+                p_gen_mask.append(0)
+                # batch_masks[i, j, -1] = 0
+            p_gen_masks.append(p_gen_mask + [1] * (seqlen - len(p_gen_mask)))
+        p_gen_masks = torch.Tensor(p_gen_masks).to(yseqs.device).byte()
+
+        return batch_masks, p_gen_masks
+
     def get_tcpgen_step(self, vy, trie, resettrie):
         new_tree = trie[0]
         if vy in [self.blank_idx]:
@@ -358,6 +414,7 @@ class RNNTBiasing(RNNT):
         T: maximum source sequence length in batch;
         U: maximum target sequence length in batch;
         D: dimension of each source and target sequence encoding.
+        A: TCPGen attention dimension
 
         Args:
             source_encodings (torch.Tensor): source encoding sequences, with
@@ -367,6 +424,7 @@ class RNNTBiasing(RNNT):
             target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.
             target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing
                 valid sequence length of i-th batch element in ``target_encodings``.
+            hptr (torch.Tensor): deep biasing vector with shape `(B, T, U, A)`.
 
         Returns:
             (torch.Tensor, torch.Tensor, torch.Tensor):
@@ -376,8 +434,7 @@ class RNNTBiasing(RNNT):
                     output source lengths, with shape `(B,)` and i-th element representing
                     number of valid elements along dim 1 for i-th batch element in joint network output.
                 torch.Tensor
-                    output target lengths, with shape `(B,)` and i-th element representing
-                    number of valid elements along dim 2 for i-th batch element in joint network output.
+                    joint network second last layer output, with shape `(B, T, U, D)`.
         """
         output, source_lengths, target_lengths, jointer_activation = self.joiner(
             source_encodings=source_encodings,
@@ -536,6 +593,12 @@ def conformer_rnnt_biasing(
         lstm_dropout (float): LSTM dropout probability.
         joiner_activation (str): activation function to use in the joiner.
             Must be one of ("relu", "tanh"). (Default: "relu")
+        attndim (int): TCPGen attention dimension
+        biasing (bool): If true, use biasing, otherwise use standard RNN-T
+        charlist (list): The list of word piece tokens in the same order as the output layer
+        deepbiasing (bool): If true, use deep biasing by extracting the biasing vector
+        tcpsche (int): The epoch at which TCPGen starts to train
+        DBaverage (bool): If true, instead of TCPGen, use DBRNNT for biasing
 
         Returns:
             RNNT:
@@ -569,11 +632,11 @@ def conformer_rnnt_biasing(
                        tcpsche, DBaverage)
 
 def conformer_rnnt_biasing_base(charlist=[], biasing=True) -> RNNT:
-    r"""Builds basic version of Conformer RNN-T model.
+    r"""Builds basic version of Conformer RNN-T model with TCPGen.
 
     Returns:
         RNNT:
-            Conformer RNN-T model.
+            Conformer RNN-T model with TCPGen.
     """
     return conformer_rnnt_biasing(
         input_dim=80,
