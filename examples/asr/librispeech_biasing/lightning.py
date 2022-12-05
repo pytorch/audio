@@ -91,13 +91,15 @@ class ConformerRNNTModule(LightningModule):
         self.blank_idx = spm_vocab_size
         self.char_list.append('<blank>')
 
-        # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
-        # For greater customizability, please refer to ``conformer_rnnt_model``.
+        # ``conformer_rnnt_biasing_base`` hardcodes a specific Conformer RNN-T configuration.
+        # For greater customizability, please refer to ``conformer_rnnt_biasing``.
         self.biasing = biasing
         self.model = conformer_rnnt_biasing_base(charlist=self.char_list, biasing=self.biasing)
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum", fused_log_softmax=False)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
+        # This scheduler is for clean 100 and train 90 epochs, should change it when running longer
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 35, 60, 0.92)
+        # The epoch from which the TCPGen starts to train
         self.tcpsche = self.model.tcpsche
 
         self.automatic_optimization = False
@@ -122,11 +124,14 @@ class ConformerRNNTModule(LightningModule):
             # Assuming blank is the last token
             model_output = torch.softmax(output, dim=-1)
             p_not_null = 1.0 - model_output[:, :, :, -1:]
-            # exclude blank prob
+            # Exclude blank prob
             ptr_dist_fact = torch.cat([tcpgen_dist[:, :, :, :-2], tcpgen_dist[:, :, :, -1:]], dim=-1) * p_not_null
             ptr_gen_complement  = tcpgen_dist[:, :, :, -1:] * p_gen
+            # Interpolate between TPGen distribution and model distribution
             p_partial = ptr_dist_fact[:, :, :, :-1] * p_gen + model_output[:, :, :, :-1] * (1 - p_gen + ptr_gen_complement)
+            # Add blank back
             p_final = torch.cat([p_partial, model_output[:, :, :, -1:]], dim=-1)
+            # Numerical stability? Didn't need to do this in Espnet
             logsmax_output = torch.log(p_final+1e-12)
         else:
             logsmax_output = torch.log_softmax(output, dim=-1)
