@@ -47,6 +47,11 @@ if(BUILD_RIR)
     LIBTORCHAUDIO_SOURCES
     build_rir.cpp
     )
+  list(
+    APPEND
+    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    INCLUDE_RIR
+    )
 endif()
 
 if(USE_CUDA)

@@ -17,7 +17,7 @@ bool is_kaldi_available() {
 
 
 bool is_rir_available() {
-#ifdef BUILD_RIR
+#ifdef INCLUDE_RIR
   return true;
 #else
   return false;
