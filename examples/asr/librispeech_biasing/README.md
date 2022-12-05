@@ -1,6 +1,6 @@
 # Contextual Conformer RNN-T with TCPGen Example
 
-This directory contains sample implementations of training and evaluation pipelines for the Conformer RNN-T model with tree-constrained pointer generator (TCPGen) for contextual biasing.
+This directory contains sample implementations of training and evaluation pipelines for the Conformer RNN-T model with tree-constrained pointer generator (TCPGen) for contextual biasing, as described in the paper: [Tree-Constrained Pointer Generator for End-to-End Contextual Speech Recognition](https://ieeexplore.ieee.org/abstract/document/9687915)
 
 ## Setup
 ### Install PyTorch and TorchAudio nightly or from source
@@ -24,16 +24,26 @@ pip install pytorch-lightning sentencepiece
 - Full LibriSpeech dataset.
 - SentencePiece model to be used to encode targets; the model can be generated using [`train_spm.py`](./train_spm.py).
 - File (--global_stats_path) that contains training set feature statistics; this file can be generated using [`global_stats.py`](../emformer_rnnt/global_stats.py).
+- Biasing list: See [`rareword_f15.txt`](./blists/rareword_f15.txt) as an example for the biasing list used for training with clean-100 data. Words appeared less than 15 times were treated as rare words. For inference, [`all_rare_words.txt`](blists/all_rare_words.txt) which is the same list used in [https://github.com/facebookresearch/fbai-speech/tree/main/is21_deep_bias](https://github.com/facebookresearch/fbai-speech/tree/main/is21_deep_bias).
 
-Sample local training script: `train.sh`
+Sample local training script: [`train.sh`](./train.sh)
 
-Training options:
+Other training options:
+- `--droprate` is the drop rate of biasing words appeared in the reference text to avoid over-confidence
+- `--maxsize` is the size of the biasing list used for training, which is the sum of biasing words in reference and distractors
 
 ### Evaluation
 
-[`eval.py`](./eval.py) evaluates a trained Conformer RNN-T model on LibriSpeech test-clean.
+[`eval.py`](./eval.py) evaluates a trained Conformer RNN-T model with TCPGen on LibriSpeech test-clean.
 
 Sample decoding script: `eval.sh`
 
-Decoding options:
+Other decoding options:
+
+- `--biasinglist` should be [`all_rare_words.txt`](blists/all_rare_words.txt) for Librispeech experiments
+- `--droprate` normally should be 0 because we assume the reference biasing words are included
+- `--maxsize` is the size of the biasing list used for decoding, where 1000 was used in the paper.
+
+### Scoring
+Example scoring script using sclite is in `score.sh`
 
