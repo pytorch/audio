@@ -92,9 +92,9 @@ total_errors = common_error + rare_error + oov_error + insert_error
 WER = total_errors / total_words
 print('=' * 89)
 print('Common words error freq: {} / {} = {}'.format(
-    common_error+insert_common, common_freq, (common_error + insert_common) / common_freq))
+    common_error + insert_common, common_freq, (common_error + insert_common) / common_freq))
 print('Rare words error freq: {} / {} = {}'.format(
-    rare_error+insert_rare, rare_freq, (rare_error + insert_rare) / rare_freq))
+    rare_error + insert_rare, rare_freq, (rare_error + insert_rare) / rare_freq))
 print('OOV words error freq: {} / {} = {}'.format(oov_error, oov_freq, oov_error / max(oov_freq, 1)))
 print('WER estimate: {} / {} = {}'.format(total_errors, total_words, WER))
 print('Insert error: {} / {} = {}'.format(

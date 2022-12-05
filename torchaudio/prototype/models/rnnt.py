@@ -155,7 +155,7 @@ class RNNTBiasing(RNNT):
     """
 
     def __init__(
-        self, 
+        self,
         transcriber: _Transcriber,
         predictor: _Predictor,
         joiner: _Joiner,
