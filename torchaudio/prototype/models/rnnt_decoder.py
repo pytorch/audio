@@ -92,6 +92,8 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
             for a given hypothesis to rank hypotheses by. If ``None``, defaults to callable that returns
             hypothesis score normalized by token sequence length. (Default: None)
         step_max_tokens (int, optional): maximum number of tokens to emit per input time step. (Default: 100)
+        trie (list, optional): the prefix tree for TCPGen biasing
+        biasing (bool, optional): If true, do biasing, otherwise use standard RNN-T
     """
 
     def __init__(
@@ -118,7 +120,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
 
         self.step_max_tokens = step_max_tokens
 
-    def _init_b_hypos(self, hypo: Optional[Hypothesis], device: torch.device, trie: list) -> List[Hypothesis]:
+    def _init_b_hypos(self, hypo: Optional[Hypothesis], device: torch.device) -> List[Hypothesis]:
         if hypo is not None:
             token = _get_hypo_tokens(hypo)[-1]
             state = _get_hypo_state(hypo)
@@ -133,7 +135,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
             pred_out[0].detach(),
             pred_state,
             0.0,
-            trie
+            self.resettrie
         )
         return [init_hypo]
 
@@ -285,13 +287,12 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
         enc_out: torch.Tensor,
         hypo: Optional[Hypothesis],
         beam_width: int,
-        trie: list
     ) -> List[Hypothesis]:
         n_time_steps = enc_out.shape[1]
         device = enc_out.device
 
         a_hypos: List[Hypothesis] = []
-        b_hypos = self._init_b_hypos(hypo, device, trie)
+        b_hypos = self._init_b_hypos(hypo, device)
         for t in range(n_time_steps):
             a_hypos = b_hypos
             b_hypos = torch.jit.annotate(List[Hypothesis], [])
@@ -338,7 +339,6 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
             length (torch.Tensor): number of valid frames in input
                 sequence, with shape () or (1,).
             beam_width (int): beam size to use during search.
-            trie (list): the prefix-tree constructed from biasing list for biasing
 
         Returns:
             List[Hypothesis]: top-``beam_width`` hypotheses found by beam search.
@@ -354,7 +354,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
             input = input.unsqueeze(0)
 
         enc_out, _ = self.model.transcribe(input, length)
-        return self._search(enc_out, None, beam_width, self.resettrie)
+        return self._search(enc_out, None, beam_width)
 
     @torch.jit.export
     def infer(
