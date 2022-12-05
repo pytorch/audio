@@ -19,11 +19,11 @@ pip install pytorch-lightning sentencepiece
 
 ### Training
 
-[`train.py`](./train.py) trains an Conformer RNN-T model (30.2M parameters, 121MB) on LibriSpeech using PyTorch Lightning. Note that the script expects users to have the following:
+[`train.py`](./train.py) trains an Conformer RNN-T model with TCPGen on LibriSpeech using PyTorch Lightning. Note that the script expects users to have the following:
 - Access to GPU nodes for training.
 - Full LibriSpeech dataset.
-- SentencePiece model to be used to encode targets; the model can be generated using [`train_spm.py`](./train_spm.py).
-- File (--global_stats_path) that contains training set feature statistics; this file can be generated using [`global_stats.py`](../emformer_rnnt/global_stats.py).
+- SentencePiece model to be used to encode targets; the model can be generated using [`train_spm.py`](./train_spm.py). **Note that suffix-based wordpieces are used in this example**. [`run_spm.sh`](./run_spm.sh) will generate 600 suffix-based wordpieces which is used in the paper.
+- File (--global_stats_path) that contains training set feature statistics; this file can be generated using [`global_stats.py`](../emformer_rnnt/global_stats.py). The [`global_stats_100.json`](./global_stats_100.json) has been generated for train-clean-100.
 - Biasing list: See [`rareword_f15.txt`](./blists/rareword_f15.txt) as an example for the biasing list used for training with clean-100 data. Words appeared less than 15 times were treated as rare words. For inference, [`all_rare_words.txt`](blists/all_rare_words.txt) which is the same list used in [https://github.com/facebookresearch/fbai-speech/tree/main/is21_deep_bias](https://github.com/facebookresearch/fbai-speech/tree/main/is21_deep_bias).
 
 Sample local training script: [`train.sh`](./train.sh)
