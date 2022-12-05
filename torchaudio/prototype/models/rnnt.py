@@ -68,13 +68,13 @@ class _JoinerBiasing(torch.nn.Module):
     """
 
     def __init__(
-        self, 
-        input_dim: int, 
-        output_dim: int, 
+        self,
+        input_dim: int,
+        output_dim: int,
         activation: str = "relu",
-        biasing: bool = False, 
-        deepbiasing: bool = False, 
-        attndim: int = 1
+        biasing: bool = False,
+        deepbiasing: bool = False,
+        attndim: int = 1,
     ) -> None:
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim, bias=True)
@@ -156,19 +156,19 @@ class RNNTBiasing(RNNT):
 
     def __init__(
         self, 
-        transcriber: _Transcriber, 
-        predictor: _Predictor, 
+        transcriber: _Transcriber,
+        predictor: _Predictor,
         joiner: _Joiner,
-        attndim: int, 
-        biasing:bool, 
-        deepbiasing: bool, 
-        embdim: int, 
-        jointdim: int, 
+        attndim: int,
+        biasing:bool,
+        deepbiasing: bool,
+        embdim: int,
+        jointdim: int,
         charlist: list,
-        encoutdim: int, 
-        dropout_tcpgen: float, 
-        tcpsche: int, 
-        DBaverage: bool
+        encoutdim: int,
+        dropout_tcpgen: float,
+        tcpsche: int,
+        DBaverage: bool,
     ) -> None:
         super().__init__(transcriber, predictor, joiner)
         self.attndim = attndim
@@ -309,7 +309,7 @@ class RNNTBiasing(RNNT):
         tcpgendist.masked_fill_(ptrdist_mask.bool(), -1e9)
         tcpgendist = torch.nn.functional.softmax(tcpgendist, dim=-1)
         # B * T * U * nbpe, nbpe * attndim -> B * T * U * attndim
-        hptr = torch.einsum("ntui,ij->ntuj", tcpgendist[:,:,:,:-1], keyvalues[:-1,:])
+        hptr = torch.einsum("ntui,ij->ntuj", tcpgendist[:,:,:,:-1], keyvalues[:-1, :])
         return hptr, tcpgendist
 
     def forward_tcpgen(self, targets, ptrdist_mask, source_encodings):
