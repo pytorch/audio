@@ -98,4 +98,3 @@ print('WER estimate: {} / {} = {}'.format(total_errors, total_words, WER))
 print('Insert error: {} / {} = {}'.format(insert_error - insert_rare, total_words, (insert_error - insert_rare)/total_words))
 print('Insertion + OOV error {}'.format((insert_error + oov_error - insert_rare) / total_words))
 print('='*89)
-
