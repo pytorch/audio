@@ -27,7 +27,7 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         self.assertEqual(ts_output, output)
 
     @nested_params(
-        [F.convolve, F.fftconvolve],
+        ["convolve", "fftconvolve"],
         ["full", "valid", "same"],
     )
     def test_convolve(self, fn, mode):
@@ -36,7 +36,7 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
 
-        self._assert_consistency(fn, (x, y, mode))
+        self._assert_consistency(getattr(F, fn), (x, y, mode))
 
     def test_add_noise(self):
         leading_dims = (2, 3)
@@ -77,6 +77,28 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         self._assert_consistency(F.extend_pitch, (input, num_pitches))
         self._assert_consistency(F.extend_pitch, (input, pattern))
         self._assert_consistency(F.extend_pitch, (input, torch.tensor(pattern)))
+
+    def test_sinc_ir(self):
+        cutoff = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype)
+        self._assert_consistency(F.sinc_impulse_response, (cutoff, 513, False))
+        self._assert_consistency(F.sinc_impulse_response, (cutoff, 513, True))
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        self._assert_consistency(F.speed, (waveform, lengths, 1000, 1.1))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.preemphasis, (waveform, coeff))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.deemphasis, (waveform, coeff))
 
 
 class TorchScriptConsistencyCPUOnlyTestImpl(TorchScriptConsistencyTestImpl, TestBaseMixin):

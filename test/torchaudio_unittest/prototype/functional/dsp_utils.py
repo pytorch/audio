@@ -18,3 +18,20 @@ def oscillator_bank(
 
     waveform = amplitudes * np.sin(phases)
     return waveform
+
+
+def sinc_ir(cutoff: ArrayLike, window_size: int = 513, high_pass: bool = False):
+    if window_size % 2 == 0:
+        raise ValueError(f"`window_size` must be odd. Given: {window_size}")
+    half = window_size // 2
+    dtype = cutoff.dtype
+    idx = np.linspace(-half, half, window_size, dtype=dtype)
+
+    filt = np.sinc(cutoff[..., None] * idx[None, ...])
+    filt *= np.hamming(window_size).astype(dtype)[None, ...]
+    filt /= np.abs(filt.sum(axis=-1, keepdims=True))
+
+    if high_pass:
+        filt *= -1
+        filt[..., half] = 1.0 + filt[..., half]
+    return filt

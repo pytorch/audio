@@ -56,3 +56,21 @@ class Autograd(TestBaseMixin):
             get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
         )
         self.assert_grad(transform, [spec])
+
+    def test_Speed(self):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, dtype=torch.float64, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims, dtype=torch.float64, device=self.device)
+        speed = T.Speed(1000, 1.1).to(device=self.device, dtype=torch.float64)
+        assert gradcheck(speed, (waveform, lengths))
+        assert gradgradcheck(speed, (waveform, lengths))
+
+    def test_SpeedPerturbation(self):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, dtype=torch.float64, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims, dtype=torch.float64, device=self.device)
+        speed = T.SpeedPerturbation(1000, [0.9]).to(device=self.device, dtype=torch.float64)
+        assert gradcheck(speed, (waveform, lengths))
+        assert gradgradcheck(speed, (waveform, lengths))
