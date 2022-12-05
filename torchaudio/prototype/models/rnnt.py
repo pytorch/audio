@@ -160,7 +160,7 @@ class RNNTBiasing(RNNT):
         predictor: _Predictor,
         joiner: _Joiner,
         attndim: int,
-        biasing:bool,
+        biasing: bool,
         deepbiasing: bool,
         embdim: int,
         jointdim: int,
@@ -309,7 +309,7 @@ class RNNTBiasing(RNNT):
         tcpgendist.masked_fill_(ptrdist_mask.bool(), -1e9)
         tcpgendist = torch.nn.functional.softmax(tcpgendist, dim=-1)
         # B * T * U * nbpe, nbpe * attndim -> B * T * U * attndim
-        hptr = torch.einsum("ntui,ij->ntuj", tcpgendist[:,:,:,:-1], keyvalues[:-1, :])
+        hptr = torch.einsum("ntui,ij->ntuj", tcpgendist[:, :, :, :-1], keyvalues[:-1, :])
         return hptr, tcpgendist
 
     def forward_tcpgen(self, targets, ptrdist_mask, source_encodings):

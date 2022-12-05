@@ -18,7 +18,8 @@ def compute_word_level_distance(seq1, seq2):
 
 def run_eval(args):
     usebiasing = True if args.biasing == 'true' else False
-    model = ConformerRNNTModule.load_from_checkpoint(args.checkpoint_path, sp_model=str(args.sp_model_path), biasing=usebiasing).eval()
+    model = ConformerRNNTModule.load_from_checkpoint(
+        args.checkpoint_path, sp_model=str(args.sp_model_path), biasing=usebiasing).eval()
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path),
                                   biasinglist=args.biasinglist, droprate=args.droprate, maxsize=args.maxsize)
 

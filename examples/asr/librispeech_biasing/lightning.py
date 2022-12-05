@@ -126,13 +126,14 @@ class ConformerRNNTModule(LightningModule):
             p_not_null = 1.0 - model_output[:, :, :, -1:]
             # Exclude blank prob
             ptr_dist_fact = torch.cat([tcpgen_dist[:, :, :, :-2], tcpgen_dist[:, :, :, -1:]], dim=-1) * p_not_null
-            ptr_gen_complement  = tcpgen_dist[:, :, :, -1:] * p_gen
+            ptr_gen_complement = tcpgen_dist[:, :, :, -1:] * p_gen
             # Interpolate between TPGen distribution and model distribution
-            p_partial = ptr_dist_fact[:, :, :, :-1] * p_gen + model_output[:, :, :, :-1] * (1 - p_gen + ptr_gen_complement)
+            p_partial = ptr_dist_fact[:, :, :, :-1] * p_gen + model_output[:, :, :, :-1] * (
+                1 - p_gen + ptr_gen_complement)
             # Add blank back
             p_final = torch.cat([p_partial, model_output[:, :, :, -1:]], dim=-1)
             # Numerical stability? Didn't need to do this in Espnet
-            logsmax_output = torch.log(p_final+1e-12)
+            logsmax_output = torch.log(p_final + 1e-12)
         else:
             logsmax_output = torch.log_softmax(output, dim=-1)
         loss = self.loss(logsmax_output, batch.targets, src_lengths, batch.target_lengths)
@@ -177,7 +178,13 @@ class ConformerRNNTModule(LightningModule):
         loss = self._step(batch, batch_idx, "train")
         batch_size = batch.features.size(0)
         batch_sizes = self.all_gather(batch_size)
-        self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True, batch_size=batch.targets.size(0))
+        self.log(
+            "Gathered batch size",
+            batch_sizes.sum(),
+            on_step=True,
+            on_epoch=True,
+            batch_size=batch.targets.size(0),
+        )
         loss *= batch_sizes.size(0) / batch_sizes.sum()  # world size / batch size
         self.manual_backward(loss)
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)
