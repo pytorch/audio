@@ -41,5 +41,5 @@ __all__ = [
     "hifigan_generator_v3",
     "hifigan_generator",
     "Hypothesis",
-    "RNNTBeamSearchBiasing"
+    "RNNTBeamSearchBiasing",
 ]

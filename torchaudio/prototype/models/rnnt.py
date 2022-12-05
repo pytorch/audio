@@ -1,6 +1,5 @@
 import math
 from typing import List, Optional, Tuple
-import math
 
 import torch
 from torchaudio.models import Conformer, RNNT
