@@ -3,7 +3,11 @@ import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
 from scipy import signal
-from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
+from torchaudio._internal import module_utils as _mod_utils
+from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, TestBaseMixin
+
+if _mod_utils.is_module_available("pyroomacoustics"):
+    import pyroomacoustics as pra
 
 from .dsp_utils import oscillator_bank as oscillator_bank_np
 
@@ -574,39 +578,64 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         hist_single = hist_single.expand(2, 6, 2500)
         torch.testing.assert_close(hist_single, hist_per_band_per_wall)
 
+    @skipIfNoModule("pyroomacoustics")
     @parameterized.expand(
         [
-            ([20, 25], [2, 2], [[8, 8], [7, 6]], 10_000, 5.563379765),  # 2D with 2 mics
-            ([20, 25, 30], [1, 10, 5], [[8, 8, 22]], 1_000, 0.038723841),  # 3D with 1 mic
+            ([20, 25], [2, 2], [[8, 8], [7, 6]], 10_000),  # 2D with 2 mics
+            ([20, 25, 30], [1, 10, 5], [[8, 8, 22]], 1_000),  # 3D with 1 mic
         ]
     )
-    def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays, expected_sum):
-        """Ideally we would be checking the histogram directly against
-        pyroomacoustics, but unfortunately PRA may randomly segfault during the
-        ray-tracing. So instead we check the overlall sum of the histrogram
-        values.
-
-        The sums have been validated *on each bin* against PRA with high
-        precision, i.e. this was passing:
-
-        self.assertEqual(hist, hist_pra)  # check all bin values with default atol and rtol
-        Note: need to set max_order=0 and air_absorption=False in PRA for consistent checks.
-        max_order=0 makes sure PRA doesn't use the hybrid method and only does ray-tracing.
-        """
-        num_walls = 4 if len(room_dim) == 2 else 6
+    def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
+        walls = ["west", "east", "south", "north"]
+        if len(room_dim) == 3:
+            walls += ["floor", "ceiling"]
+        num_walls = len(walls)
         num_bands = 6  # Note: in ray tracing, we don't need to restrict the number of bands to 7
 
-        torch.manual_seed(0)
-        # We don't do torch.rand(dtype=self.dtype). This would generate different
-        # numbers for float32 and float64, thus leading to a different output!
-        # Instead, we do the dtype conversion after the random values were
-        # generated as float32.
-        e_absorption = torch.rand(num_bands, num_walls).to(self.dtype)
-        scattering = torch.rand(num_bands, num_walls).to(self.dtype)
+        e_absorption = torch.rand(num_bands, num_walls, dtype=self.dtype)
+        scattering = torch.rand(num_bands, num_walls, dtype=self.dtype)
+        energy_thres = 1e-7
+        time_thres = 10
+        hist_bin_size = 0.004
+        mic_radius = 0.5
+        sound_speed = 343
 
         room_dim = torch.tensor(room_dim, dtype=self.dtype)
         source = torch.tensor(source, dtype=self.dtype)
         mic_array = torch.tensor(mic_array, dtype=self.dtype)
+
+        room = pra.ShoeBox(
+            room_dim.tolist(),
+            ray_tracing=True,
+            materials={
+                walls[i]: pra.Material(
+                    energy_absorption={
+                        "coeffs": e_absorption[:, i].reshape(-1).detach().numpy(),
+                        "center_freqs": 125 * 2 ** np.arange(num_bands),
+                    },
+                    scattering={
+                        "coeffs": scattering[:, i].reshape(-1).detach().numpy(),
+                        "center_freqs": 125 * 2 ** np.arange(num_bands),
+                    },
+                )
+                for i in range(num_walls)
+            },
+            air_absorption=False,
+            max_order=0,  # Make sure PRA doesn't use the hybrid method (we just want ray tracing)
+        )
+        room.add_microphone_array(mic_array.T.tolist())
+        room.add_source(source.tolist())
+        room.set_ray_tracing(
+            n_rays=num_rays,
+            energy_thres=energy_thres,
+            time_thres=time_thres,
+            hist_bin_size=hist_bin_size,
+            receiver_radius=mic_radius,
+        )
+        room.set_sound_speed(sound_speed)
+
+        room.compute_rir()
+        hist_pra = torch.tensor(np.array(room.rt_histograms))[:, 0, 0]
 
         hist = F.ray_tracing(
             room=room_dim,
@@ -615,7 +644,13 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             num_rays=num_rays,
             e_absorption=e_absorption,
             scattering=scattering,
+            sound_speed=sound_speed,
+            mic_radius=mic_radius,
+            energy_thres=energy_thres,
+            time_thres=time_thres,
+            hist_bin_size=hist_bin_size,
         )
 
         assert hist.ndim == 3
-        self.assertEqual(hist.sum(), expected_sum)
+        assert hist.shape == hist_pra.shape
+        self.assertEqual(hist.to(torch.float32), hist_pra)
