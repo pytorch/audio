@@ -75,6 +75,9 @@ def _remove_hypo(hypo: Hypothesis, hypo_list: List[Hypothesis]) -> None:
 class RNNTBeamSearch(torch.nn.Module):
     r"""Beam search decoder for RNN-T model.
 
+    See Also:
+        * :class:`torchaudio.pipelines.RNNTBundle`: ASR pipeline with pretrained model.
+
     Args:
         model (RNNT): RNN-T model to use.
         blank (int): index of blank token in vocabulary.
@@ -280,13 +283,13 @@ class RNNTBeamSearch(torch.nn.Module):
         Returns:
             List[Hypothesis]: top-``beam_width`` hypotheses found by beam search.
         """
-        assert input.dim() == 2 or (
-            input.dim() == 3 and input.shape[0] == 1
-        ), "input must be of shape (T, D) or (1, T, D)"
+        if input.dim() != 2 and not (input.dim() == 3 and input.shape[0] == 1):
+            raise ValueError("input must be of shape (T, D) or (1, T, D)")
         if input.dim() == 2:
             input = input.unsqueeze(0)
 
-        assert length.shape == () or length.shape == (1,), "length must be of shape () or (1,)"
+        if length.shape != () and length.shape != (1,):
+            raise ValueError("length must be of shape () or (1,)")
         if input.dim() == 0:
             input = input.unsqueeze(0)
 
@@ -326,13 +329,13 @@ class RNNTBeamSearch(torch.nn.Module):
                     list of lists of tensors representing transcription network
                     internal state generated in current invocation.
         """
-        assert input.dim() == 2 or (
-            input.dim() == 3 and input.shape[0] == 1
-        ), "input must be of shape (T, D) or (1, T, D)"
+        if input.dim() != 2 and not (input.dim() == 3 and input.shape[0] == 1):
+            raise ValueError("input must be of shape (T, D) or (1, T, D)")
         if input.dim() == 2:
             input = input.unsqueeze(0)
 
-        assert length.shape == () or length.shape == (1,), "length must be of shape () or (1,)"
+        if length.shape != () and length.shape != (1,):
+            raise ValueError("length must be of shape () or (1,)")
         if length.dim() == 0:
             length = length.unsqueeze(0)
 

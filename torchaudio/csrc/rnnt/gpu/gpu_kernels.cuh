@@ -29,7 +29,8 @@ __global__ void ComputeLogProbs(
     const int* tgtLengths,
     const CAST_DTYPE* denominators,
     CAST_DTYPE* logProbs,
-    int H = 1) {
+    int H = 1,
+    bool fusedLogSmax = true) {
   const int& maxT = maxSrcLen;
   const int& maxU = maxTgtLen;
   const int& D = numTargets;
@@ -54,12 +55,22 @@ __global__ void ComputeLogProbs(
   logProbs[(idx << 1) + LOG_PROBS_SKIP_IDX] =
       CAST_DTYPE(logits[idx * D + blank]) - denominators[idx];
 
+  if (!fusedLogSmax) {
+    logProbs[(idx << 1) + LOG_PROBS_SKIP_IDX] =
+        CAST_DTYPE(logits[idx * D + blank]);
+  }
+
   if (u < U - 1) {
     // emit: log_prob(b, t, u).emit() = logits(b, t, u, tgt[u]) - denom(b, t,
     // u).
     int target = targets[Indexer2D(maxU - 1)(bTgt, u)];
     logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
         CAST_DTYPE(logits[idx * D + target]) - denominators[idx];
+
+    if (!fusedLogSmax) {
+      logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
+          CAST_DTYPE(logits[idx * D + target]);
+    }
   }
 }
 
@@ -341,7 +352,8 @@ __global__ void ComputeGradients(
     const CAST_DTYPE* alphas,
     const CAST_DTYPE* betas,
     DTYPE* gradients,
-    int H = 1) {
+    int H = 1,
+    bool fusedLogSmax = true) {
   const int bTgt = blockIdx.z; // 0 <= b < B
   const int t = blockIdx.x * blockDim.x + threadIdx.x;
   const int u = blockIdx.y;
@@ -363,7 +375,8 @@ __global__ void ComputeGradients(
       alphas,
       betas,
       gradients,
-      H);
+      H,
+      fusedLogSmax);
 }
 
 // This is a __global__ wrapper around ComputeAlphas

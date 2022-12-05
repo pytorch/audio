@@ -1,3 +1,9 @@
+from ._source_separation_pipeline import (
+    CONVTASNET_BASE_LIBRI2MIX,
+    HDEMUCS_HIGH_MUSDB,
+    HDEMUCS_HIGH_MUSDB_PLUS,
+    SourceSeparationBundle,
+)
 from ._tts import (
     TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH,
     TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH,
@@ -31,6 +37,9 @@ from ._wav2vec2.impl import (
     WAV2VEC2_XLSR53,
     Wav2Vec2ASRBundle,
     Wav2Vec2Bundle,
+    WAVLM_BASE,
+    WAVLM_BASE_PLUS,
+    WAVLM_LARGE,
 )
 from .rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH, RNNTBundle
 
@@ -61,6 +70,9 @@ __all__ = [
     "HUBERT_XLARGE",
     "HUBERT_ASR_LARGE",
     "HUBERT_ASR_XLARGE",
+    "WAVLM_BASE",
+    "WAVLM_BASE_PLUS",
+    "WAVLM_LARGE",
     "Tacotron2TTSBundle",
     "TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH",
     "TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH",
@@ -68,4 +80,8 @@ __all__ = [
     "TACOTRON2_WAVERNN_PHONE_LJSPEECH",
     "RNNTBundle",
     "EMFORMER_RNNT_BASE_LIBRISPEECH",
+    "SourceSeparationBundle",
+    "CONVTASNET_BASE_LIBRI2MIX",
+    "HDEMUCS_HIGH_MUSDB_PLUS",
+    "HDEMUCS_HIGH_MUSDB",
 ]

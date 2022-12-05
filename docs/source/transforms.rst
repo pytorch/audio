@@ -1,217 +1,145 @@
-.. role:: hidden
-    :class: hidden-section
+.. py:module:: torchaudio.transforms
 
 torchaudio.transforms
-======================
-
-.. py:module:: torchaudio.transforms
+=====================
 
 .. currentmodule:: torchaudio.transforms
 
-Transforms are common audio transforms. They can be chained together using :class:`torch.nn.Sequential`
+``torchaudio.transforms`` module contains common audio processings and feature extractions. The following diagram shows the relationship between some of the available transforms.
 
-:hidden:`Utility`
-~~~~~~~~~~~~~~~~~~
 
-:hidden:`AmplitudeToDB`
------------------------
+.. image:: https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png
 
-.. autoclass:: AmplitudeToDB
+Transforms are implemented using :class:`torch.nn.Module`. Common ways to build a processing pipeline are to define custom Module class or chain Modules together using :class:`torch.nn.Sequential`, then move it to a target device and data type.
 
-  .. automethod:: forward
+.. code::
 
-:hidden:`MelScale`
-------------------
+   # Define custom feature extraction pipeline.
+   #
+   # 1. Resample audio
+   # 2. Convert to power spectrogram
+   # 3. Apply augmentations
+   # 4. Convert to mel-scale
+   #
+   class MyPipeline(torch.nn.Module):
+       def __init__(
+           self,
+           input_freq=16000,
+           resample_freq=8000,
+           n_fft=1024,
+           n_mel=256,
+           stretch_factor=0.8,
+       ):
+           super().__init__()
+           self.resample = Resample(orig_freq=input_freq, new_freq=resample_freq)
 
-.. autoclass:: MelScale
+           self.spec = Spectrogram(n_fft=n_fft, power=2)
 
-  .. automethod:: forward
+           self.spec_aug = torch.nn.Sequential(
+               TimeStretch(stretch_factor, fixed_rate=True),
+               FrequencyMasking(freq_mask_param=80),
+               TimeMasking(time_mask_param=80),
+           )
 
-:hidden:`InverseMelScale`
--------------------------
+           self.mel_scale = MelScale(
+               n_mels=n_mel, sample_rate=resample_freq, n_stft=n_fft // 2 + 1)
 
-.. autoclass:: InverseMelScale
+       def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+           # Resample the input
+           resampled = self.resample(waveform)
 
-  .. automethod:: forward
+           # Convert to power spectrogram
+           spec = self.spec(resampled)
 
-:hidden:`MuLawEncoding`
------------------------
+           # Apply SpecAugment
+           spec = self.spec_aug(spec)
 
-.. autoclass:: MuLawEncoding
+           # Convert to mel-scale
+           mel = self.mel_scale(spec)
 
-  .. automethod:: forward
+           return mel
 
-:hidden:`MuLawDecoding`
------------------------
 
-.. autoclass:: MuLawDecoding
+.. code::
 
-  .. automethod:: forward
+   # Instantiate a pipeline
+   pipeline = MyPipeline()
 
-:hidden:`Resample`
-------------------
+   # Move the computation graph to CUDA
+   pipeline.to(device=torch.device("cuda"), dtype=torch.float32)
 
-.. autoclass:: Resample
+   # Perform the transform
+   features = pipeline(waveform)
 
-  .. automethod:: forward
+Please check out tutorials that cover in-depth usage of trasforms.
 
-:hidden:`FrequencyMasking`
---------------------------
+.. minigallery:: torchaudio.transforms
 
-.. autoclass:: FrequencyMasking
+Utility
+-------
 
-  .. automethod:: forward
+.. autosummary::
+    :toctree: generated
+    :nosignatures:
 
-:hidden:`TimeMasking`
----------------------
+    AmplitudeToDB
+    MelScale
+    MuLawEncoding
+    MuLawDecoding
+    Resample
+    Fade
+    Vol
+    Loudness
 
-.. autoclass:: TimeMasking
+Feature Extractions
+-------------------
 
-  .. automethod:: forward
+.. autosummary::
+    :toctree: generated
+    :nosignatures:
 
-:hidden:`TimeStretch`
----------------------
+    Spectrogram
+    InverseSpectrogram
+    MelSpectrogram
+    GriffinLim
+    MFCC
+    LFCC
+    ComputeDeltas
+    PitchShift
+    SlidingWindowCmn
+    SpectralCentroid
+    Vad
 
-.. autoclass:: TimeStretch
-
-  .. automethod:: forward
-
-:hidden:`Fade`
---------------
-
-.. autoclass:: Fade
-
-  .. automethod:: forward
-
-:hidden:`Vol`
+Augmentations
 -------------
 
-.. autoclass:: Vol
+The following transforms implement popular augmentation techniques known as *SpecAugment* :cite:`specaugment`.
 
-  .. automethod:: forward
+.. autosummary::
+    :toctree: generated
+    :nosignatures:
 
-:hidden:`Feature Extractions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    FrequencyMasking
+    TimeMasking
+    TimeStretch
 
-:hidden:`Spectrogram`
----------------------
+Loss
+----
 
-.. autoclass:: Spectrogram
+.. autosummary::
+    :toctree: generated
+    :nosignatures:
 
-  .. automethod:: forward
+    RNNTLoss
 
-:hidden:`InverseSpectrogram`
-----------------------------
-
-.. autoclass:: InverseSpectrogram
-
-  .. automethod:: forward
-
-:hidden:`MelSpectrogram`
-------------------------
-
-.. autoclass:: MelSpectrogram
-
-  .. automethod:: forward
-
-:hidden:`GriffinLim`
---------------------
-
-.. autoclass:: GriffinLim
-
-  .. automethod:: forward
-
-:hidden:`MFCC`
---------------
-
-.. autoclass:: MFCC
-
-  .. automethod:: forward
-
-:hidden:`LFCC`
---------------
-
-.. autoclass:: LFCC
-
-  .. automethod:: forward
-
-:hidden:`ComputeDeltas`
------------------------
-
-.. autoclass:: ComputeDeltas
-
-  .. automethod:: forward
-
-:hidden:`PitchShift`
---------------------
-
-.. autoclass:: PitchShift
-
-  .. automethod:: forward
-
-:hidden:`SlidingWindowCmn`
---------------------------
-
-.. autoclass:: SlidingWindowCmn
-
-  .. automethod:: forward
-
-:hidden:`SpectralCentroid`
---------------------------
-
-.. autoclass:: SpectralCentroid
-
-  .. automethod:: forward
-
-:hidden:`Vad`
+Multi-channel
 -------------
 
-.. autoclass:: Vad
+.. autosummary::
+    :toctree: generated
+    :nosignatures:
 
-  .. automethod:: forward
-
-:hidden:`Loss`
-~~~~~~~~~~~~~~
-
-:hidden:`RNNTLoss`
-------------------
-
-.. autoclass:: RNNTLoss
-
-  .. automethod:: forward
-
-:hidden:`Multi-channel`
-~~~~~~~~~~~~~~~~~~~~~~~
-
-:hidden:`PSD`
--------------
-
-.. autoclass:: PSD
-
-  .. automethod:: forward
-
-:hidden:`MVDR`
---------------
-
-.. autoclass:: MVDR
-
-  .. automethod:: forward
-
-:hidden:`RTFMVDR`
------------------
-
-.. autoclass:: RTFMVDR
-
-  .. automethod:: forward
-
-:hidden:`SoudenMVDR`
---------------------
-
-.. autoclass:: SoudenMVDR
-
-  .. automethod:: forward
-
-References
-~~~~~~~~~~
-
-.. footbibliography::
+    PSD
+    MVDR
+    RTFMVDR
+    SoudenMVDR

@@ -37,7 +37,8 @@ class _ConvolutionModule(torch.nn.Module):
         use_group_norm: bool = False,
     ) -> None:
         super().__init__()
-        assert (depthwise_kernel_size - 1) % 2 == 0, "depthwise_kernel_size must be odd to achieve 'SAME' padding."
+        if (depthwise_kernel_size - 1) % 2 != 0:
+            raise ValueError("depthwise_kernel_size must be odd to achieve 'SAME' padding.")
         self.layer_norm = torch.nn.LayerNorm(input_dim)
         self.sequential = torch.nn.Sequential(
             torch.nn.Conv1d(
@@ -212,9 +213,9 @@ class ConformerLayer(torch.nn.Module):
 
 
 class Conformer(torch.nn.Module):
-    r"""Implements the Conformer architecture introduced in
+    r"""Conformer architecture introduced in
     *Conformer: Convolution-augmented Transformer for Speech Recognition*
-    [:footcite:`gulati2020conformer`].
+    :cite:`gulati2020conformer`.
 
     Args:
         input_dim (int): input dimension.

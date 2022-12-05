@@ -1,4 +1,7 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
+file(MAKE_DIRECTORY install/include)
+file(MAKE_DIRECTORY install/lib)
 
 ################################################################################
 # sox
@@ -15,12 +18,14 @@ if (BUILD_KALDI)
 endif()
 
 ################################################################################
-# KenLM
+# Decoder
 ################################################################################
 if (BUILD_CTC_DECODER)
   add_subdirectory(zlib)
   add_subdirectory(bzip2)
-  add_subdirectory(lzma)
-  add_subdirectory(boost)
+  if (NOT MSVC)
+    add_subdirectory(lzma)
+  endif()
   add_subdirectory(kenlm)
+  add_subdirectory(flashlight-text)
 endif()

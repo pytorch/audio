@@ -41,8 +41,7 @@ _RELEASE_CONFIGS = {
 
 
 class TEDLIUM(Dataset):
-    """
-    Create a Dataset for *Tedlium* [:footcite:`rousseau2012tedlium`]. It supports releases 1,2 and 3.
+    """*Tedlium* :cite:`rousseau2012tedlium` dataset (releases 1,2 and 3).
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -178,7 +177,20 @@ class TEDLIUM(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            int:
+                Talk ID
+            int:
+                Speaker ID
+            int:
+                Identifier
         """
         fileid, line = self._filelist[n]
         return self._load_tedlium_item(fileid, line, self._path)

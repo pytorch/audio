@@ -2,8 +2,8 @@
 Text-to-Speech with Tacotron2
 =============================
 
-**Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
-`Moto Hira <moto@fb.com>`__
+**Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
+`Moto Hira <moto@meta.com>`__
 
 """
 
@@ -35,9 +35,8 @@ import matplotlib.pyplot as plt
 #    The last step is converting the spectrogram into the waveform. The
 #    process to generate speech from spectrogram is also called Vocoder.
 #    In this tutorial, three different vocoders are used,
-#    `WaveRNN <https://pytorch.org/audio/stable/models/wavernn.html>`__,
-#    `Griffin-Lim <https://pytorch.org/audio/stable/transforms.html#griffinlim>`__,
-#    and
+#    :py:class:`~torchaudio.models.WaveRNN`,
+#    :py:class:`~torchaudio.transforms.GriffinLim`, and
 #    `Nvidia's WaveGlow <https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/>`__.
 #
 #
@@ -45,7 +44,7 @@ import matplotlib.pyplot as plt
 #
 # .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png
 #
-# All the related components are bundled in :py:func:`torchaudio.pipelines.Tacotron2TTSBundle`,
+# All the related components are bundled in :py:class:`torchaudio.pipelines.Tacotron2TTSBundle`,
 # but this tutorial will also cover the process under the hood.
 
 ######################################################################
@@ -57,8 +56,11 @@ import matplotlib.pyplot as plt
 # encoding.
 #
 
-# When running this example in notebook, install DeepPhonemizer
-# !pip3 install deep_phonemizer
+# %%
+#  .. code-block:: bash
+#
+#      %%bash
+#      pip3 install deep_phonemizer
 
 import torch
 import torchaudio
@@ -196,10 +198,11 @@ print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 # however, note that the input to Tacotron2 models need to be processed
 # by the matching text processor.
 #
-# :py:func:`torchaudio.pipelines.Tacotron2TTSBundle` bundles the matching
+# :py:class:`torchaudio.pipelines.Tacotron2TTSBundle` bundles the matching
 # models and processors together so that it is easy to create the pipeline.
 #
-# For the available bundles, and its usage, please refer to :py:mod:`torchaudio.pipelines`.
+# For the available bundles, and its usage, please refer to
+# :py:class:`~torchaudio.pipelines.Tacotron2TTSBundle`.
 #
 
 bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
@@ -215,7 +218,7 @@ with torch.inference_mode():
     spec, _, _ = tacotron2.infer(processed, lengths)
 
 
-plt.imshow(spec[0].cpu().detach())
+_ = plt.imshow(spec[0].cpu().detach())
 
 
 ######################################################################
@@ -271,8 +274,7 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate)
-IPython.display.Audio("_assets/output_wavernn.wav")
+IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
 
 
 ######################################################################
@@ -280,7 +282,9 @@ IPython.display.Audio("_assets/output_wavernn.wav")
 # ~~~~~~~~~~~
 #
 # Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
-# the vocode object with ``get_vocoder`` method and pass the spectrogram.
+# the vocode object with
+# :py:func:`~torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder`
+# method and pass the spectrogram.
 #
 
 bundle = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
@@ -300,20 +304,15 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save(
-    "_assets/output_griffinlim.wav",
-    waveforms[0:1].cpu(),
-    sample_rate=vocoder.sample_rate,
-)
-IPython.display.Audio("_assets/output_griffinlim.wav")
+IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
 
 
 ######################################################################
 # Waveglow
 # ~~~~~~~~
 #
-# Waveglow is a vocoder published by Nvidia. The pretrained weight is
-# publishe on Torch Hub. One can instantiate the model using ``torch.hub``
+# Waveglow is a vocoder published by Nvidia. The pretrained weights are
+# published on Torch Hub. One can instantiate the model using ``torch.hub``
 # module.
 #
 
@@ -344,5 +343,4 @@ fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
 ax1.imshow(spec[0].cpu().detach())
 ax2.plot(waveforms[0].cpu().detach())
 
-torchaudio.save("_assets/output_waveglow.wav", waveforms[0:1].cpu(), sample_rate=22050)
-IPython.display.Audio("_assets/output_waveglow.wav")
+IPython.display.Audio(waveforms[0:1].cpu(), rate=22050)

@@ -60,12 +60,6 @@ def extract_feature_mfcc(
     ).to(device)
     waveform = waveform[0].to(device)
     mfccs = feature_extractor(waveform)  # (freq, time)
-    # mfccs = torchaudio.compliance.kaldi.mfcc(
-    #     waveform=waveform,
-    #     sample_frequency=sample_rate,
-    #     use_energy=False,
-    # )  # (time, freq)
-    # mfccs = mfccs.transpose(0, 1)  # (freq, time)
     deltas = torchaudio.functional.compute_deltas(mfccs)
     ddeltas = torchaudio.functional.compute_deltas(deltas)
     concat = torch.cat([mfccs, deltas, ddeltas], dim=0)

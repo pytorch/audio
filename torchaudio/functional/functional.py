@@ -11,6 +11,8 @@ import torchaudio
 from torch import Tensor
 from torchaudio._internal import module_utils as _mod_utils
 
+from .filtering import highpass_biquad, treble_biquad
+
 __all__ = [
     "spectrogram",
     "inverse_spectrogram",
@@ -35,6 +37,7 @@ __all__ = [
     "apply_codec",
     "resample",
     "edit_distance",
+    "loudness",
     "pitch_shift",
     "rnnt_loss",
     "psd",
@@ -54,7 +57,7 @@ def spectrogram(
     hop_length: int,
     win_length: int,
     power: Optional[float],
-    normalized: bool,
+    normalized: Union[bool, str],
     center: bool = True,
     pad_mode: str = "reflect",
     onesided: bool = True,
@@ -77,7 +80,11 @@ def spectrogram(
         power (float or None): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
-        normalized (bool): Whether to normalize by magnitude after stft
+        normalized (bool or str): Whether to normalize by magnitude after stft. If input is str, choices are
+            ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
+            ``"window"``. When normalized on ``"window"``, waveform is normalized upon the window's L2 energy. If
+            normalized on ``"frame_length"``, waveform is normalized by dividing by
+            :math:`(\text{frame\_length})^{0.5}`.
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
@@ -104,6 +111,8 @@ def spectrogram(
         # TODO add "with torch.no_grad():" back when JIT supports it
         waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
 
+    frame_length_norm, window_norm = _get_spec_norms(normalized)
+
     # pack batch
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
@@ -117,7 +126,7 @@ def spectrogram(
         window=window,
         center=center,
         pad_mode=pad_mode,
-        normalized=False,
+        normalized=frame_length_norm,
         onesided=onesided,
         return_complex=True,
     )
@@ -125,7 +134,7 @@ def spectrogram(
     # unpack batch
     spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-2:])
 
-    if normalized:
+    if window_norm:
         spec_f /= window.pow(2.0).sum().sqrt()
     if power is not None:
         if power == 1.0:
@@ -142,7 +151,7 @@ def inverse_spectrogram(
     n_fft: int,
     hop_length: int,
     win_length: int,
-    normalized: bool,
+    normalized: Union[bool, str],
     center: bool = True,
     pad_mode: str = "reflect",
     onesided: bool = True,
@@ -162,7 +171,9 @@ def inverse_spectrogram(
         n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
-        normalized (bool): Whether the stft output was normalized by magnitude
+        normalized (bool or str): Whether the stft output was normalized by magnitude. If input is str, choices are
+            ``"window"`` and ``"frame_length"``, dependent on normalization mode. ``True`` maps to
+            ``"window"``.
         center (bool, optional): whether the waveform was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             Default: ``True``
@@ -176,10 +187,12 @@ def inverse_spectrogram(
         Tensor: Dimension `(..., time)`. Least squares estimation of the original signal.
     """
 
+    frame_length_norm, window_norm = _get_spec_norms(normalized)
+
     if not spectrogram.is_complex():
         raise ValueError("Expected `spectrogram` to be complex dtype.")
 
-    if normalized:
+    if window_norm:
         spectrogram = spectrogram * window.pow(2.0).sum().sqrt()
 
     # pack batch
@@ -194,7 +207,7 @@ def inverse_spectrogram(
         win_length=win_length,
         window=window,
         center=center,
-        normalized=False,
+        normalized=frame_length_norm,
         onesided=onesided,
         length=length + 2 * pad if length is not None else None,
         return_complex=False,
@@ -208,6 +221,23 @@ def inverse_spectrogram(
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
 
     return waveform
+
+
+def _get_spec_norms(normalized: Union[str, bool]):
+    frame_length_norm, window_norm = False, False
+    if torch.jit.isinstance(normalized, str):
+        if normalized not in ["frame_length", "window"]:
+            raise ValueError("Invalid normalized parameter: {}".format(normalized))
+        if normalized == "frame_length":
+            frame_length_norm = True
+        elif normalized == "window":
+            window_norm = True
+    elif torch.jit.isinstance(normalized, bool):
+        if normalized:
+            window_norm = True
+    else:
+        raise TypeError("Input type not supported")
+    return frame_length_norm, window_norm
 
 
 def _get_complex_dtype(real_dtype: torch.dtype):
@@ -239,8 +269,8 @@ def griffinlim(
     .. properties:: Autograd TorchScript
 
     Implementation ported from
-    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
-    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
+    *librosa* :cite:`brian_mcfee-proc-scipy-2015`, *A fast Griffin-Lim algorithm* :cite:`6701851`
+    and *Signal estimation from modified short-time Fourier transform* :cite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension `(..., freq, frames)`
@@ -262,8 +292,10 @@ def griffinlim(
     Returns:
         Tensor: waveform of `(..., time)`, where time equals the ``length`` parameter if given.
     """
-    assert momentum < 1, "momentum={} > 1 can be unstable".format(momentum)
-    assert momentum >= 0, "momentum={} < 0".format(momentum)
+    if not 0 <= momentum < 1:
+        raise ValueError("momentum must be in range [0, 1). Found: {}".format(momentum))
+
+    momentum = momentum / (1 + momentum)
 
     # pack batch
     shape = specgram.size()
@@ -302,7 +334,7 @@ def griffinlim(
         # Update our phase estimates
         angles = rebuilt
         if momentum:
-            angles = angles - tprev.mul_(momentum / (1 + momentum))
+            angles = angles - tprev.mul_(momentum)
         angles = angles.div(angles.abs().add(1e-16))
 
         # Store the previous iterate
@@ -501,7 +533,7 @@ def melscale_fbanks(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
@@ -515,7 +547,7 @@ def melscale_fbanks(
     """
 
     if norm is not None and norm != "slaney":
-        raise ValueError("norm must be one of None or 'slaney'")
+        raise ValueError('norm must be one of None or "slaney"')
 
     # freq bins
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
@@ -602,20 +634,24 @@ def create_dct(n_mfcc: int, n_mels: int, norm: Optional[str]) -> Tensor:
     Args:
         n_mfcc (int): Number of mfc coefficients to retain
         n_mels (int): Number of mel filterbanks
-        norm (str or None): Norm to use (either 'ortho' or None)
+        norm (str or None): Norm to use (either "ortho" or None)
 
     Returns:
         Tensor: The transformation matrix, to be right-multiplied to
         row-wise data of size (``n_mels``, ``n_mfcc``).
     """
+
+    if norm is not None and norm != "ortho":
+        raise ValueError('norm must be either "ortho" or None')
+
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
     n = torch.arange(float(n_mels))
     k = torch.arange(float(n_mfcc)).unsqueeze(1)
     dct = torch.cos(math.pi / float(n_mels) * (n + 0.5) * k)  # size (n_mfcc, n_mels)
+
     if norm is None:
         dct *= 2.0
     else:
-        assert norm == "ortho"
         dct[0] *= 1.0 / math.sqrt(2.0)
         dct *= math.sqrt(2.0 / float(n_mels))
     return dct.t()
@@ -877,7 +913,8 @@ def mask_along_axis(
     if axis == 1:
         mask = mask.unsqueeze(-1)
 
-    assert mask_end - mask_start < mask_param
+    if mask_end - mask_start >= mask_param:
+        raise ValueError("Number of columns to be masked should be less than mask_param")
 
     specgram = specgram.masked_fill(mask, mask_value)
 
@@ -921,7 +958,8 @@ def compute_deltas(specgram: Tensor, win_length: int = 5, mode: str = "replicate
     shape = specgram.size()
     specgram = specgram.reshape(1, -1, shape[-1])
 
-    assert win_length >= 3
+    if win_length < 3:
+        raise ValueError(f"Window length should be greater than or equal to 3. Found win_length {win_length}")
 
     n = (win_length - 1) // 2
 
@@ -1294,7 +1332,7 @@ def compute_kaldi_pitch(
     snip_edges: bool = True,
 ) -> torch.Tensor:
     """Extract pitch based on method described in *A pitch extraction algorithm tuned
-    for automatic speech recognition* [:footcite:`6854049`].
+    for automatic speech recognition* :cite:`6854049`.
 
     .. devices:: CPU
 
@@ -1413,8 +1451,8 @@ def _get_sinc_resample_kernel(
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
 
-    assert lowpass_filter_width > 0
-    kernels = []
+    if lowpass_filter_width <= 0:
+        raise ValueError("Low pass filter width should be positive.")
     base_freq = min(orig_freq, new_freq)
     # This will perform antialiasing filtering by removing the highest frequencies.
     # At first I thought I only needed this when downsampling, but when upsampling
@@ -1445,31 +1483,33 @@ def _get_sinc_resample_kernel(
     # There is probably a way to evaluate those filters more efficiently, but this is kept for
     # future work.
     idx_dtype = dtype if dtype is not None else torch.float64
-    idx = torch.arange(-width, width + orig_freq, device=device, dtype=idx_dtype)
 
-    for i in range(new_freq):
-        t = (-i / new_freq + idx / orig_freq) * base_freq
-        t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
+    idx = torch.arange(-width, width + orig_freq, dtype=idx_dtype, device=device)[None, None] / orig_freq
 
-        # we do not use built in torch windows here as we need to evaluate the window
-        # at specific positions, not over a regular grid.
-        if resampling_method == "sinc_interpolation":
-            window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
-        else:
-            # kaiser_window
-            if beta is None:
-                beta = 14.769656459379492
-            beta_tensor = torch.tensor(float(beta))
-            window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
-        t *= math.pi
-        kernel = torch.where(t == 0, torch.tensor(1.0).to(t), torch.sin(t) / t)
-        kernel.mul_(window)
-        kernels.append(kernel)
+    t = torch.arange(0, -new_freq, -1, dtype=dtype, device=device)[:, None, None] / new_freq + idx
+    t *= base_freq
+    t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
+
+    # we do not use built in torch windows here as we need to evaluate the window
+    # at specific positions, not over a regular grid.
+    if resampling_method == "sinc_interpolation":
+        window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
+    else:
+        # kaiser_window
+        if beta is None:
+            beta = 14.769656459379492
+        beta_tensor = torch.tensor(float(beta))
+        window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
+
+    t *= math.pi
 
     scale = base_freq / orig_freq
-    kernels = torch.stack(kernels).view(new_freq, 1, -1).mul_(scale)
+    kernels = torch.where(t == 0, torch.tensor(1.0).to(t), t.sin() / t)
+    kernels *= window * scale
+
     if dtype is None:
         kernels = kernels.to(dtype=torch.float32)
+
     return kernels, width
 
 
@@ -1512,7 +1552,7 @@ def resample(
     resampling_method: str = "sinc_interpolation",
     beta: Optional[float] = None,
 ) -> Tensor:
-    r"""Resamples the waveform at the new frequency using bandlimited interpolation. [:footcite:`RESAMPLE`].
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.
 
     .. devices:: CPU CUDA
 
@@ -1531,14 +1571,15 @@ def resample(
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+            Options: [``"sinc_interpolation"``, ``"kaiser_window"``] (Default: ``"sinc_interpolation"``)
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
         Tensor: The waveform at the new frequency of dimension `(..., time).`
     """
 
-    assert orig_freq > 0.0 and new_freq > 0.0
+    if orig_freq <= 0.0 or new_freq <= 0.0:
+        raise ValueError("Original frequency and desired frequecy should be positive")
 
     if orig_freq == new_freq:
         return waveform
@@ -1600,6 +1641,67 @@ def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
         dnew, dold = dold, dnew
 
     return int(dold[-1])
+
+
+def loudness(waveform: Tensor, sample_rate: int):
+    r"""Measure audio loudness according to the ITU-R BS.1770-4 recommendation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension `(..., channels, time)`
+        sample_rate (int): sampling rate of the waveform
+
+    Returns:
+        Tensor: loudness estimates (LKFS)
+
+    Reference:
+        - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
+    """
+
+    if waveform.size(-2) > 5:
+        raise ValueError("Only up to 5 channels are supported.")
+
+    gate_duration = 0.4
+    overlap = 0.75
+    gamma_abs = -70.0
+    kweight_bias = -0.691
+    gate_samples = int(round(gate_duration * sample_rate))
+    step = int(round(gate_samples * (1 - overlap)))
+
+    # Apply K-weighting
+    waveform = treble_biquad(waveform, sample_rate, 4.0, 1500.0, 1 / math.sqrt(2))
+    waveform = highpass_biquad(waveform, sample_rate, 38.0, 0.5)
+
+    # Compute the energy for each block
+    energy = torch.square(waveform).unfold(-1, gate_samples, step)
+    energy = torch.mean(energy, dim=-1)
+
+    # Compute channel-weighted summation
+    g = torch.tensor([1.0, 1.0, 1.0, 1.41, 1.41], dtype=waveform.dtype, device=waveform.device)
+    g = g[: energy.size(-2)]
+
+    energy_weighted = torch.sum(g.unsqueeze(-1) * energy, dim=-2)
+    loudness = -0.691 + 10 * torch.log10(energy_weighted)
+
+    # Apply absolute gating of the blocks
+    gated_blocks = loudness > gamma_abs
+    gated_blocks = gated_blocks.unsqueeze(-2)
+
+    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
+    energy_weighted = torch.sum(g * energy_filtered, dim=-1)
+    gamma_rel = kweight_bias + 10 * torch.log10(energy_weighted) - 10
+
+    # Apply relative gating of the blocks
+    gated_blocks = torch.logical_and(gated_blocks.squeeze(-2), loudness > gamma_rel.unsqueeze(-1))
+    gated_blocks = gated_blocks.unsqueeze(-2)
+
+    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
+    energy_weighted = torch.sum(g * energy_filtered, dim=-1)
+    LKFS = kweight_bias + 10 * torch.log10(energy_weighted)
+    return LKFS
 
 
 def pitch_shift(
@@ -1736,9 +1838,10 @@ def rnnt_loss(
     blank: int = -1,
     clamp: float = -1,
     reduction: str = "mean",
+    fused_log_softmax: bool = True,
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
-    [:footcite:`graves2012sequence`].
+    :cite:`graves2012sequence`.
 
     .. devices:: CPU CUDA
 
@@ -1757,13 +1860,14 @@ def rnnt_loss(
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
-            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+            ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
     Returns:
-        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size `(batch)`,
+        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size `(batch)`,
         otherwise scalar.
     """
     if reduction not in ["none", "mean", "sum"]:
-        raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
+        raise ValueError('reduction should be one of "none", "mean", or "sum"')
 
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
@@ -1775,6 +1879,7 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
+        fused_log_softmax=fused_log_softmax,
     )
 
     if reduction == "mean":
@@ -1815,10 +1920,11 @@ def psd(
     psd = torch.einsum("...ct,...et->...tce", [specgram, specgram.conj()])
 
     if mask is not None:
-        assert (
-            mask.shape[:-1] == specgram.shape[:-2] and mask.shape[-1] == specgram.shape[-1]
-        ), "The dimensions of mask except the channel dimension should be the same as specgram."
-        f"Found {mask.shape} for mask and {specgram.shape} for specgram."
+        if mask.shape[:-1] != specgram.shape[:-2] or mask.shape[-1] != specgram.shape[-1]:
+            raise ValueError(
+                "The dimensions of mask except the channel dimension should be the same as specgram."
+                f"Found {mask.shape} for mask and {specgram.shape} for specgram."
+            )
         # Normalized mask along time dimension:
         if normalize:
             mask = mask / (mask.sum(dim=-1, keepdim=True) + eps)
@@ -1842,8 +1948,10 @@ def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> t
     Returns:
         Tensor: The trace of the input Tensor.
     """
-    assert input.ndim >= 2, "The dimension of the tensor must be at least 2."
-    assert input.shape[dim1] == input.shape[dim2], "The size of ``dim1`` and ``dim2`` must be the same."
+    if input.ndim < 2:
+        raise ValueError("The dimension of the tensor must be at least 2.")
+    if input.shape[dim1] != input.shape[dim2]:
+        raise ValueError("The size of ``dim1`` and ``dim2`` must be the same.")
     input = torch.diagonal(input, 0, dim1=dim1, dim2=dim2)
     return input.sum(dim=-1)
 
@@ -1878,20 +1986,22 @@ def _assert_psd_matrices(psd_s: torch.Tensor, psd_n: torch.Tensor) -> None:
         psd_n (torch.Tensor): The complex-valued power spectral density (PSD) matrix of noise.
             Tensor with dimensions `(..., freq, channel, channel)`.
     """
-    assert (
-        psd_s.ndim >= 3 and psd_n.ndim >= 3
-    ), "Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n."
-    "Found {psd_s.shape} for psd_s and {psd_n.shape} for psd_n."
-    assert (
-        psd_s.is_complex() and psd_n.is_complex()
-    ), "The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
-    f"Found {psd_s.dtype} for psd_s and {psd_n.dtype} for psd_n."
-    assert (
-        psd_s.shape == psd_n.shape
-    ), f"The dimensions of psd_s and psd_n should be the same. Found {psd_s.shape} and {psd_n.shape}."
-    assert (
-        psd_s.shape[-1] == psd_s.shape[-2]
-    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
+    if psd_s.ndim < 3 or psd_n.ndim < 3:
+        raise ValueError(
+            "Expected at least 3D Tensor (..., freq, channel, channel) for psd_s and psd_n. "
+            f"Found {psd_s.shape} for psd_s and {psd_n.shape} for psd_n."
+        )
+    if not (psd_s.is_complex() and psd_n.is_complex()):
+        raise TypeError(
+            "The type of psd_s and psd_n must be ``torch.cfloat`` or ``torch.cdouble``. "
+            f"Found {psd_s.dtype} for psd_s and {psd_n.dtype} for psd_n."
+        )
+    if psd_s.shape != psd_n.shape:
+        raise ValueError(
+            f"The dimensions of psd_s and psd_n should be the same. Found {psd_s.shape} and {psd_n.shape}."
+        )
+    if psd_s.shape[-1] != psd_s.shape[-2]:
+        raise ValueError(f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}.")
 
 
 def mvdr_weights_souden(
@@ -1902,8 +2012,8 @@ def mvdr_weights_souden(
     diag_eps: float = 1e-7,
     eps: float = 1e-8,
 ) -> Tensor:
-    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
-    by the method proposed by *Souden et, al.* [:footcite:`souden2009optimal`].
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights
+    by the method proposed by *Souden et, al.* :cite:`souden2009optimal`.
 
     .. devices:: CPU CUDA
 
@@ -1952,7 +2062,7 @@ def mvdr_weights_souden(
         # h: (..., F, C_1, C_2) x (..., C_2) -> (..., F, C_1)
         beamform_weights = torch.einsum("...c,...c->...", [ws, reference_channel[..., None, None, :]])
     else:
-        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+        raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
 
     return beamform_weights
 
@@ -1965,7 +2075,7 @@ def mvdr_weights_rtf(
     diag_eps: float = 1e-7,
     eps: float = 1e-8,
 ) -> Tensor:
-    r"""Compute the Minimum Variance Distortionless Response (*MVDR* [:footcite:`capon1969high`]) beamforming weights
+    r"""Compute the Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) beamforming weights
     based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.
 
     .. devices:: CPU CUDA
@@ -2003,19 +2113,22 @@ def mvdr_weights_rtf(
     Returns:
         torch.Tensor: The complex-valued MVDR beamforming weight matrix with dimensions `(..., freq, channel)`.
     """
-    assert rtf.ndim >= 2, f"Expected at least 2D Tensor (..., freq, channel) for rtf. Found {rtf.shape}."
-    assert psd_n.ndim >= 3, f"Expected at least 3D Tensor (..., freq, channel, channel) for psd_n. Found {psd_n.shape}."
-    assert (
-        rtf.is_complex() and psd_n.is_complex()
-    ), "The type of rtf and psd_n must be ``torch.cfloat`` or ``torch.cdouble``."
-    f"Found {rtf.dtype} for rtf and {psd_n.dtype} for psd_n."
-    assert (
-        rtf.shape == psd_n.shape[:-1]
-    ), "The dimensions of rtf and the dimensions withou the last dimension of psd_n should be the same."
-    f"Found {rtf.shape} for rtf and {psd_n.shape} for psd_n."
-    assert (
-        psd_n.shape[-1] == psd_n.shape[-2]
-    ), f"The last two dimensions of psd_n should be the same. Found {psd_n.shape}."
+    if rtf.ndim < 2:
+        raise ValueError(f"Expected at least 2D Tensor (..., freq, channel) for rtf. Found {rtf.shape}.")
+    if psd_n.ndim < 3:
+        raise ValueError(f"Expected at least 3D Tensor (..., freq, channel, channel) for psd_n. Found {psd_n.shape}.")
+    if not (rtf.is_complex() and psd_n.is_complex()):
+        raise TypeError(
+            "The type of rtf and psd_n must be ``torch.cfloat`` or ``torch.cdouble``. "
+            f"Found {rtf.dtype} for rtf and {psd_n.dtype} for psd_n."
+        )
+    if rtf.shape != psd_n.shape[:-1]:
+        raise ValueError(
+            "The dimensions of rtf and the dimensions withou the last dimension of psd_n should be the same. "
+            f"Found {rtf.shape} for rtf and {psd_n.shape} for psd_n."
+        )
+    if psd_n.shape[-1] != psd_n.shape[-2]:
+        raise ValueError(f"The last two dimensions of psd_n should be the same. Found {psd_n.shape}.")
 
     if diagonal_loading:
         psd_n = _tik_reg(psd_n, reg=diag_eps)
@@ -2032,7 +2145,7 @@ def mvdr_weights_rtf(
             reference_channel = reference_channel.to(psd_n.dtype)
             scale = torch.einsum("...c,...c->...", [rtf.conj(), reference_channel[..., None, :]])
         else:
-            raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+            raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
 
         beamform_weights = beamform_weights * scale[..., None]
 
@@ -2054,10 +2167,10 @@ def rtf_evd(psd_s: Tensor) -> Tensor:
         Tensor: The estimated complex-valued RTF of target speech.
         Tensor of dimension `(..., freq, channel)`
     """
-    assert psd_s.is_complex(), f"The type of psd_s must be ``torch.cfloat`` or ``torch.cdouble``. Found {psd_s.dtype}."
-    assert (
-        psd_s.shape[-1] == psd_s.shape[-2]
-    ), f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}."
+    if not psd_s.is_complex():
+        raise TypeError(f"The type of psd_s must be ``torch.cfloat`` or ``torch.cdouble``. Found {psd_s.dtype}.")
+    if psd_s.shape[-1] != psd_s.shape[-2]:
+        raise ValueError(f"The last two dimensions of psd_s should be the same. Found {psd_s.shape}.")
     _, v = torch.linalg.eigh(psd_s)  # v is sorted along with eigenvalues in ascending order
     rtf = v[..., -1]  # choose the eigenvector with max eigenvalue
     return rtf
@@ -2096,7 +2209,8 @@ def rtf_power(
         Tensor of dimension `(..., freq, channel)`.
     """
     _assert_psd_matrices(psd_s, psd_n)
-    assert n_iter > 0, "The number of iteration must be greater than 0."
+    if n_iter <= 0:
+        raise ValueError("The number of iteration must be greater than 0.")
 
     # Apply diagonal loading to psd_n to improve robustness.
     if diagonal_loading:
@@ -2109,7 +2223,7 @@ def rtf_power(
         reference_channel = reference_channel.to(psd_n.dtype)
         rtf = torch.einsum("...c,...c->...", [phi, reference_channel[..., None, None, :]])
     else:
-        raise TypeError(f"Expected 'int' or 'Tensor' for reference_channel. Found: {type(reference_channel)}.")
+        raise TypeError(f'Expected "int" or "Tensor" for reference_channel. Found: {type(reference_channel)}.')
     rtf = rtf.unsqueeze(-1)  # (..., freq, channel, 1)
     if n_iter >= 2:
         # The number of iterations in the for loop is `n_iter - 2`
@@ -2134,6 +2248,7 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
 
     .. math::
         \hat{\textbf{S}}(f) = \textbf{w}_{\text{bf}}(f)^{\mathsf{H}} \textbf{Y}(f)
+
     where :math:`\textbf{w}_{\text{bf}}(f)` is the beamforming weight for the :math:`f`-th frequency bin,
     :math:`\textbf{Y}` is the multi-channel spectrum for the :math:`f`-th frequency bin.
 
@@ -2147,15 +2262,18 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
         Tensor: The single-channel complex-valued enhanced spectrum.
             Tensor of dimension `(..., freq, time)`
     """
-    assert (
-        beamform_weights.shape[:-2] == specgram.shape[:-3]
-    ), "The dimensions except the last two dimensions of beamform_weights should be the same "
-    "as the dimensions except the last three dimensions of specgram."
-    f"Found {beamform_weights.shape} for beamform_weights and {specgram.shape} for specgram."
-    assert (
-        beamform_weights.is_complex() and specgram.is_complex()
-    ), "The type of beamform_weights and specgram must be ``torch.cfloat`` or ``torch.cdouble``."
-    f"Found {beamform_weights.dtype} for beamform_weights and {specgram.dtype} for specgram."
+    if beamform_weights.shape[:-2] != specgram.shape[:-3]:
+        raise ValueError(
+            "The dimensions except the last two dimensions of beamform_weights should be the same "
+            "as the dimensions except the last three dimensions of specgram. "
+            f"Found {beamform_weights.shape} for beamform_weights and {specgram.shape} for specgram."
+        )
+
+    if not (beamform_weights.is_complex() and specgram.is_complex()):
+        raise TypeError(
+            "The type of beamform_weights and specgram must be ``torch.cfloat`` or ``torch.cdouble``. "
+            f"Found {beamform_weights.dtype} for beamform_weights and {specgram.dtype} for specgram."
+        )
 
     # (..., freq, channel) x (..., channel, freq, time) -> (..., freq, time)
     specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_weights.conj(), specgram])

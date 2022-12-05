@@ -160,9 +160,16 @@ class MaskGenerator(torch.nn.Module):
 
 
 class ConvTasNet(torch.nn.Module):
-    """Conv-TasNet: a fully-convolutional time-domain audio separation network
+    """Conv-TasNet architecture introduced in
     *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*
-    [:footcite:`Luo_2019`].
+    :cite:`Luo_2019`.
+
+    Note:
+        This implementation corresponds to the "non-causal" setting in the paper.
+
+    See Also:
+        * :func:`~torchaudio.models.conv_tasnet_base`: A factory function.
+        * :class:`torchaudio.pipelines.SourceSeparationBundle`: Source separation pipeline with pre-trained models.
 
     Args:
         num_sources (int, optional): The number of sources to split.
@@ -174,9 +181,6 @@ class ConvTasNet(torch.nn.Module):
         msk_num_layers (int, optional): The number of layers in one conv block of the mask generator, <X>.
         msk_num_stacks (int, optional): The numbr of conv blocks of the mask generator, <R>.
         msk_activate (str, optional): The activation function of the mask output (Default: ``sigmoid``).
-
-    Note:
-        This implementation corresponds to the "non-causal" setting in the paper.
     """
 
     def __init__(
@@ -299,3 +303,29 @@ class ConvTasNet(torch.nn.Module):
         if num_pads > 0:
             output = output[..., :-num_pads]  # B, S, L
         return output
+
+
+def conv_tasnet_base(num_sources: int = 2) -> ConvTasNet:
+    r"""Builds non-causal version of :class:`~torchaudio.models.ConvTasNet`.
+
+    The parameter settings follow the ones with the highest Si-SNR metirc score in the paper,
+    except the mask activation function is changed from "sigmoid" to "relu" for performance improvement.
+
+    Args:
+        num_sources (int, optional): Number of sources in the output.
+            (Default: 2)
+    Returns:
+        ConvTasNet:
+            ConvTasNet model.
+    """
+    return ConvTasNet(
+        num_sources=num_sources,
+        enc_kernel_size=16,
+        enc_num_feats=512,
+        msk_kernel_size=3,
+        msk_num_feats=128,
+        msk_num_hidden_feats=512,
+        msk_num_layers=8,
+        msk_num_stacks=3,
+        msk_activate="relu",
+    )

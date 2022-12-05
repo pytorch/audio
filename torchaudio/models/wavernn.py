@@ -15,7 +15,7 @@ __all__ = [
 
 
 class ResBlock(nn.Module):
-    r"""ResNet block based on *Efficient Neural Audio Synthesis* [:footcite:`kalchbrenner2018efficient`].
+    r"""ResNet block based on *Efficient Neural Audio Synthesis* :cite:`kalchbrenner2018efficient`.
 
     Args:
         n_freq: the number of bins in a spectrogram. (Default: ``128``)
@@ -197,11 +197,16 @@ class UpsampleNetwork(nn.Module):
 
 
 class WaveRNN(nn.Module):
-    r"""WaveRNN model based on the implementation from `fatchord <https://github.com/fatchord/WaveRNN>`_.
+    r"""WaveRNN model from *Efficient Neural Audio Synthesis* :cite:`wavernn`
+    based on the implementation from `fatchord/WaveRNN <https://github.com/fatchord/WaveRNN>`_.
 
     The original implementation was introduced in *Efficient Neural Audio Synthesis*
-    [:footcite:`kalchbrenner2018efficient`]. The input channels of waveform and spectrogram have to be 1.
+    :cite:`kalchbrenner2018efficient`. The input channels of waveform and spectrogram have to be 1.
     The product of `upsample_scales` must equal `hop_length`.
+
+    See Also:
+        * `Training example <https://github.com/pytorch/audio/tree/release/0.12/examples/pipeline_wavernn>`__
+        * :class:`torchaudio.pipelines.Tacotron2TTSBundle`: TTS pipeline with pretrained model.
 
     Args:
         upsample_scales: the list of upsample scales.
@@ -277,8 +282,10 @@ class WaveRNN(nn.Module):
             Tensor: shape (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
         """
 
-        assert waveform.size(1) == 1, "Require the input channel of waveform is 1"
-        assert specgram.size(1) == 1, "Require the input channel of specgram is 1"
+        if waveform.size(1) != 1:
+            raise ValueError("Require the input channel of waveform is 1")
+        if specgram.size(1) != 1:
+            raise ValueError("Require the input channel of specgram is 1")
         # remove channel dimension until the end
         waveform, specgram = waveform.squeeze(1), specgram.squeeze(1)
 

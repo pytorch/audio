@@ -83,7 +83,8 @@ def _get_conv1d_layer(
         (torch.nn.Conv1d): The corresponding Conv1D layer.
     """
     if padding is None:
-        assert kernel_size % 2 == 1
+        if kernel_size % 2 != 1:
+            raise ValueError("kernel_size must be odd")
         padding = int(dilation * (kernel_size - 1) / 2)
 
     conv1d = torch.nn.Conv1d(
@@ -866,12 +867,12 @@ class _Decoder(nn.Module):
 
 
 class Tacotron2(nn.Module):
-    r"""Tacotron2 model based on the implementation from
-    `Nvidia <https://github.com/NVIDIA/DeepLearningExamples/>`_.
+    r"""Tacotron2 model from *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
+    :cite:`shen2018natural` based on the implementation from
+    `Nvidia Deep Learning Examples <https://github.com/NVIDIA/DeepLearningExamples/>`_.
 
-    The original implementation was introduced in
-    *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
-    [:footcite:`shen2018natural`].
+    See Also:
+        * :class:`torchaudio.pipelines.Tacotron2TTSBundle`: TTS pipeline with pretrained model.
 
     Args:
         mask_padding (bool, optional): Use mask padding (Default: ``False``).
@@ -1033,7 +1034,6 @@ class Tacotron2(nn.Module):
             lengths = torch.tensor([max_length]).expand(n_batch).to(tokens.device, tokens.dtype)
 
         assert lengths is not None  # For TorchScript compiler
-
         embedded_inputs = self.embedding(tokens).transpose(1, 2)
         encoder_outputs = self.encoder(embedded_inputs, lengths)
         mel_specgram, mel_specgram_lengths, _, alignments = self.decoder.infer(encoder_outputs, lengths)

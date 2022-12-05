@@ -1,4 +1,4 @@
-name: Build on M1
+name: Build for M1
 on:
   pull_request:
     paths:
@@ -17,7 +17,7 @@ env:
 jobs:
   build_wheels:
     name: "Build TorchAudio M1 wheels"
-    runs-on: macos-m1-11
+    runs-on: macos-m1-12
     strategy:
       matrix:
         py_vers: [ "3.8", "3.9", "3.10" ]
@@ -35,6 +35,8 @@ jobs:
         if: ${{ (github.event_name == 'pull_request' && startsWith(github.base_ref, 'release')) || startsWith(github.ref, 'refs/heads/release') }}
         run: |
           echo "CHANNEL=test" >> "$GITHUB_ENV"
+      - name: Setup miniconda
+        uses: pytorch/test-infra/.github/actions/setup-miniconda@main
       - name: Build TorchAudio M1 wheel
         shell: arch -arch arm64 bash {0}
         env:
@@ -44,9 +46,9 @@ jobs:
           USE_FFMPEG: true
           USE_OPENMP: false
           USE_CUDA: false
+          # Needed so that delocate puts files in places it can actually modify
+          TMPDIR: ${{ runner.temp }}
         run: |
-          echo $PATH
-          . ~/miniconda3/etc/profile.d/conda.sh
           set -ex
           . packaging/pkg_helpers.bash
           # if we are uploading to test channell, our version consist only of the base: 0.x.x - no date string or suffix added
@@ -59,13 +61,12 @@ jobs:
           export SOURCE_ROOT_DIR=$(pwd)
           export FFMPEG_ROOT="${SOURCE_ROOT_DIR}/third_party/ffmpeg"
           . packaging/ffmpeg/build.sh
-          WHL_NAME=torchaudio-${BUILD_VERSION}-cp${PY_VERS/.}-cp${PY_VERS/.}-macosx_11_0_arm64.whl
           conda create -yp ${ENV_NAME} python=${PY_VERS} numpy cmake ninja wheel pkg-config
           conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/${CHANNEL}
           conda run -p ${ENV_NAME} python3 -mpip install delocate
           conda run -p ${ENV_NAME} python3 setup.py bdist_wheel
           export PYTORCH_VERSION="$(conda run -p ${ENV_NAME} python3 -mpip show torch | grep ^Version: | sed 's/Version: *//')"
-          conda run -p ${ENV_NAME} DYLD_FALLBACK_LIBRARY_PATH="${ENV_NAME}/lib" delocate-wheel -v --ignore-missing-dependencies dist/${WHL_NAME}
+          conda run -p ${ENV_NAME} DYLD_FALLBACK_LIBRARY_PATH="${ENV_NAME}/lib" delocate-wheel -v --ignore-missing-dependencies dist/*.whl
           conda env remove -p ${ENV_NAME}
       - name: Test wheel
         shell: arch -arch arm64 bash {0}
@@ -73,7 +74,6 @@ jobs:
           ENV_NAME: conda-test-env-${{ github.run_id }}
           PY_VERS: ${{ matrix.py_vers }}
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           set -ex
           conda create -yp ${ENV_NAME} python=${PY_VERS} numpy
           conda run -p ${ENV_NAME} python3 -mpip install torch --pre --extra-index-url=https://download.pytorch.org/whl/${CHANNEL}
@@ -99,7 +99,7 @@ jobs:
           done
   build_conda:
     name: "Build TorchAudio M1 conda packages"
-    runs-on: macos-m1-11
+    runs-on: macos-m1-12
     strategy:
       matrix:
         py_vers: [ "3.8", "3.9", "3.10" ]
@@ -117,23 +117,23 @@ jobs:
         if: ${{ (github.event_name == 'pull_request' && startsWith(github.base_ref, 'release')) || startsWith(github.ref, 'refs/heads/release') }}
         run: |
           echo "CHANNEL=test" >> "$GITHUB_ENV"
+      - name: Setup miniconda
+        uses: pytorch/test-infra/.github/actions/setup-miniconda@main
       - name: Install conda-build and purge previous artifacts
         shell: arch -arch arm64 bash {0}
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           conda install -yq conda-build
           conda build purge-all
       - name: Build TorchAudio M1 conda package
         shell: arch -arch arm64 bash {0}
         env:
           ENV_NAME: conda-env-${{ github.run_id }}
-          PYTHON_VERSION: ${{ matrix.py_vers }}
+          PY_VERS: ${{ matrix.py_vers }}
           CU_VERSION: cpu
           USE_FFMPEG: true
           USE_OPENMP: false
           USE_CUDA: false
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           set -ex
           . packaging/pkg_helpers.bash
 
@@ -156,9 +156,13 @@ jobs:
           setup_conda_pytorch_constraint
           setup_conda_cudatoolkit_constraint
           setup_visual_studio_constraint
-          conda build -c defaults $CONDA_CHANNEL_FLAGS --no-anaconda-upload --python "$PYTHON_VERSION" packaging/torchaudio
-          mkdir -p dist
-          cp ~/miniconda3/conda-bld/osx-arm64/*.tar.bz2 dist/
+          conda build \
+            -c defaults \
+            $CONDA_CHANNEL_FLAGS \
+            --no-anaconda-upload \
+            --python "$PY_VERS" \
+            --output-folder=dist/ \
+            packaging/torchaudio
       - name: Upload package to GitHub
         uses: actions/upload-artifact@v3
         with:
@@ -170,7 +174,11 @@ jobs:
         env:
           CONDA_PYTORCHBOT_TOKEN: ${{ secrets.CONDA_PYTORCHBOT_TOKEN }}
         run: |
-          . ~/miniconda3/etc/profile.d/conda.sh
           conda install -yq anaconda-client
           set -x
-          anaconda  -t "${CONDA_PYTORCHBOT_TOKEN}" upload ~/miniconda3/conda-bld/osx-arm64/*.tar.bz2 -u "pytorch-${CHANNEL}" --label main --no-progress --force
+          export ANACONDA_PATH=$(conda info --base)/bin
+          $ANACONDA_PATH/anaconda  -t "${CONDA_PYTORCHBOT_TOKEN}" upload dist/osx-arm64/*.tar.bz2 -u "pytorch-${CHANNEL}" --label main --no-progress --force
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.event_name == 'workflow_dispatch' }}
+  cancel-in-progress: true

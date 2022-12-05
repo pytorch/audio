@@ -24,9 +24,7 @@ Format get_format_from_string(const std::string& format) {
     return Format::HTK;
   if (format == "gsm")
     return Format::GSM;
-  std::ostringstream stream;
-  stream << "Internal Error: unexpected format value: " << format;
-  throw std::runtime_error(stream.str());
+  TORCH_CHECK(false, "Internal Error: unexpected format value: ", format);
 }
 
 std::string to_string(Encoding v) {
@@ -56,7 +54,7 @@ std::string to_string(Encoding v) {
     case Encoding::OPUS:
       return "OPUS";
     default:
-      throw std::runtime_error("Internal Error: unexpected encoding.");
+      TORCH_CHECK(false, "Internal Error: unexpected encoding.");
   }
 }
 
@@ -74,9 +72,7 @@ Encoding get_encoding_from_option(const c10::optional<std::string> encoding) {
     return Encoding::ULAW;
   if (v == "ALAW")
     return Encoding::ALAW;
-  std::ostringstream stream;
-  stream << "Internal Error: unexpected encoding value: " << v;
-  throw std::runtime_error(stream.str());
+  TORCH_CHECK(false, "Internal Error: unexpected encoding value: ", v);
 }
 
 BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth) {
@@ -95,9 +91,7 @@ BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth) {
     case 64:
       return BitDepth::B64;
     default: {
-      std::ostringstream s;
-      s << "Internal Error: unexpected bit depth value: " << v;
-      throw std::runtime_error(s.str());
+      TORCH_CHECK(false, "Internal Error: unexpected bit depth value: ", v);
     }
   }
 }

@@ -46,7 +46,15 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self.assertEqual(ts_output, output)
 
-    def test_spectrogram(self):
+    @parameterized.expand(
+        [
+            (True,),
+            (False,),
+            ("window",),
+            ("frame_length",),
+        ]
+    )
+    def test_spectrogram(self, normalize):
         waveform = common_utils.get_whitenoise()
         n_fft = 400
         ws = 400
@@ -54,12 +62,19 @@ class Functional(TempDirMixin, TestBaseMixin):
         pad = 0
         window = torch.hann_window(ws, device=waveform.device, dtype=waveform.dtype)
         power = None
-        normalize = False
         self._assert_consistency(
             F.spectrogram, (waveform, pad, window, n_fft, hop, ws, power, normalize, True, "reflect", True, True)
         )
 
-    def test_inverse_spectrogram(self):
+    @parameterized.expand(
+        [
+            (True,),
+            (False,),
+            ("window",),
+            ("frame_length",),
+        ]
+    )
+    def test_inverse_spectrogram(self, normalize):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=0.05)
         specgram = common_utils.get_spectrogram(waveform, n_fft=400, hop_length=200)
         length = 400
@@ -68,7 +83,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         ws = 400
         pad = 0
         window = torch.hann_window(ws, device=specgram.device, dtype=torch.float64)
-        normalize = False
         self._assert_consistency_complex(
             F.inverse_spectrogram, (specgram, length, pad, window, n_fft, hop, ws, normalize, True, "reflect", True)
         )
@@ -105,6 +119,14 @@ class Functional(TempDirMixin, TestBaseMixin):
             return F.detect_pitch_frequency(tensor, sample_rate)
 
         self._assert_consistency(func, (waveform,))
+
+    def test_measure_loudness(self):
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        sample_rate = 44100
+        waveform = common_utils.get_sinusoid(sample_rate=sample_rate, device=self.device)
+        self._assert_consistency(F.loudness, (waveform, sample_rate))
 
     def test_melscale_fbanks(self):
         if self.device != torch.device("cpu"):
