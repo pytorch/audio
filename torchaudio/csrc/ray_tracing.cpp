@@ -128,8 +128,6 @@ class RayTracer {
         mic_array(_mic_array),
         num_rays(_num_rays),
         energy_0(2. / num_rays),
-        // e_absorption(_e_absorption),
-        // scattering(_scattering),
         mic_radius(_mic_radius),
         mic_radius_sq(mic_radius * mic_radius),
         sound_speed(_sound_speed),
@@ -148,8 +146,8 @@ class RayTracer {
    * and calls simul_ray() on each of them.
    */
   void compute_histograms(torch::Tensor& histograms) {
-    // TODO: Could probably parallelize call over num_rays? We would need
-    // `num_threads` histograms and then sum-reduce them into a single
+    // TODO: the for loop can be parallelized over num_rays by creating
+    // `num_threads` histograms and then sum-reducing them into a single
     // histogram.
 
     if (D == 3) {

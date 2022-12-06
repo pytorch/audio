@@ -79,19 +79,21 @@ def ray_tracing(
             Or the shape must be `(6,)` if the room is a 3D room, representing absorption coefficients
             of ``"west"``, ``"east"``, ``"south"``, ``"north"``, ``"floor"``, and ``"ceiling"``, respectively.
             If ``e_absorption`` is a 2D Tensor, the shape must be `(num_bands, 4)` if the room is a 2D room,
-            or `(num_bands, 6)` if the room is a 3D room.
+            or `(num_bands, 6)` if the room is a 3D room. ``num_bands`` is the number of frequency bands (usually 7),
+            but you can choose other values.
         scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials.
             The shape and type of this parameter is the same as for ``e_absorption``.
-        mic_radius(float): The radius of the microphone in meters. (Default: 0.5m)
+        mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5m)
         sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343 m/s``)
-        energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: 1e-7).
+        energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``).
             The initial enery of each ray is ``2 / num_rays``.
         time_thres (float, optional):  The maximal duration (in seconds) for which rays are traced. (Defaut: 10s)
         hist_bin_size (float, optional): The size (in seconds) of each bin in the output histogram. (Default: 4ms)
     Returns:
         (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded. Each bin corresponds
             to a given time slot. The shape is `(channel, num_bands, num_bins)`
-            where ``num_bins = ceil(time_thres / hist_bin_size)``.
+            where ``num_bins = ceil(time_thres / hist_bin_size)``. If both ``e_absorption`` and ``scattering``
+            are floats, then ``num_bands == 1``.
     """
     D = room.shape[0]
 

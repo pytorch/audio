@@ -5,12 +5,8 @@ import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
 from scipy import signal
-from torchaudio._internal import module_utils as _mod_utils
-from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, TestBaseMixin
-
-if _mod_utils.is_module_available("pyroomacoustics"):
-    import pyroomacoustics as pra
 from torchaudio.functional import lfilter
+from torchaudio_unittest.common_utils import nested_params, skipIfNoPyRommAcoustics, TestBaseMixin
 
 from .dsp_utils import oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
 
@@ -737,7 +733,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         hist_single = hist_single.expand(2, 6, 2500)
         torch.testing.assert_close(hist_single, hist_per_band_per_wall)
 
-    @skipIfNoModule("pyroomacoustics")
+    @skipIfNoPyRommAcoustics
     @parameterized.expand(
         [
             ([20, 25], [2, 2], [[8, 8], [7, 6]], 10_000),  # 2D with 2 mics
@@ -745,6 +741,8 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         ]
     )
     def test_ray_tracing_same_results_as_pyroomacoustics(self, room_dim, source, mic_array, num_rays):
+        import pyroomacoustics as pra
+
         walls = ["west", "east", "south", "north"]
         if len(room_dim) == 3:
             walls += ["floor", "ceiling"]
