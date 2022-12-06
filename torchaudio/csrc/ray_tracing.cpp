@@ -24,9 +24,9 @@ SOFTWARE.
  * Ray tracing implementation. This is heavily based on PyRoomAcoustics:
  * https://github.com/LCAV/pyroomacoustics
  */
-#include <math.h>
 #include <torch/script.h>
 #include <torch/torch.h>
+#include <cmath>
 
 namespace torchaudio {
 namespace rir {
@@ -46,10 +46,10 @@ template <typename scalar_t>
 class Wall {
  public:
   Wall(
-      torch::Tensor _absorption,
-      torch::Tensor _scattering,
-      torch::Tensor _normal,
-      torch::Tensor _origin)
+      const torch::Tensor& _absorption,
+      const torch::Tensor& _scattering,
+      const torch::Tensor& _normal,
+      const torch::Tensor& _origin)
       : absorption(_absorption),
         reflection((scalar_t)1. - _absorption),
         scattering(_scattering),
@@ -69,7 +69,7 @@ class Wall {
   /**
    * Returns the side (-1, 1 or 0) on which a point lies w.r.t. the wall.
    */
-  int side(torch::Tensor pos) {
+  int side(const torch::Tensor& pos) {
     auto dot = VAL((pos - origin).dot(normal));
 
     if (dot > EPS) {
@@ -84,14 +84,14 @@ class Wall {
   /**
    * Reflects a ray (dir) on the wall. Preserves norm of vector.
    */
-  torch::Tensor reflect(torch::Tensor dir) {
+  torch::Tensor reflect(const torch::Tensor& dir) {
     return dir - normal * 2 * dir.dot(normal);
   }
 
   /**
    * Returns the cosine angle of a ray (dir) with the normal of the wall
    */
-  scalar_t cosine(torch::Tensor dir) {
+  scalar_t cosine(const torch::Tensor& dir) {
     return VAL(dir.dot(normal) / dir.norm());
   }
 
@@ -112,12 +112,12 @@ template <typename scalar_t>
 class RayTracer {
  public:
   RayTracer(
-      const torch::Tensor _room,
-      const torch::Tensor _source,
-      const torch::Tensor _mic_array,
+      const torch::Tensor& _room,
+      const torch::Tensor& _source,
+      const torch::Tensor& _mic_array,
       int _num_rays,
-      const torch::Tensor _e_absorption,
-      const torch::Tensor _scattering,
+      const torch::Tensor& _e_absorption,
+      const torch::Tensor& _scattering,
       scalar_t _mic_radius,
       scalar_t _sound_speed,
       scalar_t _energy_thres,
@@ -152,11 +152,11 @@ class RayTracer {
 
     if (D == 3) {
       scalar_t offset = 2. / num_rays;
-      scalar_t increment = M_PI * (3. - sqrt(5.)); // phi increment
+      scalar_t increment = M_PI * (3. - std::sqrt(5.)); // phi increment
 
       for (auto i = 0; i < num_rays; ++i) {
         auto z = (i * offset - 1) + offset / 2.;
-        auto rho = sqrt(1. - z * z);
+        auto rho = std::sqrt(1. - z * z);
 
         scalar_t phi = i * increment;
 
@@ -164,7 +164,7 @@ class RayTracer {
         auto y = sin(phi) * rho;
 
         auto azimuth = atan2(y, x);
-        auto colatitude = atan2(sqrt(x * x + y * y), z);
+        auto colatitude = atan2(std::sqrt(x * x + y * y), z);
 
         simul_ray(histograms, azimuth, colatitude);
       }
@@ -177,9 +177,9 @@ class RayTracer {
   }
 
  private:
-  const torch::Tensor room;
-  const torch::Tensor source;
-  const torch::Tensor mic_array;
+  const torch::Tensor& room;
+  const torch::Tensor& source;
+  const torch::Tensor& mic_array;
   int num_rays;
   scalar_t energy_0; // initial energy of each ray
   scalar_t mic_radius;
@@ -201,8 +201,8 @@ class RayTracer {
    * - the distance from the start to the wall
    */
   std::tuple<torch::Tensor, int, scalar_t> next_wall_hit(
-      torch::Tensor start,
-      torch::Tensor end) {
+      const torch::Tensor& start,
+      const torch::Tensor& end) {
     const static std::vector<std::vector<int>> shoebox_orders = {
         {0, 1, 2}, {1, 0, 2}, {2, 0, 1}};
 
@@ -276,7 +276,7 @@ class RayTracer {
   void log_hist(
       torch::Tensor& histograms,
       int mic_idx,
-      torch::Tensor energy,
+      const torch::Tensor& energy,
       scalar_t travel_dist_at_mic) {
     auto time_at_mic = travel_dist_at_mic / sound_speed;
     auto bin = (int)floor(time_at_mic / hist_bin_size);
@@ -304,7 +304,7 @@ class RayTracer {
           room.scalar_type());
     }
 
-    int next_wall_index;
+    int next_wall_index = -1;
 
     auto num_bands = histograms.size(2);
     auto transmitted = torch::ones({num_bands}) * energy_0;
@@ -329,8 +329,9 @@ class RayTracer {
           next_wall_hit(start, start + dir * max_dist);
 
       // If no wall is hit (rounding errors), stop the ray
-      if (next_wall_index == -1)
+      if (next_wall_index == -1) {
         break;
+      }
 
       auto wall = walls[next_wall_index];
 
@@ -357,7 +358,10 @@ class RayTracer {
             auto travel_dist_at_mic = travel_dist + distance;
             double r_sq = travel_dist_at_mic * travel_dist_at_mic;
             auto p_hit =
-                (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
+                ((scalar_t)1. -
+                 std::sqrt(
+                     (scalar_t)1. -
+                     mic_radius_sq / std::max(mic_radius_sq, r_sq)));
             energy = transmitted / (r_sq * p_hit);
 
             log_hist(histograms, mic_idx, energy, travel_dist_at_mic);
@@ -393,9 +397,9 @@ class RayTracer {
   void scat_ray(
       torch::Tensor& histograms,
       Wall<scalar_t>& wall,
-      torch::Tensor transmitted,
-      torch::Tensor prev_hit_point,
-      torch::Tensor hit_point,
+      const torch::Tensor& transmitted,
+      const torch::Tensor& prev_hit_point,
+      const torch::Tensor& hit_point,
       scalar_t travel_dist) {
     auto distance_thres = time_thres * sound_speed;
 
@@ -413,10 +417,11 @@ class RayTracer {
 
       // compute the scattered energy reaching the microphone
       auto h_sq = hop_dist * hop_dist;
-      auto p_hit_equal = 1. - sqrt(1. - mic_radius_sq / h_sq);
+      auto p_hit_equal =
+          (scalar_t)1. - std::sqrt((scalar_t)1. - mic_radius_sq / h_sq);
       // cosine angle should be positive, but could be negative if normal is
       // facing out of room so we take abs
-      auto p_lambert = 2 * std::abs(wall.cosine(hit_point_to_mic));
+      auto p_lambert = (scalar_t)2. * std::abs(wall.cosine(hit_point_to_mic));
       auto scat_trans =
           wall.get_scattering() * transmitted * p_hit_equal * p_lambert;
 
@@ -424,7 +429,9 @@ class RayTracer {
           VAL(scat_trans.max()) > energy_thres) {
         double r_sq = double(travel_dist_at_mic) * travel_dist_at_mic;
         auto p_hit =
-            (1 - sqrt(1 - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
+            ((scalar_t)1. -
+             std::sqrt(
+                 (scalar_t)1. - mic_radius_sq / std::max(mic_radius_sq, r_sq)));
         auto energy = scat_trans / (r_sq * p_hit);
         log_hist(histograms, mic_idx, energy, travel_dist_at_mic);
       }
@@ -438,8 +445,8 @@ class RayTracer {
    * corners of each wall.
    */
   std::vector<Wall<scalar_t>> make_walls(
-      const torch::Tensor _e_absorption,
-      const torch::Tensor _scattering) {
+      const torch::Tensor& _e_absorption,
+      const torch::Tensor& _scattering) {
     auto room_a = room.accessor<scalar_t, 1>();
     scalar_t zero = 0;
     scalar_t W = room_a[0];
@@ -514,12 +521,12 @@ class RayTracer {
  * detail about parameters and output.
  */
 torch::Tensor ray_tracing(
-    const torch::Tensor room,
-    const torch::Tensor source,
-    const torch::Tensor mic_array,
+    const torch::Tensor& room,
+    const torch::Tensor& source,
+    const torch::Tensor& mic_array,
     int64_t num_rays,
-    const torch::Tensor e_absorption,
-    const torch::Tensor scattering,
+    const torch::Tensor& e_absorption,
+    const torch::Tensor& scattering,
     double mic_radius,
     double sound_speed,
     double energy_thres,
