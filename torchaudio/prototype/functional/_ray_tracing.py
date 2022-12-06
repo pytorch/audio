@@ -4,9 +4,10 @@ import torch
 
 
 def _validate_absorption_scattering(
-    v: Union[float, torch.Tensor], name: str, num_walls: int, D: int, dtype: torch.dtype
+    v: Union[float, torch.Tensor], name: str, D: int, dtype: torch.dtype
 ) -> torch.Tensor:
     """Validates and converts e_absorption or scattering parameters to a tensor with appropriate shape"""
+    num_walls = 4 if D == 2 else 6
     if isinstance(v, float):
         out = torch.full(
             size=(
@@ -65,10 +66,10 @@ def ray_tracing(
     .. properties:: TorchScript
 
     Args:
-        room (torch.Tensor): The 1D Tensor to determine the room size. The shape is
+        room (torch.Tensor): The room dimensions. The shape is
             `(D,)`, where ``D`` is 2 if room is a 2D room, or 3 if room is a 3D room. All rooms
             are assumed to be "shoebox" rooms.
-        source (torch.Tensor): The coordinate of the sound source. Tensor with dimensions `(D)`.
+        source (torch.Tensor): The coordinate of the sound source. Tensor with dimensions `(D,)`.
         mic_array (torch.Tensor): The coordinate of microphone array. Tensor with dimensions `(channel, D)`.
         e_absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.
             (Default: ``0.0``).
@@ -87,8 +88,8 @@ def ray_tracing(
         mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5)
         sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343.0``)
         energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``).
-            The initial enery of each ray is ``2 / num_rays``.
-        time_thres (float, optional):  The maximal duration (in seconds) for which rays are traced. (Defaut: 10.0)
+            The initial energy of each ray is ``2 / num_rays``.
+        time_thres (float, optional):  The maximal duration (in seconds) for which rays are traced. (Default: 10.0)
         hist_bin_size (float, optional): The size (in seconds) of each bin in the output histogram. (Default: 0.004)
     Returns:
         (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded. Each bin corresponds
@@ -96,13 +97,15 @@ def ray_tracing(
             where ``num_bins = ceil(time_thres / hist_bin_size)``. If both ``e_absorption`` and ``scattering``
             are floats, then ``num_bands == 1``.
     """
+    if room.ndim != 1 or room.shape[0] not in (2, 3):
+        raise ValueError(f"room must be a 1D tensor of shape (2,) or (3,), got shape={room.shape}")
     D = room.shape[0]
 
     if mic_array.ndim == 1:
         mic_array = mic_array[None, :]
     if mic_array.ndim != 2:
         raise ValueError(
-            f"mic_array must be 1D tensor of shape D, or 2D tensor of shape (num_mics, D) "
+            "mic_array must be 1D tensor of shape (D,), or 2D tensor of shape (num_mics, D) "
             f"where D is 2 or 3. Got shape = {mic_array.shape}."
         )
     if room.dtype not in (torch.float32, torch.float64):
@@ -118,15 +121,10 @@ def ray_tracing(
             f"Got {D}, {source.shape[0]}, and {mic_array.shape[1]}"
         )
     if time_thres < hist_bin_size:
-        raise ValueError(f"time_thres={time_thres} must be greater than hist_bin_size={hist_bin_size}.")
+        raise ValueError(f"time_thres={time_thres} must be at least greater than hist_bin_size={hist_bin_size}.")
 
-    num_walls = 4 if D == 2 else 6
-    e_absorption = _validate_absorption_scattering(
-        e_absorption, name="e_absorption", num_walls=num_walls, D=D, dtype=room.dtype
-    )
-    scattering = _validate_absorption_scattering(
-        scattering, name="scattering", num_walls=num_walls, D=D, dtype=room.dtype
-    )
+    e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", D=D, dtype=room.dtype)
+    scattering = _validate_absorption_scattering(scattering, name="scattering", D=D, dtype=room.dtype)
 
     # Bring e_absorption and scattering to the same shape
     if e_absorption.shape[0] == 1 and scattering.shape[0] > 1:
@@ -135,7 +133,7 @@ def ray_tracing(
         scattering = scattering.expand(e_absorption.shape)
     if e_absorption.shape != scattering.shape:
         raise ValueError(
-            f"e_absorption and scattering must have the same number of bands and walls. "
+            "e_absorption and scattering must have the same number of bands and walls. "
             f"Inferred shapes are {e_absorption.shape}  and {scattering.shape}"
         )
 

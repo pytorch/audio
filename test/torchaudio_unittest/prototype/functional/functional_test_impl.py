@@ -552,7 +552,18 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         assert hist.shape == expected_shape
 
     def test_ray_tracing_input_errors(self):
-        with self.assertRaisesRegex(ValueError, "mic_array must be 1D tensor of shape D, or 2D tensor"):
+        with self.assertRaisesRegex(ValueError, "room must be a 1D tensor"):
+            F.ray_tracing(
+                room=torch.tensor([[4, 5]]), source=torch.tensor([0, 0]), mic_array=torch.tensor([[3, 4]]), num_rays=10
+            )
+        with self.assertRaisesRegex(ValueError, "room must be a 1D tensor"):
+            F.ray_tracing(
+                room=torch.tensor([4, 5, 4, 5]),
+                source=torch.tensor([0, 0]),
+                mic_array=torch.tensor([[3, 4]]),
+                num_rays=10,
+            )
+        with self.assertRaisesRegex(ValueError, r"mic_array must be 1D tensor of shape \(D,\), or 2D tensor"):
             F.ray_tracing(
                 room=torch.tensor([4, 5]), source=torch.tensor([0, 0]), mic_array=torch.tensor([[[3, 4]]]), num_rays=10
             )
@@ -591,7 +602,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
                 mic_array=torch.tensor([3, 4], dtype=torch.float),
                 num_rays=10,
             )
-        with self.assertRaisesRegex(ValueError, "time_thres=10 must be greater than hist_bin_size=11"):
+        with self.assertRaisesRegex(ValueError, "time_thres=10 must be at least greater than hist_bin_size=11"):
             F.ray_tracing(
                 room=torch.tensor([4, 5], dtype=torch.float),
                 source=torch.tensor([0, 0], dtype=torch.float),
