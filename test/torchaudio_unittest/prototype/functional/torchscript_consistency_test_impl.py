@@ -116,10 +116,10 @@ class TorchScriptConsistencyCPUOnlyTestImpl(TorchScriptConsistencyTestImpl, Test
         scattering = torch.rand(num_bands, num_walls, dtype=torch.float32)
 
         energy_thres = 1e-7
-        time_thres = 10
+        time_thres = 10.0
         hist_bin_size = 0.004
         mic_radius = 0.5
-        sound_speed = 343
+        sound_speed = 343.0
 
         room_dim = torch.tensor(room_dim, dtype=self.dtype)
         source = torch.tensor(source, dtype=self.dtype)

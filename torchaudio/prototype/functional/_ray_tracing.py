@@ -71,6 +71,7 @@ def ray_tracing(
         source (torch.Tensor): The coordinate of the sound source. Tensor with dimensions `(D)`.
         mic_array (torch.Tensor): The coordinate of microphone array. Tensor with dimensions `(channel, D)`.
         e_absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.
+            (Default: ``0.0``).
             If the dtype is ``float``, the absorption coefficient is identical to all walls and
             all frequencies.
             If ``e_absorption`` is a 1D Tensor, the shape must be `(4,)` if the room is a 2D room,
@@ -82,7 +83,7 @@ def ray_tracing(
             or `(num_bands, 6)` if the room is a 3D room. ``num_bands`` is the number of frequency bands (usually 7),
             but you can choose other values.
         scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials.
-            The shape and type of this parameter is the same as for ``e_absorption``.
+            (Default: ``0.0``).  The shape and type of this parameter is the same as for ``e_absorption``.
         mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5m)
         sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343 m/s``)
         energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``).
