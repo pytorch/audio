@@ -6,7 +6,7 @@ import torch
 def _validate_absorption_scattering(
     v: Union[float, torch.Tensor], name: str, D: int, dtype: torch.dtype
 ) -> torch.Tensor:
-    """Validates and converts e_absorption or scattering parameters to a tensor with appropriate shape"""
+    """Validates and converts absorption or scattering parameters to a tensor with appropriate shape"""
     num_walls = 4 if D == 2 else 6
     if isinstance(v, float):
         out = torch.full(
@@ -44,7 +44,7 @@ def ray_tracing(
     source: torch.Tensor,
     mic_array: torch.Tensor,
     num_rays: int,
-    e_absorption: Union[float, torch.Tensor] = 0.0,
+    absorption: Union[float, torch.Tensor] = 0.0,
     scattering: Union[float, torch.Tensor] = 0.0,
     mic_radius: float = 0.5,
     sound_speed: float = 343.0,
@@ -71,20 +71,20 @@ def ray_tracing(
             are assumed to be "shoebox" rooms.
         source (torch.Tensor): The coordinate of the sound source. Tensor with dimensions `(D,)`.
         mic_array (torch.Tensor): The coordinate of microphone array. Tensor with dimensions `(channel, D)`.
-        e_absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.
+        absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.
             (Default: ``0.0``).
             If the dtype is ``float``, the absorption coefficient is identical to all walls and
             all frequencies.
-            If ``e_absorption`` is a 1D Tensor, the shape must be `(4,)` if the room is a 2D room,
+            If ``absorption`` is a 1D Tensor, the shape must be `(4,)` if the room is a 2D room,
             representing absorption coefficients of ``"west"``, ``"east"``, ``"south"``, and
             ``"north"`` walls, respectively.
             Or the shape must be `(6,)` if the room is a 3D room, representing absorption coefficients
             of ``"west"``, ``"east"``, ``"south"``, ``"north"``, ``"floor"``, and ``"ceiling"``, respectively.
-            If ``e_absorption`` is a 2D Tensor, the shape must be `(num_bands, 4)` if the room is a 2D room,
+            If ``absorption`` is a 2D Tensor, the shape must be `(num_bands, 4)` if the room is a 2D room,
             or `(num_bands, 6)` if the room is a 3D room. ``num_bands`` is the number of frequency bands (usually 7),
             but you can choose other values.
         scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials.
-            (Default: ``0.0``).  The shape and type of this parameter is the same as for ``e_absorption``.
+            (Default: ``0.0``).  The shape and type of this parameter is the same as for ``absorption``.
         mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5)
         sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343.0``)
         energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``).
@@ -94,7 +94,7 @@ def ray_tracing(
     Returns:
         (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded. Each bin corresponds
             to a given time slot. The shape is `(channel, num_bands, num_bins)`
-            where ``num_bins = ceil(time_thres / hist_bin_size)``. If both ``e_absorption`` and ``scattering``
+            where ``num_bins = ceil(time_thres / hist_bin_size)``. If both ``absorption`` and ``scattering``
             are floats, then ``num_bands == 1``.
     """
     if room.ndim != 1 or room.shape[0] not in (2, 3):
@@ -123,18 +123,18 @@ def ray_tracing(
     if time_thres < hist_bin_size:
         raise ValueError(f"time_thres={time_thres} must be at least greater than hist_bin_size={hist_bin_size}.")
 
-    e_absorption = _validate_absorption_scattering(e_absorption, name="e_absorption", D=D, dtype=room.dtype)
+    absorption = _validate_absorption_scattering(absorption, name="absorption", D=D, dtype=room.dtype)
     scattering = _validate_absorption_scattering(scattering, name="scattering", D=D, dtype=room.dtype)
 
-    # Bring e_absorption and scattering to the same shape
-    if e_absorption.shape[0] == 1 and scattering.shape[0] > 1:
-        e_absorption = e_absorption.expand(scattering.shape)
-    if scattering.shape[0] == 1 and e_absorption.shape[0] > 1:
-        scattering = scattering.expand(e_absorption.shape)
-    if e_absorption.shape != scattering.shape:
+    # Bring absorption and scattering to the same shape
+    if absorption.shape[0] == 1 and scattering.shape[0] > 1:
+        absorption = absorption.expand(scattering.shape)
+    if scattering.shape[0] == 1 and absorption.shape[0] > 1:
+        scattering = scattering.expand(absorption.shape)
+    if absorption.shape != scattering.shape:
         raise ValueError(
-            "e_absorption and scattering must have the same number of bands and walls. "
-            f"Inferred shapes are {e_absorption.shape}  and {scattering.shape}"
+            "absorption and scattering must have the same number of bands and walls. "
+            f"Inferred shapes are {absorption.shape}  and {scattering.shape}"
         )
 
     histograms = torch.ops.torchaudio.ray_tracing(
@@ -142,7 +142,7 @@ def ray_tracing(
         source,
         mic_array,
         num_rays,
-        e_absorption,
+        absorption,
         scattering,
         mic_radius,
         sound_speed,

@@ -112,7 +112,7 @@ class TorchScriptConsistencyCPUOnlyTestImpl(TorchScriptConsistencyTestImpl, Test
         num_walls = 4 if len(room_dim) == 2 else 6
         num_bands = 3
 
-        e_absorption = torch.rand(num_bands, num_walls, dtype=torch.float32)
+        absorption = torch.rand(num_bands, num_walls, dtype=torch.float32)
         scattering = torch.rand(num_bands, num_walls, dtype=torch.float32)
 
         energy_thres = 1e-7
@@ -132,7 +132,7 @@ class TorchScriptConsistencyCPUOnlyTestImpl(TorchScriptConsistencyTestImpl, Test
                 source,
                 mic_array,
                 num_rays,
-                e_absorption,
+                absorption,
                 scattering,
                 mic_radius,
                 sound_speed,

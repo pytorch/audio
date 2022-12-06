@@ -116,7 +116,7 @@ class RayTracer {
       const torch::Tensor& _source,
       const torch::Tensor& _mic_array,
       int _num_rays,
-      const torch::Tensor& _e_absorption,
+      const torch::Tensor& _absorption,
       const torch::Tensor& _scattering,
       scalar_t _mic_radius,
       scalar_t _sound_speed,
@@ -137,7 +137,7 @@ class RayTracer {
         max_dist(VAL(room.norm()) + (scalar_t)1.),
         D(room.size(0)),
         do_scattering(VAL(_scattering.max()) > (scalar_t)0.),
-        walls(make_walls(_e_absorption, _scattering)) {}
+        walls(make_walls(_absorption, _scattering)) {}
 
   /**
    * The main (and only) public entry point of this class. The histograms Tensor
@@ -445,7 +445,7 @@ class RayTracer {
    * corners of each wall.
    */
   std::vector<Wall<scalar_t>> make_walls(
-      const torch::Tensor& _e_absorption,
+      const torch::Tensor& _absorption,
       const torch::Tensor& _scattering) {
     auto room_a = room.accessor<scalar_t, 1>();
     scalar_t zero = 0;
@@ -501,7 +501,7 @@ class RayTracer {
 
     for (auto i = 0; i < normals.size(0); i++) {
       walls.push_back(Wall<scalar_t>(
-          _e_absorption.index({at::indexing::Slice(), i}),
+          _absorption.index({at::indexing::Slice(), i}),
           _scattering.index({at::indexing::Slice(), i}),
           normals[i],
           origins[i]));
@@ -525,7 +525,7 @@ torch::Tensor ray_tracing(
     const torch::Tensor& source,
     const torch::Tensor& mic_array,
     int64_t num_rays,
-    const torch::Tensor& e_absorption,
+    const torch::Tensor& absorption,
     const torch::Tensor& scattering,
     double mic_radius,
     double sound_speed,
@@ -533,7 +533,7 @@ torch::Tensor ray_tracing(
     double time_thres,
     double hist_bin_size) {
   auto num_mics = mic_array.size(0);
-  auto num_bands = e_absorption.size(0);
+  auto num_bands = absorption.size(0);
   auto num_bins = (int)ceil(time_thres / hist_bin_size);
   // Output shape will actually be (num_mics, num_bands, num_bins). We let
   // num_bands be the last dim during computation to make indexing cleaner in
@@ -547,7 +547,7 @@ torch::Tensor ray_tracing(
         source,
         mic_array,
         num_rays,
-        e_absorption,
+        absorption,
         scattering,
         mic_radius,
         sound_speed,
@@ -572,5 +572,5 @@ TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, Tensor e_absorption, Tensor scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor");
+      "torchaudio::ray_tracing(Tensor room, Tensor source, Tensor mic_array, int num_rays, Tensor absorption, Tensor scattering, float mic_radius, float sound_speed, float energy_thres, float time_thres, float hist_bin_size) -> Tensor");
 }

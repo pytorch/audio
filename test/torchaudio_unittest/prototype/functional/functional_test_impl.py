@@ -538,7 +538,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             (torch.rand(6, 4), torch.rand(6, 4), (2, 6, 2500)),
         ]
     )
-    def test_ray_tracing_output_shape(self, e_absorption, scattering, expected_shape):
+    def test_ray_tracing_output_shape(self, absorption, scattering, expected_shape):
         room_dim = torch.tensor([20, 25], dtype=self.dtype)
         mic_array = torch.tensor([[2, 2], [8, 8]], dtype=self.dtype)
         source = torch.tensor([7, 6], dtype=self.dtype)
@@ -549,7 +549,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             source=source,
             mic_array=mic_array,
             num_rays=num_rays,
-            e_absorption=e_absorption,
+            absorption=absorption,
             scattering=scattering,
         )
 
@@ -615,13 +615,13 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
                 time_thres=10,
                 hist_bin_size=11,
             )
-        with self.assertRaisesRegex(ValueError, "The shape of e_absorption must be"):
+        with self.assertRaisesRegex(ValueError, "The shape of absorption must be"):
             F.ray_tracing(
                 room=torch.tensor([4, 5], dtype=torch.float),
                 source=torch.tensor([0, 0], dtype=torch.float),
                 mic_array=torch.tensor([3, 4], dtype=torch.float),
                 num_rays=10,
-                e_absorption=torch.rand(5, dtype=torch.float),
+                absorption=torch.rand(5, dtype=torch.float),
             )
         with self.assertRaisesRegex(ValueError, "The shape of scattering must be"):
             F.ray_tracing(
@@ -631,13 +631,13 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
                 num_rays=10,
                 scattering=torch.rand(5, 5, dtype=torch.float),
             )
-        with self.assertRaisesRegex(ValueError, "The shape of e_absorption must be"):
+        with self.assertRaisesRegex(ValueError, "The shape of absorption must be"):
             F.ray_tracing(
                 room=torch.tensor([4, 5], dtype=torch.float),
                 source=torch.tensor([0, 0], dtype=torch.float),
                 mic_array=torch.tensor([3, 4], dtype=torch.float),
                 num_rays=10,
-                e_absorption=torch.rand(5, 5, dtype=torch.float),
+                absorption=torch.rand(5, 5, dtype=torch.float),
             )
         with self.assertRaisesRegex(ValueError, "The shape of scattering must be"):
             F.ray_tracing(
@@ -648,25 +648,25 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
                 scattering=torch.rand(5, dtype=torch.float),
             )
         with self.assertRaisesRegex(
-            ValueError, "e_absorption and scattering must have the same number of bands and walls"
+            ValueError, "absorption and scattering must have the same number of bands and walls"
         ):
             F.ray_tracing(
                 room=torch.tensor([4, 5], dtype=torch.float),
                 source=torch.tensor([0, 0], dtype=torch.float),
                 mic_array=torch.tensor([3, 4], dtype=torch.float),
                 num_rays=10,
-                e_absorption=torch.rand(6, 4, dtype=torch.float),
+                absorption=torch.rand(6, 4, dtype=torch.float),
                 scattering=torch.rand(5, 4, dtype=torch.float),
             )
 
-        # Make sure passing different shapes for e_abs or scattering doesn't raise an error
+        # Make sure passing different shapes for absorption or scattering doesn't raise an error
         # float and tensor
         F.ray_tracing(
             room=torch.tensor([4, 5], dtype=torch.float),
             source=torch.tensor([0, 0], dtype=torch.float),
             mic_array=torch.tensor([3, 4], dtype=torch.float),
             num_rays=10,
-            e_absorption=0.1,
+            absorption=0.1,
             scattering=torch.rand(5, 4, dtype=torch.float),
         )
         F.ray_tracing(
@@ -674,7 +674,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             source=torch.tensor([0, 0], dtype=torch.float),
             mic_array=torch.tensor([3, 4], dtype=torch.float),
             num_rays=10,
-            e_absorption=torch.rand(5, 4, dtype=torch.float),
+            absorption=torch.rand(5, 4, dtype=torch.float),
             scattering=0.1,
         )
         # per-wall only and per-band + per-wall
@@ -683,7 +683,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             source=torch.tensor([0, 0], dtype=torch.float),
             mic_array=torch.tensor([3, 4], dtype=torch.float),
             num_rays=10,
-            e_absorption=torch.rand(4, dtype=torch.float),
+            absorption=torch.rand(4, dtype=torch.float),
             scattering=torch.rand(6, 4, dtype=torch.float),
         )
         F.ray_tracing(
@@ -691,7 +691,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             source=torch.tensor([0, 0], dtype=torch.float),
             mic_array=torch.tensor([3, 4], dtype=torch.float),
             num_rays=10,
-            e_absorption=torch.rand(6, 4, dtype=torch.float),
+            absorption=torch.rand(6, 4, dtype=torch.float),
             scattering=torch.rand(4, dtype=torch.float),
         )
 
@@ -709,35 +709,35 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         num_rays = 1_000
         ABS, SCAT = 0.1, 0.2
 
-        e_absorption = torch.full(fill_value=ABS, size=(6, 4), dtype=self.dtype)
+        absorption = torch.full(fill_value=ABS, size=(6, 4), dtype=self.dtype)
         scattering = torch.full(fill_value=SCAT, size=(6, 4), dtype=self.dtype)
         hist_per_band_per_wall = F.ray_tracing(
             room=room_dim,
             source=source,
             mic_array=mic_array,
             num_rays=num_rays,
-            e_absorption=e_absorption,
+            absorption=absorption,
             scattering=scattering,
         )
-        e_absorption = torch.full(fill_value=ABS, size=(4,), dtype=self.dtype)
+        absorption = torch.full(fill_value=ABS, size=(4,), dtype=self.dtype)
         scattering = torch.full(fill_value=SCAT, size=(4,), dtype=self.dtype)
         hist_per_wall = F.ray_tracing(
             room=room_dim,
             source=source,
             mic_array=mic_array,
             num_rays=num_rays,
-            e_absorption=e_absorption,
+            absorption=absorption,
             scattering=scattering,
         )
 
-        e_absorption = ABS
+        absorption = ABS
         scattering = SCAT
         hist_single = F.ray_tracing(
             room=room_dim,
             source=source,
             mic_array=mic_array,
             num_rays=num_rays,
-            e_absorption=e_absorption,
+            absorption=absorption,
             scattering=scattering,
         )
         assert hist_per_band_per_wall.shape == (2, 6, 2500)
@@ -763,7 +763,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         num_walls = len(walls)
         num_bands = 6  # Note: in ray tracing, we don't need to restrict the number of bands to 7
 
-        e_absorption = torch.rand(num_bands, num_walls, dtype=self.dtype)
+        absorption = torch.rand(num_bands, num_walls, dtype=self.dtype)
         scattering = torch.rand(num_bands, num_walls, dtype=self.dtype)
         energy_thres = 1e-7
         time_thres = 10.0
@@ -781,7 +781,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             materials={
                 walls[i]: pra.Material(
                     energy_absorption={
-                        "coeffs": e_absorption[:, i].reshape(-1).detach().numpy(),
+                        "coeffs": absorption[:, i].reshape(-1).detach().numpy(),
                         "center_freqs": 125 * 2 ** np.arange(num_bands),
                     },
                     scattering={
@@ -813,7 +813,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
             source=source,
             mic_array=mic_array,
             num_rays=num_rays,
-            e_absorption=e_absorption,
+            absorption=absorption,
             scattering=scattering,
             sound_speed=sound_speed,
             mic_radius=mic_radius,
