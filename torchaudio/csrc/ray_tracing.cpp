@@ -46,15 +46,15 @@ template <typename scalar_t>
 class Wall {
  public:
   Wall(
-      const torch::Tensor& _absorption,
-      const torch::Tensor& _scattering,
-      const torch::Tensor& _normal,
-      const torch::Tensor& _origin)
-      : absorption(_absorption),
+      const torch::Tensor _absorption,
+      const torch::Tensor _scattering,
+      const torch::Tensor _normal,
+      const torch::Tensor _origin)
+      : absorption(std::move(_absorption)),
         reflection((scalar_t)1. - _absorption),
-        scattering(_scattering),
-        normal(_normal),
-        origin(_origin) {}
+        scattering(std::move(_scattering)),
+        normal(std::move(_normal)),
+        origin(std::move(_origin)) {}
 
   torch::Tensor get_absorption() {
     return absorption;
