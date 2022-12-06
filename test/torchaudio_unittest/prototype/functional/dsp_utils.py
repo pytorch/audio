@@ -35,3 +35,9 @@ def sinc_ir(cutoff: ArrayLike, window_size: int = 513, high_pass: bool = False):
         filt *= -1
         filt[..., half] = 1.0 + filt[..., half]
     return filt
+
+
+def freq_ir(magnitudes):
+    ir = np.fft.fftshift(np.fft.irfft(magnitudes), axes=-1)
+    window = np.hanning(ir.shape[-1])
+    return (ir * window).astype(magnitudes.dtype)

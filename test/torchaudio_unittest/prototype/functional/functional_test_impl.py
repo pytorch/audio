@@ -8,7 +8,7 @@ from scipy import signal
 from torchaudio.functional import lfilter
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
-from .dsp_utils import oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
+from .dsp_utils import freq_ir as freq_ir_np, oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
 
 
 def _prod(l):
@@ -469,6 +469,22 @@ class FunctionalTestImpl(TestBaseMixin):
         preemphasized = F.preemphasis(waveform, coeff=coeff)
         deemphasized = F.deemphasis(preemphasized, coeff=coeff)
         self.assertEqual(deemphasized, waveform)
+
+    def test_freq_ir_warns_negative_values(self):
+        """frequency_impulse_response warns negative input value"""
+        magnitudes = -torch.ones((1, 30), device=self.device, dtype=self.dtype)
+        with self.assertWarnsRegex(UserWarning, "^.+should not contain negative values.$"):
+            F.frequency_impulse_response(magnitudes)
+
+    @parameterized.expand([((2, 3, 4),), ((1000,),)])
+    def test_freq_ir_reference(self, shape):
+        """frequency_impulse_response produces the same result as reference implementation"""
+        magnitudes = torch.rand(shape, device=self.device, dtype=self.dtype)
+
+        hyp = F.frequency_impulse_response(magnitudes)
+        ref = freq_ir_np(magnitudes.cpu().numpy())
+
+        self.assertEqual(hyp, ref)
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):
