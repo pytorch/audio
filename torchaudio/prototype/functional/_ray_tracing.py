@@ -59,7 +59,7 @@ def ray_tracing(
     ``num_rays`` rays are casted uniformly in all directions from the source; when a ray intersects a wall,
     it is reflected and part of its energy is absorbed. It is also scattered (sent directly to the microphone(s))
     according to the ``scattering`` coefficient. When a ray is close to the microphone, its current energy is
-    recoreded in the output histogram for that given time slot.
+    recorded in the output histogram for that given time slot.
 
     .. devices:: CPU
 
