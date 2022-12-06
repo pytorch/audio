@@ -29,7 +29,7 @@ from IPython.display import Audio
 ######################################################################
 #
 
-SAMPLE_RATE = 44100
+SAMPLE_RATE = 16000
 duration = 1.2
 NUM_FRAMES = int(SAMPLE_RATE * duration)
 
@@ -62,7 +62,9 @@ def plot(mod, car, sample_rate=SAMPLE_RATE):
     num_samples = int(SAMPLE_RATE * 0.01)
     t = torch.linspace(0, num_samples / sample_rate, num_samples)
     axes[2].plot(t, car[..., :num_samples])
-    axes[3].plot(freqs, spectrum[:, spectrum.shape[1]//2], marker='+')
+
+    half = freqs.shape[0] // 2
+    axes[3].plot(freqs[:half], spectrum[:half, spectrum.shape[1]//2], marker='+')
 
 
 ######################################################################
@@ -80,11 +82,8 @@ Audio(car, rate=SAMPLE_RATE)
 mod, car = fm_synth(beta=10)
 plot(mod, car)
 Audio(car, rate=SAMPLE_RATE)
-######################################################################
-#
-mod, car = fm_synth(beta=100)
-plot(mod, car)
-Audio(car, rate=SAMPLE_RATE)
+
+
 ######################################################################
 #
 mod, car = fm_synth(beta=1, f1=0.01*F0)
@@ -97,7 +96,7 @@ plot(mod, car)
 Audio(car, rate=SAMPLE_RATE)
 ######################################################################
 #
-mod, car = fm_synth(beta=5, f1=0.1*F0)
+mod, car = fm_synth(beta=10, f1=0.1*F0)
 plot(mod, car)
 Audio(car, rate=SAMPLE_RATE)
 ######################################################################
@@ -108,10 +107,5 @@ Audio(car, rate=SAMPLE_RATE)
 ######################################################################
 #
 mod, car = fm_synth(beta=1, f1=10*F0)
-plot(mod, car)
-Audio(car, rate=SAMPLE_RATE)
-######################################################################
-#
-mod, car = fm_synth(beta=1, f1=100*F0)
 plot(mod, car)
 Audio(car, rate=SAMPLE_RATE)
