@@ -246,11 +246,6 @@ skipIfPy310 = _skipIf(
     ),
     key="ON_PYTHON_310",
 )
-skipIfNoPyRommAcoustics = _skipIf(
-    not is_module_available("pyroomacoustics"),
-    reason="pyroomacoustics not available",
-    key="NO_PYROOMACOUSTICS",
-)
 
 
 def zip_equal(*iterables):
