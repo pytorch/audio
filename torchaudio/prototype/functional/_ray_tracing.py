@@ -84,12 +84,12 @@ def ray_tracing(
             but you can choose other values.
         scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials.
             (Default: ``0.0``).  The shape and type of this parameter is the same as for ``e_absorption``.
-        mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5m)
-        sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343 m/s``)
+        mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5)
+        sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343.0``)
         energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``).
             The initial enery of each ray is ``2 / num_rays``.
-        time_thres (float, optional):  The maximal duration (in seconds) for which rays are traced. (Defaut: 10s)
-        hist_bin_size (float, optional): The size (in seconds) of each bin in the output histogram. (Default: 4ms)
+        time_thres (float, optional):  The maximal duration (in seconds) for which rays are traced. (Defaut: 10.0)
+        hist_bin_size (float, optional): The size (in seconds) of each bin in the output histogram. (Default: 0.004)
     Returns:
         (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded. Each bin corresponds
             to a given time slot. The shape is `(channel, num_bands, num_bins)`
