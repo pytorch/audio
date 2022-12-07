@@ -9,9 +9,11 @@ from torch.nn import Conv1d, ConvTranspose1d
 class HiFiGANGenerator(torch.nn.Module):
     """Generator part of *HiFi GAN* :cite:`NEURIPS2020_c5d73680`.
     From https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
+
     Note:
         To build the model, please use one of the factory functions: :py:func:`hifigan_model`, :py:func:`hifigan_v1`,
         :py:func:`hifigan_v2`, :py:func:`hifigan_v3`.
+
     Args:
         in_channels: (int): Number of channels in the input features.
         upsample_rates (tuple of int): Factors by which each upsampling layer increases the time dimension.
@@ -19,7 +21,7 @@ class HiFiGANGenerator(torch.nn.Module):
         upsample_kernel_sizes (tuple of int): Kernel size for each upsampling layer.
         resblock_kernel_sizes (tuple of int): Kernel size for each residual block.
         resblock_dilation_sizes (tuple of tuples of int): Dilation sizes for each 1D convolutional layer in each
-        residual block. For resblock type 1 inner tuples should have length ``3``, because there are ``3``
+            residual block. For resblock type 1 inner tuples should have length ``3``, because there are ``3``
             convolutions in each layer. For resblock type 2 they should have length 2.
         resblock_type (int, 1 or 2): Determines whether ``ResBlock1`` or ``ResBlock2`` will be used.
         lrelu_slope (float): Slope of leaky ReLUs in activations.
@@ -67,6 +69,7 @@ class HiFiGANGenerator(torch.nn.Module):
         """
         Args:
             x (Tensor): Feature input tensor of shape (batch_size, num_channels, time_length)
+
         Returns:
             Tensor of shape ``(batch_size, 1, time_length * upsample_rate)``, where ``upsample_rate`` is the product
             of upsample rates for all layers.
