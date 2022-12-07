@@ -74,3 +74,16 @@ class Autograd(TestBaseMixin):
         speed = T.SpeedPerturbation(1000, [0.9]).to(device=self.device, dtype=torch.float64)
         assert gradcheck(speed, (waveform, lengths))
         assert gradgradcheck(speed, (waveform, lengths))
+
+    def test_AddNoise(self):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L, dtype=torch.float64, device=self.device, requires_grad=True)
+        noise = torch.rand(*leading_dims, L, dtype=torch.float64, device=self.device, requires_grad=True)
+        lengths = torch.rand(*leading_dims, dtype=torch.float64, device=self.device, requires_grad=True)
+        snr = torch.rand(*leading_dims, dtype=torch.float64, device=self.device, requires_grad=True) * 10
+
+        add_noise = T.AddNoise().to(self.device, torch.float64)
+        assert gradcheck(add_noise, (waveform, noise, lengths, snr))
+        assert gradgradcheck(add_noise, (waveform, noise, lengths, snr))
