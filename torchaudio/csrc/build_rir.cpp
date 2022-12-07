@@ -27,6 +27,7 @@ SOFTWARE.
 using namespace torch::indexing;
 
 namespace torchaudio {
+namespace rir {
 namespace {
 
 /**
@@ -189,14 +190,23 @@ torch::Tensor make_rir_filter(
   return filters;
 }
 
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def(
-      "torchaudio::build_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor",
-      &torchaudio::build_rir);
-  m.def(
-      "torchaudio::make_rir_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor",
-      &torchaudio::make_rir_filter);
+} // Anonymous namespace
+
+TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
+  m.impl(
+   "torchaudio::build_rir",
+      &torchaudio::rir::build_rir);
+  m.impl(
+      "torchaudio::make_rir_filter",
+      &torchaudio::rir::make_rir_filter);
 }
 
-} // namespace
+} // namespace rir
 } // namespace torchaudio
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def(
+   "torchaudio::build_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor");
+  m.def(
+      "torchaudio::make_rir_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor");
+}
