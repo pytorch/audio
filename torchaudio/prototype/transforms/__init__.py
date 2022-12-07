@@ -1,6 +1,16 @@
-from ._transforms import BarkScale, BarkSpectrogram, Convolve, FFTConvolve, InverseBarkScale, Speed, SpeedPerturbation
+from ._transforms import (
+    AddNoise,
+    BarkScale,
+    BarkSpectrogram,
+    Convolve,
+    FFTConvolve,
+    InverseBarkScale,
+    Speed,
+    SpeedPerturbation,
+)
 
 __all__ = [
+    "AddNoise",
     "BarkScale",
     "BarkSpectrogram",
     "Convolve",
