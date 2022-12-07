@@ -1,3 +1,27 @@
+"""
+MIT License
+
+Copyright (c) 2020 Jungil Kong
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 from typing import Tuple
 
 import torch
@@ -11,8 +35,8 @@ class HiFiGANGenerator(torch.nn.Module):
     From https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
 
     Note:
-        To build the model, please use one of the factory functions: :py:func:`hifigan_model`, :py:func:`hifigan_v1`,
-        :py:func:`hifigan_v2`, :py:func:`hifigan_v3`.
+        To build the model, please use one of the factory functions: :py:func:`hifigan_generator`,
+        :py:func:`hifigan_generator_v1`, :py:func:`hifigan_generator_v2`, :py:func:`hifigan_generator_v3`.
 
     Args:
         in_channels: (int): Number of channels in the input features.
@@ -93,7 +117,9 @@ class HiFiGANGenerator(torch.nn.Module):
 
 @torch.jit.interface
 class ResBlockInterface(torch.nn.Module):
-    """Interface for torchscriptable ResBlock - used for type annotations"""
+    """Interface for ResBlock - necessary to make type annotations in ``HiFiGANGenerator.forward`` compatible
+    with TorchScript
+    """
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         pass
@@ -220,7 +246,7 @@ def get_padding(kernel_size, dilation=1):
     return int((kernel_size * dilation - dilation) / 2)
 
 
-def hifigan_model(
+def hifigan_generator(
     in_channels: int,
     upsample_rates: Tuple[int, ...],
     upsample_initial_channel: int,
@@ -256,13 +282,13 @@ def hifigan_model(
     )
 
 
-def hifigan_v1() -> HiFiGANGenerator:
+def hifigan_generator_v1() -> HiFiGANGenerator:
     r"""Builds HiFiGAN Generator with V1 architecture :cite:`NEURIPS2020_c5d73680`.
 
     Returns:
         HiFiGANGenerator: generated model.
     """
-    return hifigan_model(
+    return hifigan_generator(
         upsample_rates=(8, 8, 2, 2),
         upsample_kernel_sizes=(16, 16, 4, 4),
         upsample_initial_channel=512,
@@ -274,13 +300,13 @@ def hifigan_v1() -> HiFiGANGenerator:
     )
 
 
-def hifigan_v2() -> HiFiGANGenerator:
+def hifigan_generator_v2() -> HiFiGANGenerator:
     r"""Builds HiFiGAN Generator with V2 architecture :cite:`NEURIPS2020_c5d73680`.
 
     Returns:
         HiFiGANGenerator: generated model.
     """
-    return hifigan_model(
+    return hifigan_generator(
         upsample_rates=(8, 8, 2, 2),
         upsample_kernel_sizes=(16, 16, 4, 4),
         upsample_initial_channel=128,
@@ -292,13 +318,13 @@ def hifigan_v2() -> HiFiGANGenerator:
     )
 
 
-def hifigan_v3() -> HiFiGANGenerator:
+def hifigan_generator_v3() -> HiFiGANGenerator:
     r"""Builds HiFiGAN Generator with V3 architecture :cite:`NEURIPS2020_c5d73680`.
 
     Returns:
         HiFiGANGenerator: generated model.
     """
-    return hifigan_model(
+    return hifigan_generator(
         upsample_rates=(8, 8, 4),
         upsample_kernel_sizes=(16, 16, 8),
         upsample_initial_channel=256,

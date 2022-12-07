@@ -5,19 +5,16 @@ import sys
 
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models import hifigan_model, hifigan_v1, hifigan_v2, hifigan_v3
+from torchaudio.prototype.models import (
+    hifigan_generator,
+    hifigan_generator_v1,
+    hifigan_generator_v2,
+    hifigan_generator_v3,
+)
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class HiFiGANTestImpl(TestBaseMixin):
-    def _get_input_config(self):
-        model_config = self._get_model_config()
-        return {
-            "batch_size": 7,
-            "in_channels": model_config["in_channels"],
-            "time_length": 10,
-        }
-
     def _get_model_config(self):
         return {
             "upsample_rates": (8, 8, 4),
@@ -30,8 +27,16 @@ class HiFiGANTestImpl(TestBaseMixin):
             "lrelu_slope": 0.1,
         }
 
+    def _get_input_config(self):
+        model_config = self._get_model_config()
+        return {
+            "batch_size": 7,
+            "in_channels": model_config["in_channels"],
+            "time_length": 10,
+        }
+
     def _get_model(self):
-        return hifigan_model(**self._get_model_config()).to(device=self.device, dtype=self.dtype).eval()
+        return hifigan_generator(**self._get_model_config()).to(device=self.device, dtype=self.dtype).eval()
 
     def _get_inputs(self):
         input_config = self._get_input_config()
@@ -73,7 +78,7 @@ class HiFiGANTestImpl(TestBaseMixin):
         sys.path.pop(0)
         sys.path.pop(0)
 
-    @parameterized.expand([(hifigan_v1,), (hifigan_v2,), (hifigan_v3,)])
+    @parameterized.expand([(hifigan_generator_v1,), (hifigan_generator_v2,), (hifigan_generator_v3,)])
     def test_smoke(self, factory_func):
         r"""Verify that model architectures V1, V2, V3 can be constructed and applied on inputs"""
         model = factory_func().to(device=self.device, dtype=self.dtype)
