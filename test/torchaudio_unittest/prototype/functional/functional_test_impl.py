@@ -1,11 +1,21 @@
+import math
+
 import numpy as np
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
 from scipy import signal
+from torchaudio.functional import lfilter
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
-from .dsp_utils import oscillator_bank as oscillator_bank_np
+from .dsp_utils import freq_ir as freq_ir_np, oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
+
+
+def _prod(l):
+    r = 1
+    for p in l:
+        r *= p
+    return r
 
 
 class FunctionalTestImpl(TestBaseMixin):
@@ -54,16 +64,66 @@ class FunctionalTestImpl(TestBaseMixin):
 
         self.assertEqual(expected, actual)
 
-    @nested_params(
-        [F.convolve, F.fftconvolve],
-        [(4, 3, 1, 2), (1,)],
-        [(10, 4), (2, 2, 2)],
+    @parameterized.expand(
+        [
+            # fmt: off
+            ((5, 2, 3), (5, 1, 3)),
+            ((5, 2, 3), (1, 2, 3)),
+            ((5, 2, 3), (1, 1, 3)),
+            # fmt: on
+        ]
     )
-    def test_convolve_input_leading_dim_check(self, fn, x_shape, y_shape):
+    def test_fftconvolve_broadcast(self, x_shape, y_shape):
+        """fftconvolve works for Tensors for different shapes if they are broadcast-able"""
+        # 1. Test broad cast case
+        x = torch.rand(x_shape, dtype=self.dtype, device=self.device)
+        y = torch.rand(y_shape, dtype=self.dtype, device=self.device)
+        out1 = F.fftconvolve(x, y)
+        # 2. Test without broadcast
+        y_clone = y.expand(x_shape).clone()
+        assert y is not y_clone
+        assert y_clone.shape == x.shape
+        out2 = F.fftconvolve(x, y_clone)
+        # check that they are same
+        self.assertEqual(out1, out2)
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            # different ndim
+            (0, F.convolve, (4, 3, 1, 2), (10, 4)),
+            (0, F.convolve, (4, 3, 1, 2), (2, 2, 2)),
+            (0, F.convolve, (1, ), (10, 4)),
+            (0, F.convolve, (1, ), (2, 2, 2)),
+            (0, F.fftconvolve, (4, 3, 1, 2), (10, 4)),
+            (0, F.fftconvolve, (4, 3, 1, 2), (2, 2, 2)),
+            (0, F.fftconvolve, (1, ), (10, 4)),
+            (0, F.fftconvolve, (1, ), (2, 2, 2)),
+            # incompatible shape except the last dim
+            (1, F.convolve, (5, 2, 3), (5, 3, 3)),
+            (1, F.convolve, (5, 2, 3), (5, 3, 4)),
+            (1, F.convolve, (5, 2, 3), (5, 3, 5)),
+            (2, F.fftconvolve, (5, 2, 3), (5, 3, 3)),
+            (2, F.fftconvolve, (5, 2, 3), (5, 3, 4)),
+            (2, F.fftconvolve, (5, 2, 3), (5, 3, 5)),
+            # broadcast-able (only for convolve)
+            (1, F.convolve, (5, 2, 3), (5, 1, 3)),
+            (1, F.convolve, (5, 2, 3), (5, 1, 4)),
+            (1, F.convolve, (5, 2, 3), (5, 1, 5)),
+            # fmt: on
+        ],
+    )
+    def test_convolve_input_leading_dim_check(self, case, fn, x_shape, y_shape):
         """Check that convolve properly rejects inputs with different leading dimensions."""
         x = torch.rand(*x_shape, dtype=self.dtype, device=self.device)
         y = torch.rand(*y_shape, dtype=self.dtype, device=self.device)
-        with self.assertRaisesRegex(ValueError, "Leading dimensions"):
+
+        message = [
+            "The operands must be the same dimension",
+            "Leading dimensions of x and y don't match",
+            "Leading dimensions of x and y are not broadcastable",
+        ][case]
+        with self.assertRaisesRegex(ValueError, message):
             fn(x, y)
 
     def test_add_noise_broadcast(self):
@@ -289,6 +349,142 @@ class FunctionalTestImpl(TestBaseMixin):
             dtype=self.dtype,
         )
         self.assertEqual(out, torch.tensor(expected, device=self.device, dtype=self.dtype))
+
+    def test_extend_pitch(self):
+        num_frames = 5
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype)
+
+        num_pitches = 7
+        pattern = [i + 1 for i in range(num_pitches)]
+        expected = torch.tensor([pattern] * num_frames).to(dtype=self.dtype, device=self.device)
+
+        # passing int will append harmonic tones
+        output = F.extend_pitch(input, num_pitches)
+        self.assertEqual(output, expected)
+
+        # Same can be done with passing the list of multipliers
+        output = F.extend_pitch(input, pattern)
+        self.assertEqual(output, expected)
+
+        # or with tensor
+        pat = torch.tensor(pattern).to(dtype=self.dtype, device=self.device)
+        output = F.extend_pitch(input, pat)
+        self.assertEqual(output, expected)
+
+    @nested_params(
+        # fmt: off
+        [(1,), (10,), (2, 5), (3, 5, 7)],
+        [1, 3, 65, 129, 257, 513, 1025],
+        [True, False],
+        # fmt: on
+    )
+    def test_sinc_ir_shape(self, input_shape, window_size, high_pass):
+        """The shape of sinc_impulse_response is correct"""
+        numel = _prod(input_shape)
+        cutoff = torch.linspace(1, numel, numel).reshape(input_shape)
+        cutoff = cutoff.to(dtype=self.dtype, device=self.device)
+
+        filt = F.sinc_impulse_response(cutoff, window_size, high_pass)
+        assert filt.shape == input_shape + (window_size,)
+
+    @nested_params([True, False])
+    def test_sinc_ir_size(self, high_pass):
+        """Increasing window size expand the filter at the ends. Core parts must stay same"""
+        cutoff = torch.tensor([200, 300, 400, 500, 600, 700])
+        cutoff = cutoff.to(dtype=self.dtype, device=self.device)
+
+        filt_5 = F.sinc_impulse_response(cutoff, 5, high_pass)
+        filt_3 = F.sinc_impulse_response(cutoff, 3, high_pass)
+
+        self.assertEqual(filt_3, filt_5[..., 1:-1])
+
+    @nested_params(
+        # fmt: off
+        [0, 0.1, 0.5, 0.9, 1.0],
+        [1, 3, 5, 65, 129, 257, 513, 1025, 2049],
+        [False, True],
+        # fmt: on
+    )
+    def test_sinc_ir_reference(self, cutoff, window_size, high_pass):
+        """sinc_impulse_response produces the same result as reference implementation"""
+        cutoff = torch.tensor([cutoff], device=self.device, dtype=self.dtype)
+
+        hyp = F.sinc_impulse_response(cutoff, window_size, high_pass)
+        ref = sinc_ir_np(cutoff.cpu().numpy(), window_size, high_pass)
+
+        self.assertEqual(hyp, ref)
+
+    def test_speed_identity(self):
+        """speed of 1.0 does not alter input waveform and length"""
+        leading_dims = (5, 4, 2)
+        T = 1000
+        waveform = torch.rand(*leading_dims, T)
+        lengths = torch.randint(1, 1000, leading_dims)
+        actual_waveform, actual_lengths = F.speed(waveform, lengths, orig_freq=1000, factor=1.0)
+        self.assertEqual(waveform, actual_waveform)
+        self.assertEqual(lengths, actual_lengths)
+
+    @nested_params(
+        [0.8, 1.1, 1.2],
+    )
+    def test_speed_accuracy(self, factor):
+        """sinusoidal waveform is properly compressed by factor"""
+        n_to_trim = 20
+
+        sample_rate = 1000
+        freq = 2
+        times = torch.arange(0, 5, 1.0 / sample_rate)
+        waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
+        lengths = torch.tensor([waveform.size(1)])
+
+        output, output_lengths = F.speed(waveform, lengths, orig_freq=sample_rate, factor=factor)
+        self.assertEqual(output.size(1), output_lengths[0])
+
+        new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
+        expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)
+
+        self.assertEqual(
+            expected_waveform[..., n_to_trim:-n_to_trim], output[..., n_to_trim:-n_to_trim], atol=1e-1, rtol=1e-4
+        )
+
+    @nested_params(
+        [(3, 2, 100), (95,)],
+        [0.97, 0.9, 0.68],
+    )
+    def test_preemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
+        actual = F.preemphasis(waveform, coeff=coeff)
+
+        a_coeffs = torch.tensor([1.0, 0.0], device=self.device, dtype=self.dtype)
+        b_coeffs = torch.tensor([1.0, -coeff], device=self.device, dtype=self.dtype)
+        expected = lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+        self.assertEqual(actual, expected)
+
+    @nested_params(
+        [(3, 2, 100), (95,)],
+        [0.97, 0.9, 0.68],
+    )
+    def test_preemphasis_deemphasis_roundtrip(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
+        preemphasized = F.preemphasis(waveform, coeff=coeff)
+        deemphasized = F.deemphasis(preemphasized, coeff=coeff)
+        self.assertEqual(deemphasized, waveform)
+
+    def test_freq_ir_warns_negative_values(self):
+        """frequency_impulse_response warns negative input value"""
+        magnitudes = -torch.ones((1, 30), device=self.device, dtype=self.dtype)
+        with self.assertWarnsRegex(UserWarning, "^.+should not contain negative values.$"):
+            F.frequency_impulse_response(magnitudes)
+
+    @parameterized.expand([((2, 3, 4),), ((1000,),)])
+    def test_freq_ir_reference(self, shape):
+        """frequency_impulse_response produces the same result as reference implementation"""
+        magnitudes = torch.rand(shape, device=self.device, dtype=self.dtype)
+
+        hyp = F.frequency_impulse_response(magnitudes)
+        ref = freq_ir_np(magnitudes.cpu().numpy())
+
+        self.assertEqual(hyp, ref)
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):

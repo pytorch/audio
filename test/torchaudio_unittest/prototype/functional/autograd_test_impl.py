@@ -54,3 +54,40 @@ class AutogradTestImpl(TestBaseMixin):
         amps = torch.linspace(-5, 5, numel, dtype=self.dtype, device=self.device, requires_grad=True).reshape(shape)
 
         assert gradcheck(F.oscillator_bank, (freq, amps, sample_rate))
+
+    def test_extend_pitch(self):
+        num_frames, num_pitches = 5, 7
+        input = torch.ones((num_frames, 1), device=self.device, dtype=self.dtype, requires_grad=True)
+        pattern = torch.linspace(1, num_pitches, num_pitches, device=self.device, dtype=self.dtype, requires_grad=True)
+
+        assert gradcheck(F.extend_pitch, (input, num_pitches))
+        assert gradcheck(F.extend_pitch, (input, pattern))
+
+    def test_sinc_ir(self):
+        cutoff = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype, requires_grad=True)
+        assert gradcheck(F.sinc_impulse_response, (cutoff, 513, False))
+        assert gradcheck(F.sinc_impulse_response, (cutoff, 513, True))
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        self.assertTrue(gradcheck(F.speed, (waveform, lengths, 1000, 1.1)))
+        self.assertTrue(gradgradcheck(F.speed, (waveform, lengths, 1000, 1.1)))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assertTrue(gradcheck(F.preemphasis, (waveform, coeff)))
+        self.assertTrue(gradgradcheck(F.preemphasis, (waveform, coeff)))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assertTrue(gradcheck(F.deemphasis, (waveform, coeff)))
+        self.assertTrue(gradgradcheck(F.deemphasis, (waveform, coeff)))
+
+    def test_freq_ir(self):
+        mags = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype, requires_grad=True)
+        assert gradcheck(F.frequency_impulse_response, (mags,))

@@ -1,21 +1,32 @@
 import math
 import warnings
 
-import torch
+from typing import Tuple
 
+import torch
+from torchaudio.functional import lfilter, resample
 from torchaudio.functional.functional import _create_triangular_filterbank
+
+
+def _check_shape_compatible(x: torch.Tensor, y: torch.Tensor, allow_broadcast: bool) -> None:
+    if x.ndim != y.ndim:
+        raise ValueError(f"The operands must be the same dimension (got {x.ndim} and {y.ndim}).")
+    if not allow_broadcast:
+        if x.shape[:-1] != y.shape[:-1]:
+            raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
+    else:
+        for i in range(x.ndim - 1):
+            xi = x.size(i)
+            yi = y.size(i)
+            if xi == yi or xi == 1 or yi == 1:
+                continue
+            raise ValueError(f"Leading dimensions of x and y are not broadcastable (got {x.shape} and {y.shape}).")
 
 
 def _check_convolve_mode(mode: str) -> None:
     valid_convolve_modes = ["full", "valid", "same"]
     if mode not in valid_convolve_modes:
         raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
-
-
-def _check_convolve_inputs(x: torch.Tensor, y: torch.Tensor, mode: str) -> None:
-    if x.shape[:-1] != y.shape[:-1]:
-        raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
-    _check_convolve_mode(mode)
 
 
 def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
@@ -48,7 +59,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
     Args:
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
-            (leading dimensions must match those of ``x``).
+            (leading dimensions must be broadcast-able to those of ``x``).
         mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
@@ -63,7 +74,8 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_convolve_inputs(x, y, mode)
+    _check_shape_compatible(x, y, allow_broadcast=True)
+    _check_convolve_mode(mode)
 
     n = x.size(-1) + y.size(-1) - 1
     fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
@@ -99,7 +111,8 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_convolve_inputs(x, y, mode)
+    _check_shape_compatible(x, y, allow_broadcast=False)
+    _check_convolve_mode(mode)
 
     x_size, y_size = x.size(-1), y.size(-1)
 
@@ -295,3 +308,81 @@ def barkscale_fbanks(
         )
 
     return fb
+
+
+def speed(
+    waveform: torch.Tensor, lengths: torch.Tensor, orig_freq: int, factor: float
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    r"""Adjusts waveform speed.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+        lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factor (float): Factor by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+
+    Returns:
+        (torch.Tensor, torch.Tensor):
+            torch.Tensor
+                Speed-adjusted waveform, with shape `(..., new_time).`
+            torch.Tensor
+                Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+    """
+
+    source_sample_rate = int(factor * orig_freq)
+    target_sample_rate = int(orig_freq)
+
+    gcd = math.gcd(source_sample_rate, target_sample_rate)
+    source_sample_rate = source_sample_rate // gcd
+    target_sample_rate = target_sample_rate // gcd
+
+    return resample(waveform, source_sample_rate, target_sample_rate), torch.ceil(
+        lengths * target_sample_rate / source_sample_rate
+    ).to(lengths.dtype)
+
+
+def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+    r"""Pre-emphasizes a waveform along its last dimension, i.e.
+    for each signal :math:`x` in ``waveform``, computes
+    output :math:`y` as
+
+    .. math::
+        y[i] = x[i] - \text{coeff} \cdot x[i - 1]
+
+    Args:
+        waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+
+    Returns:
+        torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
+    """
+    waveform = waveform.clone()
+    waveform[..., 1:] -= coeff * waveform[..., :-1]
+    return waveform
+
+
+def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+    r"""De-emphasizes a waveform along its last dimension.
+    Inverse of :meth:`preemphasis`. Concretely, for each signal
+    :math:`x` in ``waveform``, computes output :math:`y` as
+
+    .. math::
+        y[i] = x[i] + \text{coeff} \cdot y[i - 1]
+
+    Args:
+        waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+
+    Returns:
+        torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+    """
+    a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
+    b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
+    return lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)

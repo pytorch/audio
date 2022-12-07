@@ -39,6 +39,9 @@ model implementations and application components.
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
 
+   tutorials/oscillator_tutorial
+   tutorials/additive_synthesis_tutorial
+
    tutorials/audio_datasets_tutorial
 
 .. toctree::
@@ -90,6 +93,7 @@ model implementations and application components.
    :hidden:
 
    prototype
+   prototype.datasets
    prototype.functional
    prototype.models
    prototype.pipelines
@@ -182,6 +186,20 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_feature_augmentation_tutorial.png
    :link: tutorials/audio_feature_augmentation_tutorial.html
    :tags: Preprocessing
+
+.. customcarditem::
+   :header: Generating waveforms with oscillator
+   :card_description:
+   :image: _images/sphx_glr_oscillator_tutorial_003.png
+   :link: tutorials/oscillator_tutorial.html
+   :tags: DSP
+
+.. customcarditem::
+   :header: Additive Synthesis
+   :card_description:
+   :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
+   :link: tutorials/additive_synthesis_tutorial.html
+   :tags: DSP
 
 .. customcarditem::
    :header: Audio dataset
