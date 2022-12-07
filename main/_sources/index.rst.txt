@@ -93,6 +93,7 @@ model implementations and application components.
    :hidden:
 
    prototype
+   prototype.datasets
    prototype.functional
    prototype.models
    prototype.pipelines
