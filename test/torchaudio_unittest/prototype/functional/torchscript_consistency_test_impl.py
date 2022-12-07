@@ -98,3 +98,7 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
         coeff = 0.9
         self._assert_consistency(F.deemphasis, (waveform, coeff))
+
+    def test_freq_ir(self):
+        mags = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype)
+        self._assert_consistency(F.frequency_impulse_response, (mags,))
