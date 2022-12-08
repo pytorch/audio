@@ -59,6 +59,9 @@ Factory Functions
    hdemucs_low
    hdemucs_medium
    hdemucs_high
+   wavlm_model
+   wavlm_base
+   wavlm_large
 
 Utility Functions
 -----------------

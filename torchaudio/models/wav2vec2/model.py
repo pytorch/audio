@@ -12,10 +12,10 @@ class Wav2Vec2Model(Module):
     """Acoustic model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.
 
     Note:
-        To build the model, please use one of the factory functions.
-        :py:func:`wav2vec2_model`, :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`,
-        :py:func:`wav2vec2_large_lv60k`, :py:func:`hubert_base`, :py:func:`hubert_large`,
-        and :py:func:`hubert_xlarge`.
+        To build the model, please use one of the factory functions: :py:func:`wav2vec2_model`,
+        :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`, :py:func:`wav2vec2_large_lv60k`,
+        :py:func:`hubert_base`, :py:func:`hubert_large`, :py:func:`hubert_xlarge`,
+        :py:func:`wavlm_model`, :py:func:`wavlm_base`, and :py:func:`wavlm_large`.
 
     See Also:
         * :class:`torchaudio.pipelines.Wav2Vec2Bundle`: Pretrained models (without fine-tuning)
