@@ -8,6 +8,13 @@ from ._conformer_wav2vec2 import (
 )
 from ._emformer_hubert import emformer_hubert_base, emformer_hubert_model
 from .conv_emformer import ConvEmformer
+from .hifi_gan import (
+    hifigan_generator,
+    hifigan_generator_v1,
+    hifigan_generator_v2,
+    hifigan_generator_v3,
+    HiFiGANGenerator,
+)
 from .rnnt import conformer_rnnt_base, conformer_rnnt_model
 
 __all__ = [
@@ -22,4 +29,9 @@ __all__ = [
     "ConformerWav2Vec2PretrainModel",
     "emformer_hubert_base",
     "emformer_hubert_model",
+    "HiFiGANGenerator",
+    "hifigan_generator_v1",
+    "hifigan_generator_v2",
+    "hifigan_generator_v3",
+    "hifigan_generator",
 ]
