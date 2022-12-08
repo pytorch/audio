@@ -15,7 +15,8 @@ def streamreader_test():
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--streamreader', dest='streamreader', action='store_true')
+    parser.add_argument('--streamreader', action='store_true')
+    parser.add_argument('--no-streamreader', dest='streamreader', action='store_false')
     parser.set_defaults(streamreader=True)
 
     options = parser.parse_args()
