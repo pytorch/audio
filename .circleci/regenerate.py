@@ -51,8 +51,7 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                         fb = "/.*/"
 
                     # We'll stop building Linux Wheels from CircleCI.
-                    # Keeping the Python3.8 build just for docstring_parameters_sync until this job is migrated as well.
-                    if os_type == "linux" and btype == "wheel" and (python_version != "3.8" or cu_version != "cpu"):
+                    if os_type == "linux" and btype == "wheel":
                         continue
 
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
@@ -93,19 +92,17 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
     w = []
     base_workflow_name = f"{prefix}binary_{os_type}_{btype}_py{python_version}_{cu_version}"
     w.append(generate_base_workflow(base_workflow_name, python_version, cu_version, filter_branch, os_type, btype))
-    skip_job = os_type == "linux" and btype == "wheel" and python_version == "3.8" and cu_version == "cpu"
 
-    if not skip_job:
-        if upload:
-            w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
+    if upload:
+        w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
 
-        if os_type != "macos":
-            pydistro = "pip" if btype == "wheel" else "conda"
-            w.append(
-                generate_smoketest_workflow(
-                    pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
-                )
+    if os_type != "macos":
+        pydistro = "pip" if btype == "wheel" else "conda"
+        w.append(
+            generate_smoketest_workflow(
+                pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
             )
+        )
 
     return w
 
