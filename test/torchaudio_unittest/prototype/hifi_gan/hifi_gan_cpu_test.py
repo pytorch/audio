@@ -1,6 +1,7 @@
 import torch
 from torchaudio_unittest.common_utils import PytorchTestCase
-from torchaudio_unittest.prototype.hifi_gan.hifi_gan_test_impl import HiFiGANTestImpl
+
+from .hifi_gan_test_impl import HiFiGANTestImpl
 
 
 class HiFiGANFloat32CPUTest(HiFiGANTestImpl, PytorchTestCase):
