@@ -32,20 +32,20 @@ from torch.nn import Conv1d, ConvTranspose1d
 
 class HiFiGANGenerator(torch.nn.Module):
     """Generator part of *HiFi GAN* :cite:`NEURIPS2020_c5d73680`.
-    From https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
+    Source: https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
 
     Note:
         To build the model, please use one of the factory functions: :py:func:`hifigan_generator`,
         :py:func:`hifigan_generator_v1`, :py:func:`hifigan_generator_v2`, :py:func:`hifigan_generator_v3`.
 
     Args:
-        in_channels: (int): Number of channels in the input features.
-        upsample_rates (tuple of int): Factors by which each upsampling layer increases the time dimension.
+        in_channels (int): Number of channels in the input features.
+        upsample_rates (tuple of ``int``): Factors by which each upsampling layer increases the time dimension.
         upsample_initial_channel (int): Number of channels in the input feature tensor.
-        upsample_kernel_sizes (tuple of int): Kernel size for each upsampling layer.
-        resblock_kernel_sizes (tuple of int): Kernel size for each residual block.
-        resblock_dilation_sizes (tuple of tuples of int): Dilation sizes for each 1D convolutional layer in each
-            residual block. For resblock type 1 inner tuples should have length ``3``, because there are ``3``
+        upsample_kernel_sizes (tuple of ``int``): Kernel size for each upsampling layer.
+        resblock_kernel_sizes (tuple of ``int``): Kernel size for each residual block.
+        resblock_dilation_sizes (tuple of tuples of ``int``): Dilation sizes for each 1D convolutional layer in each
+            residual block. For resblock type 1 inner tuples should have length 3, because there are 3
             convolutions in each layer. For resblock type 2 they should have length 2.
         resblock_type (int, 1 or 2): Determines whether ``ResBlock1`` or ``ResBlock2`` will be used.
         lrelu_slope (float): Slope of leaky ReLUs in activations.
@@ -92,10 +92,10 @@ class HiFiGANGenerator(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x (Tensor): Feature input tensor of shape (batch_size, num_channels, time_length)
+            x (Tensor): Feature input tensor of shape `(batch_size, num_channels, time_length)`.
 
         Returns:
-            Tensor of shape ``(batch_size, 1, time_length * upsample_rate)``, where ``upsample_rate`` is the product
+            Tensor of shape `(batch_size, 1, time_length * upsample_rate)`, where `upsample_rate` is the product
             of upsample rates for all layers.
         """
         x = self.conv_pre(x)
@@ -130,7 +130,7 @@ class ResBlock1(torch.nn.Module):
     Args:
         channels (int): Number of channels in the input features.
         kernel_size (int, optional): Kernel size for 1D convolutions. (Default: ``3``)
-        dilation (tuple of 3 ints, optional): Dilations for each 1D convolution. (Default: ``(1, 3, 5)``)
+        dilation (tuple of 3 ``int``, optional): Dilations for each 1D convolution. (Default: ``(1, 3, 5)``)
         lrelu_slope (float): Slope of leaky ReLUs in activations.
     """
 
@@ -197,7 +197,7 @@ class ResBlock2(torch.nn.Module):
     Args:
         channels (int): Number of channels in the input features.
         kernel_size (int, optional): Kernel size for 1D convolutions. (Default: ``3``)
-        dilation (tuple of 2 ints, optional): Dilations for each 1D convolution. (Default: ``(1, 3)``)
+        dilation (tuple of 2 ``int``, optional): Dilations for each 1D convolution. (Default: ``(1, 3)``)
         lrelu_slope (float): Slope of leaky ReLUs in activations.
     """
 
@@ -257,14 +257,14 @@ def hifigan_generator(
     lrelu_slope: float,
 ) -> HiFiGANGenerator:
     r"""Builds HiFi GAN Generator :cite:`NEURIPS2020_c5d73680`.
+
     Args:
         in_channels (int): See :py:class:`HiFiGANGenerator`.
-        upsample_rates: See :py:class:`HiFiGANGenerator`.
-        upsample_rates (tuple of int): See :py:class:`HiFiGANGenerator`.
+        upsample_rates (tuple of ``int``): See :py:class:`HiFiGANGenerator`.
         upsample_initial_channel (int): See :py:class:`HiFiGANGenerator`.
-        upsample_kernel_sizes (tuple of int): See :py:class:`HiFiGANGenerator`.
-        resblock_kernel_sizes (tuple of int): See :py:class:`HiFiGANGenerator`.
-        resblock_dilation_sizes (tuple of tuples of int): See :py:class:`HiFiGANGenerator`.
+        upsample_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANGenerator`.
+        resblock_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANGenerator`.
+        resblock_dilation_sizes (tuple of tuples of ``int``): See :py:class:`HiFiGANGenerator`.
         resblock_type (int, 1 or 2): See :py:class:`HiFiGANGenerator`.
     Returns:
         HiFiGANGenerator: generated model.
