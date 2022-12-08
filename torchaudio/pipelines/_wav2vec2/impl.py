@@ -1317,7 +1317,7 @@ pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`71
 Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT License and
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
-`Source https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+`Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
@@ -1364,7 +1364,7 @@ and 24,000 hours of *VoxPopuli* :cite:`voxpopuli`, not fine-tuned.
 Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT License and
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
-`Source https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+`Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
@@ -1411,7 +1411,7 @@ and 24,000 hours of *VoxPopuli* :cite:`voxpopuli`, not fine-tuned.
 Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT License and
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
-`Source https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+`Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
