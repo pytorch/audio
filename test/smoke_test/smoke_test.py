@@ -17,8 +17,9 @@ def ffmpeg_test():
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+
+    # Warning: Please note this option should not be widely used, only use it when absolutely necessary
     parser.add_argument("--no-ffmpeg", dest="ffmpeg", action="store_false")
-    parser.set_defaults(ffmpeg=True)
 
     options = parser.parse_args()
     if options.ffmpeg:
