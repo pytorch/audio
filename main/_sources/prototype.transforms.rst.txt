@@ -9,6 +9,7 @@ torchaudio.prototype.transforms
     :toctree: generated
     :nosignatures:
 
+    AddNoise
     Convolve
     FFTConvolve
     BarkScale
