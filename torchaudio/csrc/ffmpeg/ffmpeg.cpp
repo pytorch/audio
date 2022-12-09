@@ -48,11 +48,17 @@ AVFormatInputContextPtr::AVFormatInputContextPtr(AVFormatContext* p)
     : Wrapper<AVFormatContext, AVFormatInputContextDeleter>(p) {}
 
 void AVFormatOutputContextDeleter::operator()(AVFormatContext* p) {
+  std::cerr << "DELETING AVFORMATOUTPUTCONTEXT" << std::endl;
+  std::cerr << "AVFormatOutputContextDeleter: p: " << p << std::endl;
+  avio_closep(&(p->pb));
   avformat_free_context(p);
 };
 
 AVFormatOutputContextPtr::AVFormatOutputContextPtr(AVFormatContext* p)
-    : Wrapper<AVFormatContext, AVFormatOutputContextDeleter>(p) {}
+    : Wrapper<AVFormatContext, AVFormatOutputContextDeleter>(p) {
+  std::cerr << "INITIALIZING AVFORMATOUTPUTCONTEXT" << std::endl;
+  std::cerr << "AVFormatOutputContextPtr: p: " << p << std::endl;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVIO
