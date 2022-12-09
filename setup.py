@@ -149,8 +149,10 @@ def _main():
         version=version,
         description="An audio package for PyTorch",
         url="https://github.com/pytorch/audio",
-        author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough",
+        author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
         author_email="soumith@pytorch.org",
+        maintainer="Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
+        maintainer_email="moto@meta.com",
         classifiers=[
             "Environment :: Plugins",
             "Intended Audience :: Developers",
