@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221208) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221209) &#x25BC</a>
     </div>
     
 
@@ -397,10 +397,10 @@
     <span class="sd">&quot;&quot;&quot;Acoustic model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        To build the model, please use one of the factory functions.</span>
-<span class="sd">        :py:func:`wav2vec2_model`, :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`,</span>
-<span class="sd">        :py:func:`wav2vec2_large_lv60k`, :py:func:`hubert_base`, :py:func:`hubert_large`,</span>
-<span class="sd">        and :py:func:`hubert_xlarge`.</span>
+<span class="sd">        To build the model, please use one of the factory functions: :py:func:`wav2vec2_model`,</span>
+<span class="sd">        :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`, :py:func:`wav2vec2_large_lv60k`,</span>
+<span class="sd">        :py:func:`hubert_base`, :py:func:`hubert_large`, :py:func:`hubert_xlarge`,</span>
+<span class="sd">        :py:func:`wavlm_model`, :py:func:`wavlm_base`, and :py:func:`wavlm_large`.</span>
 
 <span class="sd">    See Also:</span>
 <span class="sd">        * :class:`torchaudio.pipelines.Wav2Vec2Bundle`: Pretrained models (without fine-tuning)</span>
@@ -1603,7 +1603,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">wavlm_model</span><span class="p">(</span>
+<div class="viewcode-block" id="wavlm_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_model.html#torchaudio.models.wavlm_model">[docs]</a><span class="k">def</span> <span class="nf">wavlm_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
     <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1712,10 +1712,10 @@
     <span class="n">aux</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">aux_num_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">aux</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_embed_dim</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">wavlm_base</span><span class="p">(</span>
+<div class="viewcode-block" id="wavlm_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_base.html#torchaudio.models.wavlm_base">[docs]</a><span class="k">def</span> <span class="nf">wavlm_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -1764,10 +1764,10 @@
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">wavlm_large</span><span class="p">(</span>
+<div class="viewcode-block" id="wavlm_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_large.html#torchaudio.models.wavlm_large">[docs]</a><span class="k">def</span> <span class="nf">wavlm_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1816,7 +1816,7 @@
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
         <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 </pre></div>
 
              </article>

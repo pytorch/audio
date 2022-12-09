@@ -56,7 +56,7 @@ Pretrained Models
 
 
 wav2vec 2.0 / HuBERT / WavLM - SSL
---------------------------
+----------------------------------
 
 Interface
 ^^^^^^^^^

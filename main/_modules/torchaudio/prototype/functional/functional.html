@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221208) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221209) &#x25BC</a>
     </div>
     
 
@@ -739,6 +739,10 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        y[i] = x[i] - \text{coeff} \cdot x[i - 1]</span>
 
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (torch.Tensor): Waveform, with shape `(..., N)`.</span>
 <span class="sd">        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.</span>
@@ -759,6 +763,10 @@
 
 <span class="sd">    .. math::</span>
 <span class="sd">        y[i] = x[i] + \text{coeff} \cdot y[i - 1]</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (torch.Tensor): Waveform, with shape `(..., N)`.</span>
