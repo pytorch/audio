@@ -129,8 +129,8 @@ class HuBERTPretrainModel(Module):
         To build the model, please use one of the factory functions.
 
     See Also:
-        `HuBERT Pre-training and Fine-tuning Examples
-        <https://github.com/pytorch/audio/tree/release/0.12/examples/hubert>`__
+        `HuBERT Pre-training and Fine-tuning Recipes
+        <https://github.com/pytorch/audio/tree/main/examples/hubert>`__
 
     Args:
         wav2vec2 (Wav2Vec2Model):
