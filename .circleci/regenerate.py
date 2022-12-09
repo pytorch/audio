@@ -49,6 +49,10 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                     ):
                         # the fields must match the build_docs "requires" dependency
                         fb = "/.*/"
+
+                    if os_type == "macos" and btype == "wheel":
+                        continue
+
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
 
     if not filter_branch:
