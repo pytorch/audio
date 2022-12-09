@@ -1,5 +1,6 @@
 """Run smoke tests"""
 
+import argparse
 import torchaudio  # noqa: F401
 import torchaudio.compliance.kaldi  # noqa: F401
 import torchaudio.datasets  # noqa: F401
