@@ -13,9 +13,7 @@ AVFormatOutputContextPtr get_output_format_context(
         "`format` must be provided when the input is file-like object.");
   }
 
-  AVFormatContext* p = avformat_alloc_context();
-  TORCH_CHECK(p, "Failed to allocate AVFormatContext.");
-
+  AVFormatContext* p = nullptr;
   int ret = avformat_alloc_output_context2(
       &p, nullptr, format ? format.value().c_str() : nullptr, dst.c_str());
   TORCH_CHECK(
