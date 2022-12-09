@@ -525,7 +525,7 @@ void StreamWriter::add_video_stream(
     return get_video_frame(src_fmt, ctx);
   }();
   AVFramePtr dst_frame =
-      filter ? get_video_frame(ctx->pix_fmt, ctx) : AVFramePtr{};
+      filter ? AVFramePtr{} : get_video_frame(ctx->pix_fmt, ctx);
   streams.emplace_back(OutputStream{
       stream,
       std::move(ctx),
