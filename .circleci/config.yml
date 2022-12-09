@@ -1373,6 +1373,13 @@ workflows:
           python_version: '3.10'
           requires:
           - binary_windows_wheel_py3.10_cu117
+      - binary_linux_conda:
+          conda_docker_image: pytorch/conda-builder:cuda116
+          cuda_version: cu116
+          name: binary_linux_conda_py3.8_cu116
+          python_version: '3.8'
+          requires:
+          - build_ffmpeg_linux
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -2979,6 +2986,19 @@ workflows:
           python_version: '3.10'
           requires:
           - nightly_binary_windows_wheel_py3.10_cu117
+      - binary_linux_conda:
+          conda_docker_image: pytorch/conda-builder:cuda116
+          cuda_version: cu116
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_conda_py3.8_cu116
+          python_version: '3.8'
+          requires:
+          - build_ffmpeg_linux
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
