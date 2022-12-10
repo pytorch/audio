@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import BinaryIO, Dict, Optional, Union
 
 import torch
 import torchaudio
@@ -50,7 +50,7 @@ class StreamWriter:
     """Encode and write audio/video streams chunk by chunk
 
     Args:
-        dst (str): The destination where the encoded data are written.
+        dst (str or file-like object): The destination where the encoded data are written.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. The supported value depends on the FFmpeg found in the system.
 
@@ -100,7 +100,7 @@ class StreamWriter:
 
     def __init__(
         self,
-        dst: str,
+        dst: Union[str, BinaryIO],
         format: Optional[str] = None,
         buffer_size: int = 4096,
     ):
