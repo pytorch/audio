@@ -12,10 +12,7 @@ class Wav2Vec2Model(Module):
     """Acoustic model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.
 
     Note:
-        To build the model, please use one of the factory functions: :py:func:`wav2vec2_model`,
-        :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`, :py:func:`wav2vec2_large_lv60k`,
-        :py:func:`hubert_base`, :py:func:`hubert_large`, :py:func:`hubert_xlarge`,
-        :py:func:`wavlm_model`, :py:func:`wavlm_base`, and :py:func:`wavlm_large`.
+        To build the model, please use one of the factory functions.
 
     See Also:
         * :class:`torchaudio.pipelines.Wav2Vec2Bundle`: Pretrained models (without fine-tuning)
@@ -129,13 +126,11 @@ class HuBERTPretrainModel(Module):
     HuBERT model used for pretraining in *HuBERT* :cite:`hsu2021hubert`.
 
     Note:
-        To build the model, please use one of the factory functions,
-        :py:func:`hubert_pretrain_base`, :py:func:`hubert_pretrain_large`
-        or :py:func:`hubert_pretrain_xlarge`.
+        To build the model, please use one of the factory functions.
 
     See Also:
-        `HuBERT Pre-training and Fine-tuning Examples
-        <https://github.com/pytorch/audio/tree/release/0.12/examples/hubert>`__
+        `HuBERT Pre-training and Fine-tuning Recipes
+        <https://github.com/pytorch/audio/tree/main/examples/hubert>`__
 
     Args:
         wav2vec2 (Wav2Vec2Model):
@@ -1241,35 +1236,35 @@ def wavlm_model(
     """Builds custom WaveLM model :cite:`chen2022wavlm`. The architecture is compatible
     with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output object is
     :class:`~torchaudio.models.Wav2Vec2Model`. Most of the arguments have the same meaning
-    as in :py:func:`wav2vec2_model` so please refer there for documentation.
+    as in :py:func:`~torchaudio.models.wav2vec2_model` so please refer there for documentation.
 
     Args:
         extractor_mode (str): Operation mode of feature extractor.
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         extractor_conv_layer_config (list of integer tuples or None):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         extractor_conv_bias (bool):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_embed_dim (int):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_pos_conv_kernel (int):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_pos_conv_groups (int):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_num_layers (int):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_num_heads (int):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_num_buckets (int):
             Number of buckets for relative position embedding.
@@ -1277,25 +1272,25 @@ def wavlm_model(
             Maximum distance for relative position embedding.
 
         encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_ff_interm_features (int):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_layer_norm_first (bool):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         encoder_layer_drop (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
         aux_num_out (int or None):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
@@ -1344,17 +1339,17 @@ def wavlm_base(
 
     Args:
         encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_layer_drop (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         aux_num_out (int, optional):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
@@ -1396,17 +1391,17 @@ def wavlm_large(
 
     Args:
         encoder_projection_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_attention_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_ff_interm_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_dropout (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         encoder_layer_drop (float):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
         aux_num_out (int, optional):
-            See :py:func:`wav2vec2_model`.
+            See :py:func:`~torchaudio.models.wav2vec2_model`.
 
     Returns:
         Wav2Vec2Model:
