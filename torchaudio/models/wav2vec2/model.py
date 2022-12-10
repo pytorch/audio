@@ -13,9 +13,6 @@ class Wav2Vec2Model(Module):
 
     Note:
         To build the model, please use one of the factory functions.
-        :py:func:`wav2vec2_model`, :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`,
-        :py:func:`wav2vec2_large_lv60k`, :py:func:`hubert_base`, :py:func:`hubert_large`,
-        and :py:func:`hubert_xlarge`.
 
     See Also:
         * :class:`torchaudio.pipelines.Wav2Vec2Bundle`: Pretrained models (without fine-tuning)
@@ -129,13 +126,11 @@ class HuBERTPretrainModel(Module):
     HuBERT model used for pretraining in *HuBERT* :cite:`hsu2021hubert`.
 
     Note:
-        To build the model, please use one of the factory functions,
-        :py:func:`hubert_pretrain_base`, :py:func:`hubert_pretrain_large`
-        or :py:func:`hubert_pretrain_xlarge`.
+        To build the model, please use one of the factory functions.
 
     See Also:
-        `HuBERT Pre-training and Fine-tuning Examples
-        <https://github.com/pytorch/audio/tree/release/0.12/examples/hubert>`__
+        `HuBERT Pre-training and Fine-tuning Recipes
+        <https://github.com/pytorch/audio/tree/main/examples/hubert>`__
 
     Args:
         wav2vec2 (Wav2Vec2Model):
