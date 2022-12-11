@@ -47,6 +47,11 @@ void StreamProcessor::remove_stream(KeyType key) {
   sinks.erase(key);
 }
 
+void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
+  TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
+  discard_before_pts = av_rescale_q(timestamp, av_get_time_base_q(), stream->time_base);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,9 +73,7 @@ bool StreamProcessor::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // 0: some kind of success
 // <0: Some error happened
-int StreamProcessor::process_packet(
-    AVPacket* packet,
-    int64_t discard_before_pts) {
+int StreamProcessor::process_packet(AVPacket* packet) {
   int ret = decoder.process_packet(packet);
   while (ret >= 0) {
     ret = decoder.get_frame(pFrame1);
@@ -83,7 +86,19 @@ int StreamProcessor::process_packet(
     if (ret < 0)
       return ret;
 
-    if (discard_before_pts < 0 || pFrame1->pts >= discard_before_pts) {
+    // When the value of discard_before_pts is 0, we consider that the seek is not performed
+    // and all the frames are passed to downstream unconditionally.
+    //
+    // Two reasons for this behavior;
+    // 1. When seek mode is not precise, we do not discard any frame.
+    //    In this case discard_before_pts is set to zero.
+    // 2. When users seek to zero, what they expect is to get to the beginning of the data.
+    //    There are many videos with invalid PTS values, such as -9223372036854775808, and
+    //    though it is not possible to seek videos without decoding, we can still support
+    //    `seek(0)` as a special case, and just not discard any.
+    //
+    // Note: discard_before_pts < 0 is UB.
+    if (discard_before_pts <= 0 || pFrame1->pts >= discard_before_pts) {
       send_frame(pFrame1);
     }
 

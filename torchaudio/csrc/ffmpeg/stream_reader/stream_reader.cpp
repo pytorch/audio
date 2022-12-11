@@ -174,13 +174,13 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
   int flag = AVSEEK_FLAG_BACKWARD;
   switch (mode) {
     case 0:
-      seek_timestamp =
-          -1; // reset seek_timestap as it is only used for precise seek
+      // reset seek_timestap as it is only used for precise seek
+      seek_timestamp = 0;
       break;
     case 1:
       flag |= AVSEEK_FLAG_ANY;
-      seek_timestamp =
-          -1; // reset seek_timestap as it is only used for precise seek
+      // reset seek_timestap as it is only used for precise seek
+      seek_timestamp = 0;
       break;
     case 2:
       seek_timestamp = timestamp_av_tb;
@@ -192,12 +192,13 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
   int ret = av_seek_frame(pFormatContext, -1, timestamp_av_tb, flag);
 
   if (ret < 0) {
-    seek_timestamp = -1;
+    seek_timestamp = 0;
     TORCH_CHECK(false, "Failed to seek. (" + av_err2string(ret) + ".)");
   }
   for (const auto& it : processors) {
     if (it) {
       it->flush();
+      it->set_discard_timestamp(seek_timestamp);
     }
   }
 }
@@ -278,6 +279,7 @@ void StreamReader::add_stream(
   if (!processors[i]) {
     processors[i] = std::make_unique<StreamProcessor>(
         stream, decoder, decoder_option, device);
+    processors[i]->set_discard_timestamp(seek_timestamp);
   }
   stream->discard = AVDISCARD_DEFAULT;
   int key = processors[i]->add_stream(
@@ -328,12 +330,7 @@ int StreamReader::process_packet() {
     return 0;
   }
 
-  AVRational stream_tb =
-      pFormatContext->streams[pPacket->stream_index]->time_base;
-  int64_t seek_timestamp_in_stream_tb =
-      av_rescale_q(seek_timestamp, av_get_time_base_q(), stream_tb);
-
-  ret = processor->process_packet(packet, seek_timestamp_in_stream_tb);
+  ret = processor->process_packet(packet);
 
   return (ret < 0) ? ret : 0;
 }
