@@ -20,7 +20,8 @@ PRIMARY_LABELS = {
     "bug fix",
     "new feature",
     "improvement",
-    "example",
+    "tutorial",
+    "recipe",
     "prototype",
     "other",
 }

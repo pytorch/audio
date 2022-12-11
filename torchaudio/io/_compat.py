@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import BinaryIO, Dict, Optional, Tuple
 
 import torch
 import torchaudio
@@ -105,7 +105,7 @@ def load_audio(
 
 
 def load_audio_fileobj(
-    src: str,
+    src: BinaryIO,
     frame_offset: int = 0,
     num_frames: int = -1,
     convert: bool = True,
