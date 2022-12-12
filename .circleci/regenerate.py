@@ -42,16 +42,14 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
                     fb = filter_branch
-                    if cu_version.startswith("rocm") and btype == "conda":
+                    if (cu_version.startswith("rocm") and btype == "conda") or (os_type == "macos" and btype == "conda"):
                         continue
+
                     if not fb and (
                         os_type == "linux" and btype == "wheel" and python_version == "3.8" and cu_version == "cpu"
                     ):
                         # the fields must match the build_docs "requires" dependency
                         fb = "/.*/"
-
-                    if os_type == "macos" and btype == "conda":
-                        continue
 
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
 
