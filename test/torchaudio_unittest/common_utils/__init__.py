@@ -20,6 +20,7 @@ from .case_utils import (
 )
 from .data_utils import get_asset_path, get_sinusoid, get_spectrogram, get_whitenoise
 from .func_utils import torch_script
+from .gdrive_utils import download_file_from_google_drive
 from .image_utils import get_image, rgb_to_gray, rgb_to_yuv_ccir, save_image
 from .parameterized_utils import load_params, nested_params
 from .wav_utils import get_wav_data, load_wav, normalize_wav, save_wav
@@ -59,4 +60,5 @@ __all__ = [
     "rgb_to_gray",
     "rgb_to_yuv_ccir",
     "zip_equal",
+    "download_file_from_google_drive",
 ]

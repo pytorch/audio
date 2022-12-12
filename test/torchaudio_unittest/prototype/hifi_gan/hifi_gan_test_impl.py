@@ -11,7 +11,13 @@ from torchaudio.prototype.models import (
     hifigan_generator_v2,
     hifigan_generator_v3,
 )
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
+from torchaudio.prototype.pipelines import HIFIGAN_GENERATOR_LJSPEECH_V3
+from torchaudio_unittest.common_utils import (
+    download_file_from_google_drive,
+    skipIfNoModule,
+    TestBaseMixin,
+    torch_script,
+)
 
 
 class HiFiGANTestImpl(TestBaseMixin):
@@ -134,3 +140,32 @@ class HiFiGANTestImpl(TestBaseMixin):
         ref_output = model_ref(inputs)
         output = model(inputs)
         self.assertEqual(ref_output, output)
+
+    @skipIfNoModule("requests")
+    def test_pretrained_weights(self):
+        """Test that pre-trained weights from the original implementation saved on Google Drive
+        match weights in our bundle.
+        """
+        bundle = HIFIGAN_GENERATOR_LJSPEECH_V3
+        weights_download_path = "/tmp/weights_v3.bin"
+        # Download original V3 weights from Google Drive
+        download_file_from_google_drive("18TNnHbr4IlduAWdLrKcZrqmbfPOed1pS", weights_download_path)
+
+        # Instantiate the original model using parameters from the bundle
+        model_ref = self.Generator
+        model_config = self.AttrDict(bundle._params)
+        model_config.resblock = "1" if model_config.resblock_type == 1 else "2"
+        model_ref = self.Generator(model_config).to(device=self.device, dtype=self.dtype)
+        # Load the original weights into the model
+        loaded_model = torch.load(weights_download_path, map_location=self.device)
+        model_ref.load_state_dict(loaded_model["generator"])
+        model_ref.remove_weight_norm()
+
+        # Check that the weights loaded from the original implementation and from our bundle are equal
+        model_bundle = bundle.get_model()
+        self.assertEqual(model_ref, model_bundle)
+
+    def test_smoke_bundle(self):
+        """Smoke test of downloading weights for pretraining models"""
+        bundle = HIFIGAN_GENERATOR_LJSPEECH_V3
+        bundle.get_model()
