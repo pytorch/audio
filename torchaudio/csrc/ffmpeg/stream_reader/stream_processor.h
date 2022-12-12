@@ -27,7 +27,8 @@ class StreamProcessor {
 
   // Used for precise seek.
   // 0: no discard
-  // Positive Values: decoded frames with PTS values less than this are discarded.
+  // Positive Values: decoded frames with PTS values less than this are
+  // discarded.
   // Negative values: UB. Should not happen.
   int64_t discard_before_pts = 0;
 
