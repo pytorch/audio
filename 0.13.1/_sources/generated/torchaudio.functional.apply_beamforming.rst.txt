@@ -1,0 +1,6 @@
+﻿torchaudio.functional.apply\_beamforming
+========================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: apply_beamforming
