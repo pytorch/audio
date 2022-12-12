@@ -50,7 +50,7 @@ void StreamProcessor::remove_stream(KeyType key) {
 void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
   TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
   discard_before_pts =
-    av_rescale_q(timestamp, av_get_time_base_q(), stream->time_base);
+      av_rescale_q(timestamp, av_get_time_base_q(), stream->time_base);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
