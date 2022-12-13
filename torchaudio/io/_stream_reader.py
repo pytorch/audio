@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterator, Optional, Tuple
+from typing import BinaryIO, Dict, Iterator, Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -350,7 +350,7 @@ class StreamReader:
 
     def __init__(
         self,
-        src: str,
+        src: Union[str, BinaryIO, torch.Tensor],
         format: Optional[str] = None,
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
