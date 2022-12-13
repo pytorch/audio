@@ -130,6 +130,7 @@ def _check_cuda_version():
                 f"PyTorch has CUDA version {t_version} whereas TorchAudio has CUDA version {ta_version}. "
                 "Please install the TorchAudio version that matches your PyTorch version."
             )
+    return version
 
 
 _init_extension()
