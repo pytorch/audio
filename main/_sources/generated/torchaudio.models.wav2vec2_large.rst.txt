@@ -1,4 +1,4 @@
-﻿torchaudio.models.wav2vec2\_large
+torchaudio.models.wav2vec2\_large
 =================================
 
 .. currentmodule:: torchaudio.models

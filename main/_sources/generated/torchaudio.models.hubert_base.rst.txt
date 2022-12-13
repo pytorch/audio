@@ -1,4 +1,4 @@
-﻿torchaudio.models.hubert\_base
+torchaudio.models.hubert\_base
 ==============================
 
 .. currentmodule:: torchaudio.models

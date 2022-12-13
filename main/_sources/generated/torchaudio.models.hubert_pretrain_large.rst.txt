@@ -1,4 +1,4 @@
-﻿torchaudio.models.hubert\_pretrain\_large
+torchaudio.models.hubert\_pretrain\_large
 =========================================
 
 .. currentmodule:: torchaudio.models

@@ -1,4 +1,4 @@
-﻿torchaudio.models.emformer\_rnnt\_base
+torchaudio.models.emformer\_rnnt\_base
 ======================================
 
 .. currentmodule:: torchaudio.models

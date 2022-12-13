@@ -1,4 +1,4 @@
-﻿torchaudio.models.wavlm\_base
+torchaudio.models.wavlm\_base
 =============================
 
 .. currentmodule:: torchaudio.models

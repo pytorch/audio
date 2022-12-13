@@ -1,4 +1,4 @@
-﻿torchaudio.models.hdemucs\_high
+torchaudio.models.hdemucs\_high
 ===============================
 
 .. currentmodule:: torchaudio.models

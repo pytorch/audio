@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221209) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (0.14.0.dev20221213) &#x25BC</a>
     </div>
     
 
@@ -397,10 +397,7 @@
     <span class="sd">&quot;&quot;&quot;Acoustic model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        To build the model, please use one of the factory functions: :py:func:`wav2vec2_model`,</span>
-<span class="sd">        :py:func:`wav2vec2_base`, :py:func:`wav2vec2_large`, :py:func:`wav2vec2_large_lv60k`,</span>
-<span class="sd">        :py:func:`hubert_base`, :py:func:`hubert_large`, :py:func:`hubert_xlarge`,</span>
-<span class="sd">        :py:func:`wavlm_model`, :py:func:`wavlm_base`, and :py:func:`wavlm_large`.</span>
+<span class="sd">        To build the model, please use one of the factory functions.</span>
 
 <span class="sd">    See Also:</span>
 <span class="sd">        * :class:`torchaudio.pipelines.Wav2Vec2Bundle`: Pretrained models (without fine-tuning)</span>
@@ -514,13 +511,11 @@
 <span class="sd">    HuBERT model used for pretraining in *HuBERT* :cite:`hsu2021hubert`.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        To build the model, please use one of the factory functions,</span>
-<span class="sd">        :py:func:`hubert_pretrain_base`, :py:func:`hubert_pretrain_large`</span>
-<span class="sd">        or :py:func:`hubert_pretrain_xlarge`.</span>
+<span class="sd">        To build the model, please use one of the factory functions.</span>
 
 <span class="sd">    See Also:</span>
-<span class="sd">        `HuBERT Pre-training and Fine-tuning Examples</span>
-<span class="sd">        &lt;https://github.com/pytorch/audio/tree/release/0.12/examples/hubert&gt;`__</span>
+<span class="sd">        `HuBERT Pre-training and Fine-tuning Recipes</span>
+<span class="sd">        &lt;https://github.com/pytorch/audio/tree/main/examples/hubert&gt;`__</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        wav2vec2 (Wav2Vec2Model):</span>
@@ -1626,35 +1621,35 @@
     <span class="sd">&quot;&quot;&quot;Builds custom WaveLM model :cite:`chen2022wavlm`. The architecture is compatible</span>
 <span class="sd">    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output object is</span>
 <span class="sd">    :class:`~torchaudio.models.Wav2Vec2Model`. Most of the arguments have the same meaning</span>
-<span class="sd">    as in :py:func:`wav2vec2_model` so please refer there for documentation.</span>
+<span class="sd">    as in :py:func:`~torchaudio.models.wav2vec2_model` so please refer there for documentation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        extractor_mode (str): Operation mode of feature extractor.</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        extractor_conv_layer_config (list of integer tuples or None):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        extractor_conv_bias (bool):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_embed_dim (int):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_projection_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_pos_conv_kernel (int):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_pos_conv_groups (int):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_num_layers (int):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_num_heads (int):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_num_buckets (int):</span>
 <span class="sd">            Number of buckets for relative position embedding.</span>
@@ -1662,25 +1657,25 @@
 <span class="sd">            Maximum distance for relative position embedding.</span>
 
 <span class="sd">        encoder_attention_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_ff_interm_features (int):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_ff_interm_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_layer_norm_first (bool):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        encoder_layer_drop (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">        aux_num_out (int or None):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
@@ -1729,17 +1724,17 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_attention_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_ff_interm_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_layer_drop (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        aux_num_out (int, optional):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>
@@ -1781,17 +1776,17 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        encoder_projection_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_attention_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_ff_interm_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_dropout (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        encoder_layer_drop (float):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 <span class="sd">        aux_num_out (int, optional):</span>
-<span class="sd">            See :py:func:`wav2vec2_model`.</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model:</span>

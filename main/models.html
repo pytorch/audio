@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (0.14.0.dev20221209) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (0.14.0.dev20221213) &#x25BC</a>
     </div>
     
 
@@ -390,12 +390,13 @@
   <span class="target" id="module-torchaudio.models"></span><section id="torchaudio-models">
 <h1>torchaudio.models<a class="headerlink" href="#torchaudio-models" title="Permalink to this heading">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">torchaudio.models</span></code> subpackage contains definitions of models for addressing common audio tasks.</p>
-<p>For pre-trained models, please refer to <a class="reference internal" href="pipelines.html#module-torchaudio.pipelines" title="torchaudio.pipelines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code></a> module.</p>
-<section id="model-definitions">
-<h2>Model Definitions<a class="headerlink" href="#model-definitions" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For models with pre-trained parameters, please refer to <a class="reference internal" href="pipelines.html#module-torchaudio.pipelines" title="torchaudio.pipelines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code></a> module.</p>
+</div>
 <p>Model defintions are responsible for constructing computation graphs and executing them.</p>
 <p>Some models have complex structure and variations.
-For such models, <a class="reference internal" href="#factory-functions">Factory Functions</a> are provided.</p>
+For such models, factory functions are provided.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.Conformer.html#torchaudio.models.Conformer" title="torchaudio.models.Conformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conformer</span></code></a></p></td>
@@ -436,87 +437,6 @@ For such models, <a class="reference internal" href="#factory-functions">Factory
 </tr>
 </tbody>
 </table>
-</section>
-<section id="factory-functions">
-<h2>Factory Functions<a class="headerlink" href="#factory-functions" title="Permalink to this heading">¶</a></h2>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.conv_tasnet_base.html#torchaudio.models.conv_tasnet_base" title="torchaudio.models.conv_tasnet_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conv_tasnet_base</span></code></a></p></td>
-<td><p>Builds non-causal version of <a class="reference internal" href="generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.ConvTasNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConvTasNet</span></code></a>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.emformer_rnnt_model.html#torchaudio.models.emformer_rnnt_model" title="torchaudio.models.emformer_rnnt_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emformer_rnnt_model</span></code></a></p></td>
-<td><p>Builds Emformer-based <a class="reference internal" href="generated/torchaudio.models.RNNT.html#torchaudio.models.RNNT" title="torchaudio.models.RNNT"><code class="xref py py-class docutils literal notranslate"><span class="pre">RNNT</span></code></a>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.emformer_rnnt_base.html#torchaudio.models.emformer_rnnt_base" title="torchaudio.models.emformer_rnnt_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emformer_rnnt_base</span></code></a></p></td>
-<td><p>Builds basic version of Emformer-based <a class="reference internal" href="generated/torchaudio.models.RNNT.html#torchaudio.models.RNNT" title="torchaudio.models.RNNT"><code class="xref py py-class docutils literal notranslate"><span class="pre">RNNT</span></code></a>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_model.html#torchaudio.models.wav2vec2_model" title="torchaudio.models.wav2vec2_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_model</span></code></a></p></td>
-<td><p>Builds custom <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_base.html#torchaudio.models.wav2vec2_base" title="torchaudio.models.wav2vec2_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id11">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_large.html#torchaudio.models.wav2vec2_large" title="torchaudio.models.wav2vec2_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id12">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2_large_lv60k.html#torchaudio.models.wav2vec2_large_lv60k" title="torchaudio.models.wav2vec2_large_lv60k"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_large_lv60k</span></code></a></p></td>
-<td><p>Builds &quot;large lv-60k&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id13">[<a class="reference internal" href="references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_base.html#torchaudio.models.hubert_base" title="torchaudio.models.hubert_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id14">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_large.html#torchaudio.models.hubert_large" title="torchaudio.models.hubert_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id15">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_xlarge.html#torchaudio.models.hubert_xlarge" title="torchaudio.models.hubert_xlarge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_xlarge</span></code></a></p></td>
-<td><p>Builds &quot;extra large&quot; <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id16">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_model.html#torchaudio.models.hubert_pretrain_model" title="torchaudio.models.hubert_pretrain_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_model</span></code></a></p></td>
-<td><p>Builds custom <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> for training from scratch</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_base.html#torchaudio.models.hubert_pretrain_base" title="torchaudio.models.hubert_pretrain_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> from <em>HuBERT</em> <span id="id17">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for pretraining.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_large.html#torchaudio.models.hubert_pretrain_large" title="torchaudio.models.hubert_pretrain_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> from <em>HuBERT</em> <span id="id18">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for pretraining.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hubert_pretrain_xlarge.html#torchaudio.models.hubert_pretrain_xlarge" title="torchaudio.models.hubert_pretrain_xlarge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_pretrain_xlarge</span></code></a></p></td>
-<td><p>Builds &quot;extra large&quot; <a class="reference internal" href="generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel" title="torchaudio.models.HuBERTPretrainModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERTPretrainModel</span></code></a> from <em>HuBERT</em> <span id="id19">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for pretraining.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hdemucs_low.html#torchaudio.models.hdemucs_low" title="torchaudio.models.hdemucs_low"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdemucs_low</span></code></a></p></td>
-<td><p>Builds low nfft (1024) version of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>, suitable for sample rates around 8 kHz.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.hdemucs_medium.html#torchaudio.models.hdemucs_medium" title="torchaudio.models.hdemucs_medium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdemucs_medium</span></code></a></p></td>
-<td><p>Builds medium nfft (2048) version of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>, suitable for sample rates of 16-32 kHz.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.hdemucs_high.html#torchaudio.models.hdemucs_high" title="torchaudio.models.hdemucs_high"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdemucs_high</span></code></a></p></td>
-<td><p>Builds medium nfft (4096) version of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>, suitable for sample rates of 44.1-48 kHz.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wavlm_model.html#torchaudio.models.wavlm_model" title="torchaudio.models.wavlm_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavlm_model</span></code></a></p></td>
-<td><p>Builds custom WaveLM model <span id="id20">[<a class="reference internal" href="references.html#id54" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wavlm_base.html#torchaudio.models.wavlm_base" title="torchaudio.models.wavlm_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavlm_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; WaveLM model <span id="id21">[<a class="reference internal" href="references.html#id54" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wavlm_large.html#torchaudio.models.wavlm_large" title="torchaudio.models.wavlm_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavlm_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; WaveLM model <span id="id22">[<a class="reference internal" href="references.html#id54" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="utility-functions">
-<h2>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this heading">¶</a></h2>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2.utils.import_fairseq_model.html#torchaudio.models.wav2vec2.utils.import_fairseq_model" title="torchaudio.models.wav2vec2.utils.import_fairseq_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_fairseq_model</span></code></a></p></td>
-<td><p>Builds <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from the corresponding model object of <a class="reference external" href="https://github.com/pytorch/fairseq">fairseq</a>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.models.wav2vec2.utils.import_huggingface_model.html#torchaudio.models.wav2vec2.utils.import_huggingface_model" title="torchaudio.models.wav2vec2.utils.import_huggingface_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_huggingface_model</span></code></a></p></td>
-<td><p>Builds <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from the corresponding model object of <a class="reference external" href="https://huggingface.co/transformers/">Transformers</a>.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
 </section>
 
 
@@ -564,12 +484,7 @@ For such models, <a class="reference internal" href="#factory-functions">Factory
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.models</a><ul>
-<li><a class="reference internal" href="#model-definitions">Model Definitions</a></li>
-<li><a class="reference internal" href="#factory-functions">Factory Functions</a></li>
-<li><a class="reference internal" href="#utility-functions">Utility Functions</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">torchaudio.models</a></li>
 </ul>
 
             </div>

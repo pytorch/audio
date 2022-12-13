@@ -1,4 +1,4 @@
-﻿torchaudio.models.hdemucs\_medium
+torchaudio.models.hdemucs\_medium
 =================================
 
 .. currentmodule:: torchaudio.models
