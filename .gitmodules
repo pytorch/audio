@@ -3,8 +3,11 @@
 	url = https://github.com/kaldi-asr/kaldi
 	ignore = dirty
 [submodule "third_party/kenlm/submodule"]
-	path = third_party/kenlm/submodule
+	path = third_party/kenlm/kenlm
 	url = https://github.com/kpu/kenlm
 [submodule "third_party/hipify_torch"]
 	path = third_party/hipify_torch
 	url = https://github.com/ROCmSoftwarePlatform/hipify_torch
+[submodule "flashlight-text"]
+	path = third_party/flashlight-text/submodule
+	url = https://github.com/flashlight/text

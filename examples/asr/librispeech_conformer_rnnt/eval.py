@@ -2,9 +2,12 @@ import logging
 import pathlib
 from argparse import ArgumentParser
 
+import sentencepiece as spm
+
 import torch
 import torchaudio
-from lightning import ConformerRNNTModule, get_data_module
+from lightning import ConformerRNNTModule
+from transforms import get_data_module
 
 
 logger = logging.getLogger()
@@ -15,7 +18,8 @@ def compute_word_level_distance(seq1, seq2):
 
 
 def run_eval(args):
-    model = ConformerRNNTModule.load_from_checkpoint(args.checkpoint_path, sp_model_path=str(args.sp_model_path)).eval()
+    sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
+    model = ConformerRNNTModule.load_from_checkpoint(args.checkpoint_path, sp_model=sp_model).eval()
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
 
     if args.use_cuda:

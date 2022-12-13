@@ -51,6 +51,7 @@ class Functional(TestBaseMixin):
     def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2):
         logits_shape = data["logits"].shape
         costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
+
         self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
         self.assertEqual(logits_shape, gradients.shape)
         self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
@@ -244,6 +245,77 @@ class Functional(TestBaseMixin):
         )
         spec.sum().backward()
         assert not x.grad.isnan().sum()
+
+    @parameterized.expand(
+        [
+            (1024,),
+            (2048,),
+            (4096,),
+        ]
+    )
+    def test_spectrogram_normalization_hann_window(self, nfft):
+        """This test assumes that currently, torch.stft and the existing math behind spectrogram are correct.
+        The test is checking that in relation to one another, the normalization factors correctly align based on
+        mathematical prediction. Using spec_false as a base, which has no normalization factors, we check to see that
+        turning normalized as ``True`` or ``"window"`` will have a normalization factor of the sum of squares of hann
+        window, which is calculated to be sqrt(3 * nfft / 8).
+        Next, when ``normalized`` is ``"frame_length"``, we are using the normalization in torch.stft, therefore we
+        assume that it is correctly normalized by a factor of sqrt(nfft). This test does not test the accuracy of
+        spectrogram, but is testing the relative factors of normalization and that they align upon the frame_length
+        and chosen normalize parameter.
+        https://github.com/pytorch/pytorch/issues/81428
+        """
+        x = torch.rand(1, 22050)
+        spec_false = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized=False,
+        )
+
+        spec_true = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized=True,
+        )
+
+        spec_window = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized="window",
+        )
+
+        spec_frame = F.spectrogram(
+            x,
+            pad=0,
+            window=torch.hann_window(nfft, device=x.device, dtype=x.dtype),
+            n_fft=nfft,
+            hop_length=4,
+            win_length=nfft,
+            power=None,
+            normalized="frame_length",
+        )
+
+        norm_factor = math.sqrt(3 * nfft / 8)
+        frame_norm_factor = math.sqrt(nfft)
+
+        self.assertEqual(spec_true, spec_window)
+        self.assertEqual(spec_true, spec_false / norm_factor)
+        self.assertEqual(spec_frame, spec_false / frame_norm_factor)
 
     def test_compute_deltas_one_channel(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]], dtype=self.dtype, device=self.device)
@@ -566,12 +638,24 @@ class Functional(TestBaseMixin):
             rtol=rtol,
         )
 
-    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self):
+    @parameterized.expand([(True,), (False,)])
+    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self, fused_log_softmax):
         seed = 777
         for i in range(5):
-            data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
+            data = rnnt_utils.get_random_data(
+                fused_log_softmax=fused_log_softmax, dtype=torch.float32, device=self.device, seed=(seed + i)
+            )
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
+
+    def test_rnnt_loss_nonfused_softmax(self):
+        data = rnnt_utils.get_B1_T10_U3_D4_data()
+        ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
+        self._test_costs_and_gradients(
+            data=data,
+            ref_costs=ref_costs,
+            ref_gradients=ref_gradients,
+        )
 
     def test_psd(self):
         """Verify the ``F.psd`` method by the numpy implementation.

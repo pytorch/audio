@@ -14,10 +14,15 @@ conformer_rnnt_base
 
 .. autofunction:: conformer_rnnt_base
 
-conv_tasnet_base
-~~~~~~~~~~~~~~~~
+emformer_hubert_model
+~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: conv_tasnet_base
+.. autofunction:: emformer_hubert_model
+
+emformer_hubert_base
+~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: emformer_hubert_base
 
 ConvEmformer
 ~~~~~~~~~~~~
@@ -28,7 +33,34 @@ ConvEmformer
 
   .. automethod:: infer
 
-References
-~~~~~~~~~~
+ConformerWav2Vec2PretrainModel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. footbibliography::
+.. autoclass:: ConformerWav2Vec2PretrainModel
+
+  .. automethod:: forward
+
+conformer_wav2vec2_model
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_model
+
+conformer_wav2vec2_base
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_base
+
+conformer_wav2vec2_pretrain_model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_pretrain_model
+
+conformer_wav2vec2_pretrain_base
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_pretrain_base
+
+conformer_wav2vec2_pretrain_large
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: conformer_wav2vec2_pretrain_large

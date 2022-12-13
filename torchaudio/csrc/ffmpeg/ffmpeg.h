@@ -25,7 +25,16 @@ extern "C" {
 namespace torchaudio {
 namespace ffmpeg {
 
-using OptionDict = std::map<std::string, std::string>;
+using OptionDict = c10::Dict<std::string, std::string>;
+
+// https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
+// Starting from libavformat 59 (ffmpeg 5),
+// AVInputFormat is const and related functions expect constant.
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+#define AVFORMAT_CONST const
+#else
+#define AVFORMAT_CONST
+#endif
 
 // Replacement of av_err2str, which causes
 // `error: taking address of temporary array`
@@ -67,7 +76,7 @@ class Wrapper {
 // IIRC-semantic. Instead we provide helper functions.
 
 // Convert standard dict to FFmpeg native type
-AVDictionary* get_option_dict(const OptionDict& option);
+AVDictionary* get_option_dict(const c10::optional<OptionDict>& option);
 
 // Clean up the dict after use. If there is an unsed key, throw runtime error
 void clean_up_dict(AVDictionary* p);
@@ -75,21 +84,23 @@ void clean_up_dict(AVDictionary* p);
 ////////////////////////////////////////////////////////////////////////////////
 // AVFormatContext
 ////////////////////////////////////////////////////////////////////////////////
-struct AVFormatContextDeleter {
+struct AVFormatInputContextDeleter {
   void operator()(AVFormatContext* p);
 };
 
-struct AVFormatContextPtr
-    : public Wrapper<AVFormatContext, AVFormatContextDeleter> {
-  explicit AVFormatContextPtr(AVFormatContext* p);
+struct AVFormatInputContextPtr
+    : public Wrapper<AVFormatContext, AVFormatInputContextDeleter> {
+  explicit AVFormatInputContextPtr(AVFormatContext* p);
 };
 
-// create format context for reading media
-AVFormatContextPtr get_input_format_context(
-    const std::string& src,
-    const c10::optional<std::string>& device,
-    const OptionDict& option,
-    AVIOContext* io_ctx = nullptr);
+struct AVFormatOutputContextDeleter {
+  void operator()(AVFormatContext* p);
+};
+
+struct AVFormatOutputContextPtr
+    : public Wrapper<AVFormatContext, AVFormatOutputContextDeleter> {
+  explicit AVFormatOutputContextPtr(AVFormatContext* p);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVIO
@@ -165,20 +176,6 @@ struct AVCodecContextPtr
     : public Wrapper<AVCodecContext, AVCodecContextDeleter> {
   explicit AVCodecContextPtr(AVCodecContext* p);
 };
-
-// Allocate codec context from either decoder name or ID
-AVCodecContextPtr get_decode_context(
-    enum AVCodecID codec_id,
-    const c10::optional<std::string>& decoder);
-
-// Initialize codec context with the parameters
-void init_codec_context(
-    AVCodecContext* pCodecContext,
-    AVCodecParameters* pParams,
-    const c10::optional<std::string>& decoder_name,
-    const OptionDict& decoder_option,
-    const torch::Device& device,
-    AVBufferRefPtr& pHWBufferRef);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph

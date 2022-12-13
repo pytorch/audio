@@ -10,7 +10,7 @@ FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
     case AVMEDIA_TYPE_VIDEO:
       break;
     default:
-      throw std::runtime_error("Only audio and video type is supported.");
+      TORCH_CHECK(false, "Only audio and video type is supported.");
   }
 }
 
@@ -89,17 +89,14 @@ void FilterGraph::add_src(const std::string& args) {
       media_type == AVMEDIA_TYPE_AUDIO ? "abuffer" : "buffer");
   int ret = avfilter_graph_create_filter(
       &buffersrc_ctx, buffersrc, "in", args.c_str(), NULL, pFilterGraph);
-  if (ret < 0) {
-    throw std::runtime_error(
-        "Failed to create input filter: \"" + args + "\" (" +
-        av_err2string(ret) + ")");
-  }
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to create input filter: \"" + args + "\" (" + av_err2string(ret) +
+          ")");
 }
 
 void FilterGraph::add_sink() {
-  if (buffersink_ctx) {
-    throw std::runtime_error("Sink buffer is already allocated.");
-  }
+  TORCH_CHECK(!buffersink_ctx, "Sink buffer is already allocated.");
   const AVFilter* buffersink = avfilter_get_by_name(
       media_type == AVMEDIA_TYPE_AUDIO ? "abuffersink" : "buffersink");
   // Note
@@ -113,9 +110,7 @@ void FilterGraph::add_sink() {
   // `abuffersink` should not take options, and this resolved issue.
   int ret = avfilter_graph_create_filter(
       &buffersink_ctx, buffersink, "out", nullptr, nullptr, pFilterGraph);
-  if (ret < 0) {
-    throw std::runtime_error("Failed to create output filter.");
-  }
+  TORCH_CHECK(ret >= 0, "Failed to create output filter.");
 }
 
 namespace {
@@ -131,9 +126,7 @@ class InOuts {
  public:
   InOuts(const char* name, AVFilterContext* pCtx) {
     p = avfilter_inout_alloc();
-    if (!p) {
-      throw std::runtime_error("Failed to allocate AVFilterInOut.");
-    }
+    TORCH_CHECK(p, "Failed to allocate AVFilterInOut.");
     p->name = av_strdup(name);
     p->filter_ctx = pCtx;
     p->pad_idx = 0;
@@ -160,19 +153,15 @@ void FilterGraph::add_process(const std::string& filter_description) {
   int ret = avfilter_graph_parse_ptr(
       pFilterGraph, filter_description.c_str(), out, in, nullptr);
 
-  if (ret < 0) {
-    throw std::runtime_error(
-        "Failed to create the filter from \"" + filter_description + "\" (" +
-        av_err2string(ret) + ".)");
-  }
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to create the filter from \"" + filter_description + "\" (" +
+          av_err2string(ret) + ".)");
 }
 
 void FilterGraph::create_filter() {
   int ret = avfilter_graph_config(pFilterGraph, nullptr);
-  if (ret < 0) {
-    throw std::runtime_error(
-        "Failed to configure the graph: " + av_err2string(ret));
-  }
+  TORCH_CHECK(ret >= 0, "Failed to configure the graph: " + av_err2string(ret));
   // char* desc = avfilter_graph_dump(pFilterGraph.get(), NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
   // av_free(static_cast<void*>(desc));

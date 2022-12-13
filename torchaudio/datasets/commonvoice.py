@@ -14,7 +14,8 @@ def load_commonvoice_item(
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
-    assert header[1] == "path"
+    if header[1] != "path":
+        raise ValueError(f"expect `header[1]` to be 'path', but got {header[1]}")
     fileid = line[1]
     filename = os.path.join(path, folder_audio, fileid)
     if not filename.endswith(ext_audio):
@@ -27,7 +28,7 @@ def load_commonvoice_item(
 
 
 class COMMONVOICE(Dataset):
-    """Create a Dataset for *CommonVoice* [:footcite:`ardila2020common`].
+    """*CommonVoice* :cite:`ardila2020common` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is located.
@@ -60,9 +61,23 @@ class COMMONVOICE(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, Dict[str, str]): ``(waveform, sample_rate, dictionary)``,  where dictionary
-            is built from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,
-            ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            Dict[str, str]:
+                Dictionary containing the following items from the corresponding TSV file;
+
+                * ``"client_id"``
+                * ``"path"``
+                * ``"sentence"``
+                * ``"up_votes"``
+                * ``"down_votes"``
+                * ``"age"``
+                * ``"gender"``
+                * ``"accent"``
         """
         line = self._walker[n]
         return load_commonvoice_item(line, self._header, self._path, self._folder_audio, self._ext_audio)

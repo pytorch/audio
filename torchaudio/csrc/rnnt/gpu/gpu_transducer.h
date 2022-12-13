@@ -107,6 +107,8 @@ status_t Compute(
   const int& blank = options.blank_;
   const CAST_DTYPE clamp = options.clamp_;
 
+  const bool& fusedLogSmax = options.fusedLogSmax_;
+
   { // compute denominators.
     status_t status = LogSumExp2D<DTYPE, CAST_DTYPE>(
         /*stream=*/stream,
@@ -137,7 +139,8 @@ status_t Compute(
         /*tgtLengths=*/tgtLengths,
         /*denominators=*/workspace.GetPointerToDenominators(),
         /*log_probs=*/workspace.GetPointerToLogProbs(),
-        H);
+        H,
+        fusedLogSmax);
 
     if (cudaGetLastError() != cudaSuccess) {
       return COMPUTE_LOG_PROBS_FAILED;
@@ -202,7 +205,8 @@ status_t Compute(
         /*alphas=*/workspace.GetPointerToAlphas(),
         /*betas=*/workspace.GetPointerToBetas(),
         /*gradients=*/gradients,
-        H);
+        H,
+        fusedLogSmax);
     if (cudaGetLastError() != cudaSuccess) {
       return COMPUTE_GRADIENTS_FAILED;
     }

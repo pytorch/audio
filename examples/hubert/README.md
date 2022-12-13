@@ -29,7 +29,7 @@ After the first iteration of pre-training, the intermediate transformer layer's 
 
 Sample SLURM command for the second iteration of pre-preprocessing. The 6-th transformer layer's output is used as the input feature for training KMeans model. Note that the number of clusters is increased to 500 to improve the performance.
 ```
-srun --cpus-per-task=24 python preprocess.py --root-dir /home/datasets --feat-type hubert --exp-dir ./exp --layer-index 6 --checkpoint-path ./exp_iter1/checkpoints_librispeech_hubert_pretrain_base/xxx.ckpt --num-cluster 500
+srun --cpus-per-task=24 python preprocess.py --root-dir /home/datasets --feat-type hubert --exp-dir ./exp --layer-index 6 --checkpoint-path ./exp_iter1/ --num-rank 40 checkpoints_librispeech_hubert_pretrain_base/xxx.ckpt --num-cluster 500 --percent 0.1
 ```
 
 ### Pre-training (2nd iteration)
@@ -50,7 +50,7 @@ Sample SLURM command for fine-tuning on `10h` subset of `LibriLightLimited` data
 ```
 srun --gpus-per-node=1 -N 1 --ntasks-per-node=1 --cpus-per-task=10 \
   python finetune.py --dataset-path /root/datasets/ --exp-dir ./exp_finetune \
-  --checkpoint /exp_iter2/checkpoints_librispeech_hubert_pretrain_base/epoch=361-step=399999.ckpt \
+  --checkpoint ./exp_iter2/checkpoints_librispeech_hubert_pretrain_base/epoch=361-step=399999.ckpt \
   --gpus 1 --debug --warmup-updates 2000 --hold-updates 8000 --decay-updates 10000 --max-updates 20000 --learning-rate 5e-5
 ```
 
@@ -67,9 +67,9 @@ srun python evaluate.py --librispeech_path /root/datasets/ --checkpoint ./exp_fi
 ### CTC Decoding with language model
 torchaudio provides a CTCDecoder feature that is based on [Flashlight](https://github.com/flashlight/flashlight). The decoder supports KenLM language model. Use `--use-lm` to enable CTC decoding with KenLM 4-gram language model.
 
-Sample SLURM command for evaluation with KenLM language model:
+Sample SLURM command for evaluation with KenLM language model (use the checkpoint that has the lowest validation loss):
 ```
-srun python evaluate.py --librispeech_path /root/datasets/ --checkpoint ./exp_finetune/checkpoints_hubert_pretrain_base/epoch\=109-step\=19999.ckpt --split test-clean --use-lm --beam-size 1500 --lm-weight 2.46 --word-score -0.59
+srun python evaluate.py --librispeech_path /root/datasets/ --checkpoint ./exp_finetune/checkpoints_hubert_pretrain_base/epoch\=106-step\=19500.ckpt --split test-clean --use-lm --beam-size 1500 --lm-weight 2.46 --word-score -0.59
 ```
 
 ### WER results
@@ -77,7 +77,7 @@ The table below contains WER results for fine-tuning HuBERT Base model on `10h` 
 
 |                   | WER% (Viterbi)|  WER% (KenLM) |
 |:-----------------:|--------------:|--------------:|
-| dev-clean         |       10.7    |       4.4     |
-| dev-other         |       18.3    |       9.7     |
-| test-clean        |       10.8    |       4.4     |
-| test-other        |       18.5    |       10.1    |
+| dev-clean         |       10.9    |       4.2     |
+| dev-other         |       17.5    |       9.4     |
+| test-clean        |       10.9    |       4.4     |
+| test-other        |       17.8    |       9.5     |

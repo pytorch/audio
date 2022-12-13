@@ -14,7 +14,7 @@ _SUPPORTED_SUBSETS = {"train", "test"}
 
 
 class DR_VCTK(Dataset):
-    """Create a dataset for *Device Recorded VCTK (Small subset version)* [:footcite:`Sarfjoo2018DeviceRV`].
+    """*Device Recorded VCTK (Small subset version)* :cite:`Sarfjoo2018DeviceRV` dataset.
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found.
@@ -95,9 +95,24 @@ class DR_VCTK(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, Tensor, int, str, str, str, int):
-            ``(waveform_clean, sample_rate_clean, waveform_noisy, sample_rate_noisy, speaker_id,\
-                utterance_id, source, channel_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Clean waveform
+            int:
+                Sample rate of the clean waveform
+            Tensor:
+                Noisy waveform
+            int:
+                Sample rate of the noisy waveform
+            str:
+                Speaker ID
+            str:
+                Utterance ID
+            str:
+                Source
+            int:
+                Channel ID
         """
         filename = self._filename_list[n]
         return self._load_dr_vctk_item(filename)

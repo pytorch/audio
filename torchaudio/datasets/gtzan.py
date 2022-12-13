@@ -996,11 +996,15 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 
 
 class GTZAN(Dataset):
-    """Create a Dataset for *GTZAN* [:footcite:`tzanetakis_essl_cook_2001`].
+    """*GTZAN* :cite:`tzanetakis_essl_cook_2001` dataset.
 
     Note:
         Please see http://marsyas.info/downloads/datasets.html if you are planning to use
         this dataset to publish results.
+
+    Note:
+        As of October 2022, the download link is not currently working. Setting ``download=True``
+        in GTZAN dataset will result in a URL connection error.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -1036,9 +1040,8 @@ class GTZAN(Dataset):
         self.download = download
         self.subset = subset
 
-        assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from " + "{'training', 'validation', 'testing'}."
-        )
+        if subset is not None and subset not in ["training", "validation", "testing"]:
+            raise ValueError("When `subset` is not None, it must be one of ['training', 'validation', 'testing'].")
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)
@@ -1097,7 +1100,14 @@ class GTZAN(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str): ``(waveform, sample_rate, label)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Label
         """
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)

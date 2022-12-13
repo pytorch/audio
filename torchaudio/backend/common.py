@@ -1,8 +1,8 @@
 class AudioMetaData:
     """Return type of ``torchaudio.info`` function.
 
-    This class is used by :ref:`"sox_io" backend<sox_io_backend>` and
-    :ref:`"soundfile" backend with the new interface<soundfile_backend>`.
+    This class is used by :py:mod:`"sox_io" backend<torchaudio.backends.sox_io_backend>` and
+    :py:mod:`"soundfile" backend<torchaudio.backends.soundfile_backend>`.
 
     :ivar int sample_rate: Sample rate
     :ivar int num_frames: The number of frames

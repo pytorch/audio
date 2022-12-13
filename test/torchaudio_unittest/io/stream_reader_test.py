@@ -7,6 +7,8 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     is_ffmpeg_available,
     nested_params,
+    rgb_to_gray,
+    rgb_to_yuv_ccir,
     save_image,
     save_wav,
     skipIfNoFFmpeg,
@@ -26,9 +28,9 @@ if is_ffmpeg_available():
 ################################################################################
 # Helper decorator and Mixin to duplicate the tests for fileobj
 _media_source = parameterized_class(
-    ("test_fileobj",),
-    [(False,), (True,)],
-    class_name_func=lambda cls, _, params: f'{cls.__name__}{"_fileobj" if params["test_fileobj"] else "_path"}',
+    ("test_type",),
+    [("str",), ("fileobj",), ("tensor",)],
+    class_name_func=lambda cls, _, params: f'{cls.__name__}_{params["test_type"]}',
 )
 
 
@@ -38,16 +40,24 @@ class _MediaSourceMixin:
         self.src = None
 
     def get_src(self, path):
-        if not self.test_fileobj:
-            return path
         if self.src is not None:
-            raise ValueError("get_video_asset can be called only once.")
+            raise ValueError("get_src can be called only once.")
 
-        self.src = open(path, "rb")
+        if self.test_type == "str":
+            self.src = path
+        elif self.test_type == "fileobj":
+            self.src = open(path, "rb")
+        elif self.test_type == "tensor":
+            with open(path, "rb") as fileobj:
+                data = fileobj.read()
+            self.src = torch.frombuffer(data, dtype=torch.uint8)
+            print(self.src.data_ptr())
+            print(len(data))
+            print(self.src.shape)
         return self.src
 
     def tearDown(self):
-        if self.src is not None:
+        if self.test_type == "fileobj" and self.src is not None:
             self.src.close()
         super().tearDown()
 
@@ -408,21 +418,95 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             if i >= 40:
                 break
 
-    def test_seek(self):
+    @parameterized.expand(["key", "any", "precise"])
+    def test_seek(self, mode):
         """Calling `seek` multiple times should not segfault"""
         s = StreamReader(self.get_src())
         for i in range(10):
-            s.seek(i)
+            s.seek(i, mode)
         for _ in range(0):
-            s.seek(0)
+            s.seek(0, mode)
         for i in range(10, 0, -1):
-            s.seek(i)
+            s.seek(i, mode)
 
     def test_seek_negative(self):
         """Calling `seek` with negative value should raise an exception"""
         s = StreamReader(self.get_src())
         with self.assertRaises(RuntimeError):
             s.seek(-1.0)
+
+    def test_seek_invalid_mode(self):
+        """Calling `seek` with an invalid model should raise an exception"""
+        s = StreamReader(self.get_src())
+        with self.assertRaises(ValueError):
+            s.seek(10, "magic_seek")
+
+    @parameterized.expand(
+        [
+            # Test keyframe seek
+            # The source mp4 video has two key frames the first frame and 203rd frame at 8.08 second.
+            # If the seek time stamp is smaller than 8.08, it will seek into the first frame at 0.0 second.
+            ("nasa_13013.mp4", "key", 0.2, (0, 0)),
+            ("nasa_13013.mp4", "key", 8.04, (0, 0)),
+            ("nasa_13013.mp4", "key", 8.08, (0, 202)),
+            ("nasa_13013.mp4", "key", 8.12, (0, 202)),
+            # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            # if we seek to a time stamp smaller than 0.4004 it will seek into the first frame at 0.0 second.
+            ("nasa_13013.avi", "key", 0.2, (0, 0)),
+            ("nasa_13013.avi", "key", 1.01, (0, 24)),
+            ("nasa_13013.avi", "key", 7.37, (0, 216)),
+            ("nasa_13013.avi", "key", 7.7, (0, 216)),
+            # Test precise seek
+            ("nasa_13013.mp4", "precise", 0.0, (0, 0)),
+            ("nasa_13013.mp4", "precise", 0.2, (0, 5)),
+            ("nasa_13013.mp4", "precise", 8.04, (0, 201)),
+            ("nasa_13013.mp4", "precise", 8.08, (0, 202)),
+            ("nasa_13013.mp4", "precise", 8.12, (0, 203)),
+            ("nasa_13013.avi", "precise", 0.0, (0, 0)),
+            ("nasa_13013.avi", "precise", 0.2, (0, 1)),
+            ("nasa_13013.avi", "precise", 8.1, (0, 238)),
+            ("nasa_13013.avi", "precise", 8.14, (0, 239)),
+            ("nasa_13013.avi", "precise", 8.17, (0, 240)),
+            # Test any seek
+            # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
+            ("nasa_13013.avi", "any", 0.0, (0, 0)),
+            ("nasa_13013.avi", "any", 0.56, (0, 12)),
+            ("nasa_13013.avi", "any", 7.77, (0, 228)),
+            ("nasa_13013.avi", "any", 0.2002, (11, 12)),
+            ("nasa_13013.avi", "any", 0.233567, (10, 12)),
+            ("nasa_13013.avi", "any", 0.266933, (9, 12)),
+        ]
+    )
+    def test_seek_modes(self, src, mode, seek_time, ref_indices):
+        """We expect the following behaviour from the diferent kinds of seek:
+            - `key`: the reader will seek to the first keyframe from the timestamp given
+            - `precise`: the reader will seek to the first keyframe from the timestamp given
+               and start decoding from that position until the given timestmap (discarding all frames in between)
+            - `any`: the  reader will seek to the colsest frame to the timestamp
+               given but if this is not a keyframe, the content will be the delta from other frames
+
+        To thest this behaviour we can parameterize the test with the tupple ref_indices. ref_indices[0]
+        is the expected index on the frames list decoded after seek and ref_indices[1] is exepected index for
+        the list of all frames decoded from the begining (reference frames). This test checks if
+        the reference frame at index ref_indices[1] is the same as ref_indices[0]. Plese note that with `any`
+        and `key` seek we only compare keyframes, but with `precise` seek we can compare any frame content.
+        """
+        # Using the first video stream (which is not default video stream)
+        stream_index = 0
+        # Decode all frames for reference
+        src_bin = self.get_src(src)
+        s = StreamReader(src_bin)
+        s.add_basic_video_stream(-1, stream_index=stream_index)
+        s.process_all_packets()
+        (ref_frames,) = s.pop_chunks()
+
+        s.seek(seek_time, mode=mode)
+        s.process_all_packets()
+        (frame,) = s.pop_chunks()
+
+        hyp_index, ref_index = ref_indices
+
+        self.assertEqual(frame[hyp_index:], ref_frames[ref_index:])
 
 
 def _to_fltp(original):
@@ -480,12 +564,12 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         # provide the matching dtype
         self._test_wav(src, original, fmt=fmt)
         # use the internal dtype ffmpeg picks
-        if self.test_fileobj:
+        if self.test_type == "fileobj":
             src.seek(0)
         self._test_wav(src, original, fmt=None)
         # convert to float32
         expected = _to_fltp(original)
-        if self.test_fileobj:
+        if self.test_type == "fileobj":
             src.seek(0)
         self._test_wav(src, expected, fmt="fltp")
 
@@ -515,7 +599,7 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
 
         for t in range(10, 20):
             expected = original[t:, :]
-            if self.test_fileobj:
+            if self.test_type == "fileobj":
                 src.seek(0)
             s = StreamReader(src)
             s.add_audio_stream(frames_per_chunk=-1)
@@ -614,3 +698,29 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         print("expected", expected)
         print("output", output)
         self.assertEqual(expected, output)
+
+    def test_png_yuv_read_out(self):
+        """Providing format prpoerly change the color space"""
+        rgb = torch.empty(1, 3, 256, 256, dtype=torch.uint8)
+        rgb[0, 0] = torch.arange(256, dtype=torch.uint8).reshape([1, -1])
+        rgb[0, 1] = torch.arange(256, dtype=torch.uint8).reshape([-1, 1])
+        for i in range(256):
+            rgb[0, 2] = i
+            path = self.get_temp_path(f"ref_{i}.png")
+            save_image(path, rgb[0], mode="RGB")
+
+            yuv = rgb_to_yuv_ccir(rgb)
+            bgr = rgb[:, [2, 1, 0], :, :]
+            gray = rgb_to_gray(rgb)
+
+            s = StreamReader(path)
+            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv444p")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="rgb24")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="bgr24")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="gray8")
+            s.process_all_packets()
+            output_yuv, output_rgb, output_bgr, output_gray = s.pop_chunks()
+            self.assertEqual(yuv, output_yuv, atol=1, rtol=0)
+            self.assertEqual(rgb, output_rgb, atol=0, rtol=0)
+            self.assertEqual(bgr, output_bgr, atol=0, rtol=0)
+            self.assertEqual(gray, output_gray, atol=1, rtol=0)

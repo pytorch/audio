@@ -78,46 +78,61 @@ if [[ "$(uname)" == Darwin ]]; then
     avformat=libavformat.58
     avutil=libavutil.56
 
+    otool="/usr/bin/otool"
+    # NOTE: miniconda has a version of otool and install_name_tool installed and we want
+    #       to use the default sytem version instead of the miniconda version since the miniconda
+    #       version can produce inconsistent results
+
+    # Attempt to use /usr/bin/otool as our default otool
+    if [[ ! -e ${otool} ]]; then
+        otool="$(which otool)"
+    fi
+    install_name_tool="/usr/bin/install_name_tool"
+    # Attempt to use /usr/bin/install_name_tool as our default install_name_tool
+    if [[ ! -e ${install_name_tool} ]]; then
+        install_name_tool="$(which install_name_tool)"
+    fi
+
     # list up the paths to fix
     for lib in ${avcodec} ${avdevice} ${avfilter} ${avformat} ${avutil}; do
-        otool -l ${prefix}/lib/${lib}.dylib | grep -B2 ${prefix}
+        ${otool} -l ${prefix}/lib/${lib}.dylib | grep -B2 ${prefix}
     done
 
     # Replace the hardcoded paths to @rpath
-    install_name_tool \
+    ${install_name_tool} \
         -change ${prefix}/lib/${avutil}.dylib @rpath/${avutil}.dylib \
         -delete_rpath ${prefix}/lib \
         -id @rpath/${avcodec}.dylib \
         ${prefix}/lib/${avcodec}.dylib
-    otool -l ${prefix}/lib/${avcodec}.dylib | grep -B2 ${prefix}
+    ${otool} -l ${prefix}/lib/${avcodec}.dylib | grep -B2 ${prefix}
 
-    install_name_tool \
+    ${install_name_tool} \
         -change ${prefix}/lib/${avformat}.dylib @rpath/${avformat}.dylib \
         -change ${prefix}/lib/${avcodec}.dylib @rpath/${avcodec}.dylib \
         -change ${prefix}/lib/${avutil}.dylib @rpath/${avutil}.dylib \
         -delete_rpath ${prefix}/lib \
         -id @rpath/${avdevice}.dylib \
         ${prefix}/lib/${avdevice}.dylib
-    otool -l ${prefix}/lib/${avdevice}.dylib | grep -B2 ${prefix}
+    ${otool} -l ${prefix}/lib/${avdevice}.dylib | grep -B2 ${prefix}
 
-    install_name_tool \
+    ${install_name_tool} \
         -change ${prefix}/lib/${avutil}.dylib @rpath/${avutil}.dylib \
         -delete_rpath ${prefix}/lib \
         -id @rpath/${avfilter}.dylib \
         ${prefix}/lib/${avfilter}.dylib
-    otool -l ${prefix}/lib/${avfilter}.dylib | grep -B2 ${prefix}
+    ${otool} -l ${prefix}/lib/${avfilter}.dylib | grep -B2 ${prefix}
 
-    install_name_tool \
+    ${install_name_tool} \
         -change ${prefix}/lib/${avcodec}.dylib @rpath/${avcodec}.dylib \
         -change ${prefix}/lib/${avutil}.dylib @rpath/${avutil}.dylib \
         -delete_rpath ${prefix}/lib \
         -id @rpath/${avformat}.dylib \
         ${prefix}/lib/${avformat}.dylib
-    otool -l ${prefix}/lib/${avformat}.dylib | grep -B2 ${prefix}
+    ${otool} -l ${prefix}/lib/${avformat}.dylib | grep -B2 ${prefix}
 
-    install_name_tool \
+    ${install_name_tool} \
         -delete_rpath ${prefix}/lib \
         -id @rpath/${avutil}.dylib \
         ${prefix}/lib/${avutil}.dylib
-    otool -l ${prefix}/lib/${avutil}.dylib | grep -B2 ${prefix}
+    ${otool} -l ${prefix}/lib/${avutil}.dylib | grep -B2 ${prefix}
 fi

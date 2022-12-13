@@ -1,19 +1,21 @@
 import logging
 import math
+from collections import namedtuple
 from typing import List, Tuple
 
 import sentencepiece as spm
 import torch
 import torchaudio
-from data_module import LibriSpeechDataModule
 from pytorch_lightning import LightningModule
 from torchaudio.models import Hypothesis, RNNTBeamSearch
 from torchaudio.prototype.models import conformer_rnnt_base
-from transforms import Batch, TestTransform, TrainTransform, ValTransform
+
 
 logger = logging.getLogger()
 
 _expected_spm_vocab_size = 1023
+
+Batch = namedtuple("Batch", ["features", "feature_lengths", "targets", "target_lengths"])
 
 
 class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
@@ -74,10 +76,10 @@ def post_process_hypos(
 
 
 class ConformerRNNTModule(LightningModule):
-    def __init__(self, sp_model_path):
+    def __init__(self, sp_model):
         super().__init__()
 
-        self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
+        self.sp_model = sp_model
         spm_vocab_size = self.sp_model.get_piece_size()
         assert spm_vocab_size == _expected_spm_vocab_size, (
             "The model returned by conformer_rnnt_base expects a SentencePiece model of "
@@ -169,15 +171,3 @@ class ConformerRNNTModule(LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self._step(batch, batch_idx, "test")
-
-
-def get_data_module(librispeech_path, global_stats_path, sp_model_path):
-    train_transform = TrainTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path)
-    val_transform = ValTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path)
-    test_transform = TestTransform(global_stats_path=global_stats_path, sp_model_path=sp_model_path)
-    return LibriSpeechDataModule(
-        librispeech_path=librispeech_path,
-        train_transform=train_transform,
-        val_transform=val_transform,
-        test_transform=test_transform,
-    )

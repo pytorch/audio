@@ -1,3 +1,7 @@
+"""Module to change the configuration of libsox, which is used by I/O functions like
+:py:mod:`~torchaudio.backend.sox_io_backend` and :py:mod:`~torchaudio.sox_effects`.
+"""
+
 from typing import Dict, List
 
 import torch

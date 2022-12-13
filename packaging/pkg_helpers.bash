@@ -46,6 +46,14 @@ setup_cuda() {
 
   # Now work out the CUDA settings
   case "$CU_VERSION" in
+    cu117)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.7"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.7/
+      fi
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      ;;
     cu116)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.6"
@@ -53,22 +61,6 @@ setup_cuda() {
         export CUDA_HOME=/usr/local/cuda-11.6/
       fi
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
-      ;;
-    cu113)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.3"
-      else
-        export CUDA_HOME=/usr/local/cuda-11.3/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
-      ;;
-    cu102)
-      if [[ "$OSTYPE" == "msys" ]]; then
-        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
-      else
-        export CUDA_HOME=/usr/local/cuda-10.2/
-      fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     rocm*)
       export USE_ROCM=1
@@ -81,8 +73,12 @@ setup_cuda() {
       ;;
   esac
   if [[ -n "$CUDA_HOME" ]]; then
-    # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
-    export PATH="$CUDA_HOME/bin:$PATH"
+    if [[ "$OSTYPE" == "msys" ]]; then
+      export PATH="$CUDA_HOME\\bin:$PATH"
+    else
+      # Adds nvcc binary to the search path so that CMake's `find_package(CUDA)` will pick the right one
+      export PATH="$CUDA_HOME/bin:$PATH"
+    fi
     export USE_CUDA=1
   fi
 }
@@ -139,6 +135,8 @@ setup_macos() {
 #
 # Usage: setup_env 0.2.0
 setup_env() {
+  # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
+  git config --global --add safe.directory /__w/audio/audio
   git submodule update --init --recursive
   setup_cuda
   setup_build_version
@@ -209,7 +207,11 @@ setup_conda_pytorch_constraint() {
   CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
     export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
-    export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
+    if [[ "$OSTYPE" == "msys" ]]; then
+      export PYTORCH_VERSION="$(conda search --json -c pytorch-nightly pytorch | python -c "import sys, json; data=json.load(sys.stdin); print(data['pytorch'][-1]['version'])")"
+    else
+      export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python3 -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
+    fi
   else
     export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
   fi
@@ -237,14 +239,11 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
+      cu117)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.7 # [not osx]"
+        ;;
       cu116)
-        export CONDA_CUDATOOLKIT_CONSTRAINT=""
-        ;;
-      cu113)
-        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=11.3,<11.4 # [not osx]"
-        ;;
-      cu102)
-        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.2,<10.3 # [not osx]"
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.6 # [not osx]"
         ;;
       cpu)
         export CONDA_CUDATOOLKIT_CONSTRAINT=""

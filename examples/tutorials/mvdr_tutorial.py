@@ -2,7 +2,7 @@
 Speech Enhancement with MVDR Beamforming
 ========================================
 
-**Author** `Zhaoheng Ni <zni@fb.com>`__
+**Author**: `Zhaoheng Ni <zni@meta.com>`__
 
 """
 
@@ -41,7 +41,33 @@ print(torchaudio.__version__)
 # 2. Preparation
 # --------------
 #
-# First, we import the necessary packages and retrieve the data.
+
+######################################################################
+# 2.1. Import the packages
+# ~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# First, we install and import the necessary packages.
+#
+# ``mir_eval``, ``pesq``, and ``pystoi`` packages are required for
+# evaluating the speech enhancement performance.
+#
+
+# When running this example in notebook, install the following packages.
+# !pip3 install mir_eval
+# !pip3 install pesq
+# !pip3 install pystoi
+
+from pesq import pesq
+from pystoi import stoi
+import mir_eval
+
+import matplotlib.pyplot as plt
+from IPython.display import Audio
+from torchaudio.utils import download_asset
+
+######################################################################
+# 2.2. Download audio data
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # The multi-channel audio example is selected from
 # `ConferencingSpeech <https://github.com/ConferencingSpeech/ConferencingSpeech2021>`__
@@ -61,17 +87,13 @@ print(torchaudio.__version__)
 #    International — CC BY 4.0)
 #
 
-import matplotlib.pyplot as plt
-from IPython.display import Audio
-from torchaudio.utils import download_asset
-
 SAMPLE_RATE = 16000
 SAMPLE_CLEAN = download_asset("tutorial-assets/mvdr/clean_speech.wav")
 SAMPLE_NOISE = download_asset("tutorial-assets/mvdr/noise.wav")
 
 
 ######################################################################
-# 2.1. Helper functions
+# 2.3. Helper functions
 # ~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -115,6 +137,30 @@ def si_snr(estimate, reference, epsilon=1e-8):
     return si_snr.item()
 
 
+def generate_mixture(waveform_clean, waveform_noise, target_snr):
+    power_clean_signal = waveform_clean.pow(2).mean()
+    power_noise_signal = waveform_noise.pow(2).mean()
+    current_snr = 10 * torch.log10(power_clean_signal / power_noise_signal)
+    waveform_noise *= 10 ** (-(target_snr - current_snr) / 20)
+    return waveform_clean + waveform_noise
+
+
+def evaluate(estimate, reference):
+    si_snr_score = si_snr(estimate, reference)
+    (
+        sdr,
+        _,
+        _,
+        _,
+    ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    pesq_mix = pesq(SAMPLE_RATE, estimate[0].numpy(), reference[0].numpy(), "wb")
+    stoi_mix = stoi(reference[0].numpy(), estimate[0].numpy(), SAMPLE_RATE, extended=False)
+    print(f"SDR score: {sdr[0]}")
+    print(f"Si-SNR score: {si_snr_score}")
+    print(f"PESQ score: {pesq_mix}")
+    print(f"STOI score: {stoi_mix}")
+
+
 ######################################################################
 # 3. Generate Ideal Ratio Masks (IRMs)
 # ------------------------------------
@@ -129,8 +175,9 @@ def si_snr(estimate, reference, epsilon=1e-8):
 waveform_clean, sr = torchaudio.load(SAMPLE_CLEAN)
 waveform_noise, sr2 = torchaudio.load(SAMPLE_NOISE)
 assert sr == sr2 == SAMPLE_RATE
-# The mixture waveform is a combination of clean and noise waveforms
-waveform_mix = waveform_clean + waveform_noise
+# The mixture waveform is a combination of clean and noise waveforms with a desired SNR.
+target_snr = 3
+waveform_mix = generate_mixture(waveform_clean, waveform_noise, target_snr)
 
 
 ######################################################################
@@ -166,8 +213,18 @@ stft_noise = stft(waveform_noise)
 # 3.2.1. Visualize mixture speech
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
+# We evaluate the quality of the mixture speech or the enhanced speech
+# using the following three metrics:
+#
+# -  signal-to-distortion ratio (SDR)
+# -  scale-invariant signal-to-noise ratio (Si-SNR, or Si-SDR in some papers)
+# -  Perceptual Evaluation of Speech Quality (PESQ)
+#
+# We also evaluate the intelligibility of the speech with the Short-Time Objective Intelligibility
+# (STOI) metric.
 
 plot_spectrogram(stft_mix[0], "Spectrogram of Mixture Speech (dB)")
+evaluate(waveform_mix[0:1], waveform_clean[0:1])
 Audio(waveform_mix[0], rate=SAMPLE_RATE)
 
 
@@ -280,7 +337,7 @@ waveform_souden = istft(stft_souden, length=waveform_mix.shape[-1])
 
 plot_spectrogram(stft_souden, "Enhanced Spectrogram by SoudenMVDR (dB)")
 waveform_souden = waveform_souden.reshape(1, -1)
-print(f"Si-SNR score: {si_snr(waveform_souden, waveform_clean[0:1])}")
+evaluate(waveform_souden, waveform_clean[0:1])
 Audio(waveform_souden, rate=SAMPLE_RATE)
 
 
@@ -338,7 +395,7 @@ waveform_rtf_power = istft(stft_rtf_power, length=waveform_mix.shape[-1])
 
 plot_spectrogram(stft_rtf_evd, "Enhanced Spectrogram by RTFMVDR and F.rtf_evd (dB)")
 waveform_rtf_evd = waveform_rtf_evd.reshape(1, -1)
-print(f"Si-SNR score: {si_snr(waveform_rtf_evd, waveform_clean[0:1])}")
+evaluate(waveform_rtf_evd, waveform_clean[0:1])
 Audio(waveform_rtf_evd, rate=SAMPLE_RATE)
 
 
@@ -347,7 +404,7 @@ Audio(waveform_rtf_evd, rate=SAMPLE_RATE)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-plot_spectrogram(stft_rtf_power, "Enhanced Spectrogram by RTFMVDR and F.rtf_evd (dB)")
+plot_spectrogram(stft_rtf_power, "Enhanced Spectrogram by RTFMVDR and F.rtf_power (dB)")
 waveform_rtf_power = waveform_rtf_power.reshape(1, -1)
-print(f"Si-SNR score: {si_snr(waveform_rtf_power, waveform_clean[0:1])}")
+evaluate(waveform_rtf_power, waveform_clean[0:1])
 Audio(waveform_rtf_power, rate=SAMPLE_RATE)

@@ -63,7 +63,7 @@ def load_libritts_item(
 
 
 class LIBRITTS(Dataset):
-    """Create a Dataset for *LibriTTS* [:footcite:`Zen2019LibriTTSAC`].
+    """*LibriTTS* :cite:`Zen2019LibriTTSAC` dataset.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -138,8 +138,22 @@ class LIBRITTS(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, str, str, int, int, str):
-            ``(waveform, sample_rate, original_text, normalized_text, speaker_id, chapter_id, utterance_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Original text
+            str:
+                Normalized text
+            int:
+                Speaker ID
+            int:
+                Chapter ID
+            str:
+                Utterance ID
         """
         fileid = self._walker[n]
         return load_libritts_item(

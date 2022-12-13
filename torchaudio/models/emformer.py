@@ -61,7 +61,8 @@ def _get_weight_init_gains(weight_init_scale_strategy: Optional[str], num_layers
 def _gen_attention_mask_block(
     col_widths: List[int], col_mask: List[bool], num_rows: int, device: torch.device
 ) -> torch.Tensor:
-    assert len(col_widths) == len(col_mask), "Length of col_widths must match that of col_mask"
+    if len(col_widths) != len(col_mask):
+        raise ValueError("Length of col_widths must match that of col_mask")
 
     mask_block = [
         torch.ones(num_rows, col_width, device=device)
@@ -194,11 +195,12 @@ class _EmformerAttention(torch.nn.Module):
 
         # Compute attention.
         attention = torch.bmm(attention_probs, reshaped_value)
-        assert attention.shape == (
+        if attention.shape != (
             B * self.num_heads,
             T,
             self.input_dim // self.num_heads,
-        )
+        ):
+            raise AssertionError("Computed attention has incorrect dimensions")
         attention = attention.transpose(0, 1).contiguous().view(T, B, self.input_dim)
 
         # Apply output projection.
@@ -770,11 +772,12 @@ class _EmformerImpl(torch.nn.Module):
                     output states; list of lists of tensors representing internal state
                     generated in current invocation of ``infer``.
         """
-        assert input.size(1) == self.segment_length + self.right_context_length, (
-            "Per configured segment_length and right_context_length"
-            f", expected size of {self.segment_length + self.right_context_length} for dimension 1 of input"
-            f", but got {input.size(1)}."
-        )
+        if input.size(1) != self.segment_length + self.right_context_length:
+            raise ValueError(
+                "Per configured segment_length and right_context_length"
+                f", expected size of {self.segment_length + self.right_context_length} for dimension 1 of input"
+                f", but got {input.size(1)}."
+            )
         input = input.permute(1, 0, 2)
         right_context_start_idx = input.size(0) - self.right_context_length
         right_context = input[right_context_start_idx:]
@@ -801,9 +804,14 @@ class _EmformerImpl(torch.nn.Module):
 
 
 class Emformer(_EmformerImpl):
-    r"""Implements the Emformer architecture introduced in
+    r"""Emformer architecture introduced in
     *Emformer: Efficient Memory Transformer Based Acoustic Model for Low Latency Streaming Speech Recognition*
-    [:footcite:`shi2021emformer`].
+    :cite:`shi2021emformer`.
+
+    See Also:
+        * :func:`~torchaudio.models.emformer_rnnt_model`,
+          :func:`~torchaudio.models.emformer_rnnt_base`: factory functions.
+        * :class:`torchaudio.pipelines.RNNTBundle`: ASR pipelines with pretrained model.
 
     Args:
         input_dim (int): input dimension.

@@ -23,8 +23,8 @@ from jinja2 import select_autoescape
 
 PYTHON_VERSIONS = ["3.7", "3.8", "3.9", "3.10"]
 CU_VERSIONS_DICT = {
-    "linux": ["cpu", "cu102", "cu113", "cu116", "rocm5.0", "rocm5.1.1"],
-    "windows": ["cpu", "cu113", "cu116"],
+    "linux": ["cpu", "cu116", "cu117", "rocm5.1.1", "rocm5.2"],
+    "windows": ["cpu", "cu116", "cu117"],
     "macos": ["cpu"],
 }
 
@@ -241,7 +241,7 @@ def unittest_workflows(indentation=6):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
-                    "cuda_version": "cpu" if device_type == "cpu" else "cu113",
+                    "cuda_version": "cpu" if device_type == "cpu" else "cu116",
                     "requires": ["download_third_parties"],
                 }
 

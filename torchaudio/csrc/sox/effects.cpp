@@ -5,7 +5,8 @@
 
 using namespace torchaudio::sox_utils;
 
-namespace torchaudio::sox_effects {
+namespace torchaudio {
+namespace sox_effects {
 
 namespace {
 
@@ -20,16 +21,15 @@ void initialize_sox_effects() {
 
   switch (SOX_RESOURCE_STATE) {
     case NotInitialized:
-      if (sox_init() != SOX_SUCCESS) {
-        throw std::runtime_error("Failed to initialize sox effects.");
-      };
+      TORCH_CHECK(
+          sox_init() == SOX_SUCCESS, "Failed to initialize sox effects.");
       SOX_RESOURCE_STATE = Initialized;
       break;
     case Initialized:
       break;
     case ShutDown:
-      throw std::runtime_error(
-          "SoX Effects has been shut down. Cannot initialize again.");
+      TORCH_CHECK(
+          false, "SoX Effects has been shut down. Cannot initialize again.");
   }
 };
 
@@ -38,12 +38,10 @@ void shutdown_sox_effects() {
 
   switch (SOX_RESOURCE_STATE) {
     case NotInitialized:
-      throw std::runtime_error(
-          "SoX Effects is not initialized. Cannot shutdown.");
+      TORCH_CHECK(false, "SoX Effects is not initialized. Cannot shutdown.");
     case Initialized:
-      if (sox_quit() != SOX_SUCCESS) {
-        throw std::runtime_error("Failed to initialize sox effects.");
-      };
+      TORCH_CHECK(
+          sox_quit() == SOX_SUCCESS, "Failed to initialize sox effects.");
       SOX_RESOURCE_STATE = ShutDown;
       break;
     case ShutDown:
@@ -155,4 +153,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       &torchaudio::sox_effects::apply_effects_file);
 }
 
-} // namespace torchaudio::sox_effects
+} // namespace sox_effects
+} // namespace torchaudio

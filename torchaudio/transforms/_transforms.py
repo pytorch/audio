@@ -2,7 +2,7 @@
 
 import math
 import warnings
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import torch
 from torch import Tensor
@@ -37,7 +37,9 @@ class Spectrogram(torch.nn.Module):
         power (float or None, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead. (Default: ``2``)
-        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
+        normalized (bool or str, optional): Whether to normalize by magnitude after stft. If input is str, choices are
+            ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
+            ``"window"``. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
@@ -50,7 +52,7 @@ class Spectrogram(torch.nn.Module):
             Deprecated and not used.
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = torchaudio.transforms.Spectrogram(n_fft=800)
         >>> spectrogram = transform(waveform)
 
@@ -65,7 +67,7 @@ class Spectrogram(torch.nn.Module):
         pad: int = 0,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         power: Optional[float] = 2.0,
-        normalized: bool = False,
+        normalized: Union[bool, str] = False,
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
@@ -73,6 +75,7 @@ class Spectrogram(torch.nn.Module):
         return_complex: Optional[bool] = None,
     ) -> None:
         super(Spectrogram, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.Spectrogram")
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequencies due to onesided=True in torch.stft
@@ -132,8 +135,9 @@ class InverseSpectrogram(torch.nn.Module):
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        normalized (bool, optional): Whether the spectrogram was normalized by magnitude after stft.
-            (Default: ``False``)
+        normalized (bool or str, optional): Whether the stft output was normalized by magnitude. If input is str,
+            choices are ``"window"`` and ``"frame_length"``, dependent on normalization mode. ``True`` maps to
+            ``"window"``. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether the signal in spectrogram was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
@@ -159,7 +163,7 @@ class InverseSpectrogram(torch.nn.Module):
         hop_length: Optional[int] = None,
         pad: int = 0,
         window_fn: Callable[..., Tensor] = torch.hann_window,
-        normalized: bool = False,
+        normalized: Union[bool, str] = False,
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
@@ -211,8 +215,8 @@ class GriffinLim(torch.nn.Module):
     .. properties:: Autograd TorchScript
 
     Implementation ported from
-    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
-    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
+    *librosa* :cite:`brian_mcfee-proc-scipy-2015`, *A fast Griffin-Lim algorithm* :cite:`6701851`
+    and *Signal estimation from modified short-time Fourier transform* :cite:`1172092`.
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -253,8 +257,8 @@ class GriffinLim(torch.nn.Module):
     ) -> None:
         super(GriffinLim, self).__init__()
 
-        assert momentum < 1, "momentum={} > 1 can be unstable".format(momentum)
-        assert momentum >= 0, "momentum={} < 0".format(momentum)
+        if not (0 <= momentum < 1):
+            raise ValueError("momentum must be in the range [0, 1). Found: {}".format(momentum))
 
         self.n_fft = n_fft
         self.n_iter = n_iter
@@ -264,7 +268,7 @@ class GriffinLim(torch.nn.Module):
         self.register_buffer("window", window)
         self.length = length
         self.power = power
-        self.momentum = momentum / (1 + momentum)
+        self.momentum = momentum
         self.rand_init = rand_init
 
     def forward(self, specgram: Tensor) -> Tensor:
@@ -303,10 +307,15 @@ class AmplitudeToDB(torch.nn.Module):
     a full clip.
 
     Args:
-        stype (str, optional): scale of input tensor (``'power'`` or ``'magnitude'``). The
-            power being the elementwise square of the magnitude. (Default: ``'power'``)
+        stype (str, optional): scale of input tensor (``"power"`` or ``"magnitude"``). The
+            power being the elementwise square of the magnitude. (Default: ``"power"``)
         top_db (float or None, optional): minimum negative cut-off in decibels.  A reasonable
             number is 80. (Default: ``None``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.AmplitudeToDB(stype="amplitude", top_db=80)
+        >>> waveform_db = transform(waveform)
     """
     __constants__ = ["multiplier", "amin", "ref_value", "db_multiplier"]
 
@@ -348,9 +357,16 @@ class MelScale(torch.nn.Module):
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
-        norm (str or None, optional): If ``'slaney'``, divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If ``"slaney"``, divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
+        >>> spectrogram = spectrogram_transform(waveform)
+        >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
+        >>> melscale_spectrogram = melscale_transform(spectrogram)
 
     See also:
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
@@ -376,7 +392,9 @@ class MelScale(torch.nn.Module):
         self.norm = norm
         self.mel_scale = mel_scale
 
-        assert f_min <= self.f_max, "Require f_min: {} < f_max: {}".format(f_min, self.f_max)
+        if f_min > self.f_max:
+            raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
+
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale)
         self.register_buffer("fb", fb)
 
@@ -413,9 +431,16 @@ class InverseMelScale(torch.nn.Module):
         tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> mel_spectrogram_transform = transforms.MelSpectrogram(sample_rate, n_fft=1024)
+        >>> mel_spectrogram = mel_spectrogram_transform(waveform)
+        >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024 // 2 + 1)
+        >>> spectrogram = inverse_melscale_transform(mel_spectrogram)
     """
     __constants__ = [
         "n_stft",
@@ -453,7 +478,8 @@ class InverseMelScale(torch.nn.Module):
         self.tolerance_change = tolerance_change
         self.sgdargs = sgdargs or {"lr": 0.1, "momentum": 0.9}
 
-        assert f_min <= self.f_max, "Require f_min: {} < f_max: {}".format(f_min, self.f_max)
+        if f_min > self.f_max:
+            raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
 
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
         self.register_buffer("fb", fb)
@@ -473,7 +499,8 @@ class InverseMelScale(torch.nn.Module):
         n_mels, time = shape[-2], shape[-1]
         freq, _ = self.fb.size()  # (freq, n_mels)
         melspec = melspec.transpose(-1, -2)
-        assert self.n_mels == n_mels
+        if self.n_mels != n_mels:
+            raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
 
         specgram = torch.rand(
             melspec.size()[0], time, freq, requires_grad=True, dtype=melspec.dtype, device=melspec.device
@@ -540,14 +567,13 @@ class MelSpectrogram(torch.nn.Module):
             (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
             :attr:`center` is ``True``. (Default: ``"reflect"``)
-        onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy. (Default: ``True``)
-        norm (str or None, optional): If 'slaney', divide the triangular mel weights by the width of the mel band
+        onesided: Deprecated and unused.
+        norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.MelSpectrogram(sample_rate)
         >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
 
@@ -573,11 +599,18 @@ class MelSpectrogram(torch.nn.Module):
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
-        onesided: bool = True,
+        onesided: Optional[bool] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
     ) -> None:
         super(MelSpectrogram, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.MelSpectrogram")
+
+        if onesided is not None:
+            warnings.warn(
+                "Argument 'onesided' has been deprecated and has no influence on the behavior of this module."
+            )
+
         self.sample_rate = sample_rate
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
@@ -599,7 +632,7 @@ class MelSpectrogram(torch.nn.Module):
             wkwargs=wkwargs,
             center=center,
             pad_mode=pad_mode,
-            onesided=onesided,
+            onesided=True,
         )
         self.mel_scale = MelScale(
             self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm, mel_scale
@@ -637,9 +670,18 @@ class MFCC(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         n_mfcc (int, optional): Number of mfc coefficients to retain. (Default: ``40``)
         dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)
-        norm (str, optional): norm to use. (Default: ``'ortho'``)
+        norm (str, optional): norm to use. (Default: ``"ortho"``)
         log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)
         melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.MFCC(
+        >>>     sample_rate=sample_rate,
+        >>>     n_mfcc=13,
+        >>>     melkwargs={"n_fft": 400, "hop_length": 160, "n_mels": 23, "center": False},
+        >>> )
+        >>> mfcc = transform(waveform)
 
     See also:
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
@@ -718,10 +760,18 @@ class LFCC(torch.nn.Module):
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``None``)
         dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)
-        norm (str, optional): norm to use. (Default: ``'ortho'``)
+        norm (str, optional): norm to use. (Default: ``"ortho"``)
         log_lf (bool, optional): whether to use log-lf spectrograms instead of db-scaled. (Default: ``False``)
         speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
 
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.LFCC(
+        >>>     sample_rate=sample_rate,
+        >>>     n_lfcc=13,
+        >>>     speckwargs={"n_fft": 400, "hop_length": 160, "center": False},
+        >>> )
+        >>> lfcc = transform(waveform)
 
     See also:
         :py:func:`torchaudio.functional.linear_fbanks` - The function used to
@@ -815,7 +865,7 @@ class MuLawEncoding(torch.nn.Module):
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
 
     Example
-       >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+       >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
        >>> transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)
        >>> mulawtrans = transform(waveform)
 
@@ -854,7 +904,7 @@ class MuLawDecoding(torch.nn.Module):
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
         >>> mulawtrans = transform(waveform)
     """
@@ -892,7 +942,7 @@ class Resample(torch.nn.Module):
         orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``"sinc_interpolation"``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -907,7 +957,7 @@ class Resample(torch.nn.Module):
             carried out on ``torch.float64``.
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.Resample(sample_rate, sample_rate/10)
         >>> waveform = transform(waveform)
     """
@@ -970,7 +1020,7 @@ class ComputeDeltas(torch.nn.Module):
 
     Args:
         win_length (int, optional): The window length used for computing delta. (Default: ``5``)
-        mode (str, optional): Mode parameter passed to padding. (Default: ``'replicate'``)
+        mode (str, optional): Mode parameter passed to padding. (Default: ``"replicate"``)
     """
     __constants__ = ["win_length"]
 
@@ -997,7 +1047,7 @@ class TimeStretch(torch.nn.Module):
 
     .. properties:: Autograd TorchScript
 
-    Proposed in *SpecAugment* [:footcite:`specaugment`].
+    Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
@@ -1074,8 +1124,8 @@ class Fade(torch.nn.Module):
             (Default: ``"linear"``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
-        >>> transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape='linear')
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape="linear")
         >>> faded_waveform = transform(waveform)
     """
 
@@ -1183,7 +1233,7 @@ class FrequencyMasking(_AxisMasking):
 
     .. properties:: Autograd TorchScript
 
-    Proposed in *SpecAugment* [:footcite:`specaugment`].
+    Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
         freq_mask_param (int): maximum possible length of the mask.
@@ -1217,7 +1267,7 @@ class TimeMasking(_AxisMasking):
 
     .. properties:: Autograd TorchScript
 
-    Proposed in *SpecAugment* [:footcite:`specaugment`].
+    Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
         time_mask_param (int): maximum possible length of the mask.
@@ -1248,8 +1298,43 @@ class TimeMasking(_AxisMasking):
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks, p=p)
 
 
+class Loudness(torch.nn.Module):
+    r"""Measure audio loudness according to the ITU-R BS.1770-4 recommendation.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Args:
+        sample_rate (int): Sample rate of audio signal.
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.Loudness(sample_rate)
+        >>> loudness = transform(waveform)
+
+    Reference:
+        - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
+    """
+    __constants__ = ["sample_rate"]
+
+    def __init__(self, sample_rate: int):
+        super(Loudness, self).__init__()
+        self.sample_rate = sample_rate
+
+    def forward(self, wavefrom: Tensor):
+        r"""
+        Args:
+            waveform(torch.Tensor): audio waveform of dimension `(..., channels, time)`
+
+        Returns:
+            Tensor: loudness estimates (LKFS)
+        """
+        return F.loudness(wavefrom, self.sample_rate)
+
+
 class Vol(torch.nn.Module):
-    r"""Add a volume to an waveform.
+    r"""Adjust volume of waveform.
 
     .. devices:: CPU CUDA
 
@@ -1261,6 +1346,11 @@ class Vol(torch.nn.Module):
             If ``gain_type`` = ``power``, ``gain`` is a power (voltage squared).
             If ``gain_type`` = ``db``, ``gain`` is in decibels.
         gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.Vol(gain=0.5, gain_type="amplitude")
+        >>> quieter_waveform = transform(waveform)
     """
 
     def __init__(self, gain: float, gain_type: str = "amplitude"):
@@ -1306,6 +1396,11 @@ class SlidingWindowCmn(torch.nn.Module):
         center (bool, optional): If true, use a window centered on the current frame
             (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.SlidingWindowCmn(cmn_window=1000)
+        >>> cmn_waveform = transform(waveform)
     """
 
     def __init__(
@@ -1346,7 +1441,7 @@ class Vad(torch.nn.Module):
     Args:
         sample_rate (int): Sample rate of audio signal.
         trigger_level (float, optional): The measurement level used to trigger activity detection.
-            This may need to be cahnged depending on the noise level, signal level,
+            This may need to be changed depending on the noise level, signal level,
             and other characteristics of the input audio. (Default: 7.0)
         trigger_time (float, optional): The time constant (in seconds)
             used to help ignore short bursts of sound. (Default: 0.25)
@@ -1381,6 +1476,15 @@ class Vad(torch.nn.Module):
             in the detector algorithm. (Default: 150.0)
         lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
             in the detector algorithm. (Default: 2000.0)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> waveform_reversed, sample_rate = apply_effects_tensor(waveform, sample_rate, [["reverse"]])
+        >>> transform = transforms.Vad(sample_rate=sample_rate, trigger_level=7.5)
+        >>> waveform_reversed_front_trim = transform(waveform_reversed)
+        >>> waveform_end_trim, sample_rate = apply_effects_tensor(
+        >>>     waveform_reversed_front_trim, sample_rate, [["reverse"]]
+        >>> )
 
     Reference:
         - http://sox.sourceforge.net/sox.html
@@ -1477,7 +1581,7 @@ class SpectralCentroid(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.SpectralCentroid(sample_rate)
         >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
@@ -1536,7 +1640,7 @@ class PitchShift(LazyModuleMixin, torch.nn.Module):
             If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
 
     Example
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalize=True)
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.PitchShift(sample_rate, 4)
         >>> waveform_shift = transform(waveform)  # (channel, time)
     """
@@ -1627,7 +1731,7 @@ class PitchShift(LazyModuleMixin, torch.nn.Module):
 
 class RNNTLoss(torch.nn.Module):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
-    [:footcite:`graves2012sequence`].
+    :cite:`graves2012sequence`.
 
     .. devices:: CPU CUDA
 
@@ -1641,7 +1745,8 @@ class RNNTLoss(torch.nn.Module):
         blank (int, optional): blank label (Default: ``-1``)
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
-            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+            ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
 
     Example
         >>> # Hypothetical values
@@ -1666,11 +1771,13 @@ class RNNTLoss(torch.nn.Module):
         blank: int = -1,
         clamp: float = -1.0,
         reduction: str = "mean",
+        fused_log_softmax: bool = True,
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
         self.reduction = reduction
+        self.fused_log_softmax = fused_log_softmax
 
     def forward(
         self,
@@ -1687,7 +1794,16 @@ class RNNTLoss(torch.nn.Module):
             logit_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of each sequence from encoder
             target_lengths (Tensor): Tensor of dimension `(batch)` containing lengths of targets for each sequence
         Returns:
-            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(logits, targets, logit_lengths, target_lengths, self.blank, self.clamp, self.reduction)
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction,
+            self.fused_log_softmax,
+        )

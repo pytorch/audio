@@ -63,7 +63,8 @@ class _ConvolutionModule(torch.nn.Module):
 
     def _split_right_context(self, utterance: torch.Tensor, right_context: torch.Tensor) -> torch.Tensor:
         T, B, D = right_context.size()
-        assert T % self.right_context_length == 0
+        if T % self.right_context_length != 0:
+            raise ValueError("Tensor length should be divisible by its right context length")
         num_segments = T // self.right_context_length
         # (num_segments, right context length, B, D)
         right_context_segments = right_context.reshape(num_segments, self.right_context_length, B, D)
@@ -443,7 +444,7 @@ class _ConvEmformerLayer(torch.nn.Module):
 class ConvEmformer(_EmformerImpl):
     r"""Implements the convolution-augmented streaming transformer architecture introduced in
     *Streaming Transformer Transducer based Speech Recognition Using Non-Causal Convolution*
-    [:footcite:`9747706`].
+    :cite:`9747706`.
 
     Args:
         input_dim (int): input dimension.

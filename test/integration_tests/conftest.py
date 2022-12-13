@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import pytest
 import torch
 import torchaudio
@@ -40,17 +43,50 @@ _FILES = {
     "fr": "20121212-0900-PLENARY-5-fr_20121212-11_37_04_10.flac",
     "it": "20170516-0900-PLENARY-16-it_20170516-18_56_31_1.flac",
 }
+_MIXTURE_FILES = {
+    "speech_separation": "mixture_3729-6852-0037_8463-287645-0000.wav",
+    "music_separation": "al_james_mixture_shorter.wav",
+}
+_CLEAN_FILES = {
+    "speech_separation": [
+        "s1_3729-6852-0037_8463-287645-0000.wav",
+        "s2_3729-6852-0037_8463-287645-0000.wav",
+    ],
+    "music_separation": [
+        "al_james_drums_shorter.wav",
+        "al_james_bass_shorter.wav",
+        "al_james_other_shorter.wav",
+        "al_james_vocals_shorter.wav",
+    ],
+}
 
 
 @pytest.fixture
-def sample_speech(tmp_path, lang):
+def sample_speech(lang):
     if lang not in _FILES:
         raise NotImplementedError(f"Unexpected lang: {lang}")
     filename = _FILES[lang]
-    path = tmp_path.parent / filename
-    if not path.exists():
-        torchaudio.utils.download_asset(f"test-assets/{filename}", path=path)
+    path = torchaudio.utils.download_asset(f"test-assets/{filename}")
     return path
+
+
+@pytest.fixture
+def mixture_source(task):
+    if task not in _MIXTURE_FILES:
+        raise NotImplementedError(f"Unexpected task: {task}")
+    path = torchaudio.utils.download_asset(f"test-assets/{_MIXTURE_FILES[task]}")
+    return path
+
+
+@pytest.fixture
+def clean_sources(task):
+    if task not in _CLEAN_FILES:
+        raise NotImplementedError(f"Unexpected task: {task}")
+    paths = []
+    for file in _CLEAN_FILES[task]:
+        path = torchaudio.utils.download_asset(f"test-assets/{file}")
+        paths.append(path)
+    return paths
 
 
 def pytest_addoption(parser):
@@ -65,14 +101,16 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(autouse=True)
-def temp_hub_dir(tmpdir, pytestconfig):
+def temp_hub_dir(tmp_path, pytestconfig):
     if not pytestconfig.getoption("use_tmp_hub_dir"):
         yield
     else:
         org_dir = torch.hub.get_dir()
-        torch.hub.set_dir(tmpdir)
+        subdir = os.path.join(tmp_path, "hub")
+        torch.hub.set_dir(subdir)
         yield
         torch.hub.set_dir(org_dir)
+        shutil.rmtree(subdir, ignore_errors=True)
 
 
 @pytest.fixture()

@@ -4,13 +4,13 @@ from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import torch
-import torchaudio
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _load_waveform, extract_archive
 
 
 URL = "https://speech.fit.vutbr.cz/files/quesst14Database.tgz"
+SAMPLE_RATE = 8000
 _CHECKSUM = "4f869e06bc066bbe9c5dde31dbd3909a0870d70291110ebbb38878dcbc2fc5e4"
 _LANGUAGES = [
     "albanian",
@@ -23,7 +23,7 @@ _LANGUAGES = [
 
 
 class QUESST14(Dataset):
-    """Create *QUESST14* [:footcite:`Mir2015QUESST2014EQ`] Dataset
+    """*QUESST14* :cite:`Mir2015QUESST2014EQ` dataset.
 
     Args:
         root (str or Path): Root directory where the dataset's top level directory is found
@@ -42,9 +42,11 @@ class QUESST14(Dataset):
         language: Optional[str] = "nnenglish",
         download: bool = False,
     ) -> None:
-        assert subset in ["docs", "dev", "eval"], "`subset` must be one of ['docs', 'dev', 'eval']"
+        if subset not in ["docs", "dev", "eval"]:
+            raise ValueError("`subset` must be one of ['docs', 'dev', 'eval']")
 
-        assert language is None or language in _LANGUAGES, f"`language` must be None or one of {str(_LANGUAGES)}"
+        if language is not None and language not in _LANGUAGES:
+            raise ValueError(f"`language` must be None or one of {str(_LANGUAGES)}")
 
         # Get string representation of 'root'
         root = os.fspath(root)
@@ -69,10 +71,26 @@ class QUESST14(Dataset):
         elif subset == "eval":
             self.data = filter_audio_paths(self._path, language, "language_key_eval.lst")
 
-    def _load_sample(self, n: int) -> Tuple[torch.Tensor, int, str]:
+    def get_metadata(self, n: int) -> Tuple[str, int, str]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            Tuple of the following items;
+
+            str:
+                Path to audio
+            int:
+                Sample rate
+            str:
+                File name
+        """
         audio_path = self.data[n]
-        wav, sample_rate = torchaudio.load(audio_path)
-        return wav, sample_rate, audio_path.with_suffix("").name
+        relpath = os.path.relpath(audio_path, self._path)
+        return relpath, SAMPLE_RATE, audio_path.with_suffix("").name
 
     def __getitem__(self, n: int) -> Tuple[torch.Tensor, int, str]:
         """Load the n-th sample from the dataset.
@@ -81,9 +99,18 @@ class QUESST14(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str): ``(waveform, sample_rate, file_name)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                File name
         """
-        return self._load_sample(n)
+        metadata = self.get_metadata(n)
+        waveform = _load_waveform(self._path, metadata[0], metadata[1])
+        return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
         return len(self.data)
