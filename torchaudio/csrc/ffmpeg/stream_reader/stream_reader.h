@@ -18,9 +18,16 @@ class StreamReader {
   std::vector<std::pair<int, int>> stream_indices;
 
   // timestamp to seek to expressed in AV_TIME_BASE
-  // < 0 : No seek
+  //
+  // 0 : No seek
   // Positive value: Skip AVFrames with timestamps before it
-  int64_t seek_timestamp = -1;
+  // Negative value: UB. Should not happen
+  //
+  // Note:
+  // When precise seek is performed, this value is set to the value provided
+  // by client code, and PTS values of decoded frames are compared against it
+  // to determine whether the frames should be passed to downstream.
+  int64_t seek_timestamp = 0;
 
  public:
   explicit StreamReader(AVFormatInputContextPtr&& p);
