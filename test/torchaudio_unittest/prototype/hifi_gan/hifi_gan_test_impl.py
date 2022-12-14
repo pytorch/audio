@@ -117,8 +117,8 @@ class HiFiGANTestImpl(TestBaseMixin):
 
 
 def _import_hifi_gan_original_impl():
-    """Clone the original implmentation of HiFi GAN and import necessary objects. Used in a test below checking
-    that output of our implementation matches the original one.
+    """Clone the original implmentation of HiFi GAN and import necessary objects. Used in tests checking that
+    our implementation matches the original one.
     """
     module_name = "hifigan_cloned"
     path_cloned = "/tmp/" + module_name

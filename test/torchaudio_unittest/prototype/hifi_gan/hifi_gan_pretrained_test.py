@@ -9,8 +9,8 @@ from .hifi_gan_test_impl import _import_hifi_gan_original_impl
 
 class HiFiGANPretrainedTest(PytorchTestCase):
     """Test that HiFiGAN model can be created from the bundle and that the weights are the same as in the original
-    publication. This test is implemented separately from HiFiGANTestImpl, because only needs to run on one device and
-    one data type.
+    publication. This test is implemented separately from HiFiGANTestImpl, because it only needs to run on one device
+    and one data type.
     """
 
     def setUp(self):

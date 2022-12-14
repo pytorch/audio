@@ -115,7 +115,7 @@ HIFIGAN_GENERATOR_V3_LJSPEECH = HiFiGANGeneratorBundle(
         "lrelu_slope": 0.1,
     },
 )
-HIFIGAN_GENERATOR_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Generator pipeline, transforming mspectrograms into
+HIFIGAN_GENERATOR_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Generator pipeline, transforming mel spectrograms into
     waveforms. The underlying model is constructed by :py:func:`torchaudio.prototype.models.hifigan_generator`
     and utilizes weights trained on *The LJ Speech Dataset* :cite:`ljspeech17`. The weights are converted from the ones
     published with the original paper :cite:`NEURIPS2020_c5d73680` (See links to pre-trained models on
