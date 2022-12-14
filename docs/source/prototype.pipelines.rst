@@ -32,7 +32,7 @@ HiFiGAN Generator
 Interface
 ~~~~~~~~~
 
-``HiFiGANGeneratorBundle`` defines HiFiGAN Generator pipeline capable of transforming Mel spectrograms into waveforms.
+``HiFiGANGeneratorBundle`` defines HiFiGAN Generator pipeline capable of transforming mel spectrograms into waveforms.
 
 .. autosummary::
    :toctree: generated
@@ -48,5 +48,5 @@ Pretrained Models
 
 .. container:: py attribute
 
-   .. autodata:: HIFIGAN_GENERATOR_LJSPEECH_V3
+   .. autodata:: HIFIGAN_GENERATOR_V3_LJSPEECH
       :no-value:

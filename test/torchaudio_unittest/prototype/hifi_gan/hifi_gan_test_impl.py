@@ -11,13 +11,7 @@ from torchaudio.prototype.models import (
     hifigan_generator_v2,
     hifigan_generator_v3,
 )
-from torchaudio.prototype.pipelines import HIFIGAN_GENERATOR_LJSPEECH_V3
-from torchaudio_unittest.common_utils import (
-    download_file_from_google_drive,
-    skipIfNoModule,
-    TestBaseMixin,
-    torch_script,
-)
+from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 
 class HiFiGANTestImpl(TestBaseMixin):
@@ -53,31 +47,11 @@ class HiFiGANTestImpl(TestBaseMixin):
         input = torch.rand(batch_size, in_channels, time_length).to(device=self.device, dtype=self.dtype)
         return input
 
-    def _import_original_impl(self):
-        """Clone the original implmentation of HiFi GAN and import necessary objects. Used in a test below checking
-        that output of our implementation matches the original one.
-        """
-        module_name = "hifigan_cloned"
-        path_cloned = "/tmp/" + module_name
-        if not os.path.isdir(path_cloned):
-            subprocess.run(["git", "clone", "https://github.com/jik876/hifi-gan.git", path_cloned])
-            subprocess.run(["git", "checkout", "4769534d45265d52a904b850da5a622601885777"], cwd=path_cloned)
-        # Make sure imports work in the cloned code. Module "utils" is imported inside "models.py" in the cloned code,
-        # so we need to delete "utils" from the modules cache - a module with this name is already imported by another
-        # test
-        sys.path.insert(0, "/tmp")
-        sys.path.insert(0, path_cloned)
-        if "utils" in sys.modules:
-            del sys.modules["utils"]
-        env = importlib.import_module(module_name + ".env")
-        models = importlib.import_module(module_name + ".models")
-        return env.AttrDict, models.Generator
-
     def setUp(self):
         super().setUp()
         torch.random.manual_seed(31)
         # Import code necessary for test_original_implementation_match
-        self.AttrDict, self.Generator = self._import_original_impl()
+        self.AttrDict, self.Generator = _import_hifi_gan_original_impl()
 
     def tearDown(self):
         # PATH was modified on test setup, revert the modifications
@@ -141,31 +115,23 @@ class HiFiGANTestImpl(TestBaseMixin):
         output = model(inputs)
         self.assertEqual(ref_output, output)
 
-    @skipIfNoModule("requests")
-    def test_pretrained_weights(self):
-        """Test that pre-trained weights from the original implementation saved on Google Drive
-        match weights in our bundle.
-        """
-        bundle = HIFIGAN_GENERATOR_LJSPEECH_V3
-        weights_download_path = "/tmp/weights_v3.bin"
-        # Download original V3 weights from Google Drive
-        download_file_from_google_drive("18TNnHbr4IlduAWdLrKcZrqmbfPOed1pS", weights_download_path)
 
-        # Instantiate the original model using parameters from the bundle
-        model_ref = self.Generator
-        model_config = self.AttrDict(bundle._params)
-        model_config.resblock = "1" if model_config.resblock_type == 1 else "2"
-        model_ref = self.Generator(model_config).to(device=self.device, dtype=self.dtype)
-        # Load the original weights into the model
-        loaded_model = torch.load(weights_download_path, map_location=self.device)
-        model_ref.load_state_dict(loaded_model["generator"])
-        model_ref.remove_weight_norm()
-
-        # Check that the weights loaded from the original implementation and from our bundle are equal
-        model_bundle = bundle.get_model()
-        self.assertEqual(model_ref, model_bundle)
-
-    def test_smoke_bundle(self):
-        """Smoke test of downloading weights for pretraining models"""
-        bundle = HIFIGAN_GENERATOR_LJSPEECH_V3
-        bundle.get_model()
+def _import_hifi_gan_original_impl():
+    """Clone the original implmentation of HiFi GAN and import necessary objects. Used in a test below checking
+    that output of our implementation matches the original one.
+    """
+    module_name = "hifigan_cloned"
+    path_cloned = "/tmp/" + module_name
+    if not os.path.isdir(path_cloned):
+        subprocess.run(["git", "clone", "https://github.com/jik876/hifi-gan.git", path_cloned])
+        subprocess.run(["git", "checkout", "4769534d45265d52a904b850da5a622601885777"], cwd=path_cloned)
+    # Make sure imports work in the cloned code. Module "utils" is imported inside "models.py" in the cloned code,
+    # so we need to delete "utils" from the modules cache - a module with this name is already imported by another
+    # test
+    sys.path.insert(0, "/tmp")
+    sys.path.insert(0, path_cloned)
+    if "utils" in sys.modules:
+        del sys.modules["utils"]
+    env = importlib.import_module(module_name + ".env")
+    models = importlib.import_module(module_name + ".models")
+    return env.AttrDict, models.Generator
