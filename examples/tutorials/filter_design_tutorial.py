@@ -2,12 +2,21 @@
 Filter design tutorial
 ======================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to create basic digital filters
 (impulse responses) and their properties.
 
 We look into low-pass, high-pass and bandpath filters based on
-windowed-sinc kernels, and arbitary filter design using
-the frequency sampling method.
+windowed-sinc kernels, and frequency sampling method.
+
+.. warning::
+   This tutorial requires prototype DSP features, which are
+   available in nightly builds.
+
+   Please refer to https://pytorch.org/get-started/locally
+   for instructions for installing a nightly build.
+
 """
 
 ######################################################################
