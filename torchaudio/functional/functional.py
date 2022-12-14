@@ -1429,7 +1429,7 @@ def _get_sinc_resample_kernel(
     gcd: int,
     lowpass_filter_width: int = 6,
     rolloff: float = 0.99,
-    resampling_method: str = "sinc_interpolation",
+    resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
     device: torch.device = torch.device("cpu"),
     dtype: Optional[torch.dtype] = None,
@@ -1445,7 +1445,17 @@ def _get_sinc_resample_kernel(
             "For more information, please refer to https://github.com/pytorch/audio/issues/1487."
         )
 
-    if resampling_method not in ["sinc_interpolation", "kaiser_window"]:
+    if resampling_method in ["sinc_interpolation", "kaiser_window"]:
+        method_map = {
+            "sinc_interpolation": "sinc_interp_hann",
+            "kaiser_window": "sinc_interp_kaiser",
+        }
+        warnings.warn(
+            f"\"{resampling_method}\" resampling method name is being deprecated and replaced by "
+            f"\"{method_map[resampling_method]}\" in the next release. "
+            "The default behavior remains unchanged."
+        )
+    elif resampling_method not in ["sinc_interp_hann", "sinc_interp_kaiser"]:
         raise ValueError("Invalid resampling method: {}".format(resampling_method))
 
     orig_freq = int(orig_freq) // gcd
@@ -1492,10 +1502,10 @@ def _get_sinc_resample_kernel(
 
     # we do not use built in torch windows here as we need to evaluate the window
     # at specific positions, not over a regular grid.
-    if resampling_method == "sinc_interpolation":
+    if resampling_method == "sinc_interp_hann":
         window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
     else:
-        # kaiser_window
+        # sinc_interp_kaiser
         if beta is None:
             beta = 14.769656459379492
         beta_tensor = torch.tensor(float(beta))
@@ -1549,7 +1559,7 @@ def resample(
     new_freq: int,
     lowpass_filter_width: int = 6,
     rolloff: float = 0.99,
-    resampling_method: str = "sinc_interpolation",
+    resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.
@@ -1571,7 +1581,7 @@ def resample(
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``"sinc_interpolation"``, ``"kaiser_window"``] (Default: ``"sinc_interpolation"``)
+            Options: [``"sinc_interp_hann"``, ``"sinc_interp_kaiser"``] (Default: ``"sinc_interp_hann"``)
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
