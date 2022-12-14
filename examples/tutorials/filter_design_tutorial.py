@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 # Windowed-sinc finite impulse response is an approximation of sinc
 # filter. It is obtained by first evaluating sinc function for given
 # cutoff frequencies, then truncating the filter skirt, and
-# appling a window, such as Hamming window, to it so as to reduce the
+# applying a window, such as Hamming window, to reduce the
 # artifacts introduced from the truncation.
 #
 # :py:func:`~torchaudio.prototype.functional.sinc_impulse_response`
@@ -223,7 +223,7 @@ plot_sinc_fr(frs, coff, legend="right", band=True)
 # Note however that the resulting impulse response does not produce the
 # desired frequency response.
 #
-# In the follwoing, we create multiple filters and compare the input
+# In the following, we create multiple filters and compare the input
 # frequency response and the actual frequency response.
 #
 
@@ -273,7 +273,7 @@ plot_ir(magnitudes, ir)
 
 ######################################################################
 #
-# Notice that there is artifacts around the transition band. This is
+# Notice that there are artifacts around the transition band. This is
 # more noticeable when the window size is small.
 #
 
