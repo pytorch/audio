@@ -68,7 +68,7 @@ class HiFiGANGeneratorBundle:
 
     _path: str
     _params: Dict[str, Any]
-    _sample_rate: float = 22000
+    _sample_rate: float = 22050
 
     def _get_state_dict(self, dl_kwargs):
         url = f"https://download.pytorch.org/torchaudio/models/{self._path}"
