@@ -47,11 +47,31 @@ class HiFiGANTestImpl(TestBaseMixin):
         input = torch.rand(batch_size, in_channels, time_length).to(device=self.device, dtype=self.dtype)
         return input
 
+    def _import_original_impl(self):
+        """Clone the original implmentation of HiFi GAN and import necessary objects. Used in a test below checking
+        that output of our implementation matches the original one.
+        """
+        module_name = "hifigan_cloned"
+        path_cloned = "/tmp/" + module_name
+        if not os.path.isdir(path_cloned):
+            subprocess.run(["git", "clone", "https://github.com/jik876/hifi-gan.git", path_cloned])
+            subprocess.run(["git", "checkout", "4769534d45265d52a904b850da5a622601885777"], cwd=path_cloned)
+        # Make sure imports work in the cloned code. Module "utils" is imported inside "models.py" in the cloned code,
+        # so we need to delete "utils" from the modules cache - a module with this name is already imported by another
+        # test
+        sys.path.insert(0, "/tmp")
+        sys.path.insert(0, path_cloned)
+        if "utils" in sys.modules:
+            del sys.modules["utils"]
+        env = importlib.import_module(module_name + ".env")
+        models = importlib.import_module(module_name + ".models")
+        return env.AttrDict, models.Generator
+
     def setUp(self):
         super().setUp()
         torch.random.manual_seed(31)
         # Import code necessary for test_original_implementation_match
-        self.AttrDict, self.Generator = _import_hifi_gan_original_impl()
+        self.AttrDict, self.Generator = self._import_original_impl()
 
     def tearDown(self):
         # PATH was modified on test setup, revert the modifications
@@ -114,24 +134,3 @@ class HiFiGANTestImpl(TestBaseMixin):
         ref_output = model_ref(inputs)
         output = model(inputs)
         self.assertEqual(ref_output, output)
-
-
-def _import_hifi_gan_original_impl():
-    """Clone the original implmentation of HiFi GAN and import necessary objects. Used in tests checking that
-    our implementation matches the original one.
-    """
-    module_name = "hifigan_cloned"
-    path_cloned = "/tmp/" + module_name
-    if not os.path.isdir(path_cloned):
-        subprocess.run(["git", "clone", "https://github.com/jik876/hifi-gan.git", path_cloned])
-        subprocess.run(["git", "checkout", "4769534d45265d52a904b850da5a622601885777"], cwd=path_cloned)
-    # Make sure imports work in the cloned code. Module "utils" is imported inside "models.py" in the cloned code,
-    # so we need to delete "utils" from the modules cache - a module with this name is already imported by another
-    # test
-    sys.path.insert(0, "/tmp")
-    sys.path.insert(0, path_cloned)
-    if "utils" in sys.modules:
-        del sys.modules["utils"]
-    env = importlib.import_module(module_name + ".env")
-    models = importlib.import_module(module_name + ".models")
-    return env.AttrDict, models.Generator

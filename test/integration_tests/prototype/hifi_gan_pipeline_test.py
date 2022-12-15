@@ -62,4 +62,4 @@ def test_hifi_gan_pretrained_weights(lang, sample_speech):
         sdr_value = sdr(estimated_waveform, ref_waveform)
         # TODO: estimated_waveform is intelligible, but noisy and possibly shifted with respect to original,
         # so sdr_value is very low
-        assert sdr_value > -25
+        assert sdr_value > 8
