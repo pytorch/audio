@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 from torchaudio._internal import load_state_dict_from_url
 
-from torchaudio.prototype.models.hifi_gan import hifigan_generator, HiFiGANGenerator
+from torchaudio.prototype.models.hifi_gan import hifigan_generator, HiFiGANGenerator, HiFiGANMelSpectrogram
 
 
 @dataclass
@@ -30,7 +30,7 @@ class HiFiGANGeneratorBundle:
         >>> # Load the HiFiGAN bundle
         >>> vocoder = bundle.get_vocoder()
         Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_generator_v3_ljspeech.pth"
-        100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5.59M/5.59M [00:00<00:00, 18.7MB/s]
+        100%|████████████| 5.59M/5.59M [00:00<00:00, 18.7MB/s]
         >>>
         >>> # Generate synthetic mel spectrogram
         >>> specgram = torch.sin(0.5 * torch.arange(start=0, end=100)).expand(bundle._params["in_channels"], 100)
@@ -59,7 +59,7 @@ class HiFiGANGeneratorBundle:
         >>> # Load HiFiGAN bundle
         >>> vocoder = bundle_hifigan.get_vocoder()
         Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_generator_v3_ljspeech.pth"
-        100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5.59M/5.59M [00:03<00:00, 1.55MB/s]
+        100%|██████████████████████████████████████████████████████ 5.59M/5.59M [00:03<00:00, 1.55MB/s]
         >>>
         >>> # Use HiFiGAN to convert mel spectrogram to audio
         >>> waveforms = vocoder(specgram).squeeze(0)
@@ -67,8 +67,8 @@ class HiFiGANGeneratorBundle:
     """  # noqa: E501
 
     _path: str
-    _params: Dict[str, Any]
-    _sample_rate: float = 22050
+    _params: Dict[str, Any]  # Vocoder parameters
+    _mel_params: Dict[str, Any]  # Mel transformation parameters
 
     def _get_state_dict(self, dl_kwargs):
         url = f"https://download.pytorch.org/torchaudio/models/{self._path}"
@@ -93,13 +93,25 @@ class HiFiGANGeneratorBundle:
         model.eval()
         return model
 
+    def get_mel_transform(self):
+        """Construct :py:class:`HiFiGANMelSpectrogram` object, which transforms waveforms into mel spectrograms.
+        It is equivalent to the mel spectrogram transformation used for data preparation in the the original HiFiGAN
+        code.
+        See the reference code
+        `here <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_
+        """
+        return HiFiGANMelSpectrogram(
+            n_mels=self._params["in_channels"],
+            **self._mel_params,
+        )
+
     @property
     def sample_rate(self):
         """Sample rate of the audio that the model is trained on.
 
         :type: float
         """
-        return self._sample_rate
+        return self._mel_params["sample_rate"]
 
 
 HIFIGAN_GENERATOR_V3_LJSPEECH = HiFiGANGeneratorBundle(
@@ -113,6 +125,14 @@ HIFIGAN_GENERATOR_V3_LJSPEECH = HiFiGANGeneratorBundle(
         "resblock_type": 2,
         "in_channels": 80,
         "lrelu_slope": 0.1,
+    },
+    _mel_params={
+        "hop_size": 256,
+        "n_fft": 1024,
+        "win_length": 1024,
+        "f_min": 0,
+        "f_max": 8000,
+        "sample_rate": 22050,
     },
 )
 HIFIGAN_GENERATOR_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Generator pipeline, transforming mel spectrograms into

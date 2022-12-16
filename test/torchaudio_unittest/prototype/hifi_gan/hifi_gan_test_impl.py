@@ -10,6 +10,7 @@ from torchaudio.prototype.models import (
     hifigan_generator_v1,
     hifigan_generator_v2,
     hifigan_generator_v3,
+    hifigan_mel_spectrogram,
 )
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
@@ -65,13 +66,14 @@ class HiFiGANTestImpl(TestBaseMixin):
             del sys.modules["utils"]
         env = importlib.import_module(module_name + ".env")
         models = importlib.import_module(module_name + ".models")
-        return env.AttrDict, models.Generator
+        meldataset = importlib.import_module(module_name + ".meldataset")
+        return env.AttrDict, models.Generator, meldataset.mel_spectrogram
 
     def setUp(self):
         super().setUp()
         torch.random.manual_seed(31)
         # Import code necessary for test_original_implementation_match
-        self.AttrDict, self.Generator = self._import_original_impl()
+        self.AttrDict, self.Generator, self.ref_mel_spectrogram = self._import_original_impl()
 
     def tearDown(self):
         # PATH was modified on test setup, revert the modifications
@@ -134,3 +136,26 @@ class HiFiGANTestImpl(TestBaseMixin):
         ref_output = model_ref(inputs)
         output = model(inputs)
         self.assertEqual(ref_output, output)
+
+    def test_mel_transform(self):
+        """Check that HiFiGANMelSpectrogram generates same mel spectrogram as the original HiFiGAN implementation
+        when applied on a synthetic waveform.
+        There seems to be no way to change dtype in the original implmentation, so we feed in the waveform with the
+        default dtype and cast the output before comparison.
+        """
+        synth_waveform = torch.rand(1, 1000).to(device=self.device)
+        # Generate mel spectrogram with our implementation
+        self.mel_spectrogram = hifigan_mel_spectrogram().to(dtype=self.dtype)
+        mel_spec = self.mel_spectrogram(synth_waveform.to(dtype=self.dtype))
+        # Generate mel spectrogram with original implementation
+        ref_mel_spec = self.ref_mel_spectrogram(
+            synth_waveform,
+            n_fft=self.mel_spectrogram.n_fft,
+            num_mels=self.mel_spectrogram.n_mels,
+            sampling_rate=self.mel_spectrogram.sample_rate,
+            hop_size=self.mel_spectrogram.hop_size,
+            win_size=self.mel_spectrogram.win_length,
+            fmin=self.mel_spectrogram.f_min,
+            fmax=self.mel_spectrogram.f_max,
+        )
+        self.assertEqual(ref_mel_spec.to(dtype=self.dtype), mel_spec, atol=1e-5, rtol=1e-5)
