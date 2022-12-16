@@ -616,7 +616,9 @@ class Functional(TempDirMixin, TestBaseMixin):
         sr1, sr2 = 16000, 8000
         lowpass_filter_width = 6
         rolloff = 0.99
-        self._assert_consistency(F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "sinc_interp_kaiser", beta))
+        self._assert_consistency(
+            F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "sinc_interp_kaiser", beta)
+        )
 
     def test_phase_vocoder(self):
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))

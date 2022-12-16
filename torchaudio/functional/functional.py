@@ -1451,8 +1451,8 @@ def _get_sinc_resample_kernel(
             "kaiser_window": "sinc_interp_kaiser",
         }
         warnings.warn(
-            f"\"{resampling_method}\" resampling method name is being deprecated and replaced by "
-            f"\"{method_map[resampling_method]}\" in the next release. "
+            f'"{resampling_method}" resampling method name is being deprecated and replaced by '
+            f'"{method_map[resampling_method]}" in the next release. '
             "The default behavior remains unchanged."
         )
     elif resampling_method not in ["sinc_interp_hann", "sinc_interp_kaiser"]:
