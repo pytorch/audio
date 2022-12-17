@@ -41,6 +41,7 @@ model implementations and application components.
 
    tutorials/oscillator_tutorial
    tutorials/additive_synthesis_tutorial
+   tutorials/filter_design_tutorial
 
    tutorials/audio_datasets_tutorial
 
@@ -199,6 +200,13 @@ Tutorials
    :card_description:
    :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
    :link: tutorials/additive_synthesis_tutorial.html
+   :tags: DSP
+
+.. customcarditem::
+   :header: Designing digital filters
+   :card_description:
+   :image: _images/sphx_glr_filter_design_tutorial_001.png
+   :link: tutorials/filter_design_tutorial.html
    :tags: DSP
 
 .. customcarditem::

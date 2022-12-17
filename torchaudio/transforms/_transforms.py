@@ -942,7 +942,7 @@ class Resample(torch.nn.Module):
         orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``"sinc_interpolation"``)
+            Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -966,7 +966,7 @@ class Resample(torch.nn.Module):
         self,
         orig_freq: int = 16000,
         new_freq: int = 16000,
-        resampling_method: str = "sinc_interpolation",
+        resampling_method: str = "sinc_interp_hann",
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         beta: Optional[float] = None,

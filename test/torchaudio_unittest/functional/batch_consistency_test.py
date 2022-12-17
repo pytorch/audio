@@ -233,7 +233,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         func = partial(F.sliding_window_cmn, **kwargs)
         self.assert_batch_consistency(func, inputs=(spectrogram,))
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform(self, resampling_method):
         num_channels = 3
         sr = 16000
