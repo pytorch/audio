@@ -94,7 +94,7 @@ def plot_sinc_ir(irs, cutoff):
     t = torch.linspace(-half, half-1, window_size)
     for ax, ir, coff, color in zip(axes, irs, cutoff, plt.cm.tab10.colors):
         ax.plot(t, ir, linewidth=1.2, color=color, zorder=4, label=f"Cutoff: {coff}")
-        ax.legend(loc="upper left", handletextpad=0, handlelength=0).set_zorder(3)
+        ax.legend(loc=(1.05, 0.2), handletextpad=0, handlelength=0)
         ax.grid(True)
     fig.suptitle(
         "Impulse response of sinc low-pass filter for different cut-off frequencies\n"
@@ -124,7 +124,7 @@ frs = torch.fft.rfft(irs, n=2048, dim=1).abs()
 # Let's visualize the resulting frequency responses.
 #
 
-def plot_sinc_fr(frs, cutoff, legend="lower left", band=False):
+def plot_sinc_fr(frs, cutoff, band=False):
     num_filts, num_fft = frs.shape
     num_ticks = num_filts + 1 if band else num_filts
 
@@ -132,7 +132,7 @@ def plot_sinc_fr(frs, cutoff, legend="lower left", band=False):
     for ax, fr, coff, color in zip(axes, frs, cutoff, plt.cm.tab10.colors):
         ax.grid(True)
         ax.semilogy(fr, color=color, zorder=4, label=f"Cutoff: {coff}")
-        ax.legend(loc=legend, handletextpad=0, handlelength=0).set_zorder(3)
+        ax.legend(loc=(1.05, 0.2), handletextpad=0, handlelength=0).set_zorder(3)
     axes[-1].set(
         ylim=[None, 100],
         yticks=[1e-9, 1e-6, 1e-3, 1],
@@ -180,7 +180,7 @@ plot_sinc_ir(irs, cutoff)
 # ^^^^^^^^^^^^^^^^^^
 #
 
-plot_sinc_fr(frs, cutoff, legend="center right")
+plot_sinc_fr(frs, cutoff)
 
 ######################################################################
 #
@@ -214,7 +214,7 @@ plot_sinc_ir(irs, coff)
 # ^^^^^^^^^^^^^^^^^^
 #
 
-plot_sinc_fr(frs, coff, legend="right", band=True)
+plot_sinc_fr(frs, coff, band=True)
 
 
 ######################################################################
