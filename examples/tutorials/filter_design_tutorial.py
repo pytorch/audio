@@ -7,7 +7,7 @@ Filter design tutorial
 This tutorial shows how to create basic digital filters
 (impulse responses) and their properties.
 
-We look into low-pass, high-pass and bandpath filters based on
+We look into low-pass, high-pass and band-pass filters based on
 windowed-sinc kernels, and frequency sampling method.
 
 .. warning::
