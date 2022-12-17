@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (0.14.0.dev20221215) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221217) &#x25BC</a>
     </div>
     
 
@@ -256,6 +256,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -1814,7 +1815,7 @@
     <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
     <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
-    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
+    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1830,7 +1831,17 @@
             <span class="s2">&quot;For more information, please refer to https://github.com/pytorch/audio/issues/1487.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">resampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span> <span class="s2">&quot;kaiser_window&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">resampling_method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span> <span class="s2">&quot;kaiser_window&quot;</span><span class="p">]:</span>
+        <span class="n">method_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;kaiser_window&quot;</span><span class="p">:</span> <span class="s2">&quot;sinc_interp_kaiser&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">resampling_method</span><span class="si">}</span><span class="s1">&quot; resampling method name is being deprecated and replaced by &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">method_map</span><span class="p">[</span><span class="n">resampling_method</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; in the next release. &#39;</span>
+            <span class="s2">&quot;The default behavior remains unchanged.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">resampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">,</span> <span class="s2">&quot;sinc_interp_kaiser&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid resampling method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resampling_method</span><span class="p">))</span>
 
     <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
@@ -1877,10 +1888,10 @@
 
     <span class="c1"># we do not use built in torch windows here as we need to evaluate the window</span>
     <span class="c1"># at specific positions, not over a regular grid.</span>
-    <span class="k">if</span> <span class="n">resampling_method</span> <span class="o">==</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">resampling_method</span> <span class="o">==</span> <span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">:</span>
         <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># kaiser_window</span>
+        <span class="c1"># sinc_interp_kaiser</span>
         <span class="k">if</span> <span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">beta</span> <span class="o">=</span> <span class="mf">14.769656459379492</span>
         <span class="n">beta_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">beta</span><span class="p">))</span>
@@ -1934,7 +1945,7 @@
     <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
     <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
-    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
+    <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.</span>
@@ -1956,7 +1967,7 @@
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
 <span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
 <span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
-<span class="sd">            Options: [``&quot;sinc_interpolation&quot;``, ``&quot;kaiser_window&quot;``] (Default: ``&quot;sinc_interpolation&quot;``)</span>
+<span class="sd">            Options: [``&quot;sinc_interp_hann&quot;``, ``&quot;sinc_interp_kaiser&quot;``] (Default: ``&quot;sinc_interp_hann&quot;``)</span>
 <span class="sd">        beta (float or None, optional): The shape parameter used for kaiser window.</span>
 
 <span class="sd">    Returns:</span>
