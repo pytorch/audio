@@ -41,7 +41,7 @@ import matplotlib.pyplot as plt
 # Windowed-Sinc Filter
 # --------------------
 #
-# 
+#
 # `Sinc filter <https://en.wikipedia.org/wiki/Sinc_filter>`_ is an
 # idealized filter which removes frequencies above the cutoff
 # frequency without affecting the lower frequencies.
@@ -59,7 +59,7 @@ import matplotlib.pyplot as plt
 # :py:func:`~torchaudio.prototype.functional.sinc_impulse_response`
 # generates windowed-sinc impulse response for given cutoff
 # frequencies.
-# 
+#
 
 ######################################################################
 #
@@ -81,6 +81,7 @@ irs = sinc_impulse_response(cutoff, window_size=513)
 print("Cutoff shape:", cutoff.shape)
 print("Impulse response shape:", irs.shape)
 
+
 ######################################################################
 #
 # Let's visualize the resulting impulse responses.
@@ -91,7 +92,7 @@ def plot_sinc_ir(irs, cutoff):
     half = window_size // 2
 
     fig, axes = plt.subplots(num_filts, 1, sharex=True, figsize=(6.4, 4.8 * 1.5))
-    t = torch.linspace(-half, half-1, window_size)
+    t = torch.linspace(-half, half - 1, window_size)
     for ax, ir, coff, color in zip(axes, irs, cutoff, plt.cm.tab10.colors):
         ax.plot(t, ir, linewidth=1.2, color=color, zorder=4, label=f"Cutoff: {coff}")
         ax.legend(loc=(1.05, 0.2), handletextpad=0, handlelength=0)
@@ -119,6 +120,7 @@ plot_sinc_ir(irs, cutoff)
 
 frs = torch.fft.rfft(irs, n=2048, dim=1).abs()
 
+
 ######################################################################
 #
 # Let's visualize the resulting frequency responses.
@@ -128,7 +130,8 @@ def plot_sinc_fr(frs, cutoff, band=False):
     num_filts, num_fft = frs.shape
     num_ticks = num_filts + 1 if band else num_filts
 
-    fig, axes = plt.subplots(num_filts, 1, sharex=True, sharey=True, figsize=(6.4, 4.8*1.5))
+    fig, axes = plt.subplots(
+        num_filts, 1, sharex=True, sharey=True, figsize=(6.4, 4.8 * 1.5))
     for ax, fr, coff, color in zip(axes, frs, cutoff, plt.cm.tab10.colors):
         ax.grid(True)
         ax.semilogy(fr, color=color, zorder=4, label=f"Cutoff: {coff}")
@@ -157,7 +160,7 @@ plot_sinc_fr(frs, cutoff)
 #
 # High-pass filter can be obtained by subtracting low-pass
 # impulse response from the Dirac delta function.
-# 
+#
 # Passing ``high_pass=True`` to
 # :py:func:`~torchaudio.prototype.functional.sinc_impulse_response`
 # will change the returned filter kernel to high pass filter.
@@ -249,6 +252,7 @@ ir = frequency_impulse_response(magnitudes)
 print("Magnitudes:", magnitudes.shape)
 print("Impulse Response:", ir.shape)
 
+
 ######################################################################
 #
 
@@ -299,7 +303,7 @@ plot_ir(magnitudes, ir)
 # Arbitrary shapes
 # ~~~~~~~~~~~~~~~~
 #
-# 
+#
 
 magnitudes = torch.linspace(0, 1, 64)**4.0
 ir = frequency_impulse_response(magnitudes)
