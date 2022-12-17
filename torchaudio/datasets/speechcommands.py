@@ -5,7 +5,7 @@ from typing import Optional, Tuple, Union
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import _load_waveform, extract_archive
+from torchaudio.datasets.utils import _extract_tar, _load_waveform
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
@@ -107,7 +107,7 @@ class SPEECHCOMMANDS(Dataset):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
-                extract_archive(archive, self._path)
+                _extract_tar(archive, self._path)
         else:
             if not os.path.exists(self._path):
                 raise RuntimeError(
