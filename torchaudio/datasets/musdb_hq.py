@@ -6,7 +6,7 @@ import torch
 import torchaudio
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _extract_zip
 
 _URL = "https://zenodo.org/record/3338373/files/musdb18hq.zip"
 _CHECKSUM = "baac80d0483c61d74b2e5f3be75fa557eec52898339e6aa45c1fa48833c5d21d"
@@ -74,7 +74,7 @@ class MUSDB_HQ(Dataset):
                     raise RuntimeError("Dataset not found. Please use `download=True` to download")
                 download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
             os.makedirs(base_path, exist_ok=True)
-            extract_archive(archive, base_path)
+            _extract_zip(archive, base_path)
 
         self.names = self._collect_songs()
 
