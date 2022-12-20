@@ -1,4 +1,5 @@
 # flake8: noqa
+# fmt: off
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -281,3 +282,4 @@ def generator_loss(disc_outputs):
         loss += l
 
     return loss, gen_losses
+# fmt: on

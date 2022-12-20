@@ -3,12 +3,12 @@ import pytest
 import torch
 import torchaudio
 import torchaudio.functional as F
-from torchaudio.prototype.pipelines import HIFIGAN_GENERATOR_V3_LJSPEECH
+from torchaudio.prototype.pipelines import HIFIGAN_VOCODER_V3_LJSPEECH
 
 
 def test_smoke_hifi_gan_bundle():
     """Smoke test of downloading weights for pretraining model"""
-    HIFIGAN_GENERATOR_V3_LJSPEECH.get_vocoder()
+    HIFIGAN_VOCODER_V3_LJSPEECH.get_vocoder()
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ def test_smoke_hifi_gan_bundle():
 )
 def test_hifi_gan_pretrained_weights(lang, sample_speech):
     """Test that a waveform reconstructed from mel spectrogram by HiFiGAN bundle is close enough to the original"""
-    bundle = HIFIGAN_GENERATOR_V3_LJSPEECH
+    bundle = HIFIGAN_VOCODER_V3_LJSPEECH
 
     # Get HiFiGAN-compatible transformation from waveform to mel spectrogram
     mel_transform = bundle.get_mel_transform()

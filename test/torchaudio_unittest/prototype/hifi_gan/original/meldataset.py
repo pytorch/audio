@@ -1,4 +1,5 @@
 # flake8: noqa
+# fmt: off
 import torch
 import torch.utils.data
 import numpy as np
@@ -41,3 +42,4 @@ def mel_spectrogram(y, n_fft, num_mels, sampling_rate, hop_size, win_size, fmin,
     spec = spectral_normalize_torch(spec)
 
     return spec
+# fmt: on

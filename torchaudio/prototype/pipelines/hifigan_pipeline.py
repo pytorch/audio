@@ -8,7 +8,7 @@ from torchaudio.prototype.models.hifi_gan import hifigan_generator, HiFiGANGener
 
 
 @dataclass
-class HiFiGANGeneratorBundle:
+class HiFiGANVocoderBundle:
     """Data class that bundles associated information to use pretrained
     :py:class:`~torchaudio.prototype.models.HiFiGANGenerator`.
 
@@ -35,7 +35,7 @@ class HiFiGANGeneratorBundle:
         >>> import torch
         >>> import torchaudio
         >>> # Since HiFiGAN bundle is in prototypes, it needs to be exported explicitly
-        >>> from torchaudio.prototype.pipelines import HIFIGAN_GENERATOR_V3_LJSPEECH as bundle
+        >>> from torchaudio.prototype.pipelines import HIFIGAN_VOCODER_V3_LJSPEECH as bundle
         >>>
         >>> # Load the HiFiGAN bundle
         >>> vocoder = bundle.get_vocoder()
@@ -53,7 +53,7 @@ class HiFiGANGeneratorBundle:
         >>> import torch
         >>> import torchaudio
         >>> # Since HiFiGAN bundle is in prototypes, it needs to be exported explicitly
-        >>> from torchaudio.prototype.pipelines import HIFIGAN_GENERATOR_V3_LJSPEECH as bundle_hifigan
+        >>> from torchaudio.prototype.pipelines import HIFIGAN_VOCODER_V3_LJSPEECH as bundle_hifigan
         >>>
         >>> # Load Tactron2 bundle
         >>> bundle_tactron2 = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH
@@ -86,7 +86,7 @@ class HiFiGANGeneratorBundle:
         return state_dict
 
     def get_vocoder(self, *, dl_kwargs=None) -> HiFiGANGenerator:
-        """Construct the HiFiGAN Generator model and load the pretrained weight.
+        """Construct the HiFiGAN Generator model, which can be used a vocoder, and load the pretrained weight.
 
         The weight file is downloaded from the internet and cached with
         :func:`torch.hub.load_state_dict_from_url`
@@ -124,7 +124,7 @@ class HiFiGANGeneratorBundle:
         return self._mel_params["sample_rate"]
 
 
-HIFIGAN_GENERATOR_V3_LJSPEECH = HiFiGANGeneratorBundle(
+HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
     "hifigan_generator_v3_ljspeech.pth",
     _params={
         "upsample_rates": (8, 8, 4),
@@ -145,11 +145,11 @@ HIFIGAN_GENERATOR_V3_LJSPEECH = HiFiGANGeneratorBundle(
         "sample_rate": 22050,
     },
 )
-HIFIGAN_GENERATOR_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Generator pipeline, transforming mel spectrograms into
+HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Vocoder pipeline, transforming mel spectrograms into
     waveforms. The underlying model is constructed by :py:func:`torchaudio.prototype.models.hifigan_generator`
     and utilizes weights trained on *The LJ Speech Dataset* :cite:`ljspeech17`. The weights are converted from the ones
     published with the original paper :cite:`NEURIPS2020_c5d73680` (See links to pre-trained models on
     `GitHub <https://github.com/jik876/hifi-gan#pretrained-model>`__).
 
-    Please refer to :py:class:`torchaudio.prototype.pipelines.HiFiGANGeneratorBundle` for usage instructions.
+    Please refer to :py:class:`torchaudio.prototype.pipelines.HiFiGANVocoderBundle` for usage instructions.
     """
