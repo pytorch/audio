@@ -102,8 +102,7 @@ int StreamProcessor::process_packet(AVPacket* packet) {
     //    and just not discard any.
     //
     // Note: discard_before_pts < 0 is UB.
-    if (
-        discard_before_pts <= 0 || pFrame1->pts >= discard_before_pts ||
+    if (discard_before_pts <= 0 || pFrame1->pts >= discard_before_pts ||
         pFrame1->best_effort_timestamp >= discard_before_pts) {
       send_frame(pFrame1);
     }
