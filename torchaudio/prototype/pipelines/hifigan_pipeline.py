@@ -31,7 +31,7 @@ class HiFiGANGeneratorBundle:
         :py:class:`torchaudio.transforms.MelSpectrogram`. We reimplemented this transform as
         :py:meth:`get_mel_transform`.
 
-    Example: Synthetic spectrogram to audio.
+    Example: Transform synthetic mel spectrogram to audio.
         >>> import torch
         >>> import torchaudio
         >>> # Since HiFiGAN bundle is in prototypes, it needs to be exported explicitly
@@ -46,8 +46,8 @@ class HiFiGANGeneratorBundle:
         >>> specgram = torch.sin(0.5 * torch.arange(start=0, end=100)).expand(bundle._params["in_channels"], 100)
         >>>
         >>> # Trasform mel spectrogram into audio
-        >>> waveforms = vocoder(specgram)
-        >>> torchaudio.save('sample.wav', waveforms, bundle.sample_rate)
+        >>> waveform = vocoder(specgram)
+        >>> torchaudio.save('sample.wav', waveform, bundle.sample_rate)
 
     Example: Usage together with Tactron2, text to audio.
         >>> import torch
@@ -71,8 +71,8 @@ class HiFiGANGeneratorBundle:
         100%|██████████████████████████████████████████████████████ 5.59M/5.59M [00:03<00:00, 1.55MB/s]
         >>>
         >>> # Use HiFiGAN to convert mel spectrogram to audio
-        >>> waveforms = vocoder(specgram).squeeze(0)
-        >>> torchaudio.save('sample.wav', waveforms, bundle_hifigan.sample_rate)
+        >>> waveform = vocoder(specgram).squeeze(0)
+        >>> torchaudio.save('sample.wav', waveform, bundle_hifigan.sample_rate)
     """  # noqa: E501
 
     _path: str

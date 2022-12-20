@@ -407,12 +407,12 @@ class HiFiGANMelSpectrogram(torch.nn.Module):
 
 
 def hifigan_mel_spectrogram() -> HiFiGANMelSpectrogram:
-    r"""Builds :py:class:`HiFiGANMelSpectrogram` with parameters used to prepare data for pre-training models
+    r"""Builds :py:class:`HiFiGANMelSpectrogram` with parameters used to prepare data for training models
     in the original HiFiGAN publication. The parameters are taken from
     `here <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/config_v3.json#L18-L27>`_.
 
     Returns:
-        HiFiGANMelSpectrogram: Generated mel transformation object.
+        HiFiGANMelSpectrogram: Generated MelSpectrogram transform object.
     """
     return HiFiGANMelSpectrogram(
         hop_size=256, n_fft=1024, win_length=1024, f_min=0, f_max=8000, sample_rate=22050, n_mels=80
