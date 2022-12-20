@@ -26,13 +26,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This code is used for testing that our implementation matches the original one. Enable such testing
-ported code has been are modified in the minimal way, namely:
+This code is used for testing that our implementation matches the original one. To enable such testing the
+ported code has been are modified in a minimal way, namely:
  - Remove objects other than `mel_spectrogram` and its dependencies from `meldataset.py`
  - Remove objects other than `AttrDict` from `env.py`
  - Remove objects other than `init_weights` and `get_padding` from `utils.py`
- - Add `return_complex=False` argument to `torch.stft` call in `mel_spectrogram` in `meldataset.py`,
-   to make code PyTorch 2.0 compatible
+ - Add `return_complex=False` argument to `torch.stft` call in `mel_spectrogram` in `meldataset.py`, to make code
+PyTorch 2.0 compatible
  - Remove the import statements required only for the removed functions.
   - Add `# flake8: noqa` at the top of each file so as not to report any format issue on the ported code.
 The implementation of the retained functions and classes and their formats are kept as-is.
