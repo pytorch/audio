@@ -91,15 +91,3 @@ hifigan_generator_v3
 ~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: hifigan_generator_v3
-
-HiFiGANMelSpectrogram
-~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: HiFiGANMelSpectrogram
-
-  .. automethod:: forward
-
-hifigan_mel_spectrogram
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_mel_spectrogram

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
+from torch.nn import Module
 from torchaudio._internal import load_state_dict_from_url
 
 from torchaudio.prototype.models.hifi_gan import hifigan_generator, HiFiGANGenerator, HiFiGANMelSpectrogram
@@ -19,7 +20,16 @@ class HiFiGANGeneratorBundle:
     a different pretrained model. Client code should access pretrained models via these
     instances.
 
-    Please see below for the usage example.
+    This bundle can convert mel spectrorgam to waveforms and vice versa. A typical use case would be a flow like
+    `text -> mel spectrogram -> waveform`, where one can use an external component, e.g. Tactron2,
+    to generate mel spectrogram from text. Please see below for the code example.
+
+    .. note::
+        Although this works with the existing Tactron2 bundles, for the best results one needs to retrain Tactron2
+        using the same data preprocessing pipeline which was used for training HiFiGAN. In particular, the original
+        HiFiGAN implemntation uses a custom method of generating mel spectrograms from waveforms, different from
+        :py:class:`torchaudio.transforms.MelSpectrogram`. We reimplemented this transform as
+        :py:meth:`get_mel_transform`.
 
     Example: Synthetic spectrogram to audio.
         >>> import torch
@@ -38,7 +48,6 @@ class HiFiGANGeneratorBundle:
         >>> # Trasform mel spectrogram into audio
         >>> waveforms = vocoder(specgram)
         >>> torchaudio.save('sample.wav', waveforms, bundle.sample_rate)
-
 
     Example: Usage together with Tactron2, text to audio.
         >>> import torch
@@ -93,12 +102,12 @@ class HiFiGANGeneratorBundle:
         model.eval()
         return model
 
-    def get_mel_transform(self):
-        """Construct :py:class:`HiFiGANMelSpectrogram` object, which transforms waveforms into mel spectrograms.
+    def get_mel_transform(self) -> Module:
+        """Construct an object which transforms waveforms into mel spectrograms.
         It is equivalent to the mel spectrogram transformation used for data preparation in the the original HiFiGAN
         code.
         See the reference code
-        `here <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_
+        `here <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_.
         """
         return HiFiGANMelSpectrogram(
             n_mels=self._params["in_channels"],
