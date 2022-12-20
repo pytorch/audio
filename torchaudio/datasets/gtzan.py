@@ -6,7 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _extract_tar
 
 # The following lists prefixed with `filtered_` provide a filtered split
 # that:
@@ -1052,7 +1052,7 @@ class GTZAN(Dataset):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
-                extract_archive(archive)
+                _extract_tar(archive)
 
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
