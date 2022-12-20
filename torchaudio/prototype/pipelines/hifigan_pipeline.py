@@ -107,7 +107,8 @@ class HiFiGANGeneratorBundle:
         It is equivalent to the mel spectrogram transformation used for data preparation in the the original HiFiGAN
         code.
         See the reference code
-        `here <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_.
+        `here
+        <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_.
         """
         return HiFiGANMelSpectrogram(
             n_mels=self._params["in_channels"],
