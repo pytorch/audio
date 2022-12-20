@@ -15,6 +15,11 @@ def run_inference(args):
     bundle = getattr(torchaudio.pipelines, args.model)
     model = bundle.get_model()
 
+    if args.use_cuda:
+        gpu_device = torch.device("cuda")
+        cpu_device = torch.device("cpu")
+        model = model.to(gpu_device)
+
     # get decoder files
     files = download_pretrained_files("librispeech-4-gram")
 
@@ -40,9 +45,13 @@ def run_inference(args):
     for idx, sample in enumerate(dataset):
         waveform, _, transcript, _, _, _ = sample
         transcript = transcript.strip().lower().strip()
+        if args.use_cuda:
+            waveform = waveform.to(gpu_device)
 
         with torch.inference_mode():
             emission, _ = model(waveform)
+        if args.use_cuda:
+            emission = emission.to(cpu_device)
         results = decoder(emission)
 
         total_edit_distance += torchaudio.functional.edit_distance(transcript.split(), results[0][0].words)
@@ -102,6 +111,12 @@ def _parse_args():
     parser.add_argument("--unk_score", type=float, default=float("-inf"), help="unknown word insertion score")
     parser.add_argument("--sil_score", type=float, default=0, help="silence insertion score")
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
+    parser.add_argument(
+        "--use-cuda",
+        action="store_true",
+        default=False,
+        help="Run using CUDA.",
+    )
     return parser.parse_args()
 
 
