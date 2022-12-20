@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221219) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221220) &#x25BC</a>
     </div>
     
 
@@ -391,7 +391,7 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">download_url_to_file</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">extract_archive</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">_extract_zip</span>
 
 
 <span class="n">_URL</span> <span class="o">=</span> <span class="s2">&quot;https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip&quot;</span>
@@ -438,7 +438,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">download</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Dataset not found. Please use `download=True` to download it.&quot;</span><span class="p">)</span>
                 <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">hash_prefix</span><span class="o">=</span><span class="n">_CHECKSUM</span><span class="p">)</span>
-            <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
+            <span class="n">_extract_zip</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_filepath</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_filename_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">)</span>

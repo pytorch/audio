@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221219) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221220) &#x25BC</a>
     </div>
     
 
@@ -391,7 +391,7 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.hub</span> <span class="kn">import</span> <span class="n">download_url_to_file</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">_load_waveform</span><span class="p">,</span> <span class="n">extract_archive</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">_extract_zip</span><span class="p">,</span> <span class="n">_load_waveform</span>
 
 
 <span class="n">SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">16000</span>
@@ -440,7 +440,7 @@
             <span class="n">url</span> <span class="o">=</span> <span class="n">_ARCHIVE_CONFIGS</span><span class="p">[</span><span class="n">archive</span><span class="p">][</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
             <span class="n">checksum</span> <span class="o">=</span> <span class="n">_ARCHIVE_CONFIGS</span><span class="p">[</span><span class="n">archive</span><span class="p">][</span><span class="s2">&quot;checksum&quot;</span><span class="p">]</span>
             <span class="n">download_url_to_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">archive_path</span><span class="p">,</span> <span class="n">hash_prefix</span><span class="o">=</span><span class="n">checksum</span><span class="p">)</span>
-        <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive_path</span><span class="p">)</span>
+        <span class="n">_extract_zip</span><span class="p">(</span><span class="n">archive_path</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_flist</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

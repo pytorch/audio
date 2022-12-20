@@ -55,8 +55,8 @@ They can be serialized using TorchScript.
 
  .. code-block:: none
 
-    2.0.0.dev20221219
-    2.0.0.dev20221219
+    2.0.0.dev20221220
+    2.0.0.dev20221220
 
 
 
@@ -450,7 +450,7 @@ with ``librosa``.
 
  .. code-block:: none
 
-    Mean Square Difference:  3.795462323290159e-17
+    Mean Square Difference:  3.934872696751886e-17
 
 
 
@@ -583,7 +583,7 @@ spectrograms with ``librosa``.
 
  .. code-block:: none
 
-    Mean Square Difference:  1.0343034206883317e-09
+    Mean Square Difference:  1.2913579094941952e-09
 
 
 
@@ -703,7 +703,7 @@ Comparison against librosa
 
  .. code-block:: none
 
-    Mean Square Difference:  0.8103950023651123
+    Mean Square Difference:  0.8103961944580078
 
 
 
@@ -885,7 +885,7 @@ and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.490 seconds)
+   **Total running time of the script:** ( 0 minutes  5.975 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
