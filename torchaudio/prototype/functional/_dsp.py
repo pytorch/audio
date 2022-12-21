@@ -337,7 +337,7 @@ def filter_waveform(
 
     The following figure illustrates this.
 
-    .. image:: ../_static/img/apply_filter.png
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/filter_waveform.png
 
     .. note::
 
