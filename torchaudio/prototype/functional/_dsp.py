@@ -393,11 +393,8 @@ def filter_waveform(
         expand_shape = waveform.shape[:-1] + kernels.shape
         kernels = kernels.expand(expand_shape)
 
-    print("chunked:", chunked.shape, chunked)
     convolved = fftconvolve(chunked, kernels)
-    print("convolved:", convolved.shape, convolved)
     restored = _overlap_and_add(convolved, chunk_length)
-    print("restored:", restored.shape, restored)
 
     # Trim in a way that the number of samples are same as input,
     # and the filter delay is compensated
@@ -407,6 +404,5 @@ def filter_waveform(
         start = filter_size // 2
     num_crops = restored.size(-1) - num_frames
     end = num_crops - start
-    print("crop:", start, end)
     result = restored[..., start:-end]
     return result
