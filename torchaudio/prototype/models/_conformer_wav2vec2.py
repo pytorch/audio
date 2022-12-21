@@ -513,7 +513,7 @@ def conformer_wav2vec2_base(
 ) -> Wav2Vec2Model:
     """
     Build Conformer Wav2Vec2 Model with "small" architecture from
-    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
+    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
 
     Args:
         extractor_input_dim (int, optional): Input dimension of feature extractor. (Default: 64)
@@ -748,7 +748,7 @@ def conformer_wav2vec2_pretrain_large(
     cross_sample_negatives: int = 0,
 ) -> ConformerWav2Vec2PretrainModel:
     """Build Conformer Wav2Vec2 Model for pre-training with "large" architecture from
-    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
+    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
 
     Args:
         extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)
