@@ -325,11 +325,11 @@ def filter_waveform(
         waveform: torch.Tensor,
         kernels: torch.Tensor,
         delay_compensation: int = -1):
-    """Applies filters along time axis of the given waveform.
+    """Applies filters along the time axis of the given waveform.
 
     This function applies the given filters along time axis in the following manner:
 
-    1. Split the given waveform into chunks of the number of the given filters.
+    1. Split the given waveform into chunks. The number of chunks is equal to the number of given filters.
     2. Filter each chunk with corresponding filter.
     3. Place the filtered chunks at the original indices while adding up the overlapping parts.
     4. Crop the resulting waveform so that delay introduced by the filter is removed and its length
@@ -348,12 +348,12 @@ def filter_waveform(
         waveform (Tensor): Shape `(..., time)`.
         kernels (Tensor): Impulse responses.
             Valid inputs are 2D tensor with shape `(num_filters, filter_length)` or
-            `N+1` D tensor with shape `(..., num_filters, filter_length)`, where N is
+            `(N+1)`-D tensor with shape `(..., num_filters, filter_length)`, where `N` is
             the dimension of waveform.
 
-            In case of 2D input, the same set of filters are used across channels and batches.
-            Otherwise, different set of filters are applied. In this case, the shape of
-            the first `N-1` dimensions of filters must match (or broadcastable to) that of waveform.
+            In case of 2D input, the same set of filters is used across channels and batches.
+            Otherwise, different sets of filters are applied. In this case, the shape of
+            the first `N-1` dimensions of filters must match (or be broadcastable to) that of waveform.
 
         delay_compensation (int): Control how the waveform is cropped after full convolution.
             If the value is zero or positive, it is interpreted as the length of crop at the
