@@ -554,7 +554,7 @@ class FunctionalTestImpl(TestBaseMixin):
         """Applying delta kernel preserves the origianl waveform"""
         waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
         kernel = torch.zeros((num_filters, kernel_size), dtype=self.dtype, device=self.device)
-        kernel[:, kernel_size//2] = 1
+        kernel[:, kernel_size // 2] = 1
 
         result = F.filter_waveform(waveform, kernel)
         self.assertEqual(waveform, result)
@@ -589,6 +589,7 @@ class FunctionalTestImpl(TestBaseMixin):
         # The second filter is effective in the second half
         self.assertEqual(mix[-9:], ref2[-9:])
         # the middle portion is where the two filters affect
+
 
 class Functional64OnlyTestImpl(TestBaseMixin):
     @nested_params(

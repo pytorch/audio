@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 import torch
 
-from .functional import fftconvolve, convolve
+from .functional import fftconvolve
 
 
 def oscillator_bank(
@@ -321,11 +321,8 @@ def _overlap_and_add(waveform, stride):
     return buffer
 
 
-def filter_waveform(
-        waveform: torch.Tensor,
-        kernels: torch.Tensor,
-        delay_compensation: int = -1):
-    """Applies filters along the time axis of the given waveform.
+def filter_waveform(waveform: torch.Tensor, kernels: torch.Tensor, delay_compensation: int = -1):
+    """Applies filters along time axis of the given waveform.
 
     This function applies the given filters along time axis in the following manner:
 
@@ -368,12 +365,13 @@ def filter_waveform(
     if kernels.ndim not in [2, waveform.ndim + 1]:
         raise ValueError(
             "`kernels` must be 2 or N+1 dimension where "
-            f"N is the dimension of waveform. Found: {kernels.ndim} (N={waveform.ndim})")
+            f"N is the dimension of waveform. Found: {kernels.ndim} (N={waveform.ndim})"
+        )
 
     num_filters, filter_size = kernels.shape[-2:]
     num_frames = waveform.size(-1)
 
-    if delay_compensation is not None and delay_compensation > filter_size:
+    if delay_compensation > filter_size:
         raise ValueError(
             "When `delay_compenstation` is provided, it cannot be larger than the size of filters."
             f"Found: delay_compensation={delay_compensation}, filter_size={filter_size}"
