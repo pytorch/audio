@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 import torch
 
-from .functional import fftconvolve
+from .functional import fftconvolve, convolve
 
 
 def oscillator_bank(
@@ -321,7 +321,10 @@ def _overlap_and_add(waveform, stride):
     return buffer
 
 
-def filter_waveform(waveform: torch.Tensor, filters: torch.Tensor, delay_compensation: int = -1):
+def filter_waveform(
+        waveform: torch.Tensor,
+        kernels: torch.Tensor,
+        delay_compensation: int = -1):
     """Applies filters along time axis of the given waveform.
 
     This function applies the given filters along time axis in the following manner:
@@ -343,7 +346,7 @@ def filter_waveform(waveform: torch.Tensor, filters: torch.Tensor, delay_compens
 
     Args:
         waveform (Tensor): Shape `(..., time)`.
-        filters (Tensor): Impulse responses.
+        kernels (Tensor): Impulse responses.
             Valid inputs are 2D tensor with shape `(num_filters, filter_length)` or
             `N+1` D tensor with shape `(..., num_filters, filter_length)`, where N is
             the dimension of waveform.
@@ -353,19 +356,28 @@ def filter_waveform(waveform: torch.Tensor, filters: torch.Tensor, delay_compens
             the first `N-1` dimensions of filters must match (or broadcastable to) that of waveform.
 
         delay_compensation (int): Control how the waveform is cropped after full convolution.
-            Positive value denotes the index at which the cropping starts.
-            Negative value will start cropping the waveform at ``(filter_size - 1) // 2 - 1``.
+            If the value is zero or positive, it is interpreted as the length of crop at the
+            beginning of the waveform. The value cannot be larger than the size of filter kernel.
+            Otherwise the initial crop is ``filter_size // 2``.
+            When cropping happens, the waveform is also cropped from the end so that the
+            length of the resulting waveform matches the input waveform.
 
     Returns:
         Tensor: `(..., time)`.
     """
-    if filters.ndim not in [2, waveform.ndim + 1]:
+    if kernels.ndim not in [2, waveform.ndim + 1]:
         raise ValueError(
-            "`filters` must be 2 or N+1 dimension where "
-            f"N is the dimension of waveform. Found: {filters.ndim} (N={waveform.ndim})")
+            "`kernels` must be 2 or N+1 dimension where "
+            f"N is the dimension of waveform. Found: {kernels.ndim} (N={waveform.ndim})")
 
-    num_filters, filter_size = filters.shape[-2:]
+    num_filters, filter_size = kernels.shape[-2:]
     num_frames = waveform.size(-1)
+
+    if delay_compensation is not None and delay_compensation > filter_size:
+        raise ValueError(
+            "When `delay_compenstation` is provided, it cannot be larger than the size of filters."
+            f"Found: delay_compensation={delay_compensation}, filter_size={filter_size}"
+        )
 
     # Transform waveform's time axis into (num_filters x chunk_length) with optional padding
     chunk_length = num_frames // num_filters
@@ -376,22 +388,25 @@ def filter_waveform(waveform: torch.Tensor, filters: torch.Tensor, delay_compens
     chunked = waveform.unfold(-1, chunk_length, chunk_length)
     assert chunked.numel() >= waveform.numel()
 
-    # Broadcast filters
-    if waveform.ndim + 1 > filters.ndim:
-        expand_shape = waveform.shape[:-1] + filters.shape
-        filters = filters.expand(expand_shape)
+    # Broadcast kernels
+    if waveform.ndim + 1 > kernels.ndim:
+        expand_shape = waveform.shape[:-1] + kernels.shape
+        kernels = kernels.expand(expand_shape)
 
-    convolved = fftconvolve(chunked, filters)
+    print("chunked:", chunked.shape, chunked)
+    convolved = fftconvolve(chunked, kernels)
+    print("convolved:", convolved.shape, convolved)
     restored = _overlap_and_add(convolved, chunk_length)
+    print("restored:", restored.shape, restored)
 
     # Trim in a way that the number of samples are same as input,
     # and the filter delay is compensated
-    num_crops = restored.size(-1) - num_frames
     if delay_compensation >= 0:
         start = delay_compensation
     else:
-        start = (filter_size - 1) // 2 - 1
+        start = filter_size // 2
+    num_crops = restored.size(-1) - num_frames
     end = num_crops - start
-
+    print("crop:", start, end)
     result = restored[..., start:-end]
     return result

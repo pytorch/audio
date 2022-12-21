@@ -549,6 +549,46 @@ class FunctionalTestImpl(TestBaseMixin):
 
         assert filtered.shape == waveform.shape
 
+    @nested_params([1, 3, 5], [3, 5, 7, 4, 6, 8])
+    def test_filter_waveform_delta(self, num_filters, kernel_size):
+        """Applying delta kernel preserves the origianl waveform"""
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernel = torch.zeros((num_filters, kernel_size), dtype=self.dtype, device=self.device)
+        kernel[:, kernel_size//2] = 1
+
+        result = F.filter_waveform(waveform, kernel)
+        self.assertEqual(waveform, result)
+
+    def test_filter_waveform_same(self, kernel_size=5):
+        """Applying the same filter returns the original waveform"""
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernel = torch.randn((1, kernel_size), dtype=self.dtype, device=self.device)
+        kernels = torch.cat([kernel] * 3)
+
+        out1 = F.filter_waveform(waveform, kernel)
+        out2 = F.filter_waveform(waveform, kernels)
+        self.assertEqual(out1, out2)
+
+    def test_filter_waveform_diff(self):
+        """Filters are applied from the first to the last"""
+        kernel_size = 3
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernels = torch.randn((2, kernel_size), dtype=self.dtype, device=self.device)
+
+        # use both filters.
+        mix = F.filter_waveform(waveform, kernels)
+        # use only one of them
+        ref1 = F.filter_waveform(waveform[:10], kernels[0:1])
+        ref2 = F.filter_waveform(waveform[10:], kernels[1:2])
+
+        print("mix:", mix)
+        print("ref1:", ref1)
+        print("ref2:", ref2)
+        # The first filter is effective in the first half
+        self.assertEqual(mix[:10], ref1[:10])
+        # The second filter is effective in the second half
+        self.assertEqual(mix[-9:], ref2[-9:])
+        # the middle portion is where the two filters affect
 
 class Functional64OnlyTestImpl(TestBaseMixin):
     @nested_params(
