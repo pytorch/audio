@@ -95,7 +95,7 @@ def info(
             buffer_size = get_buffer_size()
             if format == "mp3":
                 return _fallback_info_fileobj(filepath, format, buffer_size)
-            sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+            sinfo = torchaudio.lib._torchaudio_sox.get_info_fileobj(filepath, format)
             if sinfo is not None:
                 return AudioMetaData(*sinfo)
             return _fallback_info_fileobj(filepath, format, buffer_size)
@@ -223,7 +223,7 @@ def load(
                     format,
                     buffer_size,
                 )
-            ret = torchaudio._torchaudio.load_audio_fileobj(
+            ret = torchaudio.lib._torchaudio_sox.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
             if ret is not None:
@@ -403,7 +403,7 @@ def save(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "write"):
-            torchaudio._torchaudio.save_audio_fileobj(
+            torchaudio.lib._torchaudio_sox.save_audio_fileobj(
                 filepath,
                 src,
                 sample_rate,
