@@ -1,6 +1,11 @@
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models import conformer_wav2vec2_base, conformer_wav2vec2_pretrain_base, emformer_hubert_base
+from torchaudio.prototype.models import (
+    conformer_wav2vec2_base,
+    conformer_wav2vec2_pretrain_base,
+    conformer_wav2vec2_pretrain_large,
+    emformer_hubert_base,
+)
 from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
 
 
@@ -138,3 +143,36 @@ class TestSSLModel(TorchaudioTestCase):
 
         self.assertEqual(hyp_out, ref_out)
         self.assertEqual(hyp_len, ref_len)
+
+    @parameterized.expand(
+        [
+            (conformer_wav2vec2_pretrain_base, 256),
+            (conformer_wav2vec2_pretrain_large, 768),
+        ]
+    )
+    def test_conformerw2v2_pretrain_shapes(self, model, output_dim):
+        batch_size, num_frames, feature_dim = 3, 2048, 64
+        features = torch.randn(batch_size, num_frames, feature_dim)
+        lengths = torch.randint(
+            low=0,
+            high=num_frames,
+            size=[
+                batch_size,
+            ],
+        )
+
+        model = model()
+        model.eval()
+        x, lengths, mask_idxs, targets, negs, neg_idxs = model(features, lengths)
+
+        # factory function parameter values
+        stride = 4
+        num_negatives = 100
+        mask_len = torch.max(mask_idxs.sum(dim=1))
+
+        assert x.shape == (batch_size, num_frames // stride, output_dim)
+        assert lengths.shape == (batch_size,)
+        assert mask_idxs.shape == (batch_size, num_frames // stride)
+        assert targets.shape == (batch_size, mask_len, output_dim)
+        assert neg_idxs.shape == (batch_size, num_negatives * mask_len)
+        assert negs.shape == (num_negatives, batch_size, mask_len, output_dim)

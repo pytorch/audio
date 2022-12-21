@@ -79,6 +79,15 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     return negs, neg_idxs
 
 
+def _mask_input(input: Tensor, mask: Tensor):
+    B, T, D = input.shape
+    mask_len = torch.max(mask.sum(dim=1))
+    masked_input = torch.zeros((B, mask_len, D))
+    for b in range(B):
+        masked_input[b] = input[b][mask[b]]
+    return masked_input
+
+
 class NegativeSampler(Module):
     r"""Applies preprocessing to input and then computes negative sampling.
 
@@ -320,7 +329,8 @@ class ConformerWav2Vec2PretrainModel(Module):
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
         x, mask_idxs = self.mask_generator(x, padding_mask)
 
-        targets, negs, neg_idxs = self.negative_sampler(x)
+        masked_x = _mask_input(x, mask_idxs)
+        targets, negs, neg_idxs = self.negative_sampler(masked_x)
 
         x = self.wav2vec2.encoder.feature_projection.projection(x)
         x = x.transpose(0, 1)
