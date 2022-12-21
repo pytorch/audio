@@ -108,7 +108,7 @@ class StreamWriter:
         if isinstance(dst, str):
             self._s = torch.classes.torchaudio.ffmpeg_StreamWriter(dst, format)
         elif hasattr(dst, "write"):
-            self._s = torchaudio._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
+            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
         else:
             raise ValueError("`dst` must be either a string or a file-like object.")
         self._is_open = False

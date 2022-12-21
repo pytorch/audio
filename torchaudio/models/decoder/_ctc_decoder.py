@@ -33,7 +33,7 @@ try:
     )
 except Exception:
     torchaudio._extension._load_lib("libflashlight-text")
-    from torchaudio.flashlight_lib_text_decoder import (
+    from torchaudio.lib.flashlight_lib_text_decoder import (
         CriterionType as _CriterionType,
         KenLM as _KenLM,
         LexiconDecoder as _LexiconDecoder,
@@ -46,7 +46,7 @@ except Exception:
         Trie as _Trie,
         ZeroLM as _ZeroLM,
     )
-    from torchaudio.flashlight_lib_text_dictionary import (
+    from torchaudio.lib.flashlight_lib_text_dictionary import (
         create_word_dict as _create_word_dict,
         Dictionary as _Dictionary,
         load_words as _load_words,

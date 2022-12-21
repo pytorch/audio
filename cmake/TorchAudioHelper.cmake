@@ -52,8 +52,8 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     endif()
     install(
       TARGETS ${name}
-      LIBRARY DESTINATION .
-      RUNTIME DESTINATION .  # For Windows
+      LIBRARY DESTINATION lib
+      RUNTIME DESTINATION lib  # For Windows
       )
   endfunction()
 endif()
