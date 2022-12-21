@@ -20,6 +20,9 @@ def run_inference(args):
         cpu_device = torch.device("cpu")
         model = model.to(gpu_device)
 
+    if args.compile:
+        model = torch.compile(model)
+
     # get decoder files
     files = download_pretrained_files("librispeech-4-gram")
 
@@ -116,6 +119,12 @@ def _parse_args():
         action="store_true",
         default=False,
         help="Run using CUDA.",
+    )
+    parser.add_argument(
+        "--compile",
+        action="store_true",
+        default=False,
+        help="Use PyTorch 2.0 compile optimizations",
     )
     return parser.parse_args()
 
