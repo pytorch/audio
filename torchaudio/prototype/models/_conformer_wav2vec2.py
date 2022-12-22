@@ -51,7 +51,8 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     cross_high = T * B
     high = T
 
-    assert high > 1
+    if not high > 1:
+        raise AssertionError(f"``high`` should be greater than 1, but got {high}")
 
     if num_negatives > 0:
         tszs = _buffered_arange(T).unsqueeze(-1).expand(-1, num_negatives).flatten()
@@ -82,7 +83,7 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
 def _mask_input(input: Tensor, mask: Tensor):
     B, T, D = input.shape
     mask_len = torch.max(mask.sum(dim=1))
-    masked_input = torch.zeros((B, mask_len, D))
+    masked_input = torch.zeros((B, mask_len, D), dtype=input.dtype, device=input.device)
     for b in range(B):
         masked_input[b] = input[b][mask[b]]
     return masked_input

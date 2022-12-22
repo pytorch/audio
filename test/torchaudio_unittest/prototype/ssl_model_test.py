@@ -9,21 +9,29 @@ from torchaudio.prototype.models import (
 from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
 
 
+def _get_features_lengths(batch_size, num_frames, feature_dim, seed=0):
+    torch.manual_seed(seed)
+    features = torch.randn(batch_size, num_frames, feature_dim)
+    lengths = torch.randint(
+        low=1,
+        high=num_frames,
+        size=[
+            batch_size,
+        ],
+    )
+    lengths[0] = num_frames
+    return features, lengths
+
+
 class TestSSLModel(TorchaudioTestCase):
     def _smoke_test(self, model, feature_dim, device, dtype):
         model = model.to(device=device, dtype=dtype)
         model = model.eval()
 
         batch_size, num_frames = 3, 1024
-        features = torch.randn(batch_size, num_frames, feature_dim, device=device, dtype=dtype)
-        lengths = torch.randint(
-            low=0,
-            high=num_frames,
-            size=[
-                batch_size,
-            ],
-            device=device,
-        )
+        features, lengths = _get_features_lengths(batch_size, num_frames, feature_dim)
+        features = features.to(device=device, dtype=dtype)
+        lengths = lengths.to(device)
 
         model(features, lengths)
 
@@ -66,14 +74,7 @@ class TestSSLModel(TorchaudioTestCase):
         else:
             num_layers = len(model.encoder.emformer.emformer_layers)
 
-        features = torch.randn(batch_size, num_frames, feature_dim)
-        lengths = torch.randint(
-            low=0,
-            high=num_frames,
-            size=[
-                batch_size,
-            ],
-        )
+        features, lengths = _get_features_lengths(batch_size, num_frames, feature_dim)
 
         all_features, lengths_ = model.extract_features(features, lengths, num_layers=None)
         assert len(all_features) == num_layers
@@ -127,14 +128,7 @@ class TestSSLModel(TorchaudioTestCase):
         model.eval()
 
         batch_size, num_frames = 3, 1024
-        features = torch.randn(batch_size, num_frames, feature_dim)
-        lengths = torch.randint(
-            low=0,
-            high=num_frames,
-            size=[
-                batch_size,
-            ],
-        )
+        features, lengths = _get_features_lengths(batch_size, num_frames, feature_dim)
 
         ref_out, ref_len = model(features, lengths)
 
@@ -152,14 +146,7 @@ class TestSSLModel(TorchaudioTestCase):
     )
     def test_conformerw2v2_pretrain_shapes(self, model, output_dim):
         batch_size, num_frames, feature_dim = 3, 2048, 64
-        features = torch.randn(batch_size, num_frames, feature_dim)
-        lengths = torch.randint(
-            low=0,
-            high=num_frames,
-            size=[
-                batch_size,
-            ],
-        )
+        features, lengths = _get_features_lengths(batch_size, num_frames, feature_dim)
 
         model = model()
         model.eval()
