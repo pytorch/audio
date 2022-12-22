@@ -78,41 +78,11 @@ if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_COMPILE_DEFINITIONS INCLUDE_KALDI)
 endif()
 
-if(BUILD_SOX)
-  list(
-    APPEND
-    LIBTORCHAUDIO_LINK_LIBRARIES
-    libsox
-    )
-  list(
-    APPEND
-    LIBTORCHAUDIO_SOURCES
-    sox/io.cpp
-    sox/utils.cpp
-    sox/effects.cpp
-    sox/effects_chain.cpp
-    sox/types.cpp
-    )
-  list(
-    APPEND
-    LIBTORCHAUDIO_COMPILE_DEFINITIONS
-    INCLUDE_SOX
-    )
-endif()
-
 if(OpenMP_CXX_FOUND)
   list(
     APPEND
     LIBTORCHAUDIO_LINK_LIBRARIES
     OpenMP::OpenMP_CXX
-    )
-endif()
-
-if(USE_FFMPEG)
-  list(
-    APPEND
-    LIBTORCHAUDIO_COMPILE_DEFINITIONS
-    USE_FFMPEG
     )
 endif()
 
@@ -132,6 +102,27 @@ if (APPLE)
   set(TORCHAUDIO_LIBRARY libtorchaudio CACHE INTERNAL "")
 else()
   set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
+endif()
+
+################################################################################
+# libtorchaudio_sox
+################################################################################
+if (BUILD_SOX)
+  set(
+    libtorchaudio_sox_sources
+    sox/io.cpp
+    sox/utils.cpp
+    sox/effects.cpp
+    sox/effects_chain.cpp
+    sox/types.cpp
+    )
+  torchaudio_library(
+    libtorchaudio_sox
+    "${libtorchaudio_sox_sources}"
+    "${LIBTORCHAUDIO_INCLUDE_DIRS}"
+    "torch;libsox"
+    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
+    )
 endif()
 
 ################################################################################
@@ -167,37 +158,37 @@ if(USE_FFMPEG)
 endif()
 
 ################################################################################
-# TODO: Rename this to _torchaudio_sox.so
-# _torchaudio.so
+# Python extensions
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   set(
-    EXTENSION_SOURCES
-    sox/pybind/pybind.cpp
+    extension_sources
+    pybind/pybind.cpp
     )
-  #----------------------------------------------------------------------------#
-  # START OF CUSTOMIZATION LOGICS
-  #----------------------------------------------------------------------------#
+  torchaudio_extension(
+    _torchaudio
+    "${extension_sources}"
+    ""
+    "libtorchaudio"
+    ""
+    )
   if(BUILD_SOX)
-    list(
-      APPEND
-      EXTENSION_SOURCES
+    set(
+      sox_extension_sources
+      sox/pybind/pybind.cpp
       sox/pybind/effects.cpp
       sox/pybind/effects_chain.cpp
       sox/pybind/io.cpp
       sox/pybind/utils.cpp
       )
+    torchaudio_extension(
+      _torchaudio_sox
+      "${sox_extension_sources}"
+      ""
+      "libtorchaudio_sox"
+      ""
+      )
   endif()
-  #----------------------------------------------------------------------------#
-  # END OF CUSTOMIZATION LOGICS
-  #----------------------------------------------------------------------------#
-  torchaudio_extension(
-    _torchaudio
-    "${EXTENSION_SOURCES}"
-    ""
-    libtorchaudio
-    "${LIBTORCHAUDIO_COMPILE_DEFINITIONS}"
-    )
   if(USE_FFMPEG)
     set(
       FFMPEG_EXTENSION_SOURCES

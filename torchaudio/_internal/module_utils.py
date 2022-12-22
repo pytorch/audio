@@ -67,7 +67,10 @@ def deprecated(direction: str, version: Optional[str] = None):
 
 
 def is_kaldi_available():
-    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_kaldi_available()
+    try:
+        return torch.ops.torchaudio.is_kaldi_available()
+    except Exception:
+        return False
 
 
 def requires_kaldi():
@@ -126,7 +129,7 @@ def requires_soundfile():
 
 
 def is_sox_available():
-    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_sox_available()
+    return is_module_available("torchaudio.lib._torchaudio_sox")
 
 
 def requires_sox():

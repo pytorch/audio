@@ -361,7 +361,7 @@ class StreamReader:
         elif isinstance(src, torch.Tensor):
             self._be = torch.classes.torchaudio.ffmpeg_StreamReaderTensor(src, format, option, buffer_size)
         elif hasattr(src, "read"):
-            self._be = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
             raise ValueError("`src` must be either string, Tensor or file-like object.")
 
