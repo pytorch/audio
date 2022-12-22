@@ -1,3 +1,4 @@
+# @nolint
 # flake8: noqa
 # fmt: off
 

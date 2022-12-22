@@ -1,3 +1,4 @@
+# @nolint
 # flake8: noqa
 
 class AttrDict(dict):
