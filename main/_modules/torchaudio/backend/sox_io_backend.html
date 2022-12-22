@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221221) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221222) &#x25BC</a>
     </div>
     
 
@@ -481,7 +481,7 @@
             <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">get_buffer_size</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
-            <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
@@ -609,7 +609,7 @@
                     <span class="nb">format</span><span class="p">,</span>
                     <span class="n">buffer_size</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
                 <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -789,7 +789,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
-            <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">save_audio_fileobj</span><span class="p">(</span>
+            <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">save_audio_fileobj</span><span class="p">(</span>
                 <span class="n">filepath</span><span class="p">,</span>
                 <span class="n">src</span><span class="p">,</span>
                 <span class="n">sample_rate</span><span class="p">,</span>

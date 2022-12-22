@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221221) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221222) &#x25BC</a>
     </div>
     
 
@@ -388,6 +388,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">.functional</span> <span class="kn">import</span> <span class="n">fftconvolve</span>
 
 
 <div class="viewcode-block" id="oscillator_bank"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.oscillator_bank.html#torchaudio.prototype.functional.oscillator_bank">[docs]</a><span class="k">def</span> <span class="nf">oscillator_bank</span><span class="p">(</span>
@@ -692,6 +694,102 @@
     <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">magnitudes</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">magnitudes</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">ir</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ir</span> <span class="o">*</span> <span class="n">window</span></div>
+
+
+<span class="k">def</span> <span class="nf">_overlap_and_add</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+    <span class="n">num_frames</span><span class="p">,</span> <span class="n">frame_size</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">numel</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_frames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span> <span class="n">frame_size</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">numel</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_frames</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">stride</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">frame_size</span>
+        <span class="n">buffer</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">+=</span> <span class="n">waveform</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">buffer</span>
+
+
+<div class="viewcode-block" id="filter_waveform"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.filter_waveform.html#torchaudio.prototype.functional.filter_waveform">[docs]</a><span class="k">def</span> <span class="nf">filter_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">kernels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">delay_compensation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies filters along time axis of the given waveform.</span>
+
+<span class="sd">    This function applies the given filters along time axis in the following manner:</span>
+
+<span class="sd">    1. Split the given waveform into chunks. The number of chunks is equal to the number of given filters.</span>
+<span class="sd">    2. Filter each chunk with corresponding filter.</span>
+<span class="sd">    3. Place the filtered chunks at the original indices while adding up the overlapping parts.</span>
+<span class="sd">    4. Crop the resulting waveform so that delay introduced by the filter is removed and its length</span>
+<span class="sd">       matches that of the input waveform.</span>
+
+<span class="sd">    The following figure illustrates this.</span>
+
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/filter_waveform.png</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">       If the number of filters is one, then the operation becomes stationary.</span>
+<span class="sd">       i.e. the same filtering is applied across the time axis.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (Tensor): Shape `(..., time)`.</span>
+<span class="sd">        kernels (Tensor): Impulse responses.</span>
+<span class="sd">            Valid inputs are 2D tensor with shape `(num_filters, filter_length)` or</span>
+<span class="sd">            `(N+1)`-D tensor with shape `(..., num_filters, filter_length)`, where `N` is</span>
+<span class="sd">            the dimension of waveform.</span>
+
+<span class="sd">            In case of 2D input, the same set of filters is used across channels and batches.</span>
+<span class="sd">            Otherwise, different sets of filters are applied. In this case, the shape of</span>
+<span class="sd">            the first `N-1` dimensions of filters must match (or be broadcastable to) that of waveform.</span>
+
+<span class="sd">        delay_compensation (int): Control how the waveform is cropped after full convolution.</span>
+<span class="sd">            If the value is zero or positive, it is interpreted as the length of crop at the</span>
+<span class="sd">            beginning of the waveform. The value cannot be larger than the size of filter kernel.</span>
+<span class="sd">            Otherwise the initial crop is ``filter_size // 2``.</span>
+<span class="sd">            When cropping happens, the waveform is also cropped from the end so that the</span>
+<span class="sd">            length of the resulting waveform matches the input waveform.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: `(..., time)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kernels</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`kernels` must be 2 or N+1 dimension where &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;N is the dimension of waveform. Found: </span><span class="si">{</span><span class="n">kernels</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> (N=</span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">num_filters</span><span class="p">,</span> <span class="n">filter_size</span> <span class="o">=</span> <span class="n">kernels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">delay_compensation</span> <span class="o">&gt;</span> <span class="n">filter_size</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;When `delay_compenstation` is provided, it cannot be larger than the size of filters.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: delay_compensation=</span><span class="si">{</span><span class="n">delay_compensation</span><span class="si">}</span><span class="s2">, filter_size=</span><span class="si">{</span><span class="n">filter_size</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Transform waveform&#39;s time axis into (num_filters x chunk_length) with optional padding</span>
+    <span class="n">chunk_length</span> <span class="o">=</span> <span class="n">num_frames</span> <span class="o">//</span> <span class="n">num_filters</span>
+    <span class="k">if</span> <span class="n">num_frames</span> <span class="o">%</span> <span class="n">num_filters</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">chunk_length</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">num_pad</span> <span class="o">=</span> <span class="n">chunk_length</span> <span class="o">*</span> <span class="n">num_filters</span> <span class="o">-</span> <span class="n">num_frames</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_pad</span><span class="p">],</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">chunked</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">unfold</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">chunk_length</span><span class="p">,</span> <span class="n">chunk_length</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">chunked</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+
+    <span class="c1"># Broadcast kernels</span>
+    <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">kernels</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+        <span class="n">expand_shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">kernels</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">kernels</span> <span class="o">=</span> <span class="n">kernels</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">expand_shape</span><span class="p">)</span>
+
+    <span class="n">convolved</span> <span class="o">=</span> <span class="n">fftconvolve</span><span class="p">(</span><span class="n">chunked</span><span class="p">,</span> <span class="n">kernels</span><span class="p">)</span>
+    <span class="n">restored</span> <span class="o">=</span> <span class="n">_overlap_and_add</span><span class="p">(</span><span class="n">convolved</span><span class="p">,</span> <span class="n">chunk_length</span><span class="p">)</span>
+
+    <span class="c1"># Trim in a way that the number of samples are same as input,</span>
+    <span class="c1"># and the filter delay is compensated</span>
+    <span class="k">if</span> <span class="n">delay_compensation</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">delay_compensation</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">filter_size</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">num_crops</span> <span class="o">=</span> <span class="n">restored</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_frames</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">num_crops</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">restored</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="o">-</span><span class="n">end</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 </pre></div>
 
              </article>

@@ -54,8 +54,8 @@ windowed-sinc kernels, and frequency sampling method.
 
  .. code-block:: none
 
-    2.0.0.dev20221221
-    2.0.0.dev20221221
+    2.0.0.dev20221222
+    2.0.0.dev20221222
 
 
 
@@ -674,7 +674,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.703 seconds)
+   **Total running time of the script:** ( 0 minutes  4.929 seconds)
 
 
 .. _sphx_glr_download_tutorials_filter_design_tutorial.py:
