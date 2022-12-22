@@ -47,6 +47,7 @@ DSP
    :nosignatures:
 
    adsr_envelope
+   filter_waveform
    extend_pitch
    oscillator_bank
    sinc_impulse_response
