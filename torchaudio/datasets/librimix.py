@@ -19,8 +19,8 @@ class LibriMix(Dataset):
     r"""*LibriMix* :cite:`cosentino2020librimix` dataset.
 
     Args:
-        root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
-            ``Libri3Mix`` is stored.
+        root (str or Path): The path where the directory ``Libri2Mix`` or
+            ``Libri3Mix`` is stored. Not the path of those directories.
         subset (str, optional): The subset to use. Options: [``"train-360"``, ``"train-100"``,
             ``"dev"``, and ``"test"``] (Default: ``"train-360"``).
         num_speakers (int, optional): The number of speakers, which determines the directories
