@@ -46,8 +46,8 @@ This tutorial shows how to use torchaudio's resampling API.
 
  .. code-block:: none
 
-    2.0.0.dev20221224
-    2.0.0.dev20221224
+    2.0.0.dev20221225
+    2.0.0.dev20221225
 
 
 
@@ -658,7 +658,7 @@ in ``torchaudio``.
 
  .. code-block:: none
 
-    torchaudio: 2.0.0.dev20221224
+    torchaudio: 2.0.0.dev20221225
     librosa: 0.9.2
     resampy: 0.2.2
 
@@ -891,10 +891,10 @@ Downsample (48 -> 44.1 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        2.27        0.34
-    sinc (width 16)      NaN        1.17        0.32
-    kaiser_best        86.17        2.01        0.34
-    kaiser_fast        10.11        1.65        0.33
+    sinc (width 64)      NaN        2.31        0.34
+    sinc (width 16)      NaN        1.15        0.32
+    kaiser_best        85.43        2.03        0.33
+    kaiser_fast         9.66        1.60        0.32
 
 
 
@@ -926,10 +926,10 @@ Downsample (16 -> 8 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        1.06        0.77
-    sinc (width 16)      NaN        0.50        0.28
-    kaiser_best        13.74        1.17        0.78
-    kaiser_fast         4.54        0.61        0.31
+    sinc (width 64)      NaN        1.02        0.74
+    sinc (width 16)      NaN        0.53        0.28
+    kaiser_best        13.10        1.05        0.75
+    kaiser_fast         4.01        0.62        0.30
 
 
 
@@ -961,10 +961,10 @@ Upsample (44.1 -> 48 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        2.24        0.33
-    sinc (width 16)      NaN        1.13        0.31
-    kaiser_best        37.48        1.93        0.34
-    kaiser_fast        10.12        1.63        0.32
+    sinc (width 64)      NaN        2.32        0.38
+    sinc (width 16)      NaN        1.26        0.36
+    kaiser_best        36.70        1.98        0.36
+    kaiser_fast         9.68        1.65        0.36
 
 
 
@@ -996,10 +996,10 @@ Upsample (8 -> 16 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.53        0.23
-    sinc (width 16)      NaN        0.39        0.17
-    kaiser_best        13.80        0.63        0.26
-    kaiser_fast         4.44        0.50        0.17
+    sinc (width 64)      NaN        0.61        0.26
+    sinc (width 16)      NaN        0.50        0.19
+    kaiser_best        13.25        0.66        0.27
+    kaiser_fast         4.06        0.56        0.21
 
 
 
@@ -1024,7 +1024,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.113 seconds)
+   **Total running time of the script:** ( 0 minutes  4.124 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:
