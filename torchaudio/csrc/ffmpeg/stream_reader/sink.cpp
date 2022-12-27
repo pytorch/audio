@@ -1,3 +1,5 @@
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
 #include <stdexcept>
 
@@ -11,12 +13,22 @@ std::unique_ptr<Buffer> get_buffer(
     int num_chunks,
     const torch::Device& device) {
   switch (type) {
-    case AVMEDIA_TYPE_AUDIO:
-      return std::unique_ptr<Buffer>(
-          new AudioBuffer(frames_per_chunk, num_chunks));
-    case AVMEDIA_TYPE_VIDEO:
-      return std::unique_ptr<Buffer>(
-          new VideoBuffer(frames_per_chunk, num_chunks, device));
+    case AVMEDIA_TYPE_AUDIO: {
+      if (frames_per_chunk < 0) {
+        return std::unique_ptr<Buffer>(new UnchunkedAudioBuffer());
+      } else {
+        return std::unique_ptr<Buffer>(
+            new ChunkedAudioBuffer(frames_per_chunk, num_chunks));
+      }
+    }
+    case AVMEDIA_TYPE_VIDEO: {
+      if (frames_per_chunk < 0) {
+        return std::unique_ptr<Buffer>(new UnchunkedVideoBuffer(device));
+      } else {
+        return std::unique_ptr<Buffer>(
+            new ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
+      }
+    }
     default:
       TORCH_CHECK(
           false,
