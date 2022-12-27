@@ -96,22 +96,18 @@ def run_inference(args):
             print("Model evaluation %d took %f s" % (num_model_evals, elapsed_time))
             if i > 0:  # Don't include the first run in timings.
                 total_time += elapsed_time
-        print('Average runtime = %f' % (total_time / (NUM_RUNS-1)))
-        
-        
+        print('Average runtime = %f' % (total_time / (NUM_RUNS - 1)))
+
         if args.use_cuda:
             emissions = emissions.to(cpu_device)
             emission_lengths = emission_lengths.to(cpu_device)
 
-        #results = decoder(emissions, emission_lengths)
-        #print(emission_lengths)
-
         for i in range(len(transcripts)):
             # Due to the removal of 'lengths' above, emission_lengths will be None and the following
             # line will break.
-            emission = emissions[i:i+1, 0:emission_lengths[i], :]
+            emission = emissions[i:i + 1, 0:emission_lengths[i], :]
             result = decoder(emission)
-            transcript = transcripts[i].strip().lower().strip()            
+            transcript = transcripts[i].strip().lower().strip()
             total_edit_distance += torchaudio.functional.edit_distance(transcript.split(), result[0][0].words)
             total_length += len(transcript.split())
 
