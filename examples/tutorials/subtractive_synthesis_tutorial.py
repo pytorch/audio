@@ -101,7 +101,7 @@ num_filters = 64 * duration
 window_size = 2049
 
 f_cutoff = torch.linspace(0.0, 0.8, num_filters)
-filt = sinc_impulse_response(f_cutoff , window_size)
+kernel = sinc_impulse_response(f_cutoff , window_size)
 
 ######################################################################
 #
@@ -109,7 +109,7 @@ filt = sinc_impulse_response(f_cutoff , window_size)
 # :py:func:`~torchaudio.prototype.functional.filter_waveform`
 #
 
-filtered = filter_waveform(noise, filt)
+filtered = filter_waveform(noise, kernel)
 
 ######################################################################
 #
@@ -145,6 +145,9 @@ plot_sinc_ir(filtered, f_cutoff, SAMPLE_RATE)
 # Oscillating cutoff frequency
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
+# By oscillating the cutoff frequency, we can emulate an effect of
+# Low-frequency oscillation (LFO).
+#
 
 PI2 = torch.pi * 2
 num_filters = 90 * duration
@@ -153,8 +156,12 @@ f_lfo = torch.linspace(0.9, 0.1, num_filters)
 f_cutoff_osci = torch.linspace(0.01, 0.03, num_filters) * torch.sin(torch.cumsum(f_lfo, dim=0))
 f_cutoff_base = torch.linspace(0.8, 0.03, num_filters) ** 1.7
 f_cutoff = f_cutoff_base + f_cutoff_osci
-filt = sinc_impulse_response(f_cutoff , window_size)
-filtered = filter_waveform(noise, filt)
+
+######################################################################
+#
+
+kernel = sinc_impulse_response(f_cutoff , window_size)
+filtered = filter_waveform(noise, kernel)
 
 ######################################################################
 #
@@ -166,11 +173,17 @@ plot_sinc_ir(filtered, f_cutoff, SAMPLE_RATE)
 # Wah-wah effects
 # ~~~~~~~~~~~~~~~
 #
+# Wah-wah effects are applications of low-pass filter or band-pass filter.
+# They change the cut-off freuqnecy or Q-factor quickly.
 
 f_lfo = torch.linspace(0.15, 0.15, num_filters)
 f_cutoff = 0.07 + 0.06 * torch.sin(torch.cumsum(f_lfo, dim=0))
-filt = sinc_impulse_response(f_cutoff , window_size)
-filtered = filter_waveform(noise, filt)
+
+######################################################################
+#
+
+kernel = sinc_impulse_response(f_cutoff , window_size)
+filtered = filter_waveform(noise, kernel)
 
 ######################################################################
 #
@@ -181,10 +194,15 @@ plot_sinc_ir(filtered, f_cutoff, SAMPLE_RATE)
 # Arbitrary frequence response
 # ----------------------------
 #
+# By using
+# :py:func:`~torchaudio.prototype.functinal.frequency_impulse_response`,
+# one can directly control the power distribution over frequency.
+#
+
 
 magnitudes = torch.sin(torch.linspace(0, 10, 64))**4.0
-ir = frequency_impulse_response(magnitudes)
-filtered = filter_waveform(noise, ir.unsqueeze(0))
+kernel = frequency_impulse_response(magnitudes)
+filtered = filter_waveform(noise, kernel.unsqueeze(0))
 
 ######################################################################
 #
@@ -217,9 +235,16 @@ plot_waveform(magnitudes, filtered, SAMPLE_RATE)
 
 ######################################################################
 #
-magnitudes = torch.concat([torch.ones((32,)), torch.zeros((32,))])
-ir = frequency_impulse_response(magnitudes)
-filtered = filter_waveform(noise, ir.unsqueeze(0))
+# It is also possible to make a non-stationary filter.
+
+magnitudes = torch.stack(
+    [torch.linspace(0.0, w, 1000) for w in torch.linspace(4.0, 40.0, 250)])
+magnitudes = torch.sin(magnitudes) ** 4.0
+
+######################################################################
+#
+kernel = frequency_impulse_response(magnitudes)
+filtered = filter_waveform(noise, kernel)
 
 ######################################################################
 #
@@ -227,11 +252,14 @@ plot_waveform(magnitudes, filtered, SAMPLE_RATE)
 
 ######################################################################
 #
-magnitudes = torch.stack(
-    [torch.linspace(0.0, w, 1000) for w in torch.linspace(4.0, 40.0, 250)])
-magnitudes = torch.sin(magnitudes) ** 4.0
-ir = frequency_impulse_response(magnitudes)
-filtered = filter_waveform(noise, ir)
+# Of cource it is also possible to emulate simpmle low pass filter.
+
+magnitudes = torch.concat([torch.ones((32,)), torch.zeros((32,))])
+
+######################################################################
+#
+kernel = frequency_impulse_response(magnitudes)
+filtered = filter_waveform(noise, kernel.unsqueeze(0))
 
 ######################################################################
 #
