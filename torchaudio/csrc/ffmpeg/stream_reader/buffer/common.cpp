@@ -194,7 +194,12 @@ torch::Tensor convert_yuv420p(AVFrame* pFrame) {
     }
   }
   // Upsample width and height
-  uv = uv.repeat_interleave(2, -1).repeat_interleave(2, -2);
+  namespace F = torch::nn::functional;
+  uv = F::interpolate(
+      uv,
+      F::InterpolateFuncOptions()
+          .mode(torch::kNearest)
+          .size(std::vector<int64_t>({height, width})));
   return torch::cat({y, uv}, 1);
 }
 
@@ -230,8 +235,13 @@ torch::Tensor convert_nv12_cpu(AVFrame* pFrame) {
     }
   }
   // Upsample width and height
-  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
-  torch::Tensor t = torch::cat({y, uv}, -1);
+  namespace F = torch::nn::functional;
+  uv = F::interpolate(
+      uv.view({1, 1, height / 2, width / 2, 2}),
+      F::InterpolateFuncOptions()
+          .mode(torch::kNearest)
+          .size(std::vector<int64_t>({height, width, 2})));
+  torch::Tensor t = torch::cat({y, uv[0]}, -1);
   return t.permute({0, 3, 1, 2}); // NCHW
 }
 
@@ -281,8 +291,13 @@ torch::Tensor convert_nv12_cuda(AVFrame* pFrame, const torch::Device& device) {
         "Failed to copy UV plane to Cuda tensor.");
   }
   // Upsample width and height
-  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
-  torch::Tensor t = torch::cat({y, uv}, -1);
+  namespace F = torch::nn::functional;
+  uv = F::interpolate(
+      uv.view({1, 1, height / 2, width / 2, 2}),
+      F::InterpolateFuncOptions()
+          .mode(torch::kNearest)
+          .size(std::vector<int64_t>({height, width, 2})));
+  torch::Tensor t = torch::cat({y, uv[0]}, -1);
   return t.permute({0, 3, 1, 2}); // NCHW
 }
 #endif
