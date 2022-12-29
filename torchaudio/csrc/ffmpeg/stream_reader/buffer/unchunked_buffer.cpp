@@ -1,3 +1,4 @@
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 
 namespace torchaudio {
@@ -18,11 +19,11 @@ void UnchunkedBuffer::push_tensor(const torch::Tensor& t) {
 }
 
 void UnchunkedAudioBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_audio_tensor(frame));
+  push_tensor(detail::convert_audio(frame));
 }
 
 void UnchunkedVideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_image_tensor(frame, device));
+  push_tensor(detail::convert_image(frame, device));
 }
 
 c10::optional<torch::Tensor> UnchunkedBuffer::pop_chunk() {

@@ -1,4 +1,5 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 
 namespace torchaudio {
 namespace ffmpeg {
@@ -68,7 +69,7 @@ void ChunkedAudioBuffer::push_tensor(torch::Tensor frame) {
 }
 
 void ChunkedAudioBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_audio_tensor(frame));
+  push_tensor(detail::convert_audio(frame));
 }
 
 void ChunkedVideoBuffer::push_tensor(const torch::Tensor& frame) {
@@ -90,7 +91,7 @@ void ChunkedVideoBuffer::push_tensor(const torch::Tensor& frame) {
 }
 
 void ChunkedVideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_image_tensor(frame, device));
+  push_tensor(detail::convert_image(frame, device));
 }
 
 c10::optional<torch::Tensor> ChunkedAudioBuffer::pop_chunk() {
