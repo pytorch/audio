@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 #include <stdexcept>
 #include <vector>
 
@@ -8,11 +8,9 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
-//////////////////////////////////////////////////////////////////////////////
-// Helper functions - audio
-//////////////////////////////////////////////////////////////////////////////
-torch::Tensor convert_audio_tensor(AVFrame* pFrame) {
+torch::Tensor convert_audio(AVFrame* pFrame) {
   // ref: https://ffmpeg.org/doxygen/4.1/filter__audio_8c_source.html#l00215
   AVSampleFormat format = static_cast<AVSampleFormat>(pFrame->format);
   int num_channels = pFrame->channels;
@@ -33,7 +31,7 @@ torch::Tensor convert_audio_tensor(AVFrame* pFrame) {
       : std::vector<int64_t>{num_frames, num_channels};
 
   torch::Tensor t;
-  uint8_t* ptr = NULL;
+  uint8_t* ptr = nullptr;
   switch (format) {
     case AV_SAMPLE_FMT_U8:
     case AV_SAMPLE_FMT_U8P: {
@@ -81,15 +79,12 @@ torch::Tensor convert_audio_tensor(AVFrame* pFrame) {
     memcpy(ptr, pFrame->extended_data[i], plane_size);
     ptr += plane_size;
   }
-  if (is_planar)
+  if (is_planar) {
     t = t.t();
+  }
   return t;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Helper functions - video
-//////////////////////////////////////////////////////////////////////////////
-namespace {
 torch::Tensor get_interlaced_image_buffer(AVFrame* pFrame) {
   int width = pFrame->width;
   int height = pFrame->height;
@@ -114,12 +109,6 @@ void write_interlaced_image(AVFrame* pFrame, torch::Tensor& frame) {
     buf += pFrame->linesize[0];
     ptr += stride;
   }
-}
-
-torch::Tensor convert_interlaced_video(AVFrame* pFrame) {
-  torch::Tensor frame = get_interlaced_image_buffer(pFrame);
-  write_interlaced_image(pFrame, frame);
-  return frame.permute({0, 3, 1, 2});
 }
 
 torch::Tensor get_planar_image_buffer(AVFrame* pFrame) {
@@ -150,6 +139,14 @@ void write_planar_image(AVFrame* pFrame, torch::Tensor& frame) {
       src += linesize;
     }
   }
+}
+
+namespace {
+
+torch::Tensor convert_interlaced_video(AVFrame* pFrame) {
+  torch::Tensor frame = get_interlaced_image_buffer(pFrame);
+  write_interlaced_image(pFrame, frame);
+  return frame.permute({0, 3, 1, 2});
 }
 
 torch::Tensor convert_planar_video(AVFrame* pFrame) {
@@ -297,9 +294,7 @@ torch::Tensor convert_nv12_cuda(AVFrame* pFrame, const torch::Device& device) {
 #endif
 } // namespace
 
-torch::Tensor convert_image_tensor(
-    AVFrame* pFrame,
-    const torch::Device& device) {
+torch::Tensor convert_image(AVFrame* pFrame, const torch::Device& device) {
   // ref:
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
   // https://ffmpeg.org/doxygen/4.1/decode__video_8c_source.html#l00038
@@ -352,5 +347,6 @@ torch::Tensor convert_image_tensor(
   }
 }
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio
