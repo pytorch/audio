@@ -252,7 +252,7 @@ plot_waveform(magnitudes, filtered, SAMPLE_RATE)
 
 ######################################################################
 #
-# Of cource it is also possible to emulate simpmle low pass filter.
+# Of course it is also possible to emulate simple low pass filter.
 
 magnitudes = torch.concat([torch.ones((32,)), torch.zeros((32,))])
 
