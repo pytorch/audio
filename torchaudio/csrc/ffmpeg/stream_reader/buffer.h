@@ -1,7 +1,6 @@
 #pragma once
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <deque>
 
 namespace torchaudio {
 namespace ffmpeg {
@@ -28,12 +27,6 @@ class Buffer {
 
   virtual void flush() = 0;
 };
-
-//////////////////////////////////////////////////////////////////////////////
-// Helper functions
-//////////////////////////////////////////////////////////////////////////////
-torch::Tensor convert_audio_tensor(AVFrame* frame);
-torch::Tensor convert_image_tensor(AVFrame* frame, const torch::Device& device);
 
 } // namespace ffmpeg
 } // namespace torchaudio

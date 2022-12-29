@@ -133,7 +133,7 @@ if(USE_FFMPEG)
     LIBTORCHAUDIO_FFMPEG_SOURCES
     ffmpeg/ffmpeg.cpp
     ffmpeg/filter_graph.cpp
-    ffmpeg/stream_reader/buffer.cpp
+    ffmpeg/stream_reader/buffer/common.cpp
     ffmpeg/stream_reader/buffer/chunked_buffer.cpp
     ffmpeg/stream_reader/buffer/unchunked_buffer.cpp
     ffmpeg/stream_reader/decoder.cpp
