@@ -6,6 +6,7 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
 // Unchunked Buffer Interface
@@ -44,5 +45,6 @@ class UnchunkedVideoBuffer : public UnchunkedBuffer {
   void push_frame(AVFrame* frame) override;
 };
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio

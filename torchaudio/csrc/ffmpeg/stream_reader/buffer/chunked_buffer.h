@@ -1,9 +1,11 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
 // Chunked Buffer Implementation
@@ -41,9 +43,18 @@ class ChunkedAudioBuffer : public ChunkedBuffer {
   c10::optional<torch::Tensor> pop_chunk() override;
 };
 
-class ChunkedVideoBuffer : public ChunkedBuffer {
+class ChunkedVideoBuffer : public Buffer {
+  const int frames_per_chunk;
+
   const torch::Device device;
-  void push_tensor(const torch::Tensor& frame);
+
+  // Ring buffer
+  // This buffer is initialized at the first time a frmae is pushed.
+  // Each Tensor represents a channel
+  size_t buffer_size;
+  ImageBuffer buffer;
+  size_t num_frames_pushed = 0;
+  size_t num_frames_popped = 0;
 
  public:
   ChunkedVideoBuffer(
@@ -51,9 +62,12 @@ class ChunkedVideoBuffer : public ChunkedBuffer {
       int num_chunks,
       const torch::Device& device);
 
+  bool is_ready() const override;
   void push_frame(AVFrame* frame) override;
   c10::optional<torch::Tensor> pop_chunk() override;
+  void flush() override;
 };
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio

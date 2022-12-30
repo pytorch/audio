@@ -367,11 +367,15 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         s = StreamReader(self.get_src())
         assert s.pop_chunks() == []
 
-    def test_pop_chunks_empty_buffer(self):
+    @parameterized.expand([
+        (-1, ),
+        (1, ),
+    ])
+    def test_pop_chunks_empty_buffer(self, frames_per_chunk):
         """`pop_chunks` method returns None when a buffer is empty"""
         s = StreamReader(self.get_src())
-        s.add_basic_audio_stream(frames_per_chunk=-1)
-        s.add_basic_video_stream(frames_per_chunk=-1)
+        s.add_basic_audio_stream(frames_per_chunk=frames_per_chunk)
+        s.add_basic_video_stream(frames_per_chunk=frames_per_chunk)
         assert s.pop_chunks() == [None, None]
 
     def test_pop_chunks_exhausted_stream(self):
@@ -513,6 +517,132 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         hyp, ref = frame[hyp_index:], ref_frames[ref_index]
         print(hyp.shape, ref.shape)
         self.assertEqual(hyp, ref)
+
+    @parameterized.expand([
+        ("rgb24", ), ("yuv444p")
+    ])
+    def test_chunked_video_decoding_stream(self, format):
+        """Test the behavior of ChunkedVideoBuffer.
+
+        ChunkedVideoBuffer uses ring buffer composed of
+        frames_per_chunk * buffer_chunk_size frames.
+        """
+        src = self.get_src("nasa_13013_no_audio.mp4")
+        s = StreamReader(src=src)
+
+        # Decode all frames for reference
+        # note: frames_per_chunk=-1 invokes UnchunkedVideoBuffer internally.
+        s.add_basic_video_stream(-1, format=format)
+        s.process_all_packets()
+        (ref_frames,) = s.pop_chunks()
+        assert ref_frames.shape == torch.Size([325, 3, 180, 320])
+
+        # Decode in streaming manner
+        if self.test_type == "fileobj":
+            src.seek(0)
+        s = StreamReader(src=src)
+        s.add_basic_video_stream(frames_per_chunk=3, buffer_chunk_size=5, format=format)
+        i = 0
+        for i, (chunk, ) in enumerate(s.stream()):
+            t = i * 3
+            if t == 324:
+                assert chunk.shape == torch.Size([1, 3, 180, 320])
+            else:
+                assert chunk.shape == torch.Size([3, 3, 180, 320])
+            self.assertEqual(chunk, ref_frames[t:t+3, ...])
+        assert i == 108
+
+    @parameterized.expand([
+        ("rgb24", ), ("yuv444p")
+    ])
+    def test_chunked_video_decoding(self, format):
+        """Test the behavior of ChunkedVideoBuffer.
+
+        ChunkedVideoBuffer uses ring buffer composed of
+        frames_per_chunk * buffer_chunk_size frames.
+        """
+        src = self.get_src("nasa_13013_no_audio.mp4")
+        s = StreamReader(src=src)
+
+        # Decode all frames for reference
+        # note: frames_per_chunk=-1 invokes UnchunkedVideoBuffer internally.
+        s.add_basic_video_stream(frames_per_chunk=-1, format=format)
+        s.process_all_packets()
+        (ref_frames,) = s.pop_chunks()
+        assert ref_frames.shape == torch.Size([325, 3, 180, 320])
+
+        # Decode manually in a way that does not align with frames_per_chunk
+        if self.test_type == "fileobj":
+            src.seek(0)
+        s = StreamReader(src=src)
+        # The underlying buffer size is 3 * 2
+        # Buffer: | - - - | - - - |
+        # -: Unused buffer
+        # +: buffer with popped frame
+        # x, s: buffer with valid frame (s is the frame popped next)
+        s.add_basic_video_stream(frames_per_chunk=3, buffer_chunk_size=2, format=format)
+
+        # Warm-up period
+        # the internal FFmpeg decoder holds the frames until the third one is fed
+        s.process_packet()
+        s.process_packet()
+        # Buffer: | - - - | - - - |
+        chunk, = s.pop_chunks()
+        assert chunk is None
+
+        # the decoder starts to return frames, and will return one frame per packet
+        s.process_packet()
+        # Buffer: | s - - | - - - |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[0:1, ...])
+
+        # two packets == two frames
+        s.process_packet()
+        s.process_packet()
+        # Buffer: | + s x | - - - |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[1:3, ...])
+
+        # two packets == two frames
+        s.process_packet()
+        s.process_packet()
+        # Buffer: | + + + | s x - |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[3:5, ...])
+
+        s.process_packet()
+        # at this point the first iteration of the ring buffer is done.
+        # the ChunkedVideoBuffer starts to fill the ring buffer from the beginning
+        s.process_packet()
+        # Buffer: | x + + | + + s |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[5:7, ...])
+
+        # Now fill the buffer entirely.
+        # The next frame will be stored at index=1 of the ring buffer and
+        # continue to 2, 3, 4, 5 then back to 0. When poppsed they should be arranged properly.
+        for _ in range(6):
+            s.process_packet()
+        # Buffer: | x s x | x x x |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[7:10, ...])
+        # Buffer: | x + + | + s x |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[10:13, ...])
+
+        # Now overflow the buffer
+        # the next frame will be dropped after 6 more packets are processed
+        s.process_packet()
+        # Buffer: | + s + | + + + |
+        # this will refresh the buffer
+        for _ in range(6):
+            s.process_packet()
+        # Buffer: | x x s | x x x |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[14:17, ...])
+        # Buffer: | x x + | + + s |
+        chunk, = s.pop_chunks()
+        self.assertEqual(chunk, ref_frames[17:20, ...])
 
 
 def _to_fltp(original):
@@ -705,7 +835,8 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         print("output", output)
         self.assertEqual(expected, output)
 
-    def test_png_yuv_read_out(self):
+    @nested_params([1, -1])  # -1 invokes UnchunkedBuffer, while 1 uses ChunkedBuffer
+    def test_png_yuv_read_out(self, fpc):
         """Providing format prpoerly change the color space"""
         rgb = torch.empty(1, 3, 256, 256, dtype=torch.uint8)
         rgb[0, 0] = torch.arange(256, dtype=torch.uint8).reshape([1, -1])
@@ -720,12 +851,12 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             gray = rgb_to_gray(rgb)
 
             s = StreamReader(path)
-            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv444p")
-            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv420p")
-            s.add_basic_video_stream(frames_per_chunk=-1, format="nv12")
-            s.add_basic_video_stream(frames_per_chunk=-1, format="rgb24")
-            s.add_basic_video_stream(frames_per_chunk=-1, format="bgr24")
-            s.add_basic_video_stream(frames_per_chunk=-1, format="gray8")
+            s.add_basic_video_stream(frames_per_chunk=fpc, format="yuv444p")
+            s.add_basic_video_stream(frames_per_chunk=fpc, format="yuv420p")
+            s.add_basic_video_stream(frames_per_chunk=fpc, format="nv12")
+            s.add_basic_video_stream(frames_per_chunk=fpc, format="rgb24")
+            s.add_basic_video_stream(frames_per_chunk=fpc, format="bgr24")
+            s.add_basic_video_stream(frames_per_chunk=fpc, format="gray8")
             s.process_all_packets()
             yuv444, yuv420, nv12, rgb24, bgr24, gray8 = s.pop_chunks()
             self.assertEqual(yuv, yuv444, atol=1, rtol=0)

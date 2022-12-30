@@ -97,7 +97,10 @@ torch::Tensor get_buffer(
 }
 } // namespace
 
-torch::Tensor get_image_buffer(AVFrame* frame, const torch::Device& device) {
+ImageBuffer get_image_buffer(
+    AVFrame* frame,
+    int num_frames,
+    const torch::Device& device) {
   auto fmt = static_cast<AVPixelFormat>(frame->format);
   const AVPixFmtDescriptor* desc = [&]() {
     if (fmt == AV_PIX_FMT_CUDA) {
@@ -124,10 +127,12 @@ torch::Tensor get_image_buffer(AVFrame* frame, const torch::Device& device) {
   // The actual number of planes can be retrieved with
   // av_pix_fmt_count_planes.
 
+  int height = frame->height;
+  int width = frame->width;
   if (desc->flags & AV_PIX_FMT_FLAG_PLANAR) {
-    return get_buffer({1, channels, frame->height, frame->width}, device);
+    return {get_buffer({num_frames, channels, height, width}, device), true};
   }
-  return get_buffer({1, frame->height, frame->width, channels}, device);
+  return {get_buffer({num_frames, height, width, channels}, device), false};
 }
 
 namespace {
@@ -303,15 +308,13 @@ void write_nv12_cuda(AVFrame* pFrame, torch::Tensor& yuv) {
   yuv.index_put_({Slice(), Slice(1)}, uv);
 }
 #endif
-
 } // namespace
 
-torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
+void write_image(AVFrame* frame, torch::Tensor& buf) {
   // ref:
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
   // https://ffmpeg.org/doxygen/4.1/decode__video_8c_source.html#l00038
   AVPixelFormat format = static_cast<AVPixelFormat>(frame->format);
-  torch::Tensor buf = get_image_buffer(frame, device);
   switch (format) {
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24:
@@ -321,19 +324,19 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
     case AV_PIX_FMT_BGRA:
     case AV_PIX_FMT_GRAY8: {
       write_interlaced_image(frame, buf);
-      return buf.permute({0, 3, 1, 2});
+      return;
     }
     case AV_PIX_FMT_YUV444P: {
       write_planar_image(frame, buf);
-      return buf;
+      return;
     }
     case AV_PIX_FMT_YUV420P: {
       write_yuv420p(frame, buf);
-      return buf;
+      return;
     }
     case AV_PIX_FMT_NV12: {
       write_nv12_cpu(frame, buf);
-      return buf;
+      return;
     }
 #ifdef USE_CUDA
     case AV_PIX_FMT_CUDA: {
@@ -345,7 +348,7 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
       switch (sw_format) {
         case AV_PIX_FMT_NV12: {
           write_nv12_cuda(frame, buf);
-          return buf;
+          return;
         }
         case AV_PIX_FMT_P010:
         case AV_PIX_FMT_P016:

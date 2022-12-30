@@ -15,18 +15,19 @@ std::unique_ptr<Buffer> get_buffer(
   switch (type) {
     case AVMEDIA_TYPE_AUDIO: {
       if (frames_per_chunk < 0) {
-        return std::unique_ptr<Buffer>(new UnchunkedAudioBuffer());
+        return std::unique_ptr<Buffer>(new detail::UnchunkedAudioBuffer());
       } else {
         return std::unique_ptr<Buffer>(
-            new ChunkedAudioBuffer(frames_per_chunk, num_chunks));
+            new detail::ChunkedAudioBuffer(frames_per_chunk, num_chunks));
       }
     }
     case AVMEDIA_TYPE_VIDEO: {
       if (frames_per_chunk < 0) {
-        return std::unique_ptr<Buffer>(new UnchunkedVideoBuffer(device));
-      } else {
         return std::unique_ptr<Buffer>(
-            new ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
+            new detail::UnchunkedVideoBuffer(device));
+      } else {
+        return std::unique_ptr<Buffer>(new detail::ChunkedVideoBuffer(
+            frames_per_chunk, num_chunks, device));
       }
     }
     default:

@@ -6,13 +6,19 @@ namespace torchaudio {
 namespace ffmpeg {
 namespace detail {
 
-//////////////////////////////////////////////////////////////////////////////
-// Helper functions
-//////////////////////////////////////////////////////////////////////////////
+struct ImageBuffer {
+  torch::Tensor buffer;
+  bool is_planar;
+};
+
 torch::Tensor convert_audio(AVFrame* frame);
 
-torch::Tensor get_image_buffer(AVFrame* pFrame, const torch::Device& device);
-torch::Tensor convert_image(AVFrame* frame, const torch::Device& device);
+ImageBuffer get_image_buffer(
+    AVFrame* pFrame,
+    int num_frames,
+    const torch::Device& device);
+
+void write_image(AVFrame* frame, torch::Tensor& buf);
 
 } // namespace detail
 } // namespace ffmpeg
