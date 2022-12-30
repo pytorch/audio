@@ -36,7 +36,7 @@ set(
 torchaudio_library(
   libflashlight-text
   "${libflashlight_src}"
-  submodule
+  "${CMAKE_CURRENT_SOURCE_DIR}/submodule"
   ""
   FL_TEXT_USE_KENLM
   )
