@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20221229) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20221230) &#x25BC</a>
     </div>
     
 
@@ -260,6 +260,7 @@
 <li class="toctree-l1"><a class="reference internal" href="oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
@@ -448,8 +449,8 @@ labels. They are bundled together and available under
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20221228
-2.0.0.dev20221229
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20221230
+2.0.0.dev20221230
 cpu
 </pre></div>
 </div>
@@ -461,7 +462,7 @@ cpu
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/106k [00:00&lt;?, ?B/s]
-100%|##########| 106k/106k [00:00&lt;00:00, 55.3MB/s]
+100%|##########| 106k/106k [00:00&lt;00:00, 56.9MB/s]
 </pre></div>
 </div>
 </section>
@@ -504,16 +505,15 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 10%|9         | 34.8M/360M [00:00&lt;00:00, 364MB/s]
- 20%|#9        | 70.3M/360M [00:00&lt;00:00, 369MB/s]
- 29%|##9       | 106M/360M [00:00&lt;00:00, 370MB/s]
- 39%|###9      | 141M/360M [00:00&lt;00:00, 371MB/s]
- 49%|####9     | 177M/360M [00:00&lt;00:00, 362MB/s]
- 59%|#####8    | 211M/360M [00:00&lt;00:00, 360MB/s]
- 68%|######8   | 247M/360M [00:00&lt;00:00, 364MB/s]
- 79%|#######9  | 285M/360M [00:00&lt;00:00, 376MB/s]
- 90%|######### | 324M/360M [00:00&lt;00:00, 387MB/s]
-100%|##########| 360M/360M [00:01&lt;00:00, 377MB/s]
+ 12%|#1        | 42.1M/360M [00:00&lt;00:00, 442MB/s]
+ 23%|##3       | 84.3M/360M [00:00&lt;00:00, 428MB/s]
+ 35%|###4      | 125M/360M [00:00&lt;00:00, 404MB/s]
+ 47%|####6     | 169M/360M [00:00&lt;00:00, 423MB/s]
+ 59%|#####8    | 212M/360M [00:00&lt;00:00, 433MB/s]
+ 70%|#######   | 253M/360M [00:00&lt;00:00, 433MB/s]
+ 82%|########2 | 297M/360M [00:00&lt;00:00, 440MB/s]
+ 95%|#########4| 340M/360M [00:00&lt;00:00, 446MB/s]
+100%|##########| 360M/360M [00:00&lt;00:00, 436MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -685,7 +685,7 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.492 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.105 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
