@@ -164,7 +164,7 @@ torch::Tensor convert_yuv420p(AVFrame* pFrame) {
                      .layout(torch::kStrided)
                      .device(torch::kCPU);
 
-  torch::Tensor y = torch::empty({1, height, width, 1}, options);
+  torch::Tensor y = torch::empty({1, 1, height, width}, options);
   {
     uint8_t* tgt = y.data_ptr<uint8_t>();
     uint8_t* src = pFrame->data[0];
@@ -175,9 +175,9 @@ torch::Tensor convert_yuv420p(AVFrame* pFrame) {
       src += linesize;
     }
   }
-  torch::Tensor u = torch::empty({1, height / 2, width / 2, 1}, options);
+  torch::Tensor uv = torch::empty({1, 2, height / 2, width / 2}, options);
   {
-    uint8_t* tgt = u.data_ptr<uint8_t>();
+    uint8_t* tgt = uv.data_ptr<uint8_t>();
     uint8_t* src = pFrame->data[1];
     int linesize = pFrame->linesize[1];
     for (int h = 0; h < height / 2; ++h) {
@@ -185,23 +185,22 @@ torch::Tensor convert_yuv420p(AVFrame* pFrame) {
       tgt += width / 2;
       src += linesize;
     }
-  }
-  torch::Tensor v = torch::empty({1, height / 2, width / 2, 1}, options);
-  {
-    uint8_t* tgt = v.data_ptr<uint8_t>();
-    uint8_t* src = pFrame->data[2];
-    int linesize = pFrame->linesize[2];
+    src = pFrame->data[2];
+    linesize = pFrame->linesize[2];
     for (int h = 0; h < height / 2; ++h) {
       memcpy(tgt, src, width / 2);
       tgt += width / 2;
       src += linesize;
     }
   }
-  torch::Tensor uv = torch::cat({u, v}, -1);
   // Upsample width and height
-  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
-  torch::Tensor t = torch::cat({y, uv}, -1);
-  return t.permute({0, 3, 1, 2}); // NCHW
+  namespace F = torch::nn::functional;
+  uv = F::interpolate(
+      uv,
+      F::InterpolateFuncOptions()
+          .mode(torch::kNearest)
+          .size(std::vector<int64_t>({height, width})));
+  return torch::cat({y, uv}, 1);
 }
 
 torch::Tensor convert_nv12_cpu(AVFrame* pFrame) {
@@ -236,8 +235,13 @@ torch::Tensor convert_nv12_cpu(AVFrame* pFrame) {
     }
   }
   // Upsample width and height
-  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
-  torch::Tensor t = torch::cat({y, uv}, -1);
+  namespace F = torch::nn::functional;
+  uv = F::interpolate(
+      uv.view({1, 1, height / 2, width / 2, 2}),
+      F::InterpolateFuncOptions()
+          .mode(torch::kNearest)
+          .size(std::vector<int64_t>({height, width, 2})));
+  torch::Tensor t = torch::cat({y, uv[0]}, -1);
   return t.permute({0, 3, 1, 2}); // NCHW
 }
 
@@ -287,8 +291,13 @@ torch::Tensor convert_nv12_cuda(AVFrame* pFrame, const torch::Device& device) {
         "Failed to copy UV plane to Cuda tensor.");
   }
   // Upsample width and height
-  uv = uv.repeat_interleave(2, -2).repeat_interleave(2, -3);
-  torch::Tensor t = torch::cat({y, uv}, -1);
+  namespace F = torch::nn::functional;
+  uv = F::interpolate(
+      uv.view({1, 1, height / 2, width / 2, 2}),
+      F::InterpolateFuncOptions()
+          .mode(torch::kNearest)
+          .size(std::vector<int64_t>({height, width, 2})));
+  torch::Tensor t = torch::cat({y, uv[0]}, -1);
   return t.permute({0, 3, 1, 2}); // NCHW
 }
 #endif
