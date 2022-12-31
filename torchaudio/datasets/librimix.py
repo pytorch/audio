@@ -51,6 +51,11 @@ class LibriMix(Dataset):
         mode: str = "min",
     ):
         self.root = Path(root) / f"Libri{num_speakers}Mix"
+        if not os.path.exists(self.root):
+            raise RuntimeError(
+                f"The path {self.root} doesn't exist. "
+                "Please check the ``root`` path and ``num_speakers`` or download the dataset manually."
+            )
         if mode not in ["max", "min"]:
             raise ValueError(f'Expect ``mode`` to be one in ["min", "max"]. Found {mode}.')
         if sample_rate == 8000:
