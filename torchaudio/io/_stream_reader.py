@@ -735,7 +735,7 @@ class StreamReader:
         """
         return self._be.pop_chunks()
 
-    def _fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
+    def fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
         """Keep processing packets until all buffers have at least one chunk
 
         Returns:
@@ -749,11 +749,7 @@ class StreamReader:
                 flushed the pending frames. The caller should stop calling
                 this method.
         """
-        while not self.is_buffer_ready():
-            code = self.process_packet(timeout, backoff)
-            if code != 0:
-                return code
-        return 0
+        return self._be.fill_buffer(timeout, backoff)
 
     def stream(
         self, timeout: Optional[float] = None, backoff: float = 10.0
@@ -779,7 +775,7 @@ class StreamReader:
             raise RuntimeError("No output stream is configured.")
 
         while True:
-            if self._fill_buffer(timeout, backoff):
+            if self.fill_buffer(timeout, backoff):
                 break
             yield self.pop_chunks()
 
