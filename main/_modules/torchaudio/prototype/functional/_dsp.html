@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -399,7 +399,7 @@
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Synthesize waveform from the given instantaneous frequencies and amplitudes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Synthesize waveform from the given instantaneous frequencies and amplitudes.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -482,7 +482,7 @@
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Generate ADSR Envelope</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate ADSR Envelope</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -575,7 +575,7 @@
     <span class="n">base</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">pattern</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Extend the given time series values with multipliers of them.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extend the given time series values with multipliers of them.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -639,7 +639,7 @@
 
 
 <div class="viewcode-block" id="sinc_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.sinc_impulse_response.html#torchaudio.prototype.functional.sinc_impulse_response">[docs]</a><span class="k">def</span> <span class="nf">sinc_impulse_response</span><span class="p">(</span><span class="n">cutoff</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">513</span><span class="p">,</span> <span class="n">high_pass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create windowed-sinc impulse response for given cutoff frequencies.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create windowed-sinc impulse response for given cutoff frequencies.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -678,7 +678,7 @@
 
 
 <div class="viewcode-block" id="frequency_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.frequency_impulse_response.html#torchaudio.prototype.functional.frequency_impulse_response">[docs]</a><span class="k">def</span> <span class="nf">frequency_impulse_response</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create filter from desired frequency response</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create filter from desired frequency response</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        magnitudes: The desired frequency responses. Shape: `(..., num_fft_bins)`</span>
@@ -709,7 +709,7 @@
 
 
 <div class="viewcode-block" id="filter_waveform"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.filter_waveform.html#torchaudio.prototype.functional.filter_waveform">[docs]</a><span class="k">def</span> <span class="nf">filter_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">kernels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">delay_compensation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Applies filters along time axis of the given waveform.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies filters along time axis of the given waveform.</span>
 
 <span class="sd">    This function applies the given filters along time axis in the following manner:</span>
 
@@ -807,7 +807,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

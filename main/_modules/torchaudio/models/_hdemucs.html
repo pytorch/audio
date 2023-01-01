@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -420,7 +420,7 @@
 
 
 <span class="k">class</span> <span class="nc">_ScaledEmbedding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Make continuous embeddings and boost learning rate</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Make continuous embeddings and boost learning rate</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_embeddings (int): number of embeddings</span>
@@ -445,7 +445,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for embedding with scale.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for embedding with scale.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): input tensor of shape `(num_embeddings)`</span>
 
@@ -459,7 +459,7 @@
 
 <span class="k">class</span> <span class="nc">_HEncLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder layer. This used both by the time and the frequency branch.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder layer. This used both by the time and the frequency branch.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        chin (int): number of input channels.</span>
 <span class="sd">        chout (int): number of output channels.</span>
@@ -521,7 +521,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dconv</span> <span class="o">=</span> <span class="n">_DConv</span><span class="p">(</span><span class="n">chout</span><span class="p">,</span> <span class="o">**</span><span class="n">dconv_kw</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">inject</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for encoding layer.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for encoding layer.</span>
 
 <span class="sd">        Size depends on whether frequency or time</span>
 
@@ -568,7 +568,7 @@
 
 
 <span class="k">class</span> <span class="nc">_HDecLayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder layer. This used both by the time and the frequency branches.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder layer. This used both by the time and the frequency branches.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        chin (int): number of input channels.</span>
 <span class="sd">        chout (int): number of output channels.</span>
@@ -637,7 +637,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">norm_fn</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">chin</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">skip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">length</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for decoding layer.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for decoding layer.</span>
 
 <span class="sd">        Size depends on whether frequency or time</span>
 
@@ -686,7 +686,7 @@
 
 
 <div class="viewcode-block" id="HDemucs"><a class="viewcode-back" href="../../../generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs">[docs]</a><span class="k">class</span> <span class="nc">HDemucs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Hybrid Demucs model from</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Hybrid Demucs model from</span>
 <span class="sd">    *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.</span>
 
 <span class="sd">    See Also:</span>
@@ -884,7 +884,7 @@
         <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">def</span> <span class="nf">_pad1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">padding_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">padding_right</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zero&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wrapper around F.pad, in order for reflect padding when num_frames is shorter than max_pad.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wrapper around F.pad, in order for reflect padding when num_frames is shorter than max_pad.</span>
 <span class="sd">        Add extra zero padding around in order for padding to not break.&quot;&quot;&quot;</span>
         <span class="n">length</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">:</span>
@@ -909,7 +909,7 @@
 
 <div class="viewcode-block" id="HDemucs.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
 
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;HDemucs forward call</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;HDemucs forward call</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): input mixed tensor of shape `(batch_size, channel, num_frames)`</span>
@@ -1022,7 +1022,7 @@
 
 
 <span class="k">class</span> <span class="nc">_DConv</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    New residual branches in each encoder layer.</span>
 <span class="sd">    This alternates dilated convolutions, potentially with LSTMs and attention.</span>
 <span class="sd">    Also before entering each residual branch, dimension is projected on a smaller subspace,</span>
@@ -1094,7 +1094,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;DConv forward call</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;DConv forward call</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): input tensor for convolution</span>
@@ -1109,7 +1109,7 @@
 
 
 <span class="k">class</span> <span class="nc">_BLSTM</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    BiLSTM with same hidden units as input dim.</span>
 <span class="sd">    If `max_steps` is not None, input will be splitting in overlapping</span>
 <span class="sd">    chunks and the LSTM applied separately on each chunk.</span>
@@ -1127,7 +1127,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">skip</span> <span class="o">=</span> <span class="n">skip</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;BLSTM forward call</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BLSTM forward call</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): input tensor for BLSTM shape is `(batch_size, dim, time_steps)`</span>
@@ -1176,13 +1176,13 @@
 
 
 <span class="k">class</span> <span class="nc">_LocalState</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Local state allows to have attention based only on data (no positional embedding),</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Local state allows to have attention based only on data (no positional embedding),</span>
 <span class="sd">    but while setting a constraint on the time window (e.g. decaying penalty term).</span>
 <span class="sd">    Also a failed experiments with trying to provide some frequency based attention.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">ndecay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            channels (int): Size of Conv1d layers.</span>
 <span class="sd">            heads (int, optional):  (default: 4)</span>
@@ -1207,7 +1207,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">channels</span> <span class="o">+</span> <span class="n">heads</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;LocalState forward call</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;LocalState forward call</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): input tensor for LocalState</span>
@@ -1245,12 +1245,12 @@
 
 
 <span class="k">class</span> <span class="nc">_LayerScale</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Layer scale from [Touvron et al 2021] (https://arxiv.org/pdf/2103.17239.pdf).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Layer scale from [Touvron et al 2021] (https://arxiv.org/pdf/2103.17239.pdf).</span>
 <span class="sd">    This rescales diagonally residual outputs close to 0 initially, then learnt.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            channels (int): Size of  rescaling</span>
 <span class="sd">            init (float, optional): Scale to default to (default: 0)</span>
@@ -1260,7 +1260,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">init</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;LayerScale forward call</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;LayerScale forward call</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): input tensor for LayerScale</span>
@@ -1273,7 +1273,7 @@
 
 
 <span class="k">def</span> <span class="nf">_unfold</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Given input of size [*OT, T], output Tensor of size [*OT, F, K]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given input of size [*OT, T], output Tensor of size [*OT, F, K]</span>
 <span class="sd">    with K the kernel size, by extracting frames with the given stride.</span>
 <span class="sd">    This will pad the input so that `F = ceil(T / K)`.</span>
 <span class="sd">    see https://github.com/pytorch/pytorch/issues/60466</span>
@@ -1293,7 +1293,7 @@
 
 
 <span class="k">def</span> <span class="nf">_rescale_module</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rescales initial weight scale for all models within the module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
@@ -1349,7 +1349,7 @@
 
 
 <div class="viewcode-block" id="hdemucs_low"><a class="viewcode-back" href="../../../generated/torchaudio.models.hdemucs_low.html#torchaudio.models.hdemucs_low">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_low</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Builds low nfft (1024) version of :class:`HDemucs`, suitable for sample rates around 8 kHz.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds low nfft (1024) version of :class:`HDemucs`, suitable for sample rates around 8 kHz.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sources (List[str]): See :py:func:`HDemucs`.</span>
@@ -1363,7 +1363,7 @@
 
 
 <div class="viewcode-block" id="hdemucs_medium"><a class="viewcode-back" href="../../../generated/torchaudio.models.hdemucs_medium.html#torchaudio.models.hdemucs_medium">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_medium</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (2048) version of :class:`HDemucs`, suitable for sample rates of 16-32 kHz.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (2048) version of :class:`HDemucs`, suitable for sample rates of 16-32 kHz.</span>
 
 <span class="sd">    .. note::</span>
 
@@ -1382,7 +1382,7 @@
 
 
 <div class="viewcode-block" id="hdemucs_high"><a class="viewcode-back" href="../../../generated/torchaudio.models.hdemucs_high.html#torchaudio.models.hdemucs_high">[docs]</a><span class="k">def</span> <span class="nf">hdemucs_high</span><span class="p">(</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">HDemucs</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (4096) version of :class:`HDemucs`, suitable for sample rates of 44.1-48 kHz.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds medium nfft (4096) version of :class:`HDemucs`, suitable for sample rates of 44.1-48 kHz.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sources (List[str]): See :py:func:`HDemucs`.</span>
@@ -1409,7 +1409,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -436,7 +436,7 @@
 <span class="k">class</span> <span class="nc">_FeatureExtractor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Generates features and length output from the given input tensor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates features and length output from the given input tensor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): input tensor.</span>
@@ -453,7 +453,7 @@
 <span class="k">class</span> <span class="nc">_TokenProcessor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Decodes given list of tokens to text sequence.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decodes given list of tokens to text sequence.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            tokens (List[int]): list of tokens to decode.</span>
@@ -465,7 +465,7 @@
 
 
 <span class="k">class</span> <span class="nc">_ModuleFeatureExtractor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">_FeatureExtractor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;``torch.nn.Module``-based feature extraction pipeline.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``torch.nn.Module``-based feature extraction pipeline.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        pipeline (torch.nn.Module): module that implements feature extraction logic.</span>
@@ -476,7 +476,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Generates features and length output from the given input tensor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates features and length output from the given input tensor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): input tensor.</span>
@@ -494,7 +494,7 @@
 
 
 <span class="k">class</span> <span class="nc">_SentencePieceTokenProcessor</span><span class="p">(</span><span class="n">_TokenProcessor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;SentencePiece-model-based token processor.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SentencePiece-model-based token processor.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sp_model_path (str): path to SentencePiece model.</span>
@@ -514,7 +514,7 @@
         <span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">lstrip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Decodes given list of tokens to text sequence.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decodes given list of tokens to text sequence.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            tokens (List[int]): list of tokens to decode.</span>
@@ -538,7 +538,7 @@
 
 <div class="viewcode-block" id="RNNTBundle"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RNNTBundle</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text)</span>
 <span class="sd">    inference with an RNN-T model.</span>
 
 <span class="sd">    More specifically, the class provides methods that produce the featurization pipeline,</span>
@@ -611,10 +611,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">class</span> <span class="nc">FeatureExtractor</span><span class="p">(</span><span class="n">_FeatureExtractor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Interface of the feature extraction part of RNN-T pipeline&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interface of the feature extraction part of RNN-T pipeline&quot;&quot;&quot;</span>
 
     <span class="k">class</span> <span class="nc">TokenProcessor</span><span class="p">(</span><span class="n">_TokenProcessor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Interface of the token processor part of RNN-T pipeline&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interface of the token processor part of RNN-T pipeline&quot;&quot;&quot;</span>
 
     <span class="n">_rnnt_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">_rnnt_factory_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">RNNT</span><span class="p">]</span>
@@ -639,7 +639,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Sample rate (in cycles per second) of input waveforms.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample rate (in cycles per second) of input waveforms.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -647,7 +647,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Size of FFT window to use.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Size of FFT window to use.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -655,7 +655,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_mels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Number of mel spectrogram features to extract from input waveforms.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of mel spectrogram features to extract from input waveforms.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -663,7 +663,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">hop_length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Number of samples between successive frames in input expected by model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of samples between successive frames in input expected by model.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -671,7 +671,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">segment_length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Number of frames in segment in input expected by model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of frames in segment in input expected by model.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -679,14 +679,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">right_context_length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Number of frames in right contextual block in input expected by model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of frames in right contextual block in input expected by model.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_context_length</span>
 
 <div class="viewcode-block" id="RNNTBundle.get_decoder"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_decoder">[docs]</a>    <span class="k">def</span> <span class="nf">get_decoder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNTBeamSearch</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Constructs RNN-T decoder.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs RNN-T decoder.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            RNNTBeamSearch</span>
@@ -695,7 +695,7 @@
         <span class="k">return</span> <span class="n">RNNTBeamSearch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blank</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RNNTBundle.get_feature_extractor"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_feature_extractor">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureExtractor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Constructs feature extractor for non-streaming (full-context) ASR.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs feature extractor for non-streaming (full-context) ASR.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            FeatureExtractor</span>
@@ -714,7 +714,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RNNTBundle.get_streaming_feature_extractor"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor">[docs]</a>    <span class="k">def</span> <span class="nf">get_streaming_feature_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureExtractor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Constructs feature extractor for streaming (simultaneous) ASR.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs feature extractor for streaming (simultaneous) ASR.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            FeatureExtractor</span>
@@ -732,7 +732,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RNNTBundle.get_token_processor"><a class="viewcode-back" href="../../../generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_token_processor">[docs]</a>    <span class="k">def</span> <span class="nf">get_token_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenProcessor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Constructs token processor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs token processor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            TokenProcessor</span>
@@ -781,7 +781,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

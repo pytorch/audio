@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -406,7 +406,7 @@
     <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A helper function for phaser. Generates a table with given parameters.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A helper function for phaser. Generates a table with given parameters.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        wave_type (str): SINE or TRIANGULAR</span>
@@ -452,7 +452,7 @@
 
 
 <div class="viewcode-block" id="allpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.allpass_biquad.html#torchaudio.functional.allpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">allpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole all-pass filter.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole all-pass filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -496,7 +496,7 @@
     <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">,</span>
     <span class="n">noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band filter.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -549,7 +549,7 @@
     <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">,</span>
     <span class="n">const_skirt_gain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band-pass filter.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band-pass filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -589,7 +589,7 @@
 
 
 <div class="viewcode-block" id="bandreject_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.bandreject_biquad.html#torchaudio.functional.bandreject_biquad">[docs]</a><span class="k">def</span> <span class="nf">bandreject_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band-reject filter.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design two-pole band-reject filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -632,7 +632,7 @@
     <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design a bass tone-control effect.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design a bass tone-control effect.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -677,7 +677,7 @@
 
 
 <div class="viewcode-block" id="biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.biquad.html#torchaudio.functional.biquad">[docs]</a><span class="k">def</span> <span class="nf">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a biquad filter of input tensor.  Initial conditions set to 0.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a biquad filter of input tensor.  Initial conditions set to 0.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -718,7 +718,7 @@
 
 
 <div class="viewcode-block" id="contrast"><a class="viewcode-back" href="../../../generated/torchaudio.functional.contrast.html#torchaudio.functional.contrast">[docs]</a><span class="k">def</span> <span class="nf">contrast</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">enhancement_amount</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply contrast effect.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply contrast effect.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -752,7 +752,7 @@
 
 
 <div class="viewcode-block" id="dcshift"><a class="viewcode-back" href="../../../generated/torchaudio.functional.dcshift.html#torchaudio.functional.dcshift">[docs]</a><span class="k">def</span> <span class="nf">dcshift</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">shift</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">limiter_gain</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a DC shift to the audio. Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a DC shift to the audio. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -799,7 +799,7 @@
 
 
 <div class="viewcode-block" id="deemph_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.deemph_biquad.html#torchaudio.functional.deemph_biquad">[docs]</a><span class="k">def</span> <span class="nf">deemph_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply ISO 908 CD de-emphasis (shelving) IIR filter.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply ISO 908 CD de-emphasis (shelving) IIR filter.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -847,7 +847,7 @@
 
 
 <span class="k">def</span> <span class="nf">_add_noise_shaping</span><span class="p">(</span><span class="n">dithered_waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Noise shaping is calculated by error:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Noise shaping is calculated by error:</span>
 <span class="sd">    error[n] = dithered[n] - original[n]</span>
 <span class="sd">    noise_shaped_waveform[n] = dithered[n] + error[n-1]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -871,7 +871,7 @@
 
 
 <span class="k">def</span> <span class="nf">_apply_probability_distribution</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a probability distribution function on a waveform.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a probability distribution function on a waveform.</span>
 
 <span class="sd">    Triangular probability density function (TPDF) dither noise has a</span>
 <span class="sd">    triangular distribution; values in the center of the range have a higher</span>
@@ -980,7 +980,7 @@
 
 
 <div class="viewcode-block" id="dither"><a class="viewcode-back" href="../../../generated/torchaudio.functional.dither.html#torchaudio.functional.dither">[docs]</a><span class="k">def</span> <span class="nf">dither</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">density_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPDF&quot;</span><span class="p">,</span> <span class="n">noise_shaping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply dither</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply dither</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1018,7 +1018,7 @@
     <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1059,7 +1059,7 @@
     <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply an IIR filter forward and backward to a waveform.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply an IIR filter forward and backward to a waveform.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1106,7 +1106,7 @@
     <span class="n">modulation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinusoidal&quot;</span><span class="p">,</span>
     <span class="n">interpolation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a flanger effect to the audio. Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a flanger effect to the audio. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1253,7 +1253,7 @@
 
 
 <div class="viewcode-block" id="gain"><a class="viewcode-back" href="../../../generated/torchaudio.functional.gain.html#torchaudio.functional.gain">[docs]</a><span class="k">def</span> <span class="nf">gain</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain_db</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply amplification or attenuation to the whole waveform.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply amplification or attenuation to the whole waveform.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1275,7 +1275,7 @@
 
 
 <div class="viewcode-block" id="highpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.highpass_biquad.html#torchaudio.functional.highpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">highpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad highpass filter and perform filtering.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad highpass filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1387,7 +1387,7 @@
 
 
 <div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../generated/torchaudio.functional.lfilter.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1455,7 +1455,7 @@
 
 
 <div class="viewcode-block" id="lowpass_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.lowpass_biquad.html#torchaudio.functional.lowpass_biquad">[docs]</a><span class="k">def</span> <span class="nf">lowpass_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1505,7 +1505,7 @@
 
 
 <div class="viewcode-block" id="overdrive"><a class="viewcode-back" href="../../../generated/torchaudio.functional.overdrive.html#torchaudio.functional.overdrive">[docs]</a><span class="k">def</span> <span class="nf">overdrive</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">colour</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a overdrive effect to the audio. Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a overdrive effect to the audio. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1570,7 +1570,7 @@
     <span class="n">mod_speed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
     <span class="n">sinusoidal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a phasing effect to the audio. Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a phasing effect to the audio. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1654,7 +1654,7 @@
 
 
 <div class="viewcode-block" id="riaa_biquad"><a class="viewcode-back" href="../../../generated/torchaudio.functional.riaa_biquad.html#torchaudio.functional.riaa_biquad">[docs]</a><span class="k">def</span> <span class="nf">riaa_biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply RIAA vinyl playback equalization.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply RIAA vinyl playback equalization.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1724,7 +1724,7 @@
     <span class="n">central_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">,</span>
     <span class="n">Q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.707</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design a treble tone-control effect.  Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Design a treble tone-control effect.  Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -1868,7 +1868,7 @@
     <span class="n">hp_lifter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">150.0</span><span class="p">,</span>
     <span class="n">lp_lifter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2000.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Voice Activity Detector. Similar to SoX implementation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Voice Activity Detector. Similar to SoX implementation.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -2093,7 +2093,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

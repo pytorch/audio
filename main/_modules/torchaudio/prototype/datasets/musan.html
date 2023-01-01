@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -398,7 +398,7 @@
 
 
 <div class="viewcode-block" id="Musan"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.datasets.Musan.html#torchaudio.prototype.datasets.Musan">[docs]</a><span class="k">class</span> <span class="nc">Musan</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;*MUSAN* :cite:`musan2015` dataset.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;*MUSAN* :cite:`musan2015` dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root (str or Path): Root directory where the dataset&#39;s top-level directory exists.</span>
@@ -413,7 +413,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">subset_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*/*.*&quot;</span><span class="p">)]</span>
 
 <div class="viewcode-block" id="Musan.get_metadata"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.datasets.Musan.html#torchaudio.prototype.datasets.Musan.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample in the dataset. Returns filepath instead of waveform,</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get metadata for the n-th sample in the dataset. Returns filepath instead of waveform,</span>
 <span class="sd">        but otherwise returns the same fields as :py:func:`__getitem__`.</span>
 
 <span class="sd">        Args:</span>
@@ -432,7 +432,7 @@
         <span class="k">return</span> <span class="n">audio_path</span><span class="p">,</span> <span class="n">_SAMPLE_RATE</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">audio_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span></div>
 
 <div class="viewcode-block" id="Musan.__getitem__"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.datasets.Musan.html#torchaudio.prototype.datasets.Musan.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the n-th sample in the dataset.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the n-th sample in the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            n (int): Index of sample to be loaded.</span>
@@ -468,7 +468,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

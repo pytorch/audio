@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -424,12 +424,12 @@
 
 
 <span class="k">def</span> <span class="nf">_next_power_of_2</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the smallest power of 2 that is greater than x&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the smallest power of 2 that is greater than x&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_get_strided</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Given a waveform (1D tensor of size ``num_samples``), it returns a 2D tensor (m, ``window_size``)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Given a waveform (1D tensor of size ``num_samples``), it returns a 2D tensor (m, ``window_size``)</span>
 <span class="sd">    representing how the window is shifted along the waveform. Each row is a frame.</span>
 
 <span class="sd">    Args:</span>
@@ -477,7 +477,7 @@
     <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns a window function with the given type and size&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns a window function with the given type and size&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">HANNING</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">HAMMING</span><span class="p">:</span>
@@ -501,7 +501,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the log energy of size (m) for a strided_input (m,*)&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the log energy of size (m) for a strided_input (m,*)&quot;&quot;&quot;</span>
     <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">strided_input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">strided_input</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">log_energy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m)</span>
     <span class="k">if</span> <span class="n">energy_floor</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
@@ -518,7 +518,7 @@
     <span class="n">round_to_power_of_two</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets the waveform and window properties&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets the waveform and window properties&quot;&quot;&quot;</span>
     <span class="n">channel</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">channel</span> <span class="o">&lt;</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;Invalid channel </span><span class="si">{}</span><span class="s2"> for size </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[</span><span class="n">channel</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># size (n)</span>
@@ -552,7 +552,7 @@
     <span class="n">remove_dc_offset</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets a window and its log energy</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets a window and its log energy</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (Tensor, Tensor): strided_input of size (m, ``padded_window_size``) and signal_log_energy of size (m)</span>
@@ -631,7 +631,7 @@
     <span class="n">subtract_mean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">POVEY</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
 <span class="sd">    compute-spectrogram-feats.</span>
 
 <span class="sd">    Args:</span>
@@ -726,7 +726,7 @@
     <span class="n">vtln_warp_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">freq</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This computes a VTLN warping function that is not the same as HTK&#39;s one,</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;This computes a VTLN warping function that is not the same as HTK&#39;s one,</span>
 <span class="sd">    but has similar inputs (this function has the advantage of never producing</span>
 <span class="sd">    empty bins).</span>
 
@@ -801,7 +801,7 @@
     <span class="n">vtln_warp_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">mel_freq</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        vtln_low_cutoff (float): Lower frequency cutoffs for VTLN</span>
 <span class="sd">        vtln_high_cutoff (float): Upper frequency cutoffs for VTLN</span>
@@ -830,7 +830,7 @@
     <span class="n">vtln_high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">vtln_warp_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        (Tensor, Tensor): The tuple consists of ``bins`` (which is</span>
 <span class="sd">        melbank of size (``num_bins``, ``num_fft_bins``)) and ``center_freqs`` (which is</span>
@@ -926,7 +926,7 @@
     <span class="n">vtln_warp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">POVEY</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fbank from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fbank from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
 <span class="sd">    compute-fbank-feats.</span>
 
 <span class="sd">    Args:</span>
@@ -1081,7 +1081,7 @@
     <span class="n">vtln_warp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">POVEY</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a mfcc from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a mfcc from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
 <span class="sd">    compute-mfcc-feats.</span>
 
 <span class="sd">    Args:</span>
@@ -1214,7 +1214,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -565,7 +565,7 @@ this increases the CPU consumption.</p>
 <p>This is the same process as
 <a class="reference external" href="./online_asr_tutorial.html">Online ASR with Emformer RNN-T</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Pipeline</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build inference pipeline from RNNTBundle.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build inference pipeline from RNNTBundle.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        bundle (torchaudio.pipelines.RNNTBundle): Bundle object</span>
@@ -584,7 +584,7 @@ this increases the CPU consumption.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Perform streaming inference&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform streaming inference&quot;&quot;&quot;</span>
         <span class="n">features</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
         <span class="n">hypos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span>
             <span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_width</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span>
@@ -595,7 +595,7 @@ this increases the CPU consumption.</p>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ContextCacher</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Cache the end of input data and prepend the next input data with it.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache the end of input data and prepend the next input data with it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        segment_length (int): The size of main segment.</span>
@@ -647,8 +647,8 @@ so we put them in a function and invoke it within
     <span class="n">context_length</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">right_context_length</span> <span class="o">*</span> <span class="n">bundle</span><span class="o">.</span><span class="n">hop_length</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample rate: </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Main segment: </span><span class="si">{</span><span class="n">segment_length</span><span class="si">}</span><span class="s2"> frames (</span><span class="si">{</span><span class="n">segment_length</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="si">}</span><span class="s2"> seconds)&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Right context: </span><span class="si">{</span><span class="n">context_length</span><span class="si">}</span><span class="s2"> frames (</span><span class="si">{</span><span class="n">context_length</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="si">}</span><span class="s2"> seconds)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Main segment: </span><span class="si">{</span><span class="n">segment_length</span><span class="si">}</span><span class="s2"> frames (</span><span class="si">{</span><span class="n">segment_length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sample_rate</span><span class="si">}</span><span class="s2"> seconds)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Right context: </span><span class="si">{</span><span class="n">context_length</span><span class="si">}</span><span class="s2"> frames (</span><span class="si">{</span><span class="n">context_length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sample_rate</span><span class="si">}</span><span class="s2"> seconds)&quot;</span><span class="p">)</span>
 
     <span class="n">cacher</span> <span class="o">=</span> <span class="n">ContextCacher</span><span class="p">(</span><span class="n">segment_length</span><span class="p">,</span> <span class="n">context_length</span><span class="p">)</span>
 
@@ -728,7 +728,7 @@ so we put them in a function and invoke it within
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

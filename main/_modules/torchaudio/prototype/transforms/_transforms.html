@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -395,7 +395,7 @@
 
 
 <div class="viewcode-block" id="Convolve"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.Convolve.html#torchaudio.prototype.transforms.Convolve">[docs]</a><span class="k">class</span> <span class="nc">Convolve</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convolves inputs along their last dimension using the direct method.</span>
 <span class="sd">    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation</span>
 <span class="sd">    operator, this module applies the true `convolution`_ operator.</span>
@@ -424,7 +424,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
 <div class="viewcode-block" id="Convolve.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.Convolve.html#torchaudio.prototype.transforms.Convolve.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">            y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
@@ -438,7 +438,7 @@
 
 
 <div class="viewcode-block" id="FFTConvolve"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.FFTConvolve.html#torchaudio.prototype.transforms.FFTConvolve">[docs]</a><span class="k">class</span> <span class="nc">FFTConvolve</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this module</span>
 <span class="sd">    is generally much faster than :class:`Convolve`.</span>
 <span class="sd">    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation</span>
@@ -469,7 +469,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
 <div class="viewcode-block" id="FFTConvolve.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.FFTConvolve.html#torchaudio.prototype.transforms.FFTConvolve.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">            y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
@@ -483,7 +483,7 @@
 
 
 <div class="viewcode-block" id="BarkScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale">[docs]</a><span class="k">class</span> <span class="nc">BarkScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a normal STFT into a bark frequency STFT with triangular filter banks.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a normal STFT into a bark frequency STFT with triangular filter banks.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -535,7 +535,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BarkScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.Tensor): A spectrogram STFT of dimension (..., freq, time).</span>
 
@@ -550,7 +550,7 @@
 
 
 <div class="viewcode-block" id="InverseBarkScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale">[docs]</a><span class="k">class</span> <span class="nc">InverseBarkScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate a STFT in normal frequency domain from bark frequency domain.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate a STFT in normal frequency domain from bark frequency domain.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -618,7 +618,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InverseBarkScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barkspec</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            barkspec (torch.Tensor): A Bark frequency spectrogram of dimension (..., ``n_barks``, time)</span>
 
@@ -666,7 +666,7 @@
 
 
 <div class="viewcode-block" id="BarkSpectrogram"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">BarkSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create BarkSpectrogram for a raw audio signal.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create BarkSpectrogram for a raw audio signal.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -762,7 +762,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="BarkSpectrogram.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (torch.Tensor): torch.Tensor of audio of dimension (..., time).</span>
 
@@ -782,7 +782,7 @@
 
 
 <div class="viewcode-block" id="Speed"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.Speed.html#torchaudio.prototype.transforms.Speed">[docs]</a><span class="k">class</span> <span class="nc">Speed</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -804,7 +804,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">resampler</span> <span class="o">=</span> <span class="n">Resample</span><span class="p">(</span><span class="n">orig_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">new_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_sample_rate</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Speed.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.Speed.html#torchaudio.prototype.transforms.Speed.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (torch.Tensor): Input signals, with shape `(..., time)`.</span>
 <span class="sd">            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
@@ -823,7 +823,7 @@
 
 
 <div class="viewcode-block" id="SpeedPerturbation"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.SpeedPerturbation.html#torchaudio.prototype.transforms.SpeedPerturbation">[docs]</a><span class="k">class</span> <span class="nc">SpeedPerturbation</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies the speed perturbation augmentation introduced in</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies the speed perturbation augmentation introduced in</span>
 <span class="sd">    *Audio augmentation for speech recognition* :cite:`ko15_interspeech`. For a given input,</span>
 <span class="sd">    the module samples a speed-up factor from ``factors`` uniformly at random and adjusts</span>
 <span class="sd">    the speed of the input by that factor.</span>
@@ -850,7 +850,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">speeders</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">Speed</span><span class="p">(</span><span class="n">orig_freq</span><span class="o">=</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="n">factor</span><span class="p">)</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">factors</span><span class="p">])</span>
 
 <div class="viewcode-block" id="SpeedPerturbation.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.SpeedPerturbation.html#torchaudio.prototype.transforms.SpeedPerturbation.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (torch.Tensor): Input signals, with shape `(..., time)`.</span>
 <span class="sd">            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
@@ -873,7 +873,7 @@
 
 
 <div class="viewcode-block" id="AddNoise"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.AddNoise.html#torchaudio.prototype.transforms.AddNoise">[docs]</a><span class="k">class</span> <span class="nc">AddNoise</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scales and adds noise to waveform per signal-to-noise ratio.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scales and adds noise to waveform per signal-to-noise ratio.</span>
 <span class="sd">    See :meth:`torchaudio.prototype.functional.add_noise` for more details.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -884,7 +884,7 @@
 <div class="viewcode-block" id="AddNoise.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.AddNoise.html#torchaudio.prototype.transforms.AddNoise.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">noise</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (torch.Tensor): Input waveform, with shape `(..., L)`.</span>
 <span class="sd">            noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).</span>
@@ -913,7 +913,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -396,7 +396,7 @@
 
 
 <span class="k">class</span> <span class="nc">ConvBlock</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;1D Convolutional block.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;1D Convolutional block.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        io_channels (int): The number of input/output channels, &lt;B, Sc&gt;</span>
@@ -455,7 +455,7 @@
 
 
 <span class="k">class</span> <span class="nc">MaskGenerator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;TCN (Temporal Convolution Network) Separation Module</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TCN (Temporal Convolution Network) Separation Module</span>
 
 <span class="sd">    Generates masks for separation.</span>
 
@@ -523,7 +523,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported activation </span><span class="si">{</span><span class="n">msk_activate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generate separation mask.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate separation mask.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): 3D Tensor with shape [batch, features, frames]</span>
@@ -547,7 +547,7 @@
 
 
 <div class="viewcode-block" id="ConvTasNet"><a class="viewcode-back" href="../../../generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet">[docs]</a><span class="k">class</span> <span class="nc">ConvTasNet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Conv-TasNet architecture introduced in</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conv-TasNet architecture introduced in</span>
 <span class="sd">    *Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation*</span>
 <span class="sd">    :cite:`Luo_2019`.</span>
 
@@ -618,7 +618,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_align_num_frames_with_strides</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Pad input Tensor so that the end of the input tensor corresponds with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pad input Tensor so that the end of the input tensor corresponds with</span>
 
 <span class="sd">        1. (if kernel size is odd) the center of the last convolution kernel</span>
 <span class="sd">        or 2. (if kernel size is even) the end of the first half of the last convolution kernel</span>
@@ -661,7 +661,7 @@
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="nb">input</span><span class="p">,</span> <span class="n">pad</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span> <span class="n">num_paddings</span>
 
 <div class="viewcode-block" id="ConvTasNet.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Perform source separation. Generate audio source waveforms.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform source separation. Generate audio source waveforms.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            input (torch.Tensor): 3D Tensor with shape [batch, channel==1, frames]</span>
@@ -692,7 +692,7 @@
 
 
 <div class="viewcode-block" id="conv_tasnet_base"><a class="viewcode-back" href="../../../generated/torchaudio.models.conv_tasnet_base.html#torchaudio.models.conv_tasnet_base">[docs]</a><span class="k">def</span> <span class="nf">conv_tasnet_base</span><span class="p">(</span><span class="n">num_sources</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvTasNet</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds non-causal version of :class:`~torchaudio.models.ConvTasNet`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds non-causal version of :class:`~torchaudio.models.ConvTasNet`.</span>
 
 <span class="sd">    The parameter settings follow the ones with the highest Si-SNR metirc score in the paper,</span>
 <span class="sd">    except the mask activation function is changed from &quot;sigmoid&quot; to &quot;relu&quot; for performance improvement.</span>
@@ -731,7 +731,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

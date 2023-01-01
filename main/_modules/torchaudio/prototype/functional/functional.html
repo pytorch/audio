@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -432,7 +432,7 @@
 
 
 <div class="viewcode-block" id="fftconvolve"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.fftconvolve">[docs]</a><span class="k">def</span> <span class="nf">fftconvolve</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this function</span>
 <span class="sd">    is generally much faster than :meth:`convolve`.</span>
 <span class="sd">    Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation</span>
@@ -471,7 +471,7 @@
 
 
 <div class="viewcode-block" id="convolve"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.convolve">[docs]</a><span class="k">def</span> <span class="nf">convolve</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convolves inputs along their last dimension using the direct method.</span>
 <span class="sd">    Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation</span>
 <span class="sd">    operator, this function applies the true `convolution`_ operator.</span>
@@ -522,7 +522,7 @@
 
 
 <div class="viewcode-block" id="add_noise"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.add_noise">[docs]</a><span class="k">def</span> <span class="nf">add_noise</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">noise</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scales and adds noise to waveform per signal-to-noise ratio.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scales and adds noise to waveform per signal-to-noise ratio.</span>
 
 <span class="sd">    Specifically, for each pair of waveform vector :math:`x \in \mathbb{R}^L` and noise vector</span>
 <span class="sd">    :math:`n \in \mathbb{R}^L`, the function computes output :math:`y` as</span>
@@ -580,7 +580,7 @@
 
 
 <span class="k">def</span> <span class="nf">_hz_to_bark</span><span class="p">(</span><span class="n">freqs</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">bark_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Hz to Barks.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Hz to Barks.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        freqs (float): Frequencies in Hz</span>
@@ -609,7 +609,7 @@
 
 
 <span class="k">def</span> <span class="nf">_bark_to_hz</span><span class="p">(</span><span class="n">barks</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">bark_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert bark bin numbers to frequencies.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert bark bin numbers to frequencies.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        barks (torch.Tensor): Bark frequencies</span>
@@ -648,7 +648,7 @@
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">bark_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;traunmuller&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
 
 <span class="sd">    .. devices:: CPU</span>
 
@@ -700,7 +700,7 @@
 <div class="viewcode-block" id="speed"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.speed">[docs]</a><span class="k">def</span> <span class="nf">speed</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 
@@ -734,7 +734,7 @@
 
 
 <div class="viewcode-block" id="preemphasis"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.preemphasis">[docs]</a><span class="k">def</span> <span class="nf">preemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pre-emphasizes a waveform along its last dimension, i.e.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pre-emphasizes a waveform along its last dimension, i.e.</span>
 <span class="sd">    for each signal :math:`x` in ``waveform``, computes</span>
 <span class="sd">    output :math:`y` as</span>
 
@@ -759,7 +759,7 @@
 
 
 <div class="viewcode-block" id="deemphasis"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.deemphasis">[docs]</a><span class="k">def</span> <span class="nf">deemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;De-emphasizes a waveform along its last dimension.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;De-emphasizes a waveform along its last dimension.</span>
 <span class="sd">    Inverse of :meth:`preemphasis`. Concretely, for each signal</span>
 <span class="sd">    :math:`x` in ``waveform``, computes output :math:`y` as</span>
 
@@ -797,7 +797,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>

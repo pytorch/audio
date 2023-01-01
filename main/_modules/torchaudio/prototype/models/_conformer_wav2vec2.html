@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20221231) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230101) &#x25BC</a>
     </div>
     
 
@@ -397,7 +397,7 @@
 
 
 <span class="k">def</span> <span class="nf">_buffered_arange</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Compute arange using a buffered tensor across function calls.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute arange using a buffered tensor across function calls.</span>
 <span class="sd">    Produces same result as torch.arange(end=max).</span>
 
 <span class="sd">    Args:</span>
@@ -412,7 +412,7 @@
 
 
 <span class="k">def</span> <span class="nf">_sample_negatives</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Sample negative examples from masked input.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample negative examples from masked input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        input (Tensor): Tensor of dimension `(batch, frame, dim)`.</span>
@@ -467,7 +467,7 @@
 
 
 <span class="k">class</span> <span class="nc">NegativeSampler</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies preprocessing to input and then computes negative sampling.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies preprocessing to input and then computes negative sampling.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        preprocessor (nn.Module): Transforms input tensor prior to negative sampling.</span>
@@ -487,7 +487,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cross_sample_negatives</span> <span class="o">=</span> <span class="n">cross_sample_negatives</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            input (Tensor): Tensor of dimension `(B, T, D)`.</span>
 
@@ -506,7 +506,7 @@
 
 
 <span class="k">class</span> <span class="nc">FeatureEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Feature Encoder class, consisting of time reduction and linear layer.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Feature Encoder class, consisting of time reduction and linear layer.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stride (int): Number of frames to merge for the output frame.</span>
@@ -524,7 +524,7 @@
         <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (Tensor): Feature Tensor representing log Mel Spectrogram output. shape ``(B, T, D)``.</span>
 <span class="sd">            lengths (Tensor or None):</span>
@@ -550,7 +550,7 @@
 
 
 <span class="k">class</span> <span class="nc">ConformerEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Conformer Encoder class, consisting of feature projection and conformer modules.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conformer Encoder class, consisting of feature projection and conformer modules.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        feature_projection (nn.Module):</span>
@@ -605,7 +605,7 @@
         <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``.</span>
 <span class="sd">            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.</span>
@@ -625,7 +625,7 @@
         <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the list of outputs from the intermediate layers of conformer block in the encoder.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the list of outputs from the intermediate layers of conformer block in the encoder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``.</span>
@@ -640,7 +640,7 @@
 
 
 <div class="viewcode-block" id="ConformerWav2Vec2PretrainModel"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">[docs]</a><span class="k">class</span> <span class="nc">ConformerWav2Vec2PretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Conformer Wav2Vec2 pre-train model for training from scratch.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conformer Wav2Vec2 pre-train model for training from scratch.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To build the model, please use one of the factory functions,</span>
@@ -672,7 +672,7 @@
         <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">audio_lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            features (Tensor):</span>
 <span class="sd">                Tensor of audio features of shape `(batch, frame, dim)`.</span>
@@ -724,7 +724,7 @@
     <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureEncoder</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Construct Feature Extractor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct Feature Extractor</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        input_dim (int): Input dimension of features.</span>
@@ -749,7 +749,7 @@
     <span class="n">convolution_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">use_group_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerEncoder</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Construct Conformer Encoder</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct Conformer Encoder</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        in_features (int): The number of input features.</span>
@@ -802,7 +802,7 @@
     <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NegativeSampler</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build custom NegativeSampler module, including linear layer and negative sampling.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build custom NegativeSampler module, including linear layer and negative sampling.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        input_dim (int): Dimension of input after feature extraction.</span>
@@ -833,7 +833,7 @@
     <span class="n">encoder_convolution_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">encoder_use_group_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2Model</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2Model</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        extractor_input_dim (int): Input dimension of the features.</span>
@@ -888,7 +888,7 @@
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Build Conformer Wav2Vec2 Model with &quot;small&quot; architecture from</span>
 <span class="sd">    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`</span>
 
@@ -946,7 +946,7 @@
     <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2 Model for pre-training</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2 Model for pre-training</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        extractor_input_dim (int): Input dimension of the features.</span>
@@ -1063,7 +1063,7 @@
     <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;small&quot; architecture from</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;small&quot; architecture from</span>
 <span class="sd">    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`</span>
 
 <span class="sd">    Args:</span>
@@ -1124,7 +1124,7 @@
     <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;large&quot; architecture from</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;large&quot; architecture from</span>
 <span class="sd">    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`</span>
 
 <span class="sd">    Args:</span>
@@ -1190,7 +1190,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2022, Torchaudio Contributors.
+        &copy; Copyright 2023, Torchaudio Contributors.
 
     </p>
   </div>
