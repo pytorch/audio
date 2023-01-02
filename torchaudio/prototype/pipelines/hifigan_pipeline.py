@@ -168,7 +168,7 @@ class HiFiGANVocoderBundle:
             self.pad_size = int((n_fft - hop_size) / 2)
 
         def forward(self, waveform: torch.Tensor) -> torch.Tensor:
-            """Generate mel spectrogram from a waveform. Should have same sampling rate as ``self.sample_rate``.
+            """Generate mel spectrogram from a waveform. Should have same sample rate as ``self.sample_rate``.
 
             Args:
                 waveform (Tensor): waveform of shape ``(batch_size, time_length)``.

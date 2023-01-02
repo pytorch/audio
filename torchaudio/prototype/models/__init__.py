@@ -34,6 +34,4 @@ __all__ = [
     "hifigan_generator_v2",
     "hifigan_generator_v3",
     "hifigan_generator",
-    "HiFiGANMelSpectrogram",
-    "hifigan_mel_spectrogram",
 ]
