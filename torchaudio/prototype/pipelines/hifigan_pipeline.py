@@ -27,13 +27,6 @@ class HiFiGANVocoderBundle:
     `text -> mel spectrogram -> waveform`, where one can use an external component, e.g. Tacotron2,
     to generate mel spectrogram from text. Please see below for the code example.
 
-    .. note::
-        Although this works with the existing Tacotron2 bundles, for the best results one needs to retrain Tacotron2
-        using the same data preprocessing pipeline which was used for training HiFiGAN. In particular, the original
-        HiFiGAN implemntation uses a custom method of generating mel spectrograms from waveforms, different from
-        :py:class:`torchaudio.transforms.MelSpectrogram`. We reimplemented this transform as
-        :py:meth:`get_mel_transform`.
-
     Example: Transform synthetic mel spectrogram to audio.
         >>> import torch
         >>> import torchaudio
@@ -46,7 +39,7 @@ class HiFiGANVocoderBundle:
         100%|████████████| 5.59M/5.59M [00:00<00:00, 18.7MB/s]
         >>>
         >>> # Generate synthetic mel spectrogram
-        >>> specgram = torch.sin(0.5 * torch.arange(start=0, end=100)).expand(bundle._params["in_channels"], 100)
+        >>> specgram = torch.sin(0.5 * torch.arange(start=0, end=100)).expand(bundle._vocoder_params["in_channels"], 100)
         >>>
         >>> # Transform mel spectrogram into audio
         >>> waveform = vocoder(specgram)
@@ -79,8 +72,9 @@ class HiFiGANVocoderBundle:
     """  # noqa: E501
 
     _path: str
-    _params: Dict[str, Any]  # Vocoder parameters
+    _vocoder_params: Dict[str, Any]  # Vocoder parameters
     _mel_params: Dict[str, Any]  # Mel transformation parameters
+    _sample_rate: float
 
     def _get_state_dict(self, dl_kwargs):
         url = f"https://download.pytorch.org/torchaudio/models/{self._path}"
@@ -100,21 +94,16 @@ class HiFiGANVocoderBundle:
         Returns:
             Variation of :py:class:`~torchaudio.prototype.models.HiFiGANGenerator`.
         """
-        model = hifigan_generator(**self._params)
+        model = hifigan_generator(**self._vocoder_params)
         model.load_state_dict(self._get_state_dict(dl_kwargs))
         model.eval()
         return model
 
     def get_mel_transform(self) -> Module:
-        """Construct an object which transforms waveforms into mel spectrograms.
-        It is equivalent to the mel spectrogram transformation used for data preparation in the the original HiFiGAN
-        code.
-        See the reference code
-        `here
-        <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_.
-        """
+        """Construct an object which transforms waveforms into mel spectrograms."""
         return self._HiFiGANMelSpectrogram(
-            n_mels=self._params["in_channels"],
+            n_mels=self._vocoder_params["in_channels"],
+            sample_rate=self._sample_rate,
             **self._mel_params,
         )
 
@@ -124,7 +113,7 @@ class HiFiGANVocoderBundle:
 
         :type: float
         """
-        return self._mel_params["sample_rate"]
+        return self._sample_rate
 
     class _HiFiGANMelSpectrogram(torch.nn.Module):
         """
@@ -197,7 +186,7 @@ class HiFiGANVocoderBundle:
 
 HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
     "hifigan_generator_v3_ljspeech.pth",
-    _params={
+    _vocoder_params={
         "upsample_rates": (8, 8, 4),
         "upsample_kernel_sizes": (16, 16, 8),
         "upsample_initial_channel": 256,
@@ -213,8 +202,8 @@ HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
         "win_length": 1024,
         "f_min": 0,
         "f_max": 8000,
-        "sample_rate": 22050,
     },
+    _sample_rate=22050,
 )
 HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Vocoder pipeline, transforming mel spectrograms into
     waveforms. The underlying model is constructed by :py:func:`torchaudio.prototype.models.hifigan_generator`
@@ -222,5 +211,14 @@ HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Vocoder pipeline, t
     published with the original paper :cite:`NEURIPS2020_c5d73680` (See links to pre-trained models on
     `GitHub <https://github.com/jik876/hifi-gan#pretrained-model>`__).
 
-    Please refer to :py:class:`torchaudio.prototype.pipelines.HiFiGANVocoderBundle` for usage instructions.
+    This pipeine can be used with an external component which generates mel spectrograms from text, for example,
+    Tacotron2 - see examples in :py:class:`HiFiGANVocoderBundle`.
+    Although this works with the existing Tacotron2 bundles, for the best results one needs to retrain Tacotron2
+    using the same data preprocessing pipeline which was used for training HiFiGAN. In particular, the original
+    HiFiGAN implementation uses a custom method of generating mel spectrograms from waveforms, different from
+    :py:class:`torchaudio.transforms.MelSpectrogram`. We reimplemented this transform as
+    :py:meth:`HiFiGANVocoderBundle.get_mel_transform`, making sure it is equivalent to the original HiFiGAN code `here
+    <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_.
+
+    Please refer to :py:class:`HiFiGANVocoderBundle` for usage instructions.
     """

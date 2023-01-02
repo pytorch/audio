@@ -40,6 +40,8 @@ Interface
    :template: autosummary/bundle_class.rst
 
    HiFiGANVocoderBundle
+   HiFiGANVocoderBundle.get_mel_transform
+   HiFiGANVocoderBundle.get_vocoder
 
 Pretrained Models
 ~~~~~~~~~~~~~~~~~
