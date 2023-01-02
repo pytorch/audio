@@ -34,5 +34,7 @@ ported code has been are modified in a minimal way, namely:
  - Add `return_complex=False` argument to `torch.stft` call in `mel_spectrogram` in `meldataset.py`, to make code
 PyTorch 2.0 compatible
  - Remove the import statements required only for the removed functions.
-  - Add directives disabling linting to each file so as not to report any format issue on the ported code.
-The implementation of the retained functions and classes and their formats are kept as-is.
+ - Code was formatted to pass pre-commit checks using `pre-commit-hooks==4.0.1`, `ufmt==1.3.2`, `black==22.3`,
+  `usort==1.0.2`, `libcst==0.4.1`, and `flake8==4.0.1`.
+
+Apart from the changes listed above, the implementation of the retained functions and classes is kept as-is.

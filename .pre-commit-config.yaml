@@ -5,7 +5,7 @@ repos:
       - id: check-docstring-first
       - id: check-toml
       - id: check-yaml
-        exclude: (packaging/.*|test/torchaudio_unittest/prototype/hifi_gan/original/.*)
+        exclude: packaging/.*
       - id: end-of-file-fixer
 
   - repo: https://github.com/omnilib/ufmt
@@ -16,4 +16,4 @@ repos:
           - black == 22.3
           - usort == 1.0.2
           - libcst == 0.4.1
-        exclude: (examples|test/torchaudio_unittest/prototype/hifi_gan/original/.*)
+        exclude: examples
