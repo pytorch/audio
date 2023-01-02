@@ -5,7 +5,7 @@ from typing import List, Tuple, Union
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import _load_waveform, extract_archive
+from torchaudio.datasets.utils import _extract_zip, _load_waveform
 
 
 SAMPLE_RATE = 16000
@@ -54,7 +54,7 @@ def _download_extract_wavs(root: str):
             url = _ARCHIVE_CONFIGS[archive]["url"]
             checksum = _ARCHIVE_CONFIGS[archive]["checksum"]
             download_url_to_file(url, archive_path, hash_prefix=checksum)
-        extract_archive(archive_path)
+        _extract_zip(archive_path)
 
 
 def _get_flist(root: str, file_path: str, subset: str) -> List[str]:

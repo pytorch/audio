@@ -354,6 +354,10 @@ def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     .. math::
         y[i] = x[i] - \text{coeff} \cdot x[i - 1]
 
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
     Args:
         waveform (torch.Tensor): Waveform, with shape `(..., N)`.
         coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
@@ -374,6 +378,10 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
 
     .. math::
         y[i] = x[i] + \text{coeff} \cdot y[i - 1]
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
 
     Args:
         waveform (torch.Tensor): Waveform, with shape `(..., N)`.

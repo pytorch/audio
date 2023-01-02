@@ -2,7 +2,7 @@ import math
 from typing import Callable, Optional, Sequence, Tuple
 
 import torch
-from torchaudio.prototype.functional import barkscale_fbanks, convolve, fftconvolve
+from torchaudio.prototype.functional import add_noise, barkscale_fbanks, convolve, fftconvolve
 from torchaudio.prototype.functional.functional import _check_convolve_mode
 from torchaudio.transforms import Resample, Spectrogram
 
@@ -483,3 +483,30 @@ class SpeedPerturbation(torch.nn.Module):
             if idx == speeder_idx:
                 return speeder(waveform, lengths)
         raise RuntimeError("Speeder not found; execution should have never reached here.")
+
+
+class AddNoise(torch.nn.Module):
+    r"""Scales and adds noise to waveform per signal-to-noise ratio.
+    See :meth:`torchaudio.prototype.functional.add_noise` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+    """
+
+    def forward(
+        self, waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor
+    ) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
+            noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
+            lengths (torch.Tensor): Valid lengths of signals in ``waveform`` and ``noise``, with shape `(...,)`
+                (leading dimensions must match those of ``waveform``).
+            snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+
+        Returns:
+            torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
+            (same shape as ``waveform``).
+        """
+        return add_noise(waveform, noise, lengths, snr)

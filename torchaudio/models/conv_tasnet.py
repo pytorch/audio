@@ -168,7 +168,6 @@ class ConvTasNet(torch.nn.Module):
         This implementation corresponds to the "non-causal" setting in the paper.
 
     See Also:
-        * :func:`~torchaudio.models.conv_tasnet_base`: A factory function.
         * :class:`torchaudio.pipelines.SourceSeparationBundle`: Source separation pipeline with pre-trained models.
 
     Args:

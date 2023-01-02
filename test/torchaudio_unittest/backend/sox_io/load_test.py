@@ -325,7 +325,7 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         # test file-like obj
         def func(path, *args):
             with open(path, "rb") as fileobj:
-                return torchaudio._torchaudio.load_audio_fileobj(fileobj, *args)
+                return torchaudio.lib._torchaudio_sox.load_audio_fileobj(fileobj, *args)
 
         self._test(func, frame_offset, num_frames, channels_first, normalize)
 

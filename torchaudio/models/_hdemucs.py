@@ -303,9 +303,6 @@ class HDemucs(torch.nn.Module):
     *Hybrid Spectrogram and Waveform Source Separation* :cite:`defossez2021hybrid`.
 
     See Also:
-        * :func:`~torchaudio.models.hdemucs_low`,
-          :func:`~torchaudio.models.hdemucs_medium`,
-          :func:`~torchaudio.models.hdemucs_high`: factory functions.
         * :class:`torchaudio.pipelines.SourceSeparationBundle`: Source separation pipeline with pre-trained models.
 
     Args:

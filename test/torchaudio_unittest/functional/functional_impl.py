@@ -20,7 +20,7 @@ from torchaudio_unittest.common_utils import (
 
 class Functional(TestBaseMixin):
     def _test_resample_waveform_accuracy(
-        self, up_scale_factor=None, down_scale_factor=None, resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4
+        self, up_scale_factor=None, down_scale_factor=None, resampling_method="sinc_interp_hann", atol=1e-1, rtol=1e-4
     ):
         # resample the signal and compare it to the ground truth
         n_to_trim = 20
@@ -471,7 +471,7 @@ class Functional(TestBaseMixin):
     @parameterized.expand(
         list(
             itertools.product(
-                ["sinc_interpolation", "kaiser_window"],
+                ["sinc_interp_hann", "sinc_interp_kaiser"],
                 [16000, 44100],
             )
         )
@@ -482,7 +482,7 @@ class Functional(TestBaseMixin):
         resampled = F.resample(waveform, sample_rate, sample_rate)
         self.assertEqual(waveform, resampled)
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform_upsample_size(self, resampling_method):
         sr = 16000
         waveform = get_whitenoise(
@@ -492,7 +492,7 @@ class Functional(TestBaseMixin):
         upsampled = F.resample(waveform, sr, sr * 2, resampling_method=resampling_method)
         assert upsampled.size(-1) == waveform.size(-1) * 2
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform_downsample_size(self, resampling_method):
         sr = 16000
         waveform = get_whitenoise(
@@ -502,7 +502,7 @@ class Functional(TestBaseMixin):
         downsampled = F.resample(waveform, sr, sr // 2, resampling_method=resampling_method)
         assert downsampled.size(-1) == waveform.size(-1) // 2
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform_identity_size(self, resampling_method):
         sr = 16000
         waveform = get_whitenoise(
@@ -515,7 +515,7 @@ class Functional(TestBaseMixin):
     @parameterized.expand(
         list(
             itertools.product(
-                ["sinc_interpolation", "kaiser_window"],
+                ["sinc_interp_hann", "sinc_interp_kaiser"],
                 list(range(1, 20)),
             )
         )
@@ -526,7 +526,7 @@ class Functional(TestBaseMixin):
     @parameterized.expand(
         list(
             itertools.product(
-                ["sinc_interpolation", "kaiser_window"],
+                ["sinc_interp_hann", "sinc_interp_kaiser"],
                 list(range(1, 20)),
             )
         )
