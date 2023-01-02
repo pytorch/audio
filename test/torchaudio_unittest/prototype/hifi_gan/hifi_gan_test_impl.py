@@ -5,8 +5,8 @@ from torchaudio.prototype.models import (
     hifigan_generator_v1,
     hifigan_generator_v2,
     hifigan_generator_v3,
-    hifigan_mel_spectrogram,
 )
+from torchaudio.prototype.pipelines import HIFIGAN_VOCODER_V3_LJSPEECH
 from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
 
 from .original.env import AttrDict
@@ -109,14 +109,15 @@ class HiFiGANTestImpl(TestBaseMixin):
         self.assertEqual(ref_output, output)
 
     def test_mel_transform(self):
-        """Check that HiFiGANMelSpectrogram generates same mel spectrogram as the original HiFiGAN implementation
-        when applied on a synthetic waveform.
+        """Check that HIFIGAN_VOCODER_V3_LJSPEECH.get_mel_transform generates the same mel spectrogram as the original
+        HiFiGAN implementation when applied on a synthetic waveform.
         There seems to be no way to change dtype in the original implmentation, so we feed in the waveform with the
         default dtype and cast the output before comparison.
         """
         synth_waveform = torch.rand(1, 1000).to(device=self.device)
-        # Generate mel spectrogram with our implementation
-        self.mel_spectrogram = hifigan_mel_spectrogram().to(dtype=self.dtype)
+
+        # Get HiFiGAN-compatible transformation from waveform to mel spectrogram
+        self.mel_spectrogram = HIFIGAN_VOCODER_V3_LJSPEECH.get_mel_transform().to(dtype=self.dtype)
         mel_spec = self.mel_spectrogram(synth_waveform.to(dtype=self.dtype))
         # Generate mel spectrogram with original implementation
         ref_mel_spec = ref_mel_spectrogram(

@@ -22,13 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Conv1d, ConvTranspose1d
-from torchaudio.transforms import MelSpectrogram
 
 
 class HiFiGANGenerator(torch.nn.Module):
@@ -334,86 +333,4 @@ def hifigan_generator_v3() -> HiFiGANGenerator:
         resblock_type=2,
         in_channels=80,
         lrelu_slope=0.1,
-    )
-
-
-class HiFiGANMelSpectrogram(torch.nn.Module):
-    """
-    Generate mel spectrogram in a way equivalent to the original HiFiGAN implementation:
-    https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72
-
-    This class wraps around :py:class:`torchaudio.transforms.MelSpectrogram`, but performs extra steps to achive
-    equivalence with the HiFiGAN implementation.
-
-    Args:
-        hop_size (int): Length of hop between STFT windows.
-        n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins.
-        win_length (int): Window size.
-        f_min (float or None):  Minimum frequency.
-        f_max (float or None): Maximum frequency.
-        sample_rate (int):  Sample rate of audio signal.
-        n_mels (int):  Number of mel filterbanks.
-    """
-
-    def __init__(
-        self,
-        hop_size: int,
-        n_fft: int,
-        win_length: int,
-        f_min: Optional[float],
-        f_max: Optional[float],
-        sample_rate: float,
-        n_mels: int,
-    ):
-        super(HiFiGANMelSpectrogram, self).__init__()
-        self.mel_transform = MelSpectrogram(
-            sample_rate=sample_rate,
-            n_fft=n_fft,
-            win_length=win_length,
-            hop_length=hop_size,
-            f_min=f_min,
-            f_max=f_max,
-            n_mels=n_mels,
-            normalized=False,
-            pad=0,
-            mel_scale="slaney",
-            norm="slaney",
-            center=False,
-        )
-        self.sample_rate = sample_rate
-        self.hop_size = hop_size
-        self.n_fft = n_fft
-        self.win_length = win_length
-        self.f_min = f_min
-        self.f_max = f_max
-        self.n_mels = n_mels
-        self.pad_size = int((n_fft - hop_size) / 2)
-
-    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
-        """Generate mel spectrogram from a waveform. Should have same sampling rate as ``self.sample_rate``.
-
-        Args:
-            waveform (Tensor): waveform of shape ``(batch_size, time_length)``.
-        Returns:
-            Tensor of shape ``(batch_size, n_mel, time_length)``
-        """
-        ref_waveform = F.pad(waveform.unsqueeze(1), (self.pad_size, self.pad_size), mode="reflect")
-        ref_waveform = ref_waveform.squeeze(1)
-
-        spectr = (self.mel_transform.spectrogram(ref_waveform) + 1e-9) ** 0.5
-        mel_spectrogram = self.mel_transform.mel_scale(spectr)
-        mel_spectrogram = torch.log(torch.clamp(mel_spectrogram, min=1e-5))
-        return mel_spectrogram
-
-
-def hifigan_mel_spectrogram() -> HiFiGANMelSpectrogram:
-    r"""Builds :py:class:`HiFiGANMelSpectrogram` with parameters used to prepare data for training models
-    in the original HiFiGAN publication. The parameters are taken from
-    `here <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/config_v3.json#L18-L27>`_.
-
-    Returns:
-        HiFiGANMelSpectrogram: Generated MelSpectrogram transform object.
-    """
-    return HiFiGANMelSpectrogram(
-        hop_size=256, n_fft=1024, win_length=1024, f_min=0, f_max=8000, sample_rate=22050, n_mels=80
     )

@@ -6,11 +6,6 @@ import torchaudio.functional as F
 from torchaudio.prototype.pipelines import HIFIGAN_VOCODER_V3_LJSPEECH
 
 
-def test_smoke_hifi_gan_bundle():
-    """Smoke test of downloading weights for pretraining model"""
-    HIFIGAN_VOCODER_V3_LJSPEECH.get_vocoder()
-
-
 @pytest.mark.parametrize(
     "lang",
     [
