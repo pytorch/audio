@@ -27,7 +27,7 @@ EMFORMER_RNNT_BASE_TEDLIUM3
 
 
 HiFiGAN Vocoder
------------------
+---------------
 
 Interface
 ~~~~~~~~~

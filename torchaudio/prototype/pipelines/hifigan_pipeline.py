@@ -45,11 +45,11 @@ class HiFiGANVocoderBundle:
         >>> # Generate synthetic mel spectrogram
         >>> specgram = torch.sin(0.5 * torch.arange(start=0, end=100)).expand(bundle._params["in_channels"], 100)
         >>>
-        >>> # Trasform mel spectrogram into audio
+        >>> # Transform mel spectrogram into audio
         >>> waveform = vocoder(specgram)
         >>> torchaudio.save('sample.wav', waveform, bundle.sample_rate)
 
-    Example: Usage together with Tactron2, text to audio.
+    Example: Usage together with Tacotron2, text to audio.
         >>> import torch
         >>> import torchaudio
         >>> # Since HiFiGAN bundle is in prototypes, it needs to be exported explicitly
@@ -68,7 +68,7 @@ class HiFiGANVocoderBundle:
         >>> # Load HiFiGAN bundle
         >>> vocoder = bundle_hifigan.get_vocoder()
         Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_generator_v3_ljspeech.pth"
-        100%|██████████████████████████████████████████████████████ 5.59M/5.59M [00:03<00:00, 1.55MB/s]
+        100%|████████████| 5.59M/5.59M [00:03<00:00, 1.55MB/s]
         >>>
         >>> # Use HiFiGAN to convert mel spectrogram to audio
         >>> waveform = vocoder(specgram).squeeze(0)
