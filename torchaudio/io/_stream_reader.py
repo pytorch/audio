@@ -251,7 +251,7 @@ _decoder_option = """Options passed to decoder.
                  - ``"thread"``: The number of threads (in str) or the value ``"0"``
                    to let FFmpeg decides based on its heuristics.
                  - ``"thread_type"``: Which multithreading methods to use.
-                   The valid values are ``"frame"``, ``"slice"`` or ``"auto"``.
+                   The valid values are ``"frame"`` or ``"slice"``.
                    Note that Each decoder supports different set of methods.
                    If not provided, a default value is used.
                     - ``"frame"``: Decode more than one frame at once.
