@@ -40,13 +40,13 @@ Interface
    :template: autosummary/bundle_class.rst
 
    HiFiGANVocoderBundle
-   HiFiGANVocoderBundle.get_mel_transform
-   HiFiGANVocoderBundle.get_vocoder
 
 Pretrained Models
 ~~~~~~~~~~~~~~~~~
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-   .. autodata:: HIFIGAN_VOCODER_V3_LJSPEECH
-      :no-value:
+   HIFIGAN_VOCODER_V3_LJSPEECH

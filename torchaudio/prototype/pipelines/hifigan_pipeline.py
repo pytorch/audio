@@ -101,7 +101,7 @@ class HiFiGANVocoderBundle:
 
     def get_mel_transform(self) -> Module:
         """Construct an object which transforms waveforms into mel spectrograms."""
-        return self._HiFiGANMelSpectrogram(
+        return _HiFiGANMelSpectrogram(
             n_mels=self._vocoder_params["in_channels"],
             sample_rate=self._sample_rate,
             **self._mel_params,
@@ -115,73 +115,74 @@ class HiFiGANVocoderBundle:
         """
         return self._sample_rate
 
-    class _HiFiGANMelSpectrogram(torch.nn.Module):
-        """
-        Generate mel spectrogram in a way equivalent to the original HiFiGAN implementation:
-        https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72
 
-        This class wraps around :py:class:`torchaudio.transforms.MelSpectrogram`, but performs extra steps to achive
-        equivalence with the HiFiGAN implementation.
+class _HiFiGANMelSpectrogram(torch.nn.Module):
+    """
+    Generate mel spectrogram in a way equivalent to the original HiFiGAN implementation:
+    https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72
+
+    This class wraps around :py:class:`torchaudio.transforms.MelSpectrogram`, but performs extra steps to achive
+    equivalence with the HiFiGAN implementation.
+
+    Args:
+        hop_size (int): Length of hop between STFT windows.
+        n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins.
+        win_length (int): Window size.
+        f_min (float or None):  Minimum frequency.
+        f_max (float or None): Maximum frequency.
+        sample_rate (int):  Sample rate of audio signal.
+        n_mels (int):  Number of mel filterbanks.
+    """
+
+    def __init__(
+        self,
+        hop_size: int,
+        n_fft: int,
+        win_length: int,
+        f_min: Optional[float],
+        f_max: Optional[float],
+        sample_rate: float,
+        n_mels: int,
+    ):
+        super(_HiFiGANMelSpectrogram, self).__init__()
+        self.mel_transform = MelSpectrogram(
+            sample_rate=sample_rate,
+            n_fft=n_fft,
+            win_length=win_length,
+            hop_length=hop_size,
+            f_min=f_min,
+            f_max=f_max,
+            n_mels=n_mels,
+            normalized=False,
+            pad=0,
+            mel_scale="slaney",
+            norm="slaney",
+            center=False,
+        )
+        self.sample_rate = sample_rate
+        self.hop_size = hop_size
+        self.n_fft = n_fft
+        self.win_length = win_length
+        self.f_min = f_min
+        self.f_max = f_max
+        self.n_mels = n_mels
+        self.pad_size = int((n_fft - hop_size) / 2)
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        """Generate mel spectrogram from a waveform. Should have same sample rate as ``self.sample_rate``.
 
         Args:
-            hop_size (int): Length of hop between STFT windows.
-            n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins.
-            win_length (int): Window size.
-            f_min (float or None):  Minimum frequency.
-            f_max (float or None): Maximum frequency.
-            sample_rate (int):  Sample rate of audio signal.
-            n_mels (int):  Number of mel filterbanks.
+            waveform (Tensor): waveform of shape ``(batch_size, time_length)``.
+        Returns:
+            Tensor of shape ``(batch_size, n_mel, time_length)``
         """
+        ref_waveform = F.pad(waveform.unsqueeze(1), (self.pad_size, self.pad_size), mode="reflect")
+        ref_waveform = ref_waveform.squeeze(1)
 
-        def __init__(
-            self,
-            hop_size: int,
-            n_fft: int,
-            win_length: int,
-            f_min: Optional[float],
-            f_max: Optional[float],
-            sample_rate: float,
-            n_mels: int,
-        ):
-            super(HiFiGANVocoderBundle._HiFiGANMelSpectrogram, self).__init__()
-            self.mel_transform = MelSpectrogram(
-                sample_rate=sample_rate,
-                n_fft=n_fft,
-                win_length=win_length,
-                hop_length=hop_size,
-                f_min=f_min,
-                f_max=f_max,
-                n_mels=n_mels,
-                normalized=False,
-                pad=0,
-                mel_scale="slaney",
-                norm="slaney",
-                center=False,
-            )
-            self.sample_rate = sample_rate
-            self.hop_size = hop_size
-            self.n_fft = n_fft
-            self.win_length = win_length
-            self.f_min = f_min
-            self.f_max = f_max
-            self.n_mels = n_mels
-            self.pad_size = int((n_fft - hop_size) / 2)
-
-        def forward(self, waveform: torch.Tensor) -> torch.Tensor:
-            """Generate mel spectrogram from a waveform. Should have same sample rate as ``self.sample_rate``.
-
-            Args:
-                waveform (Tensor): waveform of shape ``(batch_size, time_length)``.
-            Returns:
-                Tensor of shape ``(batch_size, n_mel, time_length)``
-            """
-            ref_waveform = F.pad(waveform.unsqueeze(1), (self.pad_size, self.pad_size), mode="reflect")
-            ref_waveform = ref_waveform.squeeze(1)
-
-            spectr = (self.mel_transform.spectrogram(ref_waveform) + 1e-9) ** 0.5
-            mel_spectrogram = self.mel_transform.mel_scale(spectr)
-            mel_spectrogram = torch.log(torch.clamp(mel_spectrogram, min=1e-5))
-            return mel_spectrogram
+        spectr = (self.mel_transform.spectrogram(ref_waveform) + 1e-9) ** 0.5
+        mel_spectrogram = self.mel_transform.mel_scale(spectr)
+        mel_spectrogram = torch.log(torch.clamp(mel_spectrogram, min=1e-5))
+        return mel_spectrogram
 
 
 HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
@@ -205,11 +206,11 @@ HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
     },
     _sample_rate=22050,
 )
-HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """Pre-trained HiFiGAN Vocoder pipeline, transforming mel spectrograms into
-    waveforms. The underlying model is constructed by :py:func:`torchaudio.prototype.models.hifigan_generator`
-    and utilizes weights trained on *The LJ Speech Dataset* :cite:`ljspeech17`. The weights are converted from the ones
-    published with the original paper :cite:`NEURIPS2020_c5d73680` (See links to pre-trained models on
-    `GitHub <https://github.com/jik876/hifi-gan#pretrained-model>`__).
+HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """HiFiGAN Vocoder pipeline, trained on *The LJ Speech Dataset*
+    :cite:`ljspeech17`. The weights are converted from the ones published with the original paper
+    :cite:`NEURIPS2020_c5d73680` under `MIT License
+    <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/LICENSE>`__. See links to
+    pre-trained models on `GitHub <https://github.com/jik876/hifi-gan#pretrained-model>`__.
 
     This pipeine can be used with an external component which generates mel spectrograms from text, for example,
     Tacotron2 - see examples in :py:class:`HiFiGANVocoderBundle`.
