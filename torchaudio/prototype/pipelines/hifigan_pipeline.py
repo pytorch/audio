@@ -207,8 +207,9 @@ HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
     _sample_rate=22050,
 )
 HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """HiFiGAN Vocoder pipeline, trained on *The LJ Speech Dataset*
-    :cite:`ljspeech17`. The weights are converted from the ones published with the original paper
-    :cite:`NEURIPS2020_c5d73680` under `MIT License
+    :cite:`ljspeech17`. The underlying vocoder is constructed by
+    :py:func:`torchaudio.prototype.models.hifigan_generator`. The weights are converted from the ones published
+    with the original paper :cite:`NEURIPS2020_c5d73680` under `MIT License
     <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/LICENSE>`__. See links to
     pre-trained models on `GitHub <https://github.com/jik876/hifi-gan#pretrained-model>`__.
 
