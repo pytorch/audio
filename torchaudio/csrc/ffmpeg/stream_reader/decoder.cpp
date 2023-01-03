@@ -91,7 +91,7 @@ void init_codec_context(
 
   // Default to single thread execution.
   if (!av_dict_get(opts, "threads", NULL, 0)) {
-    av_dict_set(&ist->decoder_opts, "threads", "1", 0);
+    av_dict_set(&opts, "threads", "1", 0);
   }
 
   ret = avcodec_open2(pCodecContext, pCodecContext->codec, &opts);
