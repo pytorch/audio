@@ -117,7 +117,7 @@ class HiFiGANTestImpl(TestBaseMixin):
         synth_waveform = torch.rand(1, 1000).to(device=self.device)
 
         # Get HiFiGAN-compatible transformation from waveform to mel spectrogram
-        self.mel_spectrogram = HIFIGAN_VOCODER_V3_LJSPEECH.get_mel_transform().to(dtype=self.dtype)
+        self.mel_spectrogram = HIFIGAN_VOCODER_V3_LJSPEECH.get_mel_transform().to(dtype=self.dtype, device=self.device)
         mel_spec = self.mel_spectrogram(synth_waveform.to(dtype=self.dtype))
         # Generate mel spectrogram with original implementation
         ref_mel_spec = ref_mel_spectrogram(
