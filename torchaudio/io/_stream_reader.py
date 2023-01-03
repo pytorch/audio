@@ -239,12 +239,26 @@ _decoder = """The name of the decoder to be used.
                 Default: ``None``."""
 
 _decoder_option = """Options passed to decoder.
-                Mapping from str to str.
+                Mapping from str to str. (Default: ``None``)
 
                 To list decoder options for a decoder, you can use
                 `ffmpeg -h decoder=<DECODER>` command.
 
-                Default: ``None``."""
+                In addition to decoder-specific options, you can also pass options related
+                to multithreading. They are effective only if the decoder support them.
+                If neither of them are provided, StreamReader defaults to single thread.
+
+                 - ``"thread"``: The number of threads (in str) or the value ``"0"``
+                   to let FFmpeg decides based on its heuristics.
+                 - ``"thread_type"``: Which multithreading methods to use.
+                   The valid values are ``"frame"``, ``"slice"`` or ``"auto"``.
+                   Note that Each decoder supports different set of methods.
+                   If not provided, a default value is used.
+                    - ``"frame"``: Decode more than one frame at once.
+                      Each thread handles one frame.
+                      This will increase decoding delay by one frame per thread
+                    - ``"slice"``: Decode more than one part of a single frame at once.
+                """
 
 
 _hw_accel = """Enable hardware acceleration.
