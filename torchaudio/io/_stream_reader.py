@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterator, Optional, Tuple
+from typing import BinaryIO, Dict, Iterator, Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -350,7 +350,7 @@ class StreamReader:
 
     def __init__(
         self,
-        src: str,
+        src: Union[str, BinaryIO, torch.Tensor],
         format: Optional[str] = None,
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
@@ -361,7 +361,7 @@ class StreamReader:
         elif isinstance(src, torch.Tensor):
             self._be = torch.classes.torchaudio.ffmpeg_StreamReaderTensor(src, format, option, buffer_size)
         elif hasattr(src, "read"):
-            self._be = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
             raise ValueError("`src` must be either string, Tensor or file-like object.")
 

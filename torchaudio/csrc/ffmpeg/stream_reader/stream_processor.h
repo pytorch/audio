@@ -25,6 +25,13 @@ class StreamProcessor {
   KeyType current_key = 0;
   std::map<KeyType, Sink> sinks;
 
+  // Used for precise seek.
+  // 0: no discard
+  // Positive Values: decoded frames with PTS values less than this are
+  // discarded.
+  // Negative values: UB. Should not happen.
+  int64_t discard_before_pts = 0;
+
  public:
   StreamProcessor(
       AVStream* stream,
@@ -57,6 +64,10 @@ class StreamProcessor {
   // 1. Remove the stream
   void remove_stream(KeyType key);
 
+  // Set discard
+  // The input timestamp must be expressed in AV_TIME_BASE unit.
+  void set_discard_timestamp(int64_t timestamp);
+
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
@@ -70,7 +81,7 @@ class StreamProcessor {
   // 2. pass the decoded data to filters
   // 3. each filter store the result to the corresponding buffer
   // - Sending NULL will drain (flush) the internal
-  int process_packet(AVPacket* packet, int64_t discard_before_pts = -1);
+  int process_packet(AVPacket* packet);
 
   // flush the internal buffer of decoder.
   // To be use when seeking

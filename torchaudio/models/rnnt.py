@@ -456,8 +456,7 @@ class RNNT(torch.nn.Module):
     Recurrent neural network transducer (RNN-T) model.
 
     Note:
-        To build the model, please use one of the factory functions,
-        :py:func:`emformer_rnnt_model` or :py:func:`emformer_rnnt_base`.
+        To build the model, please use one of the factory functions.
 
     See Also:
         :class:`torchaudio.pipelines.RNNTBundle`: ASR pipeline with pre-trained models.

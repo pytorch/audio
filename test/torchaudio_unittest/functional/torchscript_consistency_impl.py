@@ -600,7 +600,7 @@ class Functional(TempDirMixin, TestBaseMixin):
     def test_resample_sinc(self):
         def func(tensor):
             sr1, sr2 = 16000, 8000
-            return F.resample(tensor, sr1, sr2, resampling_method="sinc_interpolation")
+            return F.resample(tensor, sr1, sr2, resampling_method="sinc_interp_hann")
 
         tensor = common_utils.get_whitenoise(sample_rate=16000)
         self._assert_consistency(func, (tensor,))
@@ -616,7 +616,9 @@ class Functional(TempDirMixin, TestBaseMixin):
         sr1, sr2 = 16000, 8000
         lowpass_filter_width = 6
         rolloff = 0.99
-        self._assert_consistency(F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "kaiser_window", beta))
+        self._assert_consistency(
+            F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "sinc_interp_kaiser", beta)
+        )
 
     def test_phase_vocoder(self):
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))

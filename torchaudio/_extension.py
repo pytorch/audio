@@ -1,12 +1,15 @@
+import logging
 import os
 import sys
-import warnings
 from pathlib import Path
 
 import torch
-from torchaudio._internal import module_utils as _mod_utils  # noqa: F401
+
+from torchaudio._internal.module_utils import is_module_available
 
 _LIB_DIR = Path(__file__).parent / "lib"
+
+_LG = logging.getLogger(__name__)
 
 
 def _get_lib_path(lib: str):
@@ -62,7 +65,7 @@ def _init_ffmpeg():
     if _FFMPEG_INITIALIZED:
         return
 
-    if not torch.ops.torchaudio.is_ffmpeg_available():
+    if not is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
         raise RuntimeError(
             "torchaudio is not compiled with FFmpeg integration. Please set USE_FFMPEG=1 when compiling torchaudio."
         )
@@ -72,7 +75,7 @@ def _init_ffmpeg():
     except OSError as err:
         raise ImportError("FFmpeg libraries are not found. Please install FFmpeg.") from err
 
-    import torchaudio._torchaudio_ffmpeg  # noqa
+    import torchaudio.lib._torchaudio_ffmpeg  # noqa
 
     torch.ops.torchaudio.ffmpeg_init()
     if torch.ops.torchaudio.ffmpeg_get_log_level() > 8:
@@ -82,10 +85,6 @@ def _init_ffmpeg():
 
 
 def _init_extension():
-    if not _mod_utils.is_module_available("torchaudio._torchaudio"):
-        warnings.warn("torchaudio C++ extension is not available.")
-        return
-
     # On Windows Python-3.8+ has `os.add_dll_directory` call,
     # which is called to configure dll search path.
     # To find cuda related dlls we need to make sure the
@@ -102,19 +101,27 @@ def _init_extension():
                 except Exception:
                     pass
 
-    _load_lib("libtorchaudio")
-    # This import is for initializing the methods registered via PyBind11
-    # This has to happen after the base library is loaded
-    from torchaudio import _torchaudio  # noqa
+    if is_module_available("torchaudio.lib._torchaudio"):
+        try:
+            _load_lib("libtorchaudio")
+            import torchaudio.lib._torchaudio  # noqa
+        except Exception:
+            _LG.debug("Failed to initialize libtorchaudio", exc_info=True)
 
-    # Because this part is executed as part of `import torchaudio`, we ignore the
-    # initialization failure.
+    if is_module_available("torchaudio.lib._torchaudio_sox"):
+        try:
+            _load_lib("libtorchaudio_sox")
+            import torchaudio.lib._torchaudio_sox  # noqa
+        except Exception:
+            _LG.debug("Failed to initialize libsox bindings", exc_info=True)
+
     # If the FFmpeg integration is not properly initialized, then detailed error
     # will be raised when client code attempts to import the dedicated feature.
-    try:
-        _init_ffmpeg()
-    except Exception:
-        pass
+    if is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
+        try:
+            _init_ffmpeg()
+        except Exception:
+            _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
 
 
 def _check_cuda_version():
@@ -130,6 +137,7 @@ def _check_cuda_version():
                 f"PyTorch has CUDA version {t_version} whereas TorchAudio has CUDA version {ta_version}. "
                 "Please install the TorchAudio version that matches your PyTorch version."
             )
+    return version
 
 
 _init_extension()

@@ -6,7 +6,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _extract_tar
 
 
 _RELEASE_CONFIGS = {
@@ -106,7 +106,7 @@ class TEDLIUM(Dataset):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS[release]["checksum"]
                     download_url_to_file(url, archive, hash_prefix=checksum)
-                extract_archive(archive)
+                _extract_tar(archive)
         else:
             if not os.path.exists(self._path):
                 raise RuntimeError(
