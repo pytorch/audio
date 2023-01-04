@@ -90,7 +90,7 @@ void init_codec_context(
   AVDictionary* opts = get_option_dict(decoder_option);
 
   // Default to single thread execution.
-  if (!av_dict_get(opts, "threads", NULL, 0)) {
+  if (!av_dict_get(opts, "threads", nullptr, 0)) {
     av_dict_set(&opts, "threads", "1", 0);
   }
 

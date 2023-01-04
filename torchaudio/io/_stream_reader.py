@@ -248,11 +248,11 @@ _decoder_option = """Options passed to decoder.
                 to multithreading. They are effective only if the decoder support them.
                 If neither of them are provided, StreamReader defaults to single thread.
 
-                 - ``"thread"``: The number of threads (in str) or the value ``"0"``
+                 - ``"threads"``: The number of threads (in str) or the value ``"0"``
                    to let FFmpeg decides based on its heuristics.
-                 - ``"thread_type"``: Which multithreading methods to use.
+                 - ``"thread_type"``: Which multithreading method to use.
                    The valid values are ``"frame"`` or ``"slice"``.
-                   Note that Each decoder supports different set of methods.
+                   Note that sach decoder supports different set of methods.
                    If not provided, a default value is used.
                     - ``"frame"``: Decode more than one frame at once.
                       Each thread handles one frame.
