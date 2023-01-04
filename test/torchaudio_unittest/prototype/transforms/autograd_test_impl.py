@@ -87,3 +87,15 @@ class Autograd(TestBaseMixin):
         add_noise = T.AddNoise().to(self.device, torch.float64)
         assert gradcheck(add_noise, (waveform, noise, lengths, snr))
         assert gradgradcheck(add_noise, (waveform, noise, lengths, snr))
+
+    def test_Preemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=torch.float64, device=self.device, requires_grad=True)
+        preemphasis = T.Preemphasis(coeff=0.97).to(dtype=torch.float64, device=self.device)
+        assert gradcheck(preemphasis, (waveform,))
+        assert gradgradcheck(preemphasis, (waveform,))
+
+    def test_Deemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=torch.float64, device=self.device, requires_grad=True)
+        deemphasis = T.Deemphasis(coeff=0.97).to(dtype=torch.float64, device=self.device)
+        assert gradcheck(deemphasis, (waveform,))
+        assert gradgradcheck(deemphasis, (waveform,))

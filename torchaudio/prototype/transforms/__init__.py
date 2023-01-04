@@ -3,8 +3,10 @@ from ._transforms import (
     BarkScale,
     BarkSpectrogram,
     Convolve,
+    Deemphasis,
     FFTConvolve,
     InverseBarkScale,
+    Preemphasis,
     Speed,
     SpeedPerturbation,
 )
@@ -14,8 +16,10 @@ __all__ = [
     "BarkScale",
     "BarkSpectrogram",
     "Convolve",
+    "Deemphasis",
     "FFTConvolve",
     "InverseBarkScale",
+    "Preemphasis",
     "SpeedPerturbation",
     "Speed",
 ]

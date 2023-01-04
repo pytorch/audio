@@ -2,7 +2,7 @@ import math
 from typing import Callable, Optional, Sequence, Tuple
 
 import torch
-from torchaudio.prototype.functional import add_noise, barkscale_fbanks, convolve, fftconvolve
+from torchaudio.prototype.functional import add_noise, barkscale_fbanks, convolve, deemphasis, fftconvolve, preemphasis
 from torchaudio.prototype.functional.functional import _check_convolve_mode
 from torchaudio.transforms import Resample, Spectrogram
 
@@ -510,3 +510,59 @@ class AddNoise(torch.nn.Module):
             (same shape as ``waveform``).
         """
         return add_noise(waveform, noise, lengths, snr)
+
+
+class Preemphasis(torch.nn.Module):
+    r"""Pre-emphasizes a waveform along its last dimension.
+    See :meth:`torchaudio.prototype.functional.preemphasis` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+    """
+
+    def __init__(self, coeff: float = 0.97) -> None:
+        super().__init__()
+        self.coeff = coeff
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+
+        Returns:
+            torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
+        """
+        return preemphasis(waveform, coeff=self.coeff)
+
+
+class Deemphasis(torch.nn.Module):
+    r"""De-emphasizes a waveform along its last dimension.
+    See :meth:`torchaudio.prototype.functional.deemphasis` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+    """
+
+    def __init__(self, coeff: float = 0.97) -> None:
+        super().__init__()
+        self.coeff = coeff
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+
+        Returns:
+            torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+        """
+        return deemphasis(waveform, coeff=self.coeff)
