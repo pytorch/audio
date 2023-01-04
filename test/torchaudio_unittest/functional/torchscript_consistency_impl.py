@@ -758,6 +758,13 @@ class Functional(TempDirMixin, TestBaseMixin):
         specgram = torch.rand(num_channels, n_fft_bin, num_frames, dtype=self.complex_dtype, device=self.device)
         self._assert_consistency_complex(F.apply_beamforming, (beamform_weights, specgram))
 
+    def test_apply_fade(self):
+        waveform = common_utils.get_whitenoise()
+        fade_in_len = 3000
+        fade_out_len = 3000
+        fade_shape = "linear"
+        self._assert_consistency(F.fade, (waveform, fade_in_len, fade_out_len, fade_shape))
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

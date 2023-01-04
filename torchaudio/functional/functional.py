@@ -2288,3 +2288,76 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
     # (..., freq, channel) x (..., channel, freq, time) -> (..., freq, time)
     specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_weights.conj(), specgram])
     return specgram_enhanced
+
+
+def fade(waveform: Tensor, fade_in_len: int = 0, fade_out_len: int = 0, fade_shape: str = "linear") -> Tensor:
+
+    r"""Add a fade in and/or fade out to a waveform.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`.
+        fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
+        fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
+        fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
+            ``"half_sine"``, ``"linear"``, ``"logarithmic"``, ``"exponential"``.
+            (Default: ``"linear"``)
+
+    Returns:
+        Tensor: Tensor of audio of dimension `(..., time)`.
+
+    """
+    waveform_length = waveform.size()[-1]
+    device = waveform.device
+    return (
+        _fade_in(waveform_length, fade_in_len, fade_shape, device)
+        * _fade_out(waveform_length, fade_out_len, fade_shape, device)
+        * waveform
+    )
+
+
+def _fade_in(waveform_length: int, fade_in_len: int, fade_shape: str, device: torch.device) -> Tensor:
+    fade = torch.linspace(0, 1, fade_in_len, device=device)
+    ones = torch.ones(waveform_length - fade_in_len, device=device)
+
+    if fade_shape == "linear":
+        fade = fade
+
+    if fade_shape == "exponential":
+        fade = torch.pow(2, (fade - 1)) * fade
+
+    if fade_shape == "logarithmic":
+        fade = torch.log10(0.1 + fade) + 1
+
+    if fade_shape == "quarter_sine":
+        fade = torch.sin(fade * math.pi / 2)
+
+    if fade_shape == "half_sine":
+        fade = torch.sin(fade * math.pi - math.pi / 2) / 2 + 0.5
+
+    return torch.cat((fade, ones)).clamp_(0, 1)
+
+
+def _fade_out(waveform_length: int, fade_out_len: int, fade_shape: str, device: torch.device) -> Tensor:
+    fade = torch.linspace(0, 1, fade_out_len, device=device)
+    ones = torch.ones(waveform_length - fade_out_len, device=device)
+
+    if fade_shape == "linear":
+        fade = -fade + 1
+
+    if fade_shape == "exponential":
+        fade = torch.pow(2, -fade) * (1 - fade)
+
+    if fade_shape == "logarithmic":
+        fade = torch.log10(1.1 - fade) + 1
+
+    if fade_shape == "quarter_sine":
+        fade = torch.sin(fade * math.pi / 2 + math.pi / 2)
+
+    if fade_shape == "half_sine":
+        fade = torch.sin(fade * math.pi + math.pi / 2) / 2 + 0.5
+
+    return torch.cat((ones, fade)).clamp_(0, 1)

@@ -32,6 +32,7 @@ from .functional import (
     DB_to_amplitude,
     detect_pitch_frequency,
     edit_distance,
+    fade,
     griffinlim,
     inverse_spectrogram,
     linear_fbanks,
@@ -108,4 +109,5 @@ __all__ = [
     "rtf_evd",
     "rtf_power",
     "apply_beamforming",
+    "fade",
 ]
