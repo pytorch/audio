@@ -133,6 +133,9 @@ endif()
 # TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
 if (MSVC)
   set(warning_flags /W4)
+  # the following line is added in order to export symbols when building on Windows
+  # this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 else()
   set(warning_flags -Wall)
 endif()
@@ -150,3 +153,9 @@ endif()
 
 add_subdirectory(third_party)
 add_subdirectory(torchaudio/csrc)
+if (BUILD_SOX)
+  add_subdirectory(torchaudio/csrc/sox)
+endif()
+if (USE_FFMPEG)
+  add_subdirectory(torchaudio/csrc/ffmpeg)
+endif()

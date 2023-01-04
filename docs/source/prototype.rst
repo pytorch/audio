@@ -17,6 +17,7 @@ imported explicitly, e.g.
    import torchaudio.prototype.models
 
 .. toctree::
+   prototype.datasets
    prototype.functional
    prototype.models
    prototype.pipelines

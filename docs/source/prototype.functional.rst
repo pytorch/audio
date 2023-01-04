@@ -19,10 +19,25 @@ convolve
 
 .. autofunction:: convolve
 
+deemphasis
+~~~~~~~~~~
+
+.. autofunction:: deemphasis
+
 fftconvolve
 ~~~~~~~~~~~
 
 .. autofunction:: fftconvolve
+
+preemphasis
+~~~~~~~~~~~
+
+.. autofunction:: preemphasis
+
+speed
+~~~~~
+
+.. autofunction:: speed
 
 DSP
 ~~~
@@ -32,4 +47,8 @@ DSP
    :nosignatures:
 
    adsr_envelope
+   filter_waveform
+   extend_pitch
    oscillator_bank
+   sinc_impulse_response
+   frequency_impulse_response

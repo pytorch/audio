@@ -5,7 +5,7 @@ import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _extract_zip
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 _CHECKSUMS = {
@@ -59,7 +59,7 @@ class VCTK_092(Dataset):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
                     download_url_to_file(url, archive, hash_prefix=checksum)
-                extract_archive(archive, self._path)
+                _extract_zip(archive, self._path)
 
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found. Please use `download=True` to download it.")

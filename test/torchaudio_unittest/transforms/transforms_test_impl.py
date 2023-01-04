@@ -53,7 +53,7 @@ class TransformsTestBase(TestBaseMixin):
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
 
     @nested_params(
-        ["sinc_interpolation", "kaiser_window"],
+        ["sinc_interp_hann", "sinc_interp_kaiser"],
         [16000, 44100],
     )
     def test_resample_identity(self, resampling_method, sample_rate):
@@ -65,7 +65,7 @@ class TransformsTestBase(TestBaseMixin):
         self.assertEqual(waveform, resampled)
 
     @nested_params(
-        ["sinc_interpolation", "kaiser_window"],
+        ["sinc_interp_hann", "sinc_interp_kaiser"],
         [None, torch.float64],
     )
     def test_resample_cache_dtype(self, resampling_method, dtype):

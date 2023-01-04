@@ -5,7 +5,7 @@ from typing import Tuple, Union
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import _load_waveform, extract_archive
+from torchaudio.datasets.utils import _extract_tar, _load_waveform
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
@@ -40,7 +40,7 @@ def _download_librispeech(root, url):
     if not os.path.isfile(archive):
         checksum = _CHECKSUMS.get(download_url, None)
         download_url_to_file(download_url, archive, hash_prefix=checksum)
-    extract_archive(archive)
+    _extract_tar(archive)
 
 
 def _get_librispeech_metadata(
