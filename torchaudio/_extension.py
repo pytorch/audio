@@ -125,6 +125,8 @@ def _init_extension():
 
 
 def _check_cuda_version():
+    if not _get_lib_path("libtorchaudio").exists():
+        return None
     version = torch.ops.torchaudio.cuda_version()
     if version is not None and torch.version.cuda is not None:
         version_str = str(version)
