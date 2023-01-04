@@ -207,7 +207,7 @@ HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
     _sample_rate=22050,
 )
 HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """HiFiGAN Vocoder pipeline, trained on *The LJ Speech Dataset*
-    :cite:`ljspeech17`. 
+    :cite:`ljspeech17`.
 
     This pipeine can be used with an external component which generates mel spectrograms from text, for example,
     Tacotron2 - see examples in :py:class:`HiFiGANVocoderBundle`.
