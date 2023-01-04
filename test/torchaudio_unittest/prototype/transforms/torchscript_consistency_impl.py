@@ -54,3 +54,17 @@ class Transforms(TestBaseMixin):
         output = add_noise(waveform, noise, lengths, snr)
         ts_output = torch_script(add_noise)(waveform, noise, lengths, snr)
         self.assertEqual(ts_output, output)
+
+    def test_Preemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=self.dtype, device=self.device)
+        preemphasis = T.Preemphasis(coeff=0.97).to(dtype=self.dtype, device=self.device)
+        output = preemphasis(waveform)
+        ts_output = torch_script(preemphasis)(waveform)
+        self.assertEqual(ts_output, output)
+
+    def test_Deemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=self.dtype, device=self.device)
+        deemphasis = T.Deemphasis(coeff=0.97).to(dtype=self.dtype, device=self.device)
+        output = deemphasis(waveform)
+        ts_output = torch_script(deemphasis)(waveform)
+        self.assertEqual(ts_output, output)

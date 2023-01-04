@@ -17,3 +17,5 @@ torchaudio.prototype.transforms
     BarkSpectrogram
     Speed
     SpeedPerturbation
+    Deemphasis
+    Preemphasis
