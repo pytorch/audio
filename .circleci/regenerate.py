@@ -60,6 +60,9 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                         # the fields must match the build_docs "requires" dependency
                         fb = "/.*/"
 
+                    if os_type == "linux" and btype == "conda" and python_version == "3.8" and cu_version == "cu116":
+                        upload = False
+
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
 
     if not filter_branch:
@@ -97,19 +100,17 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
     w = []
     base_workflow_name = f"{prefix}binary_{os_type}_{btype}_py{python_version}_{cu_version}"
     w.append(generate_base_workflow(base_workflow_name, python_version, cu_version, filter_branch, os_type, btype))
-    skip_workflow = os_type == "linux" and btype == "conda" and python_version == "3.8" and cu_version == "cu116"
 
-    if not skip_workflow:
-        if upload:
-            w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
+    if upload:
+        w.append(generate_upload_workflow(base_workflow_name, filter_branch, os_type, btype, cu_version))
 
-        if os_type != "macos":
-            pydistro = "pip" if btype == "wheel" else "conda"
-            w.append(
-                generate_smoketest_workflow(
-                    pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
-                )
+    if os_type != "macos":
+        pydistro = "pip" if btype == "wheel" else "conda"
+        w.append(
+            generate_smoketest_workflow(
+                pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type
             )
+        )
 
     return w
 
