@@ -6,14 +6,14 @@ import torch.nn.functional as F
 from torch.nn import Module
 from torchaudio._internal import load_state_dict_from_url
 
-from torchaudio.prototype.models.hifi_gan import hifigan_generator, HiFiGANGenerator
+from torchaudio.prototype.models.hifi_gan import hifigan_vocoder, HiFiGANVocoder
 from torchaudio.transforms import MelSpectrogram
 
 
 @dataclass
 class HiFiGANVocoderBundle:
     """Data class that bundles associated information to use pretrained
-    :py:class:`~torchaudio.prototype.models.HiFiGANGenerator`.
+    :py:class:`~torchaudio.prototype.models.HiFiGANVocoder`.
 
     This class provides interfaces for instantiating the pretrained model along with
     the information necessary to retrieve pretrained weights and additional data
@@ -35,7 +35,7 @@ class HiFiGANVocoderBundle:
         >>>
         >>> # Load the HiFiGAN bundle
         >>> vocoder = bundle.get_vocoder()
-        Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_generator_v3_ljspeech.pth"
+        Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_vocoder_v3_ljspeech.pth"
         100%|████████████| 5.59M/5.59M [00:00<00:00, 18.7MB/s]
         >>>
         >>> # Generate synthetic mel spectrogram
@@ -63,7 +63,7 @@ class HiFiGANVocoderBundle:
         >>>
         >>> # Load HiFiGAN bundle
         >>> vocoder = bundle_hifigan.get_vocoder()
-        Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_generator_v3_ljspeech.pth"
+        Downloading: "https://download.pytorch.org/torchaudio/models/hifigan_vocoder_v3_ljspeech.pth"
         100%|████████████| 5.59M/5.59M [00:03<00:00, 1.55MB/s]
         >>>
         >>> # Use HiFiGAN to convert mel spectrogram to audio
@@ -82,7 +82,7 @@ class HiFiGANVocoderBundle:
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
         return state_dict
 
-    def get_vocoder(self, *, dl_kwargs=None) -> HiFiGANGenerator:
+    def get_vocoder(self, *, dl_kwargs=None) -> HiFiGANVocoder:
         """Construct the HiFiGAN Generator model, which can be used a vocoder, and load the pretrained weight.
 
         The weight file is downloaded from the internet and cached with
@@ -92,9 +92,9 @@ class HiFiGANVocoderBundle:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
 
         Returns:
-            Variation of :py:class:`~torchaudio.prototype.models.HiFiGANGenerator`.
+            Variation of :py:class:`~torchaudio.prototype.models.HiFiGANVocoder`.
         """
-        model = hifigan_generator(**self._vocoder_params)
+        model = hifigan_vocoder(**self._vocoder_params)
         model.load_state_dict(self._get_state_dict(dl_kwargs))
         model.eval()
         return model
@@ -186,7 +186,7 @@ class _HiFiGANMelSpectrogram(torch.nn.Module):
 
 
 HIFIGAN_VOCODER_V3_LJSPEECH = HiFiGANVocoderBundle(
-    "hifigan_generator_v3_ljspeech.pth",
+    "hifigan_vocoder_v3_ljspeech.pth",
     _vocoder_params={
         "upsample_rates": (8, 8, 4),
         "upsample_kernel_sizes": (16, 16, 8),
@@ -219,7 +219,7 @@ HIFIGAN_VOCODER_V3_LJSPEECH.__doc__ = """HiFiGAN Vocoder pipeline, trained on *T
     <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72>`_.
 
     The underlying vocoder is constructed by
-    :py:func:`torchaudio.prototype.models.hifigan_generator`. The weights are converted from the ones published
+    :py:func:`torchaudio.prototype.models.hifigan_vocoder`. The weights are converted from the ones published
     with the original paper :cite:`NEURIPS2020_c5d73680` under `MIT License
     <https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/LICENSE>`__. See links to
     pre-trained models on `GitHub <https://github.com/jik876/hifi-gan#pretrained-model>`__.
