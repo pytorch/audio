@@ -56,8 +56,8 @@ Subtractive synthesis creates timbre by applying filters to source waveform.
 
  .. code-block:: none
 
-    2.0.0.dev20230104
-    2.0.0.dev20230104
+    2.0.0.dev20230105
+    2.0.0.dev20230105
 
 
 
@@ -646,7 +646,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.250 seconds)
+   **Total running time of the script:** ( 0 minutes  8.525 seconds)
 
 
 .. _sphx_glr_download_tutorials_subtractive_synthesis_tutorial.py:

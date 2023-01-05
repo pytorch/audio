@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230104) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230105) &#x25BC</a>
     </div>
     
 
@@ -626,12 +626,26 @@
 <span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
 
 <span class="n">_decoder_option</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Options passed to decoder.</span>
-<span class="s2">                Mapping from str to str.</span>
+<span class="s2">                Mapping from str to str. (Default: ``None``)</span>
 
 <span class="s2">                To list decoder options for a decoder, you can use</span>
 <span class="s2">                `ffmpeg -h decoder=&lt;DECODER&gt;` command.</span>
 
-<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+<span class="s2">                In addition to decoder-specific options, you can also pass options related</span>
+<span class="s2">                to multithreading. They are effective only if the decoder support them.</span>
+<span class="s2">                If neither of them are provided, StreamReader defaults to single thread.</span>
+
+<span class="s2">                 - ``&quot;threads&quot;``: The number of threads (in str) or the value ``&quot;0&quot;``</span>
+<span class="s2">                   to let FFmpeg decides based on its heuristics.</span>
+<span class="s2">                 - ``&quot;thread_type&quot;``: Which multithreading method to use.</span>
+<span class="s2">                   The valid values are ``&quot;frame&quot;`` or ``&quot;slice&quot;``.</span>
+<span class="s2">                   Note that sach decoder supports different set of methods.</span>
+<span class="s2">                   If not provided, a default value is used.</span>
+<span class="s2">                    - ``&quot;frame&quot;``: Decode more than one frame at once.</span>
+<span class="s2">                      Each thread handles one frame.</span>
+<span class="s2">                      This will increase decoding delay by one frame per thread</span>
+<span class="s2">                    - ``&quot;slice&quot;``: Decode more than one part of a single frame at once.</span>
+<span class="s2">                &quot;&quot;&quot;</span>
 
 
 <span class="n">_hw_accel</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Enable hardware acceleration.</span>
@@ -1122,7 +1136,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.fill_buffer"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep processing packets until all buffers have at least one chunk</span>
 
 <span class="sd">        Returns:</span>
@@ -1136,11 +1150,7 @@
 <span class="sd">                flushed the pending frames. The caller should stop calling</span>
 <span class="sd">                this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">():</span>
-            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_packet</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">code</span>
-        <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
@@ -1166,7 +1176,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No output stream is configured.&quot;</span><span class="p">)</span>
 
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">):</span>
                 <span class="k">break</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
 

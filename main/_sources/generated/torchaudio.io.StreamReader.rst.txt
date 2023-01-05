@@ -68,6 +68,13 @@ add_video_stream
 
    .. automethod:: torchaudio.io.StreamReader.add_video_stream
 
+fill_buffer
+-----------
+
+.. container:: py attribute
+
+   .. automethod:: torchaudio.io.StreamReader.fill_buffer
+
 get_metadata
 ------------
 

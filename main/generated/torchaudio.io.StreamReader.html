@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230104) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230105) &#x25BC</a>
     </div>
     
 
@@ -569,10 +569,31 @@ When provided, use the specified decoder instead of the default one.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
-Mapping from str to str.</p>
+Mapping from str to str. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 <p>To list decoder options for a decoder, you can use
 <cite>ffmpeg -h decoder=&lt;DECODER&gt;</cite> command.</p>
-<p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>In addition to decoder-specific options, you can also pass options related
+to multithreading. They are effective only if the decoder support them.
+If neither of them are provided, StreamReader defaults to single thread.</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;threads&quot;</span></code>: The number of threads (in str) or the value <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code>
+to let FFmpeg decides based on its heuristics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;thread_type&quot;</span></code>: Which multithreading method to use.
+The valid values are <code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>.
+Note that sach decoder supports different set of methods.
+If not provided, a default value is used.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code>: Decode more than one frame at once.
+Each thread handles one frame.
+This will increase decoding delay by one frame per thread</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>: Decode more than one part of a single frame at once.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
 </p></li>
 <li><p><strong>filter_desc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Filter description.
 The list of available filters can be found at
@@ -611,10 +632,31 @@ When provided, use the specified decoder instead of the default one.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
-Mapping from str to str.</p>
+Mapping from str to str. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 <p>To list decoder options for a decoder, you can use
 <cite>ffmpeg -h decoder=&lt;DECODER&gt;</cite> command.</p>
-<p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>In addition to decoder-specific options, you can also pass options related
+to multithreading. They are effective only if the decoder support them.
+If neither of them are provided, StreamReader defaults to single thread.</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;threads&quot;</span></code>: The number of threads (in str) or the value <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code>
+to let FFmpeg decides based on its heuristics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;thread_type&quot;</span></code>: Which multithreading method to use.
+The valid values are <code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>.
+Note that sach decoder supports different set of methods.
+If not provided, a default value is used.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code>: Decode more than one frame at once.
+Each thread handles one frame.
+This will increase decoding delay by one frame per thread</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>: Decode more than one part of a single frame at once.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
 </p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Output sample format (precision).</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the output chunk has dtype corresponding to
@@ -665,10 +707,31 @@ When provided, use the specified decoder instead of the default one.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
-Mapping from str to str.</p>
+Mapping from str to str. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 <p>To list decoder options for a decoder, you can use
 <cite>ffmpeg -h decoder=&lt;DECODER&gt;</cite> command.</p>
-<p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>In addition to decoder-specific options, you can also pass options related
+to multithreading. They are effective only if the decoder support them.
+If neither of them are provided, StreamReader defaults to single thread.</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;threads&quot;</span></code>: The number of threads (in str) or the value <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code>
+to let FFmpeg decides based on its heuristics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;thread_type&quot;</span></code>: Which multithreading method to use.
+The valid values are <code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>.
+Note that sach decoder supports different set of methods.
+If not provided, a default value is used.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code>: Decode more than one frame at once.
+Each thread handles one frame.
+This will increase decoding delay by one frame per thread</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>: Decode more than one part of a single frame at once.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
 </p></li>
 <li><p><strong>hw_accel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Enable hardware acceleration.</p>
 <p>When video is decoded on CUDA hardware, for example
@@ -723,10 +786,31 @@ When provided, use the specified decoder instead of the default one.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
-Mapping from str to str.</p>
+Mapping from str to str. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 <p>To list decoder options for a decoder, you can use
 <cite>ffmpeg -h decoder=&lt;DECODER&gt;</cite> command.</p>
-<p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>In addition to decoder-specific options, you can also pass options related
+to multithreading. They are effective only if the decoder support them.
+If neither of them are provided, StreamReader defaults to single thread.</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;threads&quot;</span></code>: The number of threads (in str) or the value <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code>
+to let FFmpeg decides based on its heuristics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;thread_type&quot;</span></code>: Which multithreading method to use.
+The valid values are <code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>.
+Note that sach decoder supports different set of methods.
+If not provided, a default value is used.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code>: Decode more than one frame at once.
+Each thread handles one frame.
+This will increase decoding delay by one frame per thread</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>: Decode more than one part of a single frame at once.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
 </p></li>
 <li><p><strong>hw_accel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Enable hardware acceleration.</p>
 <p>When video is decoded on CUDA hardware, for example
@@ -741,6 +825,32 @@ The list of available filters can be found at
 <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html">https://ffmpeg.org/ffmpeg-filters.html</a>
 Note that complex filters are not supported.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</section>
+<section id="fill-buffer">
+<h2>fill_buffer<a class="headerlink" href="#fill-buffer" title="Permalink to this heading">¶</a></h2>
+<div class="py attribute docutils container">
+<dl class="py method">
+<dt class="sig sig-object py" id="torchaudio.io.StreamReader.fill_buffer">
+<span class="sig-prename descclassname"><span class="pre">StreamReader.</span></span><span class="sig-name descname"><span class="pre">fill_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#StreamReader.fill_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamReader.fill_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep processing packets until all buffers have at least one chunk</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p><code class="docutils literal notranslate"><span class="pre">0</span></code>
+Packets are processed properly and buffers are
+ready to be popped once.</p>
+<p><code class="docutils literal notranslate"><span class="pre">1</span></code>
+The streamer reached EOF. All the output stream processors
+flushed the pending frames. The caller should stop calling
+this method.</p>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1213,6 +1323,7 @@ returned by <a class="reference internal" href="#torchaudio.io.StreamReader.get_
 <li><a class="reference internal" href="#add-basic-audio-stream">add_basic_audio_stream</a></li>
 <li><a class="reference internal" href="#add-basic-video-stream">add_basic_video_stream</a></li>
 <li><a class="reference internal" href="#add-video-stream">add_video_stream</a></li>
+<li><a class="reference internal" href="#fill-buffer">fill_buffer</a></li>
 <li><a class="reference internal" href="#get-metadata">get_metadata</a></li>
 <li><a class="reference internal" href="#get-out-stream-info">get_out_stream_info</a></li>
 <li><a class="reference internal" href="#get-src-stream-info">get_src_stream_info</a></li>
