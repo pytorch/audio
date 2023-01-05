@@ -22,11 +22,5 @@ c10::optional<int64_t> cuda_version() {
   return {};
 #endif
 }
-namespace {
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::is_kaldi_available", &is_kaldi_available);
-  m.def("torchaudio::cuda_version", &cuda_version);
-}
-} // namespace
 
 } // namespace torchaudio
