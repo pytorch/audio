@@ -239,12 +239,26 @@ _decoder = """The name of the decoder to be used.
                 Default: ``None``."""
 
 _decoder_option = """Options passed to decoder.
-                Mapping from str to str.
+                Mapping from str to str. (Default: ``None``)
 
                 To list decoder options for a decoder, you can use
                 `ffmpeg -h decoder=<DECODER>` command.
 
-                Default: ``None``."""
+                In addition to decoder-specific options, you can also pass options related
+                to multithreading. They are effective only if the decoder support them.
+                If neither of them are provided, StreamReader defaults to single thread.
+
+                 - ``"threads"``: The number of threads (in str) or the value ``"0"``
+                   to let FFmpeg decides based on its heuristics.
+                 - ``"thread_type"``: Which multithreading method to use.
+                   The valid values are ``"frame"`` or ``"slice"``.
+                   Note that sach decoder supports different set of methods.
+                   If not provided, a default value is used.
+                    - ``"frame"``: Decode more than one frame at once.
+                      Each thread handles one frame.
+                      This will increase decoding delay by one frame per thread
+                    - ``"slice"``: Decode more than one part of a single frame at once.
+                """
 
 
 _hw_accel = """Enable hardware acceleration.
@@ -735,7 +749,7 @@ class StreamReader:
         """
         return self._be.pop_chunks()
 
-    def _fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
+    def fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
         """Keep processing packets until all buffers have at least one chunk
 
         Returns:
@@ -749,11 +763,7 @@ class StreamReader:
                 flushed the pending frames. The caller should stop calling
                 this method.
         """
-        while not self.is_buffer_ready():
-            code = self.process_packet(timeout, backoff)
-            if code != 0:
-                return code
-        return 0
+        return self._be.fill_buffer(timeout, backoff)
 
     def stream(
         self, timeout: Optional[float] = None, backoff: float = 10.0
@@ -779,7 +789,7 @@ class StreamReader:
             raise RuntimeError("No output stream is configured.")
 
         while True:
-            if self._fill_buffer(timeout, backoff):
+            if self.fill_buffer(timeout, backoff):
                 break
             yield self.pop_chunks()
 

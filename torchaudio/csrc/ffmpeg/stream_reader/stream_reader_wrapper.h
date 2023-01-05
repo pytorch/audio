@@ -74,6 +74,10 @@ struct StreamReaderBinding : public StreamReader,
       const double backoff = 10.);
 
   void process_all_packets();
+
+  int64_t fill_buffer(
+      const c10::optional<double>& timeout = c10::optional<double>(),
+      const double backoff = 10.);
 };
 
 } // namespace ffmpeg

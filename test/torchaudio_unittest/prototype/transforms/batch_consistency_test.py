@@ -133,3 +133,29 @@ class BatchConsistencyTest(TorchaudioTestCase):
                     expected.append(add_noise(waveform[i][j][k], noise[i][j][k], lengths[i][j][k], snr[i][j][k]))
 
         self.assertEqual(torch.stack(expected), actual.reshape(-1, L))
+
+    def test_Preemphasis(self):
+        waveform = torch.rand((3, 5, 2, 100), dtype=self.dtype, device=self.device)
+        preemphasis = T.Preemphasis(coeff=0.97)
+        actual = preemphasis(waveform)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            for j in range(waveform.size(1)):
+                for k in range(waveform.size(2)):
+                    expected.append(preemphasis(waveform[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, waveform.size(-1)))
+
+    def test_Deemphasis(self):
+        waveform = torch.rand((3, 5, 2, 100), dtype=self.dtype, device=self.device)
+        deemphasis = T.Deemphasis(coeff=0.97)
+        actual = deemphasis(waveform)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            for j in range(waveform.size(1)):
+                for k in range(waveform.size(2)):
+                    expected.append(deemphasis(waveform[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, waveform.size(-1)))
