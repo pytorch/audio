@@ -24,3 +24,29 @@ EMFORMER_RNNT_BASE_TEDLIUM3
 
    .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
       :no-value:
+
+
+HiFiGAN Vocoder
+---------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`HiFiGANVocoderBundle` defines HiFiGAN Vocoder pipeline capable of transforming mel spectrograms into waveforms.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   HiFiGANVocoderBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   HIFIGAN_VOCODER_V3_LJSPEECH
