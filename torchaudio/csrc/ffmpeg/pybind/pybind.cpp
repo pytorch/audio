@@ -44,6 +44,7 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def("remove_stream", &StreamReaderFileObj::remove_stream)
       .def("process_packet", &StreamReaderFileObj::process_packet)
       .def("process_all_packets", &StreamReaderFileObj::process_all_packets)
+      .def("fill_buffer", &StreamReaderFileObj::fill_buffer)
       .def("is_buffer_ready", &StreamReaderFileObj::is_buffer_ready)
       .def("pop_chunks", &StreamReaderFileObj::pop_chunks);
 }

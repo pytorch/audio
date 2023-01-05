@@ -91,5 +91,17 @@ void StreamReaderBinding::process_all_packets() {
   } while (!ret);
 }
 
+int64_t StreamReaderBinding::fill_buffer(
+    const c10::optional<double>& timeout,
+    const double backoff) {
+  while (!is_buffer_ready()) {
+    int code = process_packet(timeout, backoff);
+    if (code != 0) {
+      return code;
+    }
+  }
+  return 0;
+}
+
 } // namespace ffmpeg
 } // namespace torchaudio
