@@ -5,6 +5,8 @@ from typing import Optional
 import torch
 from torch import Tensor
 
+from torchaudio._extension import _IS_TORCHAUDIO_EXT_AVAILABLE
+
 
 def _dB2Linear(x: float) -> float:
     return math.exp(x * math.log(10) / 20.0)
@@ -929,11 +931,9 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
         padded_output_waveform[:, :, i_sample + n_order - 1] = o0
 
 
-try:
+if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
-except RuntimeError as err:
-    if str(err) != "No such operator torchaudio::_lfilter_core_loop":
-        raise
+else:
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
 
@@ -991,11 +991,9 @@ def _lfilter_core(
     return output
 
 
-try:
+if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _lfilter = torch.ops.torchaudio._lfilter
-except RuntimeError as err:
-    if str(err) != "No such operator torchaudio::_lfilter":
-        raise
+else:
     _lfilter = _lfilter_core
 
 
@@ -1109,11 +1107,9 @@ def _overdrive_core_loop_generic(
         output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
 
 
-try:
+if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
-except RuntimeError as err:
-    if str(err) != "No such operator torchaudio::_overdrive_core_loop":
-        raise
+else:
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
