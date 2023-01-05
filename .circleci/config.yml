@@ -1901,6 +1901,17 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_macos
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_conda_py3.7_cpu_upload
+          requires:
+          - nightly_binary_macos_conda_py3.7_cpu
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1914,6 +1925,17 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_macos
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_conda_py3.8_cpu_upload
+          requires:
+          - nightly_binary_macos_conda_py3.8_cpu
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1927,6 +1949,17 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_macos
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_conda_py3.9_cpu_upload
+          requires:
+          - nightly_binary_macos_conda_py3.9_cpu
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1940,6 +1973,17 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_macos
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_conda_py3.10_cpu_upload
+          requires:
+          - nightly_binary_macos_conda_py3.10_cpu
       - binary_windows_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1953,6 +1997,17 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.7_cpu_upload
+          requires:
+          - nightly_binary_windows_conda_py3.7_cpu
       - smoke_test_windows_conda:
           cuda_version: cpu
           filters:
@@ -1978,6 +2033,17 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.7_cu116_upload
+          requires:
+          - nightly_binary_windows_conda_py3.7_cu116
       - smoke_test_windows_conda_gpu:
           cuda_version: cu116
           filters:
@@ -2003,6 +2069,17 @@ workflows:
           python_version: '3.7'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.7_cu117_upload
+          requires:
+          - nightly_binary_windows_conda_py3.7_cu117
       - smoke_test_windows_conda_gpu:
           cuda_version: cu117
           filters:
@@ -2028,6 +2105,17 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.8_cpu_upload
+          requires:
+          - nightly_binary_windows_conda_py3.8_cpu
       - smoke_test_windows_conda:
           cuda_version: cpu
           filters:
@@ -2053,6 +2141,17 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.8_cu116_upload
+          requires:
+          - nightly_binary_windows_conda_py3.8_cu116
       - smoke_test_windows_conda_gpu:
           cuda_version: cu116
           filters:
@@ -2078,6 +2177,17 @@ workflows:
           python_version: '3.8'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.8_cu117_upload
+          requires:
+          - nightly_binary_windows_conda_py3.8_cu117
       - smoke_test_windows_conda_gpu:
           cuda_version: cu117
           filters:
@@ -2103,6 +2213,17 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.9_cpu_upload
+          requires:
+          - nightly_binary_windows_conda_py3.9_cpu
       - smoke_test_windows_conda:
           cuda_version: cpu
           filters:
@@ -2128,6 +2249,17 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.9_cu116_upload
+          requires:
+          - nightly_binary_windows_conda_py3.9_cu116
       - smoke_test_windows_conda_gpu:
           cuda_version: cu116
           filters:
@@ -2153,6 +2285,17 @@ workflows:
           python_version: '3.9'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.9_cu117_upload
+          requires:
+          - nightly_binary_windows_conda_py3.9_cu117
       - smoke_test_windows_conda_gpu:
           cuda_version: cu117
           filters:
@@ -2178,6 +2321,17 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.10_cpu_upload
+          requires:
+          - nightly_binary_windows_conda_py3.10_cpu
       - smoke_test_windows_conda:
           cuda_version: cpu
           filters:
@@ -2203,6 +2357,17 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.10_cu116_upload
+          requires:
+          - nightly_binary_windows_conda_py3.10_cu116
       - smoke_test_windows_conda_gpu:
           cuda_version: cu116
           filters:
@@ -2228,6 +2393,17 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.10_cu117_upload
+          requires:
+          - nightly_binary_windows_conda_py3.10_cu117
       - smoke_test_windows_conda_gpu:
           cuda_version: cu117
           filters:

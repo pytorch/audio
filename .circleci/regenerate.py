@@ -61,7 +61,8 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                         fb = "/.*/"
 
                     if os_type == "linux" and btype == "conda" and python_version == "3.8" and cu_version == "cu116":
-                        upload = False
+                        w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, False)
+                        continue
 
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
 
