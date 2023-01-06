@@ -247,6 +247,9 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
+      cu118)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.8 # [not osx]"
+        ;;
       cu117)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.7 # [not osx]"
         ;;
