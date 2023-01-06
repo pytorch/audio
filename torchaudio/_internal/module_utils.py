@@ -68,7 +68,9 @@ def deprecated(direction: str, version: Optional[str] = None):
 
 def is_kaldi_available():
     try:
-        return torch.ops.torchaudio.is_kaldi_available()
+        import torchaudio.lib._torchaudio
+
+        return torchaudio.lib._torchaudio.is_kaldi_available()
     except Exception:
         return False
 
