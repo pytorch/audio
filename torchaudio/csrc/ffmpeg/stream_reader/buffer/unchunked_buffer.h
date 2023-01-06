@@ -27,7 +27,7 @@ class UnchunkedBuffer : public Buffer {
 
  public:
   bool is_ready() const override;
-  c10::optional<torch::Tensor> pop_chunk() override;
+  c10::optional<torch::Tensor> pop_chunk(bool return_view) override;
   void flush() override;
 };
 

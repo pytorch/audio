@@ -99,7 +99,7 @@ void ChunkedVideoBuffer::push_frame(AVFrame* frame) {
   write_image(frame, buf);
 }
 
-c10::optional<torch::Tensor> ChunkedAudioBuffer::pop_chunk() {
+c10::optional<torch::Tensor> ChunkedAudioBuffer::pop_chunk(bool return_view) {
   if (!num_buffered_frames) {
     return {};
   }
@@ -110,7 +110,7 @@ c10::optional<torch::Tensor> ChunkedAudioBuffer::pop_chunk() {
   return c10::optional<torch::Tensor>{ret};
 }
 
-c10::optional<torch::Tensor> ChunkedVideoBuffer::pop_chunk() {
+c10::optional<torch::Tensor> ChunkedVideoBuffer::pop_chunk(bool return_view) {
   if (num_frames_pushed == num_frames_popped) {
     return {};
   }
@@ -125,9 +125,11 @@ c10::optional<torch::Tensor> ChunkedVideoBuffer::pop_chunk() {
     int start = num_frames_popped % buffer_size;
     int end = (start + num_pop) % buffer_size;
     if (start < end) {
-      return buffer.buffer.index({Slice(start, end)}).clone();
+      auto view = buffer.buffer.index({Slice(start, end)});
+      return return_view ? view : view.clone();
     } else if (end == 0) {
-      return buffer.buffer.index({Slice(start)}).clone();
+      auto view = buffer.buffer.index({Slice(start)});
+      return return_view ? view : view.clone();
     } else {
       torch::Tensor p1 = buffer.buffer.index({Slice(start)});
       torch::Tensor p2 = buffer.buffer.index({Slice(None, end)});

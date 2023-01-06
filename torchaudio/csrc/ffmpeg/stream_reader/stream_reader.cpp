@@ -383,10 +383,10 @@ int StreamReader::drain() {
   return ret;
 }
 
-std::vector<c10::optional<torch::Tensor>> StreamReader::pop_chunks() {
+std::vector<c10::optional<torch::Tensor>> StreamReader::pop_chunks(bool return_view) {
   std::vector<c10::optional<torch::Tensor>> ret;
   for (auto& i : stream_indices) {
-    ret.push_back(processors[i.first]->pop_chunk(i.second));
+    ret.push_back(processors[i.first]->pop_chunk(i.second, return_view));
   }
   return ret;
 }

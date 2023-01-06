@@ -743,15 +743,22 @@ class StreamReader:
         """Returns true if all the output streams have at least one chunk filled."""
         return self._be.is_buffer_ready()
 
-    def pop_chunks(self) -> Tuple[Optional[torch.Tensor]]:
+    def pop_chunks(self, return_view: bool = False) -> Tuple[Optional[torch.Tensor]]:
         """Pop one chunk from all the output stream buffers.
+
+        Args:
+            return_view (bool, optional):
+                When True, it will return the view of internal buffer, so that it avoids
+                creating a copy. The view is valid until the internal buffer is updated
+                by subsequent call to :py:meth:`~StreamReader.process_packet` s.
+                Default: ``False``.
 
         Returns:
             Tuple[Optional[Tensor]]:
                 Buffer contents.
                 If a buffer does not contain any frame, then `None` is returned instead.
         """
-        return self._be.pop_chunks()
+        return self._be.pop_chunks(return_view)
 
     def fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
         """Keep processing packets until all buffers have at least one chunk
@@ -770,7 +777,7 @@ class StreamReader:
         return self._be.fill_buffer(timeout, backoff)
 
     def stream(
-        self, timeout: Optional[float] = None, backoff: float = 10.0
+        self, timeout: Optional[float] = None, backoff: float = 10.0, return_view: bool = False,
     ) -> Iterator[Tuple[Optional[torch.Tensor], ...]]:
         """Return an iterator that generates output tensors
 
@@ -780,6 +787,9 @@ class StreamReader:
 
             backoff (float, optional): See
                 :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
+
+            return_view (bool, optional): See
+                :py:func:`~StreamReader.pop_chunks`. (Default: ``False``)
 
         Returns:
             Iterator[Tuple[Optional[torch.Tensor], ...]]:
@@ -795,10 +805,10 @@ class StreamReader:
         while True:
             if self.fill_buffer(timeout, backoff):
                 break
-            yield self.pop_chunks()
+            yield self.pop_chunks(return_view)
 
         while True:
-            chunks = self.pop_chunks()
+            chunks = self.pop_chunks(return_view)
             if all(c is None for c in chunks):
                 return
             yield chunks

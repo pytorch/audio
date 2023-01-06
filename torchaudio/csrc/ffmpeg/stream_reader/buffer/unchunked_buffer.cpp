@@ -33,7 +33,7 @@ void UnchunkedVideoBuffer::push_frame(AVFrame* frame) {
   }
 }
 
-c10::optional<torch::Tensor> UnchunkedBuffer::pop_chunk() {
+c10::optional<torch::Tensor> UnchunkedBuffer::pop_chunk(bool return_view) {
   if (!num_buffered_frames) {
     return c10::optional<torch::Tensor>{};
   }

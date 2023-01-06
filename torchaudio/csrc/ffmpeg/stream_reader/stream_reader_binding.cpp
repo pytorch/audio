@@ -92,7 +92,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
             return s->fill_buffer(timeout, backoff);
           })
       .def("is_buffer_ready", [](S s) { return s->is_buffer_ready(); })
-      .def("pop_chunks", [](S s) { return s->pop_chunks(); });
+      .def("pop_chunks", [](S s, bool return_view) { return s->pop_chunks(return_view); });
 }
 
 } // namespace

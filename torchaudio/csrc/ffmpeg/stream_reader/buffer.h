@@ -23,7 +23,7 @@ class Buffer {
   //////////////////////////////////////////////////////////////////////////////
   virtual void push_frame(AVFrame* frame) = 0;
 
-  virtual c10::optional<torch::Tensor> pop_chunk() = 0;
+  virtual c10::optional<torch::Tensor> pop_chunk(bool return_view) = 0;
 
   virtual void flush() = 0;
 };

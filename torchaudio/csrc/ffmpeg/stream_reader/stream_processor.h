@@ -95,7 +95,7 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Get the chunk from the given filter result
-  c10::optional<torch::Tensor> pop_chunk(KeyType key);
+  c10::optional<torch::Tensor> pop_chunk(KeyType key, bool return_view);
 };
 
 } // namespace ffmpeg

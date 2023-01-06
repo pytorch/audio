@@ -40,7 +40,7 @@ class ChunkedAudioBuffer : public ChunkedBuffer {
   ChunkedAudioBuffer(int frames_per_chunk, int num_chunks);
 
   void push_frame(AVFrame* frame) override;
-  c10::optional<torch::Tensor> pop_chunk() override;
+  c10::optional<torch::Tensor> pop_chunk(bool return_view) override;
 };
 
 class ChunkedVideoBuffer : public Buffer {
@@ -64,7 +64,7 @@ class ChunkedVideoBuffer : public Buffer {
 
   bool is_ready() const override;
   void push_frame(AVFrame* frame) override;
-  c10::optional<torch::Tensor> pop_chunk() override;
+  c10::optional<torch::Tensor> pop_chunk(bool return_view) override;
   void flush() override;
 };
 
