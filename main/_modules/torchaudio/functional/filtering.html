@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230105) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230106) &#x25BC</a>
     </div>
     
 
@@ -391,6 +391,8 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+
+<span class="kn">from</span> <span class="nn">torchaudio._extension</span> <span class="kn">import</span> <span class="n">_IS_TORCHAUDIO_EXT_AVAILABLE</span>
 
 
 <span class="k">def</span> <span class="nf">_dB2Linear</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1316,11 +1318,9 @@
         <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">o0</span>
 
 
-<span class="k">try</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">_IS_TORCHAUDIO_EXT_AVAILABLE</span><span class="p">:</span>
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter_core_loop</span>
-<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;No such operator torchaudio::_lfilter_core_loop&quot;</span><span class="p">:</span>
-        <span class="k">raise</span>
+<span class="k">else</span><span class="p">:</span>
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">_lfilter_core_generic_loop</span>
 
 
@@ -1378,11 +1378,9 @@
     <span class="k">return</span> <span class="n">output</span>
 
 
-<span class="k">try</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">_IS_TORCHAUDIO_EXT_AVAILABLE</span><span class="p">:</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter</span>
-<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;No such operator torchaudio::_lfilter&quot;</span><span class="p">:</span>
-        <span class="k">raise</span>
+<span class="k">else</span><span class="p">:</span>
     <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">_lfilter_core</span>
 
 
@@ -1496,11 +1494,9 @@
         <span class="n">output_waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">last_out</span> <span class="o">*</span> <span class="mf">0.75</span>
 
 
-<span class="k">try</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">_IS_TORCHAUDIO_EXT_AVAILABLE</span><span class="p">:</span>
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_overdrive_core_loop</span>
-<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;No such operator torchaudio::_overdrive_core_loop&quot;</span><span class="p">:</span>
-        <span class="k">raise</span>
+<span class="k">else</span><span class="p">:</span>
     <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">_overdrive_core_loop_generic</span>
 
 

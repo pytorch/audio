@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.prototype.transforms" href="prototype.transforms.html" />
+    <link rel="next" title="HiFiGANVocoderBundle" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" />
     <link rel="prev" title="torchaudio.prototype.models" href="prototype.models.html" />
   <!-- Google Analytics -->
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230105) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230106) &#x25BC</a>
     </div>
     
 
@@ -427,6 +427,30 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 </div>
 </section>
 </section>
+<section id="hifigan-vocoder">
+<h2>HiFiGAN Vocoder<a class="headerlink" href="#hifigan-vocoder" title="Permalink to this heading">¶</a></h2>
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a> defines HiFiGAN Vocoder pipeline capable of transforming mel spectrograms into waveforms.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="prototype.models.html#torchaudio.prototype.models.HiFiGANVocoder" title="torchaudio.prototype.models.HiFiGANVocoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoder</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pretrained-models">
+<h3>Pretrained Models<a class="headerlink" href="#pretrained-models" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html#torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH" title="torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HIFIGAN_VOCODER_V3_LJSPEECH</span></code></a></p></td>
+<td><p>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em> <span id="id2">[<a class="reference internal" href="references.html#id6" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 </section>
 
 
@@ -437,7 +461,7 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="prototype.transforms.html" class="btn btn-neutral float-right" title="torchaudio.prototype.transforms" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" class="btn btn-neutral float-right" title="HiFiGANVocoderBundle" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="prototype.models.html" class="btn btn-neutral" title="torchaudio.prototype.models" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -478,6 +502,11 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 <li><a class="reference internal" href="#rnn-t-streaming-non-streaming-asr">RNN-T Streaming/Non-Streaming ASR</a><ul>
 <li><a class="reference internal" href="#emformer-rnnt-base-mustc">EMFORMER_RNNT_BASE_MUSTC</a></li>
 <li><a class="reference internal" href="#emformer-rnnt-base-tedlium3">EMFORMER_RNNT_BASE_TEDLIUM3</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hifigan-vocoder">HiFiGAN Vocoder</a><ul>
+<li><a class="reference internal" href="#interface">Interface</a></li>
+<li><a class="reference internal" href="#pretrained-models">Pretrained Models</a></li>
 </ul>
 </li>
 </ul>

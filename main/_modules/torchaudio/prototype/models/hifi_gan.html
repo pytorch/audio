@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230105) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230106) &#x25BC</a>
     </div>
     
 
@@ -417,13 +417,13 @@
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Conv1d</span><span class="p">,</span> <span class="n">ConvTranspose1d</span>
 
 
-<div class="viewcode-block" id="HiFiGANGenerator"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.HiFiGANGenerator">[docs]</a><span class="k">class</span> <span class="nc">HiFiGANGenerator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="HiFiGANVocoder"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.HiFiGANVocoder">[docs]</a><span class="k">class</span> <span class="nc">HiFiGANVocoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generator part of *HiFi GAN* :cite:`NEURIPS2020_c5d73680`.</span>
 <span class="sd">    Source: https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        To build the model, please use one of the factory functions: :py:func:`hifigan_generator`,</span>
-<span class="sd">        :py:func:`hifigan_generator_v1`, :py:func:`hifigan_generator_v2`, :py:func:`hifigan_generator_v3`.</span>
+<span class="sd">        To build the model, please use one of the factory functions: :py:func:`hifigan_vocoder`,</span>
+<span class="sd">        :py:func:`hifigan_vocoder_v1`, :py:func:`hifigan_vocoder_v2`, :py:func:`hifigan_vocoder_v3`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        in_channels (int): Number of channels in the input features.</span>
@@ -449,7 +449,7 @@
         <span class="n">resblock_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">lrelu_slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">HiFiGANGenerator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HiFiGANVocoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_kernels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">resblock_kernel_sizes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_upsamples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">upsample_rates</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv_pre</span> <span class="o">=</span> <span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">upsample_initial_channel</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -476,7 +476,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">conv_post</span> <span class="o">=</span> <span class="n">Conv1d</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lrelu_slope</span> <span class="o">=</span> <span class="n">lrelu_slope</span>
 
-<div class="viewcode-block" id="HiFiGANGenerator.forward"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.HiFiGANGenerator.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="HiFiGANVocoder.forward"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.HiFiGANVocoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (Tensor): Feature input tensor of shape `(batch_size, num_channels, time_length)`.</span>
@@ -504,7 +504,7 @@
 
 <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">interface</span>
 <span class="k">class</span> <span class="nc">ResBlockInterface</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface for ResBlock - necessary to make type annotations in ``HiFiGANGenerator.forward`` compatible</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface for ResBlock - necessary to make type annotations in ``HiFiGANVocoder.forward`` compatible</span>
 <span class="sd">    with TorchScript</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -513,7 +513,7 @@
 
 
 <span class="k">class</span> <span class="nc">ResBlock1</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Residual block of type 1 for HiFiGAN Generator :cite:`NEURIPS2020_c5d73680`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Residual block of type 1 for HiFiGAN Vocoder :cite:`NEURIPS2020_c5d73680`.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        channels (int): Number of channels in the input features.</span>
 <span class="sd">        kernel_size (int, optional): Kernel size for 1D convolutions. (Default: ``3``)</span>
@@ -580,7 +580,7 @@
 
 
 <span class="k">class</span> <span class="nc">ResBlock2</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Residual block of type 2 for HiFiGAN Generator :cite:`NEURIPS2020_c5d73680`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Residual block of type 2 for HiFiGAN Vocoder :cite:`NEURIPS2020_c5d73680`.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        channels (int): Number of channels in the input features.</span>
 <span class="sd">        kernel_size (int, optional): Kernel size for 1D convolutions. (Default: ``3``)</span>
@@ -633,7 +633,7 @@
     <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="n">kernel_size</span> <span class="o">*</span> <span class="n">dilation</span> <span class="o">-</span> <span class="n">dilation</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="hifigan_generator"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_generator">[docs]</a><span class="k">def</span> <span class="nf">hifigan_generator</span><span class="p">(</span>
+<div class="viewcode-block" id="hifigan_vocoder"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_vocoder">[docs]</a><span class="k">def</span> <span class="nf">hifigan_vocoder</span><span class="p">(</span>
     <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">upsample_rates</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">upsample_initial_channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -642,22 +642,22 @@
     <span class="n">resblock_dilation_sizes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">resblock_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">lrelu_slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HiFiGANGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFi GAN Generator :cite:`NEURIPS2020_c5d73680`.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HiFiGANVocoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFi GAN Vocoder :cite:`NEURIPS2020_c5d73680`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        in_channels (int): See :py:class:`HiFiGANGenerator`.</span>
-<span class="sd">        upsample_rates (tuple of ``int``): See :py:class:`HiFiGANGenerator`.</span>
-<span class="sd">        upsample_initial_channel (int): See :py:class:`HiFiGANGenerator`.</span>
-<span class="sd">        upsample_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANGenerator`.</span>
-<span class="sd">        resblock_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANGenerator`.</span>
-<span class="sd">        resblock_dilation_sizes (tuple of tuples of ``int``): See :py:class:`HiFiGANGenerator`.</span>
-<span class="sd">        resblock_type (int, 1 or 2): See :py:class:`HiFiGANGenerator`.</span>
+<span class="sd">        in_channels (int): See :py:class:`HiFiGANVocoder`.</span>
+<span class="sd">        upsample_rates (tuple of ``int``): See :py:class:`HiFiGANVocoder`.</span>
+<span class="sd">        upsample_initial_channel (int): See :py:class:`HiFiGANVocoder`.</span>
+<span class="sd">        upsample_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANVocoder`.</span>
+<span class="sd">        resblock_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANVocoder`.</span>
+<span class="sd">        resblock_dilation_sizes (tuple of tuples of ``int``): See :py:class:`HiFiGANVocoder`.</span>
+<span class="sd">        resblock_type (int, 1 or 2): See :py:class:`HiFiGANVocoder`.</span>
 <span class="sd">    Returns:</span>
-<span class="sd">        HiFiGANGenerator: generated model.</span>
+<span class="sd">        HiFiGANVocoder: generated model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">HiFiGANGenerator</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">HiFiGANVocoder</span><span class="p">(</span>
         <span class="n">upsample_rates</span><span class="o">=</span><span class="n">upsample_rates</span><span class="p">,</span>
         <span class="n">resblock_kernel_sizes</span><span class="o">=</span><span class="n">resblock_kernel_sizes</span><span class="p">,</span>
         <span class="n">resblock_dilation_sizes</span><span class="o">=</span><span class="n">resblock_dilation_sizes</span><span class="p">,</span>
@@ -669,13 +669,13 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hifigan_generator_v1"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_generator_v1">[docs]</a><span class="k">def</span> <span class="nf">hifigan_generator_v1</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HiFiGANGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFiGAN Generator with V1 architecture :cite:`NEURIPS2020_c5d73680`.</span>
+<div class="viewcode-block" id="hifigan_vocoder_v1"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_vocoder_v1">[docs]</a><span class="k">def</span> <span class="nf">hifigan_vocoder_v1</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HiFiGANVocoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFiGAN Vocoder with V1 architecture :cite:`NEURIPS2020_c5d73680`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HiFiGANGenerator: generated model.</span>
+<span class="sd">        HiFiGANVocoder: generated model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">hifigan_generator</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">hifigan_vocoder</span><span class="p">(</span>
         <span class="n">upsample_rates</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="n">upsample_kernel_sizes</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
         <span class="n">upsample_initial_channel</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
@@ -687,13 +687,13 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hifigan_generator_v2"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_generator_v2">[docs]</a><span class="k">def</span> <span class="nf">hifigan_generator_v2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HiFiGANGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFiGAN Generator with V2 architecture :cite:`NEURIPS2020_c5d73680`.</span>
+<div class="viewcode-block" id="hifigan_vocoder_v2"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_vocoder_v2">[docs]</a><span class="k">def</span> <span class="nf">hifigan_vocoder_v2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HiFiGANVocoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFiGAN Vocoder with V2 architecture :cite:`NEURIPS2020_c5d73680`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HiFiGANGenerator: generated model.</span>
+<span class="sd">        HiFiGANVocoder: generated model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">hifigan_generator</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">hifigan_vocoder</span><span class="p">(</span>
         <span class="n">upsample_rates</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="n">upsample_kernel_sizes</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
         <span class="n">upsample_initial_channel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
@@ -705,13 +705,13 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hifigan_generator_v3"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_generator_v3">[docs]</a><span class="k">def</span> <span class="nf">hifigan_generator_v3</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HiFiGANGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFiGAN Generator with V3 architecture :cite:`NEURIPS2020_c5d73680`.</span>
+<div class="viewcode-block" id="hifigan_vocoder_v3"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.hifigan_vocoder_v3">[docs]</a><span class="k">def</span> <span class="nf">hifigan_vocoder_v3</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HiFiGANVocoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds HiFiGAN Vocoder with V3 architecture :cite:`NEURIPS2020_c5d73680`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HiFiGANGenerator: generated model.</span>
+<span class="sd">        HiFiGANVocoder: generated model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">hifigan_generator</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">hifigan_vocoder</span><span class="p">(</span>
         <span class="n">upsample_rates</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
         <span class="n">upsample_kernel_sizes</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
         <span class="n">upsample_initial_channel</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
