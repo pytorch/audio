@@ -9,6 +9,9 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
+    wav2vec2_xlsr_1b,
+    wav2vec2_xlsr_2b,
+    wav2vec2_xlsr_300m,
 )
 from torchaudio.models.wav2vec2.utils import import_fairseq_model
 from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase
@@ -31,6 +34,9 @@ WAV2VEC2_XLSR_53_56K = _load_config("xlsr_53_56k")
 HUBERT_BASE = _load_config("hubert_base_ls960")
 HUBERT_LARGE_LL60K = _load_config("hubert_large_ll60k")
 HUBERT_XLARGE_LL60K = _load_config("hubert_xtralarge_ll60k")
+WAV2VEC2_XLSR_300M = _load_config("xlsr_300m")
+WAV2VEC2_XLSR_1B = _load_config("xlsr_1b")
+WAV2VEC2_XLSR_2B = _load_config("xlsr_2b")
 # Finetuning models
 WAV2VEC2_BASE_960H = _load_config("wav2vec_small_960h")
 WAV2VEC2_LARGE_960H = _load_config("wav2vec_large_960h")
@@ -47,6 +53,9 @@ WAV2VEC2_PRETRAINING_CONFIGS = parameterized.expand(
         (WAV2VEC2_LARGE, wav2vec2_large),
         (WAV2VEC2_LARGE_LV60K, wav2vec2_large_lv60k),
         (WAV2VEC2_XLSR_53_56K, wav2vec2_large_lv60k),
+        (WAV2VEC2_XLSR_300M, wav2vec2_xlsr_300m),
+        (WAV2VEC2_XLSR_1B, wav2vec2_xlsr_1b),
+        (WAV2VEC2_XLSR_2B, wav2vec2_xlsr_2b),
     ],
     name_func=_name_func,
 )
@@ -64,6 +73,9 @@ ALL_PRETRAINING_CONFIGS = parameterized.expand(
         (WAV2VEC2_LARGE, wav2vec2_large),
         (WAV2VEC2_LARGE_LV60K, wav2vec2_large_lv60k),
         (WAV2VEC2_XLSR_53_56K, wav2vec2_large_lv60k),
+        (WAV2VEC2_XLSR_300M, wav2vec2_xlsr_300m),
+        (WAV2VEC2_XLSR_1B, wav2vec2_xlsr_1b),
+        (WAV2VEC2_XLSR_2B, wav2vec2_xlsr_2b),
         (HUBERT_BASE, hubert_base),
         (HUBERT_LARGE_LL60K, hubert_large),
         (HUBERT_XLARGE_LL60K, hubert_xlarge),

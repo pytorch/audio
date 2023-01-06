@@ -1513,7 +1513,7 @@ def wav2vec2_xlsr_1b(
         extractor_mode="layer_norm",
         extractor_conv_layer_config=None,
         extractor_conv_bias=True,
-        encoder_embed_dim=1024,
+        encoder_embed_dim=1280,
         encoder_projection_dropout=encoder_projection_dropout,
         encoder_pos_conv_kernel=128,
         encoder_pos_conv_groups=16,
