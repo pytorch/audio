@@ -746,6 +746,7 @@ jobs:
           command: .circleci/unittest/windows/scripts/install.sh
           environment:
               USE_FFMPEG: true
+          no_output_timeout: 30m
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
