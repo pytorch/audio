@@ -16,11 +16,12 @@ class UnchunkedBuffer : public Buffer {
   // Each AVFrame is converted to a Tensor and stored here.
   std::deque<torch::Tensor> chunks;
 
- protected:
   // The number of currently stored chunks
   // For video, one Tensor corresponds to one frame, but for audio,
   // one Tensor contains multiple samples, so we track here.
   int64_t num_buffered_frames = 0;
+
+ protected:
   void push_tensor(const torch::Tensor& t);
 
  public:
