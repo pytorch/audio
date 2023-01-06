@@ -83,6 +83,7 @@ Utility
     :nosignatures:
 
     AmplitudeToDB
+    InverseMelScale
     MelScale
     MuLawEncoding
     MuLawDecoding
