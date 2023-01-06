@@ -85,13 +85,17 @@ torch::Tensor convert_audio(AVFrame* pFrame) {
   return t;
 }
 
-torch::Tensor get_buffer(at::IntArrayRef shape, const torch::Device& device) {
+namespace {
+torch::Tensor get_buffer(
+    at::IntArrayRef shape,
+    const torch::Device& device = torch::Device(torch::kCPU)) {
   auto options = torch::TensorOptions()
                      .dtype(torch::kUInt8)
                      .layout(torch::kStrided)
                      .device(device.type(), device.index());
   return torch::empty(shape, options);
 }
+} // namespace
 
 torch::Tensor get_image_buffer(AVFrame* frame, const torch::Device& device) {
   auto fmt = static_cast<AVPixelFormat>(frame->format);
@@ -126,6 +130,7 @@ torch::Tensor get_image_buffer(AVFrame* frame, const torch::Device& device) {
   return get_buffer({1, frame->height, frame->width, channels}, device);
 }
 
+namespace {
 void write_interlaced_image(AVFrame* pFrame, torch::Tensor& frame) {
   auto ptr = frame.data_ptr<uint8_t>();
   uint8_t* buf = pFrame->data[0];
@@ -298,6 +303,8 @@ void write_nv12_cuda(AVFrame* pFrame, torch::Tensor& yuv) {
   yuv.index_put_({Slice(), Slice(1)}, uv);
 }
 #endif
+
+} // namespace
 
 torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
   // ref:
