@@ -52,7 +52,7 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     high = T
 
     if not high > 1:
-        raise AssertionError(f"``high`` should be greater than 1, but got {high}")
+        raise AssertionError(f"input.shape[1] should be greater than 1 to perform negative sampling, but got {high}")
 
     if num_negatives > 0:
         tszs = _buffered_arange(T).unsqueeze(-1).expand(-1, num_negatives).flatten()
@@ -81,7 +81,7 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
 
 
 def _mask_input(input: Tensor, mask: Tensor):
-    B, T, D = input.shape
+    B, _, D = input.shape
     mask_len = torch.max(mask.sum(dim=1))
     masked_input = torch.zeros((B, mask_len, D), dtype=input.dtype, device=input.device)
     for b in range(B):
@@ -267,7 +267,8 @@ class ConformerWav2Vec2PretrainModel(Module):
 
     Note:
         To build the model, please use one of the factory functions,
-        :py:func:`conformer_wav2vec2_base` or :py:func:`conformer_wav2vec2_large`
+        :py:func:`conformer_wav2vec2_pretrain_model`, :py:func:`conformer_wav2vec2_pretrain_base`
+        or :py:func:`conformer_wav2vec2_pretrain_large`
 
     Args:
         wav2vec2 (nn.Module):
