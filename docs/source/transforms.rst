@@ -83,8 +83,6 @@ Utility
     :nosignatures:
 
     AmplitudeToDB
-    InverseMelScale
-    MelScale
     MuLawEncoding
     MuLawDecoding
     Resample
@@ -101,6 +99,8 @@ Feature Extractions
 
     Spectrogram
     InverseSpectrogram
+    MelScale
+    InverseMelScale
     MelSpectrogram
     GriffinLim
     MFCC
