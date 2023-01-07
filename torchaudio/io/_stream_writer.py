@@ -15,7 +15,9 @@ def _format_doc(**kwargs):
 _encoder = """The name of the encoder to be used.
                 When provided, use the specified encoder instead of the default one.
 
-                To list the available encoders, you can use ``ffmpeg -encoders`` command.
+                To list the available encoders, please use
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_encoders` for audio, and
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_encoders` for video.
 
                 Default: ``None``."""
 
@@ -82,7 +84,8 @@ class StreamWriter:
 
                https://ffmpeg.org/ffmpeg-formats.html#Muxers
 
-               Use `ffmpeg -muxers` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_muxers` to list the
+               multiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
                software configuration (ffmpeg build).
@@ -90,7 +93,8 @@ class StreamWriter:
 
                https://ffmpeg.org/ffmpeg-devices.html#Output-Devices
 
-               Use `ffmpeg -devices` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_output_devices` to list
+               the output devices available in the current environment.
 
         buffer_size (int):
             The internal buffer size in byte. Used only when `dst` is a file-like object.

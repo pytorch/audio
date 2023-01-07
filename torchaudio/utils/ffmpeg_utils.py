@@ -2,7 +2,7 @@
 
 It affects functionalities in :py:mod:`torchaudio.io` (and indirectly :py:func:`torchaudio.load`).
 """
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 import torch
 
@@ -59,3 +59,169 @@ def set_log_level(level: int):
 
     """
     torch.ops.torchaudio.ffmpeg_set_log_level(level)
+
+
+def get_demuxers() -> Dict[str, str]:
+    """Get the available demuxers.
+
+    Returns:
+        Dict[str, str]: Mapping from demuxer (format) short name to long name.
+
+    Example
+        >>> for k, v in get_demuxers().items():
+        >>>     print(f"{k}: {v}")
+        ... aa: Audible AA format files
+        ... aac: raw ADTS AAC (Advanced Audio Coding)
+        ... aax: CRI AAX
+        ... ac3: raw AC-3
+    """
+    return torch.ops.torchaudio.ffmpeg_get_demuxers()
+
+
+def get_muxers() -> Dict[str, str]:
+    """Get the available muxers.
+
+    Returns:
+        Dict[str, str]: Mapping from muxer (format) short name to long name.
+
+    Example
+        >>> for k, v in get_muxers().items():
+        >>>     print(f"{k}: {v}")
+        ... a64: a64 - video for Commodore 64
+        ... ac3: raw AC-3
+        ... adts: ADTS AAC (Advanced Audio Coding)
+        ... adx: CRI ADX
+        ... aiff: Audio IFF
+    """
+    return torch.ops.torchaudio.ffmpeg_get_muxers()
+
+
+def get_audio_decoders() -> Dict[str, str]:
+    """Get the available audio decoders.
+
+    Returns:
+        Dict[str, str]: Mapping from decoder short name to long name.
+
+    Example
+        >>> for k, v in get_audio_decoders().items():
+        >>>     print(f"{k}: {v}")
+        ... a64: a64 - video for Commodore 64
+        ... ac3: raw AC-3
+        ... adts: ADTS AAC (Advanced Audio Coding)
+        ... adx: CRI ADX
+        ... aiff: Audio IFF
+    """
+    return torch.ops.torchaudio.ffmpeg_get_audio_decoders()
+
+
+def get_audio_encoders() -> Dict[str, str]:
+    """Get the available audio encoders.
+
+    Returns:
+        Dict[str, str]: Mapping from encoder short name to long name.
+
+    Example
+        >>> for k, v in get_audio_encoders().items():
+        >>>     print(f"{k}: {v}")
+        ... comfortnoise: RFC 3389 comfort noise generator
+        ... s302m: SMPTE 302M
+        ... aac: AAC (Advanced Audio Coding)
+        ... ac3: ATSC A/52A (AC-3)
+        ... ac3_fixed: ATSC A/52A (AC-3)
+        ... alac: ALAC (Apple Lossless Audio Codec)
+    """
+    return torch.ops.torchaudio.ffmpeg_get_audio_encoders()
+
+
+def get_video_decoders() -> Dict[str, str]:
+    """Get the available video decoders.
+
+    Returns:
+        Dict[str, str]: Mapping from decoder short name to long name.
+
+    Example
+        >>> for k, v in get_video_decoders().items():
+        >>>     print(f"{k}: {v}")
+        ... aasc: Autodesk RLE
+        ... aic: Apple Intermediate Codec
+        ... alias_pix: Alias/Wavefront PIX image
+        ... agm: Amuse Graphics Movie
+        ... amv: AMV Video
+        ... anm: Deluxe Paint Animation
+    """
+    return torch.ops.torchaudio.ffmpeg_get_video_decoders()
+
+
+def get_video_encoders() -> Dict[str, str]:
+    """Get the available video encoders.
+
+    Returns:
+        Dict[str, str]: Mapping from encoder short name to long name.
+
+    Example
+        >>> for k, v in get_audio_encoders().items():
+        >>>     print(f"{k}: {v}")
+        ... a64multi: Multicolor charset for Commodore 64
+        ... a64multi5: Multicolor charset for Commodore 64, extended with 5th color (colram)
+        ... alias_pix: Alias/Wavefront PIX image
+        ... amv: AMV Video
+        ... apng: APNG (Animated Portable Network Graphics) image
+        ... asv1: ASUS V1
+        ... asv2: ASUS V2
+    """
+    return torch.ops.torchaudio.ffmpeg_get_video_encoders()
+
+
+def get_input_devices() -> Dict[str, str]:
+    """Get the available input devices.
+
+    Returns:
+        Dict[str, str]: Mapping from device short name to long name.
+
+    Example
+        >>> for k, v in get_input_devices().items():
+        >>>     print(f"{k}: {v}")
+        ... avfoundation: AVFoundation input device
+        ... lavfi: Libavfilter virtual input device
+    """
+    return torch.ops.torchaudio.ffmpeg_get_input_devices()
+
+
+def get_output_devices() -> Dict[str, str]:
+    """Get the available output devices.
+
+    Returns:
+        Dict[str, str]: Mapping from device short name to long name.
+
+    Example
+        >>> for k, v in get_output_devices().items():
+        >>>     print(f"{k}: {v}")
+        ... audiotoolbox: AudioToolbox output device
+    """
+    return torch.ops.torchaudio.ffmpeg_get_output_devices()
+
+
+def get_input_protocols() -> List[str]:
+    """Get the supported input protocols.
+
+    Returns:
+        List[str]: The names of supported input protocols
+
+    Example
+        >>> print(get_input_protocols())
+        ... ['file', 'ftp', 'hls', 'http','https', 'pipe', 'rtmp', 'tcp', 'tls', 'udp', 'unix']
+    """
+    return torch.ops.torchaudio.ffmpeg_get_input_protocols()
+
+
+def get_output_protocols() -> List[str]:
+    """Get the supported output protocols.
+
+    Returns:
+        list of str: The names of supported output protocols
+
+    Example
+        >>> print(get_output_protocols())
+        ... ['file', 'ftp', 'http', 'https', 'md5', 'pipe', 'prompeg', 'rtmp', 'tee', 'tcp', 'tls', 'udp', 'unix']
+    """
+    return torch.ops.torchaudio.ffmpeg_get_output_protocols()

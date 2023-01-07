@@ -3,8 +3,6 @@ import warnings
 from functools import wraps
 from typing import Optional
 
-import torch
-
 
 def is_module_available(*modules: str) -> bool:
     r"""Returns if a top-level module with :attr:`name` exists *without**
