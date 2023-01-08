@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230106) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230108) &#x25BC</a>
     </div>
     
 
@@ -436,11 +436,13 @@ such as microphone, camera and screen, or a virtual device.</p></li>
 <p>This option roughly corresponds to <code class="docutils literal notranslate"><span class="pre">-f</span></code> option of <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> command.
 Please refer to the ffmpeg documentations for the possible values.</p>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-formats.html#Demuxers">https://ffmpeg.org/ffmpeg-formats.html#Demuxers</a></p>
-<p>Use <cite>ffmpeg -demuxers</cite> to list the values available in the current environment.</p>
+<p>Please use <a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_demuxers" title="torchaudio.utils.ffmpeg_utils.get_demuxers"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_demuxers()</span></code></a> to list the
+demultiplexers available in the current environment.</p>
 <p>For device access, the available values vary based on hardware (AV device) and
 software configuration (ffmpeg build).</p>
 <p><a class="reference external" href="https://ffmpeg.org/ffmpeg-devices.html#Input-Devices">https://ffmpeg.org/ffmpeg-devices.html#Input-Devices</a></p>
-<p>Use <cite>ffmpeg -devices</cite> to list the values available in the current environment.</p>
+<p>Please use <a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_devices" title="torchaudio.utils.ffmpeg_utils.get_input_devices"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_input_devices()</span></code></a> to list
+the input devices available in the current environment.</p>
 </div>
 </p></li>
 <li><p><strong>option</strong> (<em>dict of str to str</em><em>, </em><em>optional</em>) – <p>Custom option passed when initializing format context (opening source).</p>
@@ -565,7 +567,9 @@ dropped.</p>
 If omitted, <a class="reference internal" href="#torchaudio.io.StreamReader.default_audio_stream" title="torchaudio.io.StreamReader.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> is used.</p></li>
 <li><p><strong>decoder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The name of the decoder to be used.
 When provided, use the specified decoder instead of the default one.</p>
-<p>To list the available decoders, you can use <cite>ffmpeg -decoders</cite> command.</p>
+<p>To list the available decoders, please use
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders" title="torchaudio.utils.ffmpeg_utils.get_audio_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_decoders()</span></code></a> for audio, and
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="torchaudio.utils.ffmpeg_utils.get_video_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_decoders()</span></code></a> for video.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
@@ -628,7 +632,9 @@ dropped.</p>
 If omitted, <a class="reference internal" href="#torchaudio.io.StreamReader.default_audio_stream" title="torchaudio.io.StreamReader.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> is used.</p></li>
 <li><p><strong>decoder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The name of the decoder to be used.
 When provided, use the specified decoder instead of the default one.</p>
-<p>To list the available decoders, you can use <cite>ffmpeg -decoders</cite> command.</p>
+<p>To list the available decoders, please use
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders" title="torchaudio.utils.ffmpeg_utils.get_audio_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_decoders()</span></code></a> for audio, and
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="torchaudio.utils.ffmpeg_utils.get_video_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_decoders()</span></code></a> for video.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
@@ -703,7 +709,9 @@ dropped.</p>
 If omitted, <a class="reference internal" href="#torchaudio.io.StreamReader.default_video_stream" title="torchaudio.io.StreamReader.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a> is used.</p></li>
 <li><p><strong>decoder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The name of the decoder to be used.
 When provided, use the specified decoder instead of the default one.</p>
-<p>To list the available decoders, you can use <cite>ffmpeg -decoders</cite> command.</p>
+<p>To list the available decoders, please use
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders" title="torchaudio.utils.ffmpeg_utils.get_audio_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_decoders()</span></code></a> for audio, and
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="torchaudio.utils.ffmpeg_utils.get_video_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_decoders()</span></code></a> for video.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.
@@ -782,7 +790,9 @@ dropped.</p>
 If omitted, <a class="reference internal" href="#torchaudio.io.StreamReader.default_video_stream" title="torchaudio.io.StreamReader.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a> is used.</p></li>
 <li><p><strong>decoder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The name of the decoder to be used.
 When provided, use the specified decoder instead of the default one.</p>
-<p>To list the available decoders, you can use <cite>ffmpeg -decoders</cite> command.</p>
+<p>To list the available decoders, please use
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders" title="torchaudio.utils.ffmpeg_utils.get_audio_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_decoders()</span></code></a> for audio, and
+<a class="reference internal" href="torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="torchaudio.utils.ffmpeg_utils.get_video_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_decoders()</span></code></a> for video.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 <li><p><strong>decoder_option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Options passed to decoder.

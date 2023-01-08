@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230106) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230108) &#x25BC</a>
     </div>
     
 
@@ -395,6 +395,143 @@
 <h1>ffmpeg_utils<a class="headerlink" href="#ffmpeg-utils" title="Permalink to this heading">¶</a></h1>
 <p>Module to change the configuration of FFmpeg libraries (such as libavformat).</p>
 <p>It affects functionalities in <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a> (and indirectly <a class="reference internal" href="../torchaudio.html#torchaudio.load" title="torchaudio.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code></a>).</p>
+<section id="get-audio-decoders">
+<h2>get_audio_decoders<a class="headerlink" href="#get-audio-decoders" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_audio_decoders">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_audio_decoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_audio_decoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_audio_decoders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available audio decoders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from decoder short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_audio_decoders</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">a64</span><span class="p">:</span> <span class="n">a64</span> <span class="o">-</span> <span class="n">video</span> <span class="k">for</span> <span class="n">Commodore</span> <span class="mi">64</span>
+<span class="gp">... </span><span class="n">ac3</span><span class="p">:</span> <span class="n">raw</span> <span class="n">AC</span><span class="o">-</span><span class="mi">3</span>
+<span class="gp">... </span><span class="n">adts</span><span class="p">:</span> <span class="n">ADTS</span> <span class="n">AAC</span> <span class="p">(</span><span class="n">Advanced</span> <span class="n">Audio</span> <span class="n">Coding</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">adx</span><span class="p">:</span> <span class="n">CRI</span> <span class="n">ADX</span>
+<span class="gp">... </span><span class="n">aiff</span><span class="p">:</span> <span class="n">Audio</span> <span class="n">IFF</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-audio-encoders">
+<h2>get_audio_encoders<a class="headerlink" href="#get-audio-encoders" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_audio_encoders">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_audio_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_audio_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_audio_encoders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available audio encoders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from encoder short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_audio_encoders</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">comfortnoise</span><span class="p">:</span> <span class="n">RFC</span> <span class="mi">3389</span> <span class="n">comfort</span> <span class="n">noise</span> <span class="n">generator</span>
+<span class="gp">... </span><span class="n">s302m</span><span class="p">:</span> <span class="n">SMPTE</span> <span class="mi">302</span><span class="n">M</span>
+<span class="gp">... </span><span class="n">aac</span><span class="p">:</span> <span class="n">AAC</span> <span class="p">(</span><span class="n">Advanced</span> <span class="n">Audio</span> <span class="n">Coding</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">ac3</span><span class="p">:</span> <span class="n">ATSC</span> <span class="n">A</span><span class="o">/</span><span class="mi">52</span><span class="n">A</span> <span class="p">(</span><span class="n">AC</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">ac3_fixed</span><span class="p">:</span> <span class="n">ATSC</span> <span class="n">A</span><span class="o">/</span><span class="mi">52</span><span class="n">A</span> <span class="p">(</span><span class="n">AC</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">alac</span><span class="p">:</span> <span class="n">ALAC</span> <span class="p">(</span><span class="n">Apple</span> <span class="n">Lossless</span> <span class="n">Audio</span> <span class="n">Codec</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-demuxers">
+<h2>get_demuxers<a class="headerlink" href="#get-demuxers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_demuxers">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_demuxers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_demuxers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_demuxers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available demuxers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from demuxer (format) short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_demuxers</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">aa</span><span class="p">:</span> <span class="n">Audible</span> <span class="n">AA</span> <span class="nb">format</span> <span class="n">files</span>
+<span class="gp">... </span><span class="n">aac</span><span class="p">:</span> <span class="n">raw</span> <span class="n">ADTS</span> <span class="n">AAC</span> <span class="p">(</span><span class="n">Advanced</span> <span class="n">Audio</span> <span class="n">Coding</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">aax</span><span class="p">:</span> <span class="n">CRI</span> <span class="n">AAX</span>
+<span class="gp">... </span><span class="n">ac3</span><span class="p">:</span> <span class="n">raw</span> <span class="n">AC</span><span class="o">-</span><span class="mi">3</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-input-devices">
+<h2>get_input_devices<a class="headerlink" href="#get-input-devices" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_input_devices">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_input_devices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_input_devices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_input_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available input devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from device short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_input_devices</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">avfoundation</span><span class="p">:</span> <span class="n">AVFoundation</span> <span class="nb">input</span> <span class="n">device</span>
+<span class="gp">... </span><span class="n">lavfi</span><span class="p">:</span> <span class="n">Libavfilter</span> <span class="n">virtual</span> <span class="nb">input</span> <span class="n">device</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-input-protocols">
+<h2>get_input_protocols<a class="headerlink" href="#get-input-protocols" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_input_protocols">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_input_protocols</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_input_protocols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_input_protocols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the supported input protocols.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The names of supported input protocols</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">get_input_protocols</span><span class="p">())</span>
+<span class="gp">... </span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;ftp&#39;</span><span class="p">,</span> <span class="s1">&#39;hls&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">,</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;pipe&#39;</span><span class="p">,</span> <span class="s1">&#39;rtmp&#39;</span><span class="p">,</span> <span class="s1">&#39;tcp&#39;</span><span class="p">,</span> <span class="s1">&#39;tls&#39;</span><span class="p">,</span> <span class="s1">&#39;udp&#39;</span><span class="p">,</span> <span class="s1">&#39;unix&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="get-log-level">
 <h2>get_log_level<a class="headerlink" href="#get-log-level" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
@@ -402,6 +539,84 @@
 <span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_log_level</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_log_level" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the log level of FFmpeg.</p>
 <p>See <a class="reference internal" href="#torchaudio.utils.ffmpeg_utils.set_log_level" title="torchaudio.utils.ffmpeg_utils.set_log_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_log_level()</span></code></a> for the detailo.</p>
+</dd></dl>
+
+</section>
+<section id="get-muxers">
+<h2>get_muxers<a class="headerlink" href="#get-muxers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_muxers">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_muxers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_muxers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_muxers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available muxers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from muxer (format) short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_muxers</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">a64</span><span class="p">:</span> <span class="n">a64</span> <span class="o">-</span> <span class="n">video</span> <span class="k">for</span> <span class="n">Commodore</span> <span class="mi">64</span>
+<span class="gp">... </span><span class="n">ac3</span><span class="p">:</span> <span class="n">raw</span> <span class="n">AC</span><span class="o">-</span><span class="mi">3</span>
+<span class="gp">... </span><span class="n">adts</span><span class="p">:</span> <span class="n">ADTS</span> <span class="n">AAC</span> <span class="p">(</span><span class="n">Advanced</span> <span class="n">Audio</span> <span class="n">Coding</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">adx</span><span class="p">:</span> <span class="n">CRI</span> <span class="n">ADX</span>
+<span class="gp">... </span><span class="n">aiff</span><span class="p">:</span> <span class="n">Audio</span> <span class="n">IFF</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-output-devices">
+<h2>get_output_devices<a class="headerlink" href="#get-output-devices" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_output_devices">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_output_devices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_output_devices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_output_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available output devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from device short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_output_devices</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">audiotoolbox</span><span class="p">:</span> <span class="n">AudioToolbox</span> <span class="n">output</span> <span class="n">device</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-output-protocols">
+<h2>get_output_protocols<a class="headerlink" href="#get-output-protocols" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_output_protocols">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_output_protocols</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_output_protocols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_output_protocols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the supported output protocols.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The names of supported output protocols</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of str</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">get_output_protocols</span><span class="p">())</span>
+<span class="gp">... </span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;ftp&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;md5&#39;</span><span class="p">,</span> <span class="s1">&#39;pipe&#39;</span><span class="p">,</span> <span class="s1">&#39;prompeg&#39;</span><span class="p">,</span> <span class="s1">&#39;rtmp&#39;</span><span class="p">,</span> <span class="s1">&#39;tee&#39;</span><span class="p">,</span> <span class="s1">&#39;tcp&#39;</span><span class="p">,</span> <span class="s1">&#39;tls&#39;</span><span class="p">,</span> <span class="s1">&#39;udp&#39;</span><span class="p">,</span> <span class="s1">&#39;unix&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -428,6 +643,67 @@
 <p><a class="reference internal" href="../tutorials/streamwriter_basic_tutorial.html#sphx-glr-tutorials-streamwriter-basic-tutorial-py"><span class="std std-ref">StreamWriter Basic Usage</span></a></p>
   <div class="sphx-glr-thumbnail-title">StreamWriter Basic Usage</div>
 </div></div></dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-video-decoders">
+<h2>get_video_decoders<a class="headerlink" href="#get-video-decoders" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_video_decoders">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_video_decoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_video_decoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available video decoders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from decoder short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_video_decoders</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">aasc</span><span class="p">:</span> <span class="n">Autodesk</span> <span class="n">RLE</span>
+<span class="gp">... </span><span class="n">aic</span><span class="p">:</span> <span class="n">Apple</span> <span class="n">Intermediate</span> <span class="n">Codec</span>
+<span class="gp">... </span><span class="n">alias_pix</span><span class="p">:</span> <span class="n">Alias</span><span class="o">/</span><span class="n">Wavefront</span> <span class="n">PIX</span> <span class="n">image</span>
+<span class="gp">... </span><span class="n">agm</span><span class="p">:</span> <span class="n">Amuse</span> <span class="n">Graphics</span> <span class="n">Movie</span>
+<span class="gp">... </span><span class="n">amv</span><span class="p">:</span> <span class="n">AMV</span> <span class="n">Video</span>
+<span class="gp">... </span><span class="n">anm</span><span class="p">:</span> <span class="n">Deluxe</span> <span class="n">Paint</span> <span class="n">Animation</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-video-encoders">
+<h2>get_video_encoders<a class="headerlink" href="#get-video-encoders" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_video_encoders">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_video_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_video_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_video_encoders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the available video encoders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from encoder short name to long name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_audio_encoders</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">a64multi</span><span class="p">:</span> <span class="n">Multicolor</span> <span class="n">charset</span> <span class="k">for</span> <span class="n">Commodore</span> <span class="mi">64</span>
+<span class="gp">... </span><span class="n">a64multi5</span><span class="p">:</span> <span class="n">Multicolor</span> <span class="n">charset</span> <span class="k">for</span> <span class="n">Commodore</span> <span class="mi">64</span><span class="p">,</span> <span class="n">extended</span> <span class="k">with</span> <span class="mi">5</span><span class="n">th</span> <span class="n">color</span> <span class="p">(</span><span class="n">colram</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">alias_pix</span><span class="p">:</span> <span class="n">Alias</span><span class="o">/</span><span class="n">Wavefront</span> <span class="n">PIX</span> <span class="n">image</span>
+<span class="gp">... </span><span class="n">amv</span><span class="p">:</span> <span class="n">AMV</span> <span class="n">Video</span>
+<span class="gp">... </span><span class="n">apng</span><span class="p">:</span> <span class="n">APNG</span> <span class="p">(</span><span class="n">Animated</span> <span class="n">Portable</span> <span class="n">Network</span> <span class="n">Graphics</span><span class="p">)</span> <span class="n">image</span>
+<span class="gp">... </span><span class="n">asv1</span><span class="p">:</span> <span class="n">ASUS</span> <span class="n">V1</span>
+<span class="gp">... </span><span class="n">asv2</span><span class="p">:</span> <span class="n">ASUS</span> <span class="n">V2</span>
+</pre></div>
+</div>
+</dd>
 </dl>
 </dd></dl>
 
@@ -523,8 +799,18 @@ Extremely verbose debugging, useful for libav* development.</p></li>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">ffmpeg_utils</a><ul>
+<li><a class="reference internal" href="#get-audio-decoders">get_audio_decoders</a></li>
+<li><a class="reference internal" href="#get-audio-encoders">get_audio_encoders</a></li>
+<li><a class="reference internal" href="#get-demuxers">get_demuxers</a></li>
+<li><a class="reference internal" href="#get-input-devices">get_input_devices</a></li>
+<li><a class="reference internal" href="#get-input-protocols">get_input_protocols</a></li>
 <li><a class="reference internal" href="#get-log-level">get_log_level</a></li>
+<li><a class="reference internal" href="#get-muxers">get_muxers</a></li>
+<li><a class="reference internal" href="#get-output-devices">get_output_devices</a></li>
+<li><a class="reference internal" href="#get-output-protocols">get_output_protocols</a></li>
 <li><a class="reference internal" href="#get-versions">get_versions</a></li>
+<li><a class="reference internal" href="#get-video-decoders">get_video_decoders</a></li>
+<li><a class="reference internal" href="#get-video-encoders">get_video_encoders</a></li>
 <li><a class="reference internal" href="#set-log-level">set_log_level</a></li>
 </ul>
 </li>

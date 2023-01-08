@@ -76,8 +76,8 @@ Preparation
 
  .. code-block:: none
 
-    2.0.0.dev20230105
-    2.0.0.dev20230106
+    2.0.0.dev20230108
+    2.0.0.dev20230108
     cpu
 
 
@@ -103,7 +103,7 @@ Preparation
 
  .. code-block:: none
 
-      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 39.6MB/s]
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 51.2MB/s]
 
 
 
@@ -188,7 +188,7 @@ fetch the pre-trained weights and load it into the model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      6%|5         | 21.6M/360M [00:00<00:01, 226MB/s]     16%|#5        | 57.1M/360M [00:00<00:01, 312MB/s]     25%|##5       | 91.3M/360M [00:00<00:00, 333MB/s]     36%|###6      | 131M/360M [00:00<00:00, 366MB/s]      46%|####6     | 166M/360M [00:00<00:00, 360MB/s]     56%|#####5    | 200M/360M [00:00<00:00, 338MB/s]     65%|######5   | 235M/360M [00:00<00:00, 345MB/s]     74%|#######4  | 268M/360M [00:00<00:00, 346MB/s]     84%|########3 | 301M/360M [00:00<00:00, 344MB/s]     93%|#########2| 335M/360M [00:01<00:00, 347MB/s]    100%|##########| 360M/360M [00:01<00:00, 342MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]      6%|6         | 22.2M/360M [00:00<00:01, 233MB/s]     16%|#5        | 56.1M/360M [00:00<00:01, 305MB/s]     25%|##4       | 89.1M/360M [00:00<00:00, 323MB/s]     33%|###3      | 120M/360M [00:00<00:00, 318MB/s]      42%|####1     | 151M/360M [00:00<00:00, 320MB/s]     52%|#####2    | 188M/360M [00:00<00:00, 342MB/s]     62%|######1   | 222M/360M [00:00<00:00, 348MB/s]     71%|#######   | 255M/360M [00:00<00:00, 318MB/s]     79%|#######9  | 286M/360M [00:01<00:00, 258MB/s]     89%|########8 | 319M/360M [00:01<00:00, 280MB/s]     97%|#########6| 348M/360M [00:01<00:00, 263MB/s]    100%|##########| 360M/360M [00:01<00:00, 275MB/s]
     <class 'torchaudio.models.wav2vec2.model.Wav2Vec2Model'>
 
 
@@ -548,7 +548,7 @@ a model and getting the emission is as short as two lines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.501 seconds)
+   **Total running time of the script:** ( 0 minutes  5.044 seconds)
 
 
 .. _sphx_glr_download_tutorials_speech_recognition_pipeline_tutorial.py:

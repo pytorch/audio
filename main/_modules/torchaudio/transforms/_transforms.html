@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230106) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230108) &#x25BC</a>
     </div>
     
 
@@ -800,7 +800,7 @@
         <span class="k">return</span> <span class="n">mel_specgram</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">InverseMelScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="InverseMelScale"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.InverseMelScale.html#torchaudio.transforms.InverseMelScale">[docs]</a><span class="k">class</span> <span class="nc">InverseMelScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate a STFT in normal frequency domain from mel frequency domain.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -871,7 +871,7 @@
         <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">melscale_fbanks</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">mel_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">melspec</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="InverseMelScale.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.InverseMelScale.html#torchaudio.transforms.InverseMelScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">melspec</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            melspec (Tensor): A Mel frequency spectrogram of dimension (..., ``n_mels``, time)</span>
@@ -916,7 +916,7 @@
 
         <span class="c1"># unpack batch</span>
         <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">time</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">specgram</span>
+        <span class="k">return</span> <span class="n">specgram</span></div></div>
 
 
 <div class="viewcode-block" id="MelSpectrogram"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.MelSpectrogram.html#torchaudio.transforms.MelSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">MelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
