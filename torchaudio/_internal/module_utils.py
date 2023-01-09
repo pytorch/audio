@@ -3,8 +3,6 @@ import warnings
 from functools import wraps
 from typing import Optional
 
-import torch
-
 
 def is_module_available(*modules: str) -> bool:
     r"""Returns if a top-level module with :attr:`name` exists *without**
@@ -68,7 +66,9 @@ def deprecated(direction: str, version: Optional[str] = None):
 
 def is_kaldi_available():
     try:
-        return torch.ops.torchaudio.is_kaldi_available()
+        import torchaudio.lib._torchaudio
+
+        return torchaudio.lib._torchaudio.is_kaldi_available()
     except Exception:
         return False
 

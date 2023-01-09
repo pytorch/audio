@@ -194,7 +194,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_phaser(self):
-        sample_rate = 44100
+        sample_rate = 8000
         n_channels = 2
         waveform = common_utils.get_whitenoise(
             sample_rate=sample_rate, n_channels=self.batch_size * n_channels, duration=1
@@ -208,7 +208,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     def test_flanger(self):
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        sample_rate = 44100
+        sample_rate = 8000
         kwargs = {
             "sample_rate": sample_rate,
         }

@@ -57,6 +57,7 @@ def _load_lib(lib: str) -> bool:
     return True
 
 
+_IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
 _FFMPEG_INITIALIZED = False
 
 
@@ -101,7 +102,7 @@ def _init_extension():
                 except Exception:
                     pass
 
-    if is_module_available("torchaudio.lib._torchaudio"):
+    if _IS_TORCHAUDIO_EXT_AVAILABLE:
         try:
             _load_lib("libtorchaudio")
             import torchaudio.lib._torchaudio  # noqa
@@ -125,9 +126,12 @@ def _init_extension():
 
 
 def _check_cuda_version():
-    if not _get_lib_path("libtorchaudio").exists():
+    if not _IS_TORCHAUDIO_EXT_AVAILABLE:
         return None
-    version = torch.ops.torchaudio.cuda_version()
+
+    import torchaudio.lib._torchaudio
+
+    version = torchaudio.lib._torchaudio.cuda_version()
     if version is not None and torch.version.cuda is not None:
         version_str = str(version)
         ta_version = f"{version_str[:-3]}.{version_str[-2]}"

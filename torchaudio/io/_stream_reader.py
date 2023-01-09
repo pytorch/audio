@@ -234,7 +234,9 @@ _video_stream_index = """The source video stream index.
 _decoder = """The name of the decoder to be used.
                 When provided, use the specified decoder instead of the default one.
 
-                To list the available decoders, you can use `ffmpeg -decoders` command.
+                To list the available decoders, please use
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_decoders` for audio, and
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_decoders` for video.
 
                 Default: ``None``."""
 
@@ -340,14 +342,16 @@ class StreamReader:
 
                https://ffmpeg.org/ffmpeg-formats.html#Demuxers
 
-               Use `ffmpeg -demuxers` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_demuxers` to list the
+               demultiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
                software configuration (ffmpeg build).
 
                https://ffmpeg.org/ffmpeg-devices.html#Input-Devices
 
-               Use `ffmpeg -devices` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_input_devices` to list
+               the input devices available in the current environment.
 
         option (dict of str to str, optional):
             Custom option passed when initializing format context (opening source).
