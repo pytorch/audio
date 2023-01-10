@@ -29,6 +29,7 @@ class Decoder {
   int process_packet(AVPacket* pPacket);
   // Fetch a decoded frame
   int get_frame(AVFrame* pFrame);
+  int get_frame_number() const;
   // Flush buffer (for seek)
   void flush_buffer();
 };
