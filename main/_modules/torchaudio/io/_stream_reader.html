@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230109) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230110) &#x25BC</a>
     </div>
     
 
@@ -1140,8 +1140,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.fill_buffer"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.fill_buffer"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep processing packets until all buffers have at least one chunk</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            timeout (float or None, optional): See</span>
+<span class="sd">                :py:func:`~StreamReader.process_packet`. (Default: ``None``)</span>
+
+<span class="sd">            backoff (float, optional): See</span>
+<span class="sd">                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int:</span>
