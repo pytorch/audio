@@ -753,8 +753,15 @@ class StreamReader:
         """
         return self._be.pop_chunks()
 
-    def fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
+    def fill_buffer(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
         """Keep processing packets until all buffers have at least one chunk
+
+        Arguments:
+            timeout (float or None, optional): See
+                :py:func:`~StreamReader.process_packet`. (Default: ``None``)
+
+            backoff (float, optional): See
+                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
 
         Returns:
             int:
