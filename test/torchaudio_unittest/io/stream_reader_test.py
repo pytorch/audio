@@ -51,9 +51,6 @@ class _MediaSourceMixin:
             with open(path, "rb") as fileobj:
                 data = fileobj.read()
             self.src = torch.frombuffer(data, dtype=torch.uint8)
-            print(self.src.data_ptr())
-            print(len(data))
-            print(self.src.shape)
         return self.src
 
     def tearDown(self):
@@ -467,10 +464,10 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             ("nasa_13013.avi", "precise", 8.1, (0, slice(238, None))),
             ("nasa_13013.avi", "precise", 8.14, (0, slice(239, None))),
             ("nasa_13013.avi", "precise", 8.17, (0, slice(240, None))),
-            # Test precise seek on video with invalid PTS
+            # Test precise seek on video with missing PTS
             ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.0, (0, slice(None))),
-            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.2, (0, slice(4, -1))),
-            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.3, (0, slice(7, -1))),
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.2, (0, slice(4, None))),
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.3, (0, slice(7, None))),
             # Test any seek
             # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
             ("nasa_13013.avi", "any", 0.0, (0, slice(None))),
@@ -513,6 +510,25 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         hyp, ref = frame[hyp_index:], ref_frames[ref_index]
         print(hyp.shape, ref.shape)
         self.assertEqual(hyp, ref)
+
+    @parameterized.expand(
+        [
+            ("nasa_13013.mp4", [195, 3, 270, 480]),
+            # RATRACE does not have valid PTS metadata.
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", [36, 3, 240, 560]),
+        ]
+    )
+    def test_change_fps(self, src, shape):
+        """Can change the FPS of videos"""
+        tgt_frame_rate = 15
+        s = StreamReader(self.get_src(src))
+        info = s.get_src_stream_info(s.default_video_stream)
+        assert info.frame_rate != tgt_frame_rate
+        s.add_basic_video_stream(frames_per_chunk=-1, frame_rate=tgt_frame_rate)
+        s.process_all_packets()
+        (chunk,) = s.pop_chunks()
+
+        assert chunk.shape == torch.Size(shape)
 
 
 def _to_fltp(original):

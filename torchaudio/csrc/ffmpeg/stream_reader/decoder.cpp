@@ -123,6 +123,10 @@ int Decoder::get_frame(AVFrame* pFrame) {
   return avcodec_receive_frame(pCodecContext, pFrame);
 }
 
+int Decoder::get_frame_number() const {
+  return pCodecContext->frame_number;
+}
+
 void Decoder::flush_buffer() {
   avcodec_flush_buffers(pCodecContext);
 }
