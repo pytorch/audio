@@ -48,6 +48,7 @@ print(torchaudio.__version__)
 ######################################################################
 #
 import IPython
+import matplotlib.pyplot as plt
 
 try:
     from torchaudio.io import StreamReader
@@ -194,11 +195,11 @@ state, hypothesis = None, None
 
 stream_iterator = streamer.stream()
 
-
 @torch.inference_mode()
-def run_inference(num_iter=200):
+def run_inference(num_iter=100):
     global state, hypothesis
     chunks = []
+    feats = []
     for i, (chunk,) in enumerate(stream_iterator, start=1):
         segment = cacher(chunk[:, 0])
         features, length = feature_extractor(segment)
@@ -208,11 +209,62 @@ def run_inference(num_iter=200):
         print(transcript, end="", flush=True)
 
         chunks.append(chunk)
+        feats.append(features[:-4]) # removing the overlap originated from right context.
         if i == num_iter:
             break
 
+    # Plot the features
+    unit = 25
+    unit_dur = segment_length / sample_rate * unit
+    num_plots = num_iter // unit + (1 if num_iter % unit else 0)
+    fig, axes = plt.subplots(num_plots, 1)
+    t0 = 0
+    for i, ax in enumerate(axes):
+        feats_ = feats[i*unit:(i+1)*unit]
+        t1 = t0 + segment_length / sample_rate * len(feats_)
+        ax.imshow(torch.cat(feats_).T, extent=[t0, t1, 0, 1], aspect='auto')
+        ax.tick_params(which='both', left=False, labelleft=False)
+        ax.set_xlim(t0, t0 + unit_dur)
+        t0 = t1
+    fig.suptitle("MelSpectrogram Feature")
+    plt.tight_layout()
     return IPython.display.Audio(torch.cat(chunks).T.numpy(), rate=bundle.sample_rate)
 
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
 
 ######################################################################
 #
