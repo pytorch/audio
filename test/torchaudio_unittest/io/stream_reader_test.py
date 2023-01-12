@@ -530,6 +530,59 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
         assert chunk.shape == torch.Size(shape)
 
+    def test_invalid_chunk_option(self):
+        """Passing invalid `frames_per_chunk` and `buffer_chunk_size` raises error"""
+        s = StreamReader(self.get_src())
+        for fpc, bcs in ((0, 3), (3, 0), (-2, 3), (3, -2)):
+            with self.assertRaises(RuntimeError):
+                s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=bcs)
+            with self.assertRaises(RuntimeError):
+                s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=bcs)
+
+    def test_unchunked_stream(self):
+        """`frames_per_chunk=-1` disable chunking.
+
+        When chunking is disabled, frames contained in one AVFrame become one chunk.
+        For video, that is always one frame, but for audio, it depends.
+        """
+        s = StreamReader(self.get_src())
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=10000)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=10000)
+        s.process_all_packets()
+        video, audio = s.pop_chunks()
+        assert video.shape == torch.Size([390, 3, 270, 480])
+        assert audio.shape == torch.Size([208896, 2])
+
+    def test_buffer_chunk_size(self):
+        """`buffer_chunk_size=-1` does not drop frames."""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=30, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=16000, buffer_chunk_size=-1)
+        s.process_all_packets()
+        for _ in range(13):
+            video, audio = s.pop_chunks()
+            assert video.shape == torch.Size([30, 3, 270, 480])
+            assert audio.shape == torch.Size([16000, 2])
+        video, audio = s.pop_chunks()
+        assert video is None
+        assert audio.shape == torch.Size([896, 2])
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=30, buffer_chunk_size=3)
+        s.add_audio_stream(frames_per_chunk=16000, buffer_chunk_size=3)
+        s.process_all_packets()
+        for _ in range(2):
+            video, audio = s.pop_chunks()
+            assert video.shape == torch.Size([30, 3, 270, 480])
+            assert audio.shape == torch.Size([16000, 2])
+        video, audio = s.pop_chunks()
+        assert video.shape == torch.Size([30, 3, 270, 480])
+        assert audio.shape == torch.Size([896, 2])
+
 
 def _to_fltp(original):
     """Convert Tensor to float32 with value range [-1, 1]"""
