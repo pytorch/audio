@@ -64,87 +64,19 @@ def deprecated(direction: str, version: Optional[str] = None):
     return decorator
 
 
-def is_kaldi_available():
-    try:
-        import torchaudio.lib._torchaudio
+def fail_with_message(message):
+    """Generate decorator to give users message about missing TorchAudio extension."""
 
-        return torchaudio.lib._torchaudio.is_kaldi_available()
-    except Exception:
-        return False
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            raise RuntimeError(f"{func.__module__}.{func.__name__} {message}")
 
-
-def requires_kaldi():
-    if is_kaldi_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires kaldi")
-
-            return wrapped
+        return wrapped
 
     return decorator
 
 
-def _check_soundfile_importable():
-    if not is_module_available("soundfile"):
-        return False
-    try:
-        import soundfile  # noqa: F401
-
-        return True
-    except Exception:
-        warnings.warn("Failed to import soundfile. 'soundfile' backend is not available.")
-        return False
-
-
-_is_soundfile_importable = _check_soundfile_importable()
-
-
-def is_soundfile_available():
-    return _is_soundfile_importable
-
-
-def requires_soundfile():
-    if is_soundfile_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires soundfile")
-
-            return wrapped
-
-    return decorator
-
-
-def is_sox_available():
-    return is_module_available("torchaudio.lib._torchaudio_sox")
-
-
-def requires_sox():
-    if is_sox_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires sox")
-
-            return wrapped
-
-    return decorator
+def no_op(func):
+    """Op-op decorator. Used in place of fail_with_message when a functionality that requires extension works fine."""
+    return func
