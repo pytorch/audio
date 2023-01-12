@@ -56,15 +56,17 @@ void ChunkedAudioBuffer::push_tensor(torch::Tensor frame) {
   // Trim
   // If frames_per_chunk > 0, we only retain the following number of frames and
   // Discard older frames.
-  int64_t max_frames = num_chunks * frames_per_chunk;
-  while (num_buffered_frames > max_frames) {
-    TORCH_WARN_ONCE(
-        "The number of buffered frames exceeded the buffer size. "
-        "Dropping the old frames. "
-        "To avoid this, you can set a higher buffer_chunk_size value.");
-    torch::Tensor& t = chunks.front();
-    num_buffered_frames -= t.size(0);
-    chunks.pop_front();
+  if (num_chunks > 0) {
+    int64_t max_frames = num_chunks * frames_per_chunk;
+    while (num_buffered_frames > max_frames) {
+      TORCH_WARN_ONCE(
+          "The number of buffered frames exceeded the buffer size. "
+          "Dropping the old frames. "
+          "To avoid this, you can set a higher buffer_chunk_size value.");
+      torch::Tensor& t = chunks.front();
+      num_buffered_frames -= t.size(0);
+      chunks.pop_front();
+    }
   }
 }
 
@@ -78,15 +80,17 @@ void ChunkedVideoBuffer::push_tensor(const torch::Tensor& frame) {
   num_buffered_frames += frame.size(0);
 
   // Trim
-  int64_t max_frames = num_chunks * frames_per_chunk;
-  if (num_buffered_frames > max_frames) {
-    TORCH_WARN_ONCE(
-        "The number of buffered frames exceeded the buffer size. "
-        "Dropping the old frames. "
-        "To avoid this, you can set a higher buffer_chunk_size value.");
-    torch::Tensor& t = chunks.front();
-    num_buffered_frames -= t.size(0);
-    chunks.pop_front();
+  if (num_chunks > 0) {
+    int64_t max_frames = num_chunks * frames_per_chunk;
+    if (num_buffered_frames > max_frames) {
+      TORCH_WARN_ONCE(
+          "The number of buffered frames exceeded the buffer size. "
+          "Dropping the old frames. "
+          "To avoid this, you can set a higher buffer_chunk_size value.");
+      torch::Tensor& t = chunks.front();
+      num_buffered_frames -= t.size(0);
+      chunks.pop_front();
+    }
   }
 }
 
