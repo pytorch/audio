@@ -208,10 +208,10 @@ skipIfNoCuda = _skipIf(
     reason="CUDA is not available.",
     key="NO_CUDA",
 )
-# Skip test if model size is too large.
-# TODO: detect the real model size and compare with CUDA memory.
+# Skip test if CUDA memory is not enough
+# TODO: detect the real CUDA memory size and allow call site to configure how much the test needs
 skipIfCudaSmallMemory = _skipIf(
-    torch.cuda.is_available(),
+    "CI" in os.environ and torch.cuda.is_available(),  # temporary
     reason="CUDA does not have enough memory.",
     key="CUDA_SMALL_MEMORY",
 )

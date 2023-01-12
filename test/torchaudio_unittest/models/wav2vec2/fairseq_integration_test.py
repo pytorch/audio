@@ -78,9 +78,6 @@ ALL_PRETRAINING_CONFIGS = parameterized.expand(
         (WAV2VEC2_LARGE, wav2vec2_large),
         (WAV2VEC2_LARGE_LV60K, wav2vec2_large_lv60k),
         (WAV2VEC2_XLSR_53_56K, wav2vec2_large_lv60k),
-        (WAV2VEC2_XLSR_300M, wav2vec2_xlsr_300m),
-        (WAV2VEC2_XLSR_1B, wav2vec2_xlsr_1b),
-        (WAV2VEC2_XLSR_2B, wav2vec2_xlsr_2b),
         (HUBERT_BASE, hubert_base),
         (HUBERT_LARGE_LL60K, hubert_large),
         (HUBERT_XLARGE_LL60K, hubert_xlarge),
@@ -191,8 +188,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         ref, _ = original.extract_features(x, padding_mask=mask, output_layer=1)
         self.assertEqual(hyp[0], ref)
 
-    @ALL_PRETRAINING_CONFIGS
-    def test_recreate_pretraining_model(self, config, factory_func):
+    def _test_recreate_pretraining_model(self, config, factory_func):
         """Imported pretraining models can be recreated via a factory function without fairseq."""
         batch_size, num_frames = 3, 1024
 
@@ -221,6 +217,15 @@ class TestFairseqIntegration(TorchaudioTestCase):
         hyp, hyp_lengths = reloaded(x, lengths)
         self.assertEqual(ref, hyp)
         self.assertEqual(ref_lengths, hyp_lengths)
+
+    @ALL_PRETRAINING_CONFIGS
+    def test_wav2vec2_recreate_pretraining_model(self, config, factory_func):
+        self._test_recreate_pretraining_model(config, factory_func)
+
+    @skipIfCudaSmallMemory
+    @XLSR_PRETRAINING_CONFIGS
+    def test_xlsr_recreate_pretraining_model(self, config, factory_func):
+        self._test_recreate_pretraining_model(config, factory_func)
 
     @FINETUNING_CONFIGS
     def test_import_finetuning_model(self, config, _):
