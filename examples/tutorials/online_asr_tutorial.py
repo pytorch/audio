@@ -195,6 +195,24 @@ state, hypothesis = None, None
 
 stream_iterator = streamer.stream()
 
+
+def _plot(feats, num_iter, unit=25):
+    unit_dur = segment_length / sample_rate * unit
+    num_plots = num_iter // unit + (1 if num_iter % unit else 0)
+    fig, axes = plt.subplots(num_plots, 1)
+    t0 = 0
+    for i, ax in enumerate(axes):
+        feats_ = feats[i*unit:(i+1)*unit]
+        t1 = t0 + segment_length / sample_rate * len(feats_)
+        feats_ = torch.cat([f[2:-2] for f in feats_])  # remove boundary effect and overlap
+        ax.imshow(feats_.T, extent=[t0, t1, 0, 1], aspect='auto')
+        ax.tick_params(which='both', left=False, labelleft=False)
+        ax.set_xlim(t0, t0 + unit_dur)
+        t0 = t1
+    fig.suptitle("MelSpectrogram Feature")
+    plt.tight_layout()
+
+
 @torch.inference_mode()
 def run_inference(num_iter=100):
     global state, hypothesis
@@ -209,25 +227,12 @@ def run_inference(num_iter=100):
         print(transcript, end="", flush=True)
 
         chunks.append(chunk)
-        feats.append(features[:-4]) # removing the overlap originated from right context.
+        feats.append(features)
         if i == num_iter:
             break
 
     # Plot the features
-    unit = 25
-    unit_dur = segment_length / sample_rate * unit
-    num_plots = num_iter // unit + (1 if num_iter % unit else 0)
-    fig, axes = plt.subplots(num_plots, 1)
-    t0 = 0
-    for i, ax in enumerate(axes):
-        feats_ = feats[i*unit:(i+1)*unit]
-        t1 = t0 + segment_length / sample_rate * len(feats_)
-        ax.imshow(torch.cat(feats_).T, extent=[t0, t1, 0, 1], aspect='auto')
-        ax.tick_params(which='both', left=False, labelleft=False)
-        ax.set_xlim(t0, t0 + unit_dur)
-        t0 = t1
-    fig.suptitle("MelSpectrogram Feature")
-    plt.tight_layout()
+    _plot(feats, num_iter)
     return IPython.display.Audio(torch.cat(chunks).T.numpy(), rate=bundle.sample_rate)
 
 
