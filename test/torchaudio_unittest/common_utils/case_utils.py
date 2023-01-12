@@ -11,7 +11,7 @@ from itertools import zip_longest
 import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import is_kaldi_available, is_module_available, is_sox_available
+from torchaudio._internal.module_utils import is_module_available
 
 from .backend_utils import set_audio_backend
 
@@ -209,12 +209,12 @@ skipIfNoCuda = _skipIf(
     key="NO_CUDA",
 )
 skipIfNoSox = _skipIf(
-    not is_sox_available(),
+    not torchaudio._extension._SOX_INITIALIZED,
     reason="Sox features are not available.",
     key="NO_SOX",
 )
 skipIfNoKaldi = _skipIf(
-    not is_kaldi_available(),
+    not torchaudio._extension._IS_KALDI_AVAILABLE,
     reason="Kaldi features are not available.",
     key="NO_KALDI",
 )

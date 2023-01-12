@@ -3,7 +3,6 @@ from typing import Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import get_buffer_size
 
 from .common import AudioMetaData
@@ -48,7 +47,7 @@ else:
     _fallback_load_fileobj = _fail_load_fileobj
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def info(
     filepath: str,
     format: Optional[str] = None,
@@ -106,7 +105,7 @@ def info(
     return _fallback_info(filepath, format)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def load(
     filepath: str,
     frame_offset: int = 0,
@@ -246,7 +245,7 @@ def load(
     return _fallback_load(filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def save(
     filepath: str,
     src: torch.Tensor,

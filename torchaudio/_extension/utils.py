@@ -1,15 +1,12 @@
-import logging
 import os
-import sys
 from pathlib import Path
 
 import torch
 
+import torchaudio
 from torchaudio._internal.module_utils import is_module_available
 
-_LIB_DIR = Path(__file__).parent / "lib"
-
-_LG = logging.getLogger(__name__)
+_LIB_DIR = Path(__file__).parent.parent / "lib"
 
 
 def _get_lib_path(lib: str):
@@ -57,15 +54,19 @@ def _load_lib(lib: str) -> bool:
     return True
 
 
-_IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
-_FFMPEG_INITIALIZED = False
+def _init_sox():
+    _load_lib("libtorchaudio_sox")
+    import torchaudio.lib._torchaudio_sox  # noqa
+
+    torch.ops.torchaudio.sox_utils_set_verbosity(0)
+
+    import atexit
+
+    torch.ops.torchaudio.sox_effects_initialize_sox_effects()
+    atexit.register(torch.ops.torchaudio.sox_effects_shutdown_sox_effects)
 
 
 def _init_ffmpeg():
-    global _FFMPEG_INITIALIZED
-    if _FFMPEG_INITIALIZED:
-        return
-
     if not is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
         raise RuntimeError(
             "torchaudio is not compiled with FFmpeg integration. Please set USE_FFMPEG=1 when compiling torchaudio."
@@ -82,55 +83,23 @@ def _init_ffmpeg():
     if torch.ops.torchaudio.ffmpeg_get_log_level() > 8:
         torch.ops.torchaudio.ffmpeg_set_log_level(8)
 
-    _FFMPEG_INITIALIZED = True
 
-
-def _init_extension():
+def _init_dll_path():
     # On Windows Python-3.8+ has `os.add_dll_directory` call,
     # which is called to configure dll search path.
     # To find cuda related dlls we need to make sure the
     # conda environment/bin path is configured Please take a look:
     # https://stackoverflow.com/questions/59330863/cant-import-dll-module-in-python
     # Please note: if some path can't be added using add_dll_directory we simply ignore this path
-    if os.name == "nt" and sys.version_info >= (3, 8) and sys.version_info < (3, 9):
-        env_path = os.environ["PATH"]
-        path_arr = env_path.split(";")
-        for path in path_arr:
-            if os.path.exists(path):
-                try:
-                    os.add_dll_directory(path)
-                except Exception:
-                    pass
-
-    if _IS_TORCHAUDIO_EXT_AVAILABLE:
-        try:
-            _load_lib("libtorchaudio")
-            import torchaudio.lib._torchaudio  # noqa
-        except Exception:
-            _LG.debug("Failed to initialize libtorchaudio", exc_info=True)
-
-    if is_module_available("torchaudio.lib._torchaudio_sox"):
-        try:
-            _load_lib("libtorchaudio_sox")
-            import torchaudio.lib._torchaudio_sox  # noqa
-        except Exception:
-            _LG.debug("Failed to initialize libsox bindings", exc_info=True)
-
-    # If the FFmpeg integration is not properly initialized, then detailed error
-    # will be raised when client code attempts to import the dedicated feature.
-    if is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
-        try:
-            _init_ffmpeg()
-        except Exception:
-            _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
+    for path in os.environ.get("PATH", "").split(";"):
+        if os.path.exists(path):
+            try:
+                os.add_dll_directory(path)
+            except Exception:
+                pass
 
 
 def _check_cuda_version():
-    if not _IS_TORCHAUDIO_EXT_AVAILABLE:
-        return None
-
-    import torchaudio.lib._torchaudio
-
     version = torchaudio.lib._torchaudio.cuda_version()
     if version is not None and torch.version.cuda is not None:
         version_str = str(version)
@@ -144,7 +113,3 @@ def _check_cuda_version():
                 "Please install the TorchAudio version that matches your PyTorch version."
             )
     return version
-
-
-_init_extension()
-_check_cuda_version()

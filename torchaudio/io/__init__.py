@@ -18,7 +18,8 @@ _LAZILY_IMPORTED = _STREAM_READER + _STREAM_WRITER
 
 def __getattr__(name: str):
     if name in _LAZILY_IMPORTED:
-        torchaudio._extension._init_ffmpeg()
+        if not torchaudio._extension._FFMPEG_INITIALIZED:
+            torchaudio._extension._init_ffmpeg()
 
         if name in _STREAM_READER:
             from . import _stream_reader
