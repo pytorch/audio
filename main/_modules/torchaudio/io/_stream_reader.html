@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230110) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230112) &#x25BC</a>
     </div>
     
 
@@ -603,11 +603,16 @@
 
 <span class="n">_frames_per_chunk</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Number of frames returned as one chunk.</span>
 <span class="s2">                If the source stream is exhausted before enough frames are buffered,</span>
-<span class="s2">                then the chunk is returned as-is.&quot;&quot;&quot;</span>
+<span class="s2">                then the chunk is returned as-is.</span>
+
+<span class="s2">                Providing ``-1`` disables chunking and :py:func:`pop_chunks` method</span>
+<span class="s2">                will concatenate all the buffered frames and return it.&quot;&quot;&quot;</span>
 
 <span class="n">_buffer_chunk_size</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Internal buffer size.</span>
 <span class="s2">                When the number of chunks buffered exceeds this number, old frames are</span>
-<span class="s2">                dropped.</span>
+<span class="s2">                dropped. For example, if `frames_per_chunk` is 5 and `buffer_chunk_size` is</span>
+<span class="s2">                3, then frames older than 15 are dropped.</span>
+<span class="s2">                Providing ``-1`` disables this behavior.</span>
 
 <span class="s2">                Default: ``3``.&quot;&quot;&quot;</span>
 

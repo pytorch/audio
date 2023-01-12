@@ -120,8 +120,8 @@ encoding.
 
  .. code-block:: none
 
-    2.0.0.dev20230108
-    2.0.0.dev20230110
+    2.0.0.dev20230112
+    2.0.0.dev20230112
     cpu
 
 
@@ -301,7 +301,7 @@ fetched.
 
  .. code-block:: none
 
-      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 56.0k/63.6M [00:00<03:29, 319kB/s]      0%|          | 264k/63.6M [00:00<01:20, 830kB/s]       2%|1         | 1.10M/63.6M [00:00<00:24, 2.69MB/s]      6%|5         | 3.76M/63.6M [00:00<00:08, 7.73MB/s]     11%|#         | 6.79M/63.6M [00:00<00:05, 11.3MB/s]     15%|#5        | 9.85M/63.6M [00:01<00:04, 13.5MB/s]     20%|##        | 12.9M/63.6M [00:01<00:03, 14.9MB/s]     25%|##5       | 16.1M/63.6M [00:01<00:03, 16.0MB/s]     30%|###       | 19.2M/63.6M [00:01<00:02, 16.7MB/s]     35%|###5      | 22.5M/63.6M [00:01<00:02, 17.3MB/s]     40%|####      | 25.7M/63.6M [00:01<00:02, 17.8MB/s]     45%|####5     | 28.9M/63.6M [00:02<00:01, 20.8MB/s]     49%|####8     | 31.0M/63.6M [00:02<00:01, 18.2MB/s]     53%|#####3    | 33.9M/63.6M [00:02<00:01, 17.9MB/s]     58%|#####7    | 36.9M/63.6M [00:02<00:01, 20.6MB/s]     61%|######1   | 39.0M/63.6M [00:02<00:01, 18.0MB/s]     66%|######6   | 42.3M/63.6M [00:02<00:01, 18.4MB/s]     72%|#######1  | 45.7M/63.6M [00:03<00:01, 18.8MB/s]     77%|#######7  | 49.0M/63.6M [00:03<00:00, 22.1MB/s]     81%|########  | 51.3M/63.6M [00:03<00:00, 19.3MB/s]     85%|########5 | 54.2M/63.6M [00:03<00:00, 18.6MB/s]     90%|######### | 57.4M/63.6M [00:03<00:00, 21.6MB/s]     94%|#########3| 59.6M/63.6M [00:03<00:00, 18.8MB/s]     99%|#########8| 62.9M/63.6M [00:03<00:00, 18.9MB/s]    100%|##########| 63.6M/63.6M [00:03<00:00, 16.7MB/s]
+      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 64.0k/63.6M [00:00<03:04, 361kB/s]      0%|          | 296k/63.6M [00:00<01:12, 917kB/s]       2%|1         | 1.26M/63.6M [00:00<00:21, 3.05MB/s]      6%|6         | 4.07M/63.6M [00:00<00:07, 8.25MB/s]     11%|#         | 6.97M/63.6M [00:00<00:04, 13.5MB/s]     14%|#3        | 8.73M/63.6M [00:01<00:04, 12.4MB/s]     18%|#8        | 11.5M/63.6M [00:01<00:03, 16.4MB/s]     21%|##1       | 13.5M/63.6M [00:01<00:03, 14.8MB/s]     26%|##5       | 16.3M/63.6M [00:01<00:02, 18.1MB/s]     29%|##8       | 18.4M/63.6M [00:01<00:02, 16.2MB/s]     33%|###2      | 20.8M/63.6M [00:01<00:02, 18.1MB/s]     36%|###6      | 22.9M/63.6M [00:01<00:02, 19.2MB/s]     40%|###9      | 25.3M/63.6M [00:01<00:02, 17.8MB/s]     43%|####3     | 27.6M/63.6M [00:02<00:01, 19.1MB/s]     47%|####7     | 30.1M/63.6M [00:02<00:01, 20.7MB/s]     51%|#####1    | 32.5M/63.6M [00:02<00:01, 19.1MB/s]     54%|#####4    | 34.5M/63.6M [00:02<00:01, 19.4MB/s]     58%|#####8    | 37.0M/63.6M [00:02<00:01, 21.2MB/s]     62%|######1   | 39.4M/63.6M [00:02<00:01, 22.4MB/s]     66%|######5   | 42.0M/63.6M [00:02<00:01, 20.0MB/s]     70%|#######   | 44.6M/63.6M [00:02<00:00, 22.0MB/s]     74%|#######4  | 47.2M/63.6M [00:02<00:00, 23.3MB/s]     78%|#######8  | 49.9M/63.6M [00:03<00:00, 21.4MB/s]     82%|########1 | 52.0M/63.6M [00:03<00:00, 21.6MB/s]     86%|########5 | 54.7M/63.6M [00:03<00:00, 23.3MB/s]     90%|######### | 57.5M/63.6M [00:03<00:00, 24.8MB/s]     95%|#########4| 60.2M/63.6M [00:03<00:00, 22.5MB/s]     98%|#########8| 62.5M/63.6M [00:03<00:00, 22.7MB/s]    100%|##########| 63.6M/63.6M [00:03<00:00, 18.2MB/s]
     tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
              20, 11, 79, 77, 59, 37,  2]])
     tensor([25], dtype=torch.int32)
@@ -393,7 +393,7 @@ For the available bundles, and its usage, please refer to
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     27%|##7       | 29.5M/107M [00:00<00:00, 309MB/s]     57%|#####7    | 61.8M/107M [00:00<00:00, 326MB/s]     86%|########6 | 92.9M/107M [00:00<00:00, 316MB/s]    100%|##########| 107M/107M [00:00<00:00, 319MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     14%|#3        | 14.8M/107M [00:00<00:01, 62.4MB/s]     19%|#9        | 20.8M/107M [00:00<00:01, 58.4MB/s]     29%|##8       | 30.8M/107M [00:00<00:01, 55.5MB/s]     35%|###5      | 37.8M/107M [00:00<00:01, 60.2MB/s]     45%|####4     | 48.0M/107M [00:00<00:00, 66.5MB/s]     60%|#####9    | 64.0M/107M [00:01<00:00, 66.6MB/s]     73%|#######3  | 78.8M/107M [00:01<00:00, 72.1MB/s]     80%|#######9  | 85.8M/107M [00:01<00:00, 70.4MB/s]     89%|########9 | 95.7M/107M [00:01<00:00, 71.4MB/s]     95%|#########5| 103M/107M [00:01<00:00, 67.3MB/s]     100%|##########| 107M/107M [00:01<00:00, 66.0MB/s]
 
 
 
@@ -500,7 +500,7 @@ WaveRNN model from the same bundle.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
-      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 388MB/s]
+      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 342MB/s]
 
 
 .. raw:: html
@@ -566,7 +566,7 @@ method and pass the spectrogram.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     33%|###2      | 35.2M/107M [00:00<00:00, 368MB/s]     65%|######5   | 70.3M/107M [00:00<00:00, 339MB/s]    100%|##########| 107M/107M [00:00<00:00, 363MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     14%|#3        | 14.8M/107M [00:00<00:00, 121MB/s]     24%|##4       | 26.3M/107M [00:00<00:00, 85.2MB/s]     32%|###2      | 34.8M/107M [00:00<00:01, 72.1MB/s]     44%|####3     | 46.8M/107M [00:00<00:00, 87.3MB/s]     52%|#####1    | 55.8M/107M [00:00<00:00, 71.7MB/s]     60%|#####9    | 64.0M/107M [00:00<00:00, 64.1MB/s]     74%|#######4  | 79.7M/107M [00:01<00:00, 73.3MB/s]     81%|########  | 86.9M/107M [00:01<00:00, 60.0MB/s]     88%|########8 | 94.8M/107M [00:01<00:00, 56.7MB/s]     93%|#########3| 100M/107M [00:01<00:00, 47.2MB/s]     100%|##########| 107M/107M [00:01<00:00, 63.8MB/s]
 
 
 .. raw:: html
@@ -638,7 +638,7 @@ module.
 
  .. code-block:: none
 
-    /usr/local/envs/python3.8/lib/python3.8/site-packages/torch/hub.py:265: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torch/hub.py:286: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
       warnings.warn(
     Downloading: "https://github.com/NVIDIA/DeepLearningExamples/zipball/torchhub" to /root/.cache/torch/hub/torchhub.zip
     /root/.cache/torch/hub/NVIDIA_DeepLearningExamples_torchhub/PyTorch/Classification/ConvNets/image_classification/models/common.py:13: UserWarning: pytorch_quantization module not found, quantization will not be available
@@ -664,7 +664,7 @@ module.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  27.726 seconds)
+   **Total running time of the script:** ( 2 minutes  22.637 seconds)
 
 
 .. _sphx_glr_download_tutorials_tacotron2_pipeline_tutorial.py:

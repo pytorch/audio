@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230110) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230112) &#x25BC</a>
     </div>
     
 
@@ -555,12 +555,17 @@ the input devices available in the current environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of frames returned as one chunk.
+<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – <p>Number of frames returned as one chunk.
 If the source stream is exhausted before enough frames are buffered,
-then the chunk is returned as-is.</p></li>
+then the chunk is returned as-is.</p>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables chunking and <a class="reference internal" href="#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-func docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a> method
+will concatenate all the buffered frames and return it.</p>
+</p></li>
 <li><p><strong>buffer_chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Internal buffer size.
 When the number of chunks buffered exceeds this number, old frames are
-dropped.</p>
+dropped. For example, if <cite>frames_per_chunk</cite> is 5 and <cite>buffer_chunk_size</cite> is
+3, then frames older than 15 are dropped.
+Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables this behavior.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
 </p></li>
 <li><p><strong>stream_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The source audio stream index.
@@ -620,12 +625,17 @@ Note that complex filters are not supported.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of frames returned as one chunk.
+<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – <p>Number of frames returned as one chunk.
 If the source stream is exhausted before enough frames are buffered,
-then the chunk is returned as-is.</p></li>
+then the chunk is returned as-is.</p>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables chunking and <a class="reference internal" href="#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-func docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a> method
+will concatenate all the buffered frames and return it.</p>
+</p></li>
 <li><p><strong>buffer_chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Internal buffer size.
 When the number of chunks buffered exceeds this number, old frames are
-dropped.</p>
+dropped. For example, if <cite>frames_per_chunk</cite> is 5 and <cite>buffer_chunk_size</cite> is
+3, then frames older than 15 are dropped.
+Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables this behavior.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
 </p></li>
 <li><p><strong>stream_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The source audio stream index.
@@ -697,12 +707,17 @@ as following.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of frames returned as one chunk.
+<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – <p>Number of frames returned as one chunk.
 If the source stream is exhausted before enough frames are buffered,
-then the chunk is returned as-is.</p></li>
+then the chunk is returned as-is.</p>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables chunking and <a class="reference internal" href="#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-func docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a> method
+will concatenate all the buffered frames and return it.</p>
+</p></li>
 <li><p><strong>buffer_chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Internal buffer size.
 When the number of chunks buffered exceeds this number, old frames are
-dropped.</p>
+dropped. For example, if <cite>frames_per_chunk</cite> is 5 and <cite>buffer_chunk_size</cite> is
+3, then frames older than 15 are dropped.
+Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables this behavior.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
 </p></li>
 <li><p><strong>stream_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The source video stream index.
@@ -778,12 +793,17 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of frames returned as one chunk.
+<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – <p>Number of frames returned as one chunk.
 If the source stream is exhausted before enough frames are buffered,
-then the chunk is returned as-is.</p></li>
+then the chunk is returned as-is.</p>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables chunking and <a class="reference internal" href="#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-func docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a> method
+will concatenate all the buffered frames and return it.</p>
+</p></li>
 <li><p><strong>buffer_chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Internal buffer size.
 When the number of chunks buffered exceeds this number, old frames are
-dropped.</p>
+dropped. For example, if <cite>frames_per_chunk</cite> is 5 and <cite>buffer_chunk_size</cite> is
+3, then frames older than 15 are dropped.
+Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables this behavior.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
 </p></li>
 <li><p><strong>stream_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The source video stream index.
