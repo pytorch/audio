@@ -12,6 +12,16 @@ std::unique_ptr<Buffer> get_buffer(
     int frames_per_chunk,
     int num_chunks,
     const torch::Device& device) {
+  TORCH_CHECK(
+      frames_per_chunk > 0 || frames_per_chunk == -1,
+      "`frames_per_chunk` must be positive or -1. Found: ",
+      frames_per_chunk);
+
+  TORCH_CHECK(
+      num_chunks > 0 || num_chunks == -1,
+      "`num_chunks` must be positive or -1. Found: ",
+      num_chunks);
+
   switch (type) {
     case AVMEDIA_TYPE_AUDIO: {
       if (frames_per_chunk < 0) {

@@ -216,11 +216,16 @@ def _format_doc(**kwargs):
 
 _frames_per_chunk = """Number of frames returned as one chunk.
                 If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is."""
+                then the chunk is returned as-is.
+
+                Providing ``-1`` disables chunking and :py:func:`pop_chunks` method
+                will concatenate all the buffered frames and return it."""
 
 _buffer_chunk_size = """Internal buffer size.
                 When the number of chunks buffered exceeds this number, old frames are
-                dropped.
+                dropped. For example, if `frames_per_chunk` is 5 and `buffer_chunk_size` is
+                3, then frames older than 15 are dropped.
+                Providing ``-1`` disables this behavior.
 
                 Default: ``3``."""
 
