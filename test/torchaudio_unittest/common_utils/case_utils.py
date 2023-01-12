@@ -208,6 +208,13 @@ skipIfNoCuda = _skipIf(
     reason="CUDA is not available.",
     key="NO_CUDA",
 )
+# Skip test if model size is too large.
+# TODO: detect the real model size and compare with CUDA memory.
+skipIfCudaSmallMemory = _skipIf(
+    torch.cuda.is_available(),
+    reason="CUDA does not have enough memory.",
+    key="CUDA_SMALL_MEMORY",
+)
 skipIfNoSox = _skipIf(
     not torchaudio._extension._SOX_INITIALIZED,
     reason="Sox features are not available.",

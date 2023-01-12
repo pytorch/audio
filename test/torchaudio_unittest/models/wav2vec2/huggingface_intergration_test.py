@@ -13,7 +13,13 @@ from torchaudio.models.wav2vec2 import (
     wavlm_large,
 )
 from torchaudio.models.wav2vec2.utils import import_huggingface_model
-from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase, zip_equal
+from torchaudio_unittest.common_utils import (
+    get_asset_path,
+    skipIfCudaSmallMemory,
+    skipIfNoModule,
+    TorchaudioTestCase,
+    zip_equal,
+)
 
 
 def _load_config(*paths):
@@ -51,6 +57,11 @@ PRETRAIN_CONFIGS = parameterized.expand(
         (HF_LARGE_LV60, wav2vec2_large_lv60k),
         (HF_LARGE_XLSR_53, wav2vec2_large_lv60k),
         (HF_BASE_10K_VOXPOPULI, wav2vec2_base),
+    ],
+    name_func=_name_func,
+)
+XLSR_PRETRAIN_CONFIGS = parameterized.expand(
+    [
         (HF_XLSR_300M, wav2vec2_xlsr_300m),
         (HF_XLSR_1B, wav2vec2_xlsr_1b),
         (HF_XLSR_2B, wav2vec2_xlsr_2b),
@@ -167,6 +178,14 @@ class TestHFIntegration(TorchaudioTestCase):
     @PRETRAIN_CONFIGS
     def test_import_pretrain(self, config, _):
         """wav2vec2 models from HF transformers can be imported and yields the same results"""
+        original = self._get_model(config).eval()
+        imported = import_huggingface_model(original).eval()
+        self._test_import_pretrain(original, imported, config)
+
+    @skipIfCudaSmallMemory
+    @XLSR_PRETRAIN_CONFIGS
+    def test_import_xlsr_pretrain(self, config, _):
+        """XLS-R models from HF transformers can be imported and yields the same results"""
         original = self._get_model(config).eval()
         imported = import_huggingface_model(original).eval()
         self._test_import_pretrain(original, imported, config)

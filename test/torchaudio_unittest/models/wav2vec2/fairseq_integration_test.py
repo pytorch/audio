@@ -14,7 +14,7 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_xlsr_300m,
 )
 from torchaudio.models.wav2vec2.utils import import_fairseq_model
-from torchaudio_unittest.common_utils import get_asset_path, skipIfNoModule, TorchaudioTestCase
+from torchaudio_unittest.common_utils import get_asset_path, skipIfCudaSmallMemory, skipIfNoModule, TorchaudioTestCase
 
 
 def _load_config(*paths):
@@ -53,6 +53,11 @@ WAV2VEC2_PRETRAINING_CONFIGS = parameterized.expand(
         (WAV2VEC2_LARGE, wav2vec2_large),
         (WAV2VEC2_LARGE_LV60K, wav2vec2_large_lv60k),
         (WAV2VEC2_XLSR_53_56K, wav2vec2_large_lv60k),
+    ],
+    name_func=_name_func,
+)
+XLSR_PRETRAINING_CONFIGS = parameterized.expand(
+    [
         (WAV2VEC2_XLSR_300M, wav2vec2_xlsr_300m),
         (WAV2VEC2_XLSR_1B, wav2vec2_xlsr_1b),
         (WAV2VEC2_XLSR_2B, wav2vec2_xlsr_2b),
@@ -147,6 +152,23 @@ class TestFairseqIntegration(TorchaudioTestCase):
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
         for i, (ref, _) in enumerate(refs["layer_results"]):
             self.assertEqual(hyp[i], ref.transpose(0, 1))
+
+    @skipIfCudaSmallMemory
+    @XLSR_PRETRAINING_CONFIGS
+    def test_import_xlsr_pretraining_model(self, config, factory_func):
+        """XLS-R pretraining models from fairseq can be imported and yields the same results"""
+        batch_size, num_frames = 3, 1024
+
+        original = self._get_model(config).eval()
+        imported = import_fairseq_model(original).eval()
+
+        x = torch.randn(batch_size, num_frames)
+        hyp, _ = imported.extract_features(x)
+        refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
+        for i, (ref, _) in enumerate(refs["layer_results"]):
+            # There is one element whose difference is over 1e-5 in wav2vec2_xlsr_1b and wav2vec2_xlsr_2b.
+            atol = 1.0e-05 if factory_func is wav2vec2_xlsr_300m else 1e-4
+            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=atol, rtol=1.3e-6)
 
     @HUBERT_PRETRAINING_CONFIGS
     def test_import_hubert_pretraining_model(self, config, factory_func):
