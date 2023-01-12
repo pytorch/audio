@@ -205,7 +205,7 @@ def _plot(feats, num_iter, unit=25):
         feats_ = feats[i*unit:(i+1)*unit]
         t1 = t0 + segment_length / sample_rate * len(feats_)
         feats_ = torch.cat([f[2:-2] for f in feats_])  # remove boundary effect and overlap
-        ax.imshow(feats_.T, extent=[t0, t1, 0, 1], aspect='auto')
+        ax.imshow(feats_.T, extent=[t0, t1, 0, 1], aspect="auto", origin="lower")
         ax.tick_params(which='both', left=False, labelleft=False)
         ax.set_xlim(t0, t0 + unit_dur)
         t0 = t1
