@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230112) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230113) &#x25BC</a>
     </div>
     
 
@@ -396,7 +396,6 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 
 <span class="kn">from</span> <span class="nn">.filtering</span> <span class="kn">import</span> <span class="n">highpass_biquad</span><span class="p">,</span> <span class="n">treble_biquad</span>
 
@@ -1652,7 +1651,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">specgram</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">specgram</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
+<div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
 <span class="k">def</span> <span class="nf">apply_codec</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1696,7 +1695,7 @@
     <span class="k">return</span> <span class="n">augmented</span></div>
 
 
-<div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../generated/torchaudio.functional.compute_kaldi_pitch.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_kaldi</span><span class="p">()</span>
+<div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../generated/torchaudio.functional.compute_kaldi_pitch.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_kaldi</span>
 <span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230112) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230113) &#x25BC</a>
     </div>
     
 
@@ -1808,6 +1808,156 @@
         <span class="n">encoder_max_distance</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
         <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="wav2vec2_xlsr_300m"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_300m.html#torchaudio.models.wav2vec2_xlsr_300m">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_xlsr_300m</span><span class="p">(</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds XLS-R model :cite:`babu2021xls` with 300 millions of parameters. The architecture is compatible</span>
+<span class="sd">    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is</span>
+<span class="sd">    :class:`~torchaudio.models.Wav2Vec2Model`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        aux_num_out (int, optional):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="wav2vec2_xlsr_1b"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_1b.html#torchaudio.models.wav2vec2_xlsr_1b">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_xlsr_1b</span><span class="p">(</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds XLS-R model :cite:`babu2021xls` with 1 billion of parameters. The architecture is compatible</span>
+<span class="sd">    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is</span>
+<span class="sd">    :class:`~torchaudio.models.Wav2Vec2Model`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        aux_num_out (int, optional):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">5120</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
+        <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_layer_drop</span><span class="o">=</span><span class="n">encoder_layer_drop</span><span class="p">,</span>
+        <span class="n">aux_num_out</span><span class="o">=</span><span class="n">aux_num_out</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="wav2vec2_xlsr_2b"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_2b.html#torchaudio.models.wav2vec2_xlsr_2b">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_xlsr_2b</span><span class="p">(</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">encoder_layer_drop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">aux_num_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds XLS-R model :cite:`babu2021xls` with 2 billions of parameters. The architecture is compatible</span>
+<span class="sd">    with Wav2Vec2 model :cite:`baevski2020wav2vec`, and so the output class is</span>
+<span class="sd">    :class:`~torchaudio.models.Wav2Vec2Model`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_attention_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_ff_interm_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        encoder_layer_drop (float):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+<span class="sd">        aux_num_out (int, optional):</span>
+<span class="sd">            See :py:func:`~torchaudio.models.wav2vec2_model`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">wav2vec2_model</span><span class="p">(</span>
+        <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="n">extractor_conv_layer_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extractor_conv_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">1920</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_kernel</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">encoder_pos_conv_groups</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">encoder_attention_dropout</span><span class="o">=</span><span class="n">encoder_attention_dropout</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">7680</span><span class="p">,</span>
         <span class="n">encoder_ff_interm_dropout</span><span class="o">=</span><span class="n">encoder_ff_interm_dropout</span><span class="p">,</span>
         <span class="n">encoder_dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
         <span class="n">encoder_layer_norm_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

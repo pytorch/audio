@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230112) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230113) &#x25BC</a>
     </div>
     
 
@@ -390,12 +390,10 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 <span class="kn">from</span> <span class="nn">torchaudio.utils.sox_utils</span> <span class="kn">import</span> <span class="n">list_effects</span>
 
 
-<div class="viewcode-block" id="init_sox_effects"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.init_sox_effects.html#torchaudio.sox_effects.init_sox_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">init_sox_effects</span><span class="p">():</span>
+<div class="viewcode-block" id="init_sox_effects"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.init_sox_effects.html#torchaudio.sox_effects.init_sox_effects">[docs]</a><span class="k">def</span> <span class="nf">init_sox_effects</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize resources required to use sox effects.</span>
 
 <span class="sd">    Note:</span>
@@ -406,11 +404,10 @@
 <span class="sd">    Once :func:`shutdown_sox_effects` is called, you can no longer use SoX effects and initializing</span>
 <span class="sd">    again will result in error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_initialize_sox_effects</span><span class="p">()</span></div>
+    <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="shutdown_sox_effects"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.shutdown_sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">shutdown_sox_effects</span><span class="p">():</span>
+<div class="viewcode-block" id="shutdown_sox_effects"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.shutdown_sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">[docs]</a><span class="k">def</span> <span class="nf">shutdown_sox_effects</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean up resources required to use sox effects.</span>
 
 <span class="sd">    Note:</span>
@@ -420,10 +417,10 @@
 <span class="sd">    Once :py:func:`shutdown_sox_effects` is called, you can no longer use SoX effects and</span>
 <span class="sd">    initializing again will result in error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_shutdown_sox_effects</span><span class="p">()</span></div>
+    <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="effect_names"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.effect_names.html#torchaudio.sox_effects.effect_names">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
+<div class="viewcode-block" id="effect_names"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.effect_names.html#torchaudio.sox_effects.effect_names">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
 <span class="k">def</span> <span class="nf">effect_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets list of valid sox effect names</span>
 
@@ -437,7 +434,7 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">list_effects</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="apply_effects_tensor"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_tensor.html#torchaudio.sox_effects.apply_effects_tensor">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
+<div class="viewcode-block" id="apply_effects_tensor"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_tensor.html#torchaudio.sox_effects.apply_effects_tensor">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
 <span class="k">def</span> <span class="nf">apply_effects_tensor</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -542,7 +539,7 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
+<div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
 <span class="k">def</span> <span class="nf">apply_effects_file</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>

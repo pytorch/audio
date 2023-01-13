@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230112) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230113) &#x25BC</a>
     </div>
     
 
@@ -395,8 +395,21 @@
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
 
-<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_soundfile_available</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">soundfile</span>
+<span class="c1"># TODO: import soundfile only when it is used.</span>
+<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">soundfile</span>
+
+        <span class="n">_requires_soundfile</span> <span class="o">=</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">no_op</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">_requires_soundfile</span> <span class="o">=</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">fail_with_message</span><span class="p">(</span>
+            <span class="s2">&quot;requires soundfile, but we failed to import it. Please check the installation of soundfile.&quot;</span>
+        <span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_requires_soundfile</span> <span class="o">=</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">fail_with_message</span><span class="p">(</span>
+        <span class="s2">&quot;requires soundfile, but it is not installed. Please install soundfile.&quot;</span>
+    <span class="p">)</span>
+
 
 <span class="c1"># Mapping from soundfile subtype to number of bits per sample.</span>
 <span class="c1"># This is mostly heuristical and the value is set to 0 when it is irrelevant</span>
@@ -468,7 +481,7 @@
     <span class="k">return</span> <span class="n">_SUBTYPE_TO_ENCODING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_soundfile</span><span class="p">()</span>
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.info">[docs]</a><span class="nd">@_requires_soundfile</span>
 <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
@@ -507,7 +520,7 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_soundfile</span><span class="p">()</span>
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.load">[docs]</a><span class="nd">@_requires_soundfile</span>
 <span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -686,7 +699,7 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_soundfile</span><span class="p">()</span>
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.save">[docs]</a><span class="nd">@_requires_soundfile</span>
 <span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>

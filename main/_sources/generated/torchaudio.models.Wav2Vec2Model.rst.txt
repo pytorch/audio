@@ -50,6 +50,9 @@ Factory Functions
    ~torchaudio.models.wav2vec2_base
    ~torchaudio.models.wav2vec2_large
    ~torchaudio.models.wav2vec2_large_lv60k
+   ~torchaudio.models.wav2vec2_xlsr_300m
+   ~torchaudio.models.wav2vec2_xlsr_1b
+   ~torchaudio.models.wav2vec2_xlsr_2b
    ~torchaudio.models.hubert_base
    ~torchaudio.models.hubert_large
    ~torchaudio.models.hubert_xlarge
