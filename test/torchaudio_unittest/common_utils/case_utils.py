@@ -230,6 +230,11 @@ skipIfNoCtcDecoder = _skipIf(
     reason="CTC decoder not available.",
     key="NO_CTC_DECODER",
 )
+skipIfNotInCI = _skipIf(
+    not "CI" in os.environ,
+    reason="OS environment is not CI.",
+    key="NOT_IN_CI",
+)
 skipIfRocm = _skipIf(
     _eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
     reason="The test doesn't currently work on the ROCm stack.",

@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 import torchaudio
 from torchaudio.pipelines import (
@@ -24,10 +26,16 @@ from torchaudio.pipelines import (
     WAV2VEC2_LARGE,
     WAV2VEC2_LARGE_LV60K,
     WAV2VEC2_XLSR53,
+    WAV2VEC2_XLSR_1B,
+    WAV2VEC2_XLSR_2B,
+    WAV2VEC2_XLSR_300M,
     WAVLM_BASE,
     WAVLM_BASE_PLUS,
     WAVLM_LARGE,
 )
+
+sys.path.append("..")
+from torchaudio_unittest.common_utils.case_utils import skipIfNotInCI
 
 
 @pytest.mark.parametrize(
@@ -46,6 +54,20 @@ from torchaudio.pipelines import (
     ],
 )
 def test_pretraining_models(bundle):
+    """Smoke test of downloading weights for pretraining models"""
+    bundle.get_model()
+
+
+@skipIfNotInCI
+@pytest.mark.parametrize(
+    "bundle",
+    [
+        WAV2VEC2_XLSR_300M,
+        WAV2VEC2_XLSR_1B,
+        WAV2VEC2_XLSR_2B,
+    ],
+)
+def test_xlsr_pretraining_models(bundle):
     """Smoke test of downloading weights for pretraining models"""
     bundle.get_model()
 
