@@ -11,7 +11,7 @@ from itertools import zip_longest
 import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import is_kaldi_available, is_module_available, is_sox_available
+from torchaudio._internal.module_utils import is_module_available
 
 from .backend_utils import set_audio_backend
 
@@ -208,13 +208,20 @@ skipIfNoCuda = _skipIf(
     reason="CUDA is not available.",
     key="NO_CUDA",
 )
+# Skip test if CUDA memory is not enough
+# TODO: detect the real CUDA memory size and allow call site to configure how much the test needs
+skipIfCudaSmallMemory = _skipIf(
+    "CI" in os.environ and torch.cuda.is_available(),  # temporary
+    reason="CUDA does not have enough memory.",
+    key="CUDA_SMALL_MEMORY",
+)
 skipIfNoSox = _skipIf(
-    not is_sox_available(),
+    not torchaudio._extension._SOX_INITIALIZED,
     reason="Sox features are not available.",
     key="NO_SOX",
 )
 skipIfNoKaldi = _skipIf(
-    not is_kaldi_available(),
+    not torchaudio._extension._IS_KALDI_AVAILABLE,
     reason="Kaldi features are not available.",
     key="NO_KALDI",
 )

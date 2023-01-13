@@ -23,7 +23,7 @@ def list_audio_backends() -> List[str]:
     backends = []
     if _mod_utils.is_module_available("soundfile"):
         backends.append("soundfile")
-    if _mod_utils.is_sox_available():
+    if torchaudio._extension._SOX_INITIALIZED:
         backends.append("sox_io")
     return backends
 
