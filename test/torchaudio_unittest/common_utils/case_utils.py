@@ -231,7 +231,7 @@ skipIfNoCtcDecoder = _skipIf(
     key="NO_CTC_DECODER",
 )
 skipIfNotInCI = _skipIf(
-    not "CI" in os.environ,
+    "CI" not in os.environ,
     reason="OS environment is not CI.",
     key="NOT_IN_CI",
 )
