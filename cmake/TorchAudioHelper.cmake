@@ -60,6 +60,7 @@ endif()
 
 
 if (USE_CUDA)
+  message(STATUS "Setting cuda_deps")
   add_library(cuda_deps INTERFACE)
   target_include_directories(cuda_deps INTERFACE ${CUDA_TOOLKIT_INCLUDE})
   target_compile_definitions(cuda_deps INTERFACE USE_CUDA)

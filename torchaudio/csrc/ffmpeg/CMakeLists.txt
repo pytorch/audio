@@ -4,6 +4,7 @@ add_library(ffmpeg INTERFACE)
 target_include_directories(ffmpeg INTERFACE "${FFMPEG_INCLUDE_DIRS}")
 target_link_libraries(ffmpeg INTERFACE "${FFMPEG_LIBRARIES}")
 
+message(STATUS "USE_CUDA=${USE_CUDA}")
 
 set(
   sources
@@ -26,6 +27,7 @@ set(
   )
 
 if (USE_CUDA)
+  message(STATUS "Compiling FFmpeg extension with GPU acceleration.")
   set(
     additional_lib
     cuda_deps)
