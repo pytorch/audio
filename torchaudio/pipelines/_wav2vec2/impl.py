@@ -110,6 +110,9 @@ class Wav2Vec2Bundle:
             - WAV2VEC2_ASR_LARGE_LV60K_100H
             - WAV2VEC2_ASR_LARGE_LV60K_960H
             - WAV2VEC2_XLSR53
+            - WAV2VEC2_XLSR_300M
+            - WAV2VEC2_XLSR_1B
+            - WAV2VEC2_XLSR_2B
             - HUBERT_LARGE
             - HUBERT_XLARGE
             - HUBERT_ASR_LARGE
@@ -1412,6 +1415,155 @@ Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT L
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
 `Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+"""  # noqa: E501
+
+
+WAV2VEC2_XLSR_300M = Wav2Vec2Bundle(
+    "wav2vec2_xlsr_300m.pth",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _model_type="Wav2Vec2",
+    _sample_rate=16000,
+    _normalize_waveform=True,
+)
+WAV2VEC2_XLSR_300M.__doc__ = """XLS-R model with 300 millions of parameters,
+pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* :cite:`Pratap_2020`,
+*CommonVoice* :cite:`ardila2020common`,
+*VoxLingua107* :cite:`valk2021voxlingua107`,
+*BABEL* :cite:`Gales2014SpeechRA`, and
+*VoxPopuli* :cite:`voxpopuli`) in 128 languages,
+not fine-tuned.
+
+Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
+`Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+"""  # noqa: E501
+
+
+WAV2VEC2_XLSR_1B = Wav2Vec2Bundle(
+    "wav2vec2_xlsr_1b.pth",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1280,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 48,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 5120,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _model_type="Wav2Vec2",
+    _sample_rate=16000,
+    _normalize_waveform=True,
+)
+WAV2VEC2_XLSR_1B.__doc__ = """XLS-R model with 1 billion of parameters,
+pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* :cite:`Pratap_2020`,
+*CommonVoice* :cite:`ardila2020common`,
+*VoxLingua107* :cite:`valk2021voxlingua107`,
+*BABEL* :cite:`Gales2014SpeechRA`, and
+*VoxPopuli* :cite:`voxpopuli`) in 128 languages,
+not fine-tuned.
+
+Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
+`Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+"""  # noqa: E501
+
+WAV2VEC2_XLSR_2B = Wav2Vec2Bundle(
+    "wav2vec2_xlsr_2b.pth",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1920,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 48,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 7680,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _model_type="Wav2Vec2",
+    _sample_rate=16000,
+    _normalize_waveform=True,
+)
+WAV2VEC2_XLSR_2B.__doc__ = """XLS-R model with 2 billions of parameters,
+pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* :cite:`Pratap_2020`,
+*CommonVoice* :cite:`ardila2020common`,
+*VoxLingua107* :cite:`valk2021voxlingua107`,
+*BABEL* :cite:`Gales2014SpeechRA`, and
+*VoxPopuli* :cite:`voxpopuli`) in 128 languages,
+not fine-tuned.
+
+Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
+`Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
