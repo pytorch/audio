@@ -208,6 +208,13 @@ skipIfNoCuda = _skipIf(
     reason="CUDA is not available.",
     key="NO_CUDA",
 )
+# Skip test if CUDA memory is not enough
+# TODO: detect the real CUDA memory size and allow call site to configure how much the test needs
+skipIfCudaSmallMemory = _skipIf(
+    "CI" in os.environ and torch.cuda.is_available(),  # temporary
+    reason="CUDA does not have enough memory.",
+    key="CUDA_SMALL_MEMORY",
+)
 skipIfNoSox = _skipIf(
     not torchaudio._extension._SOX_INITIALIZED,
     reason="Sox features are not available.",
