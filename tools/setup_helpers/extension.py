@@ -108,6 +108,7 @@ class CMakeBuild(build_ext):
 
         cfg = "Debug" if self.debug else "Release"
 
+        print(f"torch.cuda.is_available: {torch.cuda.is_available()}")
         print("Configuration:")
         print(f"  USE_CUDA: {_USE_CUDA}")
 
