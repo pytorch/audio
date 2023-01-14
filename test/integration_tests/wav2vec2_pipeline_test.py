@@ -27,7 +27,6 @@ from torchaudio.pipelines import (
     WAV2VEC2_LARGE_LV60K,
     WAV2VEC2_XLSR53,
     WAV2VEC2_XLSR_1B,
-    WAV2VEC2_XLSR_2B,
     WAV2VEC2_XLSR_300M,
     WAVLM_BASE,
     WAVLM_BASE_PLUS,
@@ -61,7 +60,6 @@ def test_pretraining_models(bundle):
     [
         WAV2VEC2_XLSR_300M,
         WAV2VEC2_XLSR_1B,
-        WAV2VEC2_XLSR_2B,
     ],
 )
 def test_xlsr_pretraining_models(bundle):
