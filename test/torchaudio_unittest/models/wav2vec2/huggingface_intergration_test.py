@@ -182,8 +182,8 @@ class TestHFIntegration(TorchaudioTestCase):
         imported = import_huggingface_model(original).eval()
         self._test_import_pretrain(original, imported, config)
 
-    @skipIfCudaSmallMemory
     @XLSR_PRETRAIN_CONFIGS
+    @skipIfCudaSmallMemory
     def test_import_xlsr_pretrain(self, config, _):
         """XLS-R models from HF transformers can be imported and yields the same results"""
         original = self._get_model(config).eval()

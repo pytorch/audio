@@ -150,8 +150,8 @@ class TestFairseqIntegration(TorchaudioTestCase):
         for i, (ref, _) in enumerate(refs["layer_results"]):
             self.assertEqual(hyp[i], ref.transpose(0, 1))
 
-    @skipIfCudaSmallMemory
     @XLSR_PRETRAINING_CONFIGS
+    @skipIfCudaSmallMemory
     def test_import_xlsr_pretraining_model(self, config, factory_func):
         """XLS-R pretraining models from fairseq can be imported and yields the same results"""
         batch_size, num_frames = 3, 1024
@@ -222,8 +222,8 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_wav2vec2_recreate_pretraining_model(self, config, factory_func):
         self._test_recreate_pretraining_model(config, factory_func)
 
-    @skipIfCudaSmallMemory
     @XLSR_PRETRAINING_CONFIGS
+    @skipIfCudaSmallMemory
     def test_xlsr_recreate_pretraining_model(self, config, factory_func):
         self._test_recreate_pretraining_model(config, factory_func)
 
