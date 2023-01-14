@@ -1452,7 +1452,7 @@ WAV2VEC2_XLSR_300M = Wav2Vec2Bundle(
     _sample_rate=16000,
     _normalize_waveform=True,
 )
-WAV2VEC2_XLSR_300M.__doc__ = """XLS-R model with 300 millions of parameters,
+WAV2VEC2_XLSR_300M.__doc__ = """XLS-R model with 300 million parameters,
 pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
 *Multilingual LibriSpeech* :cite:`Pratap_2020`,
 *CommonVoice* :cite:`ardila2020common`,
@@ -1466,7 +1466,7 @@ redistributed with the same license.
 [`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
 `Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
 
-Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
 """  # noqa: E501
 
 
@@ -1502,7 +1502,7 @@ WAV2VEC2_XLSR_1B = Wav2Vec2Bundle(
     _sample_rate=16000,
     _normalize_waveform=True,
 )
-WAV2VEC2_XLSR_1B.__doc__ = """XLS-R model with 1 billion of parameters,
+WAV2VEC2_XLSR_1B.__doc__ = """XLS-R model with 1 billion parameters,
 pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
 *Multilingual LibriSpeech* :cite:`Pratap_2020`,
 *CommonVoice* :cite:`ardila2020common`,
@@ -1516,7 +1516,7 @@ redistributed with the same license.
 [`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
 `Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
 
-Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
 """  # noqa: E501
 
 WAV2VEC2_XLSR_2B = Wav2Vec2Bundle(
@@ -1551,7 +1551,7 @@ WAV2VEC2_XLSR_2B = Wav2Vec2Bundle(
     _sample_rate=16000,
     _normalize_waveform=True,
 )
-WAV2VEC2_XLSR_2B.__doc__ = """XLS-R model with 2 billions of parameters,
+WAV2VEC2_XLSR_2B.__doc__ = """XLS-R model with 2 billion parameters,
 pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
 *Multilingual LibriSpeech* :cite:`Pratap_2020`,
 *CommonVoice* :cite:`ardila2020common`,
@@ -1565,5 +1565,5 @@ redistributed with the same license.
 [`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
 `Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
 
-Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
 """  # noqa: E501
