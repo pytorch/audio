@@ -1,4 +1,4 @@
-import sys
+import os
 
 import pytest
 import torchaudio
@@ -34,9 +34,6 @@ from torchaudio.pipelines import (
     WAVLM_LARGE,
 )
 
-sys.path.append("..")
-from torchaudio_unittest.common_utils.case_utils import skipIfNotInCI
-
 
 @pytest.mark.parametrize(
     "bundle",
@@ -58,7 +55,7 @@ def test_pretraining_models(bundle):
     bundle.get_model()
 
 
-@skipIfNotInCI
+@pytest.mark.skipif("CI" not in os.environ, reason="Run tests only in CI environment.")
 @pytest.mark.parametrize(
     "bundle",
     [
