@@ -32,16 +32,16 @@ std::unique_ptr<Buffer> get_buffer(
   if (frames_per_chunk > 0) {
     if (type == AVMEDIA_TYPE_AUDIO) {
       return std::unique_ptr<Buffer>(
-          new ChunkedAudioBuffer(frames_per_chunk, num_chunks));
+          new detail::ChunkedAudioBuffer(frames_per_chunk, num_chunks));
     } else {
       return std::unique_ptr<Buffer>(
-          new ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
+          new detail::ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
     }
   } else { // unchunked mode
     if (type == AVMEDIA_TYPE_AUDIO) {
-      return std::unique_ptr<Buffer>(new UnchunkedAudioBuffer());
+      return std::unique_ptr<Buffer>(new detail::UnchunkedAudioBuffer());
     } else {
-      return std::unique_ptr<Buffer>(new UnchunkedVideoBuffer(device));
+      return std::unique_ptr<Buffer>(new detail::UnchunkedVideoBuffer(device));
     }
   }
 }

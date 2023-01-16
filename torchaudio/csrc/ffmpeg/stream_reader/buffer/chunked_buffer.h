@@ -4,6 +4,7 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
 // Chunked Buffer Implementation
@@ -53,5 +54,6 @@ class ChunkedVideoBuffer : public ChunkedBuffer {
   void push_frame(AVFrame* frame) override;
 };
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio
