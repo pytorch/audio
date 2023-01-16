@@ -12,6 +12,8 @@ FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
     default:
       TORCH_CHECK(false, "Only audio and video type is supported.");
   }
+
+  pFilterGraph->nb_threads = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
