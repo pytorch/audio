@@ -22,28 +22,27 @@ std::unique_ptr<Buffer> get_buffer(
       "`num_chunks` must be positive or -1. Found: ",
       num_chunks);
 
-  switch (type) {
-    case AVMEDIA_TYPE_AUDIO: {
-      if (frames_per_chunk < 0) {
-        return std::unique_ptr<Buffer>(new UnchunkedAudioBuffer());
-      } else {
-        return std::unique_ptr<Buffer>(
-            new ChunkedAudioBuffer(frames_per_chunk, num_chunks));
-      }
+  TORCH_INTERNAL_ASSERT(
+      type == AVMEDIA_TYPE_AUDIO || type == AVMEDIA_TYPE_VIDEO,
+      "Unsupported media type: ",
+      av_get_media_type_string(type),
+      ". Only video or audio is supported ");
+
+  // Chunked Mode
+  if (frames_per_chunk > 0) {
+    if (type == AVMEDIA_TYPE_AUDIO) {
+      return std::unique_ptr<Buffer>(
+          new ChunkedAudioBuffer(frames_per_chunk, num_chunks));
+    } else {
+      return std::unique_ptr<Buffer>(
+          new ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
     }
-    case AVMEDIA_TYPE_VIDEO: {
-      if (frames_per_chunk < 0) {
-        return std::unique_ptr<Buffer>(new UnchunkedVideoBuffer(device));
-      } else {
-        return std::unique_ptr<Buffer>(
-            new ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
-      }
+  } else { // unchunked mode
+    if (type == AVMEDIA_TYPE_AUDIO) {
+      return std::unique_ptr<Buffer>(new UnchunkedAudioBuffer());
+    } else {
+      return std::unique_ptr<Buffer>(new UnchunkedVideoBuffer(device));
     }
-    default:
-      TORCH_CHECK(
-          false,
-          std::string("Unsupported media type: ") +
-              av_get_media_type_string(type));
   }
 }
 
@@ -119,10 +118,6 @@ int Sink::process_frame(AVFrame* pFrame) {
 
 std::string Sink::get_filter_description() const {
   return filter_description;
-}
-
-bool Sink::is_buffer_ready() const {
-  return buffer->is_ready();
 }
 
 void Sink::flush() {
