@@ -3,6 +3,7 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 UnchunkedVideoBuffer::UnchunkedVideoBuffer(const torch::Device& device)
     : device(device) {}
@@ -16,11 +17,11 @@ void UnchunkedBuffer::push_tensor(const torch::Tensor& t) {
 }
 
 void UnchunkedAudioBuffer::push_frame(AVFrame* frame) {
-  push_tensor(detail::convert_audio(frame));
+  push_tensor(convert_audio(frame));
 }
 
 void UnchunkedVideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(detail::convert_image(frame, device));
+  push_tensor(convert_image(frame, device));
 }
 
 c10::optional<torch::Tensor> UnchunkedBuffer::pop_chunk() {
@@ -38,5 +39,6 @@ void UnchunkedBuffer::flush() {
   chunks.clear();
 }
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio
