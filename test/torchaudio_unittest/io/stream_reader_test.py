@@ -554,7 +554,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         assert audio.shape == torch.Size([208896, 2])
 
     @parameterized.expand([(1,), (3,), (5,), (10,)])
-    def test_frames_per_chunk(self, fbc):
+    def test_frames_per_chunk(self, fpc):
         """Changing frames_per_chunk does not change the returned content"""
         src = self.get_src()
         s = StreamReader(src)
