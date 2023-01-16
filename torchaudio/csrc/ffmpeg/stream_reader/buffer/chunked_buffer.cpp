@@ -46,6 +46,9 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame) {
   //                <- append->
   //
   if (int64_t filled = num_buffered_frames % frames_per_chunk) {
+    TORCH_INTERNAL_ASSERT(
+        chunks.size() > 0,
+        "There is supposed to be left over frames, but the buffer dequeue is empty.");
     int64_t num_frames = frame.size(0);
     int64_t remain = frames_per_chunk - filled;
     int64_t append = remain < num_frames ? remain : num_frames;
@@ -83,7 +86,7 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame) {
     int64_t chunk_size = chunk.size(0);
     TORCH_INTERNAL_ASSERT(
         chunk_size <= frames_per_chunk,
-        "Chunk size is larger than frames per chunk. Please file an issue.");
+        "Chunk size is larger than frames per chunk.");
     if (chunk_size < frames_per_chunk) {
       auto shape = chunk.sizes().vec();
       shape[0] = frames_per_chunk;
@@ -129,6 +132,7 @@ void ChunkedVideoBuffer::push_frame(AVFrame* frame) {
 }
 
 void ChunkedBuffer::flush() {
+  num_buffered_frames = 0;
   chunks.clear();
 }
 
