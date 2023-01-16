@@ -553,6 +553,28 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         assert video.shape == torch.Size([390, 3, 270, 480])
         assert audio.shape == torch.Size([208896, 2])
 
+    @parameterized.expand([(1,), (3,), (5,), (10,)])
+    def test_frames_per_chunk(self, fbc):
+        """Changing frames_per_chunk does not change the returned content"""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.process_all_packets()
+        ref_video, ref_audio = s.pop_chunks()
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        chunks = list(s.stream())
+        video_chunks = torch.cat([c[0] for c in chunks if c[0] is not None])
+        audio_chunks = torch.cat([c[1] for c in chunks if c[1] is not None])
+        self.assertEqual(ref_video, video_chunks)
+        self.assertEqual(ref_audio, audio_chunks)
+
     def test_buffer_chunk_size(self):
         """`buffer_chunk_size=-1` does not drop frames."""
         src = self.get_src()
