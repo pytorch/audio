@@ -108,6 +108,10 @@ class CMakeBuild(build_ext):
 
         cfg = "Debug" if self.debug else "Release"
 
+        print(f"torch.cuda.is_available: {torch.cuda.is_available()}")
+        print("Configuration:")
+        print(f"  USE_CUDA: {_USE_CUDA}")
+
         cmake_args = [
             f"-DCMAKE_BUILD_TYPE={cfg}",
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
