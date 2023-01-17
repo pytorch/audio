@@ -62,7 +62,7 @@ std::string StreamProcessor::get_filter_description(KeyType key) const {
 
 bool StreamProcessor::is_buffer_ready() const {
   for (const auto& it : sinks) {
-    if (!it.second.is_buffer_ready()) {
+    if (!it.second.buffer->is_ready()) {
       return false;
     }
   }
