@@ -218,7 +218,7 @@ with torch.inference_mode():
     spec, _, _ = tacotron2.infer(processed, lengths)
 
 
-_ = plt.imshow(spec[0].cpu().detach())
+_ = plt.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 
 
 ######################################################################
@@ -231,7 +231,7 @@ for i in range(3):
     with torch.inference_mode():
         spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
     print(spec[0].shape)
-    ax[i].imshow(spec[0].cpu().detach())
+    ax[i].imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 plt.show()
 
 
@@ -271,7 +271,7 @@ with torch.inference_mode():
     waveforms, lengths = vocoder(spec, spec_lengths)
 
 fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
+ax1.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 ax2.plot(waveforms[0].cpu().detach())
 
 IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
@@ -301,7 +301,7 @@ with torch.inference_mode():
 waveforms, lengths = vocoder(spec, spec_lengths)
 
 fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
+ax1.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 ax2.plot(waveforms[0].cpu().detach())
 
 IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
@@ -340,7 +340,7 @@ with torch.no_grad():
     waveforms = waveglow.infer(spec)
 
 fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
+ax1.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 ax2.plot(waveforms[0].cpu().detach())
 
 IPython.display.Audio(waveforms[0:1].cpu(), rate=22050)
