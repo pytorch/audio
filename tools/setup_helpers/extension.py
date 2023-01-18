@@ -108,7 +108,11 @@ class CMakeBuild(build_ext):
 
         cfg = "Debug" if self.debug else "Release"
 
+        print(f"CUDA_HOME: {CUDA_HOME}")
         print(f"torch.cuda.is_available: {torch.cuda.is_available()}")
+        print(f"torch.cuda._is_compiled: {torch.cuda._is_compiled()}")
+        print(f"torch.version.cuda: {torch.version.cuda}")
+        print(f"torch._C._cuda_getDeviceCount(): {torch._C._cuda_getDeviceCount()}")
         print("Configuration:")
         print(f"  USE_CUDA: {_USE_CUDA}")
 
