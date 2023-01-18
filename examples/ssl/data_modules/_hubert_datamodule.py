@@ -1,12 +1,7 @@
 import torch
 from pytorch_lightning import LightningDataModule
 
-from ._utils import (
-    BucketizeBatchSampler,
-    CollateFnHubert,
-    DistributedBatchSampler,
-    HuBERTDataSet,
-)
+from ._utils import BucketizeBatchSampler, CollateFnHubert, DistributedBatchSampler, HuBERTDataSet
 
 
 class HuBERTDataModule(LightningDataModule):
@@ -45,9 +40,7 @@ class HuBERTDataModule(LightningDataModule):
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_sampler=sampler,
-            collate_fn=CollateFnHubert(
-                feature_type=self.feature_type, pad=False, rand_crop=True
-            ),
+            collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=self.num_workers,
         )
         return dataloader
@@ -65,9 +58,7 @@ class HuBERTDataModule(LightningDataModule):
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_sampler=sampler,
-            collate_fn=CollateFnHubert(
-                feature_type=self.feature_type, pad=False, rand_crop=True
-            ),
+            collate_fn=CollateFnHubert(feature_type=self.feature_type, pad=False, rand_crop=True),
             num_workers=self.num_workers,
         )
         return dataloader

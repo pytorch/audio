@@ -1,6 +1,7 @@
 import logging
 import pathlib
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
+from functools import partial
 from typing import Dict, Tuple
 
 import torch
@@ -70,10 +71,6 @@ class HuBERTModule(SSLPretrainModule):
             prog_bar=step_type == "train",
         )
 
-    def get_sample_size(self, output):
-        logit_m, _, _ = output
-        return logit_m.shape[0]
-
 
 def run_train(args):
     seed_everything(1337)
@@ -105,6 +102,9 @@ def run_train(args):
         devices=args.gpus,
         accelerator="gpu",
         strategy="ddp",
+        precision=args.precision,
+        accumulate_grad_batches=args.accumulate_grad_batches,
+        gradient_clip_val=args.clip_norm,
         replace_sampler_ddp=False,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
@@ -115,7 +115,12 @@ def run_train(args):
             f"Found {args.model_name}."
         )
     model = getattr(torchaudio.models, args.model_name)()
-    loss_fn = hubert_loss
+    loss_fn = partial(
+        hubert_loss,
+        masked_weight=args.masked_weight,
+        unmasked_weight=args.unmasked_weight,
+        feature_weight=args.feature_weight,
+    )
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=args.learning_rate,
@@ -129,7 +134,6 @@ def run_train(args):
         loss_fn,
         optimizer,
         lr_scheduler,
-        args.clip_norm,
     )
     data_module = HuBERTDataModule(
         dataset_path=args.dataset_path,
@@ -224,7 +228,19 @@ def _parse_args():
         "--weight-decay",
         default=0.01,
         type=float,
-        help="Weight decay (L2 penalty) (default: 0.01)",
+        help="Weight decay (L2 penalty) (Default: 0.01)",
+    )
+    parser.add_argument(
+        "--precision",
+        default=16,
+        choices=[16, 32, 64, "bf16"],
+        help="Precision of model training. (Default: 16)",
+    )
+    parser.add_argument(
+        "--accumulate-grad-batches",
+        default=1,
+        type=int,
+        help="Number of steps for accumulating gradients. (Default: 1)",
     )
     parser.add_argument(
         "--clip-norm",
@@ -261,6 +277,24 @@ def _parse_args():
         default=87.5,
         type=float,
         help="Number of seconds of audio in a mini-batch. (Default: 87.5)",
+    )
+    parser.add_argument(
+        "--masked-weight",
+        default=1.0,
+        type=float,
+        help="The weight for cross-entropy loss of masksed frames. (Default: ``1.0``)",
+    )
+    parser.add_argument(
+        "--unmasked-weight",
+        default=0.0,
+        type=float,
+        help="The weight for cross-entropy loss of unmasksed frames. (Default: ``0.0``)",
+    )
+    parser.add_argument(
+        "--feature-weight",
+        default=10.0,
+        type=float,
+        help="The weight for feature penalty loss. (Default: ``10.0``)",
     )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()

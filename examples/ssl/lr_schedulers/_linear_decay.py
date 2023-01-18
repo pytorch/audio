@@ -19,14 +19,9 @@ class LinearDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
 
     def get_lr(self):
         if self._step_count <= self.warmup_updates:
-            return [
-                self._step_count / self.warmup_updates * base_lr
-                for base_lr in self.base_lrs
-            ]
+            return [self._step_count / self.warmup_updates * base_lr for base_lr in self.base_lrs]
         elif self._step_count >= self.max_updates:
             return [0.0 for _ in self.base_lrs]
         else:
-            pct_remaining = (self.max_updates - self._step_count) / (
-                self.max_updates - self.warmup_updates
-            )
+            pct_remaining = (self.max_updates - self._step_count) / (self.max_updates - self.warmup_updates)
             return [base_lr * pct_remaining for base_lr in self.base_lrs]
