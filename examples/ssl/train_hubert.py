@@ -1,13 +1,10 @@
 import logging
 import pathlib
-from argparse import (
-    ArgumentDefaultsHelpFormatter,
-    ArgumentParser,
-    RawDescriptionHelpFormatter,
-)
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from typing import Dict, Tuple
 
 import torch
+import torchaudio.models
 from data_modules import HuBERTDataModule
 from lightning import SSLPretrainModule
 from losses import hubert_loss
@@ -15,11 +12,6 @@ from lr_schedulers import LinearDecayLRScheduler
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.utilities.seed import seed_everything
-from torchaudio.models import (
-    hubert_pretrain_base,
-    hubert_pretrain_large,
-    hubert_pretrain_xlarge,
-)
 
 
 class _Formatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
@@ -51,9 +43,7 @@ class HuBERTModule(SSLPretrainModule):
             ],
         )
 
-    def log_metric(
-        self, batch: Dict, output: Tuple, loss: torch.Tensor, step_type: str
-    ):
+    def log_metric(self, batch: Dict, output: Tuple, loss: torch.Tensor, step_type: str):
         logit_m, logit_u, _ = output
         self.log(
             f"{step_type}_loss",
@@ -119,20 +109,12 @@ def run_train(args):
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
     )
-    if args.model_name == "hubert_pretrain_base":
-        model = hubert_pretrain_base(
-            feature_grad_mult=args.feature_grad_mult, num_classes=args.num_classes
+    if args.model_name not in ["hubert_pretrain_base", "hubert_pretrain_large", "hubert_pretrain_xlarge"]:
+        raise ValueError(
+            "Expect model_name to be one of 'hubert_pretrain_base', 'hubert_pretrain_large', 'hubert_pretrain_xlarge'."
+            f"Found {args.model_name}."
         )
-    elif args.model_name == "hubert_pretrain_large":
-        model = hubert_pretrain_large(
-            feature_grad_mult=args.feature_grad_mult, num_classes=args.num_classes
-        )
-    elif args.model_name == "hubert_pretrain_xlarge":
-        model = hubert_pretrain_xlarge(
-            feature_grad_mult=args.feature_grad_mult, num_classes=args.num_classes
-        )
-    else:
-        raise ValueError(f"Unsupported model name: {args.model_name}")
+    model = getattr(torchaudio.models, args.model_name)()
     loss_fn = hubert_loss
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -141,9 +123,7 @@ def run_train(args):
         eps=args.eps,
         weight_decay=args.weight_decay,
     )
-    lr_scheduler = LinearDecayLRScheduler(
-        optimizer, args.warmup_updates, args.max_updates
-    )
+    lr_scheduler = LinearDecayLRScheduler(optimizer, args.warmup_updates, args.max_updates)
     lightning_module = HuBERTModule(
         model,
         loss_fn,
@@ -282,9 +262,7 @@ def _parse_args():
         type=float,
         help="Number of seconds of audio in a mini-batch. (Default: 87.5)",
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="whether to use debug level for logging"
-    )
+    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()
 
 
