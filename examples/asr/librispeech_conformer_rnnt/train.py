@@ -44,6 +44,7 @@ def run_train(args):
         strategy=DDPPlugin(find_unused_parameters=False),
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
+        gradient_clip_val=10.0,
     )
 
     sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
