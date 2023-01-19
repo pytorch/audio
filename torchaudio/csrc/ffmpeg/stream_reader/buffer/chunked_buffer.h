@@ -4,15 +4,13 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
 // Chunked Buffer Implementation
 //////////////////////////////////////////////////////////////////////////////
 // Common to both audio and video
 class ChunkedBuffer : public Buffer {
- protected:
-  ChunkedBuffer(int frames_per_chunk, int num_chunks);
-
   // Each AVFrame is converted to a Tensor and stored here.
   std::deque<torch::Tensor> chunks;
 
@@ -26,24 +24,26 @@ class ChunkedBuffer : public Buffer {
   // one Tensor contains multiple samples, so we track here.
   int64_t num_buffered_frames = 0;
 
+ protected:
+  ChunkedBuffer(int frames_per_chunk, int num_chunks);
+
+  void push_tensor(torch::Tensor frame);
+
  public:
   bool is_ready() const override;
   void flush() override;
+  c10::optional<torch::Tensor> pop_chunk() override;
 };
 
 class ChunkedAudioBuffer : public ChunkedBuffer {
-  void push_tensor(torch::Tensor frame);
-
  public:
   ChunkedAudioBuffer(int frames_per_chunk, int num_chunks);
 
   void push_frame(AVFrame* frame) override;
-  c10::optional<torch::Tensor> pop_chunk() override;
 };
 
 class ChunkedVideoBuffer : public ChunkedBuffer {
   const torch::Device device;
-  void push_tensor(const torch::Tensor& frame);
 
  public:
   ChunkedVideoBuffer(
@@ -52,8 +52,8 @@ class ChunkedVideoBuffer : public ChunkedBuffer {
       const torch::Device& device);
 
   void push_frame(AVFrame* frame) override;
-  c10::optional<torch::Tensor> pop_chunk() override;
 };
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio

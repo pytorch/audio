@@ -6,6 +6,7 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
 // Unchunked Buffer Interface
@@ -17,10 +18,6 @@ class UnchunkedBuffer : public Buffer {
   std::deque<torch::Tensor> chunks;
 
  protected:
-  // The number of currently stored chunks
-  // For video, one Tensor corresponds to one frame, but for audio,
-  // one Tensor contains multiple samples, so we track here.
-  int64_t num_buffered_frames = 0;
   void push_tensor(const torch::Tensor& t);
 
  public:
@@ -43,5 +40,6 @@ class UnchunkedVideoBuffer : public UnchunkedBuffer {
   void push_frame(AVFrame* frame) override;
 };
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio

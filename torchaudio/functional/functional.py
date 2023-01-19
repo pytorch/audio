@@ -9,7 +9,6 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal import module_utils as _mod_utils
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -1265,7 +1264,7 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1309,7 +1308,7 @@ def apply_codec(
     return augmented
 
 
-@_mod_utils.requires_kaldi()
+@torchaudio._extension.fail_if_no_kaldi
 def compute_kaldi_pitch(
     waveform: torch.Tensor,
     sample_rate: float,

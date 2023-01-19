@@ -51,9 +51,6 @@ class _MediaSourceMixin:
             with open(path, "rb") as fileobj:
                 data = fileobj.read()
             self.src = torch.frombuffer(data, dtype=torch.uint8)
-            print(self.src.data_ptr())
-            print(len(data))
-            print(self.src.shape)
         return self.src
 
     def tearDown(self):
@@ -467,10 +464,10 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             ("nasa_13013.avi", "precise", 8.1, (0, slice(238, None))),
             ("nasa_13013.avi", "precise", 8.14, (0, slice(239, None))),
             ("nasa_13013.avi", "precise", 8.17, (0, slice(240, None))),
-            # Test precise seek on video with invalid PTS
+            # Test precise seek on video with missing PTS
             ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.0, (0, slice(None))),
-            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.2, (0, slice(4, -1))),
-            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.3, (0, slice(7, -1))),
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.2, (0, slice(4, None))),
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.3, (0, slice(7, None))),
             # Test any seek
             # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
             ("nasa_13013.avi", "any", 0.0, (0, slice(None))),
@@ -513,6 +510,100 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         hyp, ref = frame[hyp_index:], ref_frames[ref_index]
         print(hyp.shape, ref.shape)
         self.assertEqual(hyp, ref)
+
+    @parameterized.expand(
+        [
+            ("nasa_13013.mp4", [195, 3, 270, 480]),
+            # RATRACE does not have valid PTS metadata.
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", [36, 3, 240, 560]),
+        ]
+    )
+    def test_change_fps(self, src, shape):
+        """Can change the FPS of videos"""
+        tgt_frame_rate = 15
+        s = StreamReader(self.get_src(src))
+        info = s.get_src_stream_info(s.default_video_stream)
+        assert info.frame_rate != tgt_frame_rate
+        s.add_basic_video_stream(frames_per_chunk=-1, frame_rate=tgt_frame_rate)
+        s.process_all_packets()
+        (chunk,) = s.pop_chunks()
+
+        assert chunk.shape == torch.Size(shape)
+
+    def test_invalid_chunk_option(self):
+        """Passing invalid `frames_per_chunk` and `buffer_chunk_size` raises error"""
+        s = StreamReader(self.get_src())
+        for fpc, bcs in ((0, 3), (3, 0), (-2, 3), (3, -2)):
+            with self.assertRaises(RuntimeError):
+                s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=bcs)
+            with self.assertRaises(RuntimeError):
+                s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=bcs)
+
+    def test_unchunked_stream(self):
+        """`frames_per_chunk=-1` disable chunking.
+
+        When chunking is disabled, frames contained in one AVFrame become one chunk.
+        For video, that is always one frame, but for audio, it depends.
+        """
+        s = StreamReader(self.get_src())
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=10000)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=10000)
+        s.process_all_packets()
+        video, audio = s.pop_chunks()
+        assert video.shape == torch.Size([390, 3, 270, 480])
+        assert audio.shape == torch.Size([208896, 2])
+
+    @parameterized.expand([(1,), (3,), (5,), (10,)])
+    def test_frames_per_chunk(self, fpc):
+        """Changing frames_per_chunk does not change the returned content"""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.process_all_packets()
+        ref_video, ref_audio = s.pop_chunks()
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        chunks = list(s.stream())
+        video_chunks = torch.cat([c[0] for c in chunks if c[0] is not None])
+        audio_chunks = torch.cat([c[1] for c in chunks if c[1] is not None])
+        self.assertEqual(ref_video, video_chunks)
+        self.assertEqual(ref_audio, audio_chunks)
+
+    def test_buffer_chunk_size(self):
+        """`buffer_chunk_size=-1` does not drop frames."""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=30, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=16000, buffer_chunk_size=-1)
+        s.process_all_packets()
+        for _ in range(13):
+            video, audio = s.pop_chunks()
+            assert video.shape == torch.Size([30, 3, 270, 480])
+            assert audio.shape == torch.Size([16000, 2])
+        video, audio = s.pop_chunks()
+        assert video is None
+        assert audio.shape == torch.Size([896, 2])
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=30, buffer_chunk_size=3)
+        s.add_audio_stream(frames_per_chunk=16000, buffer_chunk_size=3)
+        s.process_all_packets()
+        for _ in range(2):
+            video, audio = s.pop_chunks()
+            assert video.shape == torch.Size([30, 3, 270, 480])
+            assert audio.shape == torch.Size([16000, 2])
+        video, audio = s.pop_chunks()
+        assert video.shape == torch.Size([30, 3, 270, 480])
+        assert audio.shape == torch.Size([896, 2])
 
 
 def _to_fltp(original):
