@@ -41,18 +41,22 @@ class Transforms(TestBaseMixin):
         ts_output = torch_script(speed)(waveform, lengths)
         self.assertEqual(ts_output, output)
 
-    def test_AddNoise(self):
+    @nested_params([True, False])
+    def test_AddNoise(self, use_lengths):
         leading_dims = (2, 3)
         L = 31
 
         waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
         noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        else:
+            lengths = None
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
 
         add_noise = T.AddNoise().to(self.device, self.dtype)
-        output = add_noise(waveform, noise, lengths, snr)
-        ts_output = torch_script(add_noise)(waveform, noise, lengths, snr)
+        output = add_noise(waveform, noise, snr, lengths)
+        ts_output = torch_script(add_noise)(waveform, noise, snr, lengths)
         self.assertEqual(ts_output, output)
 
     def test_Preemphasis(self):
