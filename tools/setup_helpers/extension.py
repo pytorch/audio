@@ -38,8 +38,8 @@ _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KA
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
-_USE_ROCM = _get_build("USE_ROCM", torch.cuda.is_available() and torch.version.hip is not None)
-_USE_CUDA = _get_build("USE_CUDA", torch.cuda.is_available() and torch.version.hip is None)
+_USE_ROCM = _get_build("USE_ROCM", torch.cuda._is_compiled() and torch.version.hip is not None)
+_USE_CUDA = _get_build("USE_CUDA", torch.cuda._is_compiled() and torch.version.hip is None)
 _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
@@ -113,7 +113,7 @@ class CMakeBuild(build_ext):
         print(f"torch.cuda._is_compiled: {torch.cuda._is_compiled()}")
         print(f"torch.version.cuda: {torch.version.cuda}")
         print(f"torch._C._cuda_getDeviceCount(): {torch._C._cuda_getDeviceCount()}")
-        
+
         print("Configuration:")
         print(f"  USE_CUDA: {_USE_CUDA}")
 
