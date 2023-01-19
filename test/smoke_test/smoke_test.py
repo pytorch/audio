@@ -23,6 +23,8 @@ def main() -> None:
     # Warning: Please note this option should not be widely used, only use it when absolutely necessary
     parser.add_argument("--no-ffmpeg", dest="ffmpeg", action="store_false")
 
+    print("torchaudio._extension._check_cuda_version: ", torchaudio._extension._check_cuda_version())
+
     options = parser.parse_args()
     if options.ffmpeg:
         ffmpeg_test()
