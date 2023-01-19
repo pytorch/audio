@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.distributed as dist
 import torchaudio
+from lightning import Batch
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
 
@@ -410,7 +411,5 @@ class CollateFnHubert:
         waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True)
         lengths = torch.tensor(lengths)
-        batch = {}
-        batch["input"] = (waveforms, lengths)
-        batch["label"] = (labels,)
+        batch = Batch((waveforms, labels, lengths), (labels,))
         return batch
