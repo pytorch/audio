@@ -114,7 +114,7 @@ class CMakeBuild(build_ext):
         print(f"torch.version.cuda: {torch.version.cuda}")
         print(f"torch._C._cuda_getDeviceCount(): {torch._C._cuda_getDeviceCount()}")
 
-        print("Configuration:")
+        print("Configuration: ")
         print(f"  USE_CUDA: {_USE_CUDA}")
 
         cmake_args = [
