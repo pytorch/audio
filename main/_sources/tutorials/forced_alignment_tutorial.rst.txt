@@ -52,8 +52,8 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
  .. code-block:: none
 
-    2.0.0.dev20230115
-    2.0.0.dev20230115
+    2.0.0.dev20230119
+    2.0.0.dev20230119
     cpu
 
 

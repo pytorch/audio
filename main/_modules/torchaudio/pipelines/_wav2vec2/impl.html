@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230115) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230119) &#x25BC</a>
     </div>
     
 
@@ -497,6 +497,9 @@
 <span class="sd">            - WAV2VEC2_ASR_LARGE_LV60K_100H</span>
 <span class="sd">            - WAV2VEC2_ASR_LARGE_LV60K_960H</span>
 <span class="sd">            - WAV2VEC2_XLSR53</span>
+<span class="sd">            - WAV2VEC2_XLSR_300M</span>
+<span class="sd">            - WAV2VEC2_XLSR_1B</span>
+<span class="sd">            - WAV2VEC2_XLSR_2B</span>
 <span class="sd">            - HUBERT_LARGE</span>
 <span class="sd">            - HUBERT_XLARGE</span>
 <span class="sd">            - HUBERT_ASR_LARGE</span>
@@ -1801,6 +1804,155 @@
 <span class="s2">`Source &lt;https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models&gt;`__]</span>
 
 <span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+
+<span class="n">WAV2VEC2_XLSR_300M</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
+    <span class="s2">&quot;wav2vec2_xlsr_300m.pth&quot;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;extractor_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_layer_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;extractor_conv_bias&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_embed_dim&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_projection_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_kernel&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_groups&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_heads&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_attention_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_features&quot;</span><span class="p">:</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">_model_type</span><span class="o">=</span><span class="s2">&quot;Wav2Vec2&quot;</span><span class="p">,</span>
+    <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">WAV2VEC2_XLSR_300M</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;XLS-R model with 300 million parameters,</span>
+<span class="s2">pre-trained on 436,000 hours of unlabeled audio from multiple datasets (</span>
+<span class="s2">*Multilingual LibriSpeech* :cite:`Pratap_2020`,</span>
+<span class="s2">*CommonVoice* :cite:`ardila2020common`,</span>
+<span class="s2">*VoxLingua107* :cite:`valk2021voxlingua107`,</span>
+<span class="s2">*BABEL* :cite:`Gales2014SpeechRA`, and</span>
+<span class="s2">*VoxPopuli* :cite:`voxpopuli`) in 128 languages,</span>
+<span class="s2">not fine-tuned.</span>
+
+<span class="s2">Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r&gt;`__]</span>
+
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+
+<span class="n">WAV2VEC2_XLSR_1B</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
+    <span class="s2">&quot;wav2vec2_xlsr_1b.pth&quot;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;extractor_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_layer_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;extractor_conv_bias&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_embed_dim&quot;</span><span class="p">:</span> <span class="mi">1280</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_projection_dropout&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_kernel&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_groups&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_heads&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_attention_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_features&quot;</span><span class="p">:</span> <span class="mi">5120</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">_model_type</span><span class="o">=</span><span class="s2">&quot;Wav2Vec2&quot;</span><span class="p">,</span>
+    <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">WAV2VEC2_XLSR_1B</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;XLS-R model with 1 billion parameters,</span>
+<span class="s2">pre-trained on 436,000 hours of unlabeled audio from multiple datasets (</span>
+<span class="s2">*Multilingual LibriSpeech* :cite:`Pratap_2020`,</span>
+<span class="s2">*CommonVoice* :cite:`ardila2020common`,</span>
+<span class="s2">*VoxLingua107* :cite:`valk2021voxlingua107`,</span>
+<span class="s2">*BABEL* :cite:`Gales2014SpeechRA`, and</span>
+<span class="s2">*VoxPopuli* :cite:`voxpopuli`) in 128 languages,</span>
+<span class="s2">not fine-tuned.</span>
+
+<span class="s2">Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r&gt;`__]</span>
+
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+<span class="n">WAV2VEC2_XLSR_2B</span> <span class="o">=</span> <span class="n">Wav2Vec2Bundle</span><span class="p">(</span>
+    <span class="s2">&quot;wav2vec2_xlsr_2b.pth&quot;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;extractor_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extractor_conv_layer_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;extractor_conv_bias&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_embed_dim&quot;</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_projection_dropout&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_kernel&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_pos_conv_groups&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_layers&quot;</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_num_heads&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_attention_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_features&quot;</span><span class="p">:</span> <span class="mi">7680</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_ff_interm_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_norm_first&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;encoder_layer_drop&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;aux_num_out&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">_model_type</span><span class="o">=</span><span class="s2">&quot;Wav2Vec2&quot;</span><span class="p">,</span>
+    <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">_normalize_waveform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">WAV2VEC2_XLSR_2B</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;XLS-R model with 2 billion parameters,</span>
+<span class="s2">pre-trained on 436,000 hours of unlabeled audio from multiple datasets (</span>
+<span class="s2">*Multilingual LibriSpeech* :cite:`Pratap_2020`,</span>
+<span class="s2">*CommonVoice* :cite:`ardila2020common`,</span>
+<span class="s2">*VoxLingua107* :cite:`valk2021voxlingua107`,</span>
+<span class="s2">*BABEL* :cite:`Gales2014SpeechRA`, and</span>
+<span class="s2">*VoxPopuli* :cite:`voxpopuli`) in 128 languages,</span>
+<span class="s2">not fine-tuned.</span>
+
+<span class="s2">Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and</span>
+<span class="s2">redistributed with the same license.</span>
+<span class="s2">[`License &lt;https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE&gt;`__,</span>
+<span class="s2">`Source &lt;https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r&gt;`__]</span>
+
+<span class="s2">Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 </pre></div>
 
