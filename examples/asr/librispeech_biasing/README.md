@@ -53,3 +53,9 @@ python get_error_word_count.py <path_to_results.wrd.txt>
 ```
 
 Note that the `word_freq.txt` file contains word frequencies for train-clean-100 only. For the full set it should be calculated again, which will only slightly affect OOV word error rate calculation in this case.
+
+The table below contains WER results for the test-clean sets using clean-100 training data. R-WER stands for rare word error rate, for words in the biasing list.
+
+|                     |          WER |      R-WER |
+|:-------------------:|-------------:|-----------:|
+| test-clean          |       0.0836 |        23.6|
