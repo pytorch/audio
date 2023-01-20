@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230119) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230120) &#x25BC</a>
     </div>
     
 
@@ -388,7 +388,7 @@
 <span></span><span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchaudio.functional</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span> <span class="n">resample</span>
@@ -521,7 +521,9 @@
     <span class="k">return</span> <span class="n">_apply_convolve_mode</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">x_size</span><span class="p">,</span> <span class="n">y_size</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_noise"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.add_noise">[docs]</a><span class="k">def</span> <span class="nf">add_noise</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">noise</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="add_noise"><a class="viewcode-back" href="../../../../prototype.functional.html#torchaudio.prototype.functional.add_noise">[docs]</a><span class="k">def</span> <span class="nf">add_noise</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">noise</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scales and adds noise to waveform per signal-to-noise ratio.</span>
 
 <span class="sd">    Specifically, for each pair of waveform vector :math:`x \in \mathbb{R}^L` and noise vector</span>
@@ -547,16 +549,17 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (torch.Tensor): Input waveform, with shape `(..., L)`.</span>
 <span class="sd">        noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).</span>
-<span class="sd">        lengths (torch.Tensor): Valid lengths of signals in ``waveform`` and ``noise``, with shape `(...,)`</span>
-<span class="sd">            (leading dimensions must match those of ``waveform``).</span>
 <span class="sd">        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.</span>
+<span class="sd">        lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``, with shape</span>
+<span class="sd">            `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all elements in ``waveform``</span>
+<span class="sd">            and ``noise`` are treated as valid. (Default: ``None``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`</span>
 <span class="sd">        (same shape as ``waveform``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">noise</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">lengths</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">snr</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">noise</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">snr</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">and</span> <span class="p">(</span><span class="n">lengths</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lengths</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">snr</span><span class="o">.</span><span class="n">ndim</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input leading dimensions don&#39;t match.&quot;</span><span class="p">)</span>
 
     <span class="n">L</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -565,11 +568,18 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length dimensions of waveform and noise don&#39;t match (got </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">noise</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
 
     <span class="c1"># compute scale</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">lengths</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">lengths</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span>
-        <span class="o">-</span><span class="mi">1</span>
-    <span class="p">)</span>  <span class="c1"># (*, L) &lt; (*, 1) = (*, L)</span>
-    <span class="n">energy_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">waveform</span> <span class="o">*</span> <span class="n">mask</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># (*,)</span>
-    <span class="n">energy_noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">noise</span> <span class="o">*</span> <span class="n">mask</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># (*,)</span>
+    <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">lengths</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">lengths</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># (*, L) &lt; (*, 1) = (*, L)</span>
+        <span class="n">masked_waveform</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">*</span> <span class="n">mask</span>
+        <span class="n">masked_noise</span> <span class="o">=</span> <span class="n">noise</span> <span class="o">*</span> <span class="n">mask</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">masked_waveform</span> <span class="o">=</span> <span class="n">waveform</span>
+        <span class="n">masked_noise</span> <span class="o">=</span> <span class="n">noise</span>
+
+    <span class="n">energy_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">masked_waveform</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># (*,)</span>
+    <span class="n">energy_noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">masked_noise</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># (*,)</span>
     <span class="n">original_snr_db</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">energy_signal</span><span class="p">)</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">energy_noise</span><span class="p">))</span>
     <span class="n">scale</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">((</span><span class="n">original_snr_db</span> <span class="o">-</span> <span class="n">snr</span><span class="p">)</span> <span class="o">/</span> <span class="mf">20.0</span><span class="p">)</span>  <span class="c1"># (*,)</span>
 
