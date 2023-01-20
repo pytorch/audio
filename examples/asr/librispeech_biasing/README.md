@@ -58,4 +58,4 @@ The table below contains WER results for the test-clean sets using clean-100 tra
 
 |                     |          WER |      R-WER |
 |:-------------------:|-------------:|-----------:|
-| test-clean          |       0.0836 |        23.6|
+| test-clean          |       0.0836 |      0.2366|
