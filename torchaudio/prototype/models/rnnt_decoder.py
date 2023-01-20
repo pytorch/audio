@@ -81,7 +81,7 @@ def _remove_hypo(hypo: Hypothesis, hypo_list: List[Hypothesis]) -> None:
 
 
 class RNNTBeamSearchBiasing(torch.nn.Module):
-    r"""Beam search decoder for RNN-T model.
+    r"""Beam search decoder for RNN-T model with biasing support.
 
     Args:
         model (RNNT): RNN-T model to use.
@@ -93,7 +93,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
             hypothesis score normalized by token sequence length. (Default: None)
         step_max_tokens (int, optional): maximum number of tokens to emit per input time step. (Default: 100)
         trie (list, optional): the prefix tree for TCPGen biasing
-        biasing (bool, optional): If true, do biasing, otherwise use standard RNN-T
+        biasing (bool, optional): If true, do biasing, otherwise use standard RNN-T support
     """
 
     def __init__(

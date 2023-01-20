@@ -70,6 +70,7 @@ def run_cli():
     args = parse_args()
 
     root = args.librispeech_path / "LibriSpeech"
+    # Uncomment this for running bpe on full 960-hour data
     # splits = ["train-clean-100", "train-clean-360", "train-other-500"]
     splits = ["train-clean-100"]
     merged_transcripts = []
