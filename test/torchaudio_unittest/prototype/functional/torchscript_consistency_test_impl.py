@@ -37,16 +37,20 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
 
         self._assert_consistency(getattr(F, fn), (x, y, mode))
 
-    def test_add_noise(self):
+    @nested_params([True, False])
+    def test_add_noise(self, use_lengths):
         leading_dims = (2, 3)
         L = 31
 
         waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
         noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        else:
+            lengths = None
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
 
-        self._assert_consistency(F.add_noise, (waveform, noise, lengths, snr))
+        self._assert_consistency(F.add_noise, (waveform, noise, snr, lengths))
 
     def test_barkscale_fbanks(self):
         if self.device != torch.device("cpu"):

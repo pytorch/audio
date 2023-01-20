@@ -184,12 +184,12 @@ class TransformsTestImpl(TestBaseMixin):
         snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
 
         add_noise = T.AddNoise()
-        actual = add_noise(waveform, noise, lengths, snr)
+        actual = add_noise(waveform, noise, snr, lengths)
 
         noise_expanded = noise.expand(*leading_dims, L)
         snr_expanded = snr.expand(*leading_dims)
         lengths_expanded = lengths.expand(*leading_dims)
-        expected = add_noise(waveform, noise_expanded, lengths_expanded, snr_expanded)
+        expected = add_noise(waveform, noise_expanded, snr_expanded, lengths_expanded)
 
         self.assertEqual(expected, actual)
 
@@ -208,7 +208,7 @@ class TransformsTestImpl(TestBaseMixin):
         add_noise = T.AddNoise()
 
         with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
-            add_noise(waveform, noise, lengths, snr)
+            add_noise(waveform, noise, snr, lengths)
 
     def test_AddNoise_length_check(self):
         """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
@@ -223,7 +223,7 @@ class TransformsTestImpl(TestBaseMixin):
         add_noise = T.AddNoise()
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
-            add_noise(waveform, noise, lengths, snr)
+            add_noise(waveform, noise, snr, lengths)
 
     @nested_params(
         [(2, 1, 31)],

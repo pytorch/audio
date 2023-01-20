@@ -106,11 +106,13 @@ class StreamReader {
   int process_packet();
   int process_packet_block(double timeout, double backoff);
 
+ private:
   int drain();
 
   //////////////////////////////////////////////////////////////////////////////
   // Retrieval
   //////////////////////////////////////////////////////////////////////////////
+ public:
   std::vector<c10::optional<torch::Tensor>> pop_chunks();
 };
 
