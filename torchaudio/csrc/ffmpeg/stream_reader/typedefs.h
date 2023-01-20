@@ -27,8 +27,6 @@ struct SrcStreamInfo {
 struct OutputStreamInfo {
   int source_index;
   std::string filter_description;
-  double rate;
-  OutputStreamInfo() = default;
 };
 
 } // namespace ffmpeg
