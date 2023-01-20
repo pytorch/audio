@@ -616,7 +616,7 @@ def conformer_rnnt_biasing(
 
         Returns:
             RNNT:
-                Conformer RNN-T model.
+                Conformer RNN-T model with TCPGen-based biasing support.
     """
     encoder = _ConformerEncoder(
         input_dim=input_dim,
@@ -669,7 +669,7 @@ def conformer_rnnt_biasing_base(charlist=[], biasing=True) -> RNNT:
 
     Returns:
         RNNT:
-            Conformer RNN-T model with TCPGen.
+            Conformer RNN-T model with TCPGen-based biasing support.
     """
     return conformer_rnnt_biasing(
         input_dim=80,
