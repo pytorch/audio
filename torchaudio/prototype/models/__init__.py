@@ -8,15 +8,9 @@ from ._conformer_wav2vec2 import (
 )
 from ._emformer_hubert import emformer_hubert_base, emformer_hubert_model
 from .conv_emformer import ConvEmformer
-from .hifi_gan import (
-    hifigan_generator,
-    hifigan_generator_v1,
-    hifigan_generator_v2,
-    hifigan_generator_v3,
-    HiFiGANGenerator,
-)
 from .rnnt import conformer_rnnt_base, conformer_rnnt_biasing, conformer_rnnt_biasing_base, conformer_rnnt_model
 from .rnnt_decoder import Hypothesis, RNNTBeamSearchBiasing
+from .hifi_gan import hifigan_vocoder, hifigan_vocoder_v1, hifigan_vocoder_v2, hifigan_vocoder_v3, HiFiGANVocoder
 
 __all__ = [
     "conformer_rnnt_base",
@@ -35,11 +29,9 @@ __all__ = [
     "emformer_hubert_model",
     "Hypothesis",
     "RNNTBeamSearchBiasing",
-    "HiFiGANGenerator",
-    "hifigan_generator_v1",
-    "hifigan_generator_v2",
-    "hifigan_generator_v3",
-    "hifigan_generator",
-    "Hypothesis",
-    "RNNTBeamSearchBiasing",
+    "HiFiGANVocoder",
+    "hifigan_vocoder_v1",
+    "hifigan_vocoder_v2",
+    "hifigan_vocoder_v3",
+    "hifigan_vocoder",
 ]

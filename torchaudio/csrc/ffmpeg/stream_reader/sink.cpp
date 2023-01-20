@@ -1,3 +1,5 @@
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
 #include <stdexcept>
 
@@ -10,18 +12,37 @@ std::unique_ptr<Buffer> get_buffer(
     int frames_per_chunk,
     int num_chunks,
     const torch::Device& device) {
-  switch (type) {
-    case AVMEDIA_TYPE_AUDIO:
+  TORCH_CHECK(
+      frames_per_chunk > 0 || frames_per_chunk == -1,
+      "`frames_per_chunk` must be positive or -1. Found: ",
+      frames_per_chunk);
+
+  TORCH_CHECK(
+      num_chunks > 0 || num_chunks == -1,
+      "`num_chunks` must be positive or -1. Found: ",
+      num_chunks);
+
+  TORCH_INTERNAL_ASSERT(
+      type == AVMEDIA_TYPE_AUDIO || type == AVMEDIA_TYPE_VIDEO,
+      "Unsupported media type: ",
+      av_get_media_type_string(type),
+      ". Only video or audio is supported ");
+
+  // Chunked Mode
+  if (frames_per_chunk > 0) {
+    if (type == AVMEDIA_TYPE_AUDIO) {
       return std::unique_ptr<Buffer>(
-          new AudioBuffer(frames_per_chunk, num_chunks));
-    case AVMEDIA_TYPE_VIDEO:
+          new detail::ChunkedAudioBuffer(frames_per_chunk, num_chunks));
+    } else {
       return std::unique_ptr<Buffer>(
-          new VideoBuffer(frames_per_chunk, num_chunks, device));
-    default:
-      TORCH_CHECK(
-          false,
-          std::string("Unsupported media type: ") +
-              av_get_media_type_string(type));
+          new detail::ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
+    }
+  } else { // unchunked mode
+    if (type == AVMEDIA_TYPE_AUDIO) {
+      return std::unique_ptr<Buffer>(new detail::UnchunkedAudioBuffer());
+    } else {
+      return std::unique_ptr<Buffer>(new detail::UnchunkedVideoBuffer(device));
+    }
   }
 }
 
@@ -97,10 +118,6 @@ int Sink::process_frame(AVFrame* pFrame) {
 
 std::string Sink::get_filter_description() const {
   return filter_description;
-}
-
-bool Sink::is_buffer_ready() const {
-  return buffer->is_ready();
 }
 
 void Sink::flush() {

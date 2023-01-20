@@ -135,12 +135,12 @@ class FunctionalTestImpl(TestBaseMixin):
         noise = torch.rand(5, 1, 1, L, dtype=self.dtype, device=self.device)
         lengths = torch.rand(5, 1, 3, dtype=self.dtype, device=self.device)
         snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
-        actual = F.add_noise(waveform, noise, lengths, snr)
+        actual = F.add_noise(waveform, noise, snr, lengths)
 
         noise_expanded = noise.expand(*leading_dims, L)
         snr_expanded = snr.expand(*leading_dims)
         lengths_expanded = lengths.expand(*leading_dims)
-        expected = F.add_noise(waveform, noise_expanded, lengths_expanded, snr_expanded)
+        expected = F.add_noise(waveform, noise_expanded, snr_expanded, lengths_expanded)
 
         self.assertEqual(expected, actual)
 
@@ -157,7 +157,7 @@ class FunctionalTestImpl(TestBaseMixin):
         snr = torch.rand(*snr_dims, dtype=self.dtype, device=self.device) * 10
 
         with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
+            F.add_noise(waveform, noise, snr, lengths)
 
     def test_add_noise_length_check(self):
         """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
@@ -170,7 +170,7 @@ class FunctionalTestImpl(TestBaseMixin):
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
+            F.add_noise(waveform, noise, snr, lengths)
 
     @nested_params(
         [(2, 3), (2, 3, 5), (2, 3, 5, 7)],
@@ -485,6 +485,110 @@ class FunctionalTestImpl(TestBaseMixin):
         ref = freq_ir_np(magnitudes.cpu().numpy())
 
         self.assertEqual(hyp, ref)
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((15, ), (3, 3)),  # filter size (3) is shorter than chunk size (15 // 3 == 5)
+            ((15, ), (3, 5)),  # filter size (5) matches than chunk size
+            ((15, ), (3, 7)),  # filter size (7) is longer than chunk size
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((15, ), (4, 3)),  # filter size (3) is shorter than chunk size (16 // 4 == 4)
+            ((15, ), (4, 4)),  # filter size (4) is shorter than chunk size
+            ((15, ), (4, 5)),  # filter size (5) is longer than chunk size
+            # INPUT: multi-dim waveform and 2D filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (3, 3)),
+            ((7, 2, 15), (3, 5)),
+            ((7, 2, 15), (3, 7)),
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (4, 3)),
+            ((7, 2, 15), (4, 4)),
+            ((7, 2, 15), (4, 5)),
+            # INPUT: multi-dim waveform and multi-dim filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (7, 2, 3, 3)),
+            ((7, 2, 15), (7, 2, 3, 5)),
+            ((7, 2, 15), (7, 2, 3, 7)),
+            # INPUT: multi-dim waveform and multi-dim filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (7, 2, 4, 3)),
+            ((7, 2, 15), (7, 2, 4, 4)),
+            ((7, 2, 15), (7, 2, 4, 5)),
+            # INPUT: multi-dim waveform and (broadcast) multi-dim filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (1, 1, 3, 3)),
+            ((7, 2, 15), (1, 1, 3, 5)),
+            ((7, 2, 15), (1, 1, 3, 7)),
+            # INPUT: multi-dim waveform and (broadcast) multi-dim filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (1, 1, 4, 3)),
+            ((7, 2, 15), (1, 1, 4, 4)),
+            ((7, 2, 15), (1, 1, 4, 5)),
+            # fmt: on
+        ]
+    )
+    def test_filter_waveform_shape(self, waveform_shape, filter_shape):
+        """filter_waveform returns the waveform with the same number of samples"""
+        waveform = torch.randn(waveform_shape, dtype=self.dtype, device=self.device)
+        filters = torch.randn(filter_shape, dtype=self.dtype, device=self.device)
+
+        filtered = F.filter_waveform(waveform, filters)
+
+        assert filtered.shape == waveform.shape
+
+    @nested_params([1, 3, 5], [3, 5, 7, 4, 6, 8])
+    def test_filter_waveform_delta(self, num_filters, kernel_size):
+        """Applying delta kernel preserves the origianl waveform"""
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernel = torch.zeros((num_filters, kernel_size), dtype=self.dtype, device=self.device)
+        kernel[:, kernel_size // 2] = 1
+
+        result = F.filter_waveform(waveform, kernel)
+        self.assertEqual(waveform, result)
+
+    def test_filter_waveform_same(self, kernel_size=5):
+        """Applying the same filter returns the original waveform"""
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernel = torch.randn((1, kernel_size), dtype=self.dtype, device=self.device)
+        kernels = torch.cat([kernel] * 3)
+
+        out1 = F.filter_waveform(waveform, kernel)
+        out2 = F.filter_waveform(waveform, kernels)
+        self.assertEqual(out1, out2)
+
+    def test_filter_waveform_diff(self):
+        """Filters are applied from the first to the last"""
+        kernel_size = 3
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernels = torch.randn((2, kernel_size), dtype=self.dtype, device=self.device)
+
+        # use both filters.
+        mix = F.filter_waveform(waveform, kernels)
+        # use only one of them
+        ref1 = F.filter_waveform(waveform[:10], kernels[0:1])
+        ref2 = F.filter_waveform(waveform[10:], kernels[1:2])
+
+        print("mix:", mix)
+        print("ref1:", ref1)
+        print("ref2:", ref2)
+        # The first filter is effective in the first half
+        self.assertEqual(mix[:10], ref1[:10])
+        # The second filter is effective in the second half
+        self.assertEqual(mix[-9:], ref2[-9:])
+        # the middle portion is where the two filters affect
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):

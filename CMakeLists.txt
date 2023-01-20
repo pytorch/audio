@@ -24,19 +24,10 @@ string(FIND "${CMAKE_CXX_FLAGS}" "-std=c++" env_cxx_standard)
 if(env_cxx_standard GREATER -1)
   message(
       WARNING "C++ standard version definition detected in environment variable."
-      "PyTorch requires -std=c++14. Please remove -std=c++ settings in your environment.")
+      "PyTorch requires -std=c++17. Please remove -std=c++ settings in your environment.")
 endif()
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_C_STANDARD 11)
-
-# https://developercommunity.visualstudio.com/t/VS-16100-isnt-compatible-with-CUDA-11/1433342
-if(MSVC)
-  if(USE_CUDA)
-    set(CMAKE_CXX_STANDARD 17)
-  endif()
-endif()
-
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "The C++ standard whose features are requested to build this target.")
+set(CMAKE_C_STANDARD   11 CACHE STRING "The C standard whose features are requested to build this target.")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -133,10 +124,29 @@ endif()
 # TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
 if (MSVC)
   set(warning_flags /W4)
+  # the following line is added in order to export symbols when building on Windows
+  # this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 else()
   set(warning_flags -Wall)
 endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warning_flags} ${TORCH_CXX_FLAGS}")
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Found ccache")
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+else()
+  message(STATUS "Could not find ccache. Consider installing ccache to speed up compilation.")
+endif()
+
 add_subdirectory(third_party)
 add_subdirectory(torchaudio/csrc)
+if (BUILD_SOX)
+  add_subdirectory(torchaudio/csrc/sox)
+endif()
+if (USE_FFMPEG)
+  add_subdirectory(torchaudio/csrc/ffmpeg)
+endif()

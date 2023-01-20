@@ -30,13 +30,13 @@ import torch.nn.functional as F
 from torch.nn import Conv1d, ConvTranspose1d
 
 
-class HiFiGANGenerator(torch.nn.Module):
+class HiFiGANVocoder(torch.nn.Module):
     """Generator part of *HiFi GAN* :cite:`NEURIPS2020_c5d73680`.
     Source: https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
 
     Note:
-        To build the model, please use one of the factory functions: :py:func:`hifigan_generator`,
-        :py:func:`hifigan_generator_v1`, :py:func:`hifigan_generator_v2`, :py:func:`hifigan_generator_v3`.
+        To build the model, please use one of the factory functions: :py:func:`hifigan_vocoder`,
+        :py:func:`hifigan_vocoder_v1`, :py:func:`hifigan_vocoder_v2`, :py:func:`hifigan_vocoder_v3`.
 
     Args:
         in_channels (int): Number of channels in the input features.
@@ -62,7 +62,7 @@ class HiFiGANGenerator(torch.nn.Module):
         resblock_type: int,
         lrelu_slope: float,
     ):
-        super(HiFiGANGenerator, self).__init__()
+        super(HiFiGANVocoder, self).__init__()
         self.num_kernels = len(resblock_kernel_sizes)
         self.num_upsamples = len(upsample_rates)
         self.conv_pre = Conv1d(in_channels, upsample_initial_channel, 7, 1, padding=3)
@@ -117,7 +117,7 @@ class HiFiGANGenerator(torch.nn.Module):
 
 @torch.jit.interface
 class ResBlockInterface(torch.nn.Module):
-    """Interface for ResBlock - necessary to make type annotations in ``HiFiGANGenerator.forward`` compatible
+    """Interface for ResBlock - necessary to make type annotations in ``HiFiGANVocoder.forward`` compatible
     with TorchScript
     """
 
@@ -126,7 +126,7 @@ class ResBlockInterface(torch.nn.Module):
 
 
 class ResBlock1(torch.nn.Module):
-    """Residual block of type 1 for HiFiGAN Generator :cite:`NEURIPS2020_c5d73680`.
+    """Residual block of type 1 for HiFiGAN Vocoder :cite:`NEURIPS2020_c5d73680`.
     Args:
         channels (int): Number of channels in the input features.
         kernel_size (int, optional): Kernel size for 1D convolutions. (Default: ``3``)
@@ -193,7 +193,7 @@ class ResBlock1(torch.nn.Module):
 
 
 class ResBlock2(torch.nn.Module):
-    """Residual block of type 2 for HiFiGAN Generator :cite:`NEURIPS2020_c5d73680`.
+    """Residual block of type 2 for HiFiGAN Vocoder :cite:`NEURIPS2020_c5d73680`.
     Args:
         channels (int): Number of channels in the input features.
         kernel_size (int, optional): Kernel size for 1D convolutions. (Default: ``3``)
@@ -246,7 +246,7 @@ def get_padding(kernel_size, dilation=1):
     return int((kernel_size * dilation - dilation) / 2)
 
 
-def hifigan_generator(
+def hifigan_vocoder(
     in_channels: int,
     upsample_rates: Tuple[int, ...],
     upsample_initial_channel: int,
@@ -255,22 +255,22 @@ def hifigan_generator(
     resblock_dilation_sizes: Tuple[Tuple[int, ...], ...],
     resblock_type: int,
     lrelu_slope: float,
-) -> HiFiGANGenerator:
-    r"""Builds HiFi GAN Generator :cite:`NEURIPS2020_c5d73680`.
+) -> HiFiGANVocoder:
+    r"""Builds HiFi GAN Vocoder :cite:`NEURIPS2020_c5d73680`.
 
     Args:
-        in_channels (int): See :py:class:`HiFiGANGenerator`.
-        upsample_rates (tuple of ``int``): See :py:class:`HiFiGANGenerator`.
-        upsample_initial_channel (int): See :py:class:`HiFiGANGenerator`.
-        upsample_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANGenerator`.
-        resblock_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANGenerator`.
-        resblock_dilation_sizes (tuple of tuples of ``int``): See :py:class:`HiFiGANGenerator`.
-        resblock_type (int, 1 or 2): See :py:class:`HiFiGANGenerator`.
+        in_channels (int): See :py:class:`HiFiGANVocoder`.
+        upsample_rates (tuple of ``int``): See :py:class:`HiFiGANVocoder`.
+        upsample_initial_channel (int): See :py:class:`HiFiGANVocoder`.
+        upsample_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANVocoder`.
+        resblock_kernel_sizes (tuple of ``int``): See :py:class:`HiFiGANVocoder`.
+        resblock_dilation_sizes (tuple of tuples of ``int``): See :py:class:`HiFiGANVocoder`.
+        resblock_type (int, 1 or 2): See :py:class:`HiFiGANVocoder`.
     Returns:
-        HiFiGANGenerator: generated model.
+        HiFiGANVocoder: generated model.
     """
 
-    return HiFiGANGenerator(
+    return HiFiGANVocoder(
         upsample_rates=upsample_rates,
         resblock_kernel_sizes=resblock_kernel_sizes,
         resblock_dilation_sizes=resblock_dilation_sizes,
@@ -282,13 +282,13 @@ def hifigan_generator(
     )
 
 
-def hifigan_generator_v1() -> HiFiGANGenerator:
-    r"""Builds HiFiGAN Generator with V1 architecture :cite:`NEURIPS2020_c5d73680`.
+def hifigan_vocoder_v1() -> HiFiGANVocoder:
+    r"""Builds HiFiGAN Vocoder with V1 architecture :cite:`NEURIPS2020_c5d73680`.
 
     Returns:
-        HiFiGANGenerator: generated model.
+        HiFiGANVocoder: generated model.
     """
-    return hifigan_generator(
+    return hifigan_vocoder(
         upsample_rates=(8, 8, 2, 2),
         upsample_kernel_sizes=(16, 16, 4, 4),
         upsample_initial_channel=512,
@@ -300,13 +300,13 @@ def hifigan_generator_v1() -> HiFiGANGenerator:
     )
 
 
-def hifigan_generator_v2() -> HiFiGANGenerator:
-    r"""Builds HiFiGAN Generator with V2 architecture :cite:`NEURIPS2020_c5d73680`.
+def hifigan_vocoder_v2() -> HiFiGANVocoder:
+    r"""Builds HiFiGAN Vocoder with V2 architecture :cite:`NEURIPS2020_c5d73680`.
 
     Returns:
-        HiFiGANGenerator: generated model.
+        HiFiGANVocoder: generated model.
     """
-    return hifigan_generator(
+    return hifigan_vocoder(
         upsample_rates=(8, 8, 2, 2),
         upsample_kernel_sizes=(16, 16, 4, 4),
         upsample_initial_channel=128,
@@ -318,13 +318,13 @@ def hifigan_generator_v2() -> HiFiGANGenerator:
     )
 
 
-def hifigan_generator_v3() -> HiFiGANGenerator:
-    r"""Builds HiFiGAN Generator with V3 architecture :cite:`NEURIPS2020_c5d73680`.
+def hifigan_vocoder_v3() -> HiFiGANVocoder:
+    r"""Builds HiFiGAN Vocoder with V3 architecture :cite:`NEURIPS2020_c5d73680`.
 
     Returns:
-        HiFiGANGenerator: generated model.
+        HiFiGANVocoder: generated model.
     """
-    return hifigan_generator(
+    return hifigan_vocoder(
         upsample_rates=(8, 8, 4),
         upsample_kernel_sizes=(16, 16, 8),
         upsample_initial_channel=256,

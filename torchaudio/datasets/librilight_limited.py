@@ -7,7 +7,7 @@ from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
 from torchaudio.datasets.librispeech import _get_librispeech_metadata
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _extract_tar
 
 
 _ARCHIVE_NAME = "librispeech_finetuning"
@@ -78,7 +78,7 @@ class LibriLightLimited(Dataset):
                 raise RuntimeError("Dataset not found. Please use `download=True` to download")
             if not os.path.isfile(archive):
                 download_url_to_file(_URL, archive, hash_prefix=_CHECKSUM)
-            extract_archive(archive)
+            _extract_tar(archive)
         self._fileids_paths = _get_fileids_paths(self._path, folders, self._ext_audio)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:

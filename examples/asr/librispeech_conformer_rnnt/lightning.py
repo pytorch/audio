@@ -95,8 +95,6 @@ class ConformerRNNTModule(LightningModule):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
-        self.automatic_optimization = False
-
     def _step(self, batch, _, step_type):
         if batch is None:
             return None
@@ -145,25 +143,13 @@ class ConformerRNNTModule(LightningModule):
         - Update parameters on each GPU.
 
         Doing so allows us to account for the variability in batch sizes that
-        variable-length sequential data commonly yields.
+        variable-length sequential data yield.
         """
-
-        opt = self.optimizers()
-        opt.zero_grad()
         loss = self._step(batch, batch_idx, "train")
         batch_size = batch.features.size(0)
         batch_sizes = self.all_gather(batch_size)
         self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True)
         loss *= batch_sizes.size(0) / batch_sizes.sum()  # world size / batch size
-        self.manual_backward(loss)
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)
-        opt.step()
-
-        # step every epoch
-        sch = self.lr_schedulers()
-        if self.trainer.is_last_batch:
-            sch.step()
-
         return loss
 
     def validation_step(self, batch, batch_idx):

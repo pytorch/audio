@@ -51,9 +51,6 @@ class _MediaSourceMixin:
             with open(path, "rb") as fileobj:
                 data = fileobj.read()
             self.src = torch.frombuffer(data, dtype=torch.uint8)
-            print(self.src.data_ptr())
-            print(len(data))
-            print(self.src.shape)
         return self.src
 
     def tearDown(self):
@@ -446,35 +443,39 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             # Test keyframe seek
             # The source mp4 video has two key frames the first frame and 203rd frame at 8.08 second.
             # If the seek time stamp is smaller than 8.08, it will seek into the first frame at 0.0 second.
-            ("nasa_13013.mp4", "key", 0.2, (0, 0)),
-            ("nasa_13013.mp4", "key", 8.04, (0, 0)),
-            ("nasa_13013.mp4", "key", 8.08, (0, 202)),
-            ("nasa_13013.mp4", "key", 8.12, (0, 202)),
+            ("nasa_13013.mp4", "key", 0.2, (0, slice(None))),
+            ("nasa_13013.mp4", "key", 8.04, (0, slice(None))),
+            ("nasa_13013.mp4", "key", 8.08, (0, slice(202, None))),
+            ("nasa_13013.mp4", "key", 8.12, (0, slice(202, None))),
             # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
             # if we seek to a time stamp smaller than 0.4004 it will seek into the first frame at 0.0 second.
-            ("nasa_13013.avi", "key", 0.2, (0, 0)),
-            ("nasa_13013.avi", "key", 1.01, (0, 24)),
-            ("nasa_13013.avi", "key", 7.37, (0, 216)),
-            ("nasa_13013.avi", "key", 7.7, (0, 216)),
+            ("nasa_13013.avi", "key", 0.2, (0, slice(None))),
+            ("nasa_13013.avi", "key", 1.01, (0, slice(24, None))),
+            ("nasa_13013.avi", "key", 7.37, (0, slice(216, None))),
+            ("nasa_13013.avi", "key", 7.7, (0, slice(216, None))),
             # Test precise seek
-            ("nasa_13013.mp4", "precise", 0.0, (0, 0)),
-            ("nasa_13013.mp4", "precise", 0.2, (0, 5)),
-            ("nasa_13013.mp4", "precise", 8.04, (0, 201)),
-            ("nasa_13013.mp4", "precise", 8.08, (0, 202)),
-            ("nasa_13013.mp4", "precise", 8.12, (0, 203)),
-            ("nasa_13013.avi", "precise", 0.0, (0, 0)),
-            ("nasa_13013.avi", "precise", 0.2, (0, 1)),
-            ("nasa_13013.avi", "precise", 8.1, (0, 238)),
-            ("nasa_13013.avi", "precise", 8.14, (0, 239)),
-            ("nasa_13013.avi", "precise", 8.17, (0, 240)),
+            ("nasa_13013.mp4", "precise", 0.0, (0, slice(None))),
+            ("nasa_13013.mp4", "precise", 0.2, (0, slice(5, None))),
+            ("nasa_13013.mp4", "precise", 8.04, (0, slice(201, None))),
+            ("nasa_13013.mp4", "precise", 8.08, (0, slice(202, None))),
+            ("nasa_13013.mp4", "precise", 8.12, (0, slice(203, None))),
+            ("nasa_13013.avi", "precise", 0.0, (0, slice(None))),
+            ("nasa_13013.avi", "precise", 0.2, (0, slice(1, None))),
+            ("nasa_13013.avi", "precise", 8.1, (0, slice(238, None))),
+            ("nasa_13013.avi", "precise", 8.14, (0, slice(239, None))),
+            ("nasa_13013.avi", "precise", 8.17, (0, slice(240, None))),
+            # Test precise seek on video with missing PTS
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.0, (0, slice(None))),
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.2, (0, slice(4, None))),
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", "precise", 0.3, (0, slice(7, None))),
             # Test any seek
             # The source avi video has one keyframe every twelve frames 0, 12, 24,.. or every 0.4004 seconds.
-            ("nasa_13013.avi", "any", 0.0, (0, 0)),
-            ("nasa_13013.avi", "any", 0.56, (0, 12)),
-            ("nasa_13013.avi", "any", 7.77, (0, 228)),
-            ("nasa_13013.avi", "any", 0.2002, (11, 12)),
-            ("nasa_13013.avi", "any", 0.233567, (10, 12)),
-            ("nasa_13013.avi", "any", 0.266933, (9, 12)),
+            ("nasa_13013.avi", "any", 0.0, (0, slice(None))),
+            ("nasa_13013.avi", "any", 0.56, (0, slice(12, None))),
+            ("nasa_13013.avi", "any", 7.77, (0, slice(228, None))),
+            ("nasa_13013.avi", "any", 0.2002, (11, slice(12, None))),
+            ("nasa_13013.avi", "any", 0.233567, (10, slice(12, None))),
+            ("nasa_13013.avi", "any", 0.266933, (9, slice(12, None))),
         ]
     )
     def test_seek_modes(self, src, mode, seek_time, ref_indices):
@@ -506,7 +507,103 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
         hyp_index, ref_index = ref_indices
 
-        self.assertEqual(frame[hyp_index:], ref_frames[ref_index:])
+        hyp, ref = frame[hyp_index:], ref_frames[ref_index]
+        print(hyp.shape, ref.shape)
+        self.assertEqual(hyp, ref)
+
+    @parameterized.expand(
+        [
+            ("nasa_13013.mp4", [195, 3, 270, 480]),
+            # RATRACE does not have valid PTS metadata.
+            ("RATRACE_wave_f_nm_np1_fr_goo_37.avi", [36, 3, 240, 560]),
+        ]
+    )
+    def test_change_fps(self, src, shape):
+        """Can change the FPS of videos"""
+        tgt_frame_rate = 15
+        s = StreamReader(self.get_src(src))
+        info = s.get_src_stream_info(s.default_video_stream)
+        assert info.frame_rate != tgt_frame_rate
+        s.add_basic_video_stream(frames_per_chunk=-1, frame_rate=tgt_frame_rate)
+        s.process_all_packets()
+        (chunk,) = s.pop_chunks()
+
+        assert chunk.shape == torch.Size(shape)
+
+    def test_invalid_chunk_option(self):
+        """Passing invalid `frames_per_chunk` and `buffer_chunk_size` raises error"""
+        s = StreamReader(self.get_src())
+        for fpc, bcs in ((0, 3), (3, 0), (-2, 3), (3, -2)):
+            with self.assertRaises(RuntimeError):
+                s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=bcs)
+            with self.assertRaises(RuntimeError):
+                s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=bcs)
+
+    def test_unchunked_stream(self):
+        """`frames_per_chunk=-1` disable chunking.
+
+        When chunking is disabled, frames contained in one AVFrame become one chunk.
+        For video, that is always one frame, but for audio, it depends.
+        """
+        s = StreamReader(self.get_src())
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=10000)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=10000)
+        s.process_all_packets()
+        video, audio = s.pop_chunks()
+        assert video.shape == torch.Size([390, 3, 270, 480])
+        assert audio.shape == torch.Size([208896, 2])
+
+    @parameterized.expand([(1,), (3,), (5,), (10,)])
+    def test_frames_per_chunk(self, fpc):
+        """Changing frames_per_chunk does not change the returned content"""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.process_all_packets()
+        ref_video, ref_audio = s.pop_chunks()
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        chunks = list(s.stream())
+        video_chunks = torch.cat([c[0] for c in chunks if c[0] is not None])
+        audio_chunks = torch.cat([c[1] for c in chunks if c[1] is not None])
+        self.assertEqual(ref_video, video_chunks)
+        self.assertEqual(ref_audio, audio_chunks)
+
+    def test_buffer_chunk_size(self):
+        """`buffer_chunk_size=-1` does not drop frames."""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=30, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=16000, buffer_chunk_size=-1)
+        s.process_all_packets()
+        for _ in range(13):
+            video, audio = s.pop_chunks()
+            assert video.shape == torch.Size([30, 3, 270, 480])
+            assert audio.shape == torch.Size([16000, 2])
+        video, audio = s.pop_chunks()
+        assert video is None
+        assert audio.shape == torch.Size([896, 2])
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=30, buffer_chunk_size=3)
+        s.add_audio_stream(frames_per_chunk=16000, buffer_chunk_size=3)
+        s.process_all_packets()
+        for _ in range(2):
+            video, audio = s.pop_chunks()
+            assert video.shape == torch.Size([30, 3, 270, 480])
+            assert audio.shape == torch.Size([16000, 2])
+        video, audio = s.pop_chunks()
+        assert video.shape == torch.Size([30, 3, 270, 480])
+        assert audio.shape == torch.Size([896, 2])
 
 
 def _to_fltp(original):
@@ -715,12 +812,16 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
 
             s = StreamReader(path)
             s.add_basic_video_stream(frames_per_chunk=-1, format="yuv444p")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv420p")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="nv12")
             s.add_basic_video_stream(frames_per_chunk=-1, format="rgb24")
             s.add_basic_video_stream(frames_per_chunk=-1, format="bgr24")
             s.add_basic_video_stream(frames_per_chunk=-1, format="gray8")
             s.process_all_packets()
-            output_yuv, output_rgb, output_bgr, output_gray = s.pop_chunks()
-            self.assertEqual(yuv, output_yuv, atol=1, rtol=0)
-            self.assertEqual(rgb, output_rgb, atol=0, rtol=0)
-            self.assertEqual(bgr, output_bgr, atol=0, rtol=0)
-            self.assertEqual(gray, output_gray, atol=1, rtol=0)
+            yuv444, yuv420, nv12, rgb24, bgr24, gray8 = s.pop_chunks()
+            self.assertEqual(yuv, yuv444, atol=1, rtol=0)
+            self.assertEqual(yuv, yuv420, atol=1, rtol=0)
+            self.assertEqual(yuv, nv12, atol=1, rtol=0)
+            self.assertEqual(rgb, rgb24, atol=0, rtol=0)
+            self.assertEqual(bgr, bgr24, atol=0, rtol=0)
+            self.assertEqual(gray, gray8, atol=1, rtol=0)

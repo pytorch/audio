@@ -75,15 +75,31 @@ class Autograd(TestBaseMixin):
         assert gradcheck(speed, (waveform, lengths))
         assert gradgradcheck(speed, (waveform, lengths))
 
-    def test_AddNoise(self):
+    @nested_params([True, False])
+    def test_AddNoise(self, use_lengths):
         leading_dims = (2, 3)
         L = 31
 
         waveform = torch.rand(*leading_dims, L, dtype=torch.float64, device=self.device, requires_grad=True)
         noise = torch.rand(*leading_dims, L, dtype=torch.float64, device=self.device, requires_grad=True)
-        lengths = torch.rand(*leading_dims, dtype=torch.float64, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims, dtype=torch.float64, device=self.device, requires_grad=True)
+        else:
+            lengths = None
         snr = torch.rand(*leading_dims, dtype=torch.float64, device=self.device, requires_grad=True) * 10
 
         add_noise = T.AddNoise().to(self.device, torch.float64)
-        assert gradcheck(add_noise, (waveform, noise, lengths, snr))
-        assert gradgradcheck(add_noise, (waveform, noise, lengths, snr))
+        assert gradcheck(add_noise, (waveform, noise, snr, lengths))
+        assert gradgradcheck(add_noise, (waveform, noise, snr, lengths))
+
+    def test_Preemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=torch.float64, device=self.device, requires_grad=True)
+        preemphasis = T.Preemphasis(coeff=0.97).to(dtype=torch.float64, device=self.device)
+        assert gradcheck(preemphasis, (waveform,))
+        assert gradgradcheck(preemphasis, (waveform,))
+
+    def test_Deemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=torch.float64, device=self.device, requires_grad=True)
+        deemphasis = T.Deemphasis(coeff=0.97).to(dtype=torch.float64, device=self.device)
+        assert gradcheck(deemphasis, (waveform,))
+        assert gradgradcheck(deemphasis, (waveform,))

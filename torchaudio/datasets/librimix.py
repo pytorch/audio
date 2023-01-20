@@ -18,8 +18,8 @@ class LibriMix(Dataset):
     r"""*LibriMix* :cite:`cosentino2020librimix` dataset.
 
     Args:
-        root (str or Path): The path to the directory where the directory ``Libri2Mix`` or
-            ``Libri3Mix`` is stored.
+        root (str or Path): The path where the directory ``Libri2Mix`` or
+            ``Libri3Mix`` is stored. Not the path of those directories.
         subset (str, optional): The subset to use. Options: [``"train-360"``, ``"train-100"``,
             ``"dev"``, and ``"test"``] (Default: ``"train-360"``).
         num_speakers (int, optional): The number of speakers, which determines the directories
@@ -51,6 +51,11 @@ class LibriMix(Dataset):
         mode: str = "min",
     ):
         self.root = Path(root) / f"Libri{num_speakers}Mix"
+        if not os.path.exists(self.root):
+            raise RuntimeError(
+                f"The path {self.root} doesn't exist. "
+                "Please check the ``root`` path and ``num_speakers`` or download the dataset manually."
+            )
         if mode not in ["max", "min"]:
             raise ValueError(f'Expect ``mode`` to be one in ["min", "max"]. Found {mode}.')
         if sample_rate == 8000:

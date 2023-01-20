@@ -88,6 +88,12 @@ void init_codec_context(
 #endif
 
   AVDictionary* opts = get_option_dict(decoder_option);
+
+  // Default to single thread execution.
+  if (!av_dict_get(opts, "threads", nullptr, 0)) {
+    av_dict_set(&opts, "threads", "1", 0);
+  }
+
   ret = avcodec_open2(pCodecContext, pCodecContext->codec, &opts);
   clean_up_dict(opts);
 
@@ -115,6 +121,10 @@ int Decoder::process_packet(AVPacket* pPacket) {
 
 int Decoder::get_frame(AVFrame* pFrame) {
   return avcodec_receive_frame(pCodecContext, pFrame);
+}
+
+int Decoder::get_frame_number() const {
+  return pCodecContext->frame_number;
 }
 
 void Decoder::flush_buffer() {

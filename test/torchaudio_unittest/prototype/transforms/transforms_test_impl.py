@@ -7,6 +7,8 @@ import torch
 import torchaudio.prototype.transforms as T
 from parameterized import parameterized
 from scipy import signal
+from torchaudio.functional import lfilter
+from torchaudio.prototype.functional import preemphasis
 from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
 
 
@@ -182,12 +184,12 @@ class TransformsTestImpl(TestBaseMixin):
         snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
 
         add_noise = T.AddNoise()
-        actual = add_noise(waveform, noise, lengths, snr)
+        actual = add_noise(waveform, noise, snr, lengths)
 
         noise_expanded = noise.expand(*leading_dims, L)
         snr_expanded = snr.expand(*leading_dims)
         lengths_expanded = lengths.expand(*leading_dims)
-        expected = add_noise(waveform, noise_expanded, lengths_expanded, snr_expanded)
+        expected = add_noise(waveform, noise_expanded, snr_expanded, lengths_expanded)
 
         self.assertEqual(expected, actual)
 
@@ -206,7 +208,7 @@ class TransformsTestImpl(TestBaseMixin):
         add_noise = T.AddNoise()
 
         with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
-            add_noise(waveform, noise, lengths, snr)
+            add_noise(waveform, noise, snr, lengths)
 
     def test_AddNoise_length_check(self):
         """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
@@ -221,4 +223,29 @@ class TransformsTestImpl(TestBaseMixin):
         add_noise = T.AddNoise()
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
-            add_noise(waveform, noise, lengths, snr)
+            add_noise(waveform, noise, snr, lengths)
+
+    @nested_params(
+        [(2, 1, 31)],
+        [0.97, 0.72],
+    )
+    def test_Preemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        preemphasis = T.Preemphasis(coeff=coeff).to(dtype=self.dtype, device=self.device)
+        actual = preemphasis(waveform)
+
+        a_coeffs = torch.tensor([1.0, 0.0], device=self.device, dtype=self.dtype)
+        b_coeffs = torch.tensor([1.0, -coeff], device=self.device, dtype=self.dtype)
+        expected = lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+        self.assertEqual(actual, expected)
+
+    @nested_params(
+        [(2, 1, 31)],
+        [0.97, 0.72],
+    )
+    def test_Deemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        preemphasized = preemphasis(waveform, coeff=coeff)
+        deemphasis = T.Deemphasis(coeff=coeff).to(dtype=self.dtype, device=self.device)
+        deemphasized = deemphasis(preemphasized)
+        self.assertEqual(deemphasized, waveform)

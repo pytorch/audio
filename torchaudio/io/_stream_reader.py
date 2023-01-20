@@ -216,11 +216,16 @@ def _format_doc(**kwargs):
 
 _frames_per_chunk = """Number of frames returned as one chunk.
                 If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is."""
+                then the chunk is returned as-is.
+
+                Providing ``-1`` disables chunking and :py:func:`pop_chunks` method
+                will concatenate all the buffered frames and return it."""
 
 _buffer_chunk_size = """Internal buffer size.
                 When the number of chunks buffered exceeds this number, old frames are
-                dropped.
+                dropped. For example, if `frames_per_chunk` is 5 and `buffer_chunk_size` is
+                3, then frames older than 15 are dropped.
+                Providing ``-1`` disables this behavior.
 
                 Default: ``3``."""
 
@@ -234,17 +239,33 @@ _video_stream_index = """The source video stream index.
 _decoder = """The name of the decoder to be used.
                 When provided, use the specified decoder instead of the default one.
 
-                To list the available decoders, you can use `ffmpeg -decoders` command.
+                To list the available decoders, please use
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_decoders` for audio, and
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_decoders` for video.
 
                 Default: ``None``."""
 
 _decoder_option = """Options passed to decoder.
-                Mapping from str to str.
+                Mapping from str to str. (Default: ``None``)
 
                 To list decoder options for a decoder, you can use
                 `ffmpeg -h decoder=<DECODER>` command.
 
-                Default: ``None``."""
+                In addition to decoder-specific options, you can also pass options related
+                to multithreading. They are effective only if the decoder support them.
+                If neither of them are provided, StreamReader defaults to single thread.
+
+                 - ``"threads"``: The number of threads (in str) or the value ``"0"``
+                   to let FFmpeg decides based on its heuristics.
+                 - ``"thread_type"``: Which multithreading method to use.
+                   The valid values are ``"frame"`` or ``"slice"``.
+                   Note that sach decoder supports different set of methods.
+                   If not provided, a default value is used.
+                    - ``"frame"``: Decode more than one frame at once.
+                      Each thread handles one frame.
+                      This will increase decoding delay by one frame per thread
+                    - ``"slice"``: Decode more than one part of a single frame at once.
+                """
 
 
 _hw_accel = """Enable hardware acceleration.
@@ -326,14 +347,16 @@ class StreamReader:
 
                https://ffmpeg.org/ffmpeg-formats.html#Demuxers
 
-               Use `ffmpeg -demuxers` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_demuxers` to list the
+               demultiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
                software configuration (ffmpeg build).
 
                https://ffmpeg.org/ffmpeg-devices.html#Input-Devices
 
-               Use `ffmpeg -devices` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_input_devices` to list
+               the input devices available in the current environment.
 
         option (dict of str to str, optional):
             Custom option passed when initializing format context (opening source).
@@ -361,7 +384,7 @@ class StreamReader:
         elif isinstance(src, torch.Tensor):
             self._be = torch.classes.torchaudio.ffmpeg_StreamReaderTensor(src, format, option, buffer_size)
         elif hasattr(src, "read"):
-            self._be = torchaudio._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
             raise ValueError("`src` must be either string, Tensor or file-like object.")
 
@@ -735,8 +758,15 @@ class StreamReader:
         """
         return self._be.pop_chunks()
 
-    def _fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
+    def fill_buffer(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
         """Keep processing packets until all buffers have at least one chunk
+
+        Arguments:
+            timeout (float or None, optional): See
+                :py:func:`~StreamReader.process_packet`. (Default: ``None``)
+
+            backoff (float, optional): See
+                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
 
         Returns:
             int:
@@ -749,11 +779,7 @@ class StreamReader:
                 flushed the pending frames. The caller should stop calling
                 this method.
         """
-        while not self.is_buffer_ready():
-            code = self.process_packet(timeout, backoff)
-            if code != 0:
-                return code
-        return 0
+        return self._be.fill_buffer(timeout, backoff)
 
     def stream(
         self, timeout: Optional[float] = None, backoff: float = 10.0
@@ -779,7 +805,7 @@ class StreamReader:
             raise RuntimeError("No output stream is configured.")
 
         while True:
-            if self._fill_buffer(timeout, backoff):
+            if self.fill_buffer(timeout, backoff):
                 break
             yield self.pop_chunks()
 
