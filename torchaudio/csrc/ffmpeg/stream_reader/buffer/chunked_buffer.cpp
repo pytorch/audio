@@ -5,23 +5,33 @@ namespace torchaudio {
 namespace ffmpeg {
 namespace detail {
 
-ChunkedBuffer::ChunkedBuffer(int frames_per_chunk, int num_chunks)
-    : frames_per_chunk(frames_per_chunk), num_chunks(num_chunks) {}
+ChunkedBuffer::ChunkedBuffer(
+    int frames_per_chunk,
+    int num_chunks,
+    double frame_duration)
+    : frame_duration(frame_duration),
+      frames_per_chunk(frames_per_chunk),
+      num_chunks(num_chunks) {}
 
-ChunkedAudioBuffer::ChunkedAudioBuffer(int frames_per_chunk, int num_chunks)
-    : ChunkedBuffer(frames_per_chunk, num_chunks) {}
+ChunkedAudioBuffer::ChunkedAudioBuffer(
+    int frames_per_chunk,
+    int num_chunks,
+    double frame_duration)
+    : ChunkedBuffer(frames_per_chunk, num_chunks, frame_duration) {}
 
 ChunkedVideoBuffer::ChunkedVideoBuffer(
     int frames_per_chunk,
     int num_chunks,
+    double frame_duration,
     const torch::Device& device_)
-    : ChunkedBuffer(frames_per_chunk, num_chunks), device(device_) {}
+    : ChunkedBuffer(frames_per_chunk, num_chunks, frame_duration),
+      device(device_) {}
 
 bool ChunkedBuffer::is_ready() const {
   return num_buffered_frames >= frames_per_chunk;
 }
 
-void ChunkedBuffer::push_tensor(torch::Tensor frame) {
+void ChunkedBuffer::push_tensor(torch::Tensor frame, double pts_) {
   using namespace torch::indexing;
   // Note:
   // Audio tensors contain multiple frames while video tensors contain only
@@ -60,6 +70,7 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame) {
     num_buffered_frames += append;
     // frame = frame[append:]
     frame = frame.index({Slice(append)});
+    pts_ += double(append) * frame_duration;
   }
 
   // 2. Return if the number of input frames are smaller than the empty buffer.
@@ -83,6 +94,7 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame) {
     int64_t start = i * frames_per_chunk;
     // chunk = frame[i*frames_per_chunk:(i+1) * frames_per_chunk]
     auto chunk = frame.index({Slice(start, start + frames_per_chunk)});
+    double pts_val = pts_ + double(start) * frame_duration;
     int64_t chunk_size = chunk.size(0);
     TORCH_INTERNAL_ASSERT(
         chunk_size <= frames_per_chunk,
@@ -95,6 +107,7 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame) {
       chunk = temp;
     }
     chunks.push_back(chunk);
+    pts.push_back(pts_val);
     num_buffered_frames += chunk_size;
 
     // Trim if num_chunks > 0
@@ -109,26 +122,28 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame) {
   }
 }
 
-c10::optional<torch::Tensor> ChunkedBuffer::pop_chunk() {
+c10::optional<Chunk> ChunkedBuffer::pop_chunk() {
   using namespace torch::indexing;
   if (!num_buffered_frames) {
     return {};
   }
-  torch::Tensor ret = chunks.front();
+  torch::Tensor chunk = chunks.front();
+  double pts_val = pts.front();
   chunks.pop_front();
+  pts.pop_front();
   if (num_buffered_frames < frames_per_chunk) {
-    ret = ret.index({Slice(None, num_buffered_frames)});
+    chunk = chunk.index({Slice(None, num_buffered_frames)});
   }
-  num_buffered_frames -= ret.size(0);
-  return c10::optional<torch::Tensor>{ret};
+  num_buffered_frames -= chunk.size(0);
+  return {Chunk{chunk, pts_val}};
 }
 
-void ChunkedAudioBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_audio(frame));
+void ChunkedAudioBuffer::push_frame(AVFrame* frame, double pts_) {
+  push_tensor(convert_audio(frame), pts_);
 }
 
-void ChunkedVideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(convert_image(frame, device));
+void ChunkedVideoBuffer::push_frame(AVFrame* frame, double pts_) {
+  push_tensor(convert_image(frame, device), pts_);
 }
 
 void ChunkedBuffer::flush() {

@@ -16,19 +16,20 @@ namespace detail {
 class UnchunkedBuffer : public Buffer {
   // Each AVFrame is converted to a Tensor and stored here.
   std::deque<torch::Tensor> chunks;
+  double pts = -1.;
 
  protected:
-  void push_tensor(const torch::Tensor& t);
+  void push_tensor(const torch::Tensor& t, double pts);
 
  public:
   bool is_ready() const override;
-  c10::optional<torch::Tensor> pop_chunk() override;
+  c10::optional<Chunk> pop_chunk() override;
   void flush() override;
 };
 
 class UnchunkedAudioBuffer : public UnchunkedBuffer {
  public:
-  void push_frame(AVFrame* frame) override;
+  void push_frame(AVFrame* frame, double pts) override;
 };
 
 class UnchunkedVideoBuffer : public UnchunkedBuffer {
@@ -37,7 +38,7 @@ class UnchunkedVideoBuffer : public UnchunkedBuffer {
  public:
   explicit UnchunkedVideoBuffer(const torch::Device& device);
 
-  void push_frame(AVFrame* frame) override;
+  void push_frame(AVFrame* frame, double pts) override;
 };
 
 } // namespace detail

@@ -4,6 +4,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <map>
 
 namespace torchaudio {
@@ -95,7 +96,7 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Get the chunk from the given filter result
-  c10::optional<torch::Tensor> pop_chunk(KeyType key);
+  c10::optional<Chunk> pop_chunk(KeyType key);
 };
 
 } // namespace ffmpeg
