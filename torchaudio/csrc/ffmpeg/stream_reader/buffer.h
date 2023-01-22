@@ -1,6 +1,7 @@
 #pragma once
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 
 namespace torchaudio {
 namespace ffmpeg {
@@ -21,9 +22,9 @@ class Buffer {
   //////////////////////////////////////////////////////////////////////////////
   // Modifiers
   //////////////////////////////////////////////////////////////////////////////
-  virtual void push_frame(AVFrame* frame) = 0;
+  virtual void push_frame(AVFrame* frame, double pts) = 0;
 
-  virtual c10::optional<torch::Tensor> pop_chunk() = 0;
+  virtual c10::optional<Chunk> pop_chunk() = 0;
 
   virtual void flush() = 0;
 };

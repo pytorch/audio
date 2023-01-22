@@ -263,6 +263,10 @@ class StreamReader {
   std::vector<c10::optional<torch::Tensor>> pop_chunks();
 
   ///@}
+
+  /// Pop one chunk from each output stream if it is available.
+  /// TODO: merge this to pop_chunks
+  std::vector<c10::optional<Chunk>> pop_chunks_with_metadata();
 };
 
 } // namespace ffmpeg

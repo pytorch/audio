@@ -104,5 +104,20 @@ struct OutputStreamInfo {
   std::string filter_description;
 };
 
+/// Stores decoded frames and metadata
+struct Chunk {
+  /// Audio/video frames.
+  ///
+  /// For audio, the shape is ``[time, num_channels]``, and the ``dtype``
+  /// depends on output stream configurations.
+  ///
+  /// For video, the shape is ``[time, channel, height, width]``, and
+  /// the ``dtype`` is ``torch.uint8``.
+  torch::Tensor frames;
+  ///
+  /// Presentation time stamp of the first frame, in second.
+  double pts;
+};
+
 } // namespace ffmpeg
 } // namespace torchaudio
