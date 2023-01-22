@@ -2,14 +2,14 @@ import os
 from pathlib import Path
 from typing import Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio.datasets.utils import _extract_tar, _load_waveform
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
+SAMPLE_RATE = 16000
 _DATA_SUBSETS = [
     "dev-clean",
     "dev-other",
@@ -30,7 +30,7 @@ _CHECKSUMS = {
 }
 
 
-def download_librispeech(root, url):
+def _download_librispeech(root, url):
     base_url = "http://www.openslr.org/resources/12/"
     ext_archive = ".tar.gz"
 
@@ -40,41 +40,48 @@ def download_librispeech(root, url):
     if not os.path.isfile(archive):
         checksum = _CHECKSUMS.get(download_url, None)
         download_url_to_file(download_url, archive, hash_prefix=checksum)
-    extract_archive(archive)
+    _extract_tar(archive)
 
 
-def load_librispeech_item(
-    fileid: str, path: str, ext_audio: str, ext_txt: str, blist: list
-) -> Tuple[Tensor, int, str, int, int, int]:
+def _get_librispeech_metadata(
+    fileid: str, root: str, folder: str, ext_audio: str, ext_txt: str, blist: list
+) -> Tuple[str, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
-    # Load audio
+    # Get audio path and sample rate
     fileid_audio = f"{speaker_id}-{chapter_id}-{utterance_id}"
-    file_audio = fileid_audio + ext_audio
-    file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
-    waveform, sample_rate = torchaudio.load(file_audio)
+    filepath = os.path.join(folder, speaker_id, chapter_id, f"{fileid_audio}{ext_audio}")
 
     # Load text
     file_text = f"{speaker_id}-{chapter_id}{ext_txt}"
-    file_text = os.path.join(path, speaker_id, chapter_id, file_text)
+    file_text = os.path.join(root, folder, speaker_id, chapter_id, file_text)
+    uttblist = []
     with open(file_text) as ft:
         for line in ft:
             fileid_text, transcript = line.strip().split(" ", 1)
-            wordlist = set()
-            for word in transcript.split():
-                if word in blist:
-                    wordlist.add(word)
             if fileid_audio == fileid_text:
+                # get utterance biasing list
+                for word in transcript.split():
+                    if word in blist and word not in uttblist:
+                        uttblist.append(word)
                 break
         else:
             # Translation not found
             raise FileNotFoundError(f"Translation not found for {fileid_audio}")
 
-    return (waveform, sample_rate, transcript, int(speaker_id), int(chapter_id), int(utterance_id), wordlist)
+    return (
+        filepath,
+        SAMPLE_RATE,
+        transcript,
+        int(speaker_id),
+        int(chapter_id),
+        int(utterance_id),
+        uttblist,
+    )
 
 
 class LIBRISPEECH_BIASING(Dataset):
-    """Create a Dataset for *LibriSpeech* [:footcite:`7178964`].
+    """*LibriSpeech* :cite:`7178964` dataset with biasing support.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.
@@ -87,6 +94,8 @@ class LIBRISPEECH_BIASING(Dataset):
             The top-level directory of the dataset. (default: ``"LibriSpeech"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
+        blist (list, optional):
+            The list of biasing words (default: ``[]``).
     """
 
     _ext_txt = ".trans.txt"
@@ -100,15 +109,17 @@ class LIBRISPEECH_BIASING(Dataset):
         download: bool = False,
         blist: list = [],
     ) -> None:
+        self._url = url
         if url not in _DATA_SUBSETS:
             raise ValueError(f"Invalid url '{url}' given; please provide one of {_DATA_SUBSETS}.")
 
         root = os.fspath(root)
+        self._archive = os.path.join(root, folder_in_archive)
         self._path = os.path.join(root, folder_in_archive, url)
 
         if not os.path.isdir(self._path):
             if download:
-                download_librispeech(root, url)
+                _download_librispeech(root, url)
             else:
                 raise RuntimeError(
                     f"Dataset not found at {self._path}. Please set `download=True` to download the dataset."
@@ -117,6 +128,34 @@ class LIBRISPEECH_BIASING(Dataset):
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
         self.blist = blist
 
+    def get_metadata(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
+        """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
+        but otherwise returns the same fields as :py:func:`__getitem__`.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            Tuple of the following items;
+
+            str:
+                Path to audio
+            int:
+                Sample rate
+            str:
+                Transcript
+            int:
+                Speaker ID
+            int:
+                Chapter ID
+            int:
+                Utterance ID
+            list:
+                List of biasing words in the utterance
+        """
+        fileid = self._walker[n]
+        return _get_librispeech_metadata(fileid, self._archive, self._url, self._ext_audio, self._ext_txt, self.blist)
+
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
 
@@ -124,11 +163,26 @@ class LIBRISPEECH_BIASING(Dataset):
             n (int): The index of the sample to be loaded
 
         Returns:
-            (Tensor, int, str, int, int, int):
-            ``(waveform, sample_rate, transcript, speaker_id, chapter_id, utterance_id)``
+            Tuple of the following items;
+
+            Tensor:
+                Waveform
+            int:
+                Sample rate
+            str:
+                Transcript
+            int:
+                Speaker ID
+            int:
+                Chapter ID
+            int:
+                Utterance ID
+            list:
+                List of biasing words in the utterance
         """
-        fileid = self._walker[n]
-        return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt, self.blist)
+        metadata = self.get_metadata(n)
+        waveform = _load_waveform(self._archive, metadata[0], metadata[1])
+        return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
         return len(self._walker)
