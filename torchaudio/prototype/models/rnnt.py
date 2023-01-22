@@ -692,7 +692,7 @@ def conformer_rnnt_biasing_base(charlist=[], biasing=True) -> RNNT:
         attndim=256,
         biasing=biasing,
         charlist=charlist,
-        deepbiasing=False,
+        deepbiasing=True,
         tcpsche=30,
         DBaverage=False,
     )
