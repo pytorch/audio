@@ -135,12 +135,12 @@ class FunctionalTestImpl(TestBaseMixin):
         noise = torch.rand(5, 1, 1, L, dtype=self.dtype, device=self.device)
         lengths = torch.rand(5, 1, 3, dtype=self.dtype, device=self.device)
         snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
-        actual = F.add_noise(waveform, noise, lengths, snr)
+        actual = F.add_noise(waveform, noise, snr, lengths)
 
         noise_expanded = noise.expand(*leading_dims, L)
         snr_expanded = snr.expand(*leading_dims)
         lengths_expanded = lengths.expand(*leading_dims)
-        expected = F.add_noise(waveform, noise_expanded, lengths_expanded, snr_expanded)
+        expected = F.add_noise(waveform, noise_expanded, snr_expanded, lengths_expanded)
 
         self.assertEqual(expected, actual)
 
@@ -157,7 +157,7 @@ class FunctionalTestImpl(TestBaseMixin):
         snr = torch.rand(*snr_dims, dtype=self.dtype, device=self.device) * 10
 
         with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
+            F.add_noise(waveform, noise, snr, lengths)
 
     def test_add_noise_length_check(self):
         """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
@@ -170,7 +170,7 @@ class FunctionalTestImpl(TestBaseMixin):
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
 
         with self.assertRaisesRegex(ValueError, "Length dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
+            F.add_noise(waveform, noise, snr, lengths)
 
     @nested_params(
         [(2, 3), (2, 3, 5), (2, 3, 5, 7)],

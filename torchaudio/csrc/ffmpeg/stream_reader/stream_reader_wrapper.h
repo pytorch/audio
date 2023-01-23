@@ -61,6 +61,8 @@ using OutInfo = std::tuple<
     std::string // filter description
     >;
 
+using ChunkData = std::tuple<torch::Tensor, double>;
+
 // Structure to implement wrapper API around StreamReader, which is more
 // suitable for Binding the code (i.e. it receives/returns pritimitves)
 struct StreamReaderBinding : public StreamReader,
@@ -78,6 +80,8 @@ struct StreamReaderBinding : public StreamReader,
   int64_t fill_buffer(
       const c10::optional<double>& timeout = c10::optional<double>(),
       const double backoff = 10.);
+
+  std::vector<c10::optional<ChunkData>> pop_chunks();
 };
 
 } // namespace ffmpeg

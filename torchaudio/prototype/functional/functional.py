@@ -1,7 +1,7 @@
 import math
 import warnings
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 import torch
 from torchaudio.functional import lfilter, resample
@@ -134,7 +134,9 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
     return _apply_convolve_mode(result, x_size, y_size, mode)
 
 
-def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor) -> torch.Tensor:
+def add_noise(
+    waveform: torch.Tensor, noise: torch.Tensor, snr: torch.Tensor, lengths: Optional[torch.Tensor] = None
+) -> torch.Tensor:
     r"""Scales and adds noise to waveform per signal-to-noise ratio.
 
     Specifically, for each pair of waveform vector :math:`x \in \mathbb{R}^L` and noise vector
@@ -160,16 +162,17 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
     Args:
         waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
         noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
-        lengths (torch.Tensor): Valid lengths of signals in ``waveform`` and ``noise``, with shape `(...,)`
-            (leading dimensions must match those of ``waveform``).
         snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+        lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``, with shape
+            `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all elements in ``waveform``
+            and ``noise`` are treated as valid. (Default: ``None``)
 
     Returns:
         torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
         (same shape as ``waveform``).
     """
 
-    if not (waveform.ndim - 1 == noise.ndim - 1 == lengths.ndim == snr.ndim):
+    if not (waveform.ndim - 1 == noise.ndim - 1 == snr.ndim and (lengths is None or lengths.ndim == snr.ndim)):
         raise ValueError("Input leading dimensions don't match.")
 
     L = waveform.size(-1)
@@ -178,11 +181,18 @@ def add_noise(waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor
         raise ValueError(f"Length dimensions of waveform and noise don't match (got {L} and {noise.size(-1)}).")
 
     # compute scale
-    mask = torch.arange(0, L, device=lengths.device).expand(waveform.shape) < lengths.unsqueeze(
-        -1
-    )  # (*, L) < (*, 1) = (*, L)
-    energy_signal = torch.linalg.vector_norm(waveform * mask, ord=2, dim=-1) ** 2  # (*,)
-    energy_noise = torch.linalg.vector_norm(noise * mask, ord=2, dim=-1) ** 2  # (*,)
+    if lengths is not None:
+        mask = torch.arange(0, L, device=lengths.device).expand(waveform.shape) < lengths.unsqueeze(
+            -1
+        )  # (*, L) < (*, 1) = (*, L)
+        masked_waveform = waveform * mask
+        masked_noise = noise * mask
+    else:
+        masked_waveform = waveform
+        masked_noise = noise
+
+    energy_signal = torch.linalg.vector_norm(masked_waveform, ord=2, dim=-1) ** 2  # (*,)
+    energy_noise = torch.linalg.vector_norm(masked_noise, ord=2, dim=-1) ** 2  # (*,)
     original_snr_db = 10 * (torch.log10(energy_signal) - torch.log10(energy_noise))
     scale = 10 ** ((original_snr_db - snr) / 20.0)  # (*,)
 

@@ -11,29 +11,39 @@ std::unique_ptr<Buffer> get_buffer(
     AVMediaType type,
     int frames_per_chunk,
     int num_chunks,
+    double frame_duration,
     const torch::Device& device) {
-  switch (type) {
-    case AVMEDIA_TYPE_AUDIO: {
-      if (frames_per_chunk < 0) {
-        return std::unique_ptr<Buffer>(new UnchunkedAudioBuffer());
-      } else {
-        return std::unique_ptr<Buffer>(
-            new ChunkedAudioBuffer(frames_per_chunk, num_chunks));
-      }
+  TORCH_CHECK(
+      frames_per_chunk > 0 || frames_per_chunk == -1,
+      "`frames_per_chunk` must be positive or -1. Found: ",
+      frames_per_chunk);
+
+  TORCH_CHECK(
+      num_chunks > 0 || num_chunks == -1,
+      "`num_chunks` must be positive or -1. Found: ",
+      num_chunks);
+
+  TORCH_INTERNAL_ASSERT(
+      type == AVMEDIA_TYPE_AUDIO || type == AVMEDIA_TYPE_VIDEO,
+      "Unsupported media type: ",
+      av_get_media_type_string(type),
+      ". Only video or audio is supported ");
+
+  // Chunked Mode
+  if (frames_per_chunk > 0) {
+    if (type == AVMEDIA_TYPE_AUDIO) {
+      return std::unique_ptr<Buffer>(new detail::ChunkedAudioBuffer(
+          frames_per_chunk, num_chunks, frame_duration));
+    } else {
+      return std::unique_ptr<Buffer>(new detail::ChunkedVideoBuffer(
+          frames_per_chunk, num_chunks, frame_duration, device));
     }
-    case AVMEDIA_TYPE_VIDEO: {
-      if (frames_per_chunk < 0) {
-        return std::unique_ptr<Buffer>(new UnchunkedVideoBuffer(device));
-      } else {
-        return std::unique_ptr<Buffer>(
-            new ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
-      }
+  } else { // unchunked mode
+    if (type == AVMEDIA_TYPE_AUDIO) {
+      return std::unique_ptr<Buffer>(new detail::UnchunkedAudioBuffer());
+    } else {
+      return std::unique_ptr<Buffer>(new detail::UnchunkedVideoBuffer(device));
     }
-    default:
-      TORCH_CHECK(
-          false,
-          std::string("Unsupported media type: ") +
-              av_get_media_type_string(type));
   }
 }
 
@@ -82,10 +92,12 @@ Sink::Sink(
       filter_description(filter_description_.value_or(
           codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
       filter(get_filter_graph(input_time_base_, codecpar_, filter_description)),
+      output_time_base(filter->get_output_timebase()),
       buffer(get_buffer(
           codecpar_->codec_type,
           frames_per_chunk,
           num_chunks,
+          double(output_time_base.num) / output_time_base.den,
           device)) {}
 
 // 0: some kind of success
@@ -100,7 +112,9 @@ int Sink::process_frame(AVFrame* pFrame) {
       return 0;
     }
     if (ret >= 0) {
-      buffer->push_frame(frame);
+      double pts =
+          double(frame->pts * output_time_base.num) / output_time_base.den;
+      buffer->push_frame(frame, pts);
     }
     av_frame_unref(frame);
   }
@@ -109,10 +123,6 @@ int Sink::process_frame(AVFrame* pFrame) {
 
 std::string Sink::get_filter_description() const {
   return filter_description;
-}
-
-bool Sink::is_buffer_ready() const {
-  return buffer->is_ready();
 }
 
 void Sink::flush() {

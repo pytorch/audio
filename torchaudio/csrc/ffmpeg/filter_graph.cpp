@@ -12,6 +12,8 @@ FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
     default:
       TORCH_CHECK(false, "Only audio and video type is supported.");
   }
+
+  pFilterGraph->nb_threads = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,6 +167,25 @@ void FilterGraph::create_filter() {
   // char* desc = avfilter_graph_dump(pFilterGraph.get(), NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
   // av_free(static_cast<void*>(desc));
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Query methods
+//////////////////////////////////////////////////////////////////////////////
+AVRational FilterGraph::get_output_timebase() const {
+  TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
+  return buffersink_ctx->inputs[0]->time_base;
+}
+
+int FilterGraph::get_output_sample_rate() const {
+  TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
+  return buffersink_ctx->inputs[0]->sample_rate;
+}
+
+int FilterGraph::get_output_channels() const {
+  TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
+  return av_get_channel_layout_nb_channels(
+      buffersink_ctx->inputs[0]->channel_layout);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -3,48 +3,45 @@
 
 namespace torchaudio {
 namespace ffmpeg {
+namespace detail {
 
 UnchunkedVideoBuffer::UnchunkedVideoBuffer(const torch::Device& device)
     : device(device) {}
 
 bool UnchunkedBuffer::is_ready() const {
-  return num_buffered_frames > 0;
+  return chunks.size() > 0;
 }
 
-void UnchunkedBuffer::push_tensor(const torch::Tensor& t) {
-  // If frames_per_chunk < 0, users want to fetch all frames.
-  // Just push back to chunks and that's it.
+void UnchunkedBuffer::push_tensor(const torch::Tensor& t, double pts_) {
+  if (chunks.size() == 0) {
+    pts = pts_;
+  }
   chunks.push_back(t);
-  num_buffered_frames += t.size(0);
 }
 
-void UnchunkedAudioBuffer::push_frame(AVFrame* frame) {
-  push_tensor(detail::convert_audio(frame));
+void UnchunkedAudioBuffer::push_frame(AVFrame* frame, double pts_) {
+  push_tensor(convert_audio(frame), pts_);
 }
 
-void UnchunkedVideoBuffer::push_frame(AVFrame* frame) {
-  push_tensor(detail::convert_image(frame, device));
+void UnchunkedVideoBuffer::push_frame(AVFrame* frame, double pts_) {
+  push_tensor(convert_image(frame, device), pts_);
 }
 
-c10::optional<torch::Tensor> UnchunkedBuffer::pop_chunk() {
-  if (!num_buffered_frames) {
-    return c10::optional<torch::Tensor>{};
+c10::optional<Chunk> UnchunkedBuffer::pop_chunk() {
+  if (chunks.size() == 0) {
+    return {};
   }
 
-  std::vector<torch::Tensor> ret;
-  while (chunks.size()) {
-    torch::Tensor& t = chunks.front();
-    int64_t n_frames = t.size(0);
-    ret.push_back(t);
-    chunks.pop_front();
-    num_buffered_frames -= n_frames;
-  }
-  return c10::optional<torch::Tensor>{torch::cat(ret, 0)};
+  auto frames =
+      torch::cat(std::vector<torch::Tensor>{chunks.begin(), chunks.end()}, 0);
+  chunks.clear();
+  return {Chunk{frames, pts}};
 }
 
 void UnchunkedBuffer::flush() {
   chunks.clear();
 }
 
+} // namespace detail
 } // namespace ffmpeg
 } // namespace torchaudio

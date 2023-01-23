@@ -385,8 +385,21 @@ int StreamReader::drain() {
 
 std::vector<c10::optional<torch::Tensor>> StreamReader::pop_chunks() {
   std::vector<c10::optional<torch::Tensor>> ret;
+  for (auto& c : pop_chunks_with_metadata()) {
+    if (c) {
+      ret.emplace_back(c->frames);
+    } else {
+      ret.emplace_back();
+    }
+  }
+  return ret;
+}
+
+std::vector<c10::optional<Chunk>> StreamReader::pop_chunks_with_metadata() {
+  std::vector<c10::optional<Chunk>> ret;
+  ret.reserve(num_out_streams());
   for (auto& i : stream_indices) {
-    ret.push_back(processors[i.first]->pop_chunk(i.second));
+    ret.emplace_back(processors[i.first]->pop_chunk(i.second));
   }
   return ret;
 }

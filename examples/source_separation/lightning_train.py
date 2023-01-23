@@ -308,7 +308,7 @@ def _get_dataloader(
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--batch-size", default=6, type=int)
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0mix", "librimix"])
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -412,9 +412,10 @@ def cli_main():
     trainer = Trainer(
         default_root_dir=args.exp_dir,
         max_epochs=args.epochs,
-        gpus=args.num_gpu,
         num_nodes=args.num_node,
+        accelerator="gpu",
         strategy="ddp_find_unused_parameters_false",
+        devices=args.num_gpu,
         limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,

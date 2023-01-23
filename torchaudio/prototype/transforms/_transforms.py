@@ -495,21 +495,22 @@ class AddNoise(torch.nn.Module):
     """
 
     def forward(
-        self, waveform: torch.Tensor, noise: torch.Tensor, lengths: torch.Tensor, snr: torch.Tensor
+        self, waveform: torch.Tensor, noise: torch.Tensor, snr: torch.Tensor, lengths: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
         r"""
         Args:
             waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
             noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
-            lengths (torch.Tensor): Valid lengths of signals in ``waveform`` and ``noise``, with shape `(...,)`
-                (leading dimensions must match those of ``waveform``).
             snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``,
+            with shape `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all
+            elements in ``waveform`` and ``noise`` are treated as valid. (Default: ``None``)
 
         Returns:
             torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
             (same shape as ``waveform``).
         """
-        return add_noise(waveform, noise, lengths, snr)
+        return add_noise(waveform, noise, snr, lengths)
 
 
 class Preemphasis(torch.nn.Module):

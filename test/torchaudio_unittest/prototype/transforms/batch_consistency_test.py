@@ -124,13 +124,13 @@ class BatchConsistencyTest(TorchaudioTestCase):
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
 
         add_noise = T.AddNoise()
-        actual = add_noise(waveform, noise, lengths, snr)
+        actual = add_noise(waveform, noise, snr, lengths)
 
         expected = []
         for i in range(leading_dims[0]):
             for j in range(leading_dims[1]):
                 for k in range(leading_dims[2]):
-                    expected.append(add_noise(waveform[i][j][k], noise[i][j][k], lengths[i][j][k], snr[i][j][k]))
+                    expected.append(add_noise(waveform[i][j][k], noise[i][j][k], snr[i][j][k], lengths[i][j][k]))
 
         self.assertEqual(torch.stack(expected), actual.reshape(-1, L))
 

@@ -478,7 +478,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
+            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
@@ -570,7 +570,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
 
-            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
+            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch numpy ffmpeg pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
@@ -678,8 +678,9 @@ jobs:
           name: Run tests
           environment:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
           command: |
-            docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+            docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -760,6 +761,7 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -833,7 +835,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117  ]]; then
+            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
