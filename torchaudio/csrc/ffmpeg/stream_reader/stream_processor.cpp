@@ -151,7 +151,7 @@ int StreamProcessor::send_frame(AVFrame* pFrame) {
 ////////////////////////////////////////////////////////////////////////////////
 // Retrieval
 ////////////////////////////////////////////////////////////////////////////////
-c10::optional<torch::Tensor> StreamProcessor::pop_chunk(KeyType key) {
+c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return sinks.at(key).buffer->pop_chunk();
 }
 

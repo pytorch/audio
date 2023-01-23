@@ -15,6 +15,8 @@ class Sink {
   AVCodecParameters* codecpar;
   std::string filter_description;
   std::unique_ptr<FilterGraph> filter;
+  // time_base of filter graph output, used for PTS calc
+  AVRational output_time_base;
 
  public:
   std::unique_ptr<Buffer> buffer;
