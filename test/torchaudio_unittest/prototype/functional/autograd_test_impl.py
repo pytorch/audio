@@ -27,8 +27,8 @@ class AutogradTestImpl(TestBaseMixin):
         lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
         snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
 
-        self.assertTrue(gradcheck(F.add_noise, (waveform, noise, lengths, snr)))
-        self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, lengths, snr)))
+        self.assertTrue(gradcheck(F.add_noise, (waveform, noise, snr, lengths)))
+        self.assertTrue(gradgradcheck(F.add_noise, (waveform, noise, snr, lengths)))
 
     @parameterized.expand(
         [

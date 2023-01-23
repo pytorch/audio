@@ -52,11 +52,17 @@ Methods
 Support Structures
 ==================
 
-{%- for item in ["StreamReaderSourceStream", "StreamReaderSourceAudioStream", "StreamReaderSourceVideoStream", "StreamReaderOutputStream"] %}
+{%- for item in [
+    "ChunkTensor",
+    "SourceStream",
+    "SourceAudioStream",
+    "SourceVideoStream",
+    "OutputStream",
+] %}
 
 {{ item | underline("-") }}
 
-.. autoclass:: torchaudio.io.{{item}}()
+.. autoclass:: torchaudio.io._stream_reader.{{item}}()
    :members:
 
 {%- endfor %}

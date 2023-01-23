@@ -11,6 +11,7 @@ std::unique_ptr<Buffer> get_buffer(
     AVMediaType type,
     int frames_per_chunk,
     int num_chunks,
+    double frame_duration,
     const torch::Device& device) {
   TORCH_CHECK(
       frames_per_chunk > 0 || frames_per_chunk == -1,
@@ -31,11 +32,11 @@ std::unique_ptr<Buffer> get_buffer(
   // Chunked Mode
   if (frames_per_chunk > 0) {
     if (type == AVMEDIA_TYPE_AUDIO) {
-      return std::unique_ptr<Buffer>(
-          new detail::ChunkedAudioBuffer(frames_per_chunk, num_chunks));
+      return std::unique_ptr<Buffer>(new detail::ChunkedAudioBuffer(
+          frames_per_chunk, num_chunks, frame_duration));
     } else {
-      return std::unique_ptr<Buffer>(
-          new detail::ChunkedVideoBuffer(frames_per_chunk, num_chunks, device));
+      return std::unique_ptr<Buffer>(new detail::ChunkedVideoBuffer(
+          frames_per_chunk, num_chunks, frame_duration, device));
     }
   } else { // unchunked mode
     if (type == AVMEDIA_TYPE_AUDIO) {
@@ -91,10 +92,12 @@ Sink::Sink(
       filter_description(filter_description_.value_or(
           codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
       filter(get_filter_graph(input_time_base_, codecpar_, filter_description)),
+      output_time_base(filter->get_output_timebase()),
       buffer(get_buffer(
           codecpar_->codec_type,
           frames_per_chunk,
           num_chunks,
+          double(output_time_base.num) / output_time_base.den,
           device)) {}
 
 // 0: some kind of success
@@ -109,7 +112,9 @@ int Sink::process_frame(AVFrame* pFrame) {
       return 0;
     }
     if (ret >= 0) {
-      buffer->push_frame(frame);
+      double pts =
+          double(frame->pts * output_time_base.num) / output_time_base.den;
+      buffer->push_frame(frame, pts);
     }
     av_frame_unref(frame);
   }
