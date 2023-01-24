@@ -6,7 +6,7 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from torch import Tensor
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, rnnt_utils, TestBaseMixin
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, rnnt_utils, TestBaseMixin
 
 
 class Autograd(TestBaseMixin):
@@ -334,6 +334,43 @@ class Autograd(TestBaseMixin):
         specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
         beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
         self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
+
+    @nested_params(
+        [F.convolve, F.fftconvolve],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, fn, mode):
+        leading_dims = (4, 3, 2)
+        L_x, L_y = 23, 40
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+        self.assert_grad(fn, (x, y, mode))
+
+    def test_add_noise(self):
+        leading_dims = (5, 2, 3)
+        L = 51
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+        self.assert_grad(F.add_noise, (waveform, noise, snr, lengths))
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        self.assert_grad(F.speed, (waveform, lengths, 1000, 1.1), enable_all_grad=False)
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assert_grad(F.preemphasis, (waveform, coeff))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assert_grad(F.deemphasis, (waveform, coeff))
 
 
 class AutogradFloat32(TestBaseMixin):
