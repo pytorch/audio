@@ -2,8 +2,9 @@ import math
 from typing import Callable, Optional, Sequence, Tuple
 
 import torch
-from torchaudio.prototype.functional import add_noise, barkscale_fbanks, convolve, deemphasis, fftconvolve, preemphasis
-from torchaudio.prototype.functional.functional import _check_convolve_mode
+from torchaudio.functional import add_noise, convolve, deemphasis, fftconvolve, preemphasis
+from torchaudio.functional.functional import _check_convolve_mode
+from torchaudio.prototype.functional import barkscale_fbanks
 from torchaudio.transforms import Resample, Spectrogram
 
 
