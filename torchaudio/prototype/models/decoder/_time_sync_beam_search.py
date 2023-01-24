@@ -12,13 +12,87 @@ Author: Brian Yan
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
 import numpy as np
 import torch
 
-from espnet.nets.beam_search import Hypothesis
-from espnet.nets.scorer_interface import ScorerInterface
+
+class Hypothesis(NamedTuple):
+    """Hypothesis data type."""
+
+    yseq: torch.Tensor
+    score: Union[float, torch.Tensor] = 0
+    scores: Dict[str, Union[float, torch.Tensor]] = {}
+    states: Dict[str, Any] = {}
+
+    def asdict(self) -> dict:
+        """Convert data to JSON-friendly dict."""
+        return self._replace(
+            yseq=self.yseq.tolist(),
+            score=float(self.score),
+            scores={k: float(v) for k, v in self.scores.items()},
+        )._asdict()
+
+
+class ScorerInterface:
+    """Scorer interface for beam search.
+    The scorer performs scoring of the all tokens in vocabulary.
+    Examples:
+        * Search heuristics
+            * :class:`espnet.nets.scorers.length_bonus.LengthBonus`
+        * Decoder networks of the sequence-to-sequence models
+            * :class:`espnet.nets.pytorch_backend.nets.transformer.decoder.Decoder`
+            * :class:`espnet.nets.pytorch_backend.nets.rnn.decoders.Decoder`
+        * Neural language models
+            * :class:`espnet.nets.pytorch_backend.lm.transformer.TransformerLM`
+            * :class:`espnet.nets.pytorch_backend.lm.default.DefaultRNNLM`
+            * :class:`espnet.nets.pytorch_backend.lm.seq_rnn.SequentialRNNLM`
+    """
+
+    def init_state(self, x: torch.Tensor) -> Any:
+        """Get an initial state for decoding (optional).
+        Args:
+            x (torch.Tensor): The encoded feature tensor
+        Returns: initial state
+        """
+        return None
+
+    def select_state(self, state: Any, i: int, new_id: int = None) -> Any:
+        """Select state with relative ids in the main beam search.
+        Args:
+            state: Decoder state for prefix tokens
+            i (int): Index to select a state in the main beam search
+            new_id (int): New label index to select a state if necessary
+        Returns:
+            state: pruned state
+        """
+        return None if state is None else state[i]
+
+    def score(
+        self, y: torch.Tensor, state: Any, x: torch.Tensor
+    ) -> Tuple[torch.Tensor, Any]:
+        """Score new token (required).
+        Args:
+            y (torch.Tensor): 1D torch.int64 prefix tokens.
+            state: Scorer state for prefix tokens
+            x (torch.Tensor): The encoder feature that generates ys.
+        Returns:
+            tuple[torch.Tensor, Any]: Tuple of
+                scores for next token that has a shape of `(n_vocab)`
+                and next state for ys
+        """
+        raise NotImplementedError
+
+    def final_score(self, state: Any) -> float:
+        """Score eos (optional).
+        Args:
+            state: Scorer state for prefix tokens
+        Returns:
+            float: final score
+        """
+        return 0.0
+
 
 
 @dataclass
