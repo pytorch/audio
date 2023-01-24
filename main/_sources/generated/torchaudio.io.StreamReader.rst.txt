@@ -148,26 +148,32 @@ stream
 Support Structures
 ==================
 
-StreamReaderSourceStream
-------------------------
+ChunkTensor
+-----------
 
-.. autoclass:: torchaudio.io.StreamReaderSourceStream()
+.. autoclass:: torchaudio.io._stream_reader.ChunkTensor()
    :members:
 
-StreamReaderSourceAudioStream
------------------------------
+SourceStream
+------------
 
-.. autoclass:: torchaudio.io.StreamReaderSourceAudioStream()
+.. autoclass:: torchaudio.io._stream_reader.SourceStream()
    :members:
 
-StreamReaderSourceVideoStream
------------------------------
+SourceAudioStream
+-----------------
 
-.. autoclass:: torchaudio.io.StreamReaderSourceVideoStream()
+.. autoclass:: torchaudio.io._stream_reader.SourceAudioStream()
    :members:
 
-StreamReaderOutputStream
-------------------------
+SourceVideoStream
+-----------------
 
-.. autoclass:: torchaudio.io.StreamReaderOutputStream()
+.. autoclass:: torchaudio.io._stream_reader.SourceVideoStream()
+   :members:
+
+OutputStream
+------------
+
+.. autoclass:: torchaudio.io._stream_reader.OutputStream()
    :members:

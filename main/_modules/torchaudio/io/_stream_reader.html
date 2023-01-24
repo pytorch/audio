@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230120) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230124) &#x25BC</a>
     </div>
     
 
@@ -392,16 +392,21 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">from</span> <span class="nn">torch.utils._pytree</span> <span class="kn">import</span> <span class="n">tree_map</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;StreamReader&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
-<div class="viewcode-block" id="StreamReaderSourceStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderSourceStream">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StreamReaderSourceStream</span><span class="p">:</span>
+<div class="viewcode-block" id="SourceStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.SourceStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SourceStream</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of a source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.</span>
 
 <span class="sd">    This class is used when representing streams of media type other than `audio` or `video`.</span>
 
-<span class="sd">    When source stream is `audio` or `video` type, :class:`StreamReaderSourceAudioStream` and</span>
-<span class="sd">    :class:`StreamReaderSourceVideoStream`, which reports additional media-specific attributes,</span>
+<span class="sd">    When source stream is `audio` or `video` type, :class:`SourceAudioStream` and</span>
+<span class="sd">    :class:`SourceVideoStream`, which reports additional media-specific attributes,</span>
 <span class="sd">    are used respectively.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -451,13 +456,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata attached to the source stream.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="StreamReaderSourceAudioStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderSourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StreamReaderSourceAudioStream</span><span class="p">(</span><span class="n">StreamReaderSourceStream</span><span class="p">):</span>
+<div class="viewcode-block" id="SourceAudioStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.SourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SourceAudioStream</span><span class="p">(</span><span class="n">SourceStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of an audio source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.</span>
 
 <span class="sd">    This class is used when representing audio stream.</span>
 
-<span class="sd">    In addition to the attributes reported by :class:`StreamReaderSourceStream`,</span>
+<span class="sd">    In addition to the attributes reported by :class:`SourceStream`,</span>
 <span class="sd">    the following attributes are reported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -467,13 +472,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of channels.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="StreamReaderSourceVideoStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderSourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StreamReaderSourceVideoStream</span><span class="p">(</span><span class="n">StreamReaderSourceStream</span><span class="p">):</span>
+<div class="viewcode-block" id="SourceVideoStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.SourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SourceVideoStream</span><span class="p">(</span><span class="n">SourceStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of a video source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.</span>
 
 <span class="sd">    This class is used when representing video stream.</span>
 
-<span class="sd">    In addition to the attributes reported by :class:`StreamReaderSourceStream`,</span>
+<span class="sd">    In addition to the attributes reported by :class:`SourceStream`,</span>
 <span class="sd">    the following attributes are reported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -514,7 +519,7 @@
     <span class="n">bps</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_BPS</span><span class="p">]</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_METADATA</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">StreamReaderSourceAudioStream</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">SourceAudioStream</span><span class="p">(</span>
             <span class="n">media_type</span><span class="o">=</span><span class="n">media_type</span><span class="p">,</span>
             <span class="n">codec</span><span class="o">=</span><span class="n">codec_name</span><span class="p">,</span>
             <span class="n">codec_long_name</span><span class="o">=</span><span class="n">codec_long_name</span><span class="p">,</span>
@@ -527,7 +532,7 @@
             <span class="n">num_channels</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_NUM_CHANNELS</span><span class="p">],</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">StreamReaderSourceVideoStream</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">SourceVideoStream</span><span class="p">(</span>
             <span class="n">media_type</span><span class="o">=</span><span class="n">media_type</span><span class="p">,</span>
             <span class="n">codec</span><span class="o">=</span><span class="n">codec_name</span><span class="p">,</span>
             <span class="n">codec_long_name</span><span class="o">=</span><span class="n">codec_long_name</span><span class="p">,</span>
@@ -540,7 +545,7 @@
             <span class="n">height</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_HEIGHT</span><span class="p">],</span>
             <span class="n">frame_rate</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_FRAME_RATE</span><span class="p">],</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="n">StreamReaderSourceStream</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">SourceStream</span><span class="p">(</span>
         <span class="n">media_type</span><span class="o">=</span><span class="n">media_type</span><span class="p">,</span>
         <span class="n">codec</span><span class="o">=</span><span class="n">codec_name</span><span class="p">,</span>
         <span class="n">codec_long_name</span><span class="o">=</span><span class="n">codec_long_name</span><span class="p">,</span>
@@ -552,8 +557,8 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="StreamReaderOutputStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReaderOutputStream">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StreamReaderOutputStream</span><span class="p">:</span>
+<div class="viewcode-block" id="OutputStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.OutputStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OutputStream</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Output stream configured on :class:`StreamReader`,</span>
 <span class="sd">    returned by :meth:`~torchaudio.io.StreamReader.get_out_stream_info`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -565,7 +570,7 @@
 
 
 <span class="k">def</span> <span class="nf">_parse_oi</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">StreamReaderOutputStream</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">OutputStream</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
 <span class="k">def</span> <span class="nf">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
@@ -593,6 +598,78 @@
     <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
 
 
+<span class="c1"># Base class for ChunkTensor</span>
+<span class="c1"># Based off of TrivialTensorViaComposition</span>
+<span class="c1"># https://github.com/albanD/subclass_zoo/blob/0eeb1d68fb59879029c610bc407f2997ae43ba0a/trivial_tensors.py#L83</span>
+<span class="k">class</span> <span class="nc">ChunkTensorBase</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="n">__torch_function__</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_disabled_torch_function_impl</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_elem</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_elem</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__torch_dispatch__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">unwrap</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">_elem</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">else</span> <span class="n">t</span>
+
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">tree_map</span><span class="p">(</span><span class="n">unwrap</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span> <span class="o">**</span><span class="n">tree_map</span><span class="p">(</span><span class="n">unwrap</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="ChunkTensor"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.ChunkTensor">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ChunkTensor</span><span class="p">(</span><span class="n">ChunkTensorBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decoded media frames with metadata.</span>
+
+<span class="sd">    The instance of this class represents the decoded video/audio frames with</span>
+<span class="sd">    metadata, and the instance itself behave like :py:class:`~torch.Tensor`.</span>
+
+<span class="sd">    Client codes can pass instance of this class as-if it&#39;s</span>
+<span class="sd">    :py:class:`~torch.Tensor` class, or call the methods defined on</span>
+<span class="sd">    :py:class:`~torch.Tensor` class.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # Define input streams</span>
+<span class="sd">        &gt;&gt;&gt; reader = StreamReader(...)</span>
+<span class="sd">        &gt;&gt;&gt; reader.add_audio_stream(frames_per_chunk=4000, sample_rate=8000)</span>
+<span class="sd">        &gt;&gt;&gt; reader.add_video_stream(frames_per_chunk=7, frame_rate=28)</span>
+<span class="sd">        &gt;&gt;&gt; # Decode the streams and fetch frames</span>
+<span class="sd">        &gt;&gt;&gt; reader.fill_buffer()</span>
+<span class="sd">        &gt;&gt;&gt; audio_chunk, video_chunk = reader.pop_chunks()</span>
+
+<span class="sd">        &gt;&gt;&gt; # Access metadata</span>
+<span class="sd">        &gt;&gt;&gt; (audio_chunk.pts, video_chunks.pts)</span>
+<span class="sd">        (0.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # The second time the PTS is different</span>
+<span class="sd">        &gt;&gt;&gt; reader.fill_buffer()</span>
+<span class="sd">        &gt;&gt;&gt; audio_chunk, video_chunk = reader.pop_chunks()</span>
+<span class="sd">        &gt;&gt;&gt; (audio_chunk.pts, video_chunks.pts)</span>
+<span class="sd">        (0.5, 0.25)</span>
+
+<span class="sd">        &gt;&gt;&gt; # Call PyTorch ops on chunk</span>
+<span class="sd">        &gt;&gt;&gt; audio_chunk.shape</span>
+<span class="sd">        torch.Size([4000, 2]</span>
+<span class="sd">        &gt;&gt;&gt; power = torch.pow(video_chunk, 2)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # the result is a plain torch.Tensor class</span>
+<span class="sd">        &gt;&gt;&gt; type(power)</span>
+<span class="sd">        &lt;class &#39;torch.Tensor&#39;&gt;</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Metadata is not available on the result</span>
+<span class="sd">        &gt;&gt;&gt; power.pts</span>
+<span class="sd">        AttributeError: &#39;Tensor&#39; object has no attribute &#39;pts&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Keep it private for now</span>
+    <span class="n">_elem</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+
+    <span class="n">pts</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Presentation time stamp of the first frame in the chunk.</span>
+
+<span class="sd">    Unit: second.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
 <span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -610,8 +687,8 @@
 
 <span class="n">_buffer_chunk_size</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Internal buffer size.</span>
 <span class="s2">                When the number of chunks buffered exceeds this number, old frames are</span>
-<span class="s2">                dropped. For example, if `frames_per_chunk` is 5 and `buffer_chunk_size` is</span>
-<span class="s2">                3, then frames older than 15 are dropped.</span>
+<span class="s2">                dropped. For example, if ``frames_per_chunk`` is 5 and ``buffer_chunk_size`` is</span>
+<span class="s2">                3, then frames older than ``15`` are dropped.</span>
 <span class="s2">                Providing ``-1`` disables this behavior.</span>
 
 <span class="s2">                Default: ``3``.&quot;&quot;&quot;</span>
@@ -636,22 +713,28 @@
 <span class="s2">                Mapping from str to str. (Default: ``None``)</span>
 
 <span class="s2">                To list decoder options for a decoder, you can use</span>
-<span class="s2">                `ffmpeg -h decoder=&lt;DECODER&gt;` command.</span>
+<span class="s2">                ``ffmpeg -h decoder=&lt;DECODER&gt;`` command.</span>
+
+<span class="s2">                |</span>
 
 <span class="s2">                In addition to decoder-specific options, you can also pass options related</span>
 <span class="s2">                to multithreading. They are effective only if the decoder support them.</span>
 <span class="s2">                If neither of them are provided, StreamReader defaults to single thread.</span>
 
-<span class="s2">                 - ``&quot;threads&quot;``: The number of threads (in str) or the value ``&quot;0&quot;``</span>
-<span class="s2">                   to let FFmpeg decides based on its heuristics.</span>
-<span class="s2">                 - ``&quot;thread_type&quot;``: Which multithreading method to use.</span>
-<span class="s2">                   The valid values are ``&quot;frame&quot;`` or ``&quot;slice&quot;``.</span>
-<span class="s2">                   Note that sach decoder supports different set of methods.</span>
-<span class="s2">                   If not provided, a default value is used.</span>
-<span class="s2">                    - ``&quot;frame&quot;``: Decode more than one frame at once.</span>
-<span class="s2">                      Each thread handles one frame.</span>
-<span class="s2">                      This will increase decoding delay by one frame per thread</span>
-<span class="s2">                    - ``&quot;slice&quot;``: Decode more than one part of a single frame at once.</span>
+<span class="s2">                ``&quot;threads&quot;``: The number of threads (in str).</span>
+<span class="s2">                Providing the value ``&quot;0&quot;`` will let FFmpeg decides based on its heuristics.</span>
+
+<span class="s2">                ``&quot;thread_type&quot;``: Which multithreading method to use.</span>
+<span class="s2">                The valid values are ``&quot;frame&quot;`` or ``&quot;slice&quot;``.</span>
+<span class="s2">                Note that each decoder supports different set of methods.</span>
+<span class="s2">                If not provided, a default value is used.</span>
+
+<span class="s2">                - ``&quot;frame&quot;``: Decode more than one frame at once.</span>
+<span class="s2">                  Each thread handles one frame.</span>
+<span class="s2">                  This will increase decoding delay by one frame per thread</span>
+<span class="s2">                - ``&quot;slice&quot;``: Decode more than one part of a single frame at once.</span>
+
+<span class="s2">                |</span>
 <span class="s2">                &quot;&quot;&quot;</span>
 
 
@@ -820,7 +903,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderSourceStream</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SourceStream</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of source stream</span>
 
 <span class="sd">        Args:</span>
@@ -830,7 +913,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">StreamReaderOutputStream</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">OutputStream</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of output stream</span>
 
 <span class="sd">        Args:</span>
@@ -1135,15 +1218,21 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if all the output streams have at least one chunk filled.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.pop_chunks"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<div class="viewcode-block" id="StreamReader.pop_chunks"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pop one chunk from all the output stream buffers.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tuple[Optional[Tensor]]:</span>
+<span class="sd">            Tuple[Optional[ChunkTensor]]:</span>
 <span class="sd">                Buffer contents.</span>
 <span class="sd">                If a buffer does not contain any frame, then `None` is returned instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span></div>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChunkTensor</span><span class="p">(</span><span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="StreamReader.fill_buffer"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep processing packets until all buffers have at least one chunk</span>
@@ -1170,7 +1259,7 @@
 
 <div class="viewcode-block" id="StreamReader.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="o">...</span><span class="p">]]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">],</span> <span class="o">...</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterator that generates output tensors</span>
 
 <span class="sd">        Arguments:</span>
@@ -1181,7 +1270,7 @@
 <span class="sd">                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Iterator[Tuple[Optional[torch.Tensor], ...]]:</span>
+<span class="sd">            Iterator[Tuple[Optional[ChunkTensor], ...]]:</span>
 <span class="sd">                Iterator that yields a tuple of chunks that correspond to the output</span>
 <span class="sd">                streams defined by client code.</span>
 <span class="sd">                If an output stream is exhausted, then the chunk Tensor is substituted</span>
