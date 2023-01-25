@@ -106,7 +106,7 @@ int64_t StreamReaderBinding::fill_buffer(
 std::vector<c10::optional<ChunkData>> StreamReaderBinding::pop_chunks() {
   std::vector<c10::optional<ChunkData>> ret;
   ret.reserve(static_cast<size_t>(num_out_streams()));
-  for (auto& c : StreamReader::pop_chunks_with_metadata()) {
+  for (auto& c : StreamReader::pop_chunks()) {
     if (c) {
       ret.emplace_back(std::forward_as_tuple(c->frames, c->pts));
     } else {

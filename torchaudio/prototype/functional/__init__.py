@@ -6,21 +6,15 @@ from ._dsp import (
     oscillator_bank,
     sinc_impulse_response,
 )
-from .functional import add_noise, barkscale_fbanks, convolve, deemphasis, fftconvolve, preemphasis, speed
+from .functional import barkscale_fbanks
 
 
 __all__ = [
-    "add_noise",
     "adsr_envelope",
     "barkscale_fbanks",
-    "convolve",
-    "deemphasis",
     "extend_pitch",
-    "fftconvolve",
     "filter_waveform",
     "frequency_impulse_response",
     "oscillator_bank",
-    "preemphasis",
     "sinc_impulse_response",
-    "speed",
 ]

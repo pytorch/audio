@@ -7,8 +7,7 @@ import torch
 import torchaudio.prototype.transforms as T
 from parameterized import parameterized
 from scipy import signal
-from torchaudio.functional import lfilter
-from torchaudio.prototype.functional import preemphasis
+from torchaudio.functional import lfilter, preemphasis
 from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
 
 
