@@ -3,9 +3,11 @@ from typing import List, Optional, Tuple
 
 import torch
 import torchaudio
+from torchaudio._internal.module_utils import deprecated
 from torchaudio.utils.sox_utils import list_effects
 
 
+@deprecated("Please remove the call. This function is called automatically.")
 def init_sox_effects():
     """Initialize resources required to use sox effects.
 
@@ -20,6 +22,7 @@ def init_sox_effects():
     pass
 
 
+@deprecated("Please remove the call. This function is called automatically.")
 def shutdown_sox_effects():
     """Clean up resources required to use sox effects.
 
