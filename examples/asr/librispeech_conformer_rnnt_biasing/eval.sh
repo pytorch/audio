@@ -8,7 +8,7 @@ python eval.py \
     --sp-model-path ./spm_unigram_600_100suffix.model \
     --expdir $decode_dir \
     --use-cuda \
-    --biasing true \
-    --biasinglist ./blists/all_rare_words.txt \
+    --biasing \
+    --biasing-list ./blists/all_rare_words.txt \
     --droprate 0.0 \
     --maxsize 1000 \

@@ -81,7 +81,7 @@ def _get_librispeech_metadata(
 
 
 class LIBRISPEECH_BIASING(Dataset):
-    """*LibriSpeech* :cite:`7178964` dataset with biasing support.
+    """*LibriSpeech* :cite:`7178964` dataset with prefix-tree construction and biasing support.
 
     Args:
         root (str or Path): Path to the directory where the dataset is found or downloaded.

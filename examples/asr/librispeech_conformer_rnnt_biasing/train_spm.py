@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Trains a SentencePiece model on transcripts across LibriSpeech train-clean-100, train-clean-360, and train-other-500.
+Using unigram wordpiece model and suffix-based wordpieces
 
 Example:
 python train_spm.py --librispeech-path ./datasets
