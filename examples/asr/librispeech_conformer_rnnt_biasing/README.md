@@ -32,6 +32,11 @@ Other training options:
 - `--droprate` is the drop rate of biasing words appeared in the reference text to avoid over-confidence
 - `--maxsize` is the size of the biasing list used for training, which is the sum of biasing words in reference and distractors
 
+Sample SLURM command:
+```
+srun --cpus-per-task=16 --gpus-per-node=1 -N 1 --ntasks-per-node=1 python train.py --exp-dir <Path_to_exp> --librispeech-path <Path_to_librispeech_data> --global-stats-path ./global_stats_100.json --sp-model-path ./spm_unigram_600_100suffix.model --biasing --biasing-list ./blists/rareword_f15.txt --droprate 0.1 --maxsize 200 --epochs 90
+```
+
 ### Evaluation
 
 [`eval.py`](./eval.py) evaluates a trained Conformer RNN-T model with TCPGen on LibriSpeech test-clean.
@@ -40,11 +45,18 @@ Sample decoding script: `eval.sh`
 
 Other decoding options:
 
-- `--biasinglist` should be [`all_rare_words.txt`](blists/all_rare_words.txt) for Librispeech experiments
+- `--biasing-list` should be [`all_rare_words.txt`](blists/all_rare_words.txt) for Librispeech experiments
 - `--droprate` normally should be 0 because we assume the reference biasing words are included
 - `--maxsize` is the size of the biasing list used for decoding, where 1000 was used in the paper.
 
+Sample SLURM command:
+```
+srun --cpus-per-task=16 --gpus-per-node=1 -N 1 --ntasks-per-node=1 python eval.py --checkpoint-path <Path_to_model_checkpoint> --librispeech-path <Path_to_librispeech_data> --sp-model-path ./spm_unigram_600_100suffix.model --expdir <Path_to_exp> --use-cuda --biasing --biasing-list ./blists/all_rare_words.txt --droprate 0.0 --maxsize 1000
+```
+
 ### Scoring
+Need to install SCTK, the NIST Scoring Toolkit first following: [https://github.com/usnistgov/SCTK/blob/master/README.md](https://github.com/usnistgov/SCTK/blob/master/README.md)
+
 Example scoring script using sclite is in [`score.sh`](./score.sh). Note that this will generate a file named `results.wrd.txt` which is in the format that will be used in the following script to calculate rare word error rate. Follow these steps to calculate rare word error rate:
 
 ```bash

@@ -136,7 +136,7 @@ class LibriSpeechDataModule(LightningDataModule):
         self.fullbiasinglist = fullbiasinglist
 
     def train_dataloader(self):
-        if self.subset == "clean100":
+        if self.subset == "train-clean-100":
             datasets = [self.librispeech_cls(self.librispeech_path, url="train-clean-100", blist=self.fullbiasinglist)]
         else:
             datasets = [

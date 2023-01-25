@@ -58,10 +58,9 @@ def run_train(args):
             reload_dataloaders_every_n_epochs=1,
         )
 
-    usebiasing = True if args.biasing == 'true' else False
-    model = ConformerRNNTModule(str(args.sp_model_path), usebiasing)
+    model = ConformerRNNTModule(str(args.sp_model_path), args.biasing)
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path),
-                                  subset=args.subset, biasinglist=args.biasinglist, droprate=args.droprate,
+                                  subset=args.subset, biasinglist=args.biasing_list, droprate=args.droprate,
                                   maxsize=args.maxsize)
     trainer.fit(model, data_module, ckpt_path=args.checkpoint_path)
 
@@ -118,18 +117,17 @@ def cli_main():
     )
     parser.add_argument(
         "--subset",
-        default='clean100',
+        default='train-clean-100',
         type=str,
         help="Train on subset of librispeech.",
     )
     parser.add_argument(
         "--biasing",
-        type=str,
+        action="store_true",
         help="Use biasing",
-        required=True,
     )
     parser.add_argument(
-        "--biasinglist",
+        "--biasing-list",
         type=pathlib.Path,
         help="Path to the biasing list.",
         required=True,
