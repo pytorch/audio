@@ -409,7 +409,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(F.apply_beamforming, (beamform_weights, specgram))
 
     @common_utils.nested_params(
-        [F.convolve, F.fftconvolve],
+        ["convolve", "fftconvolve"],
         ["full", "valid", "same"],
     )
     def test_convolve(self, fn, mode):
@@ -418,6 +418,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
 
+        fn = getattr(F, fn)
         actual = fn(x, y, mode)
         expected = torch.stack(
             [
