@@ -1,4 +1,5 @@
 #pragma once
+#include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
@@ -37,10 +38,37 @@ class StreamReader {
   ///
   ///@{
 
-  /// @todo Introduce a constructor that takes std::string and abstracts away
-  /// ffmpeg-native structs
+  /// Construct StreamReader from already initialized AVFormatContext.
+  /// This is a low level constructor interact with FFmpeg directly.
+  /// One can provide custom AVFormatContext in case the other constructor
+  /// does not meet a requirement.
+  /// @param AVFormatContext An initialized AVFormatContext. StreamReader will
+  /// own the resources and release it at the end.
+  explicit StreamReader(AVFormatContext* pFormatContext);
+
+  /// Construct media processor from soruce URI.
   ///
-  explicit StreamReader(AVFormatInputContextPtr&& p);
+  /// @param src URL of source media, in the format FFmpeg can understand.
+  /// @param format Specifies format (such as mp4) or device (such as lavfi and
+  /// avfoundation)
+  /// @param option Custom option passed when initializing format context
+  /// (opening source).
+  explicit StreamReader(
+      const std::string& src,
+      const c10::optional<std::string>& format = {},
+      const c10::optional<OptionDict>& option = {});
+
+  /// Concstruct media processor from custom IO.
+  ///
+  /// @param io_ctx Custom IO Context.
+  /// @param format Specifies format, such as mp4.
+  /// @param option Custom option passed when initializing format context
+  /// (opening source).
+  // TODO: Move this to wrapper class
+  explicit StreamReader(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format = {},
+      const c10::optional<OptionDict>& option = {});
 
   ///@}
 
