@@ -1,6 +1,0 @@
-﻿torchaudio.sox\_effects.init\_sox\_effects
-==========================================
-
-.. currentmodule:: torchaudio.sox_effects
-
-.. autofunction:: init_sox_effects
