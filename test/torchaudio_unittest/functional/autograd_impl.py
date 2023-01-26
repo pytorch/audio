@@ -336,7 +336,7 @@ class Autograd(TestBaseMixin):
         self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
 
     @nested_params(
-        [F.convolve, F.fftconvolve],
+        ["convolve", "fftconvolve"],
         ["full", "valid", "same"],
     )
     def test_convolve(self, fn, mode):
@@ -344,7 +344,7 @@ class Autograd(TestBaseMixin):
         L_x, L_y = 23, 40
         x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
         y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
-        self.assert_grad(fn, (x, y, mode))
+        self.assert_grad(getattr(F, fn), (x, y, mode))
 
     def test_add_noise(self):
         leading_dims = (5, 2, 3)
