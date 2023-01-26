@@ -27,40 +27,17 @@ OutInfo convert(OutputStreamInfo osi) {
 }
 } // namespace
 
-AVFormatInputContextPtr get_input_format_context(
+StreamReaderBinding::StreamReaderBinding(
     const std::string& src,
-    const c10::optional<std::string>& device,
-    const c10::optional<OptionDict>& option,
-    AVIOContext* io_ctx) {
-  AVFormatContext* pFormat = avformat_alloc_context();
-  TORCH_CHECK(pFormat, "Failed to allocate AVFormatContext.");
-  if (io_ctx) {
-    pFormat->pb = io_ctx;
-  }
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option)
+    : StreamReader(src, format, option) {}
 
-  auto* pInput = [&]() -> AVFORMAT_CONST AVInputFormat* {
-    if (device.has_value()) {
-      std::string device_str = device.value();
-      AVFORMAT_CONST AVInputFormat* p =
-          av_find_input_format(device_str.c_str());
-      TORCH_CHECK(p, "Unsupported device/format: \"", device_str, "\"");
-      return p;
-    }
-    return nullptr;
-  }();
-
-  AVDictionary* opt = get_option_dict(option);
-  int ret = avformat_open_input(&pFormat, src.c_str(), pInput, &opt);
-  clean_up_dict(opt);
-
-  TORCH_CHECK(
-      ret >= 0,
-      "Failed to open the input \"" + src + "\" (" + av_err2string(ret) + ").");
-  return AVFormatInputContextPtr(pFormat);
-}
-
-StreamReaderBinding::StreamReaderBinding(AVFormatInputContextPtr&& p)
-    : StreamReader(std::move(p)) {}
+StreamReaderBinding::StreamReaderBinding(
+    AVIOContext* io_ctx,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option)
+    : StreamReader(io_ctx, format, option) {}
 
 SrcInfo StreamReaderBinding::get_src_stream_info(int64_t i) {
   return convert(StreamReader::get_src_stream_info(static_cast<int>(i)));
