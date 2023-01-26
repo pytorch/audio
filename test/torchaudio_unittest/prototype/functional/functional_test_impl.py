@@ -1,9 +1,6 @@
-import math
-
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
-from torchaudio.functional import lfilter
 from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
 
 from .dsp_utils import freq_ir as freq_ir_np, oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
