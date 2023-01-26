@@ -3,7 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 // The reason we inherit FileObj instead of making it an attribute
 // is so that FileObj is instantiated first.
@@ -37,5 +37,5 @@ class StreamReaderFileObj : protected FileObj, public StreamReaderBinding {
       const c10::optional<std::string>& hw_accel);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

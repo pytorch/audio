@@ -5,7 +5,7 @@
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 struct OutputStream {
   AVStream* stream;
@@ -208,5 +208,5 @@ class StreamWriter {
   void flush_stream(OutputStream& os);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

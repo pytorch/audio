@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 ChunkedBuffer::ChunkedBuffer(
@@ -152,5 +152,5 @@ void ChunkedBuffer::flush() {
 }
 
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

@@ -1,7 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Decoder
@@ -131,5 +131,5 @@ void Decoder::flush_buffer() {
   avcodec_flush_buffers(pCodecContext);
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

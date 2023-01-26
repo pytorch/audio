@@ -6,7 +6,7 @@
 #include <thread>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 using KeyType = StreamProcessor::KeyType;
 
@@ -445,5 +445,5 @@ std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
   return ret;
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

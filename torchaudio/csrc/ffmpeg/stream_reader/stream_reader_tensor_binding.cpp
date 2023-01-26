@@ -1,7 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -190,5 +190,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def("pop_chunks", [](S s) { return s->pop_chunks(); });
 }
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

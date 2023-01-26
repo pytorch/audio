@@ -5,7 +5,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class Sink {
   AVFramePtr frame;
@@ -35,5 +35,5 @@ class Sink {
   void flush();
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

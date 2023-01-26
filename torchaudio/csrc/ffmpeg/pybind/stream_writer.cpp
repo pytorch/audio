@@ -1,7 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/pybind/stream_writer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 StreamWriterFileObj::StreamWriterFileObj(
     py::object fileobj_,
@@ -51,5 +51,5 @@ void StreamWriterFileObj::add_video_stream(
       hw_accel);
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

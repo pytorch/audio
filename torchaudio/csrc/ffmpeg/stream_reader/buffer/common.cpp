@@ -7,7 +7,7 @@
 #endif
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 torch::Tensor convert_audio(AVFrame* pFrame) {
@@ -380,5 +380,5 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
 }
 
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

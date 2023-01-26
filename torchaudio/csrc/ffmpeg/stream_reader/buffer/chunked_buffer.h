@@ -3,7 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -63,5 +63,5 @@ class ChunkedVideoBuffer : public ChunkedBuffer {
 };
 
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio
