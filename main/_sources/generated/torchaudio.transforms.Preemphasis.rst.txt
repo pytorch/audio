@@ -4,5 +4,5 @@
 Preemphasis
 ===========
 
-.. autoclass:: torchaudio.prototype.transforms.Preemphasis
+.. autoclass:: torchaudio.transforms.Preemphasis
    :members:

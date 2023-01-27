@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Deemphasis &mdash; Torchaudio nightly documentation</title>
+  <title>SpeedPerturbation &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -42,8 +42,8 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Preemphasis" href="torchaudio.prototype.transforms.Preemphasis.html" />
-    <link rel="prev" title="SpeedPerturbation" href="torchaudio.prototype.transforms.SpeedPerturbation.html" />
+    <link rel="next" title="Deemphasis" href="torchaudio.transforms.Deemphasis.html" />
+    <link rel="prev" title="Speed" href="torchaudio.transforms.Speed.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230126) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230127) &#x25BC</a>
     </div>
     
 
@@ -282,12 +282,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
@@ -298,13 +298,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -355,17 +355,15 @@
       </li>
 
         
-          <li><a href="../prototype.html">torchaudio.prototype</a> &gt;</li>
+          <li><a href="../transforms.html">torchaudio.transforms</a> &gt;</li>
         
-          <li><a href="../prototype.transforms.html">torchaudio.prototype.transforms</a> &gt;</li>
-        
-      <li>Deemphasis</li>
+      <li>SpeedPerturbation</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="../_sources/generated/torchaudio.prototype.transforms.Deemphasis.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+            <a href="../_sources/generated/torchaudio.transforms.SpeedPerturbation.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -393,33 +391,56 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="deemphasis">
-<h1>Deemphasis<a class="headerlink" href="#deemphasis" title="Permalink to this heading">¶</a></h1>
+  <section id="speedperturbation">
+<h1>SpeedPerturbation<a class="headerlink" href="#speedperturbation" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="torchaudio.prototype.transforms.Deemphasis">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.transforms.</span></span><span class="sig-name descname"><span class="pre">Deemphasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.97</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/prototype/transforms/_transforms.html#Deemphasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.transforms.Deemphasis" title="Permalink to this definition">¶</a></dt>
-<dd><p>De-emphasizes a waveform along its last dimension.
-See <code class="xref py py-meth docutils literal notranslate"><span class="pre">torchaudio.prototype.functional.deemphasis()</span></code> for more details.</p>
+<dt class="sig sig-object py" id="torchaudio.transforms.SpeedPerturbation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.transforms.</span></span><span class="sig-name descname"><span class="pre">SpeedPerturbation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orig_freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">factors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/transforms/_transforms.html#SpeedPerturbation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.SpeedPerturbation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the speed perturbation augmentation introduced in
+<em>Audio augmentation for speech recognition</em> <span id="id1">[<a class="reference internal" href="../references.html#id57" title="Tom Ko, Vijayaditya Peddinti, Daniel Povey, and Sanjeev Khudanpur. Audio augmentation for speech recognition. In Proc. Interspeech 2015, 3586–3589. 2015. doi:10.21437/Interspeech.2015-711.">Ko <em>et al.</em>, 2015</a>]</span>. For a given input,
+the module samples a speed-up factor from <code class="docutils literal notranslate"><span class="pre">factors</span></code> uniformly at random and adjusts
+the speed of the input by that factor.</p>
 <a class="reference external image-reference" href="../supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="../_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
 <a class="reference external image-reference" href="../supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="../_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – De-emphasis coefficient. Typically between 0.0 and 1.0.
-(Default: 0.97)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Original frequency of the signals in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>.</p></li>
+<li><p><strong>factors</strong> (<em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>]</em>) – Factors by which to adjust speed of input. Values greater than 1.0
+compress <code class="docutils literal notranslate"><span class="pre">waveform</span></code> in time, whereas values less than 1.0 stretch <code class="docutils literal notranslate"><span class="pre">waveform</span></code> in time.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">speed_perturb</span> <span class="o">=</span> <span class="n">SpeedPerturbation</span><span class="p">(</span><span class="mi">16000</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># waveform speed will be adjusted by factor 0.9 with 20% probability,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1.1 with 20% probability, and 1.0 (i.e. kept the same) with 60% probability.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">speed_perturbed_waveform</span> <span class="o">=</span> <span class="n">speed_perturb</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="torchaudio.prototype.transforms.Deemphasis.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/transforms/_transforms.html#Deemphasis.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.transforms.Deemphasis.forward" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="torchaudio.transforms.SpeedPerturbation.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/transforms/_transforms.html#SpeedPerturbation.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.SpeedPerturbation.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Waveform, with shape <cite>(…, N)</cite>.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Input signals, with shape <cite>(…, time)</cite>.</p></li>
+<li><p><strong>lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Valid lengths of signals in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, with shape <cite>(…)</cite>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>De-emphasized waveform, with shape <cite>(…, N)</cite>.</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Tensor</dt><dd><p>Speed-adjusted waveform, with shape <cite>(…, new_time).</cite></p>
+</dd>
+<dt>torch.Tensor</dt><dd><p>Valid lengths of signals in speed-adjusted waveform, with shape <cite>(…)</cite>.</p>
+</dd>
+</dl>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a></p>
+<dd class="field-odd"><p>(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -436,10 +457,10 @@ See <code class="xref py py-meth docutils literal notranslate"><span class="pre"
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="torchaudio.prototype.transforms.Preemphasis.html" class="btn btn-neutral float-right" title="Preemphasis" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="torchaudio.transforms.Deemphasis.html" class="btn btn-neutral float-right" title="Deemphasis" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="torchaudio.prototype.transforms.SpeedPerturbation.html" class="btn btn-neutral" title="SpeedPerturbation" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="torchaudio.transforms.Speed.html" class="btn btn-neutral" title="Speed" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -473,7 +494,7 @@ See <code class="xref py py-meth docutils literal notranslate"><span class="pre"
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Deemphasis</a></li>
+<li><a class="reference internal" href="#">SpeedPerturbation</a></li>
 </ul>
 
             </div>

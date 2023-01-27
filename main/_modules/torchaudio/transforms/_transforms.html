@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230126) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230127) &#x25BC</a>
     </div>
     
 
@@ -389,7 +389,7 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
@@ -399,6 +399,7 @@
 <span class="kn">from</span> <span class="nn">torchaudio</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 <span class="kn">from</span> <span class="nn">torchaudio.functional.functional</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_apply_sinc_resample_kernel</span><span class="p">,</span>
+    <span class="n">_check_convolve_mode</span><span class="p">,</span>
     <span class="n">_fix_waveform_shape</span><span class="p">,</span>
     <span class="n">_get_sinc_resample_kernel</span><span class="p">,</span>
     <span class="n">_stretch_waveform</span><span class="p">,</span>
@@ -2194,6 +2195,276 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fused_log_softmax</span><span class="p">,</span>
         <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Convolve"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Convolve.html#torchaudio.transforms.Convolve">[docs]</a><span class="k">class</span> <span class="nc">Convolve</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convolves inputs along their last dimension using the direct method.</span>
+<span class="sd">    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation</span>
+<span class="sd">    operator, this module applies the true `convolution`_ operator.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
+
+<span class="sd">            * &quot;full&quot;: Returns the full convolution result, with shape `(..., N + M - 1)`, where</span>
+<span class="sd">              `N` and `M` are the trailing dimensions of the two inputs. (Default)</span>
+<span class="sd">            * &quot;valid&quot;: Returns the segment of the full convolution result corresponding to where</span>
+<span class="sd">              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.</span>
+<span class="sd">            * &quot;same&quot;: Returns the center segment of the full convolution result, with shape `(..., N)`.</span>
+
+<span class="sd">    .. _convolution:</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Convolution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_check_convolve_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="Convolve.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Convolve.html#torchaudio.transforms.Convolve.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
+<span class="sd">            y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
+<span class="sd">                (leading dimensions must match those of ``x``).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where</span>
+<span class="sd">            the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FFTConvolve"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.FFTConvolve.html#torchaudio.transforms.FFTConvolve">[docs]</a><span class="k">class</span> <span class="nc">FFTConvolve</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this module</span>
+<span class="sd">    is generally much faster than :class:`Convolve`.</span>
+<span class="sd">    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation</span>
+<span class="sd">    operator, this module applies the true `convolution`_ operator.</span>
+<span class="sd">    Also note that this module can only output float tensors (int tensor inputs will be cast to float).</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str, optional): Must be one of (&quot;full&quot;, &quot;valid&quot;, &quot;same&quot;).</span>
+
+<span class="sd">            * &quot;full&quot;: Returns the full convolution result, with shape `(..., N + M - 1)`, where</span>
+<span class="sd">              `N` and `M` are the trailing dimensions of the two inputs. (Default)</span>
+<span class="sd">            * &quot;valid&quot;: Returns the segment of the full convolution result corresponding to where</span>
+<span class="sd">              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.</span>
+<span class="sd">            * &quot;same&quot;: Returns the center segment of the full convolution result, with shape `(..., N)`.</span>
+
+<span class="sd">    .. _convolution:</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Convolution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_check_convolve_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="FFTConvolve.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.FFTConvolve.html#torchaudio.transforms.FFTConvolve.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
+<span class="sd">            y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
+<span class="sd">                (leading dimensions must be broadcast-able to those of ``x``).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where</span>
+<span class="sd">            the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_source_target_sample_rate</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">speed</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">source_sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">speed</span> <span class="o">*</span> <span class="n">orig_freq</span><span class="p">)</span>
+    <span class="n">target_sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span>
+    <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">target_sample_rate</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">source_sample_rate</span> <span class="o">//</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">target_sample_rate</span> <span class="o">//</span> <span class="n">gcd</span>
+
+
+<div class="viewcode-block" id="Speed"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Speed.html#torchaudio.transforms.Speed">[docs]</a><span class="k">class</span> <span class="nc">Speed</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        orig_freq (int): Original frequency of the signals in ``waveform``.</span>
+<span class="sd">        factor (float): Factor by which to adjust speed of input. Values greater than 1.0</span>
+<span class="sd">            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span> <span class="o">=</span> <span class="n">orig_freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_sample_rate</span> <span class="o">=</span> <span class="n">_source_target_sample_rate</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resampler</span> <span class="o">=</span> <span class="n">Resample</span><span class="p">(</span><span class="n">orig_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">new_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_sample_rate</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Speed.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Speed.html#torchaudio.transforms.Speed.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (torch.Tensor): Input signals, with shape `(..., time)`.</span>
+<span class="sd">            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor, torch.Tensor):</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    Speed-adjusted waveform, with shape `(..., new_time).`</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resampler</span><span class="p">(</span><span class="n">waveform</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lengths</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_sample_rate</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_sample_rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SpeedPerturbation"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.SpeedPerturbation.html#torchaudio.transforms.SpeedPerturbation">[docs]</a><span class="k">class</span> <span class="nc">SpeedPerturbation</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies the speed perturbation augmentation introduced in</span>
+<span class="sd">    *Audio augmentation for speech recognition* :cite:`ko15_interspeech`. For a given input,</span>
+<span class="sd">    the module samples a speed-up factor from ``factors`` uniformly at random and adjusts</span>
+<span class="sd">    the speed of the input by that factor.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        orig_freq (int): Original frequency of the signals in ``waveform``.</span>
+<span class="sd">        factors (Sequence[float]): Factors by which to adjust speed of input. Values greater than 1.0</span>
+<span class="sd">            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; speed_perturb = SpeedPerturbation(16000, [0.9, 1.1, 1.0, 1.0, 1.0])</span>
+<span class="sd">        &gt;&gt;&gt; # waveform speed will be adjusted by factor 0.9 with 20% probability,</span>
+<span class="sd">        &gt;&gt;&gt; # 1.1 with 20% probability, and 1.0 (i.e. kept the same) with 60% probability.</span>
+<span class="sd">        &gt;&gt;&gt; speed_perturbed_waveform = speed_perturb(waveform, lengths)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">speeders</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">Speed</span><span class="p">(</span><span class="n">orig_freq</span><span class="o">=</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="n">factor</span><span class="p">)</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">factors</span><span class="p">])</span>
+
+<div class="viewcode-block" id="SpeedPerturbation.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.SpeedPerturbation.html#torchaudio.transforms.SpeedPerturbation.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (torch.Tensor): Input signals, with shape `(..., time)`.</span>
+<span class="sd">            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor, torch.Tensor):</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    Speed-adjusted waveform, with shape `(..., new_time).`</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">speeders</span><span class="p">),</span> <span class="p">()))</span>
+        <span class="c1"># NOTE: we do this because TorchScript doesn&#39;t allow for</span>
+        <span class="c1"># indexing ModuleList instances with non-literals.</span>
+        <span class="k">for</span> <span class="n">speeder_idx</span><span class="p">,</span> <span class="n">speeder</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">speeders</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="n">speeder_idx</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">speeder</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Speeder not found; execution should have never reached here.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AddNoise"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.AddNoise.html#torchaudio.transforms.AddNoise">[docs]</a><span class="k">class</span> <span class="nc">AddNoise</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scales and adds noise to waveform per signal-to-noise ratio.</span>
+<span class="sd">    See :meth:`torchaudio.functional.add_noise` for more details.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AddNoise.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.AddNoise.html#torchaudio.transforms.AddNoise.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">noise</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">snr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (torch.Tensor): Input waveform, with shape `(..., L)`.</span>
+<span class="sd">            noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).</span>
+<span class="sd">            snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.</span>
+<span class="sd">            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``,</span>
+<span class="sd">            with shape `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all</span>
+<span class="sd">            elements in ``waveform`` and ``noise`` are treated as valid. (Default: ``None``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`</span>
+<span class="sd">            (same shape as ``waveform``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">add_noise</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">noise</span><span class="p">,</span> <span class="n">snr</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Preemphasis"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Preemphasis.html#torchaudio.transforms.Preemphasis">[docs]</a><span class="k">class</span> <span class="nc">Preemphasis</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pre-emphasizes a waveform along its last dimension.</span>
+<span class="sd">    See :meth:`torchaudio.functional.preemphasis` for more details.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.</span>
+<span class="sd">            (Default: 0.97)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span>
+
+<div class="viewcode-block" id="Preemphasis.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Preemphasis.html#torchaudio.transforms.Preemphasis.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (torch.Tensor): Waveform, with shape `(..., N)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">preemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Deemphasis"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Deemphasis.html#torchaudio.transforms.Deemphasis">[docs]</a><span class="k">class</span> <span class="nc">Deemphasis</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;De-emphasizes a waveform along its last dimension.</span>
+<span class="sd">    See :meth:`torchaudio.functional.deemphasis` for more details.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.</span>
+<span class="sd">            (Default: 0.97)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span>
+
+<div class="viewcode-block" id="Deemphasis.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.Deemphasis.html#torchaudio.transforms.Deemphasis.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (torch.Tensor): Waveform, with shape `(..., N)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: De-emphasized waveform, with shape `(..., N)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">deemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span></div></div>
 </pre></div>
 
              </article>

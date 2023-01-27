@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="AddNoise" href="generated/torchaudio.prototype.transforms.AddNoise.html" />
+    <link rel="next" title="BarkScale" href="generated/torchaudio.prototype.transforms.BarkScale.html" />
     <link rel="prev" title="HIFIGAN_VOCODER_V3_LJSPEECH" href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html" />
   <!-- Google Analytics -->
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230126) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230127) &#x25BC</a>
     </div>
     
 
@@ -395,35 +395,14 @@
 <h1>torchaudio.prototype.transforms<a class="headerlink" href="#torchaudio-prototype-transforms" title="Permalink to this heading">¶</a></h1>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.AddNoise.html#torchaudio.prototype.transforms.AddNoise" title="torchaudio.prototype.transforms.AddNoise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddNoise</span></code></a></p></td>
-<td><p>Scales and adds noise to waveform per signal-to-noise ratio.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.Convolve.html#torchaudio.prototype.transforms.Convolve" title="torchaudio.prototype.transforms.Convolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Convolve</span></code></a></p></td>
-<td><p>Convolves inputs along their last dimension using the direct method.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.FFTConvolve.html#torchaudio.prototype.transforms.FFTConvolve" title="torchaudio.prototype.transforms.FFTConvolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FFTConvolve</span></code></a></p></td>
-<td><p>Convolves inputs along their last dimension using FFT.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale" title="torchaudio.prototype.transforms.BarkScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BarkScale</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale" title="torchaudio.prototype.transforms.BarkScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BarkScale</span></code></a></p></td>
 <td><p>Turn a normal STFT into a bark frequency STFT with triangular filter banks.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale" title="torchaudio.prototype.transforms.InverseBarkScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseBarkScale</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale" title="torchaudio.prototype.transforms.InverseBarkScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseBarkScale</span></code></a></p></td>
 <td><p>Estimate a STFT in normal frequency domain from bark frequency domain.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram" title="torchaudio.prototype.transforms.BarkSpectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BarkSpectrogram</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram" title="torchaudio.prototype.transforms.BarkSpectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BarkSpectrogram</span></code></a></p></td>
 <td><p>Create BarkSpectrogram for a raw audio signal.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.Speed.html#torchaudio.prototype.transforms.Speed" title="torchaudio.prototype.transforms.Speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed</span></code></a></p></td>
-<td><p>Adjusts waveform speed.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.SpeedPerturbation.html#torchaudio.prototype.transforms.SpeedPerturbation" title="torchaudio.prototype.transforms.SpeedPerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpeedPerturbation</span></code></a></p></td>
-<td><p>Applies the speed perturbation augmentation introduced in <em>Audio augmentation for speech recognition</em> <span id="id1">[<a class="reference internal" href="references.html#id57" title="Tom Ko, Vijayaditya Peddinti, Daniel Povey, and Sanjeev Khudanpur. Audio augmentation for speech recognition. In Proc. Interspeech 2015, 3586–3589. 2015. doi:10.21437/Interspeech.2015-711.">Ko <em>et al.</em>, 2015</a>]</span>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.Deemphasis.html#torchaudio.prototype.transforms.Deemphasis" title="torchaudio.prototype.transforms.Deemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Deemphasis</span></code></a></p></td>
-<td><p>De-emphasizes a waveform along its last dimension.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.transforms.Preemphasis.html#torchaudio.prototype.transforms.Preemphasis" title="torchaudio.prototype.transforms.Preemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Preemphasis</span></code></a></p></td>
-<td><p>Pre-emphasizes a waveform along its last dimension.</p></td>
 </tr>
 </tbody>
 </table>
@@ -437,7 +416,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/torchaudio.prototype.transforms.AddNoise.html" class="btn btn-neutral float-right" title="AddNoise" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="generated/torchaudio.prototype.transforms.BarkScale.html" class="btn btn-neutral float-right" title="BarkScale" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html" class="btn btn-neutral" title="HIFIGAN_VOCODER_V3_LJSPEECH" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>

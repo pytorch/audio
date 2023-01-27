@@ -4,5 +4,5 @@
 FFTConvolve
 ===========
 
-.. autoclass:: torchaudio.prototype.transforms.FFTConvolve
+.. autoclass:: torchaudio.transforms.FFTConvolve
    :members:

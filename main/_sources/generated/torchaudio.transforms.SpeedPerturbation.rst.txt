@@ -4,5 +4,5 @@
 SpeedPerturbation
 =================
 
-.. autoclass:: torchaudio.prototype.transforms.SpeedPerturbation
+.. autoclass:: torchaudio.transforms.SpeedPerturbation
    :members:
