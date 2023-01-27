@@ -3,7 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 // Because TorchScript requires c10::Dict type to pass dict,
 // while PyBind11 requires std::map type to pass dict,
@@ -86,5 +86,5 @@ struct StreamReaderBinding : public StreamReader,
   std::vector<c10::optional<ChunkData>> pop_chunks();
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

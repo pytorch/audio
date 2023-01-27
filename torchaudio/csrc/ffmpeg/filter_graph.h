@@ -2,7 +2,7 @@
 
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class FilterGraph {
   AVMediaType media_type;
@@ -64,5 +64,5 @@ class FilterGraph {
   int get_frame(AVFrame* pOutputFrame);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

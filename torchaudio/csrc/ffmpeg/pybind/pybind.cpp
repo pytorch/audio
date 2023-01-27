@@ -4,7 +4,7 @@
 #include <torchaudio/csrc/ffmpeg/pybind/stream_writer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
@@ -49,5 +49,5 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
 }
 
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

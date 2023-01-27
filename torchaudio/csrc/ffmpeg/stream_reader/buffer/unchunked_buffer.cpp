@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 UnchunkedVideoBuffer::UnchunkedVideoBuffer(const torch::Device& device)
@@ -43,5 +43,5 @@ void UnchunkedBuffer::flush() {
 }
 
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

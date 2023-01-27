@@ -3,7 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 struct FileObj {
   py::object fileobj;
@@ -20,5 +20,5 @@ c10::optional<OptionDict> map2dict(const c10::optional<OptionMap>& src);
 
 OptionMap dict2map(const OptionDict& src);
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

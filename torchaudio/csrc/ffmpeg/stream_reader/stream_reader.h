@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 ///
 /// Fetch and decode audio/video streams chunk by chunk.
@@ -293,5 +293,5 @@ class StreamReader {
   ///@}
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

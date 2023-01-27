@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/ffmpeg/pybind/typedefs.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 SrcInfoPyBind convert_pybind(SrcStreamInfo ssi) {
   return SrcInfoPyBind(std::forward_as_tuple(
@@ -72,5 +72,5 @@ void StreamReaderFileObj::add_video_stream(
       hw_accel);
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio
