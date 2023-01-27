@@ -89,6 +89,13 @@ Utility
     Fade
     Vol
     Loudness
+    AddNoise
+    Convolve
+    FFTConvolve
+    Speed
+    SpeedPerturbation
+    Deemphasis
+    Preemphasis
 
 Feature Extractions
 -------------------

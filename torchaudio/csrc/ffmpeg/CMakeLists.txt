@@ -20,7 +20,6 @@ set(
   stream_reader/stream_reader_binding.cpp
   stream_reader/stream_reader_tensor_binding.cpp
   stream_writer/stream_writer.cpp
-  stream_writer/stream_writer_wrapper.cpp
   stream_writer/stream_writer_binding.cpp
   utils.cpp
   )
