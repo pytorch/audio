@@ -7,14 +7,6 @@ namespace ffmpeg {
 
 namespace {
 
-c10::intrusive_ptr<StreamReaderBinding> init(
-    const std::string& src,
-    const c10::optional<std::string>& device,
-    const c10::optional<OptionDict>& option) {
-  return c10::make_intrusive<StreamReaderBinding>(
-      get_input_format_context(src, device, option));
-}
-
 using S = const c10::intrusive_ptr<StreamReaderBinding>&;
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
@@ -26,7 +18,11 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
     av_log_set_level(static_cast<int>(level));
   });
   m.class_<StreamReaderBinding>("ffmpeg_StreamReader")
-      .def(torch::init<>(init))
+      .def(torch::init<>([](const std::string& src,
+                            const c10::optional<std::string>& device,
+                            const c10::optional<OptionDict>& option) {
+        return c10::make_intrusive<StreamReaderBinding>(src, device, option);
+      }))
       .def("num_src_streams", [](S self) { return self->num_src_streams(); })
       .def("num_out_streams", [](S self) { return self->num_out_streams(); })
       .def("get_metadata", [](S self) { return self->get_metadata(); })

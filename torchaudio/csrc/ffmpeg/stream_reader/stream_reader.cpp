@@ -11,6 +11,81 @@ namespace ffmpeg {
 using KeyType = StreamProcessor::KeyType;
 
 //////////////////////////////////////////////////////////////////////////////
+// Initialization / resource allocations
+//////////////////////////////////////////////////////////////////////////////
+namespace {
+AVFormatContext* get_input_format_context(
+    const std::string& src,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option,
+    AVIOContext* io_ctx) {
+  AVFormatContext* p = avformat_alloc_context();
+  TORCH_CHECK(p, "Failed to allocate AVFormatContext.");
+  if (io_ctx) {
+    p->pb = io_ctx;
+  }
+
+  auto* pInputFormat = [&format]() -> AVFORMAT_CONST AVInputFormat* {
+    if (format.has_value()) {
+      std::string format_str = format.value();
+      AVFORMAT_CONST AVInputFormat* pInput =
+          av_find_input_format(format_str.c_str());
+      TORCH_CHECK(pInput, "Unsupported device/format: \"", format_str, "\"");
+      return pInput;
+    }
+    return nullptr;
+  }();
+
+  AVDictionary* opt = get_option_dict(option);
+  int ret = avformat_open_input(&p, src.c_str(), pInputFormat, &opt);
+  clean_up_dict(opt);
+
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to open the input \"",
+      src,
+      "\" (",
+      av_err2string(ret),
+      ").");
+  return p;
+}
+} // namespace
+
+StreamReader::StreamReader(AVFormatContext* p) : pFormatContext(p) {
+  int ret = avformat_find_stream_info(pFormatContext, nullptr);
+  TORCH_CHECK(
+      ret >= 0, "Failed to find stream information: ", av_err2string(ret));
+
+  processors =
+      std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
+  for (int i = 0; i < pFormatContext->nb_streams; ++i) {
+    switch (pFormatContext->streams[i]->codecpar->codec_type) {
+      case AVMEDIA_TYPE_AUDIO:
+      case AVMEDIA_TYPE_VIDEO:
+        break;
+      default:
+        pFormatContext->streams[i]->discard = AVDISCARD_ALL;
+    }
+  }
+}
+
+StreamReader::StreamReader(
+    AVIOContext* io_ctx,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option)
+    : StreamReader(get_input_format_context(
+          "Custom Input Context",
+          format,
+          option,
+          io_ctx)) {}
+
+StreamReader::StreamReader(
+    const std::string& src,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option)
+    : StreamReader(get_input_format_context(src, format, option, nullptr)) {}
+
+//////////////////////////////////////////////////////////////////////////////
 // Helper methods
 //////////////////////////////////////////////////////////////////////////////
 void StreamReader::validate_open_stream() const {
@@ -39,28 +114,6 @@ void StreamReader::validate_src_stream_type(int i, AVMediaType type) {
       " is not ",
       av_get_media_type_string(type),
       " stream.");
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Initialization / resource allocations
-//////////////////////////////////////////////////////////////////////////////
-StreamReader::StreamReader(AVFormatInputContextPtr&& p)
-    : pFormatContext(std::move(p)) {
-  int ret = avformat_find_stream_info(pFormatContext, nullptr);
-  TORCH_CHECK(
-      ret >= 0, "Failed to find stream information: ", av_err2string(ret));
-
-  processors =
-      std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
-  for (int i = 0; i < pFormatContext->nb_streams; ++i) {
-    switch (pFormatContext->streams[i]->codecpar->codec_type) {
-      case AVMEDIA_TYPE_AUDIO:
-      case AVMEDIA_TYPE_VIDEO:
-        break;
-      default:
-        pFormatContext->streams[i]->discard = AVDISCARD_ALL;
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

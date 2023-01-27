@@ -8,10 +8,7 @@ StreamWriterFileObj::StreamWriterFileObj(
     const c10::optional<std::string>& format,
     int64_t buffer_size)
     : FileObj(fileobj_, static_cast<int>(buffer_size), true),
-      StreamWriterBinding(get_output_format_context(
-          static_cast<std::string>(py::str(fileobj_.attr("__str__")())),
-          format,
-          pAVIO)) {}
+      StreamWriter(pAVIO, format) {}
 
 void StreamWriterFileObj::set_metadata(
     const std::map<std::string, std::string>& metadata) {

@@ -1,22 +1,27 @@
 #include <torch/script.h>
-#include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer_wrapper.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
 namespace torchaudio {
 namespace ffmpeg {
 namespace {
 
-c10::intrusive_ptr<StreamWriterBinding> init(
-    const std::string& dst,
-    const c10::optional<std::string>& format) {
-  return c10::make_intrusive<StreamWriterBinding>(
-      get_output_format_context(dst, format));
-}
+class StreamWriterBinding : public StreamWriter,
+                            public torch::CustomClassHolder {
+ public:
+  StreamWriterBinding(
+      const std::string& dst,
+      const c10::optional<std::string>& format)
+      : StreamWriter(dst, format) {}
+};
 
 using S = const c10::intrusive_ptr<StreamWriterBinding>&;
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.class_<StreamWriterBinding>("ffmpeg_StreamWriter")
-      .def(torch::init<>(init))
+      .def(torch::init<>(
+          [](const std::string& dst, const c10::optional<std::string>& format) {
+            return c10::make_intrusive<StreamWriterBinding>(dst, format);
+          }))
       .def(
           "add_audio_stream",
           [](S s,

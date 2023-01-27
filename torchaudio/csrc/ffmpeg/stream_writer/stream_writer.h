@@ -31,8 +31,28 @@ class StreamWriter {
   std::vector<OutputStream> streams;
   AVPacketPtr pkt;
 
+ protected:
+  explicit StreamWriter(AVFormatContext*);
+
  public:
-  explicit StreamWriter(AVFormatOutputContextPtr&& p);
+  /// Construct StreamWriter from destination URI
+  ///
+  /// @param dst Destination where encoded data are written.
+  /// @param format Specify output format. If not provided, it is guessed from
+  /// ``dst``.
+  explicit StreamWriter(
+      const std::string& dst,
+      const c10::optional<std::string>& format = {});
+
+  /// Construct StreamWriter from custom IO
+  ///
+  /// @param io_ctx Custom IO.
+  /// @param format Specify output format.
+  // TODO: Move this into wrapper class.
+  explicit StreamWriter(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format);
+
   // Non-copyable
   StreamWriter(const StreamWriter&) = delete;
   StreamWriter& operator=(const StreamWriter&) = delete;
