@@ -92,6 +92,10 @@ std::vector<std::string> get_protocols(bool output) {
   return ret;
 }
 
+std::string get_build_config() {
+  return avcodec_configuration();
+}
+
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::ffmpeg_get_versions", &get_versions);
   m.def("torchaudio::ffmpeg_get_muxers", []() { return get_muxers(false); });
@@ -99,6 +103,9 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       "torchaudio::ffmpeg_get_demuxers", []() { return get_demuxers(false); });
   m.def("torchaudio::ffmpeg_get_input_devices", []() {
     return get_demuxers(true);
+  });
+  m.def("torchaudio::ffmpeg_get_build_config", []() {
+    return get_build_config();
   });
   m.def("torchaudio::ffmpeg_get_output_devices", []() {
     return get_muxers(true);
