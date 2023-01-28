@@ -5,7 +5,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class Sink {
   AVFramePtr frame;
@@ -15,6 +15,8 @@ class Sink {
   AVCodecParameters* codecpar;
   std::string filter_description;
   std::unique_ptr<FilterGraph> filter;
+  // time_base of filter graph output, used for PTS calc
+  AVRational output_time_base;
 
  public:
   std::unique_ptr<Buffer> buffer;
@@ -33,5 +35,5 @@ class Sink {
   void flush();
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

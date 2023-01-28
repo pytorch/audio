@@ -1,8 +1,22 @@
-#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_tensor_binding.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
+
+//////////////////////////////////////////////////////////////////////////////
+// TensorIndexer
+//////////////////////////////////////////////////////////////////////////////
+// Helper structure to keep track of until where the decoding has happened
+struct TensorIndexer {
+  torch::Tensor src;
+  size_t index = 0;
+  const uint8_t* data;
+  const size_t numel;
+  AVIOContextPtr pAVIO;
+
+  TensorIndexer(const torch::Tensor& src, int buffer_size);
+};
 
 static int read_function(void* opaque, uint8_t* buf, int buf_size) {
   TensorIndexer* tensorobj = static_cast<TensorIndexer*>(opaque);
@@ -56,13 +70,6 @@ AVIOContext* get_io_context(TensorIndexer* opaque, int buffer_size) {
   return av_io_ctx;
 }
 
-std::string get_id(const torch::Tensor& src) {
-  std::stringstream ss;
-  ss << "Tensor <" << static_cast<const void*>(src.data_ptr<uint8_t>()) << ">";
-  return ss.str();
-}
-} // namespace
-
 TensorIndexer::TensorIndexer(const torch::Tensor& src, int buffer_size)
     : src(src),
       data([&]() -> uint8_t* {
@@ -83,31 +90,38 @@ TensorIndexer::TensorIndexer(const torch::Tensor& src, int buffer_size)
       numel(src.numel()),
       pAVIO(get_io_context(this, buffer_size)) {}
 
+//////////////////////////////////////////////////////////////////////////////
+// StreamReaderTensorBinding
+//////////////////////////////////////////////////////////////////////////////
+// Structure to implement wrapper API around StreamReader and input Tensor
+struct StreamReaderTensorBinding : protected TensorIndexer,
+                                   public StreamReaderBinding {
+  StreamReaderTensorBinding(
+      const torch::Tensor& src,
+      const c10::optional<std::string>& device,
+      const c10::optional<OptionDict>& option,
+      int buffer_size);
+};
+
 StreamReaderTensorBinding::StreamReaderTensorBinding(
     const torch::Tensor& src,
-    const c10::optional<std::string>& device,
+    const c10::optional<std::string>& format,
     const c10::optional<OptionDict>& option,
     int buffer_size)
     : TensorIndexer(src, buffer_size),
-      StreamReaderBinding(
-          get_input_format_context(get_id(src), device, option, pAVIO)) {}
-
-namespace {
-
-c10::intrusive_ptr<StreamReaderTensorBinding> init(
-    const torch::Tensor& src,
-    const c10::optional<std::string>& device,
-    const c10::optional<OptionDict>& option,
-    int64_t buffer_size) {
-  return c10::make_intrusive<StreamReaderTensorBinding>(
-      src, device, option, static_cast<int>(buffer_size));
-}
+      StreamReaderBinding(pAVIO, format, option) {}
 
 using S = const c10::intrusive_ptr<StreamReaderTensorBinding>&;
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.class_<StreamReaderTensorBinding>("ffmpeg_StreamReaderTensor")
-      .def(torch::init<>(init))
+      .def(torch::init<>([](const torch::Tensor& src,
+                            const c10::optional<std::string>& device,
+                            const c10::optional<OptionDict>& option,
+                            int64_t buffer_size) {
+        return c10::make_intrusive<StreamReaderTensorBinding>(
+            src, device, option, static_cast<int>(buffer_size));
+      }))
       .def("num_src_streams", [](S self) { return self->num_src_streams(); })
       .def("num_out_streams", [](S self) { return self->num_out_streams(); })
       .def("get_metadata", [](S self) { return self->get_metadata(); })
@@ -176,5 +190,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def("pop_chunks", [](S s) { return s->pop_chunks(); });
 }
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

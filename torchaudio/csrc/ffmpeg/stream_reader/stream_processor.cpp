@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 using KeyType = StreamProcessor::KeyType;
 
@@ -62,7 +62,7 @@ std::string StreamProcessor::get_filter_description(KeyType key) const {
 
 bool StreamProcessor::is_buffer_ready() const {
   for (const auto& it : sinks) {
-    if (!it.second.is_buffer_ready()) {
+    if (!it.second.buffer->is_ready()) {
       return false;
     }
   }
@@ -151,9 +151,9 @@ int StreamProcessor::send_frame(AVFrame* pFrame) {
 ////////////////////////////////////////////////////////////////////////////////
 // Retrieval
 ////////////////////////////////////////////////////////////////////////////////
-c10::optional<torch::Tensor> StreamProcessor::pop_chunk(KeyType key) {
+c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return sinks.at(key).buffer->pop_chunk();
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

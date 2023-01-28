@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
@@ -158,5 +158,5 @@ AVFilterGraphPtr::AVFilterGraphPtr()
 void AVFilterGraphPtr::reset() {
   ptr.reset(get_filter_graph());
 }
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

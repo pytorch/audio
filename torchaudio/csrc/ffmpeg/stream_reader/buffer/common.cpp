@@ -7,7 +7,7 @@
 #endif
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 torch::Tensor convert_audio(AVFrame* pFrame) {
@@ -95,9 +95,11 @@ torch::Tensor get_buffer(
                      .device(device.type(), device.index());
   return torch::empty(shape, options);
 }
-} // namespace
 
-torch::Tensor get_image_buffer(AVFrame* frame, const torch::Device& device) {
+std::tuple<torch::Tensor, bool> get_image_buffer(
+    AVFrame* frame,
+    int num_frames,
+    const torch::Device& device) {
   auto fmt = static_cast<AVPixelFormat>(frame->format);
   const AVPixFmtDescriptor* desc = [&]() {
     if (fmt == AV_PIX_FMT_CUDA) {
@@ -124,13 +126,16 @@ torch::Tensor get_image_buffer(AVFrame* frame, const torch::Device& device) {
   // The actual number of planes can be retrieved with
   // av_pix_fmt_count_planes.
 
+  int height = frame->height;
+  int width = frame->width;
   if (desc->flags & AV_PIX_FMT_FLAG_PLANAR) {
-    return get_buffer({1, channels, frame->height, frame->width}, device);
+    auto buffer = get_buffer({num_frames, channels, height, width}, device);
+    return std::make_tuple(buffer, true);
   }
-  return get_buffer({1, frame->height, frame->width, channels}, device);
+  auto buffer = get_buffer({num_frames, height, width, channels}, device);
+  return std::make_tuple(buffer, false);
 }
 
-namespace {
 void write_interlaced_image(AVFrame* pFrame, torch::Tensor& frame) {
   auto ptr = frame.data_ptr<uint8_t>();
   uint8_t* buf = pFrame->data[0];
@@ -304,14 +309,11 @@ void write_nv12_cuda(AVFrame* pFrame, torch::Tensor& yuv) {
 }
 #endif
 
-} // namespace
-
-torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
+void write_image(AVFrame* frame, torch::Tensor& buf) {
   // ref:
   // https://ffmpeg.org/doxygen/4.1/filtering__video_8c_source.html#l00179
   // https://ffmpeg.org/doxygen/4.1/decode__video_8c_source.html#l00038
   AVPixelFormat format = static_cast<AVPixelFormat>(frame->format);
-  torch::Tensor buf = get_image_buffer(frame, device);
   switch (format) {
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24:
@@ -321,19 +323,19 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
     case AV_PIX_FMT_BGRA:
     case AV_PIX_FMT_GRAY8: {
       write_interlaced_image(frame, buf);
-      return buf.permute({0, 3, 1, 2});
+      return;
     }
     case AV_PIX_FMT_YUV444P: {
       write_planar_image(frame, buf);
-      return buf;
+      return;
     }
     case AV_PIX_FMT_YUV420P: {
       write_yuv420p(frame, buf);
-      return buf;
+      return;
     }
     case AV_PIX_FMT_NV12: {
       write_nv12_cpu(frame, buf);
-      return buf;
+      return;
     }
 #ifdef USE_CUDA
     case AV_PIX_FMT_CUDA: {
@@ -345,7 +347,7 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
       switch (sw_format) {
         case AV_PIX_FMT_NV12: {
           write_nv12_cuda(frame, buf);
-          return buf;
+          return;
         }
         case AV_PIX_FMT_P010:
         case AV_PIX_FMT_P016:
@@ -369,6 +371,14 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
   }
 }
 
+} // namespace
+
+torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
+  auto [buffer, is_planar] = get_image_buffer(frame, 1, device);
+  write_image(frame, buffer);
+  return is_planar ? buffer : buffer.permute({0, 3, 1, 2});
+}
+
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

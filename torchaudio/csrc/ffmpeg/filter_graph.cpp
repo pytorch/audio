@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
   switch (media_type) {
@@ -12,6 +12,8 @@ FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
     default:
       TORCH_CHECK(false, "Only audio and video type is supported.");
   }
+
+  pFilterGraph->nb_threads = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,5 +200,5 @@ int FilterGraph::get_frame(AVFrame* pOutputFrame) {
   return av_buffersink_get_frame(buffersink_ctx, pOutputFrame);
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

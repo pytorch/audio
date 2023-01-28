@@ -3,14 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 
 namespace torchaudio {
-namespace ffmpeg {
-
-// create format context for reading media
-AVFormatInputContextPtr get_input_format_context(
-    const std::string& src,
-    const c10::optional<std::string>& device,
-    const c10::optional<OptionDict>& option,
-    AVIOContext* io_ctx = nullptr);
+namespace io {
 
 // Because TorchScript requires c10::Dict type to pass dict,
 // while PyBind11 requires std::map type to pass dict,
@@ -61,24 +54,37 @@ using OutInfo = std::tuple<
     std::string // filter description
     >;
 
+using ChunkData = std::tuple<torch::Tensor, double>;
+
 // Structure to implement wrapper API around StreamReader, which is more
 // suitable for Binding the code (i.e. it receives/returns pritimitves)
 struct StreamReaderBinding : public StreamReader,
                              public torch::CustomClassHolder {
-  explicit StreamReaderBinding(AVFormatInputContextPtr&& p);
+  StreamReaderBinding(
+      const std::string& src,
+      const c10::optional<std::string>& device,
+      const c10::optional<OptionDict>& option);
+
+  StreamReaderBinding(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& device,
+      const c10::optional<OptionDict>& option);
+
   SrcInfo get_src_stream_info(int64_t i);
   OutInfo get_out_stream_info(int64_t i);
 
   int64_t process_packet(
-      const c10::optional<double>& timeout = c10::optional<double>(),
+      const c10::optional<double>& timeout = {},
       const double backoff = 10.);
 
   void process_all_packets();
 
   int64_t fill_buffer(
-      const c10::optional<double>& timeout = c10::optional<double>(),
+      const c10::optional<double>& timeout = {},
       const double backoff = 10.);
+
+  std::vector<c10::optional<ChunkData>> pop_chunks();
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

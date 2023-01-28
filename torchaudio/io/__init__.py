@@ -2,10 +2,6 @@ import torchaudio
 
 _STREAM_READER = [
     "StreamReader",
-    "StreamReaderSourceStream",
-    "StreamReaderSourceAudioStream",
-    "StreamReaderSourceVideoStream",
-    "StreamReaderOutputStream",
 ]
 
 _STREAM_WRITER = [

@@ -83,10 +83,11 @@ def _load_audio(
     option: Dict[str, str] = {}
     s.add_audio_stream(i, -1, -1, _get_load_filter(frame_offset, num_frames, convert), None, option)
     s.process_all_packets()
-    waveform = s.pop_chunks()[0]
-    if waveform is None:
+    chunk = s.pop_chunks()[0]
+    if chunk is None:
         raise RuntimeError("Failed to decode audio.")
-    assert waveform is not None
+    assert chunk is not None
+    waveform = chunk[0]
     if channels_first:
         waveform = waveform.T
     return waveform, sample_rate

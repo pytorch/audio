@@ -1,3 +1,5 @@
+import io
+
 import torch
 import torchaudio
 from parameterized import parameterized, parameterized_class
@@ -17,12 +19,46 @@ from torchaudio_unittest.common_utils import (
 )
 
 if is_ffmpeg_available():
-    from torchaudio.io import (
-        StreamReader,
-        StreamReaderSourceAudioStream,
-        StreamReaderSourceStream,
-        StreamReaderSourceVideoStream,
-    )
+    from torchaudio.io import StreamReader, StreamWriter
+    from torchaudio.io._stream_reader import ChunkTensor, SourceAudioStream, SourceStream, SourceVideoStream
+
+
+@skipIfNoFFmpeg
+class ChunkTensorTest(TorchaudioTestCase):
+    def test_chunktensor(self):
+        """ChunkTensor serves as a replacement of tensor"""
+        data = torch.randn((256, 2))
+        pts = 16.0
+
+        c = ChunkTensor(data, pts)
+        assert c.pts == pts
+        self.assertEqual(c, data)
+
+        # method
+        sum_ = c.sum()
+        assert isinstance(sum_, torch.Tensor)
+        self.assertEqual(sum_, data.sum())
+
+        # function form
+        min_ = torch.min(c)
+        assert isinstance(min_, torch.Tensor)
+        self.assertEqual(min_, torch.min(data))
+
+        # attribute
+        t = c.T
+        assert isinstance(t, torch.Tensor)
+        self.assertEqual(t, data.T)
+
+        # in-place op
+        c[0] = 0
+        self.assertEqual(c, data)
+
+        # pass to other C++ code
+        buffer = io.BytesIO()
+        w = StreamWriter(buffer, format="wav")
+        w.add_audio_stream(8000, 2)
+        with w.open():
+            w.write_audio_chunk(0, c)
 
 
 ################################################################################
@@ -109,7 +145,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             base_metadata = {}
 
         expected = [
-            StreamReaderSourceVideoStream(
+            SourceVideoStream(
                 media_type="video",
                 codec="h264",
                 codec_long_name="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
@@ -126,7 +162,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 height=180,
                 frame_rate=25.0,
             ),
-            StreamReaderSourceAudioStream(
+            SourceAudioStream(
                 media_type="audio",
                 codec="aac",
                 codec_long_name="AAC (Advanced Audio Coding)",
@@ -142,7 +178,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 sample_rate=8000.0,
                 num_channels=2,
             ),
-            StreamReaderSourceStream(
+            SourceStream(
                 media_type="subtitle",
                 codec="mov_text",
                 codec_long_name="MOV text",
@@ -155,7 +191,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                     "language": "eng",
                 },
             ),
-            StreamReaderSourceVideoStream(
+            SourceVideoStream(
                 media_type="video",
                 codec="h264",
                 codec_long_name="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
@@ -172,7 +208,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 height=270,
                 frame_rate=29.97002997002997,
             ),
-            StreamReaderSourceAudioStream(
+            SourceAudioStream(
                 media_type="audio",
                 codec="aac",
                 codec_long_name="AAC (Advanced Audio Coding)",
@@ -188,7 +224,7 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 sample_rate=16000.0,
                 num_channels=2,
             ),
-            StreamReaderSourceStream(
+            SourceStream(
                 media_type="subtitle",
                 codec="mov_text",
                 codec_long_name="MOV text",
@@ -553,6 +589,28 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         assert video.shape == torch.Size([390, 3, 270, 480])
         assert audio.shape == torch.Size([208896, 2])
 
+    @parameterized.expand([(1,), (3,), (5,), (10,)])
+    def test_frames_per_chunk(self, fpc):
+        """Changing frames_per_chunk does not change the returned content"""
+        src = self.get_src()
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=-1, buffer_chunk_size=-1)
+        s.process_all_packets()
+        ref_video, ref_audio = s.pop_chunks()
+
+        if self.test_type == "fileobj":
+            src.seek(0)
+
+        s = StreamReader(src)
+        s.add_video_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        s.add_audio_stream(frames_per_chunk=fpc, buffer_chunk_size=-1)
+        chunks = list(s.stream())
+        video_chunks = torch.cat([c[0] for c in chunks if c[0] is not None])
+        audio_chunks = torch.cat([c[1] for c in chunks if c[1] is not None])
+        self.assertEqual(ref_video, video_chunks)
+        self.assertEqual(ref_audio, audio_chunks)
+
     def test_buffer_chunk_size(self):
         """`buffer_chunk_size=-1` does not drop frames."""
         src = self.get_src()
@@ -582,6 +640,59 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         video, audio = s.pop_chunks()
         assert video.shape == torch.Size([30, 3, 270, 480])
         assert audio.shape == torch.Size([896, 2])
+
+    @parameterized.expand([(1,), (3,), (5,), (10,)])
+    def test_video_pts(self, fpc):
+        """PTS values of the first frame are reported in .pts attribute"""
+        rate, num_frames = 30000 / 1001, 390
+        ref_pts = [i / rate for i in range(0, num_frames, fpc)]
+
+        s = StreamReader(self.get_src())
+        s.add_video_stream(fpc)
+        pts = [video.pts for video, in s.stream()]
+        self.assertEqual(pts, ref_pts)
+
+    @parameterized.expand([(256,), (512,), (1024,), (4086,)])
+    def test_audio_pts(self, fpc):
+        """PTS values of the first frame are reported in .pts attribute"""
+        rate, num_frames = 16000, 208896
+        ref_pts = [i / rate for i in range(0, num_frames, fpc)]
+
+        s = StreamReader(self.get_src())
+        s.add_audio_stream(fpc, buffer_chunk_size=-1)
+        pts = [audio.pts for audio, in s.stream()]
+        self.assertEqual(pts, ref_pts)
+
+    def test_pts_unchunked_process_all(self):
+        """PTS is zero when loading the entire media with unchunked buffer"""
+        s = StreamReader(self.get_src())
+        s.add_audio_stream(-1, buffer_chunk_size=-1)
+        s.add_video_stream(-1, buffer_chunk_size=-1)
+        s.process_all_packets()
+        audio, video = s.pop_chunks()
+        assert audio.pts == 0.0
+        assert video.pts == 0.0
+        assert audio.size(0) == 208896
+        assert video.size(0) == 390
+
+    def test_pts_unchunked(self):
+        """PTS grows proportionally to the number of frames decoded"""
+        s = StreamReader(self.get_src())
+        s.add_audio_stream(-1, buffer_chunk_size=-1)
+        s.add_video_stream(-1, buffer_chunk_size=-1)
+
+        num_audio_frames, num_video_frames = 0, 0
+        while num_audio_frames < 208896 and num_video_frames < 390:
+            s.process_packet()
+            audio, video = s.pop_chunks()
+            if audio is None and video is None:
+                continue
+            if audio is not None:
+                assert audio.pts == num_audio_frames / 16000
+                num_audio_frames += audio.size(0)
+            if video is not None:
+                assert video.pts == num_video_frames * 1001 / 30000
+                num_video_frames += video.size(0)
 
 
 def _to_fltp(original):
