@@ -1,5 +1,6 @@
 #include <torch/script.h>
 #include <torch/torch.h>
+#include "iir_cuda.h"
 
 namespace {
 
@@ -118,6 +119,8 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
     if (device.is_cpu()) {
       cpu_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
+    } else if (device.is_cuda()) {
+      cuda_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
     } else {
       lfilter_core_generic_loop(
           waveform, a_coeff_flipped, padded_output_waveform);
