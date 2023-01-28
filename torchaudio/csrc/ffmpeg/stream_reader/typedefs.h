@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 struct SrcStreamInfo {
   /// @name COMMON MEMBERS
@@ -119,5 +119,5 @@ struct Chunk {
   double pts;
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

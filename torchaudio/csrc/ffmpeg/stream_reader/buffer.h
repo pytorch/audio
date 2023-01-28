@@ -4,7 +4,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 //////////////////////////////////////////////////////////////////////////////
 // Buffer Interface
@@ -29,5 +29,5 @@ class Buffer {
   virtual void flush() = 0;
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

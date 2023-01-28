@@ -1,7 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 SrcInfo convert(SrcStreamInfo ssi) {
@@ -93,5 +93,5 @@ std::vector<c10::optional<ChunkData>> StreamReaderBinding::pop_chunks() {
   return ret;
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

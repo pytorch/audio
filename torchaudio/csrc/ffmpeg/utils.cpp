@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 c10::Dict<std::string, std::tuple<int64_t, int64_t, int64_t>> get_versions() {
@@ -124,5 +124,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
 }
 
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

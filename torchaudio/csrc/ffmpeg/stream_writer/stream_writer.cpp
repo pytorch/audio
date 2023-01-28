@@ -5,7 +5,7 @@
 #endif
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 AVFormatContext* get_output_format_context(
@@ -1107,5 +1107,5 @@ void StreamWriter::flush_stream(OutputStream& os) {
     encode_frame(nullptr, os.codec_ctx, os.stream);
   }
 }
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

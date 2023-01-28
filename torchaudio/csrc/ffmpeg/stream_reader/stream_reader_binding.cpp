@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 namespace {
 
@@ -92,5 +92,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
 }
 
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

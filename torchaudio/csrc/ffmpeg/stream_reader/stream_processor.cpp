@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 using KeyType = StreamProcessor::KeyType;
 
@@ -155,5 +155,5 @@ c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return sinks.at(key).buffer->pop_chunk();
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

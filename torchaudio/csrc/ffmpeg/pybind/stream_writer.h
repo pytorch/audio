@@ -3,7 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class StreamWriterFileObj : private FileObj, public StreamWriter {
  public:
@@ -31,5 +31,5 @@ class StreamWriterFileObj : private FileObj, public StreamWriter {
       const c10::optional<std::string>& hw_accel);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

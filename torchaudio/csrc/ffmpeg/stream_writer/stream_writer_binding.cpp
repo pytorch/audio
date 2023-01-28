@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 class StreamWriterBinding : public StreamWriter,
@@ -82,5 +82,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
 }
 
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio
