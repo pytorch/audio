@@ -1,6 +1,6 @@
 #include <torch/script.h>
 #include <torch/torch.h>
-#include "iir_cuda.h"
+#include <torchaudio/csrc/iir_cuda.h>
 
 namespace {
 
