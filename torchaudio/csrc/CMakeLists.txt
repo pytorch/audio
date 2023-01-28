@@ -44,6 +44,11 @@ endif()
 if(USE_CUDA)
   list(
     APPEND
+    sources
+    iir_cuda.cu
+  )
+  list(
+    APPEND
     additional_libs
     cuda_deps
     )
