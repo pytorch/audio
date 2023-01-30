@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230129) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230130) &#x25BC</a>
     </div>
     
 
@@ -447,6 +447,30 @@
 <span class="gp">... </span><span class="n">ac3</span><span class="p">:</span> <span class="n">ATSC</span> <span class="n">A</span><span class="o">/</span><span class="mi">52</span><span class="n">A</span> <span class="p">(</span><span class="n">AC</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">... </span><span class="n">ac3_fixed</span><span class="p">:</span> <span class="n">ATSC</span> <span class="n">A</span><span class="o">/</span><span class="mi">52</span><span class="n">A</span> <span class="p">(</span><span class="n">AC</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">... </span><span class="n">alac</span><span class="p">:</span> <span class="n">ALAC</span> <span class="p">(</span><span class="n">Apple</span> <span class="n">Lossless</span> <span class="n">Audio</span> <span class="n">Codec</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="get-build-config">
+<h2>get_build_config<a class="headerlink" href="#get-build-config" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="torchaudio.utils.ffmpeg_utils.get_build_config">
+<span class="sig-prename descclassname"><span class="pre">torchaudio.utils.ffmpeg_utils.</span></span><span class="sig-name descname"><span class="pre">get_build_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/utils/ffmpeg_utils.html#get_build_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.utils.ffmpeg_utils.get_build_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the FFmpeg build configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Build configuration string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">get_build_config</span><span class="p">())</span>
+<span class="go">--prefix=/Users/runner/miniforge3 --cc=arm64-apple-darwin20.0.0-clang --enable-gpl --enable-hardcoded-tables --enable-libfreetype --enable-libopenh264 --enable-neon --enable-libx264 --enable-libx265 --enable-libaom --enable-libsvtav1 --enable-libxml2 --enable-libvpx --enable-pic --enable-pthreads --enable-shared --disable-static --enable-version3 --enable-zlib --enable-libmp3lame --pkg-config=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/pkg-config --enable-cross-compile --arch=arm64 --target-os=darwin --cross-prefix=arm64-apple-darwin20.0.0- --host-cc=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/x86_64-apple-darwin13.4.0-clang  # noqa</span>
 </pre></div>
 </div>
 </dd>
@@ -801,6 +825,7 @@ Extremely verbose debugging, useful for libav* development.</p></li>
 <li><a class="reference internal" href="#">ffmpeg_utils</a><ul>
 <li><a class="reference internal" href="#get-audio-decoders">get_audio_decoders</a></li>
 <li><a class="reference internal" href="#get-audio-encoders">get_audio_encoders</a></li>
+<li><a class="reference internal" href="#get-build-config">get_build_config</a></li>
 <li><a class="reference internal" href="#get-demuxers">get_demuxers</a></li>
 <li><a class="reference internal" href="#get-input-devices">get_input_devices</a></li>
 <li><a class="reference internal" href="#get-input-protocols">get_input_protocols</a></li>

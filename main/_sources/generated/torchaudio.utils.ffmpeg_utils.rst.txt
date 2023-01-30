@@ -21,6 +21,11 @@ get_audio_encoders
 
 .. autofunction:: get_audio_encoders
 
+get_build_config
+----------------
+
+.. autofunction:: get_build_config
+
 get_demuxers
 ------------
 
