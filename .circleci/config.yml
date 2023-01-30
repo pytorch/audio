@@ -108,7 +108,7 @@ jobs:
 
   lint_python_and_config:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
@@ -615,7 +615,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Hack to load FFmpeg libraries
             # Note: Depending on Python version, they search different paths.
-            # For 3.7 and 3.9, copying them in CWD works.
+            # For 3.9, copying them in CWD works.
             cp ~/workspace/ffmpeg/bin/* test/smoke_test/
             # For 3.8 and 3.10, they must be in the same directory as the entrypoint lib
             cp ~/workspace/ffmpeg/bin/* /C/tools/miniconda3/envs/python${PYTHON_VERSION}/lib/site-packages/torchaudio/lib/
@@ -933,57 +933,6 @@ workflows:
           - download_third_parties
       - binary_windows_wheel:
           cuda_version: cpu
-          name: binary_windows_wheel_py3.7_cpu
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-      - smoke_test_windows_pip:
-          cuda_version: cpu
-          name: binary_windows_wheel_py3.7_cpu_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_windows_wheel_py3.7_cpu
-      - binary_windows_wheel:
-          cuda_version: cu116
-          name: binary_windows_wheel_py3.7_cu116
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-          wheel_docker_image: pytorch/manylinux-cuda116
-      - smoke_test_windows_pip:
-          cuda_version: cu116
-          name: binary_windows_wheel_py3.7_cu116_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_windows_wheel_py3.7_cu116
-      - binary_windows_wheel:
-          cuda_version: cu117
-          name: binary_windows_wheel_py3.7_cu117
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-          wheel_docker_image: pytorch/manylinux-cuda117
-      - smoke_test_windows_pip:
-          cuda_version: cu117
-          name: binary_windows_wheel_py3.7_cu117_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_windows_wheel_py3.7_cu117
-      - binary_windows_wheel:
-          cuda_version: cu118
-          name: binary_windows_wheel_py3.7_cu118
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-          wheel_docker_image: pytorch/manylinux-cuda118
-      - smoke_test_windows_pip:
-          cuda_version: cu118
-          name: binary_windows_wheel_py3.7_cu118_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - binary_windows_wheel_py3.7_cu118
-      - binary_windows_wheel:
-          cuda_version: cpu
           name: binary_windows_wheel_py3.8_cpu
           python_version: '3.8'
           requires:
@@ -1151,13 +1100,6 @@ workflows:
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
-          name: binary_macos_conda_py3.7_cpu
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_macos
-      - binary_macos_conda:
-          conda_docker_image: pytorch/conda-builder:cpu
-          cuda_version: cpu
           name: binary_macos_conda_py3.8_cpu
           python_version: '3.8'
           requires:
@@ -1176,58 +1118,6 @@ workflows:
           python_version: '3.10'
           requires:
           - build_ffmpeg_macos
-      - binary_windows_conda:
-          conda_docker_image: pytorch/conda-builder:cpu
-          cuda_version: cpu
-          name: binary_windows_conda_py3.7_cpu
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-      - smoke_test_windows_conda:
-          cuda_version: cpu
-          name: binary_windows_conda_py3.7_cpu_smoke_test_conda
-          python_version: '3.7'
-          requires:
-          - binary_windows_conda_py3.7_cpu
-      - binary_windows_conda:
-          conda_docker_image: pytorch/conda-builder:cuda116
-          cuda_version: cu116
-          name: binary_windows_conda_py3.7_cu116
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-      - smoke_test_windows_conda_gpu:
-          cuda_version: cu116
-          name: binary_windows_conda_py3.7_cu116_smoke_test_conda
-          python_version: '3.7'
-          requires:
-          - binary_windows_conda_py3.7_cu116
-      - binary_windows_conda:
-          conda_docker_image: pytorch/conda-builder:cuda117
-          cuda_version: cu117
-          name: binary_windows_conda_py3.7_cu117
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-      - smoke_test_windows_conda_gpu:
-          cuda_version: cu117
-          name: binary_windows_conda_py3.7_cu117_smoke_test_conda
-          python_version: '3.7'
-          requires:
-          - binary_windows_conda_py3.7_cu117
-      - binary_windows_conda:
-          conda_docker_image: pytorch/conda-builder:cuda118
-          cuda_version: cu118
-          name: binary_windows_conda_py3.7_cu118
-          python_version: '3.7'
-          requires:
-          - build_ffmpeg_windows
-      - smoke_test_windows_conda_gpu:
-          cuda_version: cu118
-          name: binary_windows_conda_py3.7_cu118_smoke_test_conda
-          python_version: '3.7'
-          requires:
-          - binary_windows_conda_py3.7_cu118
       - binary_windows_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1412,16 +1302,10 @@ workflows:
     jobs:
       - download_third_parties:
           name: download_third_parties
-      - unittest_linux_cpu:
-          cuda_version: cpu
-          name: unittest_linux_cpu_py3.7
-          python_version: '3.7'
-          requires:
-          - download_third_parties
       - stylecheck:
           cuda_version: cpu
-          name: stylecheck_py3.7
-          python_version: '3.7'
+          name: stylecheck_py3.8
+          python_version: '3.8'
       - unittest_linux_cpu:
           cuda_version: cpu
           name: unittest_linux_cpu_py3.8
@@ -1438,12 +1322,6 @@ workflows:
           cuda_version: cpu
           name: unittest_linux_cpu_py3.10
           python_version: '3.10'
-          requires:
-          - download_third_parties
-      - unittest_linux_gpu:
-          cuda_version: cu116
-          name: unittest_linux_gpu_py3.7
-          python_version: '3.7'
           requires:
           - download_third_parties
       - unittest_linux_gpu:
@@ -1466,20 +1344,20 @@ workflows:
           - download_third_parties
       - unittest_windows_cpu:
           cuda_version: cpu
-          name: unittest_windows_cpu_py3.7
-          python_version: '3.7'
+          name: unittest_windows_cpu_py3.8
+          python_version: '3.8'
           requires:
           - download_third_parties
       - unittest_windows_gpu:
           cuda_version: cu116
-          name: unittest_windows_gpu_py3.7
-          python_version: '3.7'
+          name: unittest_windows_gpu_py3.8
+          python_version: '3.8'
           requires:
           - download_third_parties
       - unittest_macos_cpu:
           cuda_version: cpu
-          name: unittest_macos_cpu_py3.7
-          python_version: '3.7'
+          name: unittest_macos_cpu_py3.8
+          python_version: '3.8'
           requires:
           - download_third_parties
   nightly:

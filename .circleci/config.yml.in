@@ -108,7 +108,7 @@ jobs:
 
   lint_python_and_config:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
@@ -615,7 +615,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Hack to load FFmpeg libraries
             # Note: Depending on Python version, they search different paths.
-            # For 3.7 and 3.9, copying them in CWD works.
+            # For 3.9, copying them in CWD works.
             cp ~/workspace/ffmpeg/bin/* test/smoke_test/
             # For 3.8 and 3.10, they must be in the same directory as the entrypoint lib
             cp ~/workspace/ffmpeg/bin/* /C/tools/miniconda3/envs/python${PYTHON_VERSION}/lib/site-packages/torchaudio/lib/

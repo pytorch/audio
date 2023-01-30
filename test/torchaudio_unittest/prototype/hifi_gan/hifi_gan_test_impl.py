@@ -76,9 +76,7 @@ class HiFiGANTestImpl(TestBaseMixin):
         inputs = self._get_inputs()
         model = self._get_model()
 
-        total_upsample_rate = 1  # Use loop instead of math.prod for compatibility with Python 3.7
-        for upsample_rate in model_config["upsample_rates"]:
-            total_upsample_rate *= upsample_rate
+        total_upsample_rate = math.prod(model_config["upsample_rates"])
 
         for _ in range(2):
             out = model(inputs)
