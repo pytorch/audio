@@ -456,15 +456,12 @@ void StreamWriter::add_audio_stream(
   static const int default_capacity = 10000;
   int frame_capacity = ctx->frame_size ? ctx->frame_size : default_capacity;
   AVFramePtr src_frame = get_audio_frame(src_fmt, ctx, frame_capacity);
-  AVFramePtr dst_frame = filter
-      ? AVFramePtr{}
-      : get_audio_frame(ctx->sample_fmt, ctx, frame_capacity);
   streams.emplace_back(OutputStream{
       stream,
       std::move(ctx),
       std::move(filter),
       std::move(src_frame),
-      std::move(dst_frame),
+      {},
       0,
       frame_capacity,
       AVBufferRefPtr{},
@@ -555,22 +552,18 @@ void StreamWriter::add_video_stream(
     return std::unique_ptr<FilterGraph>(nullptr);
   }();
 
-  // CUDA: require src_frame
-  // CPU: require dst_frame when filter is enabled
   AVFramePtr src_frame = [&]() {
     if (device.type() == c10::DeviceType::CUDA) {
       return get_hw_video_frame(ctx);
     }
     return get_video_frame(src_fmt, ctx);
   }();
-  AVFramePtr dst_frame =
-      filter ? AVFramePtr{} : get_video_frame(ctx->pix_fmt, ctx);
   streams.emplace_back(OutputStream{
       stream,
       std::move(ctx),
       std::move(filter),
       std::move(src_frame),
-      std::move(dst_frame),
+      {},
       0,
       -1,
       std::move(hw_device_ctx),
