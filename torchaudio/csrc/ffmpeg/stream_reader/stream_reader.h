@@ -38,13 +38,17 @@ class StreamReader {
   ///
   ///@{
 
+  /// @cond
+
   /// Construct StreamReader from already initialized AVFormatContext.
   /// This is a low level constructor interact with FFmpeg directly.
   /// One can provide custom AVFormatContext in case the other constructor
   /// does not meet a requirement.
-  /// @param AVFormatContext An initialized AVFormatContext. StreamReader will
+  /// @param pFormatContext An initialized AVFormatContext. StreamReader will
   /// own the resources and release it at the end.
   explicit StreamReader(AVFormatContext* pFormatContext);
+
+  /// @endcond
 
   /// Construct media processor from soruce URI.
   ///
@@ -58,6 +62,8 @@ class StreamReader {
       const c10::optional<std::string>& format = {},
       const c10::optional<OptionDict>& option = {});
 
+  /// @cond
+
   /// Concstruct media processor from custom IO.
   ///
   /// @param io_ctx Custom IO Context.
@@ -70,7 +76,11 @@ class StreamReader {
       const c10::optional<std::string>& format = {},
       const c10::optional<OptionDict>& option = {});
 
+  /// @endcond
+
   ///@}
+
+  /// @cond
 
   ~StreamReader() = default;
   // Non-copyable
@@ -79,6 +89,8 @@ class StreamReader {
   // Movable
   StreamReader(StreamReader&&) = default;
   StreamReader& operator=(StreamReader&&) = default;
+
+  /// @endcond
 
   //////////////////////////////////////////////////////////////////////////////
   // Helper methods
@@ -118,8 +130,6 @@ class StreamReader {
   /// The valid value range is ``[0, num_src_streams())``.
   SrcStreamInfo get_src_stream_info(int i) const;
   /// Fetch the number of output streams defined by client code.
-  ///
-  /// @addtogroup stream_reader_query_methods
   int64_t num_out_streams() const;
   /// Fetch information about the specified output stream.
   ///
