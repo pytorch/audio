@@ -208,7 +208,7 @@ def plot_spectrogram(stft, title="Spectrogram"):
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
 SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
-waveform.to(device)
+waveform = waveform.to(device)
 mixture = waveform
 
 # parameters
@@ -285,23 +285,19 @@ bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
 vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
 other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
 
-drums_spec = audios["drums"][:, frame_start: frame_end]
+drums_spec = audios["drums"][:, frame_start: frame_end].cpu()
 drums, sample_rate = torchaudio.load(drums_original)
-drums.to(device)
 
-bass_spec = audios["bass"][:, frame_start: frame_end]
+bass_spec = audios["bass"][:, frame_start: frame_end].cpu()
 bass, sample_rate = torchaudio.load(bass_original)
-bass.to(device)
 
-vocals_spec = audios["vocals"][:, frame_start: frame_end]
+vocals_spec = audios["vocals"][:, frame_start: frame_end].cpu()
 vocals, sample_rate = torchaudio.load(vocals_original)
-vocals.to(device)
 
-other_spec = audios["other"][:, frame_start: frame_end]
+other_spec = audios["other"][:, frame_start: frame_end].cpu()
 other, sample_rate = torchaudio.load(other_original)
-other.to(device)
 
-mix_spec = mixture[:, frame_start: frame_end]
+mix_spec = mixture[:, frame_start: frame_end].cpu()
 
 
 ######################################################################
