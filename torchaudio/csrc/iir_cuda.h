@@ -1,4 +1,4 @@
-#include <torch/extension.h>
+#include <torch/types.h>
 
 void cuda_lfilter_core_loop(
     const torch::Tensor& in,
