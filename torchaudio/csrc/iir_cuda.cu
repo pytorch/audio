@@ -1,4 +1,4 @@
-#include <torch/extension.h>
+#include <torch/torch.h>
 
 template <typename scalar_t>
 __global__ void iir_cu_kernel(
