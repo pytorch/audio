@@ -1,5 +1,6 @@
-import torch
 import math
+
+import torch
 from parameterized import parameterized
 from torchaudio.prototype.models import hifigan_vocoder, hifigan_vocoder_v1, hifigan_vocoder_v2, hifigan_vocoder_v3
 from torchaudio.prototype.pipelines import HIFIGAN_VOCODER_V3_LJSPEECH
