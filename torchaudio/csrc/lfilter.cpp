@@ -1,7 +1,6 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 #include <torchaudio/csrc/iir_cuda.h>
-#include <functional>
 
 namespace {
 
@@ -98,12 +97,6 @@ void lfilter_core_generic_loop(
   }
 }
 
-#ifndef USE_CUDA
-
-std::function<void(const torch::Tensor&, const torch::Tensor&, torch::Tensor&)>
-    cuda_lfilter_core_loop = lfilter_core_generic_loop;
-#endif
-
 class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
  public:
   static torch::Tensor forward(
@@ -127,7 +120,12 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
     if (device.is_cpu()) {
       cpu_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
     } else if (device.is_cuda()) {
+#ifdef USE_CUDA
       cuda_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
+#else
+      lfilter_core_generic_loop(
+          waveform, a_coeff_flipped, padded_output_waveform);
+#endif
     } else {
       lfilter_core_generic_loop(
           waveform, a_coeff_flipped, padded_output_waveform);
