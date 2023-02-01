@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230131) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230201) &#x25BC</a>
     </div>
     
 
@@ -281,7 +281,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
@@ -297,7 +297,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
@@ -305,6 +305,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.html">libtorchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -431,8 +437,8 @@ RIR (room impulse response) and codecs.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20230131
-2.0.0.dev20230131
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20230201
+2.0.0.dev20230201
 </pre></div>
 </div>
 <section id="preparation">
@@ -452,13 +458,13 @@ RIR (room impulse response) and codecs.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/427k [00:00&lt;?, ?B/s]
-100%|##########| 427k/427k [00:00&lt;00:00, 112MB/s]
+100%|##########| 427k/427k [00:00&lt;00:00, 91.4MB/s]
 
   0%|          | 0.00/31.3k [00:00&lt;?, ?B/s]
-100%|##########| 31.3k/31.3k [00:00&lt;00:00, 22.7MB/s]
+100%|##########| 31.3k/31.3k [00:00&lt;00:00, 18.2MB/s]
 
   0%|          | 0.00/78.2k [00:00&lt;?, ?B/s]
-100%|##########| 78.2k/78.2k [00:00&lt;00:00, 44.4MB/s]
+100%|##########| 78.2k/78.2k [00:00&lt;00:00, 34.3MB/s]
 </pre></div>
 </div>
 </section>
@@ -1037,7 +1043,7 @@ in the background.</p>
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.717 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.417 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-data-augmentation-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/5035f46f2e1c1557dfa0ffabb90a0b0a/audio_data_augmentation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_data_augmentation_tutorial.py</span></code></a></p>
@@ -1199,7 +1205,6 @@ in the background.</p>
       });
 
       
-      
        $(window).ready(function() {
            var original = window.sideMenus.bind;
            var startup = true;
@@ -1217,8 +1222,9 @@ in the background.</p>
                }
            };
        });
-      
     </script>
+
+    
 
 
   <!-- Begin Footer -->

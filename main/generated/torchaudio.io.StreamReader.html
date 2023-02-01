@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230131) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230201) &#x25BC</a>
     </div>
     
 
@@ -281,7 +281,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
@@ -297,7 +297,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
@@ -305,6 +305,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.html">libtorchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -475,11 +481,10 @@ the input devices available in the current environment.</p>
 </dl>
 </dd></dl>
 
-</section>
 <section id="properties">
-<h1>Properties<a class="headerlink" href="#properties" title="Permalink to this heading">¶</a></h1>
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this heading">¶</a></h2>
 <section id="default-audio-stream">
-<h2>default_audio_stream<a class="headerlink" href="#default-audio-stream" title="Permalink to this heading">¶</a></h2>
+<h3>default_audio_stream<a class="headerlink" href="#default-audio-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py property">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.default_audio_stream">
@@ -495,7 +500,7 @@ the input devices available in the current environment.</p>
 </div>
 </section>
 <section id="default-video-stream">
-<h2>default_video_stream<a class="headerlink" href="#default-video-stream" title="Permalink to this heading">¶</a></h2>
+<h3>default_video_stream<a class="headerlink" href="#default-video-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py property">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.default_video_stream">
@@ -511,7 +516,7 @@ the input devices available in the current environment.</p>
 </div>
 </section>
 <section id="num-out-streams">
-<h2>num_out_streams<a class="headerlink" href="#num-out-streams" title="Permalink to this heading">¶</a></h2>
+<h3>num_out_streams<a class="headerlink" href="#num-out-streams" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py property">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.num_out_streams">
@@ -527,7 +532,7 @@ the input devices available in the current environment.</p>
 </div>
 </section>
 <section id="num-src-streams">
-<h2>num_src_streams<a class="headerlink" href="#num-src-streams" title="Permalink to this heading">¶</a></h2>
+<h3>num_src_streams<a class="headerlink" href="#num-src-streams" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py property">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.num_src_streams">
@@ -544,9 +549,9 @@ the input devices available in the current environment.</p>
 </section>
 </section>
 <section id="methods">
-<h1>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h1>
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <section id="add-audio-stream">
-<h2>add_audio_stream<a class="headerlink" href="#add-audio-stream" title="Permalink to this heading">¶</a></h2>
+<h3>add_audio_stream<a class="headerlink" href="#add-audio-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.add_audio_stream">
@@ -615,7 +620,7 @@ Note that complex filters are not supported.</p></li>
 </div>
 </section>
 <section id="add-basic-audio-stream">
-<h2>add_basic_audio_stream<a class="headerlink" href="#add-basic-audio-stream" title="Permalink to this heading">¶</a></h2>
+<h3>add_basic_audio_stream<a class="headerlink" href="#add-basic-audio-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.add_basic_audio_stream">
@@ -696,7 +701,7 @@ as following.</p>
 </div>
 </section>
 <section id="add-basic-video-stream">
-<h2>add_basic_video_stream<a class="headerlink" href="#add-basic-video-stream" title="Permalink to this heading">¶</a></h2>
+<h3>add_basic_video_stream<a class="headerlink" href="#add-basic-video-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.add_basic_video_stream">
@@ -781,7 +786,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 </div>
 </section>
 <section id="add-video-stream">
-<h2>add_video_stream<a class="headerlink" href="#add-video-stream" title="Permalink to this heading">¶</a></h2>
+<h3>add_video_stream<a class="headerlink" href="#add-video-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.add_video_stream">
@@ -858,7 +863,7 @@ Note that complex filters are not supported.</p></li>
 </div>
 </section>
 <section id="fill-buffer">
-<h2>fill_buffer<a class="headerlink" href="#fill-buffer" title="Permalink to this heading">¶</a></h2>
+<h3>fill_buffer<a class="headerlink" href="#fill-buffer" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.fill_buffer">
@@ -892,7 +897,7 @@ this method.</p>
 </div>
 </section>
 <section id="get-metadata">
-<h2>get_metadata<a class="headerlink" href="#get-metadata" title="Permalink to this heading">¶</a></h2>
+<h3>get_metadata<a class="headerlink" href="#get-metadata" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.get_metadata">
@@ -908,7 +913,7 @@ this method.</p>
 </div>
 </section>
 <section id="get-out-stream-info">
-<h2>get_out_stream_info<a class="headerlink" href="#get-out-stream-info" title="Permalink to this heading">¶</a></h2>
+<h3>get_out_stream_info<a class="headerlink" href="#get-out-stream-info" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.get_out_stream_info">
@@ -927,7 +932,7 @@ this method.</p>
 </div>
 </section>
 <section id="get-src-stream-info">
-<h2>get_src_stream_info<a class="headerlink" href="#get-src-stream-info" title="Permalink to this heading">¶</a></h2>
+<h3>get_src_stream_info<a class="headerlink" href="#get-src-stream-info" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.get_src_stream_info">
@@ -946,7 +951,7 @@ this method.</p>
 </div>
 </section>
 <section id="is-buffer-ready">
-<h2>is_buffer_ready<a class="headerlink" href="#is-buffer-ready" title="Permalink to this heading">¶</a></h2>
+<h3>is_buffer_ready<a class="headerlink" href="#is-buffer-ready" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.is_buffer_ready">
@@ -957,7 +962,7 @@ this method.</p>
 </div>
 </section>
 <section id="pop-chunks">
-<h2>pop_chunks<a class="headerlink" href="#pop-chunks" title="Permalink to this heading">¶</a></h2>
+<h3>pop_chunks<a class="headerlink" href="#pop-chunks" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.pop_chunks">
@@ -977,7 +982,7 @@ If a buffer does not contain any frame, then <cite>None</cite> is returned inste
 </div>
 </section>
 <section id="process-all-packets">
-<h2>process_all_packets<a class="headerlink" href="#process-all-packets" title="Permalink to this heading">¶</a></h2>
+<h3>process_all_packets<a class="headerlink" href="#process-all-packets" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.process_all_packets">
@@ -988,7 +993,7 @@ If a buffer does not contain any frame, then <cite>None</cite> is returned inste
 </div>
 </section>
 <section id="process-packet">
-<h2>process_packet<a class="headerlink" href="#process-packet" title="Permalink to this heading">¶</a></h2>
+<h3>process_packet<a class="headerlink" href="#process-packet" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.process_packet">
@@ -1051,7 +1056,7 @@ this method.</p>
 </div>
 </section>
 <section id="remove-stream">
-<h2>remove_stream<a class="headerlink" href="#remove-stream" title="Permalink to this heading">¶</a></h2>
+<h3>remove_stream<a class="headerlink" href="#remove-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.remove_stream">
@@ -1067,7 +1072,7 @@ this method.</p>
 </div>
 </section>
 <section id="seek">
-<h2>seek<a class="headerlink" href="#seek" title="Permalink to this heading">¶</a></h2>
+<h3>seek<a class="headerlink" href="#seek" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.seek">
@@ -1102,7 +1107,7 @@ key frame, but will be slower.</p>
 </div>
 </section>
 <section id="stream">
-<h2>stream<a class="headerlink" href="#stream" title="Permalink to this heading">¶</a></h2>
+<h3>stream<a class="headerlink" href="#stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.stream">
@@ -1134,9 +1139,9 @@ The iterator stops if all the output streams are exhausted.</p>
 </section>
 </section>
 <section id="support-structures">
-<h1>Support Structures<a class="headerlink" href="#support-structures" title="Permalink to this heading">¶</a></h1>
+<h2>Support Structures<a class="headerlink" href="#support-structures" title="Permalink to this heading">¶</a></h2>
 <section id="chunktensor">
-<h2>ChunkTensor<a class="headerlink" href="#chunktensor" title="Permalink to this heading">¶</a></h2>
+<h3>ChunkTensor<a class="headerlink" href="#chunktensor" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.io._stream_reader.ChunkTensor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.io._stream_reader.</span></span><span class="sig-name descname"><span class="pre">ChunkTensor</span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#ChunkTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io._stream_reader.ChunkTensor" title="Permalink to this definition">¶</a></dt>
@@ -1198,7 +1203,7 @@ metadata, and the instance itself behave like <a class="reference external" href
 
 </section>
 <section id="sourcestream">
-<h2>SourceStream<a class="headerlink" href="#sourcestream" title="Permalink to this heading">¶</a></h2>
+<h3>SourceStream<a class="headerlink" href="#sourcestream" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.io._stream_reader.SourceStream">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.io._stream_reader.</span></span><span class="sig-name descname"><span class="pre">SourceStream</span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#SourceStream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io._stream_reader.SourceStream" title="Permalink to this definition">¶</a></dt>
@@ -1284,7 +1289,7 @@ For compressed format, it can be 0.</p>
 
 </section>
 <section id="sourceaudiostream">
-<h2>SourceAudioStream<a class="headerlink" href="#sourceaudiostream" title="Permalink to this heading">¶</a></h2>
+<h3>SourceAudioStream<a class="headerlink" href="#sourceaudiostream" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.io._stream_reader.SourceAudioStream">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.io._stream_reader.</span></span><span class="sig-name descname"><span class="pre">SourceAudioStream</span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#SourceAudioStream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io._stream_reader.SourceAudioStream" title="Permalink to this definition">¶</a></dt>
@@ -1308,7 +1313,7 @@ the following attributes are reported.</p>
 
 </section>
 <section id="sourcevideostream">
-<h2>SourceVideoStream<a class="headerlink" href="#sourcevideostream" title="Permalink to this heading">¶</a></h2>
+<h3>SourceVideoStream<a class="headerlink" href="#sourcevideostream" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.io._stream_reader.SourceVideoStream">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.io._stream_reader.</span></span><span class="sig-name descname"><span class="pre">SourceVideoStream</span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#SourceVideoStream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io._stream_reader.SourceVideoStream" title="Permalink to this definition">¶</a></dt>
@@ -1338,7 +1343,7 @@ the following attributes are reported.</p>
 
 </section>
 <section id="outputstream">
-<h2>OutputStream<a class="headerlink" href="#outputstream" title="Permalink to this heading">¶</a></h2>
+<h3>OutputStream<a class="headerlink" href="#outputstream" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.io._stream_reader.OutputStream">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.io._stream_reader.</span></span><span class="sig-name descname"><span class="pre">OutputStream</span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#OutputStream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io._stream_reader.OutputStream" title="Permalink to this definition">¶</a></dt>
@@ -1358,6 +1363,7 @@ returned by <a class="reference internal" href="#torchaudio.io.StreamReader.get_
 
 </dd></dl>
 
+</section>
 </section>
 </section>
 
@@ -1406,7 +1412,7 @@ returned by <a class="reference internal" href="#torchaudio.io.StreamReader.get_
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">StreamReader</a></li>
+<li><a class="reference internal" href="#">StreamReader</a><ul>
 <li><a class="reference internal" href="#properties">Properties</a><ul>
 <li><a class="reference internal" href="#default-audio-stream">default_audio_stream</a></li>
 <li><a class="reference internal" href="#default-video-stream">default_video_stream</a></li>
@@ -1438,6 +1444,8 @@ returned by <a class="reference internal" href="#torchaudio.io.StreamReader.get_
 <li><a class="reference internal" href="#sourceaudiostream">SourceAudioStream</a></li>
 <li><a class="reference internal" href="#sourcevideostream">SourceVideoStream</a></li>
 <li><a class="reference internal" href="#outputstream">OutputStream</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1507,7 +1515,26 @@ returned by <a class="reference internal" href="#torchaudio.io.StreamReader.get_
       });
 
       
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
     </script>
+
+    
 
 
   <!-- Begin Footer -->

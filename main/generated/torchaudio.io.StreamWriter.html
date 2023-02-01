@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230131) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230201) &#x25BC</a>
     </div>
     
 
@@ -281,7 +281,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
@@ -297,7 +297,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Prototype API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
@@ -305,6 +305,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.html">libtorchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -453,11 +459,10 @@ the output devices available in the current environment.</p>
 </dl>
 </dd></dl>
 
-</section>
 <section id="methods">
-<h1>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h1>
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <section id="add-audio-stream">
-<h2>add_audio_stream<a class="headerlink" href="#add-audio-stream" title="Permalink to this heading">¶</a></h2>
+<h3>add_audio_stream<a class="headerlink" href="#add-audio-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.add_audio_stream">
@@ -508,7 +513,7 @@ the format used for encoding.</p>
 </div>
 </section>
 <section id="add-video-stream">
-<h2>add_video_stream<a class="headerlink" href="#add-video-stream" title="Permalink to this heading">¶</a></h2>
+<h3>add_video_stream<a class="headerlink" href="#add-video-stream" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.add_video_stream">
@@ -569,7 +574,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 </div>
 </section>
 <section id="close">
-<h2>close<a class="headerlink" href="#close" title="Permalink to this heading">¶</a></h2>
+<h3>close<a class="headerlink" href="#close" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.close">
@@ -580,7 +585,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 </div>
 </section>
 <section id="flush">
-<h2>flush<a class="headerlink" href="#flush" title="Permalink to this heading">¶</a></h2>
+<h3>flush<a class="headerlink" href="#flush" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.flush">
@@ -591,7 +596,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 </div>
 </section>
 <section id="open">
-<h2>open<a class="headerlink" href="#open" title="Permalink to this heading">¶</a></h2>
+<h3>open<a class="headerlink" href="#open" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.open">
@@ -635,7 +640,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 </div>
 </section>
 <section id="set-metadata">
-<h2>set_metadata<a class="headerlink" href="#set-metadata" title="Permalink to this heading">¶</a></h2>
+<h3>set_metadata<a class="headerlink" href="#set-metadata" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.set_metadata">
@@ -651,7 +656,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 </div>
 </section>
 <section id="write-audio-chunk">
-<h2>write_audio_chunk<a class="headerlink" href="#write-audio-chunk" title="Permalink to this heading">¶</a></h2>
+<h3>write_audio_chunk<a class="headerlink" href="#write-audio-chunk" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.write_audio_chunk">
@@ -671,7 +676,7 @@ The <code class="docutils literal notranslate"><span class="pre">dtype</span></c
 </div>
 </section>
 <section id="write-video-chunk">
-<h2>write_video_chunk<a class="headerlink" href="#write-video-chunk" title="Permalink to this heading">¶</a></h2>
+<h3>write_video_chunk<a class="headerlink" href="#write-video-chunk" title="Permalink to this heading">¶</a></h3>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.write_video_chunk">
@@ -692,6 +697,7 @@ what was configured when calling <a class="reference internal" href="#torchaudio
 </dd></dl>
 
 </div>
+</section>
 </section>
 </section>
 
@@ -740,7 +746,7 @@ what was configured when calling <a class="reference internal" href="#torchaudio
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">StreamWriter</a></li>
+<li><a class="reference internal" href="#">StreamWriter</a><ul>
 <li><a class="reference internal" href="#methods">Methods</a><ul>
 <li><a class="reference internal" href="#add-audio-stream">add_audio_stream</a></li>
 <li><a class="reference internal" href="#add-video-stream">add_video_stream</a></li>
@@ -750,6 +756,8 @@ what was configured when calling <a class="reference internal" href="#torchaudio
 <li><a class="reference internal" href="#set-metadata">set_metadata</a></li>
 <li><a class="reference internal" href="#write-audio-chunk">write_audio_chunk</a></li>
 <li><a class="reference internal" href="#write-video-chunk">write_video_chunk</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -819,7 +827,26 @@ what was configured when calling <a class="reference internal" href="#torchaudio
       });
 
       
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
     </script>
+
+    
 
 
   <!-- Begin Footer -->
