@@ -2,6 +2,9 @@ Jinja2<3.1.0
 matplotlib
 pyparsing<3,>=2.0.2
 
+# C++ docs
+breathe==4.34.0
+
 # Note:
 # When changing Sphinx-related packages, make sure that the custom behaviors in the following
 # locations are working as expected.
