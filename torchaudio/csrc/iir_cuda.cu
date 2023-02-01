@@ -1,7 +1,3 @@
-#pragma once
-
-#ifdef USE_CUDA
-
 #include <torch/torch.h>
 
 template <typename scalar_t>
@@ -80,5 +76,3 @@ void cuda_lfilter_core_loop(
                 size_t>());
       }));
 }
-
-#endif
