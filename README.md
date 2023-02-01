@@ -35,7 +35,7 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 
 | | ``torch``                | ``torchaudio``           | ``python``                      |
 | ----------- | ------------------------ | ------------------------ | ------------------------------- |
-| Development | ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.7``, ``<=3.10``            |
+| Development | ``master`` / ``nightly`` | ``main`` / ``nightly``   | ``>=3.8``, ``<=3.10``            |
 | Latest versioned release | ``1.13.1``               | ``0.13.1``               | ``>=3.7``, ``<=3.10``            |
 
 <details><summary>Previous versions</summary>

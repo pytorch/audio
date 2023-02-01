@@ -3,7 +3,7 @@ from typing import List
 import torch
 import torchaudio.prototype.transforms as T
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, TestBaseMixin
 
 
 class Autograd(TestBaseMixin):
