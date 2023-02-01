@@ -22,6 +22,8 @@ extern "C" {
 #include <libavutil/pixdesc.h>
 }
 
+/// @cond
+
 namespace torchaudio {
 namespace io {
 
@@ -189,3 +191,5 @@ struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
 };
 } // namespace io
 } // namespace torchaudio
+
+/// @endcond

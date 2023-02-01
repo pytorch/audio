@@ -1,3 +1,5 @@
+import math
+
 import torch
 from parameterized import parameterized
 from torchaudio.prototype.models import hifigan_vocoder, hifigan_vocoder_v1, hifigan_vocoder_v2, hifigan_vocoder_v3
@@ -76,9 +78,7 @@ class HiFiGANTestImpl(TestBaseMixin):
         inputs = self._get_inputs()
         model = self._get_model()
 
-        total_upsample_rate = 1  # Use loop instead of math.prod for compatibility with Python 3.7
-        for upsample_rate in model_config["upsample_rates"]:
-            total_upsample_rate *= upsample_rate
+        total_upsample_rate = math.prod(model_config["upsample_rates"])
 
         for _ in range(2):
             out = model(inputs)

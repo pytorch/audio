@@ -7,6 +7,8 @@
 namespace torchaudio {
 namespace io {
 
+/// @cond
+
 struct OutputStream {
   AVStream* stream;
   AVCodecContextPtr codec_ctx;
@@ -22,6 +24,8 @@ struct OutputStream {
   AVBufferRefPtr hw_frame_ctx;
 };
 
+/// @endcond
+
 ///
 /// Encode and write audio/video streams chunk by chunk
 ///
@@ -32,7 +36,11 @@ class StreamWriter {
   AVPacketPtr pkt;
 
  protected:
+  /// @cond
+
   explicit StreamWriter(AVFormatContext*);
+
+  /// @endcond
 
  public:
   /// Construct StreamWriter from destination URI
@@ -44,6 +52,8 @@ class StreamWriter {
       const std::string& dst,
       const c10::optional<std::string>& format = {});
 
+  /// @cond
+
   /// Construct StreamWriter from custom IO
   ///
   /// @param io_ctx Custom IO.
@@ -53,6 +63,8 @@ class StreamWriter {
       AVIOContext* io_ctx,
       const c10::optional<std::string>& format);
 
+  /// @endcond
+
   // Non-copyable
   StreamWriter(const StreamWriter&) = delete;
   StreamWriter& operator=(const StreamWriter&) = delete;
@@ -61,12 +73,12 @@ class StreamWriter {
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
  public:
-  /// @internal
+  /// @cond
 
   /// Print the configured outputs
   void dump_format(int64_t i);
 
-  /// @endinternal
+  /// @endcond
 
   //////////////////////////////////////////////////////////////////////////////
   // Configure methods

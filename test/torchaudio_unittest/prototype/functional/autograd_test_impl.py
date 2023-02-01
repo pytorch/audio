@@ -1,3 +1,5 @@
+import math
+
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import parameterized
@@ -13,14 +15,7 @@ class AutogradTestImpl(TestBaseMixin):
         ]
     )
     def test_oscillator_bank(self, sample_rate, shape):
-        # can be replaced with math.prod when we drop 3.7 support
-        def prod(iterable):
-            ret = 1
-            for item in iterable:
-                ret *= item
-            return ret
-
-        numel = prod(shape)
+        numel = math.prod(shape)
 
         # use 1.9 instead of 2 so as to include values above nyquist frequency
         fmax = sample_rate / 1.9
