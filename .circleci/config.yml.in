@@ -657,7 +657,7 @@ jobs:
     resource_class: gpu.nvidia.medium
     environment:
       <<: *environment
-      CUDA_VERSION: 11.6
+      CUDA_VERSION: 11.7
       image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
     steps:
       - checkout
@@ -728,7 +728,7 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "11.6"
+      CUDA_VERSION: "11.7"
     steps:
       - checkout
       - designate_upload_channel
