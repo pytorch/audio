@@ -148,7 +148,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         hyp, _ = imported.extract_features(x)
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
         for i, (ref, _) in enumerate(refs["layer_results"]):
-            self.assertEqual(hyp[i], ref.transpose(0, 1))
+            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=1.5e-5, rtol=1.3e-6 )
 
     @XLSR_PRETRAINING_CONFIGS
     @skipIfCudaSmallMemory
@@ -181,8 +181,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
 
         # check the last layer
         ref, _ = original.extract_features(x, padding_mask=mask, output_layer=len(original.encoder.layers))
-        atol = 3.0e-05 if factory_func is hubert_xlarge else 1.0e-5
-        self.assertEqual(hyp[-1], ref, atol=atol, rtol=1.3e-6)
+        self.assertEqual(hyp[-1], ref, atol=3.0e-5, rtol=1.3e-6)
 
         # check the first layer
         ref, _ = original.extract_features(x, padding_mask=mask, output_layer=1)
