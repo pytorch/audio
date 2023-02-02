@@ -79,6 +79,7 @@ jobs:
             '--cov=torchaudio'
             "--junitxml=${PWD}/test-results/junit.xml"
             '--durations' '100'
+            '-k' 'cuda or gpu'
         )
 
         cd test
