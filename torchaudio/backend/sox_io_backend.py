@@ -13,7 +13,7 @@ def _fail_info(filepath: str, format: Optional[str]) -> AudioMetaData:
     raise RuntimeError("Failed to fetch metadata from {}".format(filepath))
 
 
-def _fail_info_fileobj(fileobj, format: Optional[str]) -> AudioMetaData:
+def _fail_info_fileobj(fileobj, format: Optional[str], buffer_size: int) -> AudioMetaData:
     raise RuntimeError("Failed to fetch metadata from {}".format(fileobj))
 
 
