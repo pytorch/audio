@@ -1,13 +1,12 @@
 import numpy as np
-from numpy.typing import ArrayLike
 
 
 def oscillator_bank(
-    frequencies: ArrayLike,
-    amplitudes: ArrayLike,
+    frequencies,
+    amplitudes,
     sample_rate: float,
     time_axis: int = -2,
-) -> ArrayLike:
+):
     """Reference implementation of oscillator_bank"""
     invalid = np.abs(frequencies) >= sample_rate / 2
     if np.any(invalid):
@@ -20,7 +19,7 @@ def oscillator_bank(
     return waveform
 
 
-def sinc_ir(cutoff: ArrayLike, window_size: int = 513, high_pass: bool = False):
+def sinc_ir(cutoff, window_size: int = 513, high_pass: bool = False):
     if window_size % 2 == 0:
         raise ValueError(f"`window_size` must be odd. Given: {window_size}")
     half = window_size // 2

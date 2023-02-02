@@ -210,13 +210,6 @@ class StreamWriter {
       const torch::Tensor& chunk,
       bool pad_extra = true);
 #endif
-  void process_frame(
-      AVFrame* src_frame,
-      std::unique_ptr<FilterGraph>& filter,
-      AVFrame* dst_frame,
-      AVCodecContextPtr& c,
-      AVStream* st);
-  void encode_frame(AVFrame* dst_frame, AVCodecContextPtr& c, AVStream* st);
   void flush_stream(OutputStream& os);
 };
 
