@@ -148,7 +148,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         hyp, _ = imported.extract_features(x)
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
         for i, (ref, _) in enumerate(refs["layer_results"]):
-            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=1.5e-5, rtol=1.3e-6 )
+            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=1.5e-5, rtol=1.3e-6)
 
     @XLSR_PRETRAINING_CONFIGS
     @skipIfCudaSmallMemory
