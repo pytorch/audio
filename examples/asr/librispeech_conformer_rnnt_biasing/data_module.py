@@ -103,7 +103,7 @@ class TransformDataset(torch.utils.data.Dataset):
 
 
 class LibriSpeechDataModule(LightningDataModule):
-    librispeech_cls = torchaudio.datasets.LIBRISPEECH_BIASING
+    librispeech_cls = torchaudio.datasets.LibriSpeechBiasing
 
     def __init__(
         self,

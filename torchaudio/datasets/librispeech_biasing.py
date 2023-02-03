@@ -80,7 +80,7 @@ def _get_librispeech_metadata(
     )
 
 
-class LIBRISPEECH_BIASING(Dataset):
+class LibriSpeechBiasing(Dataset):
     """*LibriSpeech* :cite:`7178964` dataset with prefix-tree construction and biasing support.
 
     Args:

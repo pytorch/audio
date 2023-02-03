@@ -8,7 +8,7 @@ from .iemocap import IEMOCAP
 from .librilight_limited import LibriLightLimited
 from .librimix import LibriMix
 from .librispeech import LIBRISPEECH
-from .librispeech_biasing import LIBRISPEECH_BIASING
+from .librispeech_biasing import LibriSpeechBiasing
 from .libritts import LIBRITTS
 from .ljspeech import LJSPEECH
 from .musdb_hq import MUSDB_HQ
@@ -24,7 +24,7 @@ from .yesno import YESNO
 __all__ = [
     "COMMONVOICE",
     "LIBRISPEECH",
-    "LIBRISPEECH_BIASING",
+    "LibriSpeechBiasing",
     "LibriLightLimited",
     "SPEECHCOMMANDS",
     "VCTK_092",
