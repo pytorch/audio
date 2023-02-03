@@ -45,7 +45,7 @@ def train_spm(input, suffix=False):
 
 
 def parse_args():
-    default_output_path = "./spm_unigram_1023.model"
+    default_output_path = "./spm_unigram_600_100suffix.model"
     parser = ArgumentParser(description=__doc__, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--librispeech-path",

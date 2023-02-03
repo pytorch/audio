@@ -17,11 +17,10 @@ def compute_word_level_distance(seq1, seq2):
 
 
 def run_eval(args):
-    usebiasing = True if args.biasing == 'true' else False
     model = ConformerRNNTModule.load_from_checkpoint(
-        args.checkpoint_path, sp_model=str(args.sp_model_path), biasing=usebiasing).eval()
+        args.checkpoint_path, sp_model=str(args.sp_model_path), biasing=args.biasing).eval()
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path),
-                                  biasinglist=args.biasinglist, droprate=args.droprate, maxsize=args.maxsize)
+                                  biasinglist=args.biasing_list, droprate=args.droprate, maxsize=args.maxsize)
 
     if args.use_cuda:
         model = model.to(device="cuda")
@@ -59,7 +58,7 @@ def cli_main():
     )
     parser.add_argument(
         "--global-stats-path",
-        default=pathlib.Path("global_stats.json"),
+        default=pathlib.Path("global_stats_100.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
@@ -88,7 +87,7 @@ def cli_main():
         help="Run using CUDA.",
     )
     parser.add_argument(
-        "--biasinglist",
+        "--biasing-list",
         type=str,
         default="",
         help="Path to the biasing list used for inference.",
@@ -109,7 +108,6 @@ def cli_main():
         "--biasing",
         type=str,
         help="Use biasing",
-        required=True,
     )
     args = parser.parse_args()
     run_eval(args)

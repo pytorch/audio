@@ -32,7 +32,7 @@ Additional training options:
 
 Sample SLURM command:
 ```
-srun --cpus-per-task=16 --gpus-per-node=1 -N 1 --ntasks-per-node=1 python train.py --exp-dir <Path_to_exp> --librispeech-path <Path_to_librispeech_data> --global-stats-path ./global_stats_100.json --sp-model-path ./spm_unigram_600_100suffix.model --biasing --biasing-list ./blists/rareword_f15.txt --droprate 0.1 --maxsize 200 --epochs 90
+srun --cpus-per-task=16 --gpus-per-node=1 -N 1 --ntasks-per-node=1 python train.py --exp-dir <Path_to_exp> --librispeech-path <Path_to_librispeech_data> --sp-model-path ./spm_unigram_600_100suffix.model --biasing --biasing-list ./blists/rareword_f15.txt --droprate 0.1 --maxsize 200 --epochs 90
 ```
 
 ### Evaluation
@@ -53,7 +53,13 @@ srun --cpus-per-task=16 --gpus-per-node=1 -N 1 --ntasks-per-node=1 python eval.p
 ### Scoring
 Need to install SCTK, the NIST Scoring Toolkit first following: [https://github.com/usnistgov/SCTK/blob/master/README.md](https://github.com/usnistgov/SCTK/blob/master/README.md)
 
-Example scoring script using sclite is in [`score.sh`](./score.sh). Note that this will generate a file named `results.wrd.txt` which is in the format that will be used in the following script to calculate rare word error rate. Follow these steps to calculate rare word error rate:
+Example scoring script using sclite is in [`score.sh`](./score.sh). 
+
+```
+./score.sh <path_to_decoding_dir>
+```
+
+Note that this will generate a file named `results.wrd.txt` which is in the format that will be used in the following script to calculate rare word error rate. Follow these steps to calculate rare word error rate:
 
 ```bash
 cd error_analysis

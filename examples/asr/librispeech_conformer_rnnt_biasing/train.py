@@ -81,7 +81,7 @@ def cli_main():
     )
     parser.add_argument(
         "--global-stats-path",
-        default=pathlib.Path("global_stats.json"),
+        default=pathlib.Path("global_stats_100.json"),
         type=pathlib.Path,
         help="Path to JSON file containing feature means and stddevs.",
     )
