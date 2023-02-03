@@ -26,9 +26,7 @@ pip install pytorch-lightning sentencepiece
 - File (--global_stats_path) that contains training set feature statistics; this file can be generated using [`global_stats.py`](../emformer_rnnt/global_stats.py). The [`global_stats_100.json`](./global_stats_100.json) has been generated for train-clean-100.
 - Biasing list: See [`rareword_f15.txt`](./blists/rareword_f15.txt) as an example for the biasing list used for training with clean-100 data. Words appeared less than 15 times were treated as rare words. For inference, [`all_rare_words.txt`](blists/all_rare_words.txt) which is the same list used in [https://github.com/facebookresearch/fbai-speech/tree/main/is21_deep_bias](https://github.com/facebookresearch/fbai-speech/tree/main/is21_deep_bias).
 
-Sample local training script: [`train.sh`](./train.sh)
-
-Other training options:
+Additional training options:
 - `--droprate` is the drop rate of biasing words appeared in the reference text to avoid over-confidence
 - `--maxsize` is the size of the biasing list used for training, which is the sum of biasing words in reference and distractors
 
@@ -41,9 +39,7 @@ srun --cpus-per-task=16 --gpus-per-node=1 -N 1 --ntasks-per-node=1 python train.
 
 [`eval.py`](./eval.py) evaluates a trained Conformer RNN-T model with TCPGen on LibriSpeech test-clean.
 
-Sample decoding script: `eval.sh`
-
-Other decoding options:
+Additional decoding options:
 
 - `--biasing-list` should be [`all_rare_words.txt`](blists/all_rare_words.txt) for Librispeech experiments
 - `--droprate` normally should be 0 because we assume the reference biasing words are included
