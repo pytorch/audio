@@ -75,7 +75,7 @@ jobs:
         conda install \
           --quiet --yes \
           -c conda-forge \
-          pandoc doxygen pysoundfile
+          sox libvorbis pandoc doxygen pysoundfile
         pip install --progress-bar off \
             git+https://github.com/kpu/kenlm/ flashlight-text \
             -r docs/requirements.txt -r docs/requirements-tutorials.txt

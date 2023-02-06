@@ -10,7 +10,7 @@ torchaudio_library(
   libtorchaudio_sox
   "${sources}"
   ""
-  "torch;libsox"
+  "torch;sox"
   ""
   )
 

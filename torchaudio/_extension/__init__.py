@@ -8,7 +8,7 @@ try:
     from .fb import _init_ffmpeg
 except ImportError:
     from .utils import _init_ffmpeg
-from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_sox, _load_lib
+from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _fail_since_no_sox, _init_dll_path, _init_sox, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -51,17 +51,21 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
 
 
-# Similar to libtorchaudio, sox-related features should be importable when present.
-#
-# Note: This will be change in the future when sox is dynamically linked.
-# At that point, this initialization should handle the case where
-# sox integration is built but libsox is not found.
+# Initialize libsox-related features
 _SOX_INITIALIZED = False
 _USE_SOX = False if os.name == "nt" else eval_env("TORCHAUDIO_USE_SOX", True)
 _SOX_MODULE_AVAILABLE = is_module_available("torchaudio.lib._torchaudio_sox")
 if _USE_SOX and _SOX_MODULE_AVAILABLE:
-    _init_sox()
-    _SOX_INITIALIZED = True
+    try:
+        _init_sox()
+        _SOX_INITIALIZED = True
+    except Exception:
+        # The initialization of sox extension will fail if supported sox
+        # libraries are not found in the system.
+        # Since the rest of the torchaudio works without it, we do not report the
+        # error here.
+        # The error will be raised when user code attempts to use these features.
+        _LG.debug("Failed to initialize sox extension", exc_info=True)
 
 
 if os.name == "nt":
@@ -74,7 +78,7 @@ elif not _SOX_MODULE_AVAILABLE:
         "Please build TorchAudio with libsox support. (BUILD_SOX=1)"
     )
 else:
-    fail_if_no_sox = no_op
+    fail_if_no_sox = no_op if _SOX_INITIALIZED else _fail_since_no_sox
 
 
 # Initialize FFmpeg-related features
