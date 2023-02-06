@@ -119,7 +119,7 @@ jobs:
         pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
 
         # Install build tools
-        conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
+        conda install --quiet -y -c conda-forge sox pandoc doxygen pysoundfile
         pip install --quiet -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
         # Build docs
