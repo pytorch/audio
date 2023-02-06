@@ -2,7 +2,7 @@
 #define TORCHAUDIO_SOX_UTILS_H
 
 #include <sox.h>
-#include <torch/script.h>
+#include <torch/types.h>
 
 namespace torchaudio::sox {
 

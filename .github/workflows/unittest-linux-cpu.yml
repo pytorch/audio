@@ -50,6 +50,8 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         echo '::endgroup::'
 
         set -euxo pipefail

@@ -49,13 +49,11 @@ torchaudio.
 conda install pytorch -c pytorch-nightly
 ```
 
-### Install build dependencies
+### Install build/runtime dependencies
 
 ```bash
 # Install build-time dependencies
 pip install cmake ninja
-# [optional for sox]
-conda install pkg-config
 # [optional for ffmpeg]
 conda install ffmpeg
 ```
