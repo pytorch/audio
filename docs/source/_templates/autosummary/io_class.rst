@@ -17,12 +17,12 @@
 {%- if attributes %}
 
 Properties
-==========
+----------
 
 {%- for item in attributes %}
 {%- if not item.startswith('_') and item not in inherited_members %}
 
-{{ item | underline("-") }}
+{{ item | underline("~") }}
 
 .. container:: py attribute
 
@@ -33,12 +33,12 @@ Properties
 {%- endif %}
 
 Methods
-=======
+-------
 
 {%- for item in members %}
 {%- if not item.startswith('_') and item not in inherited_members and item not in attributes %}
 
-{{ item | underline("-") }}
+{{ item | underline("~") }}
 
 .. container:: py attribute
 
@@ -50,13 +50,19 @@ Methods
 {%- if name == "StreamReader" %}
 
 Support Structures
-==================
+------------------
 
-{%- for item in ["StreamReaderSourceStream", "StreamReaderSourceAudioStream", "StreamReaderSourceVideoStream", "StreamReaderOutputStream"] %}
+{%- for item in [
+    "ChunkTensor",
+    "SourceStream",
+    "SourceAudioStream",
+    "SourceVideoStream",
+    "OutputStream",
+] %}
 
-{{ item | underline("-") }}
+{{ item | underline("~") }}
 
-.. autoclass:: torchaudio.io.{{item}}()
+.. autoclass:: torchaudio.io._stream_reader.{{item}}()
    :members:
 
 {%- endfor %}

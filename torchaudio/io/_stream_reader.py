@@ -5,16 +5,21 @@ from typing import BinaryIO, Dict, Iterator, Optional, Tuple, Union
 
 import torch
 import torchaudio
+from torch.utils._pytree import tree_map
+
+__all__ = [
+    "StreamReader",
+]
 
 
 @dataclass
-class StreamReaderSourceStream:
+class SourceStream:
     """The metadata of a source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
 
     This class is used when representing streams of media type other than `audio` or `video`.
 
-    When source stream is `audio` or `video` type, :class:`StreamReaderSourceAudioStream` and
-    :class:`StreamReaderSourceVideoStream`, which reports additional media-specific attributes,
+    When source stream is `audio` or `video` type, :class:`SourceAudioStream` and
+    :class:`SourceVideoStream`, which reports additional media-specific attributes,
     are used respectively.
     """
 
@@ -65,12 +70,12 @@ class StreamReaderSourceStream:
 
 
 @dataclass
-class StreamReaderSourceAudioStream(StreamReaderSourceStream):
+class SourceAudioStream(SourceStream):
     """The metadata of an audio source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
 
     This class is used when representing audio stream.
 
-    In addition to the attributes reported by :class:`StreamReaderSourceStream`,
+    In addition to the attributes reported by :class:`SourceStream`,
     the following attributes are reported.
     """
 
@@ -81,12 +86,12 @@ class StreamReaderSourceAudioStream(StreamReaderSourceStream):
 
 
 @dataclass
-class StreamReaderSourceVideoStream(StreamReaderSourceStream):
+class SourceVideoStream(SourceStream):
     """The metadata of a video source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
 
     This class is used when representing video stream.
 
-    In addition to the attributes reported by :class:`StreamReaderSourceStream`,
+    In addition to the attributes reported by :class:`SourceStream`,
     the following attributes are reported.
     """
 
@@ -127,7 +132,7 @@ def _parse_si(i):
     bps = i[_BPS]
     metadata = i[_METADATA]
     if media_type == "audio":
-        return StreamReaderSourceAudioStream(
+        return SourceAudioStream(
             media_type=media_type,
             codec=codec_name,
             codec_long_name=codec_long_name,
@@ -140,7 +145,7 @@ def _parse_si(i):
             num_channels=i[_NUM_CHANNELS],
         )
     if media_type == "video":
-        return StreamReaderSourceVideoStream(
+        return SourceVideoStream(
             media_type=media_type,
             codec=codec_name,
             codec_long_name=codec_long_name,
@@ -153,7 +158,7 @@ def _parse_si(i):
             height=i[_HEIGHT],
             frame_rate=i[_FRAME_RATE],
         )
-    return StreamReaderSourceStream(
+    return SourceStream(
         media_type=media_type,
         codec=codec_name,
         codec_long_name=codec_long_name,
@@ -166,7 +171,7 @@ def _parse_si(i):
 
 
 @dataclass
-class StreamReaderOutputStream:
+class OutputStream:
     """Output stream configured on :class:`StreamReader`,
     returned by :meth:`~torchaudio.io.StreamReader.get_out_stream_info`.
     """
@@ -178,7 +183,7 @@ class StreamReaderOutputStream:
 
 
 def _parse_oi(i):
-    return StreamReaderOutputStream(i[0], i[1])
+    return OutputStream(i[0], i[1])
 
 
 def _get_afilter_desc(sample_rate: Optional[int], fmt: Optional[str]):
@@ -206,6 +211,78 @@ def _get_vfilter_desc(frame_rate: Optional[float], width: Optional[int], height:
     return ",".join(descs) if descs else None
 
 
+# Base class for ChunkTensor
+# Based off of TrivialTensorViaComposition
+# https://github.com/albanD/subclass_zoo/blob/0eeb1d68fb59879029c610bc407f2997ae43ba0a/trivial_tensors.py#L83
+class ChunkTensorBase(torch.Tensor):
+    __torch_function__ = torch._C._disabled_torch_function_impl
+
+    @staticmethod
+    def __new__(cls, _elem, *_):
+        return super().__new__(cls, _elem)
+
+    @classmethod
+    def __torch_dispatch__(cls, func, _, args=(), kwargs=None):
+        def unwrap(t):
+            return t._elem if isinstance(t, cls) else t
+
+        return func(*tree_map(unwrap, args), **tree_map(unwrap, kwargs))
+
+
+@dataclass
+class ChunkTensor(ChunkTensorBase):
+    """Decoded media frames with metadata.
+
+    The instance of this class represents the decoded video/audio frames with
+    metadata, and the instance itself behave like :py:class:`~torch.Tensor`.
+
+    Client codes can pass instance of this class as-if it's
+    :py:class:`~torch.Tensor` class, or call the methods defined on
+    :py:class:`~torch.Tensor` class.
+
+    Example:
+        >>> # Define input streams
+        >>> reader = StreamReader(...)
+        >>> reader.add_audio_stream(frames_per_chunk=4000, sample_rate=8000)
+        >>> reader.add_video_stream(frames_per_chunk=7, frame_rate=28)
+        >>> # Decode the streams and fetch frames
+        >>> reader.fill_buffer()
+        >>> audio_chunk, video_chunk = reader.pop_chunks()
+
+        >>> # Access metadata
+        >>> (audio_chunk.pts, video_chunks.pts)
+        (0.0, 0.0)
+        >>>
+        >>> # The second time the PTS is different
+        >>> reader.fill_buffer()
+        >>> audio_chunk, video_chunk = reader.pop_chunks()
+        >>> (audio_chunk.pts, video_chunks.pts)
+        (0.5, 0.25)
+
+        >>> # Call PyTorch ops on chunk
+        >>> audio_chunk.shape
+        torch.Size([4000, 2]
+        >>> power = torch.pow(video_chunk, 2)
+        >>>
+        >>> # the result is a plain torch.Tensor class
+        >>> type(power)
+        <class 'torch.Tensor'>
+        >>>
+        >>> # Metadata is not available on the result
+        >>> power.pts
+        AttributeError: 'Tensor' object has no attribute 'pts'
+    """
+
+    # Keep it private for now
+    _elem: torch.Tensor
+
+    pts: float
+    """Presentation time stamp of the first frame in the chunk.
+
+    Unit: second.
+    """
+
+
 def _format_doc(**kwargs):
     def decorator(obj):
         obj.__doc__ = obj.__doc__.format(**kwargs)
@@ -216,11 +293,16 @@ def _format_doc(**kwargs):
 
 _frames_per_chunk = """Number of frames returned as one chunk.
                 If the source stream is exhausted before enough frames are buffered,
-                then the chunk is returned as-is."""
+                then the chunk is returned as-is.
+
+                Providing ``-1`` disables chunking and :py:func:`pop_chunks` method
+                will concatenate all the buffered frames and return it."""
 
 _buffer_chunk_size = """Internal buffer size.
                 When the number of chunks buffered exceeds this number, old frames are
-                dropped.
+                dropped. For example, if ``frames_per_chunk`` is 5 and ``buffer_chunk_size`` is
+                3, then frames older than ``15`` are dropped.
+                Providing ``-1`` disables this behavior.
 
                 Default: ``3``."""
 
@@ -234,17 +316,39 @@ _video_stream_index = """The source video stream index.
 _decoder = """The name of the decoder to be used.
                 When provided, use the specified decoder instead of the default one.
 
-                To list the available decoders, you can use `ffmpeg -decoders` command.
+                To list the available decoders, please use
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_decoders` for audio, and
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_decoders` for video.
 
                 Default: ``None``."""
 
 _decoder_option = """Options passed to decoder.
-                Mapping from str to str.
+                Mapping from str to str. (Default: ``None``)
 
                 To list decoder options for a decoder, you can use
-                `ffmpeg -h decoder=<DECODER>` command.
+                ``ffmpeg -h decoder=<DECODER>`` command.
 
-                Default: ``None``."""
+                |
+
+                In addition to decoder-specific options, you can also pass options related
+                to multithreading. They are effective only if the decoder support them.
+                If neither of them are provided, StreamReader defaults to single thread.
+
+                ``"threads"``: The number of threads (in str).
+                Providing the value ``"0"`` will let FFmpeg decides based on its heuristics.
+
+                ``"thread_type"``: Which multithreading method to use.
+                The valid values are ``"frame"`` or ``"slice"``.
+                Note that each decoder supports different set of methods.
+                If not provided, a default value is used.
+
+                - ``"frame"``: Decode more than one frame at once.
+                  Each thread handles one frame.
+                  This will increase decoding delay by one frame per thread
+                - ``"slice"``: Decode more than one part of a single frame at once.
+
+                |
+                """
 
 
 _hw_accel = """Enable hardware acceleration.
@@ -326,14 +430,16 @@ class StreamReader:
 
                https://ffmpeg.org/ffmpeg-formats.html#Demuxers
 
-               Use `ffmpeg -demuxers` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_demuxers` to list the
+               demultiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
                software configuration (ffmpeg build).
 
                https://ffmpeg.org/ffmpeg-devices.html#Input-Devices
 
-               Use `ffmpeg -devices` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_input_devices` to list
+               the input devices available in the current environment.
 
         option (dict of str to str, optional):
             Custom option passed when initializing format context (opening source).
@@ -410,7 +516,7 @@ class StreamReader:
         """
         return self._be.get_metadata()
 
-    def get_src_stream_info(self, i: int) -> torchaudio.io.StreamReaderSourceStream:
+    def get_src_stream_info(self, i: int) -> SourceStream:
         """Get the metadata of source stream
 
         Args:
@@ -420,7 +526,7 @@ class StreamReader:
         """
         return _parse_si(self._be.get_src_stream_info(i))
 
-    def get_out_stream_info(self, i: int) -> torchaudio.io.StreamReaderOutputStream:
+    def get_out_stream_info(self, i: int) -> torchaudio.io.OutputStream:
         """Get the metadata of output stream
 
         Args:
@@ -725,18 +831,31 @@ class StreamReader:
         """Returns true if all the output streams have at least one chunk filled."""
         return self._be.is_buffer_ready()
 
-    def pop_chunks(self) -> Tuple[Optional[torch.Tensor]]:
+    def pop_chunks(self) -> Tuple[Optional[ChunkTensor]]:
         """Pop one chunk from all the output stream buffers.
 
         Returns:
-            Tuple[Optional[Tensor]]:
+            Tuple[Optional[ChunkTensor]]:
                 Buffer contents.
                 If a buffer does not contain any frame, then `None` is returned instead.
         """
-        return self._be.pop_chunks()
+        ret = []
+        for chunk in self._be.pop_chunks():
+            if chunk is None:
+                ret.append(None)
+            else:
+                ret.append(ChunkTensor(chunk[0], chunk[1]))
+        return ret
 
-    def _fill_buffer(self, timeout: Optional[float], backoff: float) -> int:
+    def fill_buffer(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
         """Keep processing packets until all buffers have at least one chunk
+
+        Arguments:
+            timeout (float or None, optional): See
+                :py:func:`~StreamReader.process_packet`. (Default: ``None``)
+
+            backoff (float, optional): See
+                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
 
         Returns:
             int:
@@ -749,15 +868,11 @@ class StreamReader:
                 flushed the pending frames. The caller should stop calling
                 this method.
         """
-        while not self.is_buffer_ready():
-            code = self.process_packet(timeout, backoff)
-            if code != 0:
-                return code
-        return 0
+        return self._be.fill_buffer(timeout, backoff)
 
     def stream(
         self, timeout: Optional[float] = None, backoff: float = 10.0
-    ) -> Iterator[Tuple[Optional[torch.Tensor], ...]]:
+    ) -> Iterator[Tuple[Optional[ChunkTensor], ...]]:
         """Return an iterator that generates output tensors
 
         Arguments:
@@ -768,7 +883,7 @@ class StreamReader:
                 :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
 
         Returns:
-            Iterator[Tuple[Optional[torch.Tensor], ...]]:
+            Iterator[Tuple[Optional[ChunkTensor], ...]]:
                 Iterator that yields a tuple of chunks that correspond to the output
                 streams defined by client code.
                 If an output stream is exhausted, then the chunk Tensor is substituted
@@ -779,7 +894,7 @@ class StreamReader:
             raise RuntimeError("No output stream is configured.")
 
         while True:
-            if self._fill_buffer(timeout, backoff):
+            if self.fill_buffer(timeout, backoff):
                 break
             yield self.pop_chunks()
 

@@ -22,8 +22,10 @@ extern "C" {
 #include <libavutil/pixdesc.h>
 }
 
+/// @cond
+
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 using OptionDict = c10::Dict<std::string, std::string>;
 
@@ -187,5 +189,7 @@ struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
   AVFilterGraphPtr();
   void reset();
 };
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio
+
+/// @endcond

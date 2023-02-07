@@ -46,6 +46,14 @@ setup_cuda() {
 
   # Now work out the CUDA settings
   case "$CU_VERSION" in
+    cu118)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.8/
+      fi
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      ;;
     cu117)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.7"
@@ -149,7 +157,7 @@ retry () {
 }
 
 # Inputs:
-#   PYTHON_VERSION (2.7, 3.5, 3.6, 3.7)
+#   PYTHON_VERSION (3.8, 3.9, 3.10)
 #   UNICODE_ABI (bool)
 #
 # Outputs:
@@ -165,7 +173,6 @@ setup_wheel_python() {
     conda install --quiet -y pkg-config
   else
     case "$PYTHON_VERSION" in
-      3.7) python_abi=cp37-cp37m ;;
       3.8) python_abi=cp38-cp38 ;;
       3.9) python_abi=cp39-cp39 ;;
       3.10) python_abi=cp310-cp310 ;;
@@ -239,6 +246,9 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
+      cu118)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.8 # [not osx]"
+        ;;
       cu117)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.7 # [not osx]"
         ;;

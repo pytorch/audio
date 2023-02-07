@@ -26,6 +26,12 @@ Utility
    apply_codec
    resample
    loudness
+   convolve
+   fftconvolve
+   add_noise
+   preemphasis
+   deemphasis
+   speed
 
 
 Filtering

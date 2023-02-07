@@ -69,6 +69,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/src/
+docs/source/cpp
 docs/source/tutorials
 docs/source/gen_images
 docs/source/gen_modules

@@ -21,10 +21,10 @@ import yaml
 from jinja2 import select_autoescape
 
 
-PYTHON_VERSIONS = ["3.7", "3.8", "3.9", "3.10"]
+PYTHON_VERSIONS = ["3.8", "3.9", "3.10"]
 CU_VERSIONS_DICT = {
-    "linux": ["cpu", "cu116", "cu117", "rocm5.2", "rocm5.3"],
-    "windows": ["cpu", "cu116", "cu117"],
+    "linux": ["cpu", "cu117", "cu118", "rocm5.2", "rocm5.3"],
+    "windows": ["cpu", "cu117", "cu118"],
     "macos": ["cpu"],
 }
 
@@ -45,6 +45,11 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                     if (
                         (cu_version.startswith("rocm") and btype == "conda")
                         or (os_type == "linux" and btype == "wheel")
+                        or (
+                            os_type == "linux"
+                            and btype == "conda"
+                            and (python_version != "3.8" or cu_version != "cu117")
+                        )
                         or os_type == "macos"
                     ):
                         continue
@@ -54,6 +59,10 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                     ):
                         # the fields must match the build_docs "requires" dependency
                         fb = "/.*/"
+
+                    if os_type == "linux" and btype == "conda" and python_version == "3.8" and cu_version == "cu117":
+                        w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, False)
+                        continue
 
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
 
@@ -111,9 +120,9 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
-        "cuda_version": "cu116",
+        "cuda_version": "cu117",
         "requires": [
-            "binary_linux_conda_py3.8_cu116",
+            "binary_linux_conda_py3.8_cu117",
         ],
     }
 
@@ -245,7 +254,7 @@ def unittest_workflows(indentation=6):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
-                    "cuda_version": "cpu" if device_type == "cpu" else "cu116",
+                    "cuda_version": "cpu" if device_type == "cpu" else "cu117",
                     "requires": ["download_third_parties"],
                 }
 

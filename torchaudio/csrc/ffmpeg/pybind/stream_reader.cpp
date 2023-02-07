@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/ffmpeg/pybind/typedefs.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 SrcInfoPyBind convert_pybind(SrcStreamInfo ssi) {
   return SrcInfoPyBind(std::forward_as_tuple(
@@ -28,11 +28,7 @@ StreamReaderFileObj::StreamReaderFileObj(
     const c10::optional<std::map<std::string, std::string>>& option,
     int64_t buffer_size)
     : FileObj(fileobj_, static_cast<int>(buffer_size), false),
-      StreamReaderBinding(get_input_format_context(
-          static_cast<std::string>(py::str(fileobj_.attr("__str__")())),
-          format,
-          map2dict(option),
-          pAVIO)) {}
+      StreamReaderBinding(pAVIO, format, map2dict(option)) {}
 
 std::map<std::string, std::string> StreamReaderFileObj::get_metadata() const {
   return dict2map(StreamReader::get_metadata());
@@ -76,5 +72,5 @@ void StreamReaderFileObj::add_video_stream(
       hw_accel);
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

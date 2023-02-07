@@ -108,7 +108,7 @@ jobs:
 
   lint_python_and_config:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
@@ -478,7 +478,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
+            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
@@ -570,7 +570,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
 
-            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
+            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch numpy ffmpeg pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
@@ -615,7 +615,7 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Hack to load FFmpeg libraries
             # Note: Depending on Python version, they search different paths.
-            # For 3.7 and 3.9, copying them in CWD works.
+            # For 3.9, copying them in CWD works.
             cp ~/workspace/ffmpeg/bin/* test/smoke_test/
             # For 3.8 and 3.10, they must be in the same directory as the entrypoint lib
             cp ~/workspace/ffmpeg/bin/* /C/tools/miniconda3/envs/python${PYTHON_VERSION}/lib/site-packages/torchaudio/lib/
@@ -657,7 +657,7 @@ jobs:
     resource_class: gpu.nvidia.medium
     environment:
       <<: *environment
-      CUDA_VERSION: 11.6
+      CUDA_VERSION: 11.7
       image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
     steps:
       - checkout
@@ -678,8 +678,9 @@ jobs:
           name: Run tests
           environment:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
           command: |
-            docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+            docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -727,7 +728,7 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "11.6"
+      CUDA_VERSION: "11.7"
     steps:
       - checkout
       - designate_upload_channel
@@ -760,6 +761,7 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -833,15 +835,15 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117  ]]; then
+            if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
               conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
             fi
             conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
             # gxx_linux-64 is for installing pesq library that depends on cython
-            conda install -y pandoc 'ffmpeg<5' gxx_linux-64
-            apt update -qq && apt-get -qq install -y git make
+            conda install -y pandoc 'ffmpeg<5' gxx_linux-64 git make
+            conda install -y -c conda-forge doxygen
             pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
       - run:
           name: Build docs

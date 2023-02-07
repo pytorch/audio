@@ -26,6 +26,4 @@ Utilities
    :toctree: generated
    :nosignatures:
 
-   init_sox_effects
-   shutdown_sox_effects
    effect_names

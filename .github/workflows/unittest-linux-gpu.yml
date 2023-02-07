@@ -1,0 +1,89 @@
+name: Unit-tests on Linux GPU
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        python_version: ["3.8", "3.9", "3.10"]
+        cuda_arch_version: ["11.7"]
+      fail-fast: false
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      repository: pytorch/audio
+      gpu-arch-type: cuda
+      gpu-arch-version: ${{ matrix.cuda_arch_version }}
+      timeout: 120
+
+      script: |
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+
+        # Set up Environment Variables
+        export PYTHON_VERSION="${{ matrix.python_version }}"
+        export CU_VERSION="${{ matrix.cuda_arch_version }}"
+        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
+
+        # Set CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export CHANNEL=test
+        else
+          export CHANNEL=nightly
+        fi
+
+        # Create Conda Env
+        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
+        conda activate ./ci_env
+
+        # Install PyTorch
+        set -ex
+        set +u  # don't know why
+        conda install \
+          --yes \
+          --quiet \
+          -c "pytorch-${CHANNEL}" \
+          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
+          "${CUDATOOLKIT}"
+
+        # Install torchaudio
+        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
+        python3 -m pip --quiet install cmake>=3.18.0 ninja
+        USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
+
+        # Install test tools
+        conda install -y --quiet -c conda-forge -c numba/label/dev 'librosa>=0.8.0' parameterized 'requests>=2.20'
+        python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag
+        python3 -m pip install --quiet git+https://github.com/pytorch/fairseq.git@e47a4c8
+
+        # Run tests
+        export PATH="${PWD}/third_party/install/bin/:${PATH}"
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
+
+        declare -a args=(
+            '-v'
+            '--cov=torchaudio'
+            "--junitxml=${PWD}/test-results/junit.xml"
+            '--durations' '100'
+            '-k' 'cuda or gpu'
+        )
+
+        cd test
+        python3 -m torch.utils.collect_env
+        env | grep TORCHAUDIO || true
+        pytest "${args[@]}" torchaudio_unittest
+        coverage html
