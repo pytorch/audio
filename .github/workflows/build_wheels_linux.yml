@@ -13,8 +13,8 @@ jobs:
     with:
       package-type: wheel
       os: linux
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: osalpekar/test-infra
+      test-infra-ref: py311_wheels
       with-py311: enable
   build:
     needs: generate-matrix
