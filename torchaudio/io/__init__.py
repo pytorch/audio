@@ -8,8 +8,12 @@ _STREAM_WRITER = [
     "StreamWriter",
 ]
 
+_PLAYBACK = [
+    "play_audio",
+]
 
-_LAZILY_IMPORTED = _STREAM_READER + _STREAM_WRITER
+
+_LAZILY_IMPORTED = _STREAM_READER + _STREAM_WRITER + _PLAYBACK
 
 
 def __getattr__(name: str):
@@ -22,10 +26,15 @@ def __getattr__(name: str):
 
             item = getattr(_stream_reader, name)
 
-        else:
+        elif name in _STREAM_WRITER:
             from . import _stream_writer
 
             item = getattr(_stream_writer, name)
+
+        elif name in _PLAYBACK:
+            from . import _playback
+
+            item = getattr(_playback, name)
 
         globals()[name] = item
         return item
