@@ -9,12 +9,12 @@ on:
 
 jobs:
   generate-matrix:
-    uses: osalpekar/test-infra/.github/workflows/generate_binary_build_matrix.yml@py311_wheels
+    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
     with:
       package-type: wheel
       os: linux
-      test-infra-repository: osalpekar/test-infra
-      test-infra-ref: py311_wheels
+      test-infra-repository: pytorch/test-infra
+      test-infra-ref: main
       with-py311: enable
   build:
     needs: generate-matrix
