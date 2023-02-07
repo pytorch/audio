@@ -15,6 +15,7 @@ jobs:
       os: macos
       test-infra-repository: pytorch/test-infra
       test-infra-ref: main
+      with-py311: enable
   build:
     needs: generate-matrix
     strategy:
