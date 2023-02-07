@@ -4,8 +4,9 @@
 #include <iostream>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
+/// Information about source stream found in the input media.
 struct SrcStreamInfo {
   /// @name COMMON MEMBERS
   ///@{
@@ -96,6 +97,7 @@ struct SrcStreamInfo {
   ///@}
 };
 
+/// Information about output stream configured by user code
 struct OutputStreamInfo {
   /// The index of the input source stream
   int source_index;
@@ -119,5 +121,5 @@ struct Chunk {
   double pts;
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

@@ -4,12 +4,11 @@
 #include <torchaudio/csrc/ffmpeg/pybind/stream_writer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
-  py::class_<StreamWriterFileObj, c10::intrusive_ptr<StreamWriterFileObj>>(
-      m, "StreamWriterFileObj")
+  py::class_<StreamWriterFileObj>(m, "StreamWriterFileObj")
       .def(py::init<py::object, const c10::optional<std::string>&, int64_t>())
       .def("set_metadata", &StreamWriterFileObj::set_metadata)
       .def("add_audio_stream", &StreamWriterFileObj::add_audio_stream)
@@ -50,5 +49,5 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
 }
 
 } // namespace
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

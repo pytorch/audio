@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
   switch (media_type) {
@@ -200,5 +200,5 @@ int FilterGraph::get_frame(AVFrame* pOutputFrame) {
   return av_buffersink_get_frame(buffersink_ctx, pOutputFrame);
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

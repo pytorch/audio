@@ -225,3 +225,16 @@ def get_output_protocols() -> List[str]:
         ... ['file', 'ftp', 'http', 'https', 'md5', 'pipe', 'prompeg', 'rtmp', 'tee', 'tcp', 'tls', 'udp', 'unix']
     """
     return torch.ops.torchaudio.ffmpeg_get_output_protocols()
+
+
+def get_build_config() -> str:
+    """Get the FFmpeg build configuration
+
+    Returns:
+        str: Build configuration string.
+
+    Example
+        >>> print(get_build_config())
+        --prefix=/Users/runner/miniforge3 --cc=arm64-apple-darwin20.0.0-clang --enable-gpl --enable-hardcoded-tables --enable-libfreetype --enable-libopenh264 --enable-neon --enable-libx264 --enable-libx265 --enable-libaom --enable-libsvtav1 --enable-libxml2 --enable-libvpx --enable-pic --enable-pthreads --enable-shared --disable-static --enable-version3 --enable-zlib --enable-libmp3lame --pkg-config=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/pkg-config --enable-cross-compile --arch=arm64 --target-os=darwin --cross-prefix=arm64-apple-darwin20.0.0- --host-cc=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/x86_64-apple-darwin13.4.0-clang  # noqa
+    """
+    return torch.ops.torchaudio.ffmpeg_get_build_config()

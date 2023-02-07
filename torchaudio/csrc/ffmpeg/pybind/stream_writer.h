@@ -1,11 +1,11 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/pybind/typedefs.h>
-#include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer_wrapper.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
-class StreamWriterFileObj : protected FileObj, public StreamWriterBinding {
+class StreamWriterFileObj : private FileObj, public StreamWriter {
  public:
   StreamWriterFileObj(
       py::object fileobj,
@@ -31,5 +31,5 @@ class StreamWriterFileObj : protected FileObj, public StreamWriterBinding {
       const c10::optional<std::string>& hw_accel);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

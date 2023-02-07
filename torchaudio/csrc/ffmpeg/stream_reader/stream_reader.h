@@ -1,11 +1,12 @@
 #pragma once
+#include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <vector>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 ///
 /// Fetch and decode audio/video streams chunk by chunk.
@@ -37,12 +38,49 @@ class StreamReader {
   ///
   ///@{
 
-  /// @todo Introduce a constructor that takes std::string and abstracts away
-  /// ffmpeg-native structs
+  /// @cond
+
+  /// Construct StreamReader from already initialized AVFormatContext.
+  /// This is a low level constructor interact with FFmpeg directly.
+  /// One can provide custom AVFormatContext in case the other constructor
+  /// does not meet a requirement.
+  /// @param pFormatContext An initialized AVFormatContext. StreamReader will
+  /// own the resources and release it at the end.
+  explicit StreamReader(AVFormatContext* pFormatContext);
+
+  /// @endcond
+
+  /// Construct media processor from soruce URI.
   ///
-  explicit StreamReader(AVFormatInputContextPtr&& p);
+  /// @param src URL of source media, in the format FFmpeg can understand.
+  /// @param format Specifies format (such as mp4) or device (such as lavfi and
+  /// avfoundation)
+  /// @param option Custom option passed when initializing format context
+  /// (opening source).
+  explicit StreamReader(
+      const std::string& src,
+      const c10::optional<std::string>& format = {},
+      const c10::optional<OptionDict>& option = {});
+
+  /// @cond
+
+  /// Concstruct media processor from custom IO.
+  ///
+  /// @param io_ctx Custom IO Context.
+  /// @param format Specifies format, such as mp4.
+  /// @param option Custom option passed when initializing format context
+  /// (opening source).
+  // TODO: Move this to wrapper class
+  explicit StreamReader(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format = {},
+      const c10::optional<OptionDict>& option = {});
+
+  /// @endcond
 
   ///@}
+
+  /// @cond
 
   ~StreamReader() = default;
   // Non-copyable
@@ -51,6 +89,8 @@ class StreamReader {
   // Movable
   StreamReader(StreamReader&&) = default;
   StreamReader& operator=(StreamReader&&) = default;
+
+  /// @endcond
 
   //////////////////////////////////////////////////////////////////////////////
   // Helper methods
@@ -90,8 +130,6 @@ class StreamReader {
   /// The valid value range is ``[0, num_src_streams())``.
   SrcStreamInfo get_src_stream_info(int i) const;
   /// Fetch the number of output streams defined by client code.
-  ///
-  /// @addtogroup stream_reader_query_methods
   int64_t num_out_streams() const;
   /// Fetch information about the specified output stream.
   ///
@@ -260,14 +298,10 @@ class StreamReader {
   ///@{
 
   /// Pop one chunk from each output stream if it is available.
-  std::vector<c10::optional<torch::Tensor>> pop_chunks();
+  std::vector<c10::optional<Chunk>> pop_chunks();
 
   ///@}
-
-  /// Pop one chunk from each output stream if it is available.
-  /// TODO: merge this to pop_chunks
-  std::vector<c10::optional<Chunk>> pop_chunks_with_metadata();
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

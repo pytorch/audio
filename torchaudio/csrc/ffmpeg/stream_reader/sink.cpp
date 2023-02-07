@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 namespace {
 std::unique_ptr<Buffer> get_buffer(
@@ -130,5 +130,5 @@ void Sink::flush() {
   buffer->flush();
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

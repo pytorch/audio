@@ -758,6 +758,50 @@ class Functional(TempDirMixin, TestBaseMixin):
         specgram = torch.rand(num_channels, n_fft_bin, num_frames, dtype=self.complex_dtype, device=self.device)
         self._assert_consistency_complex(F.apply_beamforming, (beamform_weights, specgram))
 
+    @common_utils.nested_params(
+        ["convolve", "fftconvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, fn, mode):
+        leading_dims = (2, 3, 2)
+        L_x, L_y = 32, 55
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+
+        self._assert_consistency(getattr(F, fn), (x, y, mode))
+
+    @common_utils.nested_params([True, False])
+    def test_add_noise(self, use_lengths):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        else:
+            lengths = None
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
+
+        self._assert_consistency(F.add_noise, (waveform, noise, snr, lengths))
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        self._assert_consistency(F.speed, (waveform, lengths, 1000, 1.1))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.preemphasis, (waveform, coeff))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.deemphasis, (waveform, coeff))
+
 
 class FunctionalFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

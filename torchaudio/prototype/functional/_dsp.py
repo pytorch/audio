@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 import torch
 
-from .functional import fftconvolve
+from torchaudio.functional import fftconvolve
 
 
 def oscillator_bank(

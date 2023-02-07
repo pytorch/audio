@@ -52,7 +52,19 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
     "nbsphinx",
+    "breathe",
 ]
+
+breathe_projects = {"libtorchaudio": "cpp/xml"}
+
+breathe_default_project = "libtorchaudio"
+
+breathe_projects_source = {
+    "libtorchaudio": (
+        "../../torchaudio/csrc/ffmpeg/",
+        ["ffmpeg.h"],
+    )
+}
 
 nbsphinx_requirejs_path = ""
 
