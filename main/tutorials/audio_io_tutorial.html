@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230202) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230207) &#x25BC</a>
     </div>
     
 
@@ -434,8 +434,8 @@ into PyTorch’s Tensor object, and save Tensor objects to audio files.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20230202
-2.0.0.dev20230202
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20230207
+2.0.0.dev20230207
 </pre></div>
 </div>
 <section id="preparation">
@@ -468,10 +468,10 @@ with the following:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/7.99k [00:00&lt;?, ?B/s]
-100%|##########| 7.99k/7.99k [00:00&lt;00:00, 4.60MB/s]
+100%|##########| 7.99k/7.99k [00:00&lt;00:00, 4.39MB/s]
 
   0%|          | 0.00/53.2k [00:00&lt;?, ?B/s]
-100%|##########| 53.2k/53.2k [00:00&lt;00:00, 33.6MB/s]
+100%|##########| 53.2k/53.2k [00:00&lt;00:00, 29.8MB/s]
 </pre></div>
 </div>
 </section>
@@ -540,7 +540,9 @@ variable bit rate (such as MP3).</p></li>
 <span class="nb">print</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>AudioMetaData(sample_rate=44100, num_frames=109368, num_channels=2, bits_per_sample=16, encoding=PCM_S)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:106: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+  warnings.warn(_deprecation_message)
+AudioMetaData(sample_rate=44100, num_frames=109368, num_channels=2, bits_per_sample=16, encoding=PCM_S)
 </pre></div>
 </div>
 <div class="admonition note">
@@ -632,7 +634,11 @@ The following examples illustrate this.</p>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;HTTP datasource&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_audio_io_tutorial_003.png" srcset="../_images/sphx_glr_audio_io_tutorial_003.png" alt="HTTP datasource" class = "sphx-glr-single-img"/><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load audio from tar file</span>
+<img src="../_images/sphx_glr_audio_io_tutorial_003.png" srcset="../_images/sphx_glr_audio_io_tutorial_003.png" alt="HTTP datasource" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:235: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+  warnings.warn(_deprecation_message)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load audio from tar file</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tar_path</span></a> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/VOiCES_devkit.tar.gz&quot;</span><span class="p">)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tar_item</span></a> <span class="o">=</span> <span class="s2">&quot;VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>
 <span class="k">with</span> <a href="https://docs.python.org/3/library/tarfile.html#tarfile.open" title="tarfile.open" class="sphx-glr-backref-module-tarfile sphx-glr-backref-type-py-function"><span class="n">tarfile</span><span class="o">.</span><span class="n">open</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tar_path</span></a><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/tarfile.html#tarfile.TarFile" title="tarfile.TarFile" class="sphx-glr-backref-module-tarfile sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tarfile_</span></a><span class="p">:</span>
@@ -642,7 +648,9 @@ The following examples illustrate this.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_audio_io_tutorial_004.png" srcset="../_images/sphx_glr_audio_io_tutorial_004.png" alt="TAR file" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/110k [00:00&lt;?, ?B/s]
-100%|##########| 110k/110k [00:00&lt;00:00, 45.8MB/s]
+100%|##########| 110k/110k [00:00&lt;00:00, 43.6MB/s]
+/usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:235: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+  warnings.warn(_deprecation_message)
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load audio from S3</span>
@@ -654,7 +662,11 @@ The following examples illustrate this.</p>
 <span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;From S3&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_audio_io_tutorial_005.png" srcset="../_images/sphx_glr_audio_io_tutorial_005.png" alt="From S3" class = "sphx-glr-single-img"/></section>
+<img src="../_images/sphx_glr_audio_io_tutorial_005.png" srcset="../_images/sphx_glr_audio_io_tutorial_005.png" alt="From S3" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:235: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+  warnings.warn(_deprecation_message)
+</pre></div>
+</div>
+</section>
 <section id="tips-on-slicing">
 <h2>Tips on slicing<a class="headerlink" href="#tips-on-slicing" title="Permalink to this heading">¶</a></h2>
 <p>Providing <code class="docutils literal notranslate"><span class="pre">num_frames</span></code> and <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code> arguments restricts
@@ -693,6 +705,8 @@ stop as soon as the necessary amount of data is fetched.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Fetching all the data...
+/usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:235: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+  warnings.warn(_deprecation_message)
  - Fetched 108844 bytes
 Fetching until the requested frames are available...
  - Fetched 65580 bytes
@@ -741,7 +755,7 @@ the provided data fit</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmpws_5yd7o/save_example_default.wav
+Source: /tmp/tmpeh1c__7a/save_example_default.wav
 ----------
  - File size: 217658 bytes
  - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=32, encoding=PCM_F)
@@ -756,7 +770,7 @@ The resulting file occupies half the storage but loses precision</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmp2fwfpssh/save_example_PCM_S16.wav
+Source: /tmp/tmpzz5radl8/save_example_PCM_S16.wav
 ----------
  - File size: 108844 bytes
  - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -783,37 +797,37 @@ To name a few:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: /tmp/tmp99wntcgs/save_example.flac
+Source: /tmp/tmpti70cjfl/save_example.flac
 ----------
  - File size: 37141 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=24, encoding=FLAC)
 
 ----------
-Source: /tmp/tmp99wntcgs/save_example.vorbis
+Source: /tmp/tmpti70cjfl/save_example.vorbis
 ----------
  - File size: 12588 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=VORBIS)
 
 ----------
-Source: /tmp/tmp99wntcgs/save_example.sph
+Source: /tmp/tmpti70cjfl/save_example.sph
 ----------
  - File size: 109824 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_S)
 
 ----------
-Source: /tmp/tmp99wntcgs/save_example.amb
+Source: /tmp/tmpti70cjfl/save_example.amb
 ----------
  - File size: 108858 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=32, encoding=PCM_F)
 
 ----------
-Source: /tmp/tmp99wntcgs/save_example.amr-nb
+Source: /tmp/tmpti70cjfl/save_example.amr-nb
 ----------
  - File size: 2008 bytes
  - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=0, encoding=AMR_NB)
 
 ----------
-Source: /tmp/tmp99wntcgs/save_example.gsm
+Source: /tmp/tmpti70cjfl/save_example.gsm
 ----------
  - File size: 5610 bytes
  - AudioMetaData(sample_rate=8000, num_frames=0, num_channels=1, bits_per_sample=0, encoding=GSM)
@@ -835,10 +849,12 @@ required.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">buffer_</span></a><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>b&#39;RIFF2R\x03\x00WAVEfmt &#39;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:416: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+  warnings.warn(_deprecation_message)
+b&#39;RIFF2R\x03\x00WAVEfmt &#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.851 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.006 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-audio-io-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a50b7a9d7eda039b9579621100be1417/audio_io_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_io_tutorial.py</span></code></a></p>

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230202) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230207) &#x25BC</a>
     </div>
     
 
@@ -392,6 +392,7 @@
               
   <h1>Source code for torchaudio.sox_effects.sox_effects</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -548,6 +549,14 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span></div>
 
 
+<span class="n">_deprecation_message</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;File-like object support in sox_io backend is deprecated, &quot;</span>
+    <span class="s2">&quot;and will be removed in v2.1. &quot;</span>
+    <span class="s2">&quot;See https://github.com/pytorch/audio/issues/2950 for the detail.&quot;</span>
+    <span class="s2">&quot;Please migrate to the new dispatcher, or use soundfile backend.&quot;</span>
+<span class="p">)</span>
+
+
 <div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
 <span class="k">def</span> <span class="nf">apply_effects_file</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -667,6 +676,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_deprecation_message</span><span class="p">)</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">apply_effects_fileobj</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>

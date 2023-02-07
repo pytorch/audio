@@ -50,8 +50,8 @@ At the end, we synthesize noisy speech over phone from clean speech.
 
  .. code-block:: none
 
-    2.0.0.dev20230202
-    2.0.0.dev20230202
+    2.0.0.dev20230207
+    2.0.0.dev20230207
 
 
 
@@ -90,9 +90,9 @@ First, we import the modules and download the audio assets we use in this tutori
 
  .. code-block:: none
 
-      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 107MB/s]
-      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 17.4MB/s]
-      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 41.4MB/s]
+      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 59.2MB/s]
+      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 16.2MB/s]
+      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 33.2MB/s]
 
 
 
@@ -837,6 +837,15 @@ a Tensor object.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:416: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+      warnings.warn(_deprecation_message)
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:235: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+      warnings.warn(_deprecation_message)
+
 
 
 
@@ -1147,6 +1156,15 @@ in the background.
          :class: sphx-glr-multi-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:416: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+      warnings.warn(_deprecation_message)
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/backend/sox_io_backend.py:235: UserWarning: File-like object support in sox_io backend is deprecated, and will be removed in v2.1. See https://github.com/pytorch/audio/issues/2950 for the detail.Please migrate to the new dispatcher, or use soundfile backend.
+      warnings.warn(_deprecation_message)
+
 
 
 
@@ -1307,7 +1325,7 @@ Codec applied:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  14.585 seconds)
+   **Total running time of the script:** ( 0 minutes  14.610 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:
