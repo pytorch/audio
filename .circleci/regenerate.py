@@ -38,7 +38,9 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
     for os_type in ["linux", "macos", "windows"]:
         w += build_ffmpeg_job(os_type, filter_branch)
     for btype in ["wheel", "conda"]:
-        for os_type in ["linux", "macos", "windows"]:
+        # disable windows for testing purposes, will re-enable before merge
+        #for os_type in ["linux", "macos", "windows"]:
+        for os_type in ["linux", "macos"]:
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
                     fb = filter_branch
