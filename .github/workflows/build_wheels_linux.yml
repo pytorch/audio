@@ -9,7 +9,7 @@ on:
 
 jobs:
   generate-matrix:
-    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@py311_wheels
+    uses: osalpekar/test-infra/.github/workflows/generate_binary_build_matrix.yml@py311_wheels
     with:
       package-type: wheel
       os: linux
@@ -28,7 +28,7 @@ jobs:
             smoke-test-script: test/smoke_test/smoke_test.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@py311_wheels
+    uses: osalpekar/test-infra/.github/workflows/build_wheels_linux.yml@py311_wheels
     with:
       repository: ${{ matrix.repository }}
       ref: ""
