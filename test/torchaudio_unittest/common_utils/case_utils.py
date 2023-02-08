@@ -253,6 +253,16 @@ skipIfPy310 = _skipIf(
     ),
     key="ON_PYTHON_310",
 )
+skipIfNoAudioDevice = _skipIf(
+    not torchaudio.utils.ffmpeg_utils.get_output_devices(),
+    reason="No output audio device is available.",
+    key="NO_AUDIO_OUT_DEVICE",
+)
+skipIfNoMacOS = _skipIf(
+    sys.platform != "darwin",
+    reason="This feature is only available for MacOS.",
+    key="NO_MACOS",
+)
 
 
 def zip_equal(*iterables):
