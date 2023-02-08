@@ -9,7 +9,7 @@ on:
       - release/*
   workflow_dispatch:
 
-job:
+jobs:
   build:
     strategy:
       matrix:
@@ -68,5 +68,3 @@ job:
         (cd docs && make html)
 
         mv docs/build/html /artifacts/
-
-        
