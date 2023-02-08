@@ -39,6 +39,7 @@ jobs:
       upload-artifact: docs
 
       script: |
+        yum -y install doxygen
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
 
