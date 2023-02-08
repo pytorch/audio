@@ -19,7 +19,7 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
-      repositry: pytorch/audio
+      repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: ${{ matrix.cuda_arch_version }}
       timeout: 120
