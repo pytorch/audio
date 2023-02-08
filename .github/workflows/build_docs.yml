@@ -10,6 +10,17 @@ on:
   workflow_dispatch:
 
 jobs:
+  upload:
+    needs: build
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: docs
+    - name: Tweak the doc artifact
+      run: |
+        ls .
+
+    
   build:
     strategy:
       matrix:
@@ -18,11 +29,13 @@ jobs:
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
+      job-name: Build doc
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: ${{ matrix.cuda_arch_version }}
       timeout: 120
+      upload-artifact: docs
 
       script: |
         # Mark Build Directory Safe
