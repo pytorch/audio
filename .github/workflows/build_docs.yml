@@ -71,12 +71,12 @@ jobs:
         # Install torchaudio
         # TODO: Enable NVDec/NVEnc
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
-        python3 -m pip --quiet install cmake>=3.18.0 ninja
-        USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
+        pip --quiet install cmake>=3.18.0 ninja
+        USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
 
         # Install build tools
-        yum -q -y install doxygen libsndfile
-        pip install -r docs/requirements.txt -r docs/requirements-tutorials.txt
+        conda install --quiet -y pandoc doxygen soundfile
+        pip install --quiet -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
         # Build docs
         export BUILD_GALLERY=true
