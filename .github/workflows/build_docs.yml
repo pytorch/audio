@@ -75,7 +75,7 @@ jobs:
         USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
 
         # Install build tools
-        conda install --quiet -y pandoc doxygen soundfile
+        conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
         pip install --quiet -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
         # Build docs
