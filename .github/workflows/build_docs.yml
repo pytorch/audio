@@ -39,7 +39,6 @@ jobs:
       upload-artifact: docs
 
       script: |
-        yum -y install doxygen
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
 
@@ -76,6 +75,7 @@ jobs:
         USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
 
         # Install build tools
+        yum -q -y install doxygen
         pip install -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
         # Build docs
