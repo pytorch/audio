@@ -1,4 +1,13 @@
+"""Module to implement logics used for initializing extensions.
+
+The implementations here should be stateless.
+They should not depend on external state.
+Anything that depends on external state should happen in __init__.py
+"""
+
+
 import os
+from functools import wraps
 from pathlib import Path
 
 import torch
@@ -113,3 +122,22 @@ def _check_cuda_version():
                 "Please install the TorchAudio version that matches your PyTorch version."
             )
     return version
+
+
+def _fail_since_no_ffmpeg(func):
+    @wraps(func)
+    def wrapped(*_args, **_kwargs):
+        try:
+            # Note:
+            # We run _init_ffmpeg again just to show users the stacktrace.
+            # _init_ffmpeg would not succeed here.
+            _init_ffmpeg()
+        except Exception as err:
+            raise RuntimeError(
+                f"{func.__name__} requires FFmpeg extension which is not available. "
+                "Please refer to the stacktrace above for how to resolve this."
+            ) from err
+        # This should not happen in normal execution, but just in case.
+        return func(*_args, **_kwargs)
+
+    return wrapped

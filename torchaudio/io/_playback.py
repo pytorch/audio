@@ -16,6 +16,7 @@ dict_format = {
 }
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def play_audio(
     waveform: torch.Tensor,
     sample_rate: Optional[float],

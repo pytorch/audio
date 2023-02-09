@@ -381,6 +381,7 @@ _format_video_args = _format_doc(
 )
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 class StreamReader:
     """Fetch and decode audio/video streams chunk by chunk.
 
@@ -516,17 +517,20 @@ class StreamReader:
         """
         return self._be.get_metadata()
 
-    def get_src_stream_info(self, i: int) -> SourceStream:
+    def get_src_stream_info(self, i: int) -> Union[SourceStream, SourceAudioStream, SourceVideoStream]:
         """Get the metadata of source stream
 
         Args:
             i (int): Stream index.
         Returns:
-            SourceStream
+            Information about the source stream.
+            If the source stream is audio type, then :class:`SourceAudioStream` returned.
+            If it is video type, then :class:`SourceVideoStream` is returned.
+            Otherwise :class:`SourceStream` class is returned.
         """
         return _parse_si(self._be.get_src_stream_info(i))
 
-    def get_out_stream_info(self, i: int) -> torchaudio.io.OutputStream:
+    def get_out_stream_info(self, i: int) -> OutputStream:
         """Get the metadata of output stream
 
         Args:
