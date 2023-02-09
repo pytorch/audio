@@ -4,7 +4,6 @@ from typing import Optional
 
 import torch
 import torchaudio
-from torchaudio.io import StreamWriter
 
 dict_format = {
     torch.uint8: "u8",
@@ -62,7 +61,7 @@ def play_audio(
         )
 
     # Write to speaker device
-    s = StreamWriter(dst=path, format=device)
+    s = torchaudio.io.StreamWriter(dst=path, format=device)
     s.add_audio_stream(sample_rate, num_channels, format=format)
 
     # write audio to the device
