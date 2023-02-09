@@ -17,7 +17,9 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.15.0)
 endif()
 
 # Suppress warning about ExternalProject_Add timestamp
-cmake_policy(SET CMP0135 NEW)
+if(NOT CMAKE_VERSION VERSION_LESS 3.24.0)
+  cmake_policy(SET CMP0135 OLD)
+endif()
 
 project(torchaudio)
 
