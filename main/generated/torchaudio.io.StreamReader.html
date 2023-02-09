@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230208) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230209) &#x25BC</a>
     </div>
     
 
@@ -925,7 +925,7 @@ this method.</p>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.get_out_stream_info">
-<span class="sig-prename descclassname"><span class="pre">StreamReader.</span></span><span class="sig-name descname"><span class="pre">get_out_stream_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torchaudio.io.OutputStream</span></span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#StreamReader.get_out_stream_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamReader.get_out_stream_info" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">StreamReader.</span></span><span class="sig-name descname"><span class="pre">get_out_stream_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.io._stream_reader.OutputStream" title="torchaudio.io._stream_reader.OutputStream"><span class="pre">OutputStream</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#StreamReader.get_out_stream_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamReader.get_out_stream_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata of output stream</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -944,14 +944,17 @@ this method.</p>
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamReader.get_src_stream_info">
-<span class="sig-prename descclassname"><span class="pre">StreamReader.</span></span><span class="sig-name descname"><span class="pre">get_src_stream_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.io._stream_reader.SourceStream" title="torchaudio.io._stream_reader.SourceStream"><span class="pre">SourceStream</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#StreamReader.get_src_stream_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamReader.get_src_stream_info" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">StreamReader.</span></span><span class="sig-name descname"><span class="pre">get_src_stream_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.io._stream_reader.SourceStream" title="torchaudio.io._stream_reader.SourceStream"><span class="pre">SourceStream</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#torchaudio.io._stream_reader.SourceAudioStream" title="torchaudio.io._stream_reader.SourceAudioStream"><span class="pre">SourceAudioStream</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#torchaudio.io._stream_reader.SourceVideoStream" title="torchaudio.io._stream_reader.SourceVideoStream"><span class="pre">SourceVideoStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_reader.html#StreamReader.get_src_stream_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamReader.get_src_stream_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata of source stream</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Stream index.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>SourceStream</p>
+<dd class="field-even"><p>Information about the source stream.
+If the source stream is audio type, then <code class="xref py py-class docutils literal notranslate"><span class="pre">SourceAudioStream</span></code> returned.
+If it is video type, then <code class="xref py py-class docutils literal notranslate"><span class="pre">SourceVideoStream</span></code> is returned.
+Otherwise <code class="xref py py-class docutils literal notranslate"><span class="pre">SourceStream</span></code> class is returned.</p>
 </dd>
 </dl>
 </dd></dl>

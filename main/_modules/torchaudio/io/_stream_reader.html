@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230208) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230209) &#x25BC</a>
     </div>
     
 
@@ -782,7 +782,8 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="StreamReader"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader">[docs]</a><span class="k">class</span> <span class="nc">StreamReader</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
+<span class="k">class</span> <span class="nc">StreamReader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch and decode audio/video streams chunk by chunk.</span>
 
 <span class="sd">    For the detailed usage of this class, please refer to the tutorial.</span>
@@ -917,17 +918,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SourceStream</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SourceStream</span><span class="p">,</span> <span class="n">SourceAudioStream</span><span class="p">,</span> <span class="n">SourceVideoStream</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of source stream</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            i (int): Stream index.</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            SourceStream</span>
+<span class="sd">            Information about the source stream.</span>
+<span class="sd">            If the source stream is audio type, then :class:`SourceAudioStream` returned.</span>
+<span class="sd">            If it is video type, then :class:`SourceVideoStream` is returned.</span>
+<span class="sd">            Otherwise :class:`SourceStream` class is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">OutputStream</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamReader.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputStream</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of output stream</span>
 
 <span class="sd">        Args:</span>
