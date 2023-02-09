@@ -1897,7 +1897,6 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_linux_conda_py3.8_cu117
-<<<<<<< HEAD
       - binary_macos_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
@@ -1994,8 +1993,6 @@ workflows:
           name: nightly_binary_macos_conda_py3.11_cpu_upload
           requires:
           - nightly_binary_macos_conda_py3.11_cpu
-=======
->>>>>>> main
       - binary_windows_conda:
           conda_docker_image: pytorch/conda-builder:cpu
           cuda_version: cpu
