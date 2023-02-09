@@ -23,6 +23,17 @@ model implementations and application components.
    references
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Installation
+   :hidden:
+
+   installation
+   build
+   build.linux
+   build.windows
+   build.jetson
+
+.. toctree::
    :maxdepth: 1
    :caption: API Tutorials
    :hidden:

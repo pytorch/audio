@@ -50,7 +50,7 @@ def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
                             and btype == "conda"
                             and (python_version != "3.8" or cu_version != "cu117")
                         )
-                        or (os_type == "macos" and btype == "wheel")
+                        or os_type == "macos"
                     ):
                         continue
 
