@@ -8,7 +8,7 @@
 #include <map>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class StreamProcessor {
  public:
@@ -99,5 +99,5 @@ class StreamProcessor {
   c10::optional<Chunk> pop_chunk(KeyType key);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

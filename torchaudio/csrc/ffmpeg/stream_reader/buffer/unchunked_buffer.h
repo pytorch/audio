@@ -5,7 +5,7 @@
 #include <deque>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -42,5 +42,5 @@ class UnchunkedVideoBuffer : public UnchunkedBuffer {
 };
 
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

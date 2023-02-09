@@ -48,6 +48,7 @@ _format_common_args = _format_doc(
 )
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 class StreamWriter:
     """Encode and write audio/video streams chunk by chunk
 

@@ -55,3 +55,23 @@ article.pytorch-article div.tutorials-card div.card-body code {
     border-bottom: none;
     background-color: #AFB8C133;
 }
+/* C++ doc */
+/* Fix the malindentation of `class` header*/
+article.pytorch-article .cpp.class dt {
+    padding-left: 0.5em;
+}
+/* keywords like const and explicit, class */
+dt.sig.sig-object.cpp > span.k > span.pre {
+    color: #c95362;
+}
+
+dt.sig.sig-object.cpp > span.n:not(.sig-param) > span.pre {
+    color: #9257c6;
+}
+/* Fix */
+dt.sig.sig-object.cpp > span.sig-prename.descclassname > span.n > span.pre {
+    color: #6c6c6d;
+}
+dt.sig.sig-object.cpp > span.sig-prename.descname > span.n > span.pre {
+    color: #6c6c6d;
+}

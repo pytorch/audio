@@ -5,8 +5,10 @@ It affects functionalities in :py:mod:`torchaudio.io` (and indirectly :py:func:`
 from typing import Dict, List, Tuple
 
 import torch
+import torchaudio
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_versions() -> Dict[str, Tuple[int]]:
     """Get the versions of FFmpeg libraries
 
@@ -17,6 +19,7 @@ def get_versions() -> Dict[str, Tuple[int]]:
     return torch.ops.torchaudio.ffmpeg_get_versions()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_log_level() -> int:
     """Get the log level of FFmpeg.
 
@@ -25,6 +28,7 @@ def get_log_level() -> int:
     return torch.ops.torchaudio.ffmpeg_get_log_level()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def set_log_level(level: int):
     """Set the log level of FFmpeg (libavformat etc)
 
@@ -61,6 +65,7 @@ def set_log_level(level: int):
     torch.ops.torchaudio.ffmpeg_set_log_level(level)
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_demuxers() -> Dict[str, str]:
     """Get the available demuxers.
 
@@ -78,6 +83,7 @@ def get_demuxers() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_demuxers()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_muxers() -> Dict[str, str]:
     """Get the available muxers.
 
@@ -96,6 +102,7 @@ def get_muxers() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_muxers()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_audio_decoders() -> Dict[str, str]:
     """Get the available audio decoders.
 
@@ -114,6 +121,7 @@ def get_audio_decoders() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_audio_decoders()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_audio_encoders() -> Dict[str, str]:
     """Get the available audio encoders.
 
@@ -133,6 +141,7 @@ def get_audio_encoders() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_audio_encoders()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_video_decoders() -> Dict[str, str]:
     """Get the available video decoders.
 
@@ -152,6 +161,7 @@ def get_video_decoders() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_video_decoders()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_video_encoders() -> Dict[str, str]:
     """Get the available video encoders.
 
@@ -172,6 +182,7 @@ def get_video_encoders() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_video_encoders()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_input_devices() -> Dict[str, str]:
     """Get the available input devices.
 
@@ -187,6 +198,7 @@ def get_input_devices() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_input_devices()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_output_devices() -> Dict[str, str]:
     """Get the available output devices.
 
@@ -201,6 +213,7 @@ def get_output_devices() -> Dict[str, str]:
     return torch.ops.torchaudio.ffmpeg_get_output_devices()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_input_protocols() -> List[str]:
     """Get the supported input protocols.
 
@@ -214,6 +227,7 @@ def get_input_protocols() -> List[str]:
     return torch.ops.torchaudio.ffmpeg_get_input_protocols()
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 def get_output_protocols() -> List[str]:
     """Get the supported output protocols.
 
@@ -225,3 +239,17 @@ def get_output_protocols() -> List[str]:
         ... ['file', 'ftp', 'http', 'https', 'md5', 'pipe', 'prompeg', 'rtmp', 'tee', 'tcp', 'tls', 'udp', 'unix']
     """
     return torch.ops.torchaudio.ffmpeg_get_output_protocols()
+
+
+@torchaudio._extension.fail_if_no_ffmpeg
+def get_build_config() -> str:
+    """Get the FFmpeg build configuration
+
+    Returns:
+        str: Build configuration string.
+
+    Example
+        >>> print(get_build_config())
+        --prefix=/Users/runner/miniforge3 --cc=arm64-apple-darwin20.0.0-clang --enable-gpl --enable-hardcoded-tables --enable-libfreetype --enable-libopenh264 --enable-neon --enable-libx264 --enable-libx265 --enable-libaom --enable-libsvtav1 --enable-libxml2 --enable-libvpx --enable-pic --enable-pthreads --enable-shared --disable-static --enable-version3 --enable-zlib --enable-libmp3lame --pkg-config=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/pkg-config --enable-cross-compile --arch=arm64 --target-os=darwin --cross-prefix=arm64-apple-darwin20.0.0- --host-cc=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/x86_64-apple-darwin13.4.0-clang  # noqa
+    """
+    return torch.ops.torchaudio.ffmpeg_get_build_config()

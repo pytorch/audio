@@ -23,6 +23,17 @@ model implementations and application components.
    references
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Installation
+   :hidden:
+
+   installation
+   build
+   build.linux
+   build.windows
+   build.jetson
+
+.. toctree::
    :maxdepth: 1
    :caption: API Tutorials
    :hidden:
@@ -72,7 +83,7 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :caption: API Reference
+   :caption: Python API Reference
    :hidden:
 
    torchaudio
@@ -91,7 +102,7 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Prototype API Reference
+   :caption: Python Prototype API Reference
    :hidden:
 
    prototype
@@ -100,6 +111,15 @@ model implementations and application components.
    prototype.models
    prototype.pipelines
    prototype.transforms
+
+.. toctree::
+   :maxdepth: 1
+   :caption: C++ Prototype API Reference
+   :hidden:
+
+   libtorchaudio
+   libtorchaudio.stream_reader
+   libtorchaudio.stream_writer
 
 .. toctree::
    :maxdepth: 1

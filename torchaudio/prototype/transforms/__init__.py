@@ -1,25 +1,7 @@
-from ._transforms import (
-    AddNoise,
-    BarkScale,
-    BarkSpectrogram,
-    Convolve,
-    Deemphasis,
-    FFTConvolve,
-    InverseBarkScale,
-    Preemphasis,
-    Speed,
-    SpeedPerturbation,
-)
+from ._transforms import BarkScale, BarkSpectrogram, InverseBarkScale
 
 __all__ = [
-    "AddNoise",
     "BarkScale",
     "BarkSpectrogram",
-    "Convolve",
-    "Deemphasis",
-    "FFTConvolve",
     "InverseBarkScale",
-    "Preemphasis",
-    "SpeedPerturbation",
-    "Speed",
 ]

@@ -4,7 +4,7 @@ import sys
 
 from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
 
-from .utils import _check_cuda_version, _init_dll_path, _init_ffmpeg, _init_sox, _load_lib  # noqa
+from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_ffmpeg, _init_sox, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ _LG = logging.getLogger(__name__)
 __all__ = [
     "fail_if_no_kaldi",
     "fail_if_no_sox",
+    "fail_if_no_ffmpeg",
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_KALDI_AVAILABLE",
@@ -85,3 +86,5 @@ fail_if_no_sox = (
         "requires sox extension, but TorchAudio is not compiled with it. Please build TorchAudio with libsox support."
     )
 )
+
+fail_if_no_ffmpeg = no_op if _FFMPEG_INITIALIZED else _fail_since_no_ffmpeg

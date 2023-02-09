@@ -257,3 +257,122 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = transform(specgram, psd_s, psd_n, reference_channel)
 
         self.assertEqual(computed, expected)
+
+    @common_utils.nested_params(
+        ["Convolve", "FFTConvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, cls, mode):
+        leading_dims = (2, 3)
+        L_x, L_y = 89, 43
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+
+        convolve = getattr(T, cls)(mode=mode)
+        actual = convolve(x, y)
+        expected = torch.stack(
+            [
+                torch.stack(
+                    [convolve(x[i, j].unsqueeze(0), y[i, j].unsqueeze(0)).squeeze(0) for j in range(leading_dims[1])]
+                )
+                for i in range(leading_dims[0])
+            ]
+        )
+
+        self.assertEqual(expected, actual)
+
+    def test_speed(self):
+        B = 5
+        orig_freq = 100
+        factor = 0.8
+        input_lengths = torch.randint(1, 1000, (B,), dtype=torch.int32)
+
+        speed = T.Speed(orig_freq, factor)
+
+        unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
+        batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
+
+        output, output_lengths = speed(batched_input, input_lengths)
+
+        unbatched_output = []
+        unbatched_output_lengths = []
+        for idx in range(len(unbatched_input)):
+            w, l = speed(unbatched_input[idx], input_lengths[idx])
+            unbatched_output.append(w)
+            unbatched_output_lengths.append(l)
+
+        self.assertEqual(output_lengths, torch.stack(unbatched_output_lengths))
+        for idx in range(len(unbatched_output)):
+            w, l = output[idx], output_lengths[idx]
+            self.assertEqual(unbatched_output[idx], w[:l])
+
+    def test_speed_perturbation(self):
+        B = 5
+        orig_freq = 100
+        factor = 0.8
+        input_lengths = torch.randint(1, 1000, (B,), dtype=torch.int32)
+
+        speed = T.SpeedPerturbation(orig_freq, [factor])
+
+        unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
+        batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
+
+        output, output_lengths = speed(batched_input, input_lengths)
+
+        unbatched_output = []
+        unbatched_output_lengths = []
+        for idx in range(len(unbatched_input)):
+            w, l = speed(unbatched_input[idx], input_lengths[idx])
+            unbatched_output.append(w)
+            unbatched_output_lengths.append(l)
+
+        self.assertEqual(output_lengths, torch.stack(unbatched_output_lengths))
+        for idx in range(len(unbatched_output)):
+            w, l = output[idx], output_lengths[idx]
+            self.assertEqual(unbatched_output[idx], w[:l])
+
+    def test_add_noise(self):
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+
+        add_noise = T.AddNoise()
+        actual = add_noise(waveform, noise, snr, lengths)
+
+        expected = []
+        for i in range(leading_dims[0]):
+            for j in range(leading_dims[1]):
+                for k in range(leading_dims[2]):
+                    expected.append(add_noise(waveform[i][j][k], noise[i][j][k], snr[i][j][k], lengths[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, L))
+
+    def test_preemphasis(self):
+        waveform = torch.rand((3, 5, 2, 100), dtype=self.dtype, device=self.device)
+        preemphasis = T.Preemphasis(coeff=0.97)
+        actual = preemphasis(waveform)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            for j in range(waveform.size(1)):
+                for k in range(waveform.size(2)):
+                    expected.append(preemphasis(waveform[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, waveform.size(-1)))
+
+    def test_deemphasis(self):
+        waveform = torch.rand((3, 5, 2, 100), dtype=self.dtype, device=self.device)
+        deemphasis = T.Deemphasis(coeff=0.97)
+        actual = deemphasis(waveform)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            for j in range(waveform.size(1)):
+                for k in range(waveform.size(2)):
+                    expected.append(deemphasis(waveform[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, waveform.size(-1)))

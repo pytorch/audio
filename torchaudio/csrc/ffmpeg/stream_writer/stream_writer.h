@@ -5,7 +5,9 @@
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
+
+/// @cond
 
 struct OutputStream {
   AVStream* stream;
@@ -22,6 +24,8 @@ struct OutputStream {
   AVBufferRefPtr hw_frame_ctx;
 };
 
+/// @endcond
+
 ///
 /// Encode and write audio/video streams chunk by chunk
 ///
@@ -31,8 +35,36 @@ class StreamWriter {
   std::vector<OutputStream> streams;
   AVPacketPtr pkt;
 
+ protected:
+  /// @cond
+
+  explicit StreamWriter(AVFormatContext*);
+
+  /// @endcond
+
  public:
-  explicit StreamWriter(AVFormatOutputContextPtr&& p);
+  /// Construct StreamWriter from destination URI
+  ///
+  /// @param dst Destination where encoded data are written.
+  /// @param format Specify output format. If not provided, it is guessed from
+  /// ``dst``.
+  explicit StreamWriter(
+      const std::string& dst,
+      const c10::optional<std::string>& format = {});
+
+  /// @cond
+
+  /// Construct StreamWriter from custom IO
+  ///
+  /// @param io_ctx Custom IO.
+  /// @param format Specify output format.
+  // TODO: Move this into wrapper class.
+  explicit StreamWriter(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format);
+
+  /// @endcond
+
   // Non-copyable
   StreamWriter(const StreamWriter&) = delete;
   StreamWriter& operator=(const StreamWriter&) = delete;
@@ -41,12 +73,12 @@ class StreamWriter {
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
  public:
-  /// @internal
+  /// @cond
 
   /// Print the configured outputs
   void dump_format(int64_t i);
 
-  /// @endinternal
+  /// @endcond
 
   //////////////////////////////////////////////////////////////////////////////
   // Configure methods
@@ -178,15 +210,8 @@ class StreamWriter {
       const torch::Tensor& chunk,
       bool pad_extra = true);
 #endif
-  void process_frame(
-      AVFrame* src_frame,
-      std::unique_ptr<FilterGraph>& filter,
-      AVFrame* dst_frame,
-      AVCodecContextPtr& c,
-      AVStream* st);
-  void encode_frame(AVFrame* dst_frame, AVCodecContextPtr& c, AVStream* st);
   void flush_stream(OutputStream& os);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

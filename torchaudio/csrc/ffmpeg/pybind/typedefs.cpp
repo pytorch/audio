@@ -1,7 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/pybind/typedefs.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace {
 
 static int read_function(void* opaque, uint8_t* buf, int buf_size) {
@@ -112,5 +112,5 @@ OptionMap dict2map(const OptionDict& src) {
   return ret;
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

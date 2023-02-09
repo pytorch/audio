@@ -7,7 +7,7 @@
 #endif
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 namespace detail {
 
 torch::Tensor convert_audio(AVFrame* pFrame) {
@@ -88,9 +88,10 @@ torch::Tensor convert_audio(AVFrame* pFrame) {
 namespace {
 torch::Tensor get_buffer(
     at::IntArrayRef shape,
-    const torch::Device& device = torch::Device(torch::kCPU)) {
+    const torch::Device& device = torch::Device(torch::kCPU),
+    const torch::Dtype dtype = torch::kUInt8) {
   auto options = torch::TensorOptions()
-                     .dtype(torch::kUInt8)
+                     .dtype(dtype)
                      .layout(torch::kStrided)
                      .device(device.type(), device.index());
   return torch::empty(shape, options);
@@ -128,11 +129,17 @@ std::tuple<torch::Tensor, bool> get_image_buffer(
 
   int height = frame->height;
   int width = frame->width;
+
+  int depth = desc->comp[0].depth;
+  auto dtype = (depth > 8) ? torch::kInt16 : torch::kUInt8;
+
   if (desc->flags & AV_PIX_FMT_FLAG_PLANAR) {
-    auto buffer = get_buffer({num_frames, channels, height, width}, device);
+    auto buffer =
+        get_buffer({num_frames, channels, height, width}, device, dtype);
     return std::make_tuple(buffer, true);
   }
-  auto buffer = get_buffer({num_frames, height, width, channels}, device);
+  auto buffer =
+      get_buffer({num_frames, height, width, channels}, device, dtype);
   return std::make_tuple(buffer, false);
 }
 
@@ -146,6 +153,20 @@ void write_interlaced_image(AVFrame* pFrame, torch::Tensor& frame) {
     buf += pFrame->linesize[0];
     ptr += stride;
   }
+}
+
+void write_interlaced_image16(AVFrame* pFrame, torch::Tensor& frame) {
+  auto ptr = frame.data_ptr<int16_t>();
+  uint8_t* buf = pFrame->data[0];
+  size_t height = frame.size(1);
+  size_t stride = frame.size(2) * frame.size(3);
+  for (int i = 0; i < height; ++i) {
+    memcpy(ptr, buf, stride * 2);
+    buf += pFrame->linesize[0];
+    ptr += stride;
+  }
+  // correct for int16
+  frame += 32768;
 }
 
 void write_planar_image(AVFrame* pFrame, torch::Tensor& frame) {
@@ -307,6 +328,63 @@ void write_nv12_cuda(AVFrame* pFrame, torch::Tensor& yuv) {
   // yuv[:, 1:] = uv
   yuv.index_put_({Slice(), Slice(1)}, uv);
 }
+
+void write_p010_cuda(AVFrame* pFrame, torch::Tensor& yuv) {
+  int height = static_cast<int>(yuv.size(2));
+  int width = static_cast<int>(yuv.size(3));
+
+  // Write Y plane directly
+  {
+    int16_t* tgt = yuv.data_ptr<int16_t>();
+    CUdeviceptr src = (CUdeviceptr)pFrame->data[0];
+    int linesize = pFrame->linesize[0];
+    TORCH_CHECK(
+        cudaSuccess ==
+            cudaMemcpy2D(
+                (void*)tgt,
+                width * 2,
+                (const void*)src,
+                linesize,
+                width * 2,
+                height,
+                cudaMemcpyDeviceToDevice),
+        "Failed to copy Y plane to Cuda tensor.");
+  }
+  // Prepare intermediate UV planes
+  torch::Tensor uv =
+      get_buffer({1, height / 2, width / 2, 2}, yuv.device(), torch::kInt16);
+  {
+    int16_t* tgt = uv.data_ptr<int16_t>();
+    CUdeviceptr src = (CUdeviceptr)pFrame->data[1];
+    int linesize = pFrame->linesize[1];
+    TORCH_CHECK(
+        cudaSuccess ==
+            cudaMemcpy2D(
+                (void*)tgt,
+                width * 2,
+                (const void*)src,
+                linesize,
+                width * 2,
+                height / 2,
+                cudaMemcpyDeviceToDevice),
+        "Failed to copy UV plane to Cuda tensor.");
+  }
+  uv = uv.permute({0, 3, 1, 2});
+  using namespace torch::indexing;
+  // Write to the UV plane
+  // very simplistic upscale using indexing since interpolate doesn't support
+  // shorts
+  yuv.index_put_(
+      {Slice(), Slice(1, 3), Slice(None, None, 2), Slice(None, None, 2)}, uv);
+  yuv.index_put_(
+      {Slice(), Slice(1, 3), Slice(1, None, 2), Slice(None, None, 2)}, uv);
+  yuv.index_put_(
+      {Slice(), Slice(1, 3), Slice(None, None, 2), Slice(1, None, 2)}, uv);
+  yuv.index_put_(
+      {Slice(), Slice(1, 3), Slice(1, None, 2), Slice(1, None, 2)}, uv);
+  // correct for int16
+  yuv += 32768;
+}
 #endif
 
 void write_image(AVFrame* frame, torch::Tensor& buf) {
@@ -337,6 +415,10 @@ void write_image(AVFrame* frame, torch::Tensor& buf) {
       write_nv12_cpu(frame, buf);
       return;
     }
+    case AV_PIX_FMT_RGB48LE: {
+      write_interlaced_image16(frame, buf);
+      return;
+    }
 #ifdef USE_CUDA
     case AV_PIX_FMT_CUDA: {
       AVHWFramesContext* hwctx = (AVHWFramesContext*)frame->hw_frames_ctx->data;
@@ -349,7 +431,10 @@ void write_image(AVFrame* frame, torch::Tensor& buf) {
           write_nv12_cuda(frame, buf);
           return;
         }
-        case AV_PIX_FMT_P010:
+        case AV_PIX_FMT_P010: {
+          write_p010_cuda(frame, buf);
+          return;
+        }
         case AV_PIX_FMT_P016:
           TORCH_CHECK(
               false,
@@ -380,5 +465,5 @@ torch::Tensor convert_image(AVFrame* frame, const torch::Device& device) {
 }
 
 } // namespace detail
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

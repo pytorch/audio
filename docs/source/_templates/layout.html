@@ -83,7 +83,6 @@
           $(".main-menu a:contains('Github')").each(overwrite);
       });
 
-      {% if 'tutorial' in pagename %}
       {#
        # Override the right side menu bar behavior so that subsections
        # are shown by default in tutorial page.
@@ -107,6 +106,30 @@
                }
            };
        });
-      {% endif %}
     </script>
+
+    {% if 'libtorchaudio' in pagename %}
+    {#
+     # change the layout of signature one param per line if #params >= 2
+     #}
+    <script type="text/javascript">
+      $(window).ready(function() {
+          $("dt.sig.sig-object.cpp").each(function(i) {
+              let newline = "<br>\20\20\20\20";
+              let params = $(this).children(".sig-param");
+              if (params.length >= 2) {
+                  $(this).html($(this).html().replace(/, /g, "," + newline));
+                  $(this).children(".sig-paren").each(function(i) {
+                      console.log(i, $(this));
+                      if (i == 0) {
+                          $(this).html($(this).html() + newline + "\20");
+                      } else if (i == 1) {
+                          $(this).html("<br>" + $(this).html());
+                      }
+                  });
+              }
+          });
+      });
+    </script>
+    {% endif %}
 {% endblock %}
