@@ -23,8 +23,13 @@ def play_audio(
     device: Optional[str] = None,
 ) -> None:
     """Plays audio through specified or available output device.
-    This function is currently only supported on MacOS, which has access
-    to "audiotoolbox" output device that can play up to two audio channels.
+
+    .. warning::
+       This function is currently only supported on MacOS, and requires
+       libavdevice (FFmpeg) with ``audiotoolbox`` output device.
+
+    .. note::
+       This function can play up to two audio channels.
 
     Args:
         waveform: Tensor containing the audio to play.
