@@ -152,6 +152,16 @@ class RNNTBiasing(RNNT):
         transcriber (torch.nn.Module): transcription network.
         predictor (torch.nn.Module): prediction network.
         joiner (torch.nn.Module): joint network.
+        attndim (int): TCPGen attention dimension
+        biasing (bool): If true, use biasing, otherwise use standard RNN-T
+        deepbiasing (bool): If true, use deep biasing by extracting the biasing vector
+        embdim (int): dimension of symbol embeddings
+        jointdim (int): dimension of the joint network joint dimension
+        charlist (list): The list of word piece tokens in the same order as the output layer
+        encoutdim (int): dimension of the encoder output vectors
+        dropout_tcpgen (float): dropout rate for TCPGen
+        tcpsche (int): The epoch at which TCPGen starts to train
+        DBaverage (bool): If true, instead of TCPGen, use DBRNNT for biasing
     """
 
     def __init__(
