@@ -20,7 +20,6 @@ jobs:
     - name: Tweak the doc artifact
       run: |
         ls .
-
     
   build:
     strategy:
@@ -70,7 +69,7 @@ jobs:
 
         # Install torchaudio
         # TODO: Enable NVDec/NVEnc
-        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
+        conda install --quiet -y 'ffmpeg>=4.1' pkg-config automake=1.15
         pip --quiet install cmake>=3.18.0 ninja
         USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
 
