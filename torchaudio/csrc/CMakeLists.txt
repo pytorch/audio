@@ -45,7 +45,7 @@ if(BUILD_RIR)
   list(
     APPEND
     LIBTORCHAUDIO_SOURCES
-    build_rir.cpp
+    rir.cpp
     )
   list(
     APPEND

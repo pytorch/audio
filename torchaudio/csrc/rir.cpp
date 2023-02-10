@@ -49,15 +49,16 @@ namespace {
  * @param ir_length The length of impulse response signal.
  */
 template <typename scalar_t>
-void build_rir_impl(
+void simulate_rir_impl(
     const torch::Tensor& irs,
     const torch::Tensor& delay,
-    torch::Tensor& rirs,
     const int64_t rir_length,
     const int64_t num_band,
     const int64_t num_image,
     const int64_t num_mic,
-    const int64_t ir_length) {
+    const int64_t ir_length,
+    torch::Tensor& rirs
+    ) {
   const scalar_t* input_data = irs.data_ptr<scalar_t>();
   const int* delay_data = delay.data_ptr<int>();
   scalar_t* output_data = rirs.data_ptr<scalar_t>();
@@ -87,7 +88,7 @@ void build_rir_impl(
  * @return torch::Tensor The output room impulse response signal. Tensor with
  * dimensions `(num_band, num_mic, rir_length)`.
  */
-torch::Tensor build_rir(
+torch::Tensor simulate_rir(
     const torch::Tensor& irs,
     const torch::Tensor& delay,
     const int64_t rir_length) {
@@ -98,8 +99,8 @@ torch::Tensor build_rir(
   torch::Tensor rirs =
       torch::zeros({num_band, num_mic, rir_length}, irs.dtype());
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(irs.scalar_type(), "build_rir", [&] {
-    build_rir_impl<scalar_t>(
-        irs, delay, rirs, rir_length, num_band, num_image, num_mic, ir_length);
+    simulate_rir_impl<scalar_t>(
+        irs, delay, rir_length, num_band, num_image, num_mic, ir_length, rirs);
   });
   return rirs;
 }
@@ -113,7 +114,7 @@ torch::Tensor build_rir(
  * @param centers The Tensor that stores the center frequencies of octave bands.
  * Tensor with dimension `(num_band,)`.
  * @param sample_rate The sample_rate of simulated room impulse response signal.
- * @param n_fft The window size of FFT.
+ * @param n_fft The number of fft points.
  * @param filters The output band-pass filter. Tensor with dimensions
  * `(num_band, n_fft - 1)`.
  */
@@ -174,7 +175,7 @@ void make_rir_filter_impl(
  * @param centers The Tensor that stores the center frequencies of octave bands.
  * Tensor with dimension `(num_band,)`.
  * @param sample_rate The sample_rate of simulated room impulse response signal.
- * @param n_fft The window size of FFT.
+ * @param n_fft The number of fft points.
  * @return torch::Tensor The output band-pass filter. Tensor with dimensions
  * `(num_band, n_fft - 1)`.
  */
@@ -194,10 +195,10 @@ torch::Tensor make_rir_filter(
 
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
   m.impl(
-   "torchaudio::build_rir",
-      &torchaudio::rir::build_rir);
+   "torchaudio::_simulate_rir",
+      &torchaudio::rir::simulate_rir);
   m.impl(
-      "torchaudio::make_rir_filter",
+      "torchaudio::_make_rir_filter",
       &torchaudio::rir::make_rir_filter);
 }
 
@@ -206,7 +207,7 @@ TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-   "torchaudio::build_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor");
+   "torchaudio::_simulate_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor");
   m.def(
-      "torchaudio::make_rir_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor");
+      "torchaudio::_make_rir_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor");
 }
