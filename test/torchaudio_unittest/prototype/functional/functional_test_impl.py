@@ -1,4 +1,3 @@
-import numpy as np
 from torchaudio._internal import module_utils as _mod_utils
 
 if _mod_utils.is_module_available("pyroomacoustics"):
@@ -7,7 +6,7 @@ if _mod_utils.is_module_available("pyroomacoustics"):
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
-from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, TestBaseMixin
+from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, skipIfNoRIR, TestBaseMixin
 
 from .dsp_utils import freq_ir as freq_ir_np, oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
 
@@ -434,6 +433,7 @@ class Functional64OnlyTestImpl(TestBaseMixin):
 
 class FunctionalCPUOnlyTestImpl(TestBaseMixin):
     @skipIfNoModule("pyroomacoustics")
+    @skipIfNoRIR
     @parameterized.expand([(1,), (4,)])
     def test_simulate_rir_ism_single_band(self, channel):
         """Test simulate_rir_ism function in the case where absorption coefficients are identical for all walls."""
@@ -467,6 +467,7 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
         self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)
 
     @skipIfNoModule("pyroomacoustics")
+    @skipIfNoRIR
     @parameterized.expand([(1,), (4,)])
     def test_simulate_rir_ism_multi_band(self, channel):
         """Test simulate_rir_ism in the case where absorption coefficients are different for all walls."""

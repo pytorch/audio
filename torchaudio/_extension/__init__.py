@@ -20,6 +20,7 @@ __all__ = [
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_KALDI_AVAILABLE",
+    "_IS_RIR_AVAILABLE",
     "_SOX_INITIALIZED",
     "_FFMPEG_INITIALIZED",
 ]
@@ -71,6 +72,15 @@ if is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
         # The error will be raised when user code attempts to use these features.
         _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
 
+
+# Initialize rir-related features
+_IS_RIR_AVAILABLE = False
+if _IS_TORCHAUDIO_EXT_AVAILABLE:
+    _load_lib("libtorchaudio")
+
+    import torchaudio.lib._torchaudio  # noqa
+
+    _IS_RIR_AVAILABLE = torchaudio.lib._torchaudio.is_rir_available()
 
 fail_if_no_kaldi = (
     no_op

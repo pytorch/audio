@@ -4,7 +4,6 @@ from typing import Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal import module_utils as _mod_utils
 
 
 def _compute_image_sources(
@@ -165,7 +164,6 @@ def _validate_inputs(
     return absorption
 
 
-@_mod_utils.requires_rir()
 def simulate_rir_ism(
     room: torch.Tensor,
     source: torch.Tensor,
@@ -251,9 +249,7 @@ def simulate_rir_ism(
             center = center_frequency
         # n_fft is set to 512 by default.
         filters = torch.ops.torchaudio._make_rir_filter(center, sample_rate, n_fft=512)
-        l = rir.shape[-1]
-        rir = torchaudio.prototype.functional.fftconvolve(rir, filters.unsqueeze(1).repeat(1, rir.shape[1], 1))
-        rir = rir[..., (filters.shape[-1] - 1) // 2 : (filters.shape[-1]) // 2 + l]
+        rir = torchaudio.functional.fftconvolve(rir, filters.unsqueeze(1).repeat(1, rir.shape[1], 1), mode="same")
 
     # sum up rir signals of all image sources into one waveform.
     rir = rir.sum(0)

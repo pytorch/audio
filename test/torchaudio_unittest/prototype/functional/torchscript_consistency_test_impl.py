@@ -3,7 +3,7 @@ import unittest
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import parameterized
-from torchaudio_unittest.common_utils import TestBaseMixin, torch_script
+from torchaudio_unittest.common_utils import skipIfNoRIR, TestBaseMixin, torch_script
 
 
 class TorchScriptConsistencyTestImpl(TestBaseMixin):
@@ -85,6 +85,7 @@ class TorchScriptConsistencyCPUOnlyTestImpl(TestBaseMixin):
             output = output.shape
         self.assertEqual(ts_output, output)
 
+    @skipIfNoRIR
     @parameterized.expand([(1,), (4,)])
     def test_simulate_rir_ism_single_band(self, channel):
         room_dim = torch.rand(3, dtype=self.dtype, device=self.device) + 5
@@ -98,6 +99,7 @@ class TorchScriptConsistencyCPUOnlyTestImpl(TestBaseMixin):
             (room_dim, source, mic_array, max_order, absorption, None, 81, center_frequency, 343.0, 16000.0),
         )
 
+    @skipIfNoRIR
     @parameterized.expand([(1,), (4,)])
     def test_simulate_rir_ism_multi_band(self, channel):
         room_dim = torch.rand(3, dtype=self.dtype, device=self.device) + 5

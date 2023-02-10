@@ -28,8 +28,8 @@ using namespace torch::indexing;
 
 namespace torchaudio {
 namespace rir {
-namespace {
 
+namespace {
 /**
  * @brief Sum up impulse response signal of all image sources into one Tensor
  * based on delays of arrival of the image sources. The implementation is based
@@ -57,8 +57,7 @@ void simulate_rir_impl(
     const int64_t num_image,
     const int64_t num_mic,
     const int64_t ir_length,
-    torch::Tensor& rirs
-    ) {
+    torch::Tensor& rirs) {
   const scalar_t* input_data = irs.data_ptr<scalar_t>();
   const int* delay_data = delay.data_ptr<int>();
   scalar_t* output_data = rirs.data_ptr<scalar_t>();
@@ -194,12 +193,8 @@ torch::Tensor make_rir_filter(
 } // Anonymous namespace
 
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl(
-   "torchaudio::_simulate_rir",
-      &torchaudio::rir::simulate_rir);
-  m.impl(
-      "torchaudio::_make_rir_filter",
-      &torchaudio::rir::make_rir_filter);
+  m.impl("torchaudio::_simulate_rir", torchaudio::rir::simulate_rir);
+  m.impl("torchaudio::_make_rir_filter", torchaudio::rir::make_rir_filter);
 }
 
 } // namespace rir
@@ -207,7 +202,7 @@ TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-   "torchaudio::_simulate_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor");
+      "torchaudio::_simulate_rir(Tensor irs, Tensor delay_i, int rir_length) -> Tensor");
   m.def(
       "torchaudio::_make_rir_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor");
 }

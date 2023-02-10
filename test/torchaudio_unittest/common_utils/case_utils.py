@@ -225,6 +225,11 @@ skipIfNoKaldi = _skipIf(
     reason="Kaldi features are not available.",
     key="NO_KALDI",
 )
+skipIfNoRIR = _skipIf(
+    not torchaudio._extension._IS_RIR_AVAILABLE,
+    reason="RIR features are not available.",
+    key="NO_RIR",
+)
 skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),
     reason="CTC decoder not available.",

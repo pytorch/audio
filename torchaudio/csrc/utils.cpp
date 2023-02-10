@@ -33,7 +33,3 @@ c10::optional<int64_t> cuda_version() {
 }
 
 } // namespace torchaudio
-
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::is_rir_available", &is_rir_available);
-}
