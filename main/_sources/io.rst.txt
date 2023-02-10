@@ -12,6 +12,7 @@ torchaudio.io
 
    StreamReader
    StreamWriter
+   play_audio
 
 .. rubric:: Tutorials using ``torchaudio.io``
 
