@@ -32,6 +32,8 @@ Properties
 {%- endfor %}
 {%- endif %}
 
+{%- if members %}
+
 Methods
 -------
 
@@ -46,6 +48,7 @@ Methods
 
 {%- endif %}
 {%- endfor %}
+{%- endif %}
 
 {%- if name == "StreamReader" %}
 
