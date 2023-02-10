@@ -6,8 +6,8 @@ from ._dsp import (
     oscillator_bank,
     sinc_impulse_response,
 )
-from .functional import barkscale_fbanks
 from ._rir import simulate_rir_ism
+from .functional import barkscale_fbanks
 
 
 __all__ = [

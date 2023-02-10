@@ -1,4 +1,5 @@
 import importlib.util
+import torch
 import warnings
 from functools import wraps
 from typing import Optional

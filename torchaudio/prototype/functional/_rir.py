@@ -178,7 +178,7 @@ def simulate_rir_ism(
     sound_speed: float = 343.0,
     sample_rate: float = 16000.0,
 ) -> Tensor:
-    r"""Compute Room Impulse Response (RIR) based on the image source method.
+    r"""Compute Room Impulse Response (RIR) based on the *image source method* :cite:`allen1979image`.
     The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.
 
     .. devices:: CPU
@@ -191,7 +191,8 @@ def simulate_rir_ism(
         source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(3,)`.
         mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, 3)`.
         max_order (int): The maximum number of reflections of the source.
-        absorption (float or torch.Tensor): The absorption coefficients of wall materials.
+        absorption (float or torch.Tensor): The *absorption* :cite:`wiki:Absorption_(acoustics)`
+            coefficients of wall materials for sound energy.
             If the dtype is ``float``, the absorption coefficient is identical for all walls and
             all frequencies.
             If ``absorption`` is a 1D Tensor, the shape must be `(6,)`, where the values represent
