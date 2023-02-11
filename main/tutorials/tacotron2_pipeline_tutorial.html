@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230210) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230211) &#x25BC</a>
     </div>
     
 
@@ -252,6 +252,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../build.linux.html">Building on Linux and macOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../build.windows.html">Building on Windows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
 <ul>
@@ -260,7 +261,7 @@
 <li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">Hardware-Accelerated Video Decoding and Encoding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
@@ -489,8 +490,8 @@ pip3<span class="w"> </span>install<span class="w"> </span>deep_phonemizer
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20230210
-2.0.0.dev20230210
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.0.0.dev20230211
+2.0.0.dev20230211
 cpu
 </pre></div>
 </div>
@@ -584,29 +585,29 @@ fetched.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/63.6M [00:00&lt;?, ?B/s]
-  0%|          | 48.0k/63.6M [00:00&lt;04:03, 274kB/s]
-  0%|          | 248k/63.6M [00:00&lt;01:25, 782kB/s]
-  2%|1         | 0.98M/63.6M [00:00&lt;00:27, 2.38MB/s]
-  5%|5         | 3.47M/63.6M [00:00&lt;00:08, 7.16MB/s]
- 10%|#         | 6.55M/63.6M [00:00&lt;00:05, 11.0MB/s]
- 15%|#5        | 9.70M/63.6M [00:01&lt;00:04, 13.5MB/s]
- 20%|##        | 12.9M/63.6M [00:01&lt;00:03, 15.2MB/s]
- 26%|##5       | 16.3M/63.6M [00:01&lt;00:02, 16.6MB/s]
- 31%|###       | 19.7M/63.6M [00:01&lt;00:02, 17.5MB/s]
- 36%|###6      | 23.1M/63.6M [00:01&lt;00:02, 18.3MB/s]
- 42%|####1     | 26.6M/63.6M [00:01&lt;00:02, 18.9MB/s]
- 47%|####7     | 30.2M/63.6M [00:02&lt;00:01, 19.4MB/s]
- 53%|#####2    | 33.7M/63.6M [00:02&lt;00:01, 19.8MB/s]
- 59%|#####8    | 37.3M/63.6M [00:02&lt;00:01, 20.1MB/s]
- 64%|######4   | 41.0M/63.6M [00:02&lt;00:01, 20.5MB/s]
- 70%|#######   | 44.7M/63.6M [00:02&lt;00:00, 20.7MB/s]
- 76%|#######5  | 48.3M/63.6M [00:03&lt;00:00, 21.0MB/s]
- 80%|########  | 51.0M/63.6M [00:03&lt;00:00, 22.3MB/s]
- 85%|########4 | 53.9M/63.6M [00:03&lt;00:00, 21.0MB/s]
- 89%|########8 | 56.4M/63.6M [00:03&lt;00:00, 22.2MB/s]
- 93%|#########3| 59.5M/63.6M [00:03&lt;00:00, 21.0MB/s]
- 97%|#########7| 61.9M/63.6M [00:03&lt;00:00, 21.9MB/s]
-100%|##########| 63.6M/63.6M [00:03&lt;00:00, 17.6MB/s]
+  0%|          | 64.0k/63.6M [00:00&lt;03:03, 364kB/s]
+  0%|          | 264k/63.6M [00:00&lt;01:21, 817kB/s]
+  2%|1         | 1.12M/63.6M [00:00&lt;00:23, 2.74MB/s]
+  6%|5         | 3.79M/63.6M [00:00&lt;00:08, 7.76MB/s]
+ 10%|#         | 6.48M/63.6M [00:00&lt;00:05, 10.6MB/s]
+ 15%|#5        | 9.55M/63.6M [00:01&lt;00:04, 13.0MB/s]
+ 20%|#9        | 12.7M/63.6M [00:01&lt;00:03, 14.7MB/s]
+ 25%|##4       | 15.8M/63.6M [00:01&lt;00:03, 15.8MB/s]
+ 30%|##9       | 18.9M/63.6M [00:01&lt;00:02, 16.5MB/s]
+ 35%|###4      | 22.1M/63.6M [00:01&lt;00:02, 17.0MB/s]
+ 40%|###9      | 25.2M/63.6M [00:01&lt;00:02, 17.4MB/s]
+ 45%|####4     | 28.4M/63.6M [00:02&lt;00:02, 17.7MB/s]
+ 50%|####9     | 31.6M/63.6M [00:02&lt;00:01, 18.0MB/s]
+ 55%|#####4    | 34.9M/63.6M [00:02&lt;00:01, 18.3MB/s]
+ 59%|#####9    | 37.8M/63.6M [00:02&lt;00:01, 17.9MB/s]
+ 65%|######4   | 41.2M/63.6M [00:02&lt;00:01, 18.3MB/s]
+ 70%|#######   | 44.6M/63.6M [00:03&lt;00:01, 18.7MB/s]
+ 75%|#######5  | 48.0M/63.6M [00:03&lt;00:00, 19.0MB/s]
+ 81%|########  | 51.4M/63.6M [00:03&lt;00:00, 19.2MB/s]
+ 86%|########6 | 54.8M/63.6M [00:03&lt;00:00, 19.4MB/s]
+ 92%|#########1| 58.3M/63.6M [00:03&lt;00:00, 19.7MB/s]
+ 97%|#########6| 61.5M/63.6M [00:03&lt;00:00, 22.4MB/s]
+100%|##########| 63.6M/63.6M [00:04&lt;00:00, 16.4MB/s]
 tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
          20, 11, 79, 77, 59, 37,  2]])
 tensor([25], dtype=torch.int32)
@@ -654,16 +655,9 @@ models and processors together so that it is easy to create the pipeline.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 14%|#3        | 14.8M/107M [00:00&lt;00:00, 113MB/s]
- 24%|##3       | 25.6M/107M [00:00&lt;00:00, 89.6MB/s]
- 32%|###1      | 34.2M/107M [00:00&lt;00:01, 64.5MB/s]
- 45%|####4     | 48.0M/107M [00:00&lt;00:00, 76.1MB/s]
- 58%|#####7    | 62.1M/107M [00:00&lt;00:00, 94.1MB/s]
- 67%|######6   | 72.0M/107M [00:00&lt;00:00, 82.4MB/s]
- 75%|#######4  | 80.5M/107M [00:01&lt;00:00, 74.1MB/s]
- 89%|########9 | 95.7M/107M [00:01&lt;00:00, 64.3MB/s]
- 95%|#########5| 102M/107M [00:01&lt;00:00, 61.1MB/s]
-100%|##########| 107M/107M [00:01&lt;00:00, 64.5MB/s]
+ 37%|###6      | 39.6M/107M [00:00&lt;00:00, 415MB/s]
+ 74%|#######3  | 79.4M/107M [00:00&lt;00:00, 416MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 412MB/s]
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">Tacotron2.infer</span></code> method perfoms multinomial sampling,
@@ -718,8 +712,7 @@ WaveRNN model from the same bundle.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_003.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_003.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
 
   0%|          | 0.00/16.7M [00:00&lt;?, ?B/s]
- 89%|########8 | 14.8M/16.7M [00:00&lt;00:00, 108MB/s]
-100%|##########| 16.7M/16.7M [00:00&lt;00:00, 70.2MB/s]
+100%|##########| 16.7M/16.7M [00:00&lt;00:00, 345MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -761,18 +754,9 @@ method and pass the spectrogram.</p>
 <img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_004.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_004.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 14%|#3        | 14.8M/107M [00:00&lt;00:01, 63.5MB/s]
- 19%|#9        | 20.9M/107M [00:00&lt;00:01, 47.4MB/s]
- 23%|##3       | 25.2M/107M [00:00&lt;00:01, 46.1MB/s]
- 30%|##9       | 32.0M/107M [00:00&lt;00:02, 39.3MB/s]
- 45%|####4     | 48.0M/107M [00:00&lt;00:01, 58.5MB/s]
- 50%|####9     | 53.6M/107M [00:01&lt;00:01, 52.2MB/s]
- 59%|#####9    | 63.7M/107M [00:01&lt;00:00, 58.3MB/s]
- 65%|######4   | 69.3M/107M [00:01&lt;00:00, 57.6MB/s]
- 74%|#######4  | 80.0M/107M [00:01&lt;00:00, 57.2MB/s]
- 88%|########8 | 94.8M/107M [00:01&lt;00:00, 77.1MB/s]
- 96%|#########5| 103M/107M [00:02&lt;00:00, 47.8MB/s]
-100%|##########| 107M/107M [00:02&lt;00:00, 51.7MB/s]
+ 32%|###1      | 34.1M/107M [00:00&lt;00:00, 358MB/s]
+ 67%|######7   | 72.1M/107M [00:00&lt;00:00, 381MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 398MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -839,7 +823,7 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  43.947 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  43.914 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9772cbd0af96f57f17a2da758b365a43/tacotron2_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tacotron2_pipeline_tutorial.py</span></code></a></p>
