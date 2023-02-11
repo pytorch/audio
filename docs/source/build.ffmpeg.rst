@@ -3,7 +3,7 @@ Enabling GPU video decoder/encoder
 
 TorchAudio can make use of hardware-based video decoding and encoding supported by underlying FFmpeg libraries that are linked at runtime.
 
-Using NVIDIA's GPU decoder and encoder, it is also possible to pass around CUDA Tensor directly, that is decode video into CUDA tensor or encode vide from CUDA tensor, without moving data to CPU.
+Using NVIDIA's GPU decoder and encoder, it is also possible to pass around CUDA Tensor directly, that is decode video into CUDA tensor or encode video from CUDA tensor, without moving data from/to CPU.
 
 This improves the video throughput significantly. However, please note that not all the video formats are supported by hardware acceleration.
 
@@ -466,7 +466,7 @@ It is often the case where there are multiple FFmpeg installations in the system
 Using the hardware decoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once the installation and the runtime linking works fine, then you can test the GPU decoding with the following.
+Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.
 
 For the detail on the performance of GPU decoder and encoder please see `Hardware-Accelerated Video Decoding and Encoding <./hw_acceleration_tutorial.html>`_
 
