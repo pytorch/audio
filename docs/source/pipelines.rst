@@ -21,6 +21,8 @@ A pre-trained model and associated pipelines are expressed as an instance of ``B
 
    Under the hood, the implementations of ``Bundle`` use components from other ``torchaudio`` modules, such as :mod:`torchaudio.models` and :mod:`torchaudio.transforms`, or even third party libraries like `SentencPiece <https://github.com/google/sentencepiece>`__ and `DeepPhonemizer <https://github.com/as-ideas/DeepPhonemizer>`__. But this implementation detail is abstracted away from library users.
 
+.. _RNNT:
+
 RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
@@ -141,6 +143,8 @@ Pretrained Models
    HUBERT_ASR_XLARGE
 
 
+.. _Tacotron2:
+   
 Tacotron2 Text-To-Speech
 ------------------------
 
