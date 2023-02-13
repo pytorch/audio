@@ -431,9 +431,9 @@ class Functional64OnlyTestImpl(TestBaseMixin):
             raise
 
 
+@skipIfNoModule("pyroomacoustics")
+@skipIfNoRIR
 class FunctionalCPUOnlyTestImpl(TestBaseMixin):
-    @skipIfNoModule("pyroomacoustics")
-    @skipIfNoRIR
     @parameterized.expand([(1,), (4,)])
     def test_simulate_rir_ism_single_band(self, channel):
         """Test simulate_rir_ism function in the case where absorption coefficients are identical for all walls."""
@@ -466,8 +466,6 @@ class FunctionalCPUOnlyTestImpl(TestBaseMixin):
 
         self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)
 
-    @skipIfNoModule("pyroomacoustics")
-    @skipIfNoRIR
     @parameterized.expand([(1,), (4,)])
     def test_simulate_rir_ism_multi_band(self, channel):
         """Test simulate_rir_ism in the case where absorption coefficients are different for all walls."""

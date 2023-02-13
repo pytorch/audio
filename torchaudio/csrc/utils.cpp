@@ -15,7 +15,6 @@ bool is_kaldi_available() {
 #endif
 }
 
-
 bool is_rir_available() {
 #ifdef INCLUDE_RIR
   return true;
