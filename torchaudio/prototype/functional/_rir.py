@@ -181,7 +181,7 @@ def simulate_rir_ism(
 
     .. devices:: CPU
 
-    .. properties:: Autograd TorchScript
+    .. properties:: TorchScript
 
     Args:
         room (torch.Tensor): Room coordinates. The shape of `room` must be `(3,)` which represents

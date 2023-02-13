@@ -23,7 +23,11 @@ DSP
    sinc_impulse_response
    frequency_impulse_response
 
-simulate_rir_ism
-~~~~~~~~~~~~~~~~
+Room Impulse Response Simulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: simulate_rir_ism
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   simulate_rir_ism
