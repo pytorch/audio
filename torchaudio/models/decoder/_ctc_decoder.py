@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import itertools as it
+
+import warnings
 from abc import abstractmethod
 from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Tuple, Union
@@ -31,6 +33,7 @@ if torchaudio._internal.module_utils.is_module_available("flashlight"):
         Dictionary as _Dictionary,
         load_words as _load_words,
     )
+
     try:
         from flashlight.lib.text.decoder import KenLM as _KenLM
     except Exception:
@@ -38,7 +41,8 @@ if torchaudio._internal.module_utils.is_module_available("flashlight"):
 else:
     warnings.warn(
         "The built-in flashlight integration is deprecated, and will be removed in future release."
-        "Please install flashlight-text. https://pypi.org/project/flashlight-text/")
+        "Please install flashlight-text. https://pypi.org/project/flashlight-text/"
+    )
     torchaudio._extension._load_lib("libflashlight-text")
     from torchaudio.lib.flashlight_lib_text_decoder import (
         CriterionType as _CriterionType,
@@ -435,8 +439,7 @@ def ctc_decoder(
 
     if type(lm) == str:
         if _KenLM is None:
-            raise RuntimeError(
-                "flashlight is installed, but KenLM is not installed. Please install KenLM.")
+            raise RuntimeError("flashlight is installed, but KenLM is not installed. Please install KenLM.")
         lm = _KenLM(lm, word_dict)
     elif lm is None:
         lm = _ZeroLM()
