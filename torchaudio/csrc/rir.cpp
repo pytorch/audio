@@ -190,15 +190,10 @@ torch::Tensor make_rir_filter(
   return filters;
 }
 
-} // Anonymous namespace
-
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
   m.impl("torchaudio::_simulate_rir", torchaudio::rir::simulate_rir);
   m.impl("torchaudio::_make_rir_filter", torchaudio::rir::make_rir_filter);
 }
-
-} // namespace rir
-} // namespace torchaudio
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
@@ -206,3 +201,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
       "torchaudio::_make_rir_filter(Tensor centers, float sample_rate, int n_fft) -> Tensor");
 }
+
+} // Anonymous namespace
+} // namespace rir
+} // namespace torchaudio
