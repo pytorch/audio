@@ -47,3 +47,10 @@ class AutogradTestImpl(TestBaseMixin):
         waveform = torch.rand(3, 1, 2, 10, device=self.device, dtype=self.dtype, requires_grad=True)
         filters = torch.rand(3, 2, device=self.device, dtype=self.dtype, requires_grad=True)
         assert gradcheck(F.filter_waveform, (waveform, filters))
+
+    def test_exp_sigmoid_input(self):
+        input = torch.linspace(-5, 5, 20, device=self.device, dtype=self.dtype, requires_grad=True)
+        exponent = 10.0
+        max_value = 2.0
+        threshold = 1e-7
+        assert gradcheck(F.exp_sigmoid, (input, exponent, max_value, threshold))
