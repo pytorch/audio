@@ -6,9 +6,10 @@ import numpy as np
 import torch
 import torch.distributed as dist
 import torchaudio
-from lightning import Batch
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
+
+from ..lightning import Batch
 
 
 class BucketizeBatchSampler(BatchSampler):
