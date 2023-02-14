@@ -41,6 +41,11 @@ if(BUILD_RNNT)
   endif()
 endif()
 
+if(BUILD_RIR)
+  list(APPEND sources rir.cpp)
+  list(APPEND compile_definitions INCLUDE_RIR)
+endif()
+
 if(USE_CUDA)
   list(
     APPEND

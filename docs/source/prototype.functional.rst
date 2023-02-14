@@ -22,3 +22,12 @@ DSP
    oscillator_bank
    sinc_impulse_response
    frequency_impulse_response
+
+Room Impulse Response Simulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   simulate_rir_ism
