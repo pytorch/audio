@@ -6,13 +6,14 @@ from typing import Dict, Tuple
 
 import torch
 import torchaudio.models
-from data_modules import HuBERTDataModule
-from lightning import SSLPretrainModule
-from losses import hubert_loss
-from lr_schedulers import LinearDecayLRScheduler
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.utilities.seed import seed_everything
+
+from .data_modules import HuBERTDataModule
+from .lightning import SSLPretrainModule
+from .losses import hubert_loss
+from .lr_schedulers import LinearDecayLRScheduler
 
 
 class _Formatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
