@@ -20,6 +20,7 @@ __all__ = [
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_KALDI_AVAILABLE",
+    "_IS_RIR_AVAILABLE",
     "_SOX_INITIALIZED",
     "_FFMPEG_INITIALIZED",
 ]
@@ -33,9 +34,10 @@ if os.name == "nt" and (3, 8) <= sys.version_info < (3, 9):
 # In case of an error, we do not catch the failure as it suggests there is something
 # wrong with the installation.
 _IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
-# Kaldi features are implemented in _torchaudio extension, but it can be individually
+# Kaldi and RIR features are implemented in _torchaudio extension, but they can be individually
 # turned on/off at build time. Available means that _torchaudio is loaded properly, and
-# Kaldi features are found there.
+# Kaldi or RIR features are found there.
+_IS_RIR_AVAILABLE = False
 _IS_KALDI_AVAILABLE = False
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _load_lib("libtorchaudio")
@@ -43,6 +45,7 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     import torchaudio.lib._torchaudio  # noqa
 
     _check_cuda_version()
+    _IS_RIR_AVAILABLE = torchaudio.lib._torchaudio.is_rir_available()
     _IS_KALDI_AVAILABLE = torchaudio.lib._torchaudio.is_kaldi_available()
 
 
@@ -88,3 +91,11 @@ fail_if_no_sox = (
 )
 
 fail_if_no_ffmpeg = no_op if _FFMPEG_INITIALIZED else _fail_since_no_ffmpeg
+
+fail_if_no_rir = (
+    no_op
+    if _IS_RIR_AVAILABLE
+    else fail_with_message(
+        "requires RIR extension, but TorchAudio is not compiled with it. Please build TorchAudio with RIR support."
+    )
+)

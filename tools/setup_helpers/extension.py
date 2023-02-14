@@ -35,6 +35,7 @@ def _get_build(var, default=False):
 
 _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
 _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KALDI", True)
+_BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
@@ -116,6 +117,7 @@ class CMakeBuild(build_ext):
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
+            f"-DBUILD_RIR:BOOL={'ON' if _BUILD_RIR else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             f"-DBUILD_CTC_DECODER:BOOL={'ON' if _BUILD_CTC_DECODER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",

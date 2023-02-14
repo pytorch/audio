@@ -6,6 +6,7 @@ from ._dsp import (
     oscillator_bank,
     sinc_impulse_response,
 )
+from ._rir import simulate_rir_ism
 from .functional import barkscale_fbanks
 
 
@@ -17,4 +18,5 @@ __all__ = [
     "frequency_impulse_response",
     "oscillator_bank",
     "sinc_impulse_response",
+    "simulate_rir_ism",
 ]
