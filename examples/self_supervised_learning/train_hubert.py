@@ -1,10 +1,6 @@
 import logging
 import pathlib
-from argparse import (
-    ArgumentDefaultsHelpFormatter,
-    ArgumentParser,
-    RawDescriptionHelpFormatter,
-)
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from functools import partial
 from typing import Dict, Tuple
 
