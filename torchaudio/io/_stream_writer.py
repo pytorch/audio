@@ -226,7 +226,9 @@ class StreamWriter:
 
         :py:class:`StreamWriter` is also a context manager and therefore supports the
         ``with`` statement.
-        It is recommended use context manager, as the file is closed automatically
+        This method returns the instance on which the method is called (i.e. `self`),
+        so that it can be used in `with` statement.
+        It is recommended to use context manager, as the file is closed automatically
         when exiting from ``with`` clause.
 
         Args:
