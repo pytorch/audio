@@ -23,6 +23,15 @@ DSP
    sinc_impulse_response
    frequency_impulse_response
 
+Forced Alignment
+~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   forced_align
+
 Room Impulse Response Simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

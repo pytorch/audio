@@ -7,7 +7,7 @@ from ._dsp import (
     sinc_impulse_response,
 )
 from ._rir import simulate_rir_ism
-from .functional import barkscale_fbanks
+from .functional import barkscale_fbanks, forced_align
 
 
 __all__ = [
@@ -15,6 +15,7 @@ __all__ = [
     "barkscale_fbanks",
     "extend_pitch",
     "filter_waveform",
+    "forced_align",
     "frequency_impulse_response",
     "oscillator_bank",
     "sinc_impulse_response",
