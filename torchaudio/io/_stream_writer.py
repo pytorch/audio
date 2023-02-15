@@ -267,7 +267,7 @@ class StreamWriter:
 
         :py:class:`StreamWriter` is also a context manager and therefore supports the
         ``with`` statement.
-        It is recommended use context manager, as the file is closed automatically
+        It is recommended to use context manager, as the file is closed automatically
         when exiting from ``with`` clause.
 
         See :py:meth:`StreamWriter.open` for more detail.
