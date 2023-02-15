@@ -1844,7 +1844,7 @@ class Convolve(torch.nn.Module):
         Args:
             x (torch.Tensor): First convolution operand, with shape `(..., N)`.
             y (torch.Tensor): Second convolution operand, with shape `(..., M)`
-                (leading dimensions must match those of ``x``).
+                (leading dimensions must be broadcast-able with those of ``x``).
 
         Returns:
             torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
@@ -1889,7 +1889,7 @@ class FFTConvolve(torch.nn.Module):
         Args:
             x (torch.Tensor): First convolution operand, with shape `(..., N)`.
             y (torch.Tensor): Second convolution operand, with shape `(..., M)`
-                (leading dimensions must be broadcast-able to those of ``x``).
+                (leading dimensions must be broadcast-able with those of ``x``).
 
         Returns:
             torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
