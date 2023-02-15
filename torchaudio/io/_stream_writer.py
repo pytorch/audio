@@ -221,7 +221,7 @@ class StreamWriter:
         """[debug] Print the registered stream information to stdout."""
         self._s.dump_format(i)
 
-    def open(self, option: Optional[Dict[str, str]] = None):
+    def open(self, option: Optional[Dict[str, str]] = None) -> "StreamWriter":
         """Open the output file / device and write the header.
 
         :py:class:`StreamWriter` is also a context manager and therefore supports the
