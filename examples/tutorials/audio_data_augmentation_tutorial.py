@@ -185,24 +185,22 @@ plot_specgram(rir_raw, sample_rate, title="Room Impulse Response (raw)")
 Audio(rir_raw, rate=sample_rate)
 
 ######################################################################
-# First, we need to clean up the RIR. We extract the main impulse, normalize
-# the signal power, then flip along the time axis.
+# First, we need to clean up the RIR. We extract the main impulse and normalize
+# it by its power.
 #
 
 rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
 rir = rir / torch.norm(rir, p=2)
-RIR = torch.flip(rir, [1])
 
 plot_waveform(rir, sample_rate, title="Room Impulse Response")
 
 ######################################################################
-# Then, we convolve the speech signal with the RIR filter.
+# Then, using :py:func:`torchaudio.functional.fftconvolve`,
+# we convolve the speech signal with the RIR.
 #
 
 speech, _ = torchaudio.load(SAMPLE_SPEECH)
-
-speech_ = torch.nn.functional.pad(speech, (RIR.shape[1] - 1, 0))
-augmented = torch.nn.functional.conv1d(speech_[None, ...], RIR[None, ...])[0]
+augmented = F.fftconvolve(speech, rir)
 
 ######################################################################
 # Original:
@@ -227,29 +225,27 @@ Audio(augmented, rate=sample_rate)
 # Adding background noise
 # -----------------------
 #
-# To add background noise to audio data, you can simply add a noise Tensor to
-# the Tensor representing the audio data. A common method to adjust the
-# intensity of noise is changing the Signal-to-Noise Ratio (SNR).
-# [`wikipedia <https://en.wikipedia.org/wiki/Signal-to-noise_ratio>`__]
+# To introduce background noise to audio data, we can add a noise Tensor to
+# the Tensor representing the audio data according to some desired
+# signal-to-noise ratio (SNR)
+# [`wikipedia <https://en.wikipedia.org/wiki/Signal-to-noise_ratio>`__],
+# which determines the intensity of the audio data relative to that of the noise
+# in the output.
 #
 # $$ \\mathrm{SNR} = \\frac{P_{signal}}{P_{noise}} $$
 #
 # $$ \\mathrm{SNR_{dB}} = 10 \\log _{{10}} \\mathrm {SNR} $$
 #
+# To add noise to audio data per SNRs, we
+# use :py:func:`torchaudio.functional.add_noise`.
 
 speech, _ = torchaudio.load(SAMPLE_SPEECH)
 noise, _ = torchaudio.load(SAMPLE_NOISE)
 noise = noise[:, : speech.shape[1]]
 
-speech_rms = speech.norm(p=2)
-noise_rms = noise.norm(p=2)
+snr_dbs = torch.tensor([20, 10, 3])
+noisy_speeches = F.add_noise(speech, noise, snr_dbs)
 
-snr_dbs = [20, 10, 3]
-noisy_speeches = []
-for snr_db in snr_dbs:
-    snr = 10 ** (snr_db / 20)
-    scale = snr * noise_rms / speech_rms
-    noisy_speeches.append((scale * speech + noise) / 2)
 
 ######################################################################
 # Background noise:
@@ -265,7 +261,7 @@ Audio(noise, rate=sample_rate)
 # ~~~~~~~~~~
 #
 
-snr_db, noisy_speech = snr_dbs[0], noisy_speeches[0]
+snr_db, noisy_speech = snr_dbs[0], noisy_speeches[0:1]
 plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 Audio(noisy_speech, rate=sample_rate)
@@ -275,7 +271,7 @@ Audio(noisy_speech, rate=sample_rate)
 # ~~~~~~~~~~
 #
 
-snr_db, noisy_speech = snr_dbs[1], noisy_speeches[1]
+snr_db, noisy_speech = snr_dbs[1], noisy_speeches[1:2]
 plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 Audio(noisy_speech, rate=sample_rate)
@@ -285,7 +281,7 @@ Audio(noisy_speech, rate=sample_rate)
 # ~~~~~~~~~
 #
 
-snr_db, noisy_speech = snr_dbs[2], noisy_speeches[2]
+snr_db, noisy_speech = snr_dbs[2], noisy_speeches[2:3]
 plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 Audio(noisy_speech, rate=sample_rate)
@@ -365,8 +361,7 @@ original_speech, sample_rate = torchaudio.load(SAMPLE_SPEECH)
 plot_specgram(original_speech, sample_rate, title="Original")
 
 # Apply RIR
-speech_ = torch.nn.functional.pad(original_speech, (RIR.shape[1] - 1, 0))
-rir_applied = torch.nn.functional.conv1d(speech_[None, ...], RIR[None, ...])[0]
+rir_applied = F.fftconvolve(speech, rir)
 
 plot_specgram(rir_applied, sample_rate, title="RIR Applied")
 
@@ -377,9 +372,8 @@ plot_specgram(rir_applied, sample_rate, title="RIR Applied")
 noise, _ = torchaudio.load(SAMPLE_NOISE)
 noise = noise[:, : rir_applied.shape[1]]
 
-snr_db = 8
-scale = (10 ** (snr_db / 20)) * noise.norm(p=2) / rir_applied.norm(p=2)
-bg_added = (scale * rir_applied + noise) / 2
+snr_db = torch.tensor([8])
+bg_added = F.add_noise(rir_applied, noise, snr_db)
 
 plot_specgram(bg_added, sample_rate, title="BG noise added")
 
