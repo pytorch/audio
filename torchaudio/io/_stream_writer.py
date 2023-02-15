@@ -224,6 +224,11 @@ class StreamWriter:
     def open(self, option: Optional[Dict[str, str]] = None):
         """Open the output file / device and write the header.
 
+        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        ``with`` statement.
+        It is recommended use context manager, as the file is closed automatically
+        when exiting from ``with`` clause.
+
         Args:
             option (dict or None, optional): Private options for protocol, device and muxer. See example.
 
@@ -256,7 +261,15 @@ class StreamWriter:
         return self
 
     def close(self):
-        """Close the output"""
+        """Close the output
+
+        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        ``with`` statement.
+        It is recommended use context manager, as the file is closed automatically
+        when exiting from ``with`` clause.
+
+        See :py:meth:`StreamWriter.open` for more detail.
+        """
         if self._is_open:
             self._s.close()
             self._is_open = False
