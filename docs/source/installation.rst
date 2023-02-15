@@ -18,15 +18,48 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
 .. note::
    This software was compiled against an unmodified copy of FFmpeg (licensed under `the LGPLv2.1 <https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1>`_), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded `here <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`_.
 
+Dependencies
+------------
+
+* `PyTorch <https://pytorch.org>`_
+
+  Please refer to the compatibility matrix bellow for supported PyTorch versions.
+
+Optional Dependencies
+~~~~~~~~~~~~~~~~~~~~~
+
+
+* `sentencepiece <https://pypi.org/project/sentencepiece/>`_
+
+  Required for performing automatic speech recognition with :ref:`Emformer RNN-T<RNNT>`.
+
+* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`_
+
+  Required for performing text-to-speech with :ref:`Tacotron2`.
+
+* `kaldi_io <https://pypi.org/project/kaldi-io/>`_
+
+  Required to use :py:mod:`torchaudio.kaldi_io` module.
+
+   
 Compatibility Matrix
 --------------------
+
+The official binary distributions of TorchAudio contain extension modules
+which are written in C++ and linked against specific versions of PyTorch.
+
+TorchAudio and PyTorch from different releases cannot be used together.
+Please refer to the following table for the matching versions.
 
 .. list-table::
    :header-rows: 1
 
-   * - ``torch``
-     - ``torchaudio``
-     - ``python``
+   * - ``PyTorch``
+     - ``TorchAudio``
+     - ``Python``
+   * - ``1.13.1``
+     - ``0.13.1``
+     - ``>=3.7``, ``<=3.10``
    * - ``1.13.0``
      - ``0.13.0``
      - ``>=3.7``, ``<=3.10``

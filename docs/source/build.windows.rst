@@ -59,6 +59,11 @@ The following combination is known to work.
 
 2. Activate dev tools by running the following command.
 
+   We need to use the MSVC x64 toolset for compilation.
+   To enable the toolset, one can use ``vcvarsall.bat`` or ``vcvars64.bat`` file, which
+   are found under Visual Studio's installation folder, under ``VC\Auxiliary\Build\``.
+   More information are available at https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture
+
    .. code-block::
 
       call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
