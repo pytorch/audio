@@ -40,3 +40,26 @@ def freq_ir(magnitudes):
     ir = np.fft.fftshift(np.fft.irfft(magnitudes), axes=-1)
     window = np.hanning(ir.shape[-1])
     return (ir * window).astype(magnitudes.dtype)
+
+
+def exp_sigmoid(
+    input: np.ndarray, exponent: float = 10.0, max_value: float = 2.0, threshold: float = 1e-7
+) -> np.ndarray:
+    """Exponential Sigmoid pointwise nonlinearity (Numpy version).
+    Implements the equation:
+    ``max_value`` * sigmoid(``input``) ** (log(``exponent``)) + ``threshold``
+
+    The output has a range of [``threshold``, ``max_value``].
+    ``exponent`` controls the slope of the output.
+
+    Args:
+        input (np.ndarray): Input array
+        exponent (float, optional): Exponent. Controls the slope of the output
+        max_value (float, optional): Maximum value of the output
+        threshold (float, optional): Minimum value of the output
+
+    Returns:
+        np.ndarray: Exponential Sigmoid output. Shape: same as input
+
+    """
+    return max_value * (1 / (1 + np.exp(-input, dtype=input.dtype))) ** np.log(exponent, dtype=input.dtype) + threshold

@@ -8,7 +8,12 @@ import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
 from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, skipIfNoRIR, TestBaseMixin
 
-from .dsp_utils import freq_ir as freq_ir_np, oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
+from .dsp_utils import (
+    exp_sigmoid as exp_sigmoid_np,
+    freq_ir as freq_ir_np,
+    oscillator_bank as oscillator_bank_np,
+    sinc_ir as sinc_ir_np,
+)
 
 
 def _prod(l):
@@ -380,6 +385,37 @@ class FunctionalTestImpl(TestBaseMixin):
         # The second filter is effective in the second half
         self.assertEqual(mix[-9:], ref2[-9:])
         # the middle portion is where the two filters affect
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            ((-10, 10, 100), (10.0, 2.0, 1e-7)),
+            ((-1, -1, 1), (5.0, 2.4, 1e-7)),  # This is single sample
+            ((0, 3, 10), (1, 1, 1e-12)),
+            # fmt: on
+        ]
+    )
+    def test_exp_sigmoid_input_diff(self, linspace_input_values, exp_sigmoid_parameters):
+        """Test exp_sigmoid function
+
+        linspace_input_values are tuples that specify (start, end, step) for torch.linspace
+        exp_sigmoid_parameters are parameters to exp_sigmoid function: (exponent, max_value, threshold)
+
+        """
+
+        x = torch.linspace(
+            linspace_input_values[0],
+            linspace_input_values[1],
+            linspace_input_values[2],
+            dtype=self.dtype,
+            device=self.device,
+        )
+        exponent, max_value, threshold = exp_sigmoid_parameters
+
+        torch_out = F.exp_sigmoid(x, exponent, max_value, threshold)
+        np_out = exp_sigmoid_np(x.cpu().numpy(), exponent, max_value, threshold)
+
+        self.assertEqual(torch_out, torch.tensor(np_out))
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):
