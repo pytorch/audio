@@ -221,8 +221,15 @@ class StreamWriter:
         """[debug] Print the registered stream information to stdout."""
         self._s.dump_format(i)
 
-    def open(self, option: Optional[Dict[str, str]] = None):
+    def open(self, option: Optional[Dict[str, str]] = None) -> "StreamWriter":
         """Open the output file / device and write the header.
+
+        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        ``with`` statement.
+        This method returns the instance on which the method is called (i.e. `self`),
+        so that it can be used in `with` statement.
+        It is recommended to use context manager, as the file is closed automatically
+        when exiting from ``with`` clause.
 
         Args:
             option (dict or None, optional): Private options for protocol, device and muxer. See example.
@@ -256,7 +263,15 @@ class StreamWriter:
         return self
 
     def close(self):
-        """Close the output"""
+        """Close the output
+
+        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        ``with`` statement.
+        It is recommended to use context manager, as the file is closed automatically
+        when exiting from ``with`` clause.
+
+        See :py:meth:`StreamWriter.open` for more detail.
+        """
         if self._is_open:
             self._s.close()
             self._is_open = False
