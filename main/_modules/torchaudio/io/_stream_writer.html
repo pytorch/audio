@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230213) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
     </div>
     
 
@@ -623,8 +623,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[debug] Print the registered stream information to stdout.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">dump_format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-<div class="viewcode-block" id="StreamWriter.open"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamWriter.open"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;StreamWriter&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Open the output file / device and write the header.</span>
+
+<span class="sd">        :py:class:`StreamWriter` is also a context manager and therefore supports the</span>
+<span class="sd">        ``with`` statement.</span>
+<span class="sd">        This method returns the instance on which the method is called (i.e. `self`),</span>
+<span class="sd">        so that it can be used in `with` statement.</span>
+<span class="sd">        It is recommended to use context manager, as the file is closed automatically</span>
+<span class="sd">        when exiting from ``with`` clause.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            option (dict or None, optional): Private options for protocol, device and muxer. See example.</span>
@@ -658,7 +665,15 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="StreamWriter.close"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the output&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the output</span>
+
+<span class="sd">        :py:class:`StreamWriter` is also a context manager and therefore supports the</span>
+<span class="sd">        ``with`` statement.</span>
+<span class="sd">        It is recommended to use context manager, as the file is closed automatically</span>
+<span class="sd">        when exiting from ``with`` clause.</span>
+
+<span class="sd">        See :py:meth:`StreamWriter.open` for more detail.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span></div>

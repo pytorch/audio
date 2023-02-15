@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230213) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
     </div>
     
 
@@ -459,6 +459,10 @@ We also use Bash for the sake of similar experience to Linux/macOS.</p>
 </div>
 </li>
 <li><p>Activate dev tools by running the following command.</p>
+<p>We need to use the MSVC x64 toolset for compilation.
+To enable the toolset, one can use <code class="docutils literal notranslate"><span class="pre">vcvarsall.bat</span></code> or <code class="docutils literal notranslate"><span class="pre">vcvars64.bat</span></code> file, which
+are found under Visual Studio’s installation folder, under <code class="docutils literal notranslate"><span class="pre">VC\Auxiliary\Build\</span></code>.
+More information are available at <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture">https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">call</span> <span class="s2">&quot;C:\Program Files (x86)\Microsoft Visual Studio</span><span class="se">\201</span><span class="s2">9\Community\VC\Auxiliary\Build</span><span class="se">\v</span><span class="s2">cvarsall.bat&quot;</span> <span class="n">x64</span>
 </pre></div>
 </div>

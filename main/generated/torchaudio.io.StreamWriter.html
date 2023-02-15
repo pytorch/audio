@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230213) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
     </div>
     
 
@@ -589,6 +589,11 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.close">
 <span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the output</p>
+<p><a class="reference internal" href="#torchaudio.io.StreamWriter" title="torchaudio.io.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> is also a context manager and therefore supports the
+<code class="docutils literal notranslate"><span class="pre">with</span></code> statement.
+It is recommended to use context manager, as the file is closed automatically
+when exiting from <code class="docutils literal notranslate"><span class="pre">with</span></code> clause.</p>
+<p>See <a class="reference internal" href="#torchaudio.io.StreamWriter.open" title="torchaudio.io.StreamWriter.open"><code class="xref py py-meth docutils literal notranslate"><span class="pre">StreamWriter.open()</span></code></a> for more detail.</p>
 </dd></dl>
 
 </div>
@@ -609,8 +614,14 @@ Default: <code class="docutils literal notranslate"><span class="pre">None</span
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.open">
-<span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.open"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.open" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.io.StreamWriter" title="torchaudio.io._stream_writer.StreamWriter"><span class="pre">StreamWriter</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.open"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.open" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open the output file / device and write the header.</p>
+<p><a class="reference internal" href="#torchaudio.io.StreamWriter" title="torchaudio.io.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> is also a context manager and therefore supports the
+<code class="docutils literal notranslate"><span class="pre">with</span></code> statement.
+This method returns the instance on which the method is called (i.e. <cite>self</cite>),
+so that it can be used in <cite>with</cite> statement.
+It is recommended to use context manager, as the file is closed automatically
+when exiting from <code class="docutils literal notranslate"><span class="pre">with</span></code> clause.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Private options for protocol, device and muxer. See example.</p>

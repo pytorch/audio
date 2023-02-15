@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230213) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
     </div>
     
 
@@ -417,7 +417,7 @@
 <p>Under the hood, the implementations of <code class="docutils literal notranslate"><span class="pre">Bundle</span></code> use components from other <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> modules, such as <a class="reference internal" href="models.html#module-torchaudio.models" title="torchaudio.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.models</span></code></a> and <a class="reference internal" href="transforms.html#module-torchaudio.transforms" title="torchaudio.transforms"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.transforms</span></code></a>, or even third party libraries like <a class="reference external" href="https://github.com/google/sentencepiece">SentencPiece</a> and <a class="reference external" href="https://github.com/as-ideas/DeepPhonemizer">DeepPhonemizer</a>. But this implementation detail is abstracted away from library users.</p>
 </div>
 <section id="rnn-t-streaming-non-streaming-asr">
-<h2>RNN-T Streaming/Non-Streaming ASR<a class="headerlink" href="#rnn-t-streaming-non-streaming-asr" title="Permalink to this heading">¶</a></h2>
+<span id="rnnt"></span><h2>RNN-T Streaming/Non-Streaming ASR<a class="headerlink" href="#rnn-t-streaming-non-streaming-asr" title="Permalink to this heading">¶</a></h2>
 <section id="interface">
 <h3>Interface<a class="headerlink" href="#interface" title="Permalink to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">RNNTBundle</span></code> defines ASR pipelines and consists of three steps: feature extraction, inference, and de-tokenization.</p>
@@ -596,7 +596,7 @@
 </section>
 </section>
 <section id="tacotron2-text-to-speech">
-<h2>Tacotron2 Text-To-Speech<a class="headerlink" href="#tacotron2-text-to-speech" title="Permalink to this heading">¶</a></h2>
+<span id="tacotron2"></span><h2>Tacotron2 Text-To-Speech<a class="headerlink" href="#tacotron2-text-to-speech" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code> defines text-to-speech pipelines and consists of three steps: tokenization, spectrogram generation and vocoder. The spectrogram generation is based on <a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> model.</p>
 <img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-tacotron2bundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-tacotron2bundle.png" />
 <p><code class="docutils literal notranslate"><span class="pre">TextProcessor</span></code> can be rule-based tokenization in the case of characters, or it can be a neural-netowrk-based G2P model that generates sequence of phonemes from input text.</p>
