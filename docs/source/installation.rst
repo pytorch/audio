@@ -28,6 +28,11 @@ Dependencies
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
+* `FFmpeg <https://ffmpeg.org>`_.
+
+  Required to use :py:mod:`torchaudio.io` module.
+  TorchAudio official binary distributions are compatible with FFmpeg 4.1 to 4.4.
+  If you need to use FFmpeg 5, please build TorchAudio from source.
 
 * `sentencepiece <https://pypi.org/project/sentencepiece/>`_
 
