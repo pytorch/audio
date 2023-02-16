@@ -785,12 +785,16 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         self._assert_consistency(F.add_noise, (waveform, noise, snr, lengths))
 
-    def test_speed(self):
+    @common_utils.nested_params([True, False])
+    def test_speed(self, use_lengths):
         leading_dims = (3, 2)
         T = 200
         waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
-        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
-        self._assert_consistency(F.speed, (waveform, lengths, 1000, 1.1))
+        if use_lengths:
+            lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        else:
+            lengths = None
+        self._assert_consistency(F.speed, (waveform, 1000, 1.1, lengths))
 
     def test_preemphasis(self):
         waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
