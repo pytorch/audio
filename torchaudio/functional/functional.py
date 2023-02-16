@@ -2295,19 +2295,16 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
     return specgram_enhanced
 
 
-def _check_shape_compatible(x: torch.Tensor, y: torch.Tensor, allow_broadcast: bool) -> None:
+def _check_shape_compatible(x: torch.Tensor, y: torch.Tensor) -> None:
     if x.ndim != y.ndim:
         raise ValueError(f"The operands must be the same dimension (got {x.ndim} and {y.ndim}).")
-    if not allow_broadcast:
-        if x.shape[:-1] != y.shape[:-1]:
-            raise ValueError(f"Leading dimensions of x and y don't match (got {x.shape} and {y.shape}).")
-    else:
-        for i in range(x.ndim - 1):
-            xi = x.size(i)
-            yi = y.size(i)
-            if xi == yi or xi == 1 or yi == 1:
-                continue
-            raise ValueError(f"Leading dimensions of x and y are not broadcastable (got {x.shape} and {y.shape}).")
+
+    for i in range(x.ndim - 1):
+        xi = x.size(i)
+        yi = y.size(i)
+        if xi == yi or xi == 1 or yi == 1:
+            continue
+        raise ValueError(f"Leading dimensions of x and y are not broadcastable (got {x.shape} and {y.shape}).")
 
 
 def _check_convolve_mode(mode: str) -> None:
@@ -2346,7 +2343,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
     Args:
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
-            (leading dimensions must be broadcast-able to those of ``x``).
+            (leading dimensions must be broadcast-able with those of ``x``).
         mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
@@ -2361,7 +2358,7 @@ def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.T
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_shape_compatible(x, y, allow_broadcast=True)
+    _check_shape_compatible(x, y)
     _check_convolve_mode(mode)
 
     n = x.size(-1) + y.size(-1) - 1
@@ -2383,7 +2380,7 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
     Args:
         x (torch.Tensor): First convolution operand, with shape `(..., N)`.
         y (torch.Tensor): Second convolution operand, with shape `(..., M)`
-            (leading dimensions must match those of ``x``).
+            (leading dimensions must be broadcast-able with those of ``x``).
         mode (str, optional): Must be one of ("full", "valid", "same").
 
             * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
@@ -2398,13 +2395,18 @@ def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tens
     .. _convolution:
         https://en.wikipedia.org/wiki/Convolution
     """
-    _check_shape_compatible(x, y, allow_broadcast=False)
+    _check_shape_compatible(x, y)
     _check_convolve_mode(mode)
 
     x_size, y_size = x.size(-1), y.size(-1)
 
     if x.size(-1) < y.size(-1):
         x, y = y, x
+
+    if x.shape[:-1] != y.shape[:-1]:
+        new_shape = [max(i, j) for i, j in zip(x.shape[:-1], y.shape[:-1])]
+        x = x.broadcast_to(new_shape + [x.shape[-1]])
+        y = y.broadcast_to(new_shape + [y.shape[-1]])
 
     num_signals = torch.tensor(x.shape[:-1]).prod()
     reshaped_x = x.reshape((int(num_signals), x.size(-1)))
