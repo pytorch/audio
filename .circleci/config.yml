@@ -544,7 +544,11 @@ jobs:
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
-            conda install 'ffmpeg<5'
+            if [[ "${PYTHON_VERSION}" == "3.11" ]]; then
+              conda install ffmpeg
+            else
+              conda install 'ffmpeg<5'
+            fi
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_conda_gpu:
@@ -590,7 +594,6 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Install sound backend
             pip install PySoundFile
-            # conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_pip:
