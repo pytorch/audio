@@ -32,6 +32,7 @@ class BucketizeBatchSampler(BatchSampler):
             (Default: ``None``)
         shuffle (bool, optional): Whether to shuffle buckets for non-monotonic length sampling.
             (Default: True)
+        seed (int, optional): The seed for initialzing RNG. Only used when `shuffle` is True. (Default: 0)
         drop_last (bool, optional): If ``True``, the sampler will drop the last batch if
             its size would be less than ``batch_size``
             (Default: False)
@@ -45,7 +46,7 @@ class BucketizeBatchSampler(BatchSampler):
 
     Note:
         if ``shuffle`` is True, it will only shuffle the data once. Please set ``reload_dataloaders_every_n_epochs=1``
-        in pytorch_lightning Trainer to enable shuffling every epoch.
+        in pytorch_lightning Trainer and set ``seed`` to ``self.trainer.current_epoch`` to enable shuffling every epoch.
     """
 
     def __init__(
@@ -57,6 +58,7 @@ class BucketizeBatchSampler(BatchSampler):
         max_token_count: Optional[int] = None,
         batch_size: Optional[int] = None,
         shuffle: bool = True,
+        seed: int = 0,
         drop_last: bool = False,
     ) -> None:
         if max_len is None:
@@ -82,9 +84,10 @@ class BucketizeBatchSampler(BatchSampler):
         self.max_token_count = max_token_count
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.seed = seed
         if self.shuffle:
             self.g = torch.Generator()
-            self.g.manual_seed(1337)
+            self.g.manual_seed(self.seed)
         self.drop_last = drop_last
         self.buckets = self._get_buckets(self.lengths, num_buckets, min_len, max_len)
         self._update_iter_list()
