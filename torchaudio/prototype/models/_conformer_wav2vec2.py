@@ -51,7 +51,8 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     cross_high = T * B
     high = T
 
-    assert high > 1
+    if not high > 1:
+        raise AssertionError(f"input.shape[1] should be greater than 1 to perform negative sampling, but got {high}")
 
     if num_negatives > 0:
         tszs = _buffered_arange(T).unsqueeze(-1).expand(-1, num_negatives).flatten()
@@ -77,6 +78,15 @@ def _sample_negatives(input: Tensor, num_negatives: int, cross_sample_negatives:
     negs = negs.view(B, T, num_negatives + cross_sample_negatives, D).permute(2, 0, 1, 3)  # NxBxCxT
 
     return negs, neg_idxs
+
+
+def _mask_input(input: Tensor, mask: Tensor):
+    B, _, D = input.shape
+    mask_len = torch.max(mask.sum(dim=1))
+    masked_input = torch.zeros((B, mask_len, D), dtype=input.dtype, device=input.device)
+    for b in range(B):
+        masked_input[b] = input[b][mask[b]]
+    return masked_input
 
 
 class NegativeSampler(Module):
@@ -257,7 +267,8 @@ class ConformerWav2Vec2PretrainModel(Module):
 
     Note:
         To build the model, please use one of the factory functions,
-        :py:func:`conformer_wav2vec2_base` or :py:func:`conformer_wav2vec2_large`
+        :py:func:`conformer_wav2vec2_pretrain_model`, :py:func:`conformer_wav2vec2_pretrain_base`
+        or :py:func:`conformer_wav2vec2_pretrain_large`
 
     Args:
         wav2vec2 (nn.Module):
@@ -320,7 +331,8 @@ class ConformerWav2Vec2PretrainModel(Module):
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
         x, mask_idxs = self.mask_generator(x, padding_mask)
 
-        targets, negs, neg_idxs = self.negative_sampler(x)
+        masked_x = _mask_input(x, mask_idxs)
+        targets, negs, neg_idxs = self.negative_sampler(masked_x)
 
         x = self.wav2vec2.encoder.feature_projection.projection(x)
         x = x.transpose(0, 1)
@@ -503,7 +515,7 @@ def conformer_wav2vec2_base(
 ) -> Wav2Vec2Model:
     """
     Build Conformer Wav2Vec2 Model with "small" architecture from
-    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
+    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
 
     Args:
         extractor_input_dim (int, optional): Input dimension of feature extractor. (Default: 64)
@@ -738,7 +750,7 @@ def conformer_wav2vec2_pretrain_large(
     cross_sample_negatives: int = 0,
 ) -> ConformerWav2Vec2PretrainModel:
     """Build Conformer Wav2Vec2 Model for pre-training with "large" architecture from
-    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
+    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`
 
     Args:
         extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)
