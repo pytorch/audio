@@ -545,7 +545,7 @@ jobs:
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
             if [[ "${PYTHON_VERSION}" == "3.11" ]]; then
-              conda install ffmpeg
+              conda install -c conda-forge ffmpeg=4.4.2
             else
               conda install 'ffmpeg<5'
             fi
