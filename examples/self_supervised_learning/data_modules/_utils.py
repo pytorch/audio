@@ -78,6 +78,9 @@ class BucketizeBatchSampler(BatchSampler):
         self.max_token_count = max_token_count
         self.batch_size = batch_size
         self.shuffle = shuffle
+        if self.shuffle:
+            self.g = torch.Generator()
+            self.g.manual_seed(1337)
         self.drop_last = drop_last
         self.buckets = self._get_buckets(self.lengths, num_buckets, min_len, max_len)
         self._update_iter_list()
@@ -111,7 +114,7 @@ class BucketizeBatchSampler(BatchSampler):
     def _update_iter_list(self) -> None:
         if self.shuffle:
             for k in self.buckets:
-                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0))]
+                self.buckets[k] = self.buckets[k][torch.randperm(self.buckets[k].size(0), generator=self.g)]
         self.iter_list = []
         total_len = 0
         batch = []
@@ -189,7 +192,18 @@ class DistributedBatchSampler(DistributedSampler):
         self.epoch = 0
         self.seed = seed
         self.drop_last = drop_last
-        if shuffle:
+        self.shuffle = shuffle
+        indices = self.batch_sampler.iter_list
+        if self.drop_last and len(indices) % self.num_replicas != 0:
+            # Split to nearest available length that is evenly divisible.
+            # This is to ensure each rank receives the same amount of data when
+            # using this Sampler.
+            self.num_samples = math.ceil((len(indices) - self.num_replicas) / self.num_replicas)
+        else:
+            self.num_samples = math.ceil(len(indices) / self.num_replicas)
+
+    def __iter__(self):
+        if self.shuffle:
             g = torch.Generator()
             g.manual_seed(self.seed + self.epoch)
             perm = torch.randperm(len(self.batch_sampler.iter_list), generator=g).tolist()
@@ -206,7 +220,6 @@ class DistributedBatchSampler(DistributedSampler):
         self.subset = indices[self.rank : self.total_size : self.num_replicas]
         assert len(self.subset) == self.num_samples
 
-    def __iter__(self):
         return iter(self.subset)
 
     def __len__(self):
