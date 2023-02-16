@@ -20,8 +20,8 @@ class AudioMetaData:
             * ``ALAW``: A-law
             * ``MP3`` : MP3, MPEG-1 Audio Layer III
             * ``VORBIS``: OGG Vorbis
-            * ``AMR_WB``: Adaptive Multi-Rate
-            * ``AMR_NB``: Adaptive Multi-Rate Wideband
+            * ``AMR_WB``: Adaptive Multi-Rate Wideband
+            * ``AMR_NB``: Adaptive Multi-Rate Narrowband
             * ``OPUS``: Opus
             * ``HTK``: Single channel 16-bit PCM
             * ``UNKNOWN`` : None of above
