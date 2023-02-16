@@ -8,7 +8,9 @@ import torch
 import torchaudio.backend.soundfile_backend as soundfile_backend
 from torchaudio._extension import _FFMPEG_INITIALIZED, _SOX_INITIALIZED
 from torchaudio.backend.common import AudioMetaData
-from torchaudio.io._compat import info_audio, info_audio_fileobj, load_audio, load_audio_fileobj, save_audio
+
+if _FFMPEG_INITIALIZED:
+    from torchaudio.io._compat import info_audio, info_audio_fileobj, load_audio, load_audio_fileobj, save_audio
 
 
 class Backend(ABC):
