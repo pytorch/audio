@@ -305,6 +305,9 @@ class CTCDecoder:
         if emissions.is_cuda:
             raise RuntimeError("emissions must be a CPU tensor.")
 
+        if not emissions.is_contiguous():
+            raise RuntimeError("emissions must be contiguous.")
+
         if lengths is not None and lengths.is_cuda:
             raise RuntimeError("lengths must be a CPU tensor.")
 
