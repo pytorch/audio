@@ -140,7 +140,7 @@ def run_train(args):
         dataset_path=args.dataset_path,
         dataset="librispeech",
         feature_type="mfcc",
-        seconds_per_batch=200,
+        seconds_per_batch=args.seconds_per_batch,
         train_shuffle=True,
         num_workers=10,
     )

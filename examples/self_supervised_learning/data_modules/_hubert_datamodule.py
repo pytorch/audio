@@ -34,6 +34,7 @@ class HuBERTDataModule(LightningDataModule):
             min_len=32000,
             max_len=250000,
             shuffle=True,
+            seed=self.trainer.current_epoch,
         )
         sampler = DistributedBatchSampler(sampler, shuffle=self.train_shuffle)
         sampler.set_epoch(self.trainer.current_epoch)
