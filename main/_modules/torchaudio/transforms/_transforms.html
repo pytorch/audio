@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
     </div>
     
 
@@ -2246,7 +2246,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">            y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
-<span class="sd">                (leading dimensions must match those of ``x``).</span>
+<span class="sd">                (leading dimensions must be broadcast-able with those of ``x``).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where</span>
@@ -2291,7 +2291,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            x (torch.Tensor): First convolution operand, with shape `(..., N)`.</span>
 <span class="sd">            y (torch.Tensor): Second convolution operand, with shape `(..., M)`</span>
-<span class="sd">                (leading dimensions must be broadcast-able to those of ``x``).</span>
+<span class="sd">                (leading dimensions must be broadcast-able with those of ``x``).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where</span>

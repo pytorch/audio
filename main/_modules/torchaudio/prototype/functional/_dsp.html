@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
     </div>
     
 
@@ -806,6 +806,35 @@
     <span class="n">end</span> <span class="o">=</span> <span class="n">num_crops</span> <span class="o">-</span> <span class="n">start</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">restored</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="o">-</span><span class="n">end</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">result</span></div>
+
+
+<span class="k">def</span> <span class="nf">exp_sigmoid</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exponential Sigmoid pointwise nonlinearity.</span>
+<span class="sd">    Implements the equation:</span>
+<span class="sd">    ``max_value`` * sigmoid(``input``) ** (log(``exponent``)) + ``threshold``</span>
+
+<span class="sd">    The output has a range of [``threshold``, ``max_value``].</span>
+<span class="sd">    ``exponent`` controls the slope of the output.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input (Tensor): Input Tensor</span>
+<span class="sd">        exponent (float, optional): Exponent. Controls the slope of the output</span>
+<span class="sd">        max_value (float, optional): Maximum value of the output</span>
+<span class="sd">        threshold (float, optional): Minimum value of the output</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Exponential Sigmoid output. Shape: same as input</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">max_value</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="nb">input</span><span class="p">),</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">exponent</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">)),</span>
+    <span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 </pre></div>
 
              </article>

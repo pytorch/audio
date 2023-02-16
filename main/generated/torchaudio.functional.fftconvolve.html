@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
     </div>
     
 
@@ -423,7 +423,7 @@ Also note that this function can only output float tensors (int tensor inputs wi
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – First convolution operand, with shape <cite>(…, N)</cite>.</p></li>
 <li><p><strong>y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Second convolution operand, with shape <cite>(…, M)</cite>
-(leading dimensions must be broadcast-able to those of <code class="docutils literal notranslate"><span class="pre">x</span></code>).</p></li>
+(leading dimensions must be broadcast-able with those of <code class="docutils literal notranslate"><span class="pre">x</span></code>).</p></li>
 <li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Must be one of (“full”, “valid”, “same”).</p>
 <ul>
 <li><p>”full”: Returns the full convolution result, with shape <cite>(…, N + M - 1)</cite>. (Default)</p></li>
@@ -441,6 +441,12 @@ the leading dimensions match those of <code class="docutils literal notranslate"
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a></p>
 </dd>
+</dl>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">fftconvolve</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Audio Data Augmentation" src="../_images/sphx_glr_audio_data_augmentation_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/audio_data_augmentation_tutorial.html#sphx-glr-tutorials-audio-data-augmentation-tutorial-py"><span class="std std-ref">Audio Data Augmentation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio Data Augmentation</div>
+</div></div></dd>
 </dl>
 </dd></dl>
 

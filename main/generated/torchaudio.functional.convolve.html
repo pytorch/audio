@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230215) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
     </div>
     
 
@@ -421,7 +421,7 @@ operator, this function applies the true <a class="reference external" href="htt
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – First convolution operand, with shape <cite>(…, N)</cite>.</p></li>
 <li><p><strong>y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Second convolution operand, with shape <cite>(…, M)</cite>
-(leading dimensions must match those of <code class="docutils literal notranslate"><span class="pre">x</span></code>).</p></li>
+(leading dimensions must be broadcast-able with those of <code class="docutils literal notranslate"><span class="pre">x</span></code>).</p></li>
 <li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Must be one of (“full”, “valid”, “same”).</p>
 <ul>
 <li><p>”full”: Returns the full convolution result, with shape <cite>(…, N + M - 1)</cite>. (Default)</p></li>
