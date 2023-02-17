@@ -249,4 +249,4 @@ def forced_align(
             scores.append(emission[t, lbl_idx].exp().item())
         ltr_idx -= backptr[(t * S) + ltr_idx]
 
-    return paths, torch.tenosr(token_indices), torch.tensor(time_indices), torch.tensor(scores)
+    return paths, torch.tensor(token_indices), torch.tensor(time_indices), torch.tensor(scores)
