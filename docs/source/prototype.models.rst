@@ -91,3 +91,21 @@ hifigan_vocoder_v3
 ~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: hifigan_vocoder_v3
+
+
+SQUIM_OBJECTIVE
+~~~~~~~~~~~~~~~
+
+.. autoclass:: SQUIM_OBJECTIVE
+
+  .. automethod:: forward
+
+squim_objective_model
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: squim_objective_model
+
+squim_objective_base
+~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: squim_objective_base

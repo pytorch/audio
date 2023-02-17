@@ -25,7 +25,7 @@ def transform_wb_pesq_range(x: float) -> float:
 PESQRange: Tuple[float, float] = (
     1.0,  # P.862.2 uses a different input filter than P.862, and the lower bound of
     # the raw score is not -0.5 anymore. It's hard to figure out the true lower bound.
-    # We are using 1.0 as a reasonable approximation
+    # We are using 1.0 as a reasonable approximation.
     transform_wb_pesq_range(4.5),
 )
 
@@ -56,6 +56,14 @@ class Encoder(nn.Module):
         self.conv1d = nn.Conv1d(1, feat_dim, win_len, stride=win_len // 2, bias=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Apply waveforms to convolutional layer and ReLU layer.
+
+        Args:
+            x (torch.Tensor): Input waveforms. Tensor with dimensions `(batch, time)`.
+
+        Returns:
+            (torch,Tensor): Feature Tensor with dimensions `(batch, channel, frame)`.
+        """
         out = x.unsqueeze(dim=1)
         out = F.relu(self.conv1d(out))
         return out
@@ -98,6 +106,7 @@ class DPRNN(nn.Module):
         chunk_size: int = 100,
         chunk_stride: int = 50,
     ) -> None:
+        """Dual-path RNN network proposed in :cite:`luo2020dual`."""
         super(DPRNN, self).__init__()
 
         self.num_blocks = num_blocks
@@ -185,6 +194,16 @@ class AutoPool(nn.Module):
 
 
 class SQUIM_OBJECTIVE(nn.Module):
+    """SQUIM_OBJECTIVE model that predicts objective metric scorres for speech enhancement (e.g., STOI, PESQ, and SI-SDR).
+    The model uses *dual-path recurrent neural networks (DPRNN)* :cite:`luo2020dual` to model sequential signals,
+    and multiple transformer branches to estimate the objective metric scores, respectively.
+
+    Args:
+        encoder (torch.nn.Module): Encoder module to transform 1D waveform to 2D feature representation.
+        dprnn (torch.nn.Module): DPRNN module to model sequential feature.
+        branches (torch.nn.ModuleList): Transformer branches in which each branch estimate one objective metirc score.
+    """
+
     def __init__(
         self,
         encoder: nn.Module,
@@ -197,6 +216,15 @@ class SQUIM_OBJECTIVE(nn.Module):
         self.branches = branches
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        """
+        Args:
+            x (torch.Tensor): Input waveforms. Tensor with dimensions `(batch, time)`.
+
+        Returns:
+            List(torch.Tensor): List of score Tenosrs. Each Tensor is with dimension `(batch,)`.
+        """
+        if x.ndim != 2:
+            raise ValueError(f"The input must be a 2D Tensor. Found dimension {x.ndim}.")
         x = x / (torch.mean(x**2, dim=1, keepdim=True) ** 0.5 * 20)
         out = self.encoder(x)
         out = self.dprnn(out)
@@ -249,7 +277,7 @@ def squim_objective_model(
     chunk_size: int,
     chunk_stride: Optional[int] = None,
 ) -> SQUIM_OBJECTIVE:
-    """Build a custome SQUIM_OBJECTIVE model.
+    """Build a custome :class:`torchaudio.prototype.models.SQUIM_OBJECTIVE` model.
 
     Args:
         feat_dim (int, optional): The feature dimension after Encoder module.
@@ -277,6 +305,7 @@ def squim_objective_model(
 
 
 def squim_objective_base() -> SQUIM_OBJECTIVE:
+    """Build :class:`torchaudio.prototype.models.SQUIM_OBJECTIVE` model with default arguments."""
     return squim_objective_model(
         feat_dim=256,
         win_len=64,
