@@ -459,12 +459,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
         batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
 
-        output, output_lengths = F.speed(batched_input, input_lengths, orig_freq=orig_freq, factor=factor)
+        output, output_lengths = F.speed(batched_input, orig_freq=orig_freq, factor=factor, lengths=input_lengths)
 
         unbatched_output = []
         unbatched_output_lengths = []
         for idx in range(len(unbatched_input)):
-            w, l = F.speed(unbatched_input[idx], input_lengths[idx], orig_freq=orig_freq, factor=factor)
+            w, l = F.speed(unbatched_input[idx], orig_freq=orig_freq, factor=factor, lengths=input_lengths[idx])
             unbatched_output.append(w)
             unbatched_output_lengths.append(l)
 

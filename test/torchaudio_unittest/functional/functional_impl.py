@@ -1042,14 +1042,12 @@ class Functional(TestBaseMixin):
         T = 1000
         waveform = torch.rand(*leading_dims, T)
         lengths = torch.randint(1, 1000, leading_dims)
-        actual_waveform, actual_lengths = F.speed(waveform, lengths, orig_freq=1000, factor=1.0)
+        actual_waveform, actual_lengths = F.speed(waveform, orig_freq=1000, factor=1.0, lengths=lengths)
         self.assertEqual(waveform, actual_waveform)
         self.assertEqual(lengths, actual_lengths)
 
-    @nested_params(
-        [0.8, 1.1, 1.2],
-    )
-    def test_speed_accuracy(self, factor):
+    @nested_params([0.8, 1.1, 1.2], [True, False])
+    def test_speed_accuracy(self, factor, use_lengths):
         """sinusoidal waveform is properly compressed by factor"""
         n_to_trim = 20
 
@@ -1057,10 +1055,18 @@ class Functional(TestBaseMixin):
         freq = 2
         times = torch.arange(0, 5, 1.0 / sample_rate)
         waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
-        lengths = torch.tensor([waveform.size(1)])
 
-        output, output_lengths = F.speed(waveform, lengths, orig_freq=sample_rate, factor=factor)
-        self.assertEqual(output.size(1), output_lengths[0])
+        if use_lengths:
+            lengths = torch.tensor([waveform.size(1)])
+        else:
+            lengths = None
+
+        output, output_lengths = F.speed(waveform, orig_freq=sample_rate, factor=factor, lengths=lengths)
+
+        if use_lengths:
+            self.assertEqual(output.size(1), output_lengths[0])
+        else:
+            self.assertEqual(None, output_lengths)
 
         new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
         expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)

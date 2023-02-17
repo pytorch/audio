@@ -8,12 +8,15 @@ from torchaudio._internal import module_utils as _mod_utils
 from .common import AudioMetaData
 
 
+_IS_SOUNDFILE_AVAILABLE = False
+
 # TODO: import soundfile only when it is used.
 if _mod_utils.is_module_available("soundfile"):
     try:
         import soundfile
 
         _requires_soundfile = _mod_utils.no_op
+        _IS_SOUNDFILE_AVAILABLE = True
     except Exception:
         _requires_soundfile = _mod_utils.fail_with_message(
             "requires soundfile, but we failed to import it. Please check the installation of soundfile."

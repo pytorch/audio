@@ -224,10 +224,8 @@ class TransformsTestBase(TestBaseMixin):
         self.assertEqual(waveform, actual_waveform)
         self.assertEqual(lengths, actual_lengths)
 
-    @nested_params(
-        [0.8, 1.1, 1.2],
-    )
-    def test_speed_accuracy(self, factor):
+    @nested_params([0.8, 1.1, 1.2], [True, False])
+    def test_speed_accuracy(self, factor, use_lengths):
         """sinusoidal waveform is properly compressed by factor"""
         n_to_trim = 20
 
@@ -235,11 +233,19 @@ class TransformsTestBase(TestBaseMixin):
         freq = 2
         times = torch.arange(0, 5, 1.0 / sample_rate)
         waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
-        lengths = torch.tensor([waveform.size(1)])
+
+        if use_lengths:
+            lengths = torch.tensor([waveform.size(1)])
+        else:
+            lengths = None
 
         speed = T.Speed(sample_rate, factor).to(self.device, self.dtype)
         output, output_lengths = speed(waveform, lengths)
-        self.assertEqual(output.size(1), output_lengths[0])
+
+        if use_lengths:
+            self.assertEqual(output.size(1), output_lengths[0])
+        else:
+            self.assertEqual(None, output_lengths)
 
         new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
         expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)

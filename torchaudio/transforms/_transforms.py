@@ -1927,23 +1927,28 @@ class Speed(torch.nn.Module):
         self.source_sample_rate, self.target_sample_rate = _source_target_sample_rate(orig_freq, factor)
         self.resampler = Resample(orig_freq=self.source_sample_rate, new_freq=self.target_sample_rate)
 
-    def forward(self, waveform, lengths) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, waveform, lengths: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         r"""
         Args:
             waveform (torch.Tensor): Input signals, with shape `(..., time)`.
-            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+                If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
 
         Returns:
-            (torch.Tensor, torch.Tensor):
+            (torch.Tensor, torch.Tensor or None):
                 torch.Tensor
                     Speed-adjusted waveform, with shape `(..., new_time).`
-                torch.Tensor
-                    Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+                torch.Tensor or None
+                    If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                    with shape `(...)`; otherwise, ``None``.
         """
-        return (
-            self.resampler(waveform),
-            torch.ceil(lengths * self.target_sample_rate / self.source_sample_rate).to(lengths.dtype),
-        )
+
+        if lengths is None:
+            out_lengths = None
+        else:
+            out_lengths = torch.ceil(lengths * self.target_sample_rate / self.source_sample_rate).to(lengths.dtype)
+
+        return self.resampler(waveform), out_lengths
 
 
 class SpeedPerturbation(torch.nn.Module):
@@ -1973,18 +1978,22 @@ class SpeedPerturbation(torch.nn.Module):
 
         self.speeders = torch.nn.ModuleList([Speed(orig_freq=orig_freq, factor=factor) for factor in factors])
 
-    def forward(self, waveform: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(
+        self, waveform: torch.Tensor, lengths: Optional[torch.Tensor] = None
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         r"""
         Args:
             waveform (torch.Tensor): Input signals, with shape `(..., time)`.
-            lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+                If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
 
         Returns:
-            (torch.Tensor, torch.Tensor):
+            (torch.Tensor, torch.Tensor or None):
                 torch.Tensor
                     Speed-adjusted waveform, with shape `(..., new_time).`
-                torch.Tensor
-                    Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+                torch.Tensor or None
+                    If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                    with shape `(...)`; otherwise, ``None``.
         """
 
         idx = int(torch.randint(len(self.speeders), ()))
