@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230217) &#x25BC</a>
     </div>
     
 
@@ -410,12 +410,15 @@
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
 
+<span class="n">_IS_SOUNDFILE_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+
 <span class="c1"># TODO: import soundfile only when it is used.</span>
 <span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">soundfile</span>
 
         <span class="n">_requires_soundfile</span> <span class="o">=</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">no_op</span>
+        <span class="n">_IS_SOUNDFILE_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="n">_requires_soundfile</span> <span class="o">=</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">fail_with_message</span><span class="p">(</span>
             <span class="s2">&quot;requires soundfile, but we failed to import it. Please check the installation of soundfile.&quot;</span>

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230217) &#x25BC</a>
     </div>
     
 
@@ -403,6 +403,8 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
@@ -411,13 +413,13 @@
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># We prioritize the version from upstream flashlight here.</span>
-    <span class="c1"># This will allow applications that use the upstream flashlight</span>
-    <span class="c1"># alongside torchaudio.</span>
+
+<span class="c1"># We prioritize the version from upstream flashlight here.</span>
+<span class="c1"># This will allow applications that use the upstream flashlight</span>
+<span class="c1"># alongside torchaudio.</span>
+<span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_internal</span><span class="o">.</span><span class="n">module_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;flashlight&quot;</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">flashlight.lib.text.decoder</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">CriterionType</span> <span class="k">as</span> <span class="n">_CriterionType</span><span class="p">,</span>
-        <span class="n">KenLM</span> <span class="k">as</span> <span class="n">_KenLM</span><span class="p">,</span>
         <span class="n">LexiconDecoder</span> <span class="k">as</span> <span class="n">_LexiconDecoder</span><span class="p">,</span>
         <span class="n">LexiconDecoderOptions</span> <span class="k">as</span> <span class="n">_LexiconDecoderOptions</span><span class="p">,</span>
         <span class="n">LexiconFreeDecoder</span> <span class="k">as</span> <span class="n">_LexiconFreeDecoder</span><span class="p">,</span>
@@ -433,7 +435,16 @@
         <span class="n">Dictionary</span> <span class="k">as</span> <span class="n">_Dictionary</span><span class="p">,</span>
         <span class="n">load_words</span> <span class="k">as</span> <span class="n">_load_words</span><span class="p">,</span>
     <span class="p">)</span>
-<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">flashlight.lib.text.decoder</span> <span class="kn">import</span> <span class="n">KenLM</span> <span class="k">as</span> <span class="n">_KenLM</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">_KenLM</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;The built-in flashlight integration is deprecated, and will be removed in future release.&quot;</span>
+        <span class="s2">&quot;Please install flashlight-text. https://pypi.org/project/flashlight-text/&quot;</span>
+    <span class="p">)</span>
     <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_load_lib</span><span class="p">(</span><span class="s2">&quot;libflashlight-text&quot;</span><span class="p">)</span>
     <span class="kn">from</span> <span class="nn">torchaudio.lib.flashlight_lib_text_decoder</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">CriterionType</span> <span class="k">as</span> <span class="n">_CriterionType</span><span class="p">,</span>
@@ -696,6 +707,9 @@
         <span class="k">if</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_cuda</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;emissions must be a CPU tensor.&quot;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;emissions must be contiguous.&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lengths</span><span class="o">.</span><span class="n">is_cuda</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;lengths must be a CPU tensor.&quot;</span><span class="p">)</span>
 
@@ -829,6 +843,8 @@
     <span class="n">word_dict</span> <span class="o">=</span> <span class="n">_get_word_dict</span><span class="p">(</span><span class="n">lexicon</span><span class="p">,</span> <span class="n">lm</span><span class="p">,</span> <span class="n">lm_dict</span><span class="p">,</span> <span class="n">tokens_dict</span><span class="p">,</span> <span class="n">unk_word</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">lm</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_KenLM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;flashlight is installed, but KenLM is not installed. Please install KenLM.&quot;</span><span class="p">)</span>
         <span class="n">lm</span> <span class="o">=</span> <span class="n">_KenLM</span><span class="p">(</span><span class="n">lm</span><span class="p">,</span> <span class="n">word_dict</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">lm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">lm</span> <span class="o">=</span> <span class="n">_ZeroLM</span><span class="p">()</span>

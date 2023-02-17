@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230217) &#x25BC</a>
     </div>
     
 
@@ -2894,8 +2894,8 @@
 
 
 <div class="viewcode-block" id="speed"><a class="viewcode-back" href="../../../generated/torchaudio.functional.speed.html#torchaudio.functional.speed">[docs]</a><span class="k">def</span> <span class="nf">speed</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adjusts waveform speed.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -2904,17 +2904,19 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (torch.Tensor): Input signals, with shape `(..., time)`.</span>
-<span class="sd">        lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
 <span class="sd">        orig_freq (int): Original frequency of the signals in ``waveform``.</span>
 <span class="sd">        factor (float): Factor by which to adjust speed of input. Values greater than 1.0</span>
 <span class="sd">            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.</span>
+<span class="sd">        lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.</span>
+<span class="sd">            If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (torch.Tensor, torch.Tensor):</span>
+<span class="sd">        (torch.Tensor, torch.Tensor or None):</span>
 <span class="sd">            torch.Tensor</span>
 <span class="sd">                Speed-adjusted waveform, with shape `(..., new_time).`</span>
-<span class="sd">            torch.Tensor</span>
-<span class="sd">                Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.</span>
+<span class="sd">            torch.Tensor or None</span>
+<span class="sd">                If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,</span>
+<span class="sd">                with shape `(...)`; otherwise, ``None``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">source_sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="n">orig_freq</span><span class="p">)</span>
@@ -2924,9 +2926,12 @@
     <span class="n">source_sample_rate</span> <span class="o">=</span> <span class="n">source_sample_rate</span> <span class="o">//</span> <span class="n">gcd</span>
     <span class="n">target_sample_rate</span> <span class="o">=</span> <span class="n">target_sample_rate</span> <span class="o">//</span> <span class="n">gcd</span>
 
-    <span class="k">return</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">target_sample_rate</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-        <span class="n">lengths</span> <span class="o">*</span> <span class="n">target_sample_rate</span> <span class="o">/</span> <span class="n">source_sample_rate</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_lengths</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out_lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lengths</span> <span class="o">*</span> <span class="n">target_sample_rate</span> <span class="o">/</span> <span class="n">source_sample_rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">lengths</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">source_sample_rate</span><span class="p">,</span> <span class="n">target_sample_rate</span><span class="p">),</span> <span class="n">out_lengths</span></div>
 
 
 <div class="viewcode-block" id="preemphasis"><a class="viewcode-back" href="../../../generated/torchaudio.functional.preemphasis.html#torchaudio.functional.preemphasis">[docs]</a><span class="k">def</span> <span class="nf">preemphasis</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>

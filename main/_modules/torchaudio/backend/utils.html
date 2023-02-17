@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230216) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230217) &#x25BC</a>
     </div>
     
 
@@ -401,6 +401,7 @@
               
   <h1>Source code for torchaudio.backend.utils</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Defines utilities for switching audio backends&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -416,12 +417,19 @@
 <span class="p">]</span>
 
 
+<span class="k">def</span> <span class="nf">_is_backend_dispatcher_enabled</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TORCHAUDIO_USE_BACKEND_DISPATCHER&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span>
+
+
 <div class="viewcode-block" id="list_audio_backends"><a class="viewcode-back" href="../../../torchaudio.html#torchaudio.list_audio_backends">[docs]</a><span class="k">def</span> <span class="nf">list_audio_backends</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;List available backends</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        List[str]: The list of available backends.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_is_backend_dispatcher_enabled</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;list_audio_backend&#39;s return value is irrelevant when the I/O backend dispatcher is enabled.&quot;</span><span class="p">)</span>
+
     <span class="n">backends</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">):</span>
         <span class="n">backends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
@@ -438,6 +446,10 @@
 <span class="sd">            One of ``&quot;sox_io&quot;`` or ``&quot;soundfile&quot;`` based on availability</span>
 <span class="sd">            of the system. If ``None`` is provided the  current backend is unassigned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_is_backend_dispatcher_enabled</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;set_audio_backend is a no-op when the I/O backend dispatcher is enabled.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
     <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_audio_backends</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot; is not one of &#39;</span> <span class="sa">f</span><span class="s2">&quot;available backends: </span><span class="si">{</span><span class="n">list_audio_backends</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
@@ -471,6 +483,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Optional[str]: The name of the current backend or ``None`` if no backend is assigned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_is_backend_dispatcher_enabled</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;get_audio_backend&#39;s return value is irrelevant when the I/O backend dispatcher is enabled.&quot;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">no_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
