@@ -9,10 +9,6 @@ torchaudio.prototype.transforms
     :toctree: generated
     :nosignatures:
 
-    Convolve
-    FFTConvolve
     BarkScale
     InverseBarkScale
     BarkSpectrogram
-    Speed
-    SpeedPerturbation

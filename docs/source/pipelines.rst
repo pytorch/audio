@@ -21,6 +21,8 @@ A pre-trained model and associated pipelines are expressed as an instance of ``B
 
    Under the hood, the implementations of ``Bundle`` use components from other ``torchaudio`` modules, such as :mod:`torchaudio.models` and :mod:`torchaudio.transforms`, or even third party libraries like `SentencPiece <https://github.com/google/sentencepiece>`__ and `DeepPhonemizer <https://github.com/as-ideas/DeepPhonemizer>`__. But this implementation detail is abstracted away from library users.
 
+.. _RNNT:
+
 RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
@@ -56,7 +58,7 @@ Pretrained Models
 
 
 wav2vec 2.0 / HuBERT / WavLM - SSL
---------------------------
+----------------------------------
 
 Interface
 ^^^^^^^^^
@@ -84,6 +86,9 @@ Pretrained Models
    WAV2VEC2_LARGE
    WAV2VEC2_LARGE_LV60K
    WAV2VEC2_XLSR53
+   WAV2VEC2_XLSR_300M
+   WAV2VEC2_XLSR_1B
+   WAV2VEC2_XLSR_2B
    HUBERT_BASE
    HUBERT_LARGE
    HUBERT_XLARGE
@@ -138,6 +143,8 @@ Pretrained Models
    HUBERT_ASR_XLARGE
 
 
+.. _Tacotron2:
+   
 Tacotron2 Text-To-Speech
 ------------------------
 

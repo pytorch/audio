@@ -237,7 +237,7 @@ class Tester(common_utils.TorchaudioTestCase):
             torchaudio.transforms.Resample(sample_rate, upsample_rate, resampling_method=invalid_resampling_method)
 
         upsample_resample = torchaudio.transforms.Resample(
-            sample_rate, upsample_rate, resampling_method="sinc_interpolation"
+            sample_rate, upsample_rate, resampling_method="sinc_interp_hann"
         )
         up_sampled = upsample_resample(waveform)
 
@@ -245,7 +245,7 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertTrue(up_sampled.size(-1) == waveform.size(-1) * 2)
 
         downsample_resample = torchaudio.transforms.Resample(
-            sample_rate, downsample_rate, resampling_method="sinc_interpolation"
+            sample_rate, downsample_rate, resampling_method="sinc_interp_hann"
         )
         down_sampled = downsample_resample(waveform)
 

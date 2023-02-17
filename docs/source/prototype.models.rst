@@ -64,3 +64,30 @@ conformer_wav2vec2_pretrain_large
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: conformer_wav2vec2_pretrain_large
+
+HiFiGANVocoder
+~~~~~~~~~~~~~~
+
+.. autoclass:: HiFiGANVocoder
+
+  .. automethod:: forward
+
+hifigan_vocoder
+~~~~~~~~~~~~~~~
+
+.. autofunction:: hifigan_vocoder
+
+hifigan_vocoder_v1
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: hifigan_vocoder_v1
+
+hifigan_vocoder_v2
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: hifigan_vocoder_v2
+
+hifigan_vocoder_v3
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: hifigan_vocoder_v3

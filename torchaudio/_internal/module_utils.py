@@ -3,8 +3,6 @@ import warnings
 from functools import wraps
 from typing import Optional
 
-import torch
-
 
 def is_module_available(*modules: str) -> bool:
     r"""Returns if a top-level module with :attr:`name` exists *without**
@@ -66,82 +64,19 @@ def deprecated(direction: str, version: Optional[str] = None):
     return decorator
 
 
-def is_kaldi_available():
-    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_kaldi_available()
+def fail_with_message(message):
+    """Generate decorator to give users message about missing TorchAudio extension."""
 
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            raise RuntimeError(f"{func.__module__}.{func.__name__} {message}")
 
-def requires_kaldi():
-    if is_kaldi_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires kaldi")
-
-            return wrapped
+        return wrapped
 
     return decorator
 
 
-def _check_soundfile_importable():
-    if not is_module_available("soundfile"):
-        return False
-    try:
-        import soundfile  # noqa: F401
-
-        return True
-    except Exception:
-        warnings.warn("Failed to import soundfile. 'soundfile' backend is not available.")
-        return False
-
-
-_is_soundfile_importable = _check_soundfile_importable()
-
-
-def is_soundfile_available():
-    return _is_soundfile_importable
-
-
-def requires_soundfile():
-    if is_soundfile_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires soundfile")
-
-            return wrapped
-
-    return decorator
-
-
-def is_sox_available():
-    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_sox_available()
-
-
-def requires_sox():
-    if is_sox_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires sox")
-
-            return wrapped
-
-    return decorator
+def no_op(func):
+    """Op-op decorator. Used in place of fail_with_message when a functionality that requires extension works fine."""
+    return func

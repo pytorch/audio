@@ -23,15 +23,19 @@ from .filtering import (
     vad,
 )
 from .functional import (
+    add_noise,
     amplitude_to_DB,
     apply_beamforming,
     apply_codec,
     compute_deltas,
     compute_kaldi_pitch,
+    convolve,
     create_dct,
     DB_to_amplitude,
+    deemphasis,
     detect_pitch_frequency,
     edit_distance,
+    fftconvolve,
     griffinlim,
     inverse_spectrogram,
     linear_fbanks,
@@ -45,6 +49,7 @@ from .functional import (
     mvdr_weights_souden,
     phase_vocoder,
     pitch_shift,
+    preemphasis,
     psd,
     resample,
     rnnt_loss,
@@ -53,6 +58,7 @@ from .functional import (
     sliding_window_cmn,
     spectral_centroid,
     spectrogram,
+    speed,
 )
 
 __all__ = [
@@ -108,4 +114,10 @@ __all__ = [
     "rtf_evd",
     "rtf_power",
     "apply_beamforming",
+    "fftconvolve",
+    "convolve",
+    "add_noise",
+    "speed",
+    "preemphasis",
+    "deemphasis",
 ]

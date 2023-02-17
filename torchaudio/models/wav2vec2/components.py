@@ -134,7 +134,7 @@ class FeatureExtractor(Module):
                 Valid length of each output sample. shape: ``[batch, ]``.
         """
         if x.ndim != 2:
-            raise ValueError("Expected the input Tensor to be 2D (batch, time), " "but received {list(x.shape)}")
+            raise ValueError(f"Expected the input Tensor to be 2D (batch, time). Found: {list(x.shape)}")
 
         x = x.unsqueeze(1)  # (batch, channel==1, frame)
         for layer in self.conv_layers:

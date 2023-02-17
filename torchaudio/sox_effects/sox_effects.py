@@ -1,13 +1,14 @@
 import os
+import warnings
 from typing import List, Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal.module_utils import deprecated
 from torchaudio.utils.sox_utils import list_effects
 
 
-@_mod_utils.requires_sox()
+@deprecated("Please remove the call. This function is called automatically.")
 def init_sox_effects():
     """Initialize resources required to use sox effects.
 
@@ -19,10 +20,10 @@ def init_sox_effects():
     Once :func:`shutdown_sox_effects` is called, you can no longer use SoX effects and initializing
     again will result in error.
     """
-    torch.ops.torchaudio.sox_effects_initialize_sox_effects()
+    pass
 
 
-@_mod_utils.requires_sox()
+@deprecated("Please remove the call. This function is called automatically.")
 def shutdown_sox_effects():
     """Clean up resources required to use sox effects.
 
@@ -33,10 +34,10 @@ def shutdown_sox_effects():
     Once :py:func:`shutdown_sox_effects` is called, you can no longer use SoX effects and
     initializing again will result in error.
     """
-    torch.ops.torchaudio.sox_effects_shutdown_sox_effects()
+    pass
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -50,7 +51,7 @@ def effect_names() -> List[str]:
     return list(list_effects().keys())
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def apply_effects_tensor(
     tensor: torch.Tensor,
     sample_rate: int,
@@ -155,7 +156,15 @@ def apply_effects_tensor(
     return torch.ops.torchaudio.sox_effects_apply_effects_tensor(tensor, sample_rate, effects, channels_first)
 
 
-@_mod_utils.requires_sox()
+_deprecation_message = (
+    "File-like object support in sox_io backend is deprecated, "
+    "and will be removed in v2.1. "
+    "See https://github.com/pytorch/audio/issues/2950 for the detail."
+    "Please migrate to the new dispatcher, or use soundfile backend."
+)
+
+
+@torchaudio._extension.fail_if_no_sox
 def apply_effects_file(
     path: str,
     effects: List[List[str]],
@@ -274,7 +283,8 @@ def apply_effects_file(
     """
     if not torch.jit.is_scripting():
         if hasattr(path, "read"):
-            ret = torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
+            warnings.warn(_deprecation_message)
+            ret = torchaudio.lib._torchaudio_sox.apply_effects_fileobj(path, effects, normalize, channels_first, format)
             if ret is None:
                 raise RuntimeError("Failed to load audio from {}".format(path))
             return ret

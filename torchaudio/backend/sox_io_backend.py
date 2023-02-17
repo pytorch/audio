@@ -1,9 +1,9 @@
 import os
+import warnings
 from typing import Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import get_buffer_size
 
 from .common import AudioMetaData
@@ -14,7 +14,7 @@ def _fail_info(filepath: str, format: Optional[str]) -> AudioMetaData:
     raise RuntimeError("Failed to fetch metadata from {}".format(filepath))
 
 
-def _fail_info_fileobj(fileobj, format: Optional[str]) -> AudioMetaData:
+def _fail_info_fileobj(fileobj, format: Optional[str], buffer_size: int) -> AudioMetaData:
     raise RuntimeError("Failed to fetch metadata from {}".format(fileobj))
 
 
@@ -48,7 +48,15 @@ else:
     _fallback_load_fileobj = _fail_load_fileobj
 
 
-@_mod_utils.requires_sox()
+_deprecation_message = (
+    "File-like object support in sox_io backend is deprecated, "
+    "and will be removed in v2.1. "
+    "See https://github.com/pytorch/audio/issues/2950 for the detail."
+    "Please migrate to the new dispatcher, or use soundfile backend."
+)
+
+
+@torchaudio._extension.fail_if_no_sox
 def info(
     filepath: str,
     format: Optional[str] = None,
@@ -95,7 +103,8 @@ def info(
             buffer_size = get_buffer_size()
             if format == "mp3":
                 return _fallback_info_fileobj(filepath, format, buffer_size)
-            sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+            warnings.warn(_deprecation_message)
+            sinfo = torchaudio.lib._torchaudio_sox.get_info_fileobj(filepath, format)
             if sinfo is not None:
                 return AudioMetaData(*sinfo)
             return _fallback_info_fileobj(filepath, format, buffer_size)
@@ -106,7 +115,7 @@ def info(
     return _fallback_info(filepath, format)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def load(
     filepath: str,
     frame_offset: int = 0,
@@ -223,7 +232,8 @@ def load(
                     format,
                     buffer_size,
                 )
-            ret = torchaudio._torchaudio.load_audio_fileobj(
+            warnings.warn(_deprecation_message)
+            ret = torchaudio.lib._torchaudio_sox.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format
             )
             if ret is not None:
@@ -246,7 +256,7 @@ def load(
     return _fallback_load(filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def save(
     filepath: str,
     src: torch.Tensor,
@@ -403,7 +413,8 @@ def save(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "write"):
-            torchaudio._torchaudio.save_audio_fileobj(
+            warnings.warn(_deprecation_message)
+            torchaudio.lib._torchaudio_sox.save_audio_fileobj(
                 filepath,
                 src,
                 sample_rate,

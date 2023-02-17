@@ -6,9 +6,84 @@
 #include <thread>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 using KeyType = StreamProcessor::KeyType;
+
+//////////////////////////////////////////////////////////////////////////////
+// Initialization / resource allocations
+//////////////////////////////////////////////////////////////////////////////
+namespace {
+AVFormatContext* get_input_format_context(
+    const std::string& src,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option,
+    AVIOContext* io_ctx) {
+  AVFormatContext* p = avformat_alloc_context();
+  TORCH_CHECK(p, "Failed to allocate AVFormatContext.");
+  if (io_ctx) {
+    p->pb = io_ctx;
+  }
+
+  auto* pInputFormat = [&format]() -> AVFORMAT_CONST AVInputFormat* {
+    if (format.has_value()) {
+      std::string format_str = format.value();
+      AVFORMAT_CONST AVInputFormat* pInput =
+          av_find_input_format(format_str.c_str());
+      TORCH_CHECK(pInput, "Unsupported device/format: \"", format_str, "\"");
+      return pInput;
+    }
+    return nullptr;
+  }();
+
+  AVDictionary* opt = get_option_dict(option);
+  int ret = avformat_open_input(&p, src.c_str(), pInputFormat, &opt);
+  clean_up_dict(opt);
+
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to open the input \"",
+      src,
+      "\" (",
+      av_err2string(ret),
+      ").");
+  return p;
+}
+} // namespace
+
+StreamReader::StreamReader(AVFormatContext* p) : pFormatContext(p) {
+  int ret = avformat_find_stream_info(pFormatContext, nullptr);
+  TORCH_CHECK(
+      ret >= 0, "Failed to find stream information: ", av_err2string(ret));
+
+  processors =
+      std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
+  for (int i = 0; i < pFormatContext->nb_streams; ++i) {
+    switch (pFormatContext->streams[i]->codecpar->codec_type) {
+      case AVMEDIA_TYPE_AUDIO:
+      case AVMEDIA_TYPE_VIDEO:
+        break;
+      default:
+        pFormatContext->streams[i]->discard = AVDISCARD_ALL;
+    }
+  }
+}
+
+StreamReader::StreamReader(
+    AVIOContext* io_ctx,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option)
+    : StreamReader(get_input_format_context(
+          "Custom Input Context",
+          format,
+          option,
+          io_ctx)) {}
+
+StreamReader::StreamReader(
+    const std::string& src,
+    const c10::optional<std::string>& format,
+    const c10::optional<OptionDict>& option)
+    : StreamReader(get_input_format_context(src, format, option, nullptr)) {}
 
 //////////////////////////////////////////////////////////////////////////////
 // Helper methods
@@ -39,28 +114,6 @@ void StreamReader::validate_src_stream_type(int i, AVMediaType type) {
       " is not ",
       av_get_media_type_string(type),
       " stream.");
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Initialization / resource allocations
-//////////////////////////////////////////////////////////////////////////////
-StreamReader::StreamReader(AVFormatInputContextPtr&& p)
-    : pFormatContext(std::move(p)) {
-  int ret = avformat_find_stream_info(pFormatContext, nullptr);
-  TORCH_CHECK(
-      ret >= 0, "Failed to find stream information: ", av_err2string(ret));
-
-  processors =
-      std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
-  for (int i = 0; i < pFormatContext->nb_streams; ++i) {
-    switch (pFormatContext->streams[i]->codecpar->codec_type) {
-      case AVMEDIA_TYPE_AUDIO:
-      case AVMEDIA_TYPE_VIDEO:
-        break;
-      default:
-        pFormatContext->streams[i]->discard = AVDISCARD_ALL;
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,13 +227,13 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
   int flag = AVSEEK_FLAG_BACKWARD;
   switch (mode) {
     case 0:
-      seek_timestamp =
-          -1; // reset seek_timestap as it is only used for precise seek
+      // reset seek_timestap as it is only used for precise seek
+      seek_timestamp = 0;
       break;
     case 1:
       flag |= AVSEEK_FLAG_ANY;
-      seek_timestamp =
-          -1; // reset seek_timestap as it is only used for precise seek
+      // reset seek_timestap as it is only used for precise seek
+      seek_timestamp = 0;
       break;
     case 2:
       seek_timestamp = timestamp_av_tb;
@@ -192,12 +245,13 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
   int ret = av_seek_frame(pFormatContext, -1, timestamp_av_tb, flag);
 
   if (ret < 0) {
-    seek_timestamp = -1;
+    seek_timestamp = 0;
     TORCH_CHECK(false, "Failed to seek. (" + av_err2string(ret) + ".)");
   }
   for (const auto& it : processors) {
     if (it) {
       it->flush();
+      it->set_discard_timestamp(seek_timestamp);
     }
   }
 }
@@ -278,6 +332,7 @@ void StreamReader::add_stream(
   if (!processors[i]) {
     processors[i] = std::make_unique<StreamProcessor>(
         stream, decoder, decoder_option, device);
+    processors[i]->set_discard_timestamp(seek_timestamp);
   }
   stream->discard = AVDISCARD_DEFAULT;
   int key = processors[i]->add_stream(
@@ -328,12 +383,7 @@ int StreamReader::process_packet() {
     return 0;
   }
 
-  AVRational stream_tb =
-      pFormatContext->streams[pPacket->stream_index]->time_base;
-  int64_t seek_timestamp_in_stream_tb =
-      av_rescale_q(seek_timestamp, av_get_time_base_q(), stream_tb);
-
-  ret = processor->process_packet(packet, seek_timestamp_in_stream_tb);
+  ret = processor->process_packet(packet);
 
   return (ret < 0) ? ret : 0;
 }
@@ -386,13 +436,14 @@ int StreamReader::drain() {
   return ret;
 }
 
-std::vector<c10::optional<torch::Tensor>> StreamReader::pop_chunks() {
-  std::vector<c10::optional<torch::Tensor>> ret;
+std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
+  std::vector<c10::optional<Chunk>> ret;
+  ret.reserve(static_cast<size_t>(num_out_streams()));
   for (auto& i : stream_indices) {
-    ret.push_back(processors[i.first]->pop_chunk(i.second));
+    ret.emplace_back(processors[i.first]->pop_chunk(i.second));
   }
   return ret;
 }
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

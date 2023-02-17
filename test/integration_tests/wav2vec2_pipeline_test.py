@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import torchaudio
 from torchaudio.pipelines import (
@@ -24,6 +26,8 @@ from torchaudio.pipelines import (
     WAV2VEC2_LARGE,
     WAV2VEC2_LARGE_LV60K,
     WAV2VEC2_XLSR53,
+    WAV2VEC2_XLSR_1B,
+    WAV2VEC2_XLSR_300M,
     WAVLM_BASE,
     WAVLM_BASE_PLUS,
     WAVLM_LARGE,
@@ -50,6 +54,19 @@ def test_pretraining_models(bundle):
     bundle.get_model()
 
 
+@pytest.mark.skipif("CI" not in os.environ, reason="Run tests only in CI environment.")
+@pytest.mark.parametrize(
+    "bundle",
+    [
+        WAV2VEC2_XLSR_300M,
+        WAV2VEC2_XLSR_1B,
+    ],
+)
+def test_xlsr_pretraining_models(bundle):
+    """Smoke test of downloading weights for pretraining models"""
+    bundle.get_model()
+
+
 @pytest.mark.parametrize(
     "bundle,lang,expected",
     [
@@ -59,7 +76,7 @@ def test_pretraining_models(bundle):
         (WAV2VEC2_ASR_LARGE_10M, "en", "I|HAD|THAT|CURIOUSITY|BESIDE|ME|AT|THIS|MOMENT|"),
         (WAV2VEC2_ASR_LARGE_100H, "en", "I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|"),
         (WAV2VEC2_ASR_LARGE_960H, "en", "I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|"),
-        (WAV2VEC2_ASR_LARGE_LV60K_10M, "en", "I|HAD|THAT|CURIOUSSITY|BESID|ME|AT|THISS|MOMENT|"),
+        (WAV2VEC2_ASR_LARGE_LV60K_10M, "en", "I|HAD|THAT|CURIOUSITY|BESID|ME|AT|THISS|MOMENT|"),
         (WAV2VEC2_ASR_LARGE_LV60K_100H, "en", "I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|"),
         (WAV2VEC2_ASR_LARGE_LV60K_960H, "en", "I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|"),
         (HUBERT_ASR_LARGE, "en", "I|HAVE|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|"),

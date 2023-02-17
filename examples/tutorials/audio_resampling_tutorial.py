@@ -240,13 +240,13 @@ plot_sweep(resampled_waveform, resample_rate, title="rolloff=0.8")
 sample_rate = 48000
 resample_rate = 32000
 
-resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interpolation")
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interp_hann")
 plot_sweep(resampled_waveform, resample_rate, title="Hann Window Default")
 
 ######################################################################
 #
 
-resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="kaiser_window")
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interp_kaiser")
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
@@ -271,7 +271,7 @@ resampled_waveform = F.resample(
     resample_rate,
     lowpass_filter_width=64,
     rolloff=0.9475937167399596,
-    resampling_method="kaiser_window",
+    resampling_method="sinc_interp_kaiser",
     beta=14.769656459379492,
 )
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
@@ -300,7 +300,7 @@ resampled_waveform = F.resample(
     resample_rate,
     lowpass_filter_width=16,
     rolloff=0.85,
-    resampling_method="kaiser_window",
+    resampling_method="sinc_interp_kaiser",
     beta=8.555504641634386,
 )
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
@@ -344,7 +344,7 @@ def benchmark_resample_functional(
     resample_rate,
     lowpass_filter_width=6,
     rolloff=0.99,
-    resampling_method="sinc_interpolation",
+    resampling_method="sinc_interp_hann",
     beta=None,
     iters=5,
 ):
@@ -375,7 +375,7 @@ def benchmark_resample_transforms(
     resample_rate,
     lowpass_filter_width=6,
     rolloff=0.99,
-    resampling_method="sinc_interpolation",
+    resampling_method="sinc_interp_hann",
     beta=None,
     iters=5,
 ):
@@ -451,7 +451,7 @@ def benchmark(sample_rate, resample_rate):
     kwargs = {
         "lowpass_filter_width": 64,
         "rolloff": 0.9475937167399596,
-        "resampling_method": "kaiser_window",
+        "resampling_method": "sinc_interp_kaiser",
         "beta": 14.769656459379492,
     }
     lib_time = benchmark_resample_librosa(*args, res_type="kaiser_best")
@@ -464,7 +464,7 @@ def benchmark(sample_rate, resample_rate):
     kwargs = {
         "lowpass_filter_width": 16,
         "rolloff": 0.85,
-        "resampling_method": "kaiser_window",
+        "resampling_method": "sinc_interp_kaiser",
         "beta": 8.555504641634386,
     }
     lib_time = benchmark_resample_librosa(*args, res_type="kaiser_fast")
@@ -531,8 +531,8 @@ plot(df)
 # - a larger ``lowpass_filter_width`` results in a larger resampling kernel,
 #   and therefore increases computation time for both the kernel computation
 #   and convolution
-# - using ``kaiser_window`` results in longer computation times than the default
-#   ``sinc_interpolation`` because it is more complex to compute the intermediate
+# - using ``sinc_interp_kaiser`` results in longer computation times than the default
+#   ``sinc_interp_hann`` because it is more complex to compute the intermediate
 #   window values
 # - a large GCD between the sample and resample rate will result
 #   in a simplification that allows for a smaller kernel and faster kernel computation.

@@ -11,7 +11,7 @@ from itertools import zip_longest
 import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import is_kaldi_available, is_module_available, is_sox_available
+from torchaudio._internal.module_utils import is_module_available
 
 from .backend_utils import set_audio_backend
 
@@ -208,15 +208,27 @@ skipIfNoCuda = _skipIf(
     reason="CUDA is not available.",
     key="NO_CUDA",
 )
+# Skip test if CUDA memory is not enough
+# TODO: detect the real CUDA memory size and allow call site to configure how much the test needs
+skipIfCudaSmallMemory = _skipIf(
+    "CI" in os.environ and torch.cuda.is_available(),  # temporary
+    reason="CUDA does not have enough memory.",
+    key="CUDA_SMALL_MEMORY",
+)
 skipIfNoSox = _skipIf(
-    not is_sox_available(),
+    not torchaudio._extension._SOX_INITIALIZED,
     reason="Sox features are not available.",
     key="NO_SOX",
 )
 skipIfNoKaldi = _skipIf(
-    not is_kaldi_available(),
+    not torchaudio._extension._IS_KALDI_AVAILABLE,
     reason="Kaldi features are not available.",
     key="NO_KALDI",
+)
+skipIfNoRIR = _skipIf(
+    not torchaudio._extension._IS_RIR_AVAILABLE,
+    reason="RIR features are not available.",
+    key="NO_RIR",
 )
 skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),
@@ -245,6 +257,16 @@ skipIfPy310 = _skipIf(
         "See: https://github.com/pytorch/audio/pull/2224#issuecomment-1048329450"
     ),
     key="ON_PYTHON_310",
+)
+skipIfNoAudioDevice = _skipIf(
+    not torchaudio.utils.ffmpeg_utils.get_output_devices(),
+    reason="No output audio device is available.",
+    key="NO_AUDIO_OUT_DEVICE",
+)
+skipIfNoMacOS = _skipIf(
+    sys.platform != "darwin",
+    reason="This feature is only available for MacOS.",
+    key="NO_MACOS",
 )
 
 

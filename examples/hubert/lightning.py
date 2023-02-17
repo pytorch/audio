@@ -287,7 +287,8 @@ class HuBERTPreTrainModule(LightningModule):
             max_token_count=self.seconds_per_batch * 16000,
             min_len=32000,
             max_len=250000,
-            shuffle=False,
+            shuffle=True,
+            seed=self.trainer.current_epoch,
         )
         sampler = DistributedBatchSampler(sampler, shuffle=True)
         sampler.set_epoch(self.current_epoch)
@@ -508,7 +509,11 @@ class HuBERTFineTuneModule(LightningModule):
         dataset = torchaudio.datasets.LibriLightLimited(self.dataset_path, self.subset)
         lengths = _get_lengths_librilightlimited(dataset._fileids_paths, dataset._path, dataset._ext_audio)
         sampler = BucketizeBatchSampler(
-            lengths, num_buckets=100, max_token_count=self.seconds_per_batch * 16000, shuffle=True
+            lengths,
+            num_buckets=100,
+            max_token_count=self.seconds_per_batch * 16000,
+            shuffle=True,
+            seed=self.global_step,
         )
         sampler = DistributedBatchSampler(sampler, shuffle=True)
         sampler.set_epoch(self.global_step)

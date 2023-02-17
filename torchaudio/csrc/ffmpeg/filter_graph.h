@@ -2,7 +2,7 @@
 
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class FilterGraph {
   AVMediaType media_type;
@@ -50,6 +50,13 @@ class FilterGraph {
   void create_filter();
 
   //////////////////////////////////////////////////////////////////////////////
+  // Query methods
+  //////////////////////////////////////////////////////////////////////////////
+  [[nodiscard]] AVRational get_output_timebase() const;
+  [[nodiscard]] int get_output_sample_rate() const;
+  [[nodiscard]] int get_output_channels() const;
+
+  //////////////////////////////////////////////////////////////////////////////
   // Streaming process
   //////////////////////////////////////////////////////////////////////////////
  public:
@@ -57,5 +64,5 @@ class FilterGraph {
   int get_frame(AVFrame* pOutputFrame);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

@@ -2,7 +2,8 @@ import unittest
 
 import torch
 import torchaudio.prototype.functional as F
-from torchaudio_unittest.common_utils import nested_params, TestBaseMixin, torch_script
+from parameterized import parameterized
+from torchaudio_unittest.common_utils import skipIfNoRIR, TestBaseMixin, torch_script
 
 
 class TorchScriptConsistencyTestImpl(TestBaseMixin):
@@ -24,29 +25,6 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
             ts_output = ts_output.shape
             output = output.shape
         self.assertEqual(ts_output, output)
-
-    @nested_params(
-        ["convolve", "fftconvolve"],
-        ["full", "valid", "same"],
-    )
-    def test_convolve(self, fn, mode):
-        leading_dims = (2, 3, 2)
-        L_x, L_y = 32, 55
-        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
-        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
-
-        self._assert_consistency(getattr(F, fn), (x, y, mode))
-
-    def test_add_noise(self):
-        leading_dims = (2, 3)
-        L = 31
-
-        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
-        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
-        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
-
-        self._assert_consistency(F.add_noise, (waveform, noise, lengths, snr))
 
     def test_barkscale_fbanks(self):
         if self.device != torch.device("cpu"):
@@ -82,19 +60,55 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         self._assert_consistency(F.sinc_impulse_response, (cutoff, 513, False))
         self._assert_consistency(F.sinc_impulse_response, (cutoff, 513, True))
 
-    def test_speed(self):
-        leading_dims = (3, 2)
-        T = 200
-        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
-        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
-        self._assert_consistency(F.speed, (waveform, lengths, 1000, 1.1))
+    def test_freq_ir(self):
+        mags = torch.tensor([0, 0.5, 1.0], device=self.device, dtype=self.dtype)
+        self._assert_consistency(F.frequency_impulse_response, (mags,))
 
-    def test_preemphasis(self):
-        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
-        coeff = 0.9
-        self._assert_consistency(F.preemphasis, (waveform, coeff))
 
-    def test_deemphasis(self):
-        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
-        coeff = 0.9
-        self._assert_consistency(F.deemphasis, (waveform, coeff))
+class TorchScriptConsistencyCPUOnlyTestImpl(TestBaseMixin):
+    def _assert_consistency(self, func, inputs, shape_only=False):
+        inputs_ = []
+        for i in inputs:
+            if torch.is_tensor(i):
+                i = i.to(device=self.device, dtype=self.dtype)
+            inputs_.append(i)
+        ts_func = torch_script(func)
+
+        torch.random.manual_seed(40)
+        output = func(*inputs_)
+
+        torch.random.manual_seed(40)
+        ts_output = ts_func(*inputs_)
+
+        if shape_only:
+            ts_output = ts_output.shape
+            output = output.shape
+        self.assertEqual(ts_output, output)
+
+    @skipIfNoRIR
+    @parameterized.expand([(1,), (4,)])
+    def test_simulate_rir_ism_single_band(self, channel):
+        room_dim = torch.rand(3, dtype=self.dtype, device=self.device) + 5
+        mic_array = torch.rand(channel, 3, dtype=self.dtype, device=self.device) + 1
+        source = torch.rand(3, dtype=self.dtype, device=self.device) + 4
+        max_order = 3
+        absorption = 0.5
+        center_frequency = torch.tensor([125, 250, 500, 1000, 2000, 4000, 8000], dtype=self.dtype, device=self.device)
+        self._assert_consistency(
+            F.simulate_rir_ism,
+            (room_dim, source, mic_array, max_order, absorption, None, 81, center_frequency, 343.0, 16000.0),
+        )
+
+    @skipIfNoRIR
+    @parameterized.expand([(1,), (4,)])
+    def test_simulate_rir_ism_multi_band(self, channel):
+        room_dim = torch.rand(3, dtype=self.dtype, device=self.device) + 5
+        mic_array = torch.rand(channel, 3, dtype=self.dtype, device=self.device) + 1
+        source = torch.rand(3, dtype=self.dtype, device=self.device) + 4
+        max_order = 3
+        absorption = torch.rand(7, 6, dtype=self.dtype, device=self.device)
+        center_frequency = torch.tensor([125, 250, 500, 1000, 2000, 4000, 8000], dtype=self.dtype, device=self.device)
+        self._assert_consistency(
+            F.simulate_rir_ism,
+            (room_dim, source, mic_array, max_order, absorption, None, 81, center_frequency, 343.0, 16000.0),
+        )

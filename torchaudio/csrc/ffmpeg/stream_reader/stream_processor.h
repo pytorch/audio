@@ -4,10 +4,11 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <map>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class StreamProcessor {
  public:
@@ -24,6 +25,13 @@ class StreamProcessor {
 
   KeyType current_key = 0;
   std::map<KeyType, Sink> sinks;
+
+  // Used for precise seek.
+  // 0: no discard
+  // Positive Values: decoded frames with PTS values less than this are
+  // discarded.
+  // Negative values: UB. Should not happen.
+  int64_t discard_before_pts = 0;
 
  public:
   StreamProcessor(
@@ -57,6 +65,10 @@ class StreamProcessor {
   // 1. Remove the stream
   void remove_stream(KeyType key);
 
+  // Set discard
+  // The input timestamp must be expressed in AV_TIME_BASE unit.
+  void set_discard_timestamp(int64_t timestamp);
+
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
@@ -70,7 +82,7 @@ class StreamProcessor {
   // 2. pass the decoded data to filters
   // 3. each filter store the result to the corresponding buffer
   // - Sending NULL will drain (flush) the internal
-  int process_packet(AVPacket* packet, int64_t discard_before_pts = -1);
+  int process_packet(AVPacket* packet);
 
   // flush the internal buffer of decoder.
   // To be use when seeking
@@ -84,8 +96,8 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Get the chunk from the given filter result
-  c10::optional<torch::Tensor> pop_chunk(KeyType key);
+  c10::optional<Chunk> pop_chunk(KeyType key);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

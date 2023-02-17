@@ -28,7 +28,7 @@ else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 
     cuda_toolkit_pckg="cudatoolkit"
-    if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 ]]; then
+    if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
         cuda_toolkit_pckg="pytorch-cuda"
     fi
 
@@ -90,7 +90,8 @@ esac
         unidecode \
         'protobuf<4.21.0' \
         demucs \
-        tinytag
+        tinytag \
+        pyroomacoustics
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

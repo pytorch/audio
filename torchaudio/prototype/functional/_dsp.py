@@ -3,6 +3,8 @@ from typing import List, Optional, Union
 
 import torch
 
+from torchaudio.functional import fftconvolve
+
 
 def oscillator_bank(
     frequencies: torch.Tensor,
@@ -286,3 +288,148 @@ def sinc_impulse_response(cutoff: torch.Tensor, window_size: int = 513, high_pas
         filt = -filt
         filt[..., half] = 1.0 + filt[..., half]
     return filt
+
+
+def frequency_impulse_response(magnitudes):
+    """Create filter from desired frequency response
+
+    Args:
+        magnitudes: The desired frequency responses. Shape: `(..., num_fft_bins)`
+
+    Returns:
+        Tensor: Impulse response. Shape `(..., 2 * (num_fft_bins - 1))`
+    """
+    if magnitudes.min() < 0.0:
+        # Negative magnitude does not make sense but allowing so that autograd works
+        # around 0.
+        # Should we raise error?
+        warnings.warn("The input frequency response should not contain negative values.")
+    ir = torch.fft.fftshift(torch.fft.irfft(magnitudes), dim=-1)
+    device, dtype = magnitudes.device, magnitudes.dtype
+    window = torch.hann_window(ir.size(-1), periodic=False, device=device, dtype=dtype).expand_as(ir)
+    return ir * window
+
+
+def _overlap_and_add(waveform, stride):
+    num_frames, frame_size = waveform.shape[-2:]
+    numel = (num_frames - 1) * stride + frame_size
+    buffer = torch.zeros(waveform.shape[:-2] + (numel,), device=waveform.device, dtype=waveform.dtype)
+    for i in range(num_frames):
+        start = i * stride
+        end = start + frame_size
+        buffer[..., start:end] += waveform[..., i, :]
+    return buffer
+
+
+def filter_waveform(waveform: torch.Tensor, kernels: torch.Tensor, delay_compensation: int = -1):
+    """Applies filters along time axis of the given waveform.
+
+    This function applies the given filters along time axis in the following manner:
+
+    1. Split the given waveform into chunks. The number of chunks is equal to the number of given filters.
+    2. Filter each chunk with corresponding filter.
+    3. Place the filtered chunks at the original indices while adding up the overlapping parts.
+    4. Crop the resulting waveform so that delay introduced by the filter is removed and its length
+       matches that of the input waveform.
+
+    The following figure illustrates this.
+
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/filter_waveform.png
+
+    .. note::
+
+       If the number of filters is one, then the operation becomes stationary.
+       i.e. the same filtering is applied across the time axis.
+
+    Args:
+        waveform (Tensor): Shape `(..., time)`.
+        kernels (Tensor): Impulse responses.
+            Valid inputs are 2D tensor with shape `(num_filters, filter_length)` or
+            `(N+1)`-D tensor with shape `(..., num_filters, filter_length)`, where `N` is
+            the dimension of waveform.
+
+            In case of 2D input, the same set of filters is used across channels and batches.
+            Otherwise, different sets of filters are applied. In this case, the shape of
+            the first `N-1` dimensions of filters must match (or be broadcastable to) that of waveform.
+
+        delay_compensation (int): Control how the waveform is cropped after full convolution.
+            If the value is zero or positive, it is interpreted as the length of crop at the
+            beginning of the waveform. The value cannot be larger than the size of filter kernel.
+            Otherwise the initial crop is ``filter_size // 2``.
+            When cropping happens, the waveform is also cropped from the end so that the
+            length of the resulting waveform matches the input waveform.
+
+    Returns:
+        Tensor: `(..., time)`.
+    """
+    if kernels.ndim not in [2, waveform.ndim + 1]:
+        raise ValueError(
+            "`kernels` must be 2 or N+1 dimension where "
+            f"N is the dimension of waveform. Found: {kernels.ndim} (N={waveform.ndim})"
+        )
+
+    num_filters, filter_size = kernels.shape[-2:]
+    num_frames = waveform.size(-1)
+
+    if delay_compensation > filter_size:
+        raise ValueError(
+            "When `delay_compenstation` is provided, it cannot be larger than the size of filters."
+            f"Found: delay_compensation={delay_compensation}, filter_size={filter_size}"
+        )
+
+    # Transform waveform's time axis into (num_filters x chunk_length) with optional padding
+    chunk_length = num_frames // num_filters
+    if num_frames % num_filters > 0:
+        chunk_length += 1
+        num_pad = chunk_length * num_filters - num_frames
+        waveform = torch.nn.functional.pad(waveform, [0, num_pad], "constant", 0)
+    chunked = waveform.unfold(-1, chunk_length, chunk_length)
+    assert chunked.numel() >= waveform.numel()
+
+    # Broadcast kernels
+    if waveform.ndim + 1 > kernels.ndim:
+        expand_shape = waveform.shape[:-1] + kernels.shape
+        kernels = kernels.expand(expand_shape)
+
+    convolved = fftconvolve(chunked, kernels)
+    restored = _overlap_and_add(convolved, chunk_length)
+
+    # Trim in a way that the number of samples are same as input,
+    # and the filter delay is compensated
+    if delay_compensation >= 0:
+        start = delay_compensation
+    else:
+        start = filter_size // 2
+    num_crops = restored.size(-1) - num_frames
+    end = num_crops - start
+    result = restored[..., start:-end]
+    return result
+
+
+def exp_sigmoid(
+    input: torch.Tensor, exponent: float = 10.0, max_value: float = 2.0, threshold: float = 1e-7
+) -> torch.Tensor:
+    """Exponential Sigmoid pointwise nonlinearity.
+    Implements the equation:
+    ``max_value`` * sigmoid(``input``) ** (log(``exponent``)) + ``threshold``
+
+    The output has a range of [``threshold``, ``max_value``].
+    ``exponent`` controls the slope of the output.
+
+    .. devices:: CPU CUDA
+
+    Args:
+        input (Tensor): Input Tensor
+        exponent (float, optional): Exponent. Controls the slope of the output
+        max_value (float, optional): Maximum value of the output
+        threshold (float, optional): Minimum value of the output
+
+    Returns:
+        Tensor: Exponential Sigmoid output. Shape: same as input
+
+    """
+
+    return max_value * torch.pow(
+        torch.nn.functional.sigmoid(input),
+        torch.log(torch.tensor(exponent, device=input.device, dtype=input.dtype)),
+    ) + torch.tensor(threshold, device=input.device, dtype=input.dtype)

@@ -5,7 +5,52 @@
 #endif
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
+namespace {
+
+AVFormatContext* get_output_format_context(
+    const std::string& dst,
+    const c10::optional<std::string>& format,
+    AVIOContext* io_ctx) {
+  if (io_ctx) {
+    TORCH_CHECK(
+        format,
+        "`format` must be provided when the input is file-like object.");
+  }
+
+  AVFormatContext* p = nullptr;
+  int ret = avformat_alloc_output_context2(
+      &p, nullptr, format ? format.value().c_str() : nullptr, dst.c_str());
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to open output \"",
+      dst,
+      "\" (",
+      av_err2string(ret),
+      ").");
+
+  if (io_ctx) {
+    p->pb = io_ctx;
+    p->flags |= AVFMT_FLAG_CUSTOM_IO;
+  }
+
+  return p;
+}
+} // namespace
+
+StreamWriter::StreamWriter(AVFormatContext* p) : pFormatContext(p) {}
+
+StreamWriter::StreamWriter(
+    AVIOContext* io_ctx,
+    const c10::optional<std::string>& format)
+    : StreamWriter(
+          get_output_format_context("Custom Output Context", format, io_ctx)) {}
+
+StreamWriter::StreamWriter(
+    const std::string& dst,
+    const c10::optional<std::string>& format)
+    : StreamWriter(get_output_format_context(dst, format, nullptr)) {}
+
 namespace {
 std::vector<std::string> get_supported_pix_fmts(const AVCodec* codec) {
   std::vector<std::string> ret;
@@ -77,12 +122,6 @@ std::vector<uint64_t> get_supported_channel_layouts(const AVCodec* codec) {
   return ret;
 }
 
-} // namespace
-
-StreamWriter::StreamWriter(AVFormatOutputContextPtr&& p)
-    : pFormatContext(std::move(p)), streams(), pkt() {}
-
-namespace {
 void configure_audio_codec(
     AVCodecContextPtr& ctx,
     int64_t sample_rate,
@@ -417,15 +456,12 @@ void StreamWriter::add_audio_stream(
   static const int default_capacity = 10000;
   int frame_capacity = ctx->frame_size ? ctx->frame_size : default_capacity;
   AVFramePtr src_frame = get_audio_frame(src_fmt, ctx, frame_capacity);
-  AVFramePtr dst_frame = filter
-      ? AVFramePtr{}
-      : get_audio_frame(ctx->sample_fmt, ctx, frame_capacity);
   streams.emplace_back(OutputStream{
       stream,
       std::move(ctx),
       std::move(filter),
       std::move(src_frame),
-      std::move(dst_frame),
+      {},
       0,
       frame_capacity,
       AVBufferRefPtr{},
@@ -516,22 +552,18 @@ void StreamWriter::add_video_stream(
     return std::unique_ptr<FilterGraph>(nullptr);
   }();
 
-  // CUDA: require src_frame
-  // CPU: require dst_frame when filter is enabled
   AVFramePtr src_frame = [&]() {
     if (device.type() == c10::DeviceType::CUDA) {
       return get_hw_video_frame(ctx);
     }
     return get_video_frame(src_fmt, ctx);
   }();
-  AVFramePtr dst_frame =
-      filter ? get_video_frame(ctx->pix_fmt, ctx) : AVFramePtr{};
   streams.emplace_back(OutputStream{
       stream,
       std::move(ctx),
       std::move(filter),
       std::move(src_frame),
-      std::move(dst_frame),
+      {},
       0,
       -1,
       std::move(hw_device_ctx),
@@ -634,36 +666,26 @@ void StreamWriter::validate_stream(int i, enum AVMediaType type) {
       av_get_media_type_string(type));
 }
 
-void StreamWriter::process_frame(
-    AVFrame* src_frame,
-    std::unique_ptr<FilterGraph>& filter,
-    AVFrame* dst_frame,
-    AVCodecContextPtr& c,
-    AVStream* st) {
-  int ret = filter->add_frame(src_frame);
-  while (ret >= 0) {
-    ret = filter->get_frame(dst_frame);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-      if (ret == AVERROR_EOF) {
-        encode_frame(nullptr, c, st);
-      }
-      break;
-    }
-    if (ret >= 0) {
-      encode_frame(dst_frame, c, st);
-    }
-    av_frame_unref(dst_frame);
-  }
-}
+namespace {
 
-void StreamWriter::encode_frame(
+///
+/// Encode the given AVFrame data
+///
+/// @param frame Frame data to encode
+/// @param format Output format context
+/// @param stream Output stream in the output format context
+/// @param codec Encoding context
+/// @param packet Temporaly packet used during encoding.
+void encode_frame(
     AVFrame* frame,
-    AVCodecContextPtr& c,
-    AVStream* st) {
-  int ret = avcodec_send_frame(c, frame);
+    AVFormatContext* format,
+    AVStream* stream,
+    AVCodecContext* codec,
+    AVPacket* packet) {
+  int ret = avcodec_send_frame(codec, frame);
   TORCH_CHECK(ret >= 0, "Failed to encode frame (", av_err2string(ret), ").");
   while (ret >= 0) {
-    ret = avcodec_receive_packet(c, pkt);
+    ret = avcodec_receive_packet(codec, packet);
     if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
       if (ret == AVERROR_EOF) {
         // Note:
@@ -678,7 +700,7 @@ void StreamWriter::encode_frame(
         // An alternative is to use `av_write_frame` functoin, but in that case
         // client code is responsible for ordering packets, which makes it
         // complicated to use StreamWriter
-        ret = av_interleaved_write_frame(pFormatContext, nullptr);
+        ret = av_interleaved_write_frame(format, nullptr);
         TORCH_CHECK(
             ret >= 0, "Failed to flush packet (", av_err2string(ret), ").");
       }
@@ -693,20 +715,43 @@ void StreamWriter::encode_frame(
     // https://github.com/pytorch/audio/issues/2790
     // If this is not set, the last frame is not properly saved, as
     // the encoder cannot figure out when the packet should finish.
-    if (pkt->duration == 0 && c->codec_type == AVMEDIA_TYPE_VIDEO) {
+    if (packet->duration == 0 && codec->codec_type == AVMEDIA_TYPE_VIDEO) {
       // 1 means that 1 frame (in codec time base, which is the frame rate)
       // This has to be set before av_packet_rescale_ts bellow.
-      pkt->duration = 1;
+      packet->duration = 1;
     }
-    av_packet_rescale_ts(pkt, c->time_base, st->time_base);
-    pkt->stream_index = st->index;
+    av_packet_rescale_ts(packet, codec->time_base, stream->time_base);
+    packet->stream_index = stream->index;
 
-    ret = av_interleaved_write_frame(pFormatContext, pkt);
+    ret = av_interleaved_write_frame(format, packet);
     TORCH_CHECK(ret >= 0, "Failed to write packet (", av_err2string(ret), ").");
   }
 }
 
-namespace {
+void process_frame(
+    AVFrame* src_frame,
+    std::unique_ptr<FilterGraph>& filter,
+    AVFrame* dst_frame,
+    AVFormatContext* format,
+    AVStream* stream,
+    AVCodecContextPtr& codec,
+    AVPacket* packet) {
+  int ret = filter->add_frame(src_frame);
+  while (ret >= 0) {
+    ret = filter->get_frame(dst_frame);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+      if (ret == AVERROR_EOF) {
+        encode_frame(nullptr, format, stream, codec, packet);
+      }
+      break;
+    }
+    if (ret >= 0) {
+      encode_frame(dst_frame, format, stream, codec, packet);
+    }
+    av_frame_unref(dst_frame);
+  }
+}
+
 void validate_audio_input(
     enum AVSampleFormat fmt,
     AVCodecContext* ctx,
@@ -780,6 +825,7 @@ void validate_video_input(
       ") (NCHW format). Found ",
       t.sizes());
 }
+
 } // namespace
 
 void StreamWriter::write_audio_chunk(int i, const torch::Tensor& waveform) {
@@ -821,9 +867,16 @@ void StreamWriter::write_audio_chunk(int i, const torch::Tensor& waveform) {
 
       if (os.filter) {
         process_frame(
-            os.src_frame, os.filter, os.dst_frame, os.codec_ctx, os.stream);
+            os.src_frame,
+            os.filter,
+            os.dst_frame,
+            pFormatContext,
+            os.stream,
+            os.codec_ctx,
+            pkt);
       } else {
-        encode_frame(os.src_frame, os.codec_ctx, os.stream);
+        encode_frame(
+            os.src_frame, pFormatContext, os.stream, os.codec_ctx, pkt);
       }
     }
   });
@@ -908,7 +961,7 @@ void StreamWriter::write_interlaced_video_cuda(
     }
     os.src_frame->pts = os.num_frames;
     os.num_frames += 1;
-    encode_frame(os.src_frame, os.codec_ctx, os.stream);
+    encode_frame(os.src_frame, pFormatContext, os.stream, os.codec_ctx, pkt);
   }
 }
 
@@ -939,7 +992,7 @@ void StreamWriter::write_planar_video_cuda(
     }
     os.src_frame->pts = os.num_frames;
     os.num_frames += 1;
-    encode_frame(os.src_frame, os.codec_ctx, os.stream);
+    encode_frame(os.src_frame, pFormatContext, os.stream, os.codec_ctx, pkt);
   }
 }
 #endif
@@ -988,9 +1041,15 @@ void StreamWriter::write_interlaced_video(
 
     if (os.filter) {
       process_frame(
-          os.src_frame, os.filter, os.dst_frame, os.codec_ctx, os.stream);
+          os.src_frame,
+          os.filter,
+          os.dst_frame,
+          pFormatContext,
+          os.stream,
+          os.codec_ctx,
+          pkt);
     } else {
-      encode_frame(os.src_frame, os.codec_ctx, os.stream);
+      encode_frame(os.src_frame, pFormatContext, os.stream, os.codec_ctx, pkt);
     }
   }
 }
@@ -1048,9 +1107,15 @@ void StreamWriter::write_planar_video(
 
     if (os.filter) {
       process_frame(
-          os.src_frame, os.filter, os.dst_frame, os.codec_ctx, os.stream);
+          os.src_frame,
+          os.filter,
+          os.dst_frame,
+          pFormatContext,
+          os.stream,
+          os.codec_ctx,
+          pkt);
     } else {
-      encode_frame(os.src_frame, os.codec_ctx, os.stream);
+      encode_frame(os.src_frame, pFormatContext, os.stream, os.codec_ctx, pkt);
     }
   }
 }
@@ -1063,10 +1128,17 @@ void StreamWriter::flush() {
 
 void StreamWriter::flush_stream(OutputStream& os) {
   if (os.filter) {
-    process_frame(nullptr, os.filter, os.dst_frame, os.codec_ctx, os.stream);
+    process_frame(
+        nullptr,
+        os.filter,
+        os.dst_frame,
+        pFormatContext,
+        os.stream,
+        os.codec_ctx,
+        pkt);
   } else {
-    encode_frame(nullptr, os.codec_ctx, os.stream);
+    encode_frame(nullptr, pFormatContext, os.stream, os.codec_ctx, pkt);
   }
 }
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

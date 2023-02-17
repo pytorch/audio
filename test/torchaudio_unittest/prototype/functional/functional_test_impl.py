@@ -1,14 +1,19 @@
-import math
+from torchaudio._internal import module_utils as _mod_utils
 
-import numpy as np
+if _mod_utils.is_module_available("pyroomacoustics"):
+    import pyroomacoustics as pra
+
 import torch
 import torchaudio.prototype.functional as F
 from parameterized import param, parameterized
-from scipy import signal
-from torchaudio.functional import lfilter
-from torchaudio_unittest.common_utils import nested_params, TestBaseMixin
+from torchaudio_unittest.common_utils import nested_params, skipIfNoModule, skipIfNoRIR, TestBaseMixin
 
-from .dsp_utils import oscillator_bank as oscillator_bank_np, sinc_ir as sinc_ir_np
+from .dsp_utils import (
+    exp_sigmoid as exp_sigmoid_np,
+    freq_ir as freq_ir_np,
+    oscillator_bank as oscillator_bank_np,
+    sinc_ir as sinc_ir_np,
+)
 
 
 def _prod(l):
@@ -19,159 +24,6 @@ def _prod(l):
 
 
 class FunctionalTestImpl(TestBaseMixin):
-    @nested_params(
-        [(10, 4), (4, 3, 1, 2), (2,), ()],
-        [(100, 43), (21, 45)],
-        ["full", "valid", "same"],
-    )
-    def test_convolve_numerics(self, leading_dims, lengths, mode):
-        """Check that convolve returns values identical to those that SciPy produces."""
-        L_x, L_y = lengths
-
-        x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
-        y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
-
-        actual = F.convolve(x, y, mode=mode)
-
-        num_signals = torch.tensor(leading_dims).prod() if leading_dims else 1
-        x_reshaped = x.reshape((num_signals, L_x))
-        y_reshaped = y.reshape((num_signals, L_y))
-        expected = [
-            signal.convolve(x_reshaped[i].detach().cpu().numpy(), y_reshaped[i].detach().cpu().numpy(), mode=mode)
-            for i in range(num_signals)
-        ]
-        expected = torch.tensor(np.array(expected))
-        expected = expected.reshape(leading_dims + (-1,))
-
-        self.assertEqual(expected, actual)
-
-    @nested_params(
-        [(10, 4), (4, 3, 1, 2), (2,), ()],
-        [(100, 43), (21, 45)],
-        ["full", "valid", "same"],
-    )
-    def test_fftconvolve_numerics(self, leading_dims, lengths, mode):
-        """Check that fftconvolve returns values identical to those that SciPy produces."""
-        L_x, L_y = lengths
-
-        x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
-        y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
-
-        actual = F.fftconvolve(x, y, mode=mode)
-
-        expected = signal.fftconvolve(x.detach().cpu().numpy(), y.detach().cpu().numpy(), axes=-1, mode=mode)
-        expected = torch.tensor(expected)
-
-        self.assertEqual(expected, actual)
-
-    @parameterized.expand(
-        [
-            # fmt: off
-            ((5, 2, 3), (5, 1, 3)),
-            ((5, 2, 3), (1, 2, 3)),
-            ((5, 2, 3), (1, 1, 3)),
-            # fmt: on
-        ]
-    )
-    def test_fftconvolve_broadcast(self, x_shape, y_shape):
-        """fftconvolve works for Tensors for different shapes if they are broadcast-able"""
-        # 1. Test broad cast case
-        x = torch.rand(x_shape, dtype=self.dtype, device=self.device)
-        y = torch.rand(y_shape, dtype=self.dtype, device=self.device)
-        out1 = F.fftconvolve(x, y)
-        # 2. Test without broadcast
-        y_clone = y.expand(x_shape).clone()
-        assert y is not y_clone
-        assert y_clone.shape == x.shape
-        out2 = F.fftconvolve(x, y_clone)
-        # check that they are same
-        self.assertEqual(out1, out2)
-
-    @parameterized.expand(
-        [
-            # fmt: off
-            # different ndim
-            (0, F.convolve, (4, 3, 1, 2), (10, 4)),
-            (0, F.convolve, (4, 3, 1, 2), (2, 2, 2)),
-            (0, F.convolve, (1, ), (10, 4)),
-            (0, F.convolve, (1, ), (2, 2, 2)),
-            (0, F.fftconvolve, (4, 3, 1, 2), (10, 4)),
-            (0, F.fftconvolve, (4, 3, 1, 2), (2, 2, 2)),
-            (0, F.fftconvolve, (1, ), (10, 4)),
-            (0, F.fftconvolve, (1, ), (2, 2, 2)),
-            # incompatible shape except the last dim
-            (1, F.convolve, (5, 2, 3), (5, 3, 3)),
-            (1, F.convolve, (5, 2, 3), (5, 3, 4)),
-            (1, F.convolve, (5, 2, 3), (5, 3, 5)),
-            (2, F.fftconvolve, (5, 2, 3), (5, 3, 3)),
-            (2, F.fftconvolve, (5, 2, 3), (5, 3, 4)),
-            (2, F.fftconvolve, (5, 2, 3), (5, 3, 5)),
-            # broadcast-able (only for convolve)
-            (1, F.convolve, (5, 2, 3), (5, 1, 3)),
-            (1, F.convolve, (5, 2, 3), (5, 1, 4)),
-            (1, F.convolve, (5, 2, 3), (5, 1, 5)),
-            # fmt: on
-        ],
-    )
-    def test_convolve_input_leading_dim_check(self, case, fn, x_shape, y_shape):
-        """Check that convolve properly rejects inputs with different leading dimensions."""
-        x = torch.rand(*x_shape, dtype=self.dtype, device=self.device)
-        y = torch.rand(*y_shape, dtype=self.dtype, device=self.device)
-
-        message = [
-            "The operands must be the same dimension",
-            "Leading dimensions of x and y don't match",
-            "Leading dimensions of x and y are not broadcastable",
-        ][case]
-        with self.assertRaisesRegex(ValueError, message):
-            fn(x, y)
-
-    def test_add_noise_broadcast(self):
-        """Check that add_noise produces correct outputs when broadcasting input dimensions."""
-        leading_dims = (5, 2, 3)
-        L = 51
-
-        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(5, 1, 1, L, dtype=self.dtype, device=self.device)
-        lengths = torch.rand(5, 1, 3, dtype=self.dtype, device=self.device)
-        snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
-        actual = F.add_noise(waveform, noise, lengths, snr)
-
-        noise_expanded = noise.expand(*leading_dims, L)
-        snr_expanded = snr.expand(*leading_dims)
-        lengths_expanded = lengths.expand(*leading_dims)
-        expected = F.add_noise(waveform, noise_expanded, lengths_expanded, snr_expanded)
-
-        self.assertEqual(expected, actual)
-
-    @parameterized.expand(
-        [((5, 2, 3), (2, 1, 1), (5, 2), (5, 2, 3)), ((2, 1), (5,), (5,), (5,)), ((3,), (5, 2, 3), (2, 1, 1), (5, 2))]
-    )
-    def test_add_noise_leading_dim_check(self, waveform_dims, noise_dims, lengths_dims, snr_dims):
-        """Check that add_noise properly rejects inputs with different leading dimension lengths."""
-        L = 51
-
-        waveform = torch.rand(*waveform_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(*noise_dims, L, dtype=self.dtype, device=self.device)
-        lengths = torch.rand(*lengths_dims, dtype=self.dtype, device=self.device)
-        snr = torch.rand(*snr_dims, dtype=self.dtype, device=self.device) * 10
-
-        with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
-
-    def test_add_noise_length_check(self):
-        """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
-        leading_dims = (5, 2, 3)
-        L = 51
-
-        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
-        noise = torch.rand(*leading_dims, 50, dtype=self.dtype, device=self.device)
-        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
-        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
-
-        with self.assertRaisesRegex(ValueError, "Length dimensions"):
-            F.add_noise(waveform, noise, lengths, snr)
-
     @nested_params(
         [(2, 3), (2, 3, 5), (2, 3, 5, 7)],
         ["sum", "mean", "none"],
@@ -414,61 +266,156 @@ class FunctionalTestImpl(TestBaseMixin):
 
         self.assertEqual(hyp, ref)
 
-    def test_speed_identity(self):
-        """speed of 1.0 does not alter input waveform and length"""
-        leading_dims = (5, 4, 2)
-        T = 1000
-        waveform = torch.rand(*leading_dims, T)
-        lengths = torch.randint(1, 1000, leading_dims)
-        actual_waveform, actual_lengths = F.speed(waveform, lengths, orig_freq=1000, factor=1.0)
-        self.assertEqual(waveform, actual_waveform)
-        self.assertEqual(lengths, actual_lengths)
+    def test_freq_ir_warns_negative_values(self):
+        """frequency_impulse_response warns negative input value"""
+        magnitudes = -torch.ones((1, 30), device=self.device, dtype=self.dtype)
+        with self.assertWarnsRegex(UserWarning, "^.+should not contain negative values.$"):
+            F.frequency_impulse_response(magnitudes)
 
-    @nested_params(
-        [0.8, 1.1, 1.2],
+    @parameterized.expand([((2, 3, 4),), ((1000,),)])
+    def test_freq_ir_reference(self, shape):
+        """frequency_impulse_response produces the same result as reference implementation"""
+        magnitudes = torch.rand(shape, device=self.device, dtype=self.dtype)
+
+        hyp = F.frequency_impulse_response(magnitudes)
+        ref = freq_ir_np(magnitudes.cpu().numpy())
+
+        self.assertEqual(hyp, ref)
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((15, ), (3, 3)),  # filter size (3) is shorter than chunk size (15 // 3 == 5)
+            ((15, ), (3, 5)),  # filter size (5) matches than chunk size
+            ((15, ), (3, 7)),  # filter size (7) is longer than chunk size
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((15, ), (4, 3)),  # filter size (3) is shorter than chunk size (16 // 4 == 4)
+            ((15, ), (4, 4)),  # filter size (4) is shorter than chunk size
+            ((15, ), (4, 5)),  # filter size (5) is longer than chunk size
+            # INPUT: multi-dim waveform and 2D filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (3, 3)),
+            ((7, 2, 15), (3, 5)),
+            ((7, 2, 15), (3, 7)),
+            # INPUT: single-dim waveform and 2D filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (4, 3)),
+            ((7, 2, 15), (4, 4)),
+            ((7, 2, 15), (4, 5)),
+            # INPUT: multi-dim waveform and multi-dim filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (7, 2, 3, 3)),
+            ((7, 2, 15), (7, 2, 3, 5)),
+            ((7, 2, 15), (7, 2, 3, 7)),
+            # INPUT: multi-dim waveform and multi-dim filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (7, 2, 4, 3)),
+            ((7, 2, 15), (7, 2, 4, 4)),
+            ((7, 2, 15), (7, 2, 4, 5)),
+            # INPUT: multi-dim waveform and (broadcast) multi-dim filter
+            # The number of frames is divisible with the number of filters (15 % 3 == 0),
+            # thus waveform must be split into chunks without padding
+            ((7, 2, 15), (1, 1, 3, 3)),
+            ((7, 2, 15), (1, 1, 3, 5)),
+            ((7, 2, 15), (1, 1, 3, 7)),
+            # INPUT: multi-dim waveform and (broadcast) multi-dim filter
+            # The number of frames is NOT divisible with the number of filters (15 % 4 != 0),
+            # thus waveform must be padded before padding
+            ((7, 2, 15), (1, 1, 4, 3)),
+            ((7, 2, 15), (1, 1, 4, 4)),
+            ((7, 2, 15), (1, 1, 4, 5)),
+            # fmt: on
+        ]
     )
-    def test_speed_accuracy(self, factor):
-        """sinusoidal waveform is properly compressed by factor"""
-        n_to_trim = 20
+    def test_filter_waveform_shape(self, waveform_shape, filter_shape):
+        """filter_waveform returns the waveform with the same number of samples"""
+        waveform = torch.randn(waveform_shape, dtype=self.dtype, device=self.device)
+        filters = torch.randn(filter_shape, dtype=self.dtype, device=self.device)
 
-        sample_rate = 1000
-        freq = 2
-        times = torch.arange(0, 5, 1.0 / sample_rate)
-        waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
-        lengths = torch.tensor([waveform.size(1)])
+        filtered = F.filter_waveform(waveform, filters)
 
-        output, output_lengths = F.speed(waveform, lengths, orig_freq=sample_rate, factor=factor)
-        self.assertEqual(output.size(1), output_lengths[0])
+        assert filtered.shape == waveform.shape
 
-        new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
-        expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)
+    @nested_params([1, 3, 5], [3, 5, 7, 4, 6, 8])
+    def test_filter_waveform_delta(self, num_filters, kernel_size):
+        """Applying delta kernel preserves the origianl waveform"""
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernel = torch.zeros((num_filters, kernel_size), dtype=self.dtype, device=self.device)
+        kernel[:, kernel_size // 2] = 1
 
-        self.assertEqual(
-            expected_waveform[..., n_to_trim:-n_to_trim], output[..., n_to_trim:-n_to_trim], atol=1e-1, rtol=1e-4
+        result = F.filter_waveform(waveform, kernel)
+        self.assertEqual(waveform, result)
+
+    def test_filter_waveform_same(self, kernel_size=5):
+        """Applying the same filter returns the original waveform"""
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernel = torch.randn((1, kernel_size), dtype=self.dtype, device=self.device)
+        kernels = torch.cat([kernel] * 3)
+
+        out1 = F.filter_waveform(waveform, kernel)
+        out2 = F.filter_waveform(waveform, kernels)
+        self.assertEqual(out1, out2)
+
+    def test_filter_waveform_diff(self):
+        """Filters are applied from the first to the last"""
+        kernel_size = 3
+        waveform = torch.arange(-10, 10, dtype=self.dtype, device=self.device)
+        kernels = torch.randn((2, kernel_size), dtype=self.dtype, device=self.device)
+
+        # use both filters.
+        mix = F.filter_waveform(waveform, kernels)
+        # use only one of them
+        ref1 = F.filter_waveform(waveform[:10], kernels[0:1])
+        ref2 = F.filter_waveform(waveform[10:], kernels[1:2])
+
+        print("mix:", mix)
+        print("ref1:", ref1)
+        print("ref2:", ref2)
+        # The first filter is effective in the first half
+        self.assertEqual(mix[:10], ref1[:10])
+        # The second filter is effective in the second half
+        self.assertEqual(mix[-9:], ref2[-9:])
+        # the middle portion is where the two filters affect
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            ((-10, 10, 100), (10.0, 2.0, 1e-7)),
+            ((-1, -1, 1), (5.0, 2.4, 1e-7)),  # This is single sample
+            ((0, 3, 10), (1, 1, 1e-12)),
+            # fmt: on
+        ]
+    )
+    def test_exp_sigmoid_input_diff(self, linspace_input_values, exp_sigmoid_parameters):
+        """Test exp_sigmoid function
+
+        linspace_input_values are tuples that specify (start, end, step) for torch.linspace
+        exp_sigmoid_parameters are parameters to exp_sigmoid function: (exponent, max_value, threshold)
+
+        """
+
+        x = torch.linspace(
+            linspace_input_values[0],
+            linspace_input_values[1],
+            linspace_input_values[2],
+            dtype=self.dtype,
+            device=self.device,
         )
+        exponent, max_value, threshold = exp_sigmoid_parameters
 
-    @nested_params(
-        [(3, 2, 100), (95,)],
-        [0.97, 0.9, 0.68],
-    )
-    def test_preemphasis(self, input_shape, coeff):
-        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
-        actual = F.preemphasis(waveform, coeff=coeff)
+        torch_out = F.exp_sigmoid(x, exponent, max_value, threshold)
+        np_out = exp_sigmoid_np(x.cpu().numpy(), exponent, max_value, threshold)
 
-        a_coeffs = torch.tensor([1.0, 0.0], device=self.device, dtype=self.dtype)
-        b_coeffs = torch.tensor([1.0, -coeff], device=self.device, dtype=self.dtype)
-        expected = lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
-        self.assertEqual(actual, expected)
-
-    @nested_params(
-        [(3, 2, 100), (95,)],
-        [0.97, 0.9, 0.68],
-    )
-    def test_preemphasis_deemphasis_roundtrip(self, input_shape, coeff):
-        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
-        preemphasized = F.preemphasis(waveform, coeff=coeff)
-        deemphasized = F.deemphasis(preemphasized, coeff=coeff)
-        self.assertEqual(deemphasized, waveform)
+        self.assertEqual(torch_out, torch.tensor(np_out))
 
 
 class Functional64OnlyTestImpl(TestBaseMixin):
@@ -518,3 +465,83 @@ class Functional64OnlyTestImpl(TestBaseMixin):
         except AssertionError:
             _debug_plot()
             raise
+
+
+@skipIfNoModule("pyroomacoustics")
+@skipIfNoRIR
+class FunctionalCPUOnlyTestImpl(TestBaseMixin):
+    @parameterized.expand([(1,), (4,)])
+    def test_simulate_rir_ism_single_band(self, channel):
+        """Test simulate_rir_ism function in the case where absorption coefficients are identical for all walls."""
+        room_dim = torch.rand(3, dtype=self.dtype, device=self.device) + 5
+        mic_array = torch.rand(channel, 3, dtype=self.dtype, device=self.device) + 1
+        source = torch.rand(3, dtype=self.dtype, device=self.device) + 4
+        max_order = 3
+        # absorption is set as a float value indicating absorption coefficients are the same for every wall.
+        absorption = 0.5
+        # compute rir signal by torchaudio implementation
+        actual = F.simulate_rir_ism(room_dim, source, mic_array, max_order, absorption)
+        # compute rir signal by pyroomacoustics
+        room = pra.ShoeBox(
+            room_dim.detach().numpy(),
+            fs=16000,
+            materials=pra.Material(absorption),
+            max_order=max_order,
+            ray_tracing=False,
+            air_absorption=False,
+        )
+        # mic_locs is a numpy array of dimension `(3, channel)`.
+        mic_locs = mic_array.transpose(0, 1).double().detach().numpy()
+        room.add_microphone_array(mic_locs)
+        room.add_source(source.tolist())
+        room.compute_rir()
+        max_len = max([room.rir[i][0].shape[0] for i in range(channel)])
+        expected = torch.zeros(channel, max_len, dtype=self.dtype, device=self.device)
+        for i in range(channel):
+            expected[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
+
+        self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)
+
+    @parameterized.expand([(1,), (4,)])
+    def test_simulate_rir_ism_multi_band(self, channel):
+        """Test simulate_rir_ism in the case where absorption coefficients are different for all walls."""
+        room_dim = torch.rand(3, dtype=self.dtype, device=self.device) + 5
+        mic_array = torch.rand(channel, 3, dtype=self.dtype, device=self.device) + 1
+        source = torch.rand(3, dtype=self.dtype, device=self.device) + 4
+        max_order = 3
+        # absorption is set as a Tensor with dimensions `(7, 6)` indicating there are
+        # 6 walls and each wall has 7 absorption coefficients corresponds to 7 octave bands, respectively.
+        absorption = torch.rand(7, 6, dtype=self.dtype, device=self.device)
+        walls = ["west", "east", "south", "north", "floor", "ceiling"]
+        room = pra.ShoeBox(
+            room_dim.detach().numpy(),
+            fs=16000,
+            materials={
+                walls[i]: pra.Material(
+                    {
+                        "coeffs": absorption[:, i]
+                        .reshape(
+                            -1,
+                        )
+                        .detach()
+                        .numpy(),
+                        "center_freqs": [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+                    }
+                )
+                for i in range(len(walls))
+            },
+            max_order=max_order,
+            ray_tracing=False,
+            air_absorption=False,
+        )
+        # mic_locs is a numpy array of dimension `(D, channel)`.
+        mic_locs = mic_array.transpose(0, 1).double().detach().numpy()
+        room.add_microphone_array(mic_locs)
+        room.add_source(source.tolist())
+        room.compute_rir()
+        max_len = max([room.rir[i][0].shape[0] for i in range(channel)])
+        expected = torch.zeros(channel, max_len, dtype=self.dtype, device=self.device)
+        for i in range(channel):
+            expected[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
+        actual = F.simulate_rir_ism(room_dim, source, mic_array, max_order, absorption)
+        self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)

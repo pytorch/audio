@@ -600,7 +600,7 @@ class Functional(TempDirMixin, TestBaseMixin):
     def test_resample_sinc(self):
         def func(tensor):
             sr1, sr2 = 16000, 8000
-            return F.resample(tensor, sr1, sr2, resampling_method="sinc_interpolation")
+            return F.resample(tensor, sr1, sr2, resampling_method="sinc_interp_hann")
 
         tensor = common_utils.get_whitenoise(sample_rate=16000)
         self._assert_consistency(func, (tensor,))
@@ -616,7 +616,9 @@ class Functional(TempDirMixin, TestBaseMixin):
         sr1, sr2 = 16000, 8000
         lowpass_filter_width = 6
         rolloff = 0.99
-        self._assert_consistency(F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "kaiser_window", beta))
+        self._assert_consistency(
+            F.resample, (tensor, sr1, sr2, lowpass_filter_width, rolloff, "sinc_interp_kaiser", beta)
+        )
 
     def test_phase_vocoder(self):
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
@@ -755,6 +757,54 @@ class Functional(TempDirMixin, TestBaseMixin):
         beamform_weights = torch.rand(n_fft_bin, num_channels, dtype=self.complex_dtype, device=self.device)
         specgram = torch.rand(num_channels, n_fft_bin, num_frames, dtype=self.complex_dtype, device=self.device)
         self._assert_consistency_complex(F.apply_beamforming, (beamform_weights, specgram))
+
+    @common_utils.nested_params(
+        ["convolve", "fftconvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, fn, mode):
+        leading_dims = (2, 3, 2)
+        L_x, L_y = 32, 55
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+
+        self._assert_consistency(getattr(F, fn), (x, y, mode))
+
+    @common_utils.nested_params([True, False])
+    def test_add_noise(self, use_lengths):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        else:
+            lengths = None
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
+
+        self._assert_consistency(F.add_noise, (waveform, noise, snr, lengths))
+
+    @common_utils.nested_params([True, False])
+    def test_speed(self, use_lengths):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        else:
+            lengths = None
+        self._assert_consistency(F.speed, (waveform, 1000, 1.1, lengths))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.preemphasis, (waveform, coeff))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        self._assert_consistency(F.deemphasis, (waveform, coeff))
 
 
 class FunctionalFloat32Only(TestBaseMixin):

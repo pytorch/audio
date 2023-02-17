@@ -2,7 +2,7 @@
 
 import math
 import warnings
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Sequence, Tuple, Union
 
 import torch
 from torch import Tensor
@@ -12,6 +12,7 @@ from torch.nn.parameter import UninitializedParameter
 from torchaudio import functional as F
 from torchaudio.functional.functional import (
     _apply_sinc_resample_kernel,
+    _check_convolve_mode,
     _fix_waveform_shape,
     _get_sinc_resample_kernel,
     _stretch_waveform,
@@ -942,7 +943,7 @@ class Resample(torch.nn.Module):
         orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``"sinc_interpolation"``)
+            Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -966,7 +967,7 @@ class Resample(torch.nn.Module):
         self,
         orig_freq: int = 16000,
         new_freq: int = 16000,
-        resampling_method: str = "sinc_interpolation",
+        resampling_method: str = "sinc_interp_hann",
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         beta: Optional[float] = None,
@@ -1807,3 +1808,282 @@ class RNNTLoss(torch.nn.Module):
             self.reduction,
             self.fused_log_softmax,
         )
+
+
+class Convolve(torch.nn.Module):
+    r"""
+    Convolves inputs along their last dimension using the direct method.
+    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation
+    operator, this module applies the true `convolution`_ operator.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`, where
+              `N` and `M` are the trailing dimensions of the two inputs. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+
+    def __init__(self, mode: str = "full") -> None:
+        _check_convolve_mode(mode)
+
+        super().__init__()
+        self.mode = mode
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+            y (torch.Tensor): Second convolution operand, with shape `(..., M)`
+                (leading dimensions must be broadcast-able with those of ``x``).
+
+        Returns:
+            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+            the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
+        """
+        return F.convolve(x, y, mode=self.mode)
+
+
+class FFTConvolve(torch.nn.Module):
+    r"""
+    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this module
+    is generally much faster than :class:`Convolve`.
+    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation
+    operator, this module applies the true `convolution`_ operator.
+    Also note that this module can only output float tensors (int tensor inputs will be cast to float).
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`, where
+              `N` and `M` are the trailing dimensions of the two inputs. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+
+    def __init__(self, mode: str = "full") -> None:
+        _check_convolve_mode(mode)
+
+        super().__init__()
+        self.mode = mode
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+            y (torch.Tensor): Second convolution operand, with shape `(..., M)`
+                (leading dimensions must be broadcast-able with those of ``x``).
+
+        Returns:
+            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+            the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
+        """
+        return F.fftconvolve(x, y, mode=self.mode)
+
+
+def _source_target_sample_rate(orig_freq: int, speed: float) -> Tuple[int, int]:
+    source_sample_rate = int(speed * orig_freq)
+    target_sample_rate = int(orig_freq)
+    gcd = math.gcd(source_sample_rate, target_sample_rate)
+    return source_sample_rate // gcd, target_sample_rate // gcd
+
+
+class Speed(torch.nn.Module):
+    r"""Adjusts waveform speed.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factor (float): Factor by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+    """
+
+    def __init__(self, orig_freq, factor) -> None:
+        super().__init__()
+
+        self.orig_freq = orig_freq
+        self.factor = factor
+
+        self.source_sample_rate, self.target_sample_rate = _source_target_sample_rate(orig_freq, factor)
+        self.resampler = Resample(orig_freq=self.source_sample_rate, new_freq=self.target_sample_rate)
+
+    def forward(self, waveform, lengths: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+                If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
+
+        Returns:
+            (torch.Tensor, torch.Tensor or None):
+                torch.Tensor
+                    Speed-adjusted waveform, with shape `(..., new_time).`
+                torch.Tensor or None
+                    If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                    with shape `(...)`; otherwise, ``None``.
+        """
+
+        if lengths is None:
+            out_lengths = None
+        else:
+            out_lengths = torch.ceil(lengths * self.target_sample_rate / self.source_sample_rate).to(lengths.dtype)
+
+        return self.resampler(waveform), out_lengths
+
+
+class SpeedPerturbation(torch.nn.Module):
+    r"""Applies the speed perturbation augmentation introduced in
+    *Audio augmentation for speech recognition* :cite:`ko15_interspeech`. For a given input,
+    the module samples a speed-up factor from ``factors`` uniformly at random and adjusts
+    the speed of the input by that factor.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factors (Sequence[float]): Factors by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+
+    Example
+        >>> speed_perturb = SpeedPerturbation(16000, [0.9, 1.1, 1.0, 1.0, 1.0])
+        >>> # waveform speed will be adjusted by factor 0.9 with 20% probability,
+        >>> # 1.1 with 20% probability, and 1.0 (i.e. kept the same) with 60% probability.
+        >>> speed_perturbed_waveform = speed_perturb(waveform, lengths)
+    """
+
+    def __init__(self, orig_freq: int, factors: Sequence[float]) -> None:
+        super().__init__()
+
+        self.speeders = torch.nn.ModuleList([Speed(orig_freq=orig_freq, factor=factor) for factor in factors])
+
+    def forward(
+        self, waveform: torch.Tensor, lengths: Optional[torch.Tensor] = None
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+                If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
+
+        Returns:
+            (torch.Tensor, torch.Tensor or None):
+                torch.Tensor
+                    Speed-adjusted waveform, with shape `(..., new_time).`
+                torch.Tensor or None
+                    If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                    with shape `(...)`; otherwise, ``None``.
+        """
+
+        idx = int(torch.randint(len(self.speeders), ()))
+        # NOTE: we do this because TorchScript doesn't allow for
+        # indexing ModuleList instances with non-literals.
+        for speeder_idx, speeder in enumerate(self.speeders):
+            if idx == speeder_idx:
+                return speeder(waveform, lengths)
+        raise RuntimeError("Speeder not found; execution should have never reached here.")
+
+
+class AddNoise(torch.nn.Module):
+    r"""Scales and adds noise to waveform per signal-to-noise ratio.
+    See :meth:`torchaudio.functional.add_noise` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+    """
+
+    def forward(
+        self, waveform: torch.Tensor, noise: torch.Tensor, snr: torch.Tensor, lengths: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
+            noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
+            snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``,
+            with shape `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all
+            elements in ``waveform`` and ``noise`` are treated as valid. (Default: ``None``)
+
+        Returns:
+            torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
+            (same shape as ``waveform``).
+        """
+        return F.add_noise(waveform, noise, snr, lengths)
+
+
+class Preemphasis(torch.nn.Module):
+    r"""Pre-emphasizes a waveform along its last dimension.
+    See :meth:`torchaudio.functional.preemphasis` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+    """
+
+    def __init__(self, coeff: float = 0.97) -> None:
+        super().__init__()
+        self.coeff = coeff
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+
+        Returns:
+            torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
+        """
+        return F.preemphasis(waveform, coeff=self.coeff)
+
+
+class Deemphasis(torch.nn.Module):
+    r"""De-emphasizes a waveform along its last dimension.
+    See :meth:`torchaudio.functional.deemphasis` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+    """
+
+    def __init__(self, coeff: float = 0.97) -> None:
+        super().__init__()
+        self.coeff = coeff
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+
+        Returns:
+            torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+        """
+        return F.deemphasis(waveform, coeff=self.coeff)

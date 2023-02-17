@@ -23,6 +23,18 @@ model implementations and application components.
    references
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Installation
+   :hidden:
+
+   installation
+   build
+   build.linux
+   build.windows
+   build.jetson
+   build.ffmpeg
+
+.. toctree::
    :maxdepth: 1
    :caption: API Tutorials
    :hidden:
@@ -41,6 +53,8 @@ model implementations and application components.
 
    tutorials/oscillator_tutorial
    tutorials/additive_synthesis_tutorial
+   tutorials/filter_design_tutorial
+   tutorials/subtractive_synthesis_tutorial
 
    tutorials/audio_datasets_tutorial
 
@@ -70,7 +84,7 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :caption: API Reference
+   :caption: Python API Reference
    :hidden:
 
    torchaudio
@@ -89,14 +103,24 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Prototype API Reference
+   :caption: Python Prototype API Reference
    :hidden:
 
    prototype
+   prototype.datasets
    prototype.functional
    prototype.models
    prototype.pipelines
    prototype.transforms
+
+.. toctree::
+   :maxdepth: 1
+   :caption: C++ Prototype API Reference
+   :hidden:
+
+   libtorchaudio
+   libtorchaudio.stream_reader
+   libtorchaudio.stream_writer
 
 .. toctree::
    :maxdepth: 1
@@ -198,6 +222,20 @@ Tutorials
    :card_description:
    :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
    :link: tutorials/additive_synthesis_tutorial.html
+   :tags: DSP
+
+.. customcarditem::
+   :header: Designing digital filters
+   :card_description:
+   :image: _images/sphx_glr_filter_design_tutorial_001.png
+   :link: tutorials/filter_design_tutorial.html
+   :tags: DSP
+
+.. customcarditem::
+   :header: Subtractive Synthesis
+   :card_description:
+   :image: _images/sphx_glr_subtractive_synthesis_tutorial_002.png
+   :link: tutorials/subtractive_synthesis_tutorial.html
    :tags: DSP
 
 .. customcarditem::

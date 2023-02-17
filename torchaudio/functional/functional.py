@@ -9,7 +9,6 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal import module_utils as _mod_utils
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -46,6 +45,12 @@ __all__ = [
     "rtf_evd",
     "rtf_power",
     "apply_beamforming",
+    "fftconvolve",
+    "convolve",
+    "add_noise",
+    "speed",
+    "preemphasis",
+    "deemphasis",
 ]
 
 
@@ -1265,7 +1270,7 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1309,7 +1314,7 @@ def apply_codec(
     return augmented
 
 
-@_mod_utils.requires_kaldi()
+@torchaudio._extension.fail_if_no_kaldi
 def compute_kaldi_pitch(
     waveform: torch.Tensor,
     sample_rate: float,
@@ -1429,7 +1434,7 @@ def _get_sinc_resample_kernel(
     gcd: int,
     lowpass_filter_width: int = 6,
     rolloff: float = 0.99,
-    resampling_method: str = "sinc_interpolation",
+    resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
     device: torch.device = torch.device("cpu"),
     dtype: Optional[torch.dtype] = None,
@@ -1445,7 +1450,17 @@ def _get_sinc_resample_kernel(
             "For more information, please refer to https://github.com/pytorch/audio/issues/1487."
         )
 
-    if resampling_method not in ["sinc_interpolation", "kaiser_window"]:
+    if resampling_method in ["sinc_interpolation", "kaiser_window"]:
+        method_map = {
+            "sinc_interpolation": "sinc_interp_hann",
+            "kaiser_window": "sinc_interp_kaiser",
+        }
+        warnings.warn(
+            f'"{resampling_method}" resampling method name is being deprecated and replaced by '
+            f'"{method_map[resampling_method]}" in the next release. '
+            "The default behavior remains unchanged."
+        )
+    elif resampling_method not in ["sinc_interp_hann", "sinc_interp_kaiser"]:
         raise ValueError("Invalid resampling method: {}".format(resampling_method))
 
     orig_freq = int(orig_freq) // gcd
@@ -1492,10 +1507,10 @@ def _get_sinc_resample_kernel(
 
     # we do not use built in torch windows here as we need to evaluate the window
     # at specific positions, not over a regular grid.
-    if resampling_method == "sinc_interpolation":
+    if resampling_method == "sinc_interp_hann":
         window = torch.cos(t * math.pi / lowpass_filter_width / 2) ** 2
     else:
-        # kaiser_window
+        # sinc_interp_kaiser
         if beta is None:
             beta = 14.769656459379492
         beta_tensor = torch.tensor(float(beta))
@@ -1549,7 +1564,7 @@ def resample(
     new_freq: int,
     lowpass_filter_width: int = 6,
     rolloff: float = 0.99,
-    resampling_method: str = "sinc_interpolation",
+    resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency using bandlimited interpolation. :cite:`RESAMPLE`.
@@ -1571,7 +1586,7 @@ def resample(
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``"sinc_interpolation"``, ``"kaiser_window"``] (Default: ``"sinc_interpolation"``)
+            Options: [``"sinc_interp_hann"``, ``"sinc_interp_kaiser"``] (Default: ``"sinc_interp_hann"``)
         beta (float or None, optional): The shape parameter used for kaiser window.
 
     Returns:
@@ -2278,3 +2293,290 @@ def apply_beamforming(beamform_weights: Tensor, specgram: Tensor) -> Tensor:
     # (..., freq, channel) x (..., channel, freq, time) -> (..., freq, time)
     specgram_enhanced = torch.einsum("...fc,...cft->...ft", [beamform_weights.conj(), specgram])
     return specgram_enhanced
+
+
+def _check_shape_compatible(x: torch.Tensor, y: torch.Tensor) -> None:
+    if x.ndim != y.ndim:
+        raise ValueError(f"The operands must be the same dimension (got {x.ndim} and {y.ndim}).")
+
+    for i in range(x.ndim - 1):
+        xi = x.size(i)
+        yi = y.size(i)
+        if xi == yi or xi == 1 or yi == 1:
+            continue
+        raise ValueError(f"Leading dimensions of x and y are not broadcastable (got {x.shape} and {y.shape}).")
+
+
+def _check_convolve_mode(mode: str) -> None:
+    valid_convolve_modes = ["full", "valid", "same"]
+    if mode not in valid_convolve_modes:
+        raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
+
+
+def _apply_convolve_mode(conv_result: torch.Tensor, x_length: int, y_length: int, mode: str) -> torch.Tensor:
+    valid_convolve_modes = ["full", "valid", "same"]
+    if mode == "full":
+        return conv_result
+    elif mode == "valid":
+        target_length = max(x_length, y_length) - min(x_length, y_length) + 1
+        start_idx = (conv_result.size(-1) - target_length) // 2
+        return conv_result[..., start_idx : start_idx + target_length]
+    elif mode == "same":
+        start_idx = (conv_result.size(-1) - x_length) // 2
+        return conv_result[..., start_idx : start_idx + x_length]
+    else:
+        raise ValueError(f"Unrecognized mode value '{mode}'. Please specify one of {valid_convolve_modes}.")
+
+
+def fftconvolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tensor:
+    r"""
+    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this function
+    is generally much faster than :meth:`convolve`.
+    Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation
+    operator, this function applies the true `convolution`_ operator.
+    Also note that this function can only output float tensors (int tensor inputs will be cast to float).
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(..., M)`
+            (leading dimensions must be broadcast-able with those of ``x``).
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
+
+    Returns:
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+        the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+    _check_shape_compatible(x, y)
+    _check_convolve_mode(mode)
+
+    n = x.size(-1) + y.size(-1) - 1
+    fresult = torch.fft.rfft(x, n=n) * torch.fft.rfft(y, n=n)
+    result = torch.fft.irfft(fresult, n=n)
+    return _apply_convolve_mode(result, x.size(-1), y.size(-1), mode)
+
+
+def convolve(x: torch.Tensor, y: torch.Tensor, mode: str = "full") -> torch.Tensor:
+    r"""
+    Convolves inputs along their last dimension using the direct method.
+    Note that, in contrast to :meth:`torch.nn.functional.conv1d`, which actually applies the valid cross-correlation
+    operator, this function applies the true `convolution`_ operator.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+        y (torch.Tensor): Second convolution operand, with shape `(..., M)`
+            (leading dimensions must be broadcast-able with those of ``x``).
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
+
+    Returns:
+        torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+        the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+    _check_shape_compatible(x, y)
+    _check_convolve_mode(mode)
+
+    x_size, y_size = x.size(-1), y.size(-1)
+
+    if x.size(-1) < y.size(-1):
+        x, y = y, x
+
+    if x.shape[:-1] != y.shape[:-1]:
+        new_shape = [max(i, j) for i, j in zip(x.shape[:-1], y.shape[:-1])]
+        x = x.broadcast_to(new_shape + [x.shape[-1]])
+        y = y.broadcast_to(new_shape + [y.shape[-1]])
+
+    num_signals = torch.tensor(x.shape[:-1]).prod()
+    reshaped_x = x.reshape((int(num_signals), x.size(-1)))
+    reshaped_y = y.reshape((int(num_signals), y.size(-1)))
+    output = torch.nn.functional.conv1d(
+        input=reshaped_x,
+        weight=reshaped_y.flip(-1).unsqueeze(1),
+        stride=1,
+        groups=reshaped_x.size(0),
+        padding=reshaped_y.size(-1) - 1,
+    )
+    output_shape = x.shape[:-1] + (-1,)
+    result = output.reshape(output_shape)
+    return _apply_convolve_mode(result, x_size, y_size, mode)
+
+
+def add_noise(
+    waveform: torch.Tensor, noise: torch.Tensor, snr: torch.Tensor, lengths: Optional[torch.Tensor] = None
+) -> torch.Tensor:
+    r"""Scales and adds noise to waveform per signal-to-noise ratio.
+
+    Specifically, for each pair of waveform vector :math:`x \in \mathbb{R}^L` and noise vector
+    :math:`n \in \mathbb{R}^L`, the function computes output :math:`y` as
+
+    .. math::
+        y = x + a n \, \text{,}
+
+    where
+
+    .. math::
+        a = \sqrt{ \frac{ ||x||_{2}^{2} }{ ||n||_{2}^{2} } \cdot 10^{-\frac{\text{SNR}}{10}} } \, \text{,}
+
+    with :math:`\text{SNR}` being the desired signal-to-noise ratio between :math:`x` and :math:`n`, in dB.
+
+    Note that this function broadcasts singleton leading dimensions in its inputs in a manner that is
+    consistent with the above formulae and PyTorch's broadcasting semantics.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
+        noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
+        snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+        lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``, with shape
+            `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all elements in ``waveform``
+            and ``noise`` are treated as valid. (Default: ``None``)
+
+    Returns:
+        torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
+        (same shape as ``waveform``).
+    """
+
+    if not (waveform.ndim - 1 == noise.ndim - 1 == snr.ndim and (lengths is None or lengths.ndim == snr.ndim)):
+        raise ValueError("Input leading dimensions don't match.")
+
+    L = waveform.size(-1)
+
+    if L != noise.size(-1):
+        raise ValueError(f"Length dimensions of waveform and noise don't match (got {L} and {noise.size(-1)}).")
+
+    # compute scale
+    if lengths is not None:
+        mask = torch.arange(0, L, device=lengths.device).expand(waveform.shape) < lengths.unsqueeze(
+            -1
+        )  # (*, L) < (*, 1) = (*, L)
+        masked_waveform = waveform * mask
+        masked_noise = noise * mask
+    else:
+        masked_waveform = waveform
+        masked_noise = noise
+
+    energy_signal = torch.linalg.vector_norm(masked_waveform, ord=2, dim=-1) ** 2  # (*,)
+    energy_noise = torch.linalg.vector_norm(masked_noise, ord=2, dim=-1) ** 2  # (*,)
+    original_snr_db = 10 * (torch.log10(energy_signal) - torch.log10(energy_noise))
+    scale = 10 ** ((original_snr_db - snr) / 20.0)  # (*,)
+
+    # scale noise
+    scaled_noise = scale.unsqueeze(-1) * noise  # (*, 1) * (*, L) = (*, L)
+
+    return waveform + scaled_noise  # (*, L)
+
+
+def speed(
+    waveform: torch.Tensor, orig_freq: int, factor: float, lengths: Optional[torch.Tensor] = None
+) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+    r"""Adjusts waveform speed.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factor (float): Factor by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+        lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+            If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
+
+    Returns:
+        (torch.Tensor, torch.Tensor or None):
+            torch.Tensor
+                Speed-adjusted waveform, with shape `(..., new_time).`
+            torch.Tensor or None
+                If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                with shape `(...)`; otherwise, ``None``.
+    """
+
+    source_sample_rate = int(factor * orig_freq)
+    target_sample_rate = int(orig_freq)
+
+    gcd = math.gcd(source_sample_rate, target_sample_rate)
+    source_sample_rate = source_sample_rate // gcd
+    target_sample_rate = target_sample_rate // gcd
+
+    if lengths is None:
+        out_lengths = None
+    else:
+        out_lengths = torch.ceil(lengths * target_sample_rate / source_sample_rate).to(lengths.dtype)
+
+    return resample(waveform, source_sample_rate, target_sample_rate), out_lengths
+
+
+def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+    r"""Pre-emphasizes a waveform along its last dimension, i.e.
+    for each signal :math:`x` in ``waveform``, computes
+    output :math:`y` as
+
+    .. math::
+        y[i] = x[i] - \text{coeff} \cdot x[i - 1]
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+
+    Returns:
+        torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
+    """
+    waveform = waveform.clone()
+    waveform[..., 1:] -= coeff * waveform[..., :-1]
+    return waveform
+
+
+def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+    r"""De-emphasizes a waveform along its last dimension.
+    Inverse of :meth:`preemphasis`. Concretely, for each signal
+    :math:`x` in ``waveform``, computes output :math:`y` as
+
+    .. math::
+        y[i] = x[i] + \text{coeff} \cdot y[i - 1]
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+
+    Returns:
+        torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+    """
+    a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
+    b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
+    return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)

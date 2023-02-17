@@ -83,13 +83,19 @@ Utility
     :nosignatures:
 
     AmplitudeToDB
-    MelScale
     MuLawEncoding
     MuLawDecoding
     Resample
     Fade
     Vol
     Loudness
+    AddNoise
+    Convolve
+    FFTConvolve
+    Speed
+    SpeedPerturbation
+    Deemphasis
+    Preemphasis
 
 Feature Extractions
 -------------------
@@ -100,6 +106,8 @@ Feature Extractions
 
     Spectrogram
     InverseSpectrogram
+    MelScale
+    InverseMelScale
     MelSpectrogram
     GriffinLim
     MFCC

@@ -1,13 +1,12 @@
 import numpy as np
-from numpy.typing import ArrayLike
 
 
 def oscillator_bank(
-    frequencies: ArrayLike,
-    amplitudes: ArrayLike,
+    frequencies,
+    amplitudes,
     sample_rate: float,
     time_axis: int = -2,
-) -> ArrayLike:
+):
     """Reference implementation of oscillator_bank"""
     invalid = np.abs(frequencies) >= sample_rate / 2
     if np.any(invalid):
@@ -20,7 +19,7 @@ def oscillator_bank(
     return waveform
 
 
-def sinc_ir(cutoff: ArrayLike, window_size: int = 513, high_pass: bool = False):
+def sinc_ir(cutoff, window_size: int = 513, high_pass: bool = False):
     if window_size % 2 == 0:
         raise ValueError(f"`window_size` must be odd. Given: {window_size}")
     half = window_size // 2
@@ -35,3 +34,32 @@ def sinc_ir(cutoff: ArrayLike, window_size: int = 513, high_pass: bool = False):
         filt *= -1
         filt[..., half] = 1.0 + filt[..., half]
     return filt
+
+
+def freq_ir(magnitudes):
+    ir = np.fft.fftshift(np.fft.irfft(magnitudes), axes=-1)
+    window = np.hanning(ir.shape[-1])
+    return (ir * window).astype(magnitudes.dtype)
+
+
+def exp_sigmoid(
+    input: np.ndarray, exponent: float = 10.0, max_value: float = 2.0, threshold: float = 1e-7
+) -> np.ndarray:
+    """Exponential Sigmoid pointwise nonlinearity (Numpy version).
+    Implements the equation:
+    ``max_value`` * sigmoid(``input``) ** (log(``exponent``)) + ``threshold``
+
+    The output has a range of [``threshold``, ``max_value``].
+    ``exponent`` controls the slope of the output.
+
+    Args:
+        input (np.ndarray): Input array
+        exponent (float, optional): Exponent. Controls the slope of the output
+        max_value (float, optional): Maximum value of the output
+        threshold (float, optional): Minimum value of the output
+
+    Returns:
+        np.ndarray: Exponential Sigmoid output. Shape: same as input
+
+    """
+    return max_value * (1 / (1 + np.exp(-input, dtype=input.dtype))) ** np.log(exponent, dtype=input.dtype) + threshold

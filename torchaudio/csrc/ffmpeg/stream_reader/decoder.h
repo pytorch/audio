@@ -3,7 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class Decoder {
   AVCodecContextPtr pCodecContext;
@@ -29,9 +29,10 @@ class Decoder {
   int process_packet(AVPacket* pPacket);
   // Fetch a decoded frame
   int get_frame(AVFrame* pFrame);
+  int get_frame_number() const;
   // Flush buffer (for seek)
   void flush_buffer();
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

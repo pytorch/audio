@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import itertools as it
+
+import warnings
 from abc import abstractmethod
 from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Tuple, Union
@@ -9,13 +11,13 @@ import torch
 import torchaudio
 from torchaudio.utils import download_asset
 
-try:
-    # We prioritize the version from upstream flashlight here.
-    # This will allow applications that use the upstream flashlight
-    # alongside torchaudio.
+
+# We prioritize the version from upstream flashlight here.
+# This will allow applications that use the upstream flashlight
+# alongside torchaudio.
+if torchaudio._internal.module_utils.is_module_available("flashlight"):
     from flashlight.lib.text.decoder import (
         CriterionType as _CriterionType,
-        KenLM as _KenLM,
         LexiconDecoder as _LexiconDecoder,
         LexiconDecoderOptions as _LexiconDecoderOptions,
         LexiconFreeDecoder as _LexiconFreeDecoder,
@@ -31,9 +33,18 @@ try:
         Dictionary as _Dictionary,
         load_words as _load_words,
     )
-except Exception:
+
+    try:
+        from flashlight.lib.text.decoder import KenLM as _KenLM
+    except Exception:
+        _KenLM = None
+else:
+    warnings.warn(
+        "The built-in flashlight integration is deprecated, and will be removed in future release."
+        "Please install flashlight-text. https://pypi.org/project/flashlight-text/"
+    )
     torchaudio._extension._load_lib("libflashlight-text")
-    from torchaudio.flashlight_lib_text_decoder import (
+    from torchaudio.lib.flashlight_lib_text_decoder import (
         CriterionType as _CriterionType,
         KenLM as _KenLM,
         LexiconDecoder as _LexiconDecoder,
@@ -46,7 +57,7 @@ except Exception:
         Trie as _Trie,
         ZeroLM as _ZeroLM,
     )
-    from torchaudio.flashlight_lib_text_dictionary import (
+    from torchaudio.lib.flashlight_lib_text_dictionary import (
         create_word_dict as _create_word_dict,
         Dictionary as _Dictionary,
         load_words as _load_words,
@@ -294,6 +305,9 @@ class CTCDecoder:
         if emissions.is_cuda:
             raise RuntimeError("emissions must be a CPU tensor.")
 
+        if not emissions.is_contiguous():
+            raise RuntimeError("emissions must be contiguous.")
+
         if lengths is not None and lengths.is_cuda:
             raise RuntimeError("lengths must be a CPU tensor.")
 
@@ -427,6 +441,8 @@ def ctc_decoder(
     word_dict = _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word)
 
     if type(lm) == str:
+        if _KenLM is None:
+            raise RuntimeError("flashlight is installed, but KenLM is not installed. Please install KenLM.")
         lm = _KenLM(lm, word_dict)
     elif lm is None:
         lm = _ZeroLM()

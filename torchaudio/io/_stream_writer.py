@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import BinaryIO, Dict, Optional, Union
 
 import torch
 import torchaudio
@@ -15,7 +15,9 @@ def _format_doc(**kwargs):
 _encoder = """The name of the encoder to be used.
                 When provided, use the specified encoder instead of the default one.
 
-                To list the available encoders, you can use ``ffmpeg -encoders`` command.
+                To list the available encoders, please use
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_encoders` for audio, and
+                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_encoders` for video.
 
                 Default: ``None``."""
 
@@ -46,11 +48,12 @@ _format_common_args = _format_doc(
 )
 
 
+@torchaudio._extension.fail_if_no_ffmpeg
 class StreamWriter:
     """Encode and write audio/video streams chunk by chunk
 
     Args:
-        dst (str): The destination where the encoded data are written.
+        dst (str or file-like object): The destination where the encoded data are written.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. The supported value depends on the FFmpeg found in the system.
 
@@ -82,7 +85,8 @@ class StreamWriter:
 
                https://ffmpeg.org/ffmpeg-formats.html#Muxers
 
-               Use `ffmpeg -muxers` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_muxers` to list the
+               multiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
                software configuration (ffmpeg build).
@@ -90,7 +94,8 @@ class StreamWriter:
 
                https://ffmpeg.org/ffmpeg-devices.html#Output-Devices
 
-               Use `ffmpeg -devices` to list the values available in the current environment.
+               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_output_devices` to list
+               the output devices available in the current environment.
 
         buffer_size (int):
             The internal buffer size in byte. Used only when `dst` is a file-like object.
@@ -100,7 +105,7 @@ class StreamWriter:
 
     def __init__(
         self,
-        dst: str,
+        dst: Union[str, BinaryIO],
         format: Optional[str] = None,
         buffer_size: int = 4096,
     ):
@@ -108,7 +113,7 @@ class StreamWriter:
         if isinstance(dst, str):
             self._s = torch.classes.torchaudio.ffmpeg_StreamWriter(dst, format)
         elif hasattr(dst, "write"):
-            self._s = torchaudio._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
+            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
         else:
             raise ValueError("`dst` must be either a string or a file-like object.")
         self._is_open = False
@@ -216,8 +221,15 @@ class StreamWriter:
         """[debug] Print the registered stream information to stdout."""
         self._s.dump_format(i)
 
-    def open(self, option: Optional[Dict[str, str]] = None):
+    def open(self, option: Optional[Dict[str, str]] = None) -> "StreamWriter":
         """Open the output file / device and write the header.
+
+        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        ``with`` statement.
+        This method returns the instance on which the method is called (i.e. `self`),
+        so that it can be used in `with` statement.
+        It is recommended to use context manager, as the file is closed automatically
+        when exiting from ``with`` clause.
 
         Args:
             option (dict or None, optional): Private options for protocol, device and muxer. See example.
@@ -251,7 +263,15 @@ class StreamWriter:
         return self
 
     def close(self):
-        """Close the output"""
+        """Close the output
+
+        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        ``with`` statement.
+        It is recommended to use context manager, as the file is closed automatically
+        when exiting from ``with`` clause.
+
+        See :py:meth:`StreamWriter.open` for more detail.
+        """
         if self._is_open:
             self._s.close()
             self._is_open = False

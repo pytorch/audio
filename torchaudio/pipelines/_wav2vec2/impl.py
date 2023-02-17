@@ -73,6 +73,7 @@ class Wav2Vec2Bundle:
     _params: Dict[str, Any]
     _sample_rate: float
     _normalize_waveform: bool
+    _model_type: str
 
     @property
     def sample_rate(self) -> float:
@@ -109,14 +110,16 @@ class Wav2Vec2Bundle:
             - WAV2VEC2_ASR_LARGE_LV60K_100H
             - WAV2VEC2_ASR_LARGE_LV60K_960H
             - WAV2VEC2_XLSR53
+            - WAV2VEC2_XLSR_300M
+            - WAV2VEC2_XLSR_1B
+            - WAV2VEC2_XLSR_2B
             - HUBERT_LARGE
             - HUBERT_XLARGE
             - HUBERT_ASR_LARGE
             - HUBERT_ASR_XLARGE
             - WAVLM_LARGE
         """
-        model_type = self._params.pop("model_type", None)
-        if model_type == "WavLM":
+        if self._model_type == "WavLM":
             model = wavlm_model(**self._params)
         else:
             model = wav2vec2_model(**self._params)
@@ -245,6 +248,7 @@ WAV2VEC2_BASE = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_BASE.__doc__ = """Wav2vec 2.0 model ("base" architecture),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -289,6 +293,7 @@ WAV2VEC2_ASR_BASE_10M = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_BASE_10M.__doc__ = """Wav2vec 2.0 model ("base" architecture with an extra linear module),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -335,6 +340,7 @@ WAV2VEC2_ASR_BASE_100H = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 
 WAV2VEC2_ASR_BASE_100H.__doc__ = """Wav2vec 2.0 model ("base" architecture with an extra linear module),
@@ -381,6 +387,7 @@ WAV2VEC2_ASR_BASE_960H = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_BASE_960H.__doc__ = """Wav2vec 2.0 model ("base" architecture with an extra linear module),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -425,6 +432,7 @@ WAV2VEC2_LARGE = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_LARGE.__doc__ = """Wav2vec 2.0 model ("large" architecture),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -469,6 +477,7 @@ WAV2VEC2_ASR_LARGE_10M = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_LARGE_10M.__doc__ = """Wav2vec 2.0 model ("large" architecture with an extra linear module),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -515,6 +524,7 @@ WAV2VEC2_ASR_LARGE_100H = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_LARGE_100H.__doc__ = """Wav2vec 2.0 model ("large" architecture with an extra linear module),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -561,6 +571,7 @@ WAV2VEC2_ASR_LARGE_960H = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_LARGE_960H.__doc__ = """Wav2vec 2.0 model ("large" architecture with an extra linear module),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -605,6 +616,7 @@ WAV2VEC2_LARGE_LV60K = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_LARGE_LV60K.__doc__ = """Wav2vec 2.0 model ("large-lv60k" architecture),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,
@@ -649,6 +661,7 @@ WAV2VEC2_ASR_LARGE_LV60K_10M = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_LARGE_LV60K_10M.__doc__ = """Wav2vec 2.0 model ("large-lv60k" architecture with an extra linear module),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and
@@ -693,6 +706,7 @@ WAV2VEC2_ASR_LARGE_LV60K_100H = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_LARGE_LV60K_100H.__doc__ = """Wav2vec 2.0 model ("large-lv60k" architecture with an extra linear module),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and
@@ -738,6 +752,7 @@ WAV2VEC2_ASR_LARGE_LV60K_960H = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_ASR_LARGE_LV60K_960H.__doc__ = """Wav2vec 2.0 model ("large-lv60k" architecture with an extra linear module),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* :cite:`librilight` dataset, and
@@ -782,6 +797,7 @@ WAV2VEC2_XLSR53 = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 WAV2VEC2_XLSR53.__doc__ = """Wav2vec 2.0 model ("base" architecture),
 pre-trained on 56,000 hours of unlabeled audio from multiple datasets (
@@ -829,6 +845,7 @@ HUBERT_BASE = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 HUBERT_BASE.__doc__ = """HuBERT model ("base" architecture),
 pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`7178964`
@@ -872,6 +889,7 @@ HUBERT_LARGE = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 HUBERT_LARGE.__doc__ = """HuBERT model ("large" architecture),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,
@@ -915,6 +933,7 @@ HUBERT_XLARGE = Wav2Vec2Bundle(
     },
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 HUBERT_XLARGE.__doc__ = """HuBERT model ("extra large" architecture),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`,
@@ -959,6 +978,7 @@ HUBERT_ASR_LARGE = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 HUBERT_ASR_LARGE.__doc__ = """HuBERT model ("large" architecture),
 pre-trained on 60,000 hours of unlabeled audio from *Libri-Light* dataset :cite:`librilight`, and
@@ -1004,6 +1024,7 @@ HUBERT_ASR_XLARGE = Wav2Vec2ASRBundle(
     _labels=utils._get_en_labels(),
     _sample_rate=16000,
     _normalize_waveform=True,
+    _model_type="Wav2Vec2",
 )
 HUBERT_ASR_XLARGE.__doc__ = """HuBERT model ("extra large" architecture),
 pre-trained on 60,000 hours of unlabeled audio from
@@ -1053,6 +1074,7 @@ VOXPOPULI_ASR_BASE_10K_DE = Wav2Vec2ASRBundle(
     _sample_rate=16000,
     _normalize_waveform=False,
     _remove_aux_axis=(1, 2, 3, 35),
+    _model_type="Wav2Vec2",
 )
 VOXPOPULI_ASR_BASE_10K_DE.__doc__ = """wav2vec 2.0 model ("base" architecture),
 pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`
@@ -1100,6 +1122,7 @@ VOXPOPULI_ASR_BASE_10K_EN = Wav2Vec2ASRBundle(
     _sample_rate=16000,
     _normalize_waveform=False,
     _remove_aux_axis=(1, 2, 3, 31),
+    _model_type="Wav2Vec2",
 )
 VOXPOPULI_ASR_BASE_10K_EN.__doc__ = """wav2vec 2.0 model ("base" architecture),
 pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`
@@ -1147,6 +1170,7 @@ VOXPOPULI_ASR_BASE_10K_ES = Wav2Vec2ASRBundle(
     _sample_rate=16000,
     _normalize_waveform=False,
     _remove_aux_axis=(1, 2, 3, 35),
+    _model_type="Wav2Vec2",
 )
 VOXPOPULI_ASR_BASE_10K_ES.__doc__ = """wav2vec 2.0 model ("base" architecture),
 pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`
@@ -1192,6 +1216,7 @@ VOXPOPULI_ASR_BASE_10K_FR = Wav2Vec2ASRBundle(
     _labels=utils._get_fr_labels(),
     _sample_rate=16000,
     _normalize_waveform=False,
+    _model_type="Wav2Vec2",
 )
 VOXPOPULI_ASR_BASE_10K_FR.__doc__ = """wav2vec 2.0 model ("base" architecture),
 pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`
@@ -1239,6 +1264,7 @@ VOXPOPULI_ASR_BASE_10K_IT = Wav2Vec2ASRBundle(
     _sample_rate=16000,
     _normalize_waveform=False,
     _remove_aux_axis=(1, 2, 3),
+    _model_type="Wav2Vec2",
 )
 VOXPOPULI_ASR_BASE_10K_IT.__doc__ = """wav2vec 2.0 model ("base" architecture),
 pre-trained on 10k hours of unlabeled audio from *VoxPopuli* dataset :cite:`voxpopuli`
@@ -1283,8 +1309,8 @@ WAVLM_BASE = Wav2Vec2Bundle(
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
-        "model_type": "WavLM",
     },
+    _model_type="WavLM",
     _sample_rate=16000,
     _normalize_waveform=False,
 )
@@ -1294,7 +1320,7 @@ pre-trained on 960 hours of unlabeled audio from *LibriSpeech* dataset :cite:`71
 Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT License and
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
-`Source https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+`Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
@@ -1329,8 +1355,8 @@ WAVLM_BASE_PLUS = Wav2Vec2Bundle(
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
-        "model_type": "WavLM",
     },
+    _model_type="WavLM",
     _sample_rate=16000,
     _normalize_waveform=False,
 )
@@ -1341,7 +1367,7 @@ and 24,000 hours of *VoxPopuli* :cite:`voxpopuli`, not fine-tuned.
 Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT License and
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
-`Source https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+`Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
 """  # noqa: E501
@@ -1376,8 +1402,8 @@ WAVLM_LARGE = Wav2Vec2Bundle(
         "encoder_layer_norm_first": False,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
-        "model_type": "WavLM",
     },
+    _model_type="WavLM",
     _sample_rate=16000,
     _normalize_waveform=True,
 )
@@ -1388,7 +1414,156 @@ and 24,000 hours of *VoxPopuli* :cite:`voxpopuli`, not fine-tuned.
 Originally published by the authors of *WavLM* :cite:`chen2022wavlm` under MIT License and
 redistributed with the same license.
 [`License <https://github.com/microsoft/unilm/blob/65f15af2a307ebb64cfb25adf54375b002e6fe8d/LICENSE>`__,
-`Source https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
+`Source <https://github.com/microsoft/unilm/tree/65f15af2a307ebb64cfb25adf54375b002e6fe8d/wavlm#pre-trained-models>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for the usage.
+"""  # noqa: E501
+
+
+WAV2VEC2_XLSR_300M = Wav2Vec2Bundle(
+    "wav2vec2_xlsr_300m.pth",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _model_type="Wav2Vec2",
+    _sample_rate=16000,
+    _normalize_waveform=True,
+)
+WAV2VEC2_XLSR_300M.__doc__ = """XLS-R model with 300 million parameters,
+pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* :cite:`Pratap_2020`,
+*CommonVoice* :cite:`ardila2020common`,
+*VoxLingua107* :cite:`valk2021voxlingua107`,
+*BABEL* :cite:`Gales2014SpeechRA`, and
+*VoxPopuli* :cite:`voxpopuli`) in 128 languages,
+not fine-tuned.
+
+Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
+`Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
+"""  # noqa: E501
+
+
+WAV2VEC2_XLSR_1B = Wav2Vec2Bundle(
+    "wav2vec2_xlsr_1b.pth",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1280,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 48,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 5120,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _model_type="Wav2Vec2",
+    _sample_rate=16000,
+    _normalize_waveform=True,
+)
+WAV2VEC2_XLSR_1B.__doc__ = """XLS-R model with 1 billion parameters,
+pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* :cite:`Pratap_2020`,
+*CommonVoice* :cite:`ardila2020common`,
+*VoxLingua107* :cite:`valk2021voxlingua107`,
+*BABEL* :cite:`Gales2014SpeechRA`, and
+*VoxPopuli* :cite:`voxpopuli`) in 128 languages,
+not fine-tuned.
+
+Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
+`Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
+"""  # noqa: E501
+
+WAV2VEC2_XLSR_2B = Wav2Vec2Bundle(
+    "wav2vec2_xlsr_2b.pth",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1920,
+        "encoder_projection_dropout": 0.1,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 48,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 7680,
+        "encoder_ff_interm_dropout": 0.0,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.0,
+        "aux_num_out": None,
+    },
+    _model_type="Wav2Vec2",
+    _sample_rate=16000,
+    _normalize_waveform=True,
+)
+WAV2VEC2_XLSR_2B.__doc__ = """XLS-R model with 2 billion parameters,
+pre-trained on 436,000 hours of unlabeled audio from multiple datasets (
+*Multilingual LibriSpeech* :cite:`Pratap_2020`,
+*CommonVoice* :cite:`ardila2020common`,
+*VoxLingua107* :cite:`valk2021voxlingua107`,
+*BABEL* :cite:`Gales2014SpeechRA`, and
+*VoxPopuli* :cite:`voxpopuli`) in 128 languages,
+not fine-tuned.
+
+Originally published by the authors of *XLS-R* :cite:`babu2021xls` under MIT License and
+redistributed with the same license.
+[`License <https://github.com/facebookresearch/fairseq/blob/30c912b73c0f88d41171879b2f03226a171004ef/LICENSE>`__,
+`Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
 """  # noqa: E501
