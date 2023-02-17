@@ -533,7 +533,10 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
+            if [[ "${PYTHON_VERSION}" == "3.11" ]]; then
+              export CONDA_CHANNEL_FLAGS=" -c malfet"
+            fi
+            conda install -v -y ${CONDA_CHANNEL_FLAGS:-} -c pytorch-${UPLOAD_CHANNEL} pytorch cpuonly
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
       - checkout
       - run:
@@ -541,7 +544,11 @@ jobs:
           command: |
             eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
             conda activate python${PYTHON_VERSION}
-            conda install 'ffmpeg<5'
+            if [[ "${PYTHON_VERSION}" == "3.11" ]]; then
+              conda install -c conda-forge ffmpeg=4.4.2
+            else
+              conda install 'ffmpeg<5'
+            fi
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_conda_gpu:
@@ -569,11 +576,14 @@ jobs:
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
             # Include numpy and cudatoolkit in the install conda-forge chanell is used for cudatoolkit
+            if [[ "${PYTHON_VERSION}" == "3.11" ]]; then
+              export CONDA_CHANNEL_FLAGS=" -c malfet"
+            fi
 
             if [[ "$CU_VERSION" == cu116 || "$CU_VERSION" == cu117 || "$CU_VERSION" == cu118 ]]; then
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch numpy ffmpeg pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y ${CONDA_CHANNEL_FLAGS:-} -c pytorch-${UPLOAD_CHANNEL} -c nvidia pytorch numpy ffmpeg pytorch-cuda=${CU_VERSION:2:2}.${CU_VERSION:4}
             else
-              conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
+              conda install -v -y ${CONDA_CHANNEL_FLAGS:-} -c pytorch-${UPLOAD_CHANNEL} pytorch numpy ffmpeg cudatoolkit=${CU_VERSION:2:2}.${CU_VERSION:4}
             fi
             # Install from torchaudio file
             conda install -v -y $(ls ~/workspace/conda-bld/win-64/torchaudio*.tar.bz2)
@@ -584,7 +594,6 @@ jobs:
             conda activate python${PYTHON_VERSION}
             # Install sound backend
             pip install PySoundFile
-            # conda install 'ffmpeg<5'
             ./test/smoke_test/run_smoke_test.sh
 
   smoke_test_windows_pip:
@@ -1220,6 +1229,45 @@ workflows:
           python_version: '3.10'
           requires:
           - binary_windows_conda_py3.10_cu118
+      - binary_windows_conda:
+          conda_docker_image: pytorch/conda-builder:cpu
+          cuda_version: cpu
+          name: binary_windows_conda_py3.11_cpu
+          python_version: '3.11'
+          requires:
+          - build_ffmpeg_windows
+      - smoke_test_windows_conda:
+          cuda_version: cpu
+          name: binary_windows_conda_py3.11_cpu_smoke_test_conda
+          python_version: '3.11'
+          requires:
+          - binary_windows_conda_py3.11_cpu
+      - binary_windows_conda:
+          conda_docker_image: pytorch/conda-builder:cuda117
+          cuda_version: cu117
+          name: binary_windows_conda_py3.11_cu117
+          python_version: '3.11'
+          requires:
+          - build_ffmpeg_windows
+      - smoke_test_windows_conda_gpu:
+          cuda_version: cu117
+          name: binary_windows_conda_py3.11_cu117_smoke_test_conda
+          python_version: '3.11'
+          requires:
+          - binary_windows_conda_py3.11_cu117
+      - binary_windows_conda:
+          conda_docker_image: pytorch/conda-builder:cuda118
+          cuda_version: cu118
+          name: binary_windows_conda_py3.11_cu118
+          python_version: '3.11'
+          requires:
+          - build_ffmpeg_windows
+      - smoke_test_windows_conda_gpu:
+          cuda_version: cu118
+          name: binary_windows_conda_py3.11_cu118_smoke_test_conda
+          python_version: '3.11'
+          requires:
+          - binary_windows_conda_py3.11_cu118
       - build_docs:
           cuda_version: cu117
           filters:
@@ -2154,3 +2202,111 @@ workflows:
           python_version: '3.10'
           requires:
           - nightly_binary_windows_conda_py3.10_cu118
+      - binary_windows_conda:
+          conda_docker_image: pytorch/conda-builder:cpu
+          cuda_version: cpu
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cpu
+          python_version: '3.11'
+          requires:
+          - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cpu_upload
+          requires:
+          - nightly_binary_windows_conda_py3.11_cpu
+      - smoke_test_windows_conda:
+          cuda_version: cpu
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cpu_smoke_test_conda
+          python_version: '3.11'
+          requires:
+          - nightly_binary_windows_conda_py3.11_cpu
+      - binary_windows_conda:
+          conda_docker_image: pytorch/conda-builder:cuda117
+          cuda_version: cu117
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cu117
+          python_version: '3.11'
+          requires:
+          - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cu117_upload
+          requires:
+          - nightly_binary_windows_conda_py3.11_cu117
+      - smoke_test_windows_conda_gpu:
+          cuda_version: cu117
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cu117_smoke_test_conda
+          python_version: '3.11'
+          requires:
+          - nightly_binary_windows_conda_py3.11_cu117
+      - binary_windows_conda:
+          conda_docker_image: pytorch/conda-builder:cuda118
+          cuda_version: cu118
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cu118
+          python_version: '3.11'
+          requires:
+          - build_ffmpeg_windows
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cu118_upload
+          requires:
+          - nightly_binary_windows_conda_py3.11_cu118
+      - smoke_test_windows_conda_gpu:
+          cuda_version: cu118
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.11_cu118_smoke_test_conda
+          python_version: '3.11'
+          requires:
+          - nightly_binary_windows_conda_py3.11_cu118
