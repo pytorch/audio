@@ -360,7 +360,7 @@ class Autograd(TestBaseMixin):
         T = 200
         waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
         lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
-        self.assert_grad(F.speed, (waveform, lengths, 1000, 1.1), enable_all_grad=False)
+        self.assert_grad(F.speed, (waveform, 1000, 1.1, lengths), enable_all_grad=False)
 
     def test_preemphasis(self):
         waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)

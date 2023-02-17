@@ -2492,8 +2492,8 @@ def add_noise(
 
 
 def speed(
-    waveform: torch.Tensor, lengths: torch.Tensor, orig_freq: int, factor: float
-) -> Tuple[torch.Tensor, torch.Tensor]:
+    waveform: torch.Tensor, orig_freq: int, factor: float, lengths: Optional[torch.Tensor] = None
+) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     r"""Adjusts waveform speed.
 
     .. devices:: CPU CUDA
@@ -2502,17 +2502,19 @@ def speed(
 
     Args:
         waveform (torch.Tensor): Input signals, with shape `(..., time)`.
-        lengths (torch.Tensor): Valid lengths of signals in ``waveform``, with shape `(...)`.
         orig_freq (int): Original frequency of the signals in ``waveform``.
         factor (float): Factor by which to adjust speed of input. Values greater than 1.0
             compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+        lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+            If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
 
     Returns:
-        (torch.Tensor, torch.Tensor):
+        (torch.Tensor, torch.Tensor or None):
             torch.Tensor
                 Speed-adjusted waveform, with shape `(..., new_time).`
-            torch.Tensor
-                Valid lengths of signals in speed-adjusted waveform, with shape `(...)`.
+            torch.Tensor or None
+                If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                with shape `(...)`; otherwise, ``None``.
     """
 
     source_sample_rate = int(factor * orig_freq)
@@ -2522,9 +2524,12 @@ def speed(
     source_sample_rate = source_sample_rate // gcd
     target_sample_rate = target_sample_rate // gcd
 
-    return resample(waveform, source_sample_rate, target_sample_rate), torch.ceil(
-        lengths * target_sample_rate / source_sample_rate
-    ).to(lengths.dtype)
+    if lengths is None:
+        out_lengths = None
+    else:
+        out_lengths = torch.ceil(lengths * target_sample_rate / source_sample_rate).to(lengths.dtype)
+
+    return resample(waveform, source_sample_rate, target_sample_rate), out_lengths
 
 
 def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
