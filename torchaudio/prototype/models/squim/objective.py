@@ -7,17 +7,15 @@ import torch.nn.functional as F
 
 
 def transform_wb_pesq_range(x: float) -> float:
-    """Map from the P.862 score to the P.862.2 score.
-    Officially, only the metric defined by ITU-T P.862 is called 'PESQ score',
-    which is for narrow-band signals and has a value range of [-0.5, 4.5] exactly.
-    In this project, we are using the metric defined by ITU-T P.862.2, commonly known as
-    'wide-band PESQ'.
+    """The metric defined by ITU-T P.862 is often called 'PESQ score', which is defined
+    for narrow-band signals and has a value range of [-0.5, 4.5] exactly. Here, we use the metric
+    defined by ITU-T P.862.2, commonly known as 'wide-band PESQ' and will be referred to as "PESQ score".
 
     Args:
-        x (float): narrow-band PESQ score.
+        x (float): Narrow-band PESQ score.
 
     Returns:
-        (float): wide-band PESQ score.
+        (float): Wide-band PESQ score.
     """
     return 0.999 + (4.999 - 0.999) / (1 + math.exp(-1.3669 * x + 3.8224))
 
@@ -96,6 +94,18 @@ class SingleRNN(nn.Module):
 
 
 class DPRNN(nn.Module):
+    """*Dual-path recurrent neural networks (DPRNN)* :cite:`luo2020dual`.
+
+    Args:
+        feat_dim (int, optional): The feature dimension after Encoder module. (Default: 64)
+        hidden_dim (int, optional): Hidden dimension in the RNN layer of DPRNN. (Default: 128)
+        num_blocks (int, optional): Number of DPRNN layers. (Default: 6)
+        rnn_type (str, optional): Type of RNN in DPRNN. Valid options are ["RNN", "LSTM", "GRU"]. (Default: "LSTM")
+        d_model (int, optional): The number of expected features in the input. (Default: 256)
+        chunk_size (int, optional): Chunk size of input for DPRNN. (Default: 100)
+        chunk_stride (int, optional): Stride of chunk input for DPRNN. (Default: 50)
+    """
+
     def __init__(
         self,
         feat_dim: int = 64,
@@ -106,7 +116,6 @@ class DPRNN(nn.Module):
         chunk_size: int = 100,
         chunk_stride: int = 50,
     ) -> None:
-        """Dual-path RNN network proposed in :cite:`luo2020dual`."""
         super(DPRNN, self).__init__()
 
         self.num_blocks = num_blocks
@@ -286,7 +295,7 @@ def squim_objective_model(
         nhead (int): Number of heads in the multi-head attention model.
         hidden_dim (int): Hidden dimension in the RNN layer of DPRNN.
         num_blocks (int): Number of DPRNN layers.
-        rnn_type (str): Type of RNN in DPRNN.
+        rnn_type (str): Type of RNN in DPRNN. Valid options are ["RNN", "LSTM", "GRU"].
         chunk_size (int): Chunk size of input for DPRNN.
         chunk_stride (int or None, optional): Stride of chunk input for DPRNN.
     """
