@@ -196,7 +196,7 @@ setup_pip_pytorch_version() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
     # Install latest prerelease version of torch, per our nightlies, consistent
     # with the requested cuda version
-    pip_install --pre torch -f "https://download.pytorch.org/whl/nightly/${WHEEL_DIR}torch_nightly.html"
+    pip_install --pre torch -f "https://download.pytorch.org/whl/test/${WHEEL_DIR}torch_test.html"
     # CUDA and CPU are ABI compatible on the CPU-only parts, so strip in this case
     export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
   else
@@ -213,14 +213,14 @@ setup_pip_pytorch_version() {
 setup_conda_pytorch_constraint() {
   CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
-    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-test"
     if [[ "$OSTYPE" == "msys" ]]; then
-      export PYTORCH_VERSION="$(conda search --json -c pytorch-nightly pytorch | python -c "import sys, json; data=json.load(sys.stdin); print(data['pytorch'][-1]['version'])")"
+      export PYTORCH_VERSION="$(conda search --json -c pytorch-test pytorch | python -c "import sys, json; data=json.load(sys.stdin); print(data['pytorch'][-1]['version'])")"
     else
-      export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python3 -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
+      export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-test]' | python3 -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
     fi
   else
-    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-test"
   fi
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
