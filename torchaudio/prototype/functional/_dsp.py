@@ -11,6 +11,7 @@ def oscillator_bank(
     amplitudes: torch.Tensor,
     sample_rate: float,
     reduction: str = "sum",
+    dtype: Optional[torch.dtype] = torch.float64,
 ) -> torch.Tensor:
     """Synthesize waveform from the given instantaneous frequencies and amplitudes.
 
@@ -38,6 +39,8 @@ def oscillator_bank(
         sample_rate (float): Sample rate
         reduction (str): Reduction to perform.
             Valid values are ``"sum"``, ``"mean"`` or ``"none"``. Default: ``"sum"``
+        dtype (torch.dtype or None, optional): The data type on which cumulative sum operation is performed.
+            Default: ``torch.float64``. Pass ``None`` to disable the casting.
 
     Returns:
         Tensor:
@@ -64,16 +67,11 @@ def oscillator_bank(
         )
         amplitudes = torch.where(invalid, 0.0, amplitudes)
 
-    # Note:
-    # In magenta/ddsp, there is an option to reduce the number of summation to reduce
-    # the accumulation error.
-    # https://github.com/magenta/ddsp/blob/7cb3c37f96a3e5b4a2b7e94fdcc801bfd556021b/ddsp/core.py#L950-L955
-    # It mentions some performance penalty.
-    # In torchaudio, a simple way to work around is to use float64.
-    # We might add angular_cumsum if it turned out to be undesirable.
     pi2 = 2.0 * torch.pi
     freqs = frequencies * pi2 / sample_rate % pi2
-    phases = torch.cumsum(freqs, dim=-2)
+    phases = torch.cumsum(freqs, dim=-2, dtype=dtype)
+    if dtype is not None and freqs.dtype != dtype:
+        phases = phases.to(freqs.dtype)
 
     waveform = amplitudes * torch.sin(phases)
     if reduction == "sum":
