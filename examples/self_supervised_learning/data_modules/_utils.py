@@ -327,23 +327,22 @@ class HuBERTDataSet(Dataset):
 
 def _crop_audio_label(
     waveform: Tensor,
-    label: Optional[Tensor],
+    label: Tensor,
     length: Tensor,
     num_frames: int,
     rand_crop: bool,
-) -> Tuple[Tensor, Optional[Tensor], Tensor]:
+) -> Tuple[Tensor, Tensor, Tensor]:
     """Collate the audio and label at the same time.
     Args:
         waveform (Tensor): The waveform Tensor with dimensions `(1, time)`.
-        label (Tensor, optional): The label Tensor with dimensions `(1, seq)`.
+        label (Tensor): The label Tensor with dimensions `(1, seq)`.
         length (Tensor): The length Tensor with dimension `(1,)`.
         num_frames (int): The final length of the waveform.
         rand_crop (bool): if ``rand_crop`` is True, the starting index of the
             waveform and label is random if the length is longer than the minimum
             length in the mini-batch.
-
     Returns:
-        (Tuple(Tensor, (Tensor, optional), Tensor)): Returns the Tensors for the waveform,
+        (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveform,
             label, and the waveform length.
     """
     kernel_size = 25
@@ -356,15 +355,13 @@ def _crop_audio_label(
         frame_offset = torch.randint(diff, size=(1,))
     elif waveform.size(0) < num_frames:
         num_frames = waveform.size(0)
-        
-    if label is not None:
-        label_offset = max(
-            math.floor((frame_offset - kernel_size * sample_rate) / (stride * sample_rate)) + 1,
-            0,
-        )
-        num_label = math.floor((num_frames - kernel_size * sample_rate) / (stride * sample_rate)) + 1
-        label = label[label_offset : label_offset + num_label]
+    label_offset = max(
+        math.floor((frame_offset - kernel_size * sample_rate) / (stride * sample_rate)) + 1,
+        0,
+    )
+    num_label = math.floor((num_frames - kernel_size * sample_rate) / (stride * sample_rate)) + 1
     waveform = waveform[frame_offset : frame_offset + num_frames]
+    label = label[label_offset : label_offset + num_label]
     length = num_frames
 
     return waveform, label, length
