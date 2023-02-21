@@ -17,7 +17,7 @@ if(USE_ROCM)
   set(OPENMP_LIBRARIES "/opt/rocm/llvm/lib/")
   set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
   set(OpenMP_CXX_FLAGS "-fopenmp=libomp")
-  set(OpenMP_CXX_LIB_NAMES "omp")
+  #set(OpenMP_CXX_LIB_NAMES "omp")
   set(OpenMP_omp_LIBRARY omp)
   find_package(OpenMP REQUIRED)
 
@@ -90,6 +90,7 @@ if(USE_ROCM)
     LIBTORCHAUDIO_LINK_LIBRARIES
     hip::host
     hip::device
+    /opt/rocm/llvm/lib/libomp.so
     )
   list(
     APPEND
