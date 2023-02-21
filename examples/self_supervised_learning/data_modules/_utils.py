@@ -9,6 +9,9 @@ import torchaudio
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
 
+_spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=64, hop_length=160)
+
+
 from ..lightning import Batch
 
 
@@ -436,54 +439,27 @@ class CollateFnHubert:
 class CollateFnWav2Vec2:
     """The collate class for Wav2Vec2 pre-training and fine-tuning.
     Args:
-        pad (bool): If ``True``, the waveforms and labels will be padded to the
-            max length in the mini-batch. If ``pad`` is False, the waveforms
-            and labels will be cropped to the minimum length in the mini-batch.
-            (Default: False)
-        rand_crop (bool): if ``True``, the starting index of the waveform
-            and label is random if the length is longer than the minimum
-            length in the mini-batch.
     """
 
     def __init__(
-        self,
-        pad: bool = False,
-        rand_crop: bool = True,
+        self
     ) -> None:
-        self.pad = pad
-        self.rand_crop = rand_crop
-
+        pass
+    
     def __call__(self, batch: List[Tuple[Tensor, Tensor, int]]) -> Dict:
         """
         Args:
             batch (List[Tuple(Tensor, Tensor, int)]):
-                The list of tuples that contains the waveforms, labels, and audio lengths.
 
         Returns:
             Dictionary
-                "input": Tuple of waveforms and lengths.
-                    waveforms Tensor with dimensions `(batch, time)`.
+                "input": Tuple of padded mel_features and lengths.
                     lengths Tensor with dimension `(batch,)`.
-                "label": Tuple of label Tensor with dimensions `(batch, seq)`.
+                "label": None
         """
-        if self.pad:
-            num_frames = max([sample[0].shape[1] for sample in batch])
-        else:
-            num_frames = min([sample[0].shape[1] for sample in batch])
-        waveforms, lengths = [], []
-        for sample in batch:
-            waveform, length = sample[0], sample[0].shape[1]
-
-            waveform, _, length = _crop_audio_label(waveform, None, length, num_frames, self.rand_crop)
-            waveforms.append(waveform)
-            lengths.append(length)
-        # make sure the shapes are the same if not apply zero-padding
-        if not self.pad:
-            assert all(
-                [waveform.shape[0] == waveforms[0].shape[0] for waveform in waveforms]
-            ), "The dimensions of the waveforms should be identical in the same batch."
-
-        waveforms = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
-        lengths = torch.tensor(lengths)
-        batch = Batch((waveforms, lengths), (None,))
+        
+        mel_features = [_spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in batch]
+        features = torch.nn.utils.rnn.pad_sequence(mel_features, batch_first=True)
+        lengths = torch.tensor([elem.shape[0] for elem in mel_features], dtype=torch.int32)
+        batch = Batch((features, lengths), (None))
         return batch
