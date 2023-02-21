@@ -9,11 +9,9 @@ import torchaudio
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
 
-_spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=64, hop_length=160)
-
-
 from ..lightning import Batch
 
+_spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=64, hop_length=160)
 
 class BucketizeBatchSampler(BatchSampler):
     """Buketized BatchSampler for sequential data with different lengths to reduce number of paddings.
@@ -341,6 +339,7 @@ def _crop_audio_label(
         rand_crop (bool): if ``rand_crop`` is True, the starting index of the
             waveform and label is random if the length is longer than the minimum
             length in the mini-batch.
+            
     Returns:
         (Tuple(Tensor, Tensor, Tensor)): Returns the Tensors for the waveform,
             label, and the waveform length.
@@ -391,10 +390,10 @@ class CollateFnHubert:
         self.pad = pad
         self.rand_crop = rand_crop
 
-    def __call__(self, batch: List[Tuple[Tensor, Tensor, None]]) -> Dict:
+    def __call__(self, batch: List[Tuple[Tensor, Tensor, int]]) -> Dict:
         """
         Args:
-            batch (List[Tuple(Tensor, Tensor, None)]):
+            batch (List[Tuple(Tensor, Tensor, int)]):
                 The list of tuples that contains the waveforms, labels, and audio lengths.
 
         Returns:
