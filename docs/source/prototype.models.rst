@@ -4,6 +4,30 @@ torchaudio.prototype.models
 .. py:module:: torchaudio.prototype.models
 .. currentmodule:: torchaudio.prototype.models
 
+
+The ``torchaudio.prototype.models`` subpackage contains definitions of models for addressing common audio tasks.
+
+.. note::
+   For models with pre-trained parameters, please refer to :mod:`torchaudio.prototype.pipelines` module.
+
+Model defintions are responsible for constructing computation graphs and executing them.
+
+Some models have complex structure and variations.
+For such models, factory functions are provided.
+
+.. autosummary::
+  :toctree: generated
+  :nosignatures:
+  :template: autosummary/prototype_model_class.rst
+
+  ConformerWav2Vec2PretrainModel
+  ConvEmformer
+  HiFiGANVocoder
+  SQUIM_OBJECTIVE
+
+Wav2Vec2 Factory Functions
+==========================
+
 conformer_rnnt_model
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -13,32 +37,6 @@ conformer_rnnt_base
 ~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: conformer_rnnt_base
-
-emformer_hubert_model
-~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: emformer_hubert_model
-
-emformer_hubert_base
-~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: emformer_hubert_base
-
-ConvEmformer
-~~~~~~~~~~~~
-
-.. autoclass:: ConvEmformer
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
-ConformerWav2Vec2PretrainModel
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: ConformerWav2Vec2PretrainModel
-
-  .. automethod:: forward
 
 conformer_wav2vec2_model
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,62 +48,12 @@ conformer_wav2vec2_base
 
 .. autofunction:: conformer_wav2vec2_base
 
-conformer_wav2vec2_pretrain_model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_pretrain_model
-
-conformer_wav2vec2_pretrain_base
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_pretrain_base
-
-conformer_wav2vec2_pretrain_large
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_pretrain_large
-
-HiFiGANVocoder
-~~~~~~~~~~~~~~
-
-.. autoclass:: HiFiGANVocoder
-
-  .. automethod:: forward
-
-hifigan_vocoder
-~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder
-
-hifigan_vocoder_v1
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder_v1
-
-hifigan_vocoder_v2
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder_v2
-
-hifigan_vocoder_v3
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder_v3
-
-
-SQUIM_OBJECTIVE
-~~~~~~~~~~~~~~~
-
-.. autoclass:: SQUIM_OBJECTIVE
-
-  .. automethod:: forward
-
-squim_objective_model
+emformer_hubert_model
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: squim_objective_model
+.. autofunction:: emformer_hubert_model
 
-squim_objective_base
+emformer_hubert_base
 ~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: squim_objective_base
+.. autofunction:: emformer_hubert_base
