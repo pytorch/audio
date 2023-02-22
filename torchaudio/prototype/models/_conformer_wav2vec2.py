@@ -320,7 +320,8 @@ class ConformerWav2Vec2PretrainModel(Module):
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
         x, mask_idxs = self.mask_generator(x, padding_mask)
 
-        targets, negs, neg_idxs = self.negative_sampler(x)
+        y = x[mask_idxs].view(x.shape[0], -1, x.shape[-1])
+        targets, negs, neg_idxs = self.negative_sampler(y)
 
         x = self.wav2vec2.encoder.feature_projection.projection(x)
         x = x.transpose(0, 1)
