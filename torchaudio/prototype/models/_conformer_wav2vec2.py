@@ -318,10 +318,14 @@ class ConformerWav2Vec2PretrainModel(Module):
 
         x = self.wav2vec2.encoder.feature_projection.layer_norm(x)
         x = self.wav2vec2.encoder.feature_projection.dropout(x)
-        x, mask_idxs = self.mask_generator(x, padding_mask)
 
-        y = x[mask_idxs].view(x.shape[0], -1, x.shape[-1])
-        targets, negs, neg_idxs = self.negative_sampler(y)
+        # Unmasked feature is used to generate positive and negative samples.
+        unmasked_x = x.clone()
+        # Apply masking to x before passing it to Conformer layers.
+        x, mask_idxs = self.mask_generator(x, padding_mask)
+        # Select the frames from masked indices for negative sampling.
+        unmasked_x = unmasked_x[mask_idxs].view(x.shape[0], -1, x.shape[-1])
+        targets, negs, neg_idxs = self.negative_sampler(unmasked_x)
 
         x = self.wav2vec2.encoder.feature_projection.projection(x)
         x = x.transpose(0, 1)
