@@ -58,6 +58,7 @@ else:
         Dictionary as _Dictionary,
         load_words as _load_words,
     )
+
     warnings.warn(
         "The built-in flashlight integration is deprecated, and will be removed in future release. "
         "Please install flashlight-text. https://pypi.org/project/flashlight-text/ "
