@@ -119,6 +119,8 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
                             const c10::optional<std::string>& device,
                             const c10::optional<OptionDict>& option,
                             int64_t buffer_size) {
+        TORCH_WARN_ONCE(
+            "Using Tensor as byte string buffer is deprecated, and will be removed in 2.1, please pass the data using I/O object.")
         return c10::make_intrusive<StreamReaderTensorBinding>(
             src, device, option, static_cast<int>(buffer_size));
       }))
