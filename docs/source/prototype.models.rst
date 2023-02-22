@@ -25,35 +25,18 @@ For such models, factory functions are provided.
   HiFiGANVocoder
   SQUIM_OBJECTIVE
 
-Wav2Vec2 Factory Functions
-==========================
+Prototype Factory Functions of Beta Models
+==========================================
 
-conformer_rnnt_model
-~~~~~~~~~~~~~~~~~~~~
+.. py:module:: torchaudio.models
+.. currentmodule:: torchaudio.models
 
-.. autofunction:: conformer_rnnt_model
+Some model definitions are in beta, but there are new factory functions are still in prototype. Please check "Prototype Factory Functions" section in each model.
 
-conformer_rnnt_base
-~~~~~~~~~~~~~~~~~~~
+.. autosummary::
+  :toctree: generated
+  :nosignatures:
+  :template: autosummary/model_class.rst
 
-.. autofunction:: conformer_rnnt_base
-
-conformer_wav2vec2_model
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_model
-
-conformer_wav2vec2_base
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_base
-
-emformer_hubert_model
-~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: emformer_hubert_model
-
-emformer_hubert_base
-~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: emformer_hubert_base
+  Wav2Vec2Model
+  RNNT
