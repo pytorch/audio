@@ -10,7 +10,7 @@ from ._emformer_hubert import emformer_hubert_base, emformer_hubert_model
 from .conv_emformer import ConvEmformer
 from .hifi_gan import hifigan_vocoder, hifigan_vocoder_v1, hifigan_vocoder_v2, hifigan_vocoder_v3, HiFiGANVocoder
 from .rnnt import conformer_rnnt_base, conformer_rnnt_model
-from .squim import SQUIM_OBJECTIVE, squim_objective_base, squim_objective_model
+from .squim import SquimObjective, squim_objective_base, squim_objective_model
 
 __all__ = [
     "conformer_rnnt_base",
@@ -31,5 +31,5 @@ __all__ = [
     "hifigan_vocoder",
     "squim_objective_base",
     "squim_objective_model",
-    "SQUIM_OBJECTIVE",
+    "SquimObjective",
 ]
