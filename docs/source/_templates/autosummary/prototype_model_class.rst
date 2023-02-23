@@ -13,7 +13,7 @@
     }
 -%}
 {%- set factory={
-        "torchaudio.prototype.models.SQUIM_OBJECTIVE": [
+        "torchaudio.prototype.models.SquimObjective": [
             "squim_objective_model",
             "squim_objective_base",
         ],
