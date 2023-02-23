@@ -128,7 +128,7 @@ OptionDict parse_metadata(const AVDictionary* metadata) {
   AVDictionaryEntry* tag = nullptr;
   OptionDict ret;
   while ((tag = av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
-    ret.insert(std::string(tag->key), std::string(tag->value));
+    ret.emplace(std::string(tag->key), std::string(tag->value));
   }
   return ret;
 }

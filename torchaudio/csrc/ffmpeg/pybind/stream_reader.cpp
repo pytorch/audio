@@ -13,7 +13,7 @@ SrcInfoPyBind convert_pybind(SrcStreamInfo ssi) {
       ssi.bit_rate,
       ssi.num_frames,
       ssi.bits_per_sample,
-      dict2map(ssi.metadata),
+      ssi.metadata,
       ssi.sample_rate,
       ssi.num_channels,
       ssi.width,
@@ -28,48 +28,10 @@ StreamReaderFileObj::StreamReaderFileObj(
     const c10::optional<std::map<std::string, std::string>>& option,
     int64_t buffer_size)
     : FileObj(fileobj_, static_cast<int>(buffer_size), false),
-      StreamReaderBinding(pAVIO, format, map2dict(option)) {}
-
-std::map<std::string, std::string> StreamReaderFileObj::get_metadata() const {
-  return dict2map(StreamReader::get_metadata());
-};
+      StreamReaderBinding(pAVIO, format, option) {}
 
 SrcInfoPyBind StreamReaderFileObj::get_src_stream_info(int64_t i) {
   return convert_pybind(StreamReader::get_src_stream_info(static_cast<int>(i)));
-}
-
-void StreamReaderFileObj::add_audio_stream(
-    int64_t i,
-    int64_t frames_per_chunk,
-    int64_t num_chunks,
-    const c10::optional<std::string>& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<std::map<std::string, std::string>>& decoder_option) {
-  StreamReader::add_audio_stream(
-      i,
-      frames_per_chunk,
-      num_chunks,
-      filter_desc,
-      decoder,
-      map2dict(decoder_option));
-}
-
-void StreamReaderFileObj::add_video_stream(
-    int64_t i,
-    int64_t frames_per_chunk,
-    int64_t num_chunks,
-    const c10::optional<std::string>& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<std::map<std::string, std::string>>& decoder_option,
-    const c10::optional<std::string>& hw_accel) {
-  StreamReader::add_video_stream(
-      i,
-      frames_per_chunk,
-      num_chunks,
-      filter_desc,
-      decoder,
-      map2dict(decoder_option),
-      hw_accel);
 }
 
 } // namespace io
