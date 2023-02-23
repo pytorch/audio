@@ -388,7 +388,7 @@ class StreamReader:
     For the detailed usage of this class, please refer to the tutorial.
 
     Args:
-        src (str, file-like object or Tensor): The media source.
+        src (str, file-like object): The media source.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. This includes a file path, URL, device identifier or
             filter expression. The supported value depends on the FFmpeg found
@@ -400,9 +400,6 @@ class StreamReader:
             the method when parsing media metadata. This improves the reliability
             of codec detection. The signagure of `seek` method must be
             `seek(offset: int, whence: int) -> int`.
-
-            If Tensor, it is interpreted as byte buffer.
-            It must be one-dimensional, of type ``torch.uint8``.
 
             Please refer to the following for the expected signature and behavior
             of `read` and `seek` method.
@@ -465,8 +462,6 @@ class StreamReader:
         torch._C._log_api_usage_once("torchaudio.io.StreamReader")
         if isinstance(src, str):
             self._be = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, option)
-        elif isinstance(src, torch.Tensor):
-            self._be = torch.classes.torchaudio.ffmpeg_StreamReaderTensor(src, format, option, buffer_size)
         elif hasattr(src, "read"):
             self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
