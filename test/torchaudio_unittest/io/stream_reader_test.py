@@ -65,7 +65,7 @@ class ChunkTensorTest(TorchaudioTestCase):
 # Helper decorator and Mixin to duplicate the tests for fileobj
 _media_source = parameterized_class(
     ("test_type",),
-    [("str",), ("fileobj",), ("tensor",)],
+    [("str",), ("fileobj",)],
     class_name_func=lambda cls, _, params: f'{cls.__name__}_{params["test_type"]}',
 )
 
@@ -83,10 +83,6 @@ class _MediaSourceMixin:
             self.src = path
         elif self.test_type == "fileobj":
             self.src = open(path, "rb")
-        elif self.test_type == "tensor":
-            with open(path, "rb") as fileobj:
-                data = fileobj.read()
-            self.src = torch.frombuffer(data, dtype=torch.uint8)
         return self.src
 
     def tearDown(self):
