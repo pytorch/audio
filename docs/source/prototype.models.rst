@@ -28,10 +28,9 @@ For such models, factory functions are provided.
 Prototype Factory Functions of Beta Models
 ==========================================
 
-.. py:module:: torchaudio.models
 .. currentmodule:: torchaudio.models
 
-Some model definitions are in beta, but there are new factory functions are still in prototype. Please check "Prototype Factory Functions" section in each model.
+Some model definitions are in beta, but there are new factory functions that are still in prototype. Please check "Prototype Factory Functions" section in each model.
 
 .. autosummary::
   :toctree: generated

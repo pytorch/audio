@@ -33,7 +33,7 @@
 
 {%- if name in ["Wav2Vec2Model"] %}
   {{ methods.extend(["extract_features"]) }}
-{%- elif name in ["ConvEmformer", "RNNTBeamSearch", "WaveRNN", "Tacotron2", ] %}
+{%- elif name in ["ConvEmformer"] %}
   {{ methods.extend(["infer"]) }}
 {%- elif name == "RNNT" %}
   {{ methods.extend(["transcribe_streaming", "transcribe", "predict", "join"]) }}
