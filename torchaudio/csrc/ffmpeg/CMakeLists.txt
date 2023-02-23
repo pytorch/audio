@@ -9,6 +9,7 @@ set(
   sources
   ffmpeg.cpp
   filter_graph.cpp
+  binding_utils.cpp
   stream_reader/buffer/common.cpp
   stream_reader/buffer/chunked_buffer.cpp
   stream_reader/buffer/unchunked_buffer.cpp

@@ -586,9 +586,8 @@ AVStream* StreamWriter::add_stream(AVCodecContextPtr& codec_ctx) {
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
   av_dict_free(&pFormatContext->metadata);
-  for (const auto& it : metadata) {
-    av_dict_set(
-        &pFormatContext->metadata, it.key().c_str(), it.value().c_str(), 0);
+  for (auto const& [key, value] : metadata) {
+    av_dict_set(&pFormatContext->metadata, key.c_str(), value.c_str(), 0);
   }
 }
 

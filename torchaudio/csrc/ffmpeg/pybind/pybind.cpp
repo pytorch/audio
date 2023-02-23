@@ -24,7 +24,7 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def(py::init<
            py::object,
            const c10::optional<std::string>&,
-           const c10::optional<OptionMap>&,
+           const c10::optional<OptionDict>&,
            int64_t>())
       .def("num_src_streams", &StreamReaderFileObj::num_src_streams)
       .def("num_out_streams", &StreamReaderFileObj::num_out_streams)

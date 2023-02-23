@@ -21,7 +21,7 @@ using SrcInfo = std::tuple<
     int64_t, // bit_rate
     int64_t, // num_frames
     int64_t, // bits_per_sample
-    OptionDict, // metadata
+    c10::Dict<std::string, std::string>, // metadata
     // Audio
     double, // sample_rate
     int64_t, // num_channels
@@ -60,15 +60,7 @@ using ChunkData = std::tuple<torch::Tensor, double>;
 // suitable for Binding the code (i.e. it receives/returns pritimitves)
 struct StreamReaderBinding : public StreamReader,
                              public torch::CustomClassHolder {
-  StreamReaderBinding(
-      const std::string& src,
-      const c10::optional<std::string>& device,
-      const c10::optional<OptionDict>& option);
-
-  StreamReaderBinding(
-      AVIOContext* io_ctx,
-      const c10::optional<std::string>& device,
-      const c10::optional<OptionDict>& option);
+  using StreamReader::StreamReader;
 
   SrcInfo get_src_stream_info(int64_t i);
   OutInfo get_out_stream_info(int64_t i);
