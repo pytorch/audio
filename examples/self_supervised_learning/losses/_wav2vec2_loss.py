@@ -10,17 +10,17 @@ def compute_contrastive_loss(
     mask_indices: Tensor,
     targets: Tensor,
     neg_is_pos: Tensor,
-    reduce: bool,
+    reduction: str = 'none',
     logit_temp: float = 0.1):
     """
     Computes the contrastive loss used in Wav2Vec2 loss function.
 
     Args:
         x (Tensor): Input embeddings of shape (batch_size, sequence_length, hidden_size)
-        mask_indices (Tensor): Indices to mask negative samples
-        targets (Tensor): Labels indicating positive samples of shape (batch_size, sequence_length, hidden_size).
-        neg_is_pos (Tensor): Boolean tensor indicating whether negative samples should be treated as positives
-        reduce (bool): Whether to reduce the loss to a scalar or not.
+        mask_indices (Tensor): Indices to mask negative samples of shape (batch_size, sequence_length)
+        targets (Tensor): Labels indicating positive samples of shape (num_negative + 1, batch, sequence_length, hidden_size).
+        neg_is_pos (Tensor): Boolean tensor indicating whether negative samples should be treated as positives of shape(batch, sequence_length)
+        reduction (str): Reduction type ("sum" or "none")
         logit_temp (float, optional): Temperature scaling factor for logits, defaults to 0.1
 
     Returns:
@@ -43,7 +43,7 @@ def compute_contrastive_loss(
     loss = F.cross_entropy(
         logits,
         target,
-        reduction="sum" if reduce else "none",
+        reduction=reduction,
     )
     sample_size = target.numel()
     return loss, sample_size
@@ -53,16 +53,16 @@ def wav2vec2_loss(
     mask_indices: Tensor,
     positives: Tensor,
     negatives: Tensor, 
-    reduce: Optional[bool]=True
+    reduction: str = 'none'
 ) -> Tuple[Tensor, float]:
     """Compute Wav2Vec2 loss.
 
     Args:
-        x (Tensor): The masked sequences of probability distribution.
-        mask_indices (Tensor): The mask indices.
-        positives (Tensor): The positives, prior to negative sampling.
-        negatives (Tensor): The negative samples.
-        reduce (bool, optional): Use "sum" as reduction for cross-entropy loss (Default: ``True``).
+        x (Tensor): The masked sequences of probability distribution of shape (batch_size, sequence_length, hidden_size)
+        mask_indices (Tensor): The mask indices of shape (batch_size, sequence_length)
+        positives (Tensor): The positives, prior to negative sampling. (batch_size, masked_sequence_length, hidden_size)
+        negatives (Tensor): The negative samples. (num_negative, batch_size, masked_sequence_length, hidden_size)
+        reduction (str): Use "sum" as reduction for cross-entropy loss (Default: ``none``).
 
     Returns:
         (Tensor, float)
@@ -78,7 +78,7 @@ def wav2vec2_loss(
     targets = torch.cat([positives, negatives], dim=0)
 
     loss, sample_size = compute_contrastive_loss(
-        x, mask_indices, targets, neg_is_pos, reduce
+        x, mask_indices, targets, neg_is_pos, reduction
     )
 
     return loss, sample_size
