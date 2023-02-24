@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/ffmpeg/pybind/typedefs.h>
+#include <torchaudio/csrc/ffmpeg/pybind/fileobj.h>
 
 namespace torchaudio {
 namespace io {

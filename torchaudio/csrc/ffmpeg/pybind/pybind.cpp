@@ -1,10 +1,33 @@
 #include <torch/extension.h>
-#include <torchaudio/csrc/ffmpeg/pybind/stream_reader.h>
-#include <torchaudio/csrc/ffmpeg/pybind/stream_writer.h>
+#include <torchaudio/csrc/ffmpeg/pybind/fileobj.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
 namespace torchaudio {
 namespace io {
 namespace {
+
+// The reason we inherit FileObj instead of making it an attribute
+// is so that FileObj is instantiated first.
+// AVIOContext must be initialized before AVFormat, and outlive AVFormat.
+struct StreamReaderFileObj : private FileObj, public StreamReader {
+  StreamReaderFileObj(
+      py::object fileobj,
+      const c10::optional<std::string>& format,
+      const c10::optional<std::map<std::string, std::string>>& option,
+      int64_t buffer_size)
+      : FileObj(fileobj, static_cast<int>(buffer_size), false),
+        StreamReader(pAVIO, format, option) {}
+};
+
+struct StreamWriterFileObj : private FileObj, public StreamWriter {
+  StreamWriterFileObj(
+      py::object fileobj,
+      const c10::optional<std::string>& format,
+      int64_t buffer_size)
+      : FileObj(fileobj, static_cast<int>(buffer_size), true),
+        StreamWriter(pAVIO, format) {}
+};
 
 PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
   py::class_<Chunk>(m, "Chunk", py::module_local())

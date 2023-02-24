@@ -13,21 +13,8 @@ def info_audio(
     src: str,
     format: Optional[str],
 ) -> AudioMetaData:
-    s = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, None)
-    i = s.find_best_audio_stream()
-    sinfo = s.get_src_stream_info(i)
-    if sinfo[5] == 0:
-        waveform = _load_audio(s)
-        num_frames = waveform.size(1)
-    else:
-        num_frames = sinfo[5]
-    return AudioMetaData(
-        int(sinfo[8]),
-        num_frames,
-        sinfo[9],
-        sinfo[6],
-        sinfo[1].upper(),
-    )
+    i = torch.ops.torchaudio.compat_info(src, format)
+    return AudioMetaData(i[0], i[1], i[2], i[3], i[4].upper())
 
 
 def info_audio_fileobj(
@@ -79,47 +66,19 @@ def _get_load_filter(
     return "{},{}".format(atrim, aformat)
 
 
-# Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
-def _load_audio(
-    s: torch.classes.torchaudio.ffmpeg_StreamReader,
-    frame_offset: int = 0,
-    num_frames: int = -1,
-    convert: bool = True,
-    channels_first: bool = True,
-) -> torch.Tensor:
-    i = s.find_best_audio_stream()
-    option: Dict[str, str] = {}
-    s.add_audio_stream(i, -1, -1, _get_load_filter(frame_offset, num_frames, convert), None, option)
-    s.process_all_packets()
-    chunk = s.pop_chunks()[0]
-    if chunk is None:
-        raise RuntimeError("Failed to decode audio.")
-    assert chunk is not None
-    waveform = chunk[0]
-    if channels_first:
-        waveform = waveform.T
-    return waveform
-
-
 def _load_audio_fileobj(
-    s: torch.classes.torchaudio.ffmpeg_StreamReader,
-    frame_offset: int = 0,
-    num_frames: int = -1,
-    convert: bool = True,
+    s: torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj,
+    filter: Optional[str] = None,
     channels_first: bool = True,
 ) -> torch.Tensor:
     i = s.find_best_audio_stream()
-    option: Dict[str, str] = {}
-    s.add_audio_stream(i, -1, -1, _get_load_filter(frame_offset, num_frames, convert), None, option)
+    s.add_audio_stream(i, -1, -1, filter, None, None)
     s.process_all_packets()
     chunk = s.pop_chunks()[0]
     if chunk is None:
         raise RuntimeError("Failed to decode audio.")
-    assert chunk is not None
     waveform = chunk.frames
-    if channels_first:
-        waveform = waveform.T
-    return waveform
+    return waveform.T if channels_first else waveform
 
 
 def load_audio(
@@ -130,10 +89,8 @@ def load_audio(
     channels_first: bool = True,
     format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
-    s = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, None)
-    sample_rate = int(s.get_src_stream_info(s.find_best_audio_stream())[8])
-    waveform = _load_audio(s, frame_offset, num_frames, convert, channels_first)
-    return waveform, sample_rate
+    filter = _get_load_filter(frame_offset, num_frames, convert)
+    return torch.ops.torchaudio.compat_load(src, format, filter, channels_first)
 
 
 def load_audio_fileobj(
@@ -147,7 +104,8 @@ def load_audio_fileobj(
 ) -> Tuple[torch.Tensor, int]:
     s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
     sample_rate = int(s.get_src_stream_info(s.find_best_audio_stream()).sample_rate)
-    waveform = _load_audio_fileobj(s, frame_offset, num_frames, convert, channels_first)
+    filter = _get_load_filter(frame_offset, num_frames, convert)
+    waveform = _load_audio_fileobj(s, filter, channels_first)
     return waveform, sample_rate
 
 
