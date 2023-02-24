@@ -103,27 +103,6 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Python Prototype API Reference
-   :hidden:
-
-   prototype
-   prototype.datasets
-   prototype.functional
-   prototype.models
-   prototype.pipelines
-   prototype.transforms
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C++ Prototype API Reference
-   :hidden:
-
-   libtorchaudio
-   libtorchaudio.stream_reader
-   libtorchaudio.stream_writer
-
-.. toctree::
-   :maxdepth: 1
    :caption: PyTorch Libraries
    :hidden:
 
