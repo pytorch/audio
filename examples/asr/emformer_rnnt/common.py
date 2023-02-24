@@ -10,8 +10,6 @@ from torchaudio.models import Hypothesis
 
 
 MODEL_TYPE_LIBRISPEECH = "librispeech"
-MODEL_TYPE_TEDLIUM3 = "tedlium3"
-MODEL_TYPE_MUSTC = "mustc"
 
 
 DECIBEL = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
