@@ -38,6 +38,7 @@ _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KA
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", True)
+_BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
@@ -63,6 +64,13 @@ def get_ext_modules():
                 Extension(name="torchaudio.lib.libflashlight-text", sources=[]),
                 Extension(name="torchaudio.lib.flashlight_lib_text_decoder", sources=[]),
                 Extension(name="torchaudio.lib.flashlight_lib_text_dictionary", sources=[]),
+            ]
+        )
+    if _BUILD_CUDA_CTC_DECODER:
+        modules.extend(
+            [
+                Extension(name="torchaudio.lib.libctc_prefix_decoder", sources=[]),
+                Extension(name="torchaudio.lib.pybind11_prefixctc", sources=[]),
             ]
         )
     if _USE_FFMPEG:
@@ -120,6 +128,7 @@ class CMakeBuild(build_ext):
             f"-DBUILD_RIR:BOOL={'ON' if _BUILD_RIR else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             f"-DBUILD_CTC_DECODER:BOOL={'ON' if _BUILD_CTC_DECODER else 'OFF'}",
+            f"-DBUILD_CUDA_CTC_DECODER:BOOL={'ON' if _BUILD_CUDA_CTC_DECODER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
