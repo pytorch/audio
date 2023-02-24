@@ -12,14 +12,12 @@ class Wav2Vec2DataModule(LightningDataModule):
         self,
         *,
         dataset_path,
-        feature_type,
         seconds_per_batch,
         train_shuffle=True,
         num_workers=10,
     ):
         super().__init__()
         self.dataset_path = dataset_path
-        self.feature_type = feature_type
         self.seconds_per_batch = seconds_per_batch
         self.train_shuffle = train_shuffle
         self.num_workers = num_workers
