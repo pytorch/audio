@@ -31,24 +31,6 @@ using SrcInfo = std::tuple<
     double // frame_rate
     >;
 
-using SrcInfoPyBind = std::tuple<
-    std::string, // media_type
-    std::string, // codec name
-    std::string, // codec long name
-    std::string, // format name
-    int64_t, // bit_rate
-    int64_t, // num_frames
-    int64_t, // bits_per_sample
-    std::map<std::string, std::string>, // metadata
-    // Audio
-    double, // sample_rate
-    int64_t, // num_channels
-    // Video
-    int64_t, // width
-    int64_t, // height
-    double // frame_rate
-    >;
-
 using OutInfo = std::tuple<
     int64_t, // source index
     std::string // filter description
@@ -64,16 +46,6 @@ struct StreamReaderBinding : public StreamReader,
 
   SrcInfo get_src_stream_info(int64_t i);
   OutInfo get_out_stream_info(int64_t i);
-
-  int64_t process_packet(
-      const c10::optional<double>& timeout = {},
-      const double backoff = 10.);
-
-  void process_all_packets();
-
-  int64_t fill_buffer(
-      const c10::optional<double>& timeout = {},
-      const double backoff = 10.);
 
   std::vector<c10::optional<ChunkData>> pop_chunks();
 };

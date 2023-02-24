@@ -36,39 +36,6 @@ OutInfo StreamReaderBinding::get_out_stream_info(int64_t i) {
   return convert(StreamReader::get_out_stream_info(static_cast<int>(i)));
 }
 
-int64_t StreamReaderBinding::process_packet(
-    const c10::optional<double>& timeout,
-    const double backoff) {
-  int64_t code = [&]() {
-    if (timeout.has_value()) {
-      return StreamReader::process_packet_block(timeout.value(), backoff);
-    }
-    return StreamReader::process_packet();
-  }();
-  TORCH_CHECK(
-      code >= 0, "Failed to process a packet. (" + av_err2string(code) + "). ");
-  return code;
-}
-
-void StreamReaderBinding::process_all_packets() {
-  int64_t ret = 0;
-  do {
-    ret = process_packet();
-  } while (!ret);
-}
-
-int64_t StreamReaderBinding::fill_buffer(
-    const c10::optional<double>& timeout,
-    const double backoff) {
-  while (!is_buffer_ready()) {
-    int code = process_packet(timeout, backoff);
-    if (code != 0) {
-      return code;
-    }
-  }
-  return 0;
-}
-
 std::vector<c10::optional<ChunkData>> StreamReaderBinding::pop_chunks() {
   std::vector<c10::optional<ChunkData>> ret;
   ret.reserve(static_cast<size_t>(num_out_streams()));

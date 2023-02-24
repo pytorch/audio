@@ -283,7 +283,23 @@ class StreamReader {
   /// - ``>=0``: Keep retrying until the given time passes.
   /// - ``<0``: Keep retrying forever.
   /// @param backoff Time to wait before retrying in milli seconds.
-  int process_packet_block(double timeout, double backoff);
+  int process_packet_block(const double timeout, const double backoff);
+
+  // High-level method used by Python bindings.
+  int process_packet(
+      const c10::optional<double>& timeout,
+      const double backoff);
+
+  /// Process packets unitl EOF
+  void process_all_packets();
+
+  /// Process packets until all the chunk buffers have at least one chunk
+  ///
+  /// @param timeout See `process_packet_block()`
+  /// @param backoff See `process_packet_block()`
+  int fill_buffer(
+      const c10::optional<double>& timeout = {},
+      const double backoff = 10.);
 
   ///@}
 
