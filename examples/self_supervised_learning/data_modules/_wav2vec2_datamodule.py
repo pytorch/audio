@@ -12,7 +12,6 @@ class Wav2Vec2DataModule(LightningDataModule):
         self,
         *,
         dataset_path,
-        dataset,
         feature_type,
         seconds_per_batch,
         train_shuffle=True,
@@ -20,7 +19,6 @@ class Wav2Vec2DataModule(LightningDataModule):
     ):
         super().__init__()
         self.dataset_path = dataset_path
-        self.dataset = dataset
         self.feature_type = feature_type
         self.seconds_per_batch = seconds_per_batch
         self.train_shuffle = train_shuffle
@@ -29,9 +27,9 @@ class Wav2Vec2DataModule(LightningDataModule):
     def train_dataloader(self):
         dataset = torch.utils.data.ConcatDataset(
             [
-                self.librispeech_cls(self.dataset_path, url="train-clean-360", download=True),
-                self.librispeech_cls(self.dataset_path, url="train-clean-100", download=True),
-                self.librispeech_cls(self.dataset_path, url="train-other-500", download=True),
+                self.librispeech_cls(self.dataset_path, url="train-clean-360"),
+                self.librispeech_cls(self.dataset_path, url="train-clean-100"),
+                self.librispeech_cls(self.dataset_path, url="train-other-500"),
             ]
         )
         len_list = [d[0].size(1) for d in dataset]
