@@ -1,17 +1,14 @@
 #include <torch/script.h>
+#include <torchaudio/csrc/ffmpeg/binding_utils.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
 namespace torchaudio {
 namespace io {
 namespace {
 
-class StreamWriterBinding : public StreamWriter,
-                            public torch::CustomClassHolder {
- public:
-  StreamWriterBinding(
-      const std::string& dst,
-      const c10::optional<std::string>& format)
-      : StreamWriter(dst, format) {}
+struct StreamWriterBinding : public StreamWriter,
+                             public torch::CustomClassHolder {
+  using StreamWriter::StreamWriter;
 };
 
 using S = const c10::intrusive_ptr<StreamWriterBinding>&;
@@ -29,14 +26,14 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              int64_t num_channels,
              const std::string& format,
              const c10::optional<std::string>& encoder,
-             const c10::optional<OptionDict>& encoder_option,
+             const c10::optional<OptionDictC10>& encoder_option,
              const c10::optional<std::string>& encoder_format) {
             s->add_audio_stream(
                 sample_rate,
                 num_channels,
                 format,
                 encoder,
-                encoder_option,
+                from_c10(encoder_option),
                 encoder_format);
           })
       .def(
@@ -47,7 +44,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              int64_t height,
              const std::string& format,
              const c10::optional<std::string>& encoder,
-             const c10::optional<OptionDict>& encoder_option,
+             const c10::optional<OptionDictC10>& encoder_option,
              const c10::optional<std::string>& encoder_format,
              const c10::optional<std::string>& hw_accel) {
             s->add_video_stream(
@@ -56,17 +53,21 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
                 height,
                 format,
                 encoder,
-                encoder_option,
+                from_c10(encoder_option),
                 encoder_format,
                 hw_accel);
           })
       .def(
           "set_metadata",
-          [](S s, const OptionDict& metadata) { s->set_metadata(metadata); })
+          [](S s, const OptionDictC10& metadata) {
+            s->set_metadata(from_c10(metadata));
+          })
       .def("dump_format", [](S s, int64_t i) { s->dump_format(i); })
       .def(
           "open",
-          [](S s, const c10::optional<OptionDict>& option) { s->open(option); })
+          [](S s, const c10::optional<OptionDictC10>& option) {
+            s->open(from_c10(option));
+          })
       .def("close", [](S s) { s->close(); })
       .def(
           "write_audio_chunk",

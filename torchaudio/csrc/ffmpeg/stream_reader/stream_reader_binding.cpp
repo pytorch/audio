@@ -1,4 +1,5 @@
 #include <torch/script.h>
+#include <torchaudio/csrc/ffmpeg/binding_utils.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 #include <stdexcept>
 
@@ -19,13 +20,14 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   });
   m.class_<StreamReaderBinding>("ffmpeg_StreamReader")
       .def(torch::init<>([](const std::string& src,
-                            const c10::optional<std::string>& device,
-                            const c10::optional<OptionDict>& option) {
-        return c10::make_intrusive<StreamReaderBinding>(src, device, option);
+                            const c10::optional<std::string>& format,
+                            const c10::optional<OptionDictC10>& option) {
+        return c10::make_intrusive<StreamReaderBinding>(
+            src, format, from_c10(option));
       }))
       .def("num_src_streams", [](S self) { return self->num_src_streams(); })
       .def("num_out_streams", [](S self) { return self->num_out_streams(); })
-      .def("get_metadata", [](S self) { return self->get_metadata(); })
+      .def("get_metadata", [](S self) { return to_c10(self->get_metadata()); })
       .def(
           "get_src_stream_info",
           [](S s, int64_t i) { return s->get_src_stream_info(i); })
@@ -47,14 +49,14 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              int64_t num_chunks,
              const c10::optional<std::string>& filter_desc,
              const c10::optional<std::string>& decoder,
-             const c10::optional<OptionDict>& decoder_option) {
+             const c10::optional<OptionDictC10>& decoder_option) {
             s->add_audio_stream(
                 i,
                 frames_per_chunk,
                 num_chunks,
                 filter_desc,
                 decoder,
-                decoder_option);
+                from_c10(decoder_option));
           })
       .def(
           "add_video_stream",
@@ -64,7 +66,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
              int64_t num_chunks,
              const c10::optional<std::string>& filter_desc,
              const c10::optional<std::string>& decoder,
-             const c10::optional<OptionDict>& decoder_option,
+             const c10::optional<OptionDictC10>& decoder_option,
              const c10::optional<std::string>& hw_accel) {
             s->add_video_stream(
                 i,
@@ -72,7 +74,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
                 num_chunks,
                 filter_desc,
                 decoder,
-                decoder_option,
+                from_c10(decoder_option),
                 hw_accel);
           })
       .def("remove_stream", [](S s, int64_t i) { s->remove_stream(i); })

@@ -89,28 +89,5 @@ FileObj::FileObj(py::object fileobj_, int buffer_size, bool writable)
       buffer_size(buffer_size),
       pAVIO(get_io_context(this, buffer_size, writable)) {}
 
-OptionDict map2dict(const OptionMap& src) {
-  OptionDict dict;
-  for (const auto& it : src) {
-    dict.insert(it.first.c_str(), it.second.c_str());
-  }
-  return dict;
-}
-
-c10::optional<OptionDict> map2dict(const c10::optional<OptionMap>& src) {
-  if (src) {
-    return c10::optional<OptionDict>{map2dict(src.value())};
-  }
-  return {};
-}
-
-OptionMap dict2map(const OptionDict& src) {
-  OptionMap ret;
-  for (const auto& it : src) {
-    ret.insert({it.key(), it.value()});
-  }
-  return ret;
-}
-
 } // namespace io
 } // namespace torchaudio

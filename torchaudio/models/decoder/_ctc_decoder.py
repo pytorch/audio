@@ -39,10 +39,6 @@ if torchaudio._internal.module_utils.is_module_available("flashlight"):
     except Exception:
         _KenLM = None
 else:
-    warnings.warn(
-        "The built-in flashlight integration is deprecated, and will be removed in future release."
-        "Please install flashlight-text. https://pypi.org/project/flashlight-text/"
-    )
     torchaudio._extension._load_lib("libflashlight-text")
     from torchaudio.lib.flashlight_lib_text_decoder import (
         CriterionType as _CriterionType,
@@ -61,6 +57,12 @@ else:
         create_word_dict as _create_word_dict,
         Dictionary as _Dictionary,
         load_words as _load_words,
+    )
+
+    warnings.warn(
+        "The built-in flashlight integration is deprecated, and will be removed in future release. "
+        "Please install flashlight-text. https://pypi.org/project/flashlight-text/ "
+        "For the detail of CTC decoder migration, please see https://github.com/pytorch/audio/issues/3088."
     )
 
 

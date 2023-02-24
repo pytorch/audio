@@ -1,3 +1,4 @@
+#include <torchaudio/csrc/ffmpeg/binding_utils.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader_wrapper.h>
 
 namespace torchaudio {
@@ -13,7 +14,7 @@ SrcInfo convert(SrcStreamInfo ssi) {
       ssi.bit_rate,
       ssi.num_frames,
       ssi.bits_per_sample,
-      ssi.metadata,
+      to_c10(ssi.metadata),
       ssi.sample_rate,
       ssi.num_channels,
       ssi.width,
@@ -26,18 +27,6 @@ OutInfo convert(OutputStreamInfo osi) {
       std::forward_as_tuple(osi.source_index, osi.filter_description));
 }
 } // namespace
-
-StreamReaderBinding::StreamReaderBinding(
-    const std::string& src,
-    const c10::optional<std::string>& format,
-    const c10::optional<OptionDict>& option)
-    : StreamReader(src, format, option) {}
-
-StreamReaderBinding::StreamReaderBinding(
-    AVIOContext* io_ctx,
-    const c10::optional<std::string>& format,
-    const c10::optional<OptionDict>& option)
-    : StreamReader(io_ctx, format, option) {}
 
 SrcInfo StreamReaderBinding::get_src_stream_info(int64_t i) {
   return convert(StreamReader::get_src_stream_info(static_cast<int>(i)));

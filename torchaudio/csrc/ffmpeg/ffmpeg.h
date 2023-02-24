@@ -27,7 +27,7 @@ extern "C" {
 namespace torchaudio {
 namespace io {
 
-using OptionDict = c10::Dict<std::string, std::string>;
+using OptionDict = std::map<std::string, std::string>;
 
 // https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
 // Starting from libavformat 59 (ffmpeg 5),

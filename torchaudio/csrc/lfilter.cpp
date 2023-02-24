@@ -176,7 +176,9 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
     }
 
     if (x.requires_grad()) {
-      dx = DifferentiableIIR::apply(dy.flip(2), a_coeffs_normalized).flip(2);
+      dx =
+          DifferentiableIIR::apply(dy.flip(2).contiguous(), a_coeffs_normalized)
+              .flip(2);
     }
 
     return {dx, da};

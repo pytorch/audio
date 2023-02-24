@@ -10,46 +10,5 @@ StreamWriterFileObj::StreamWriterFileObj(
     : FileObj(fileobj_, static_cast<int>(buffer_size), true),
       StreamWriter(pAVIO, format) {}
 
-void StreamWriterFileObj::set_metadata(
-    const std::map<std::string, std::string>& metadata) {
-  StreamWriter::set_metadata(map2dict(metadata));
-}
-
-void StreamWriterFileObj::add_audio_stream(
-    int64_t sample_rate,
-    int64_t num_channels,
-    std::string format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<std::map<std::string, std::string>>& encoder_option,
-    const c10::optional<std::string>& encoder_format) {
-  StreamWriter::add_audio_stream(
-      sample_rate,
-      num_channels,
-      format,
-      encoder,
-      map2dict(encoder_option),
-      encoder_format);
-}
-
-void StreamWriterFileObj::add_video_stream(
-    double frame_rate,
-    int64_t width,
-    int64_t height,
-    std::string format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<std::map<std::string, std::string>>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<std::string>& hw_accel) {
-  StreamWriter::add_video_stream(
-      frame_rate,
-      width,
-      height,
-      format,
-      encoder,
-      map2dict(encoder_option),
-      encoder_format,
-      hw_accel);
-}
-
 } // namespace io
 } // namespace torchaudio
