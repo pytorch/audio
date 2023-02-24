@@ -422,6 +422,39 @@ int StreamReader::process_packet_block(double timeout, double backoff) {
   }
 }
 
+void StreamReader::process_all_packets() {
+  int64_t ret = 0;
+  do {
+    ret = process_packet();
+  } while (!ret);
+}
+
+int StreamReader::process_packet(
+    const c10::optional<double>& timeout,
+    const double backoff) {
+  int code = [&]() -> int {
+    if (timeout.has_value()) {
+      return process_packet_block(timeout.value(), backoff);
+    }
+    return process_packet();
+  }();
+  TORCH_CHECK(
+      code >= 0, "Failed to process a packet. (" + av_err2string(code) + "). ");
+  return code;
+}
+
+int StreamReader::fill_buffer(
+    const c10::optional<double>& timeout,
+    const double backoff) {
+  while (!is_buffer_ready()) {
+    int code = process_packet(timeout, backoff);
+    if (code != 0) {
+      return code;
+    }
+  }
+  return 0;
+}
+
 // <0: Some error happened.
 int StreamReader::drain() {
   int ret = 0, tmp = 0;

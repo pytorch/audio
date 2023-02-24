@@ -80,15 +80,13 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def("remove_stream", [](S s, int64_t i) { s->remove_stream(i); })
       .def(
           "process_packet",
-          [](S s, const c10::optional<double>& timeout, const double backoff) {
-            return s->process_packet(timeout, backoff);
-          })
+          [](S s, const c10::optional<double>& timeout, const double backoff)
+              -> int64_t { return s->process_packet(timeout, backoff); })
       .def("process_all_packets", [](S s) { s->process_all_packets(); })
       .def(
           "fill_buffer",
-          [](S s, const c10::optional<double>& timeout, const double backoff) {
-            return s->fill_buffer(timeout, backoff);
-          })
+          [](S s, const c10::optional<double>& timeout, const double backoff)
+              -> int64_t { return s->fill_buffer(timeout, backoff); })
       .def("is_buffer_ready", [](S s) { return s->is_buffer_ready(); })
       .def("pop_chunks", [](S s) { return s->pop_chunks(); });
 }
