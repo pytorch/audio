@@ -97,6 +97,13 @@ std::string get_build_config() {
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("torchaudio::ffmpeg_init", []() { avdevice_register_all(); });
+  m.def("torchaudio::ffmpeg_get_log_level", []() -> int64_t {
+    return static_cast<int64_t>(av_log_get_level());
+  });
+  m.def("torchaudio::ffmpeg_set_log_level", [](int64_t level) {
+    av_log_set_level(static_cast<int>(level));
+  });
   m.def("torchaudio::ffmpeg_get_versions", &get_versions);
   m.def("torchaudio::ffmpeg_get_muxers", []() { return get_muxers(false); });
   m.def(
