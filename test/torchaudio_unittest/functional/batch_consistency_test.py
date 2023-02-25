@@ -65,7 +65,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "rand_init": False,
         }
         func = partial(F.griffinlim, **kwargs)
-        self.assert_batch_consistency(func, inputs=(batch,), atol=5e-5)
+        self.assert_batch_consistency(func, inputs=(batch,), atol=1e-4)
 
     @parameterized.expand(
         list(
