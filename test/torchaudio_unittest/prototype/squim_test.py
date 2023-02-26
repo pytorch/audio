@@ -25,6 +25,23 @@ class TestSQUIM(TorchaudioTestCase):
         model = squim_objective_base()
         self._smoke_test_objective(model, torch.device("cuda"), dtype)
 
+    def test_batch_consistency(self):
+        model = squim_objective_base()
+        model.eval()
+
+        batch_size, num_frames = 3, 16000
+        waveforms = torch.randn(batch_size, num_frames)
+
+        ref_scores = model(waveforms)
+        hyp_scores = [torch.zeros(batch_size), torch.zeros(batch_size), torch.zeros(batch_size)]
+        for i in range(batch_size):
+            scores = model(waveforms[i : i + 1])
+            for j in range(3):
+                hyp_scores[j][i] = scores[j]
+        self.assertEqual(len(hyp_scores), len(ref_scores))
+        for i in range(len(ref_scores)):
+            self.assertEqual(hyp_scores[i], ref_scores[i])
+
     def test_torchscript_consistency(self):
         model = squim_objective_base()
         model.eval()
