@@ -72,7 +72,7 @@ if(BUILD_RNNT)
 
     list(
       APPEND
-      LIBTORCHAUDIO_SOURCES
+      sources 
       rnnt/hip/compute_alphas.hip
       rnnt/hip/compute_betas.hip
       rnnt/hip/compute.hip
@@ -83,18 +83,14 @@ endif()
 if(USE_ROCM)
   list(
     APPEND
-    LIBTORCHAUDIO_INCLUDE_DIRS
-    )
-  list(
-    APPEND
-    LIBTORCHAUDIO_LINK_LIBRARIES
+    additional_libs 
     hip::host
     hip::device
     /opt/rocm/llvm/lib/libomp.so
     )
   list(
     APPEND
-    LIBTORCHAUDIO_COMPILE_DEFINITIONS
+    compile_definitions 
     USE_ROCM
   )
 endif()
