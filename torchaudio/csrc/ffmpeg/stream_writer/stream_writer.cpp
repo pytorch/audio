@@ -1,4 +1,6 @@
+#include <torchaudio/csrc/ffmpeg/stream_writer/audio_output_stream.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/video_output_stream.h>
 
 #ifdef USE_CUDA
 #include <c10/cuda/CUDAStream.h>
