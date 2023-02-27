@@ -2,18 +2,62 @@
 
 namespace torchaudio::io {
 
+namespace {
+
+std::unique_ptr<FilterGraph> get_audio_filter(
+    AVSampleFormat src_fmt,
+    AVCodecContext* codec_ctx) {
+  if (src_fmt == codec_ctx->sample_fmt) {
+    return {nullptr};
+  }
+  std::stringstream desc;
+  desc << "aformat=" << av_get_sample_fmt_name(codec_ctx->sample_fmt);
+  auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_AUDIO);
+  p->add_audio_src(
+      src_fmt,
+      codec_ctx->time_base,
+      codec_ctx->sample_rate,
+      codec_ctx->channel_layout);
+  p->add_sink();
+  p->add_process(desc.str());
+  p->create_filter();
+  return p;
+}
+
+AVFramePtr get_audio_frame(
+    AVSampleFormat src_fmt,
+    AVCodecContext* codec_ctx,
+    int default_frame_size = 10000) {
+  AVFramePtr frame{};
+  frame->format = src_fmt;
+  frame->channel_layout = codec_ctx->channel_layout;
+  frame->sample_rate = codec_ctx->sample_rate;
+  frame->nb_samples =
+      codec_ctx->frame_size ? codec_ctx->frame_size : default_frame_size;
+  if (frame->nb_samples) {
+    int ret = av_frame_get_buffer(frame, 0);
+    TORCH_CHECK(
+        ret >= 0,
+        "Error allocating an audio buffer (",
+        av_err2string(ret),
+        ").");
+  }
+  return frame;
+}
+
+} // namespace
+
 AudioOutputStream::AudioOutputStream(
     AVFormatContext* format_ctx,
-    AVCodecContextPtr&& codec_ctx,
-    std::unique_ptr<FilterGraph>&& filter,
-    AVFramePtr&& src_frame,
-    int64_t frame_capacity_)
+    AVSampleFormat src_fmt,
+    AVCodecContextPtr&& codec_ctx_)
     : OutputStream(
           format_ctx,
-          std::move(codec_ctx),
-          std::move(filter),
-          std::move(src_frame)),
-      frame_capacity(frame_capacity_) {}
+          codec_ctx_,
+          get_audio_filter(src_fmt, codec_ctx_)),
+      src_frame(get_audio_frame(src_fmt, codec_ctx_)),
+      frame_capacity(src_frame->nb_samples),
+      codec_ctx(std::move(codec_ctx_)) {}
 
 namespace {
 

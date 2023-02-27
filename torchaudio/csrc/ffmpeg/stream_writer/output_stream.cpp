@@ -4,13 +4,11 @@ namespace torchaudio::io {
 
 OutputStream::OutputStream(
     AVFormatContext* format_ctx,
-    AVCodecContextPtr&& codec_ctx_,
-    std::unique_ptr<FilterGraph>&& filter_,
-    AVFramePtr&& src_frame_)
-    : codec_ctx(std::move(codec_ctx_)),
+    AVCodecContext* codec_ctx_,
+    std::unique_ptr<FilterGraph>&& filter_)
+    : codec_ctx(codec_ctx_),
       encoder(format_ctx, codec_ctx),
       filter(std::move(filter_)),
-      src_frame(std::move(src_frame_)),
       dst_frame(),
       num_frames(0) {}
 

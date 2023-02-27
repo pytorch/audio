@@ -4,16 +4,19 @@
 namespace torchaudio::io {
 
 struct VideoOutputStream : OutputStream {
+  AVFramePtr src_frame;
+
   AVBufferRefPtr hw_device_ctx;
   AVBufferRefPtr hw_frame_ctx;
+  AVCodecContextPtr codec_ctx;
 
   VideoOutputStream(
       AVFormatContext* format_ctx,
+      AVPixelFormat src_fmt,
       AVCodecContextPtr&& codec_ctx,
-      std::unique_ptr<FilterGraph>&& filter,
-      AVFramePtr&& src_frame,
       AVBufferRefPtr&& hw_device_ctx,
-      AVBufferRefPtr&& hw_frame_ctx);
+      AVBufferRefPtr&& hw_frame_ctx,
+      const torch::Device& device);
 
   void write_chunk(const torch::Tensor& frames) override;
   ~VideoOutputStream() override = default;

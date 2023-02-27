@@ -6,20 +6,74 @@
 
 namespace torchaudio::io {
 
+namespace {
+
+std::unique_ptr<FilterGraph> get_video_filter(
+    AVPixelFormat src_fmt,
+    AVCodecContext* codec_ctx,
+    const torch::Device& device) {
+  if (src_fmt == codec_ctx->pix_fmt || device.type() != c10::DeviceType::CPU) {
+    return {nullptr};
+  }
+  std::stringstream desc;
+  desc << "format=" << av_get_pix_fmt_name(codec_ctx->pix_fmt);
+
+  auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_VIDEO);
+  p->add_video_src(
+      src_fmt,
+      codec_ctx->time_base,
+      codec_ctx->width,
+      codec_ctx->height,
+      codec_ctx->sample_aspect_ratio);
+  p->add_sink();
+  p->add_process(desc.str());
+  p->create_filter();
+  return p;
+}
+
+AVFramePtr get_hw_video_frame(AVCodecContext* codec_ctx) {
+  AVFramePtr frame{};
+  int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
+  TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
+  return frame;
+}
+
+AVFramePtr get_video_frame(
+    AVPixelFormat src_fmt,
+    AVCodecContext* codec_ctx,
+    const torch::Device& device) {
+  if (device.type() == c10::DeviceType::CUDA) {
+    return get_hw_video_frame(codec_ctx);
+  }
+
+  AVFramePtr frame{};
+  frame->format = src_fmt;
+  frame->width = codec_ctx->width;
+  frame->height = codec_ctx->height;
+
+  int ret = av_frame_get_buffer(frame, 0);
+  TORCH_CHECK(
+      ret >= 0, "Error allocating a video buffer (", av_err2string(ret), ").");
+  return frame;
+}
+
+} // namespace
+
 VideoOutputStream::VideoOutputStream(
     AVFormatContext* format_ctx,
-    AVCodecContextPtr&& codec_ctx,
-    std::unique_ptr<FilterGraph>&& filter,
-    AVFramePtr&& src_frame,
+    AVPixelFormat src_fmt,
+    AVCodecContextPtr&& codec_ctx_,
     AVBufferRefPtr&& hw_device_ctx_,
-    AVBufferRefPtr&& hw_frame_ctx_)
+    AVBufferRefPtr&& hw_frame_ctx_,
+    const torch::Device& device)
     : OutputStream(
           format_ctx,
-          std::move(codec_ctx),
-          std::move(filter),
-          std::move(src_frame)),
+          codec_ctx_,
+          get_video_filter(src_fmt, codec_ctx_, device)),
+      src_frame(get_video_frame(src_fmt, codec_ctx_, device)),
       hw_device_ctx(std::move(hw_device_ctx_)),
-      hw_frame_ctx(std::move(hw_frame_ctx_)) {}
+      hw_frame_ctx(std::move(hw_frame_ctx_)),
+      codec_ctx(std::move(codec_ctx_)) {}
 
 namespace {
 

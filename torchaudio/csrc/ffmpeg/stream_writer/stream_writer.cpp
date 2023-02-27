@@ -282,47 +282,6 @@ void open_codec(
   TORCH_CHECK(ret >= 0, "Failed to open codec: (", av_err2string(ret), ")");
 }
 
-AVFramePtr get_audio_frame(
-    enum AVSampleFormat fmt,
-    AVCodecContextPtr& codec_ctx,
-    int frame_size) {
-  AVFramePtr frame{};
-  frame->format = fmt;
-  frame->channel_layout = codec_ctx->channel_layout;
-  frame->sample_rate = codec_ctx->sample_rate;
-  frame->nb_samples = frame_size;
-  if (frame->nb_samples) {
-    int ret = av_frame_get_buffer(frame, 0);
-    TORCH_CHECK(
-        ret >= 0,
-        "Error allocating an audio buffer (",
-        av_err2string(ret),
-        ").");
-  }
-  return frame;
-}
-
-AVFramePtr get_hw_video_frame(AVCodecContextPtr& codec_ctx) {
-  AVFramePtr frame{};
-  int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
-  TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
-  return frame;
-}
-
-AVFramePtr get_video_frame(
-    enum AVPixelFormat fmt,
-    AVCodecContextPtr& codec_ctx) {
-  AVFramePtr frame{};
-  frame->format = fmt;
-  frame->width = codec_ctx->width;
-  frame->height = codec_ctx->height;
-
-  int ret = av_frame_get_buffer(frame, 0);
-  TORCH_CHECK(
-      ret >= 0, "Error allocating a video buffer (", av_err2string(ret), ").");
-  return frame;
-}
-
 AVCodecContextPtr get_codec_ctx(
     enum AVMediaType type,
     AVFORMAT_CONST AVOutputFormat* oformat,
@@ -368,135 +327,33 @@ AVCodecContextPtr get_codec_ctx(
   return AVCodecContextPtr(ctx);
 }
 
-enum AVSampleFormat _get_src_sample_fmt(const std::string& src) {
-  auto fmt = av_get_sample_fmt(src.c_str());
-  TORCH_CHECK(fmt != AV_SAMPLE_FMT_NONE, "Unknown sample format: ", src);
-  TORCH_CHECK(
-      !av_sample_fmt_is_planar(fmt),
-      "Unexpected sample fotmat value. Valid values are ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_U8),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_S16),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_S32),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_S64),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_FLT),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_DBL),
-      ". ",
-      "Found: ",
-      src);
-  return fmt;
-}
-
-enum AVPixelFormat _get_src_pixel_fmt(const std::string& src) {
-  auto fmt = av_get_pix_fmt(src.c_str());
-  switch (fmt) {
-    case AV_PIX_FMT_GRAY8:
-    case AV_PIX_FMT_RGB24:
-    case AV_PIX_FMT_BGR24:
-    case AV_PIX_FMT_YUV444P:
-      return fmt;
-    case AV_PIX_FMT_NONE:
-      TORCH_CHECK(false, "Unknown pixel format: ", src);
-    default:
-      TORCH_CHECK(false, "Unsupported pixel format: ", src);
-  }
-}
-
-std::unique_ptr<FilterGraph> _get_audio_filter(
-    enum AVSampleFormat fmt,
-    AVCodecContextPtr& ctx) {
-  std::stringstream desc;
-  desc << "aformat=" << av_get_sample_fmt_name(ctx->sample_fmt);
-
-  auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_AUDIO);
-  p->add_audio_src(fmt, ctx->time_base, ctx->sample_rate, ctx->channel_layout);
-  p->add_sink();
-  p->add_process(desc.str());
-  p->create_filter();
-  return p;
-}
-
-std::unique_ptr<FilterGraph> _get_video_filter(
-    enum AVPixelFormat fmt,
-    AVCodecContextPtr& ctx) {
-  std::stringstream desc;
-  desc << "format=" << av_get_pix_fmt_name(ctx->pix_fmt);
-
-  auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_VIDEO);
-  p->add_video_src(
-      fmt, ctx->time_base, ctx->width, ctx->height, ctx->sample_aspect_ratio);
-  p->add_sink();
-  p->add_process(desc.str());
-  p->create_filter();
-  return p;
-}
-
-} // namespace
-
-void StreamWriter::add_audio_stream(
+AVCodecContextPtr get_audio_codec(
+    AVFORMAT_CONST AVOutputFormat* oformat,
     int64_t sample_rate,
     int64_t num_channels,
-    const std::string& format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format) {
-  AVCodecContextPtr ctx =
-      get_codec_ctx(AVMEDIA_TYPE_AUDIO, pFormatContext->oformat, encoder);
+  AVCodecContextPtr ctx = get_codec_ctx(AVMEDIA_TYPE_AUDIO, oformat, encoder);
   configure_audio_codec(ctx, sample_rate, num_channels, encoder_format);
   open_codec(ctx, encoder_option);
-
-  enum AVSampleFormat src_fmt = _get_src_sample_fmt(format);
-  std::unique_ptr<FilterGraph> filter = src_fmt == ctx->sample_fmt
-      ? std::unique_ptr<FilterGraph>(nullptr)
-      : _get_audio_filter(src_fmt, ctx);
-  static const int default_capacity = 10000;
-  int frame_capacity = ctx->frame_size ? ctx->frame_size : default_capacity;
-  AVFramePtr src_frame = get_audio_frame(src_fmt, ctx, frame_capacity);
-  streams.emplace_back(std::make_unique<AudioOutputStream>(
-      pFormatContext,
-      std::move(ctx),
-      std::move(filter),
-      std::move(src_frame),
-      frame_capacity));
+  return ctx;
 }
 
-void StreamWriter::add_video_stream(
+AVCodecContextPtr get_video_codec(
+    AVFORMAT_CONST AVOutputFormat* oformat,
     double frame_rate,
     int64_t width,
     int64_t height,
-    const std::string& format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<std::string>& hw_accel) {
-  const torch::Device device = [&]() {
-    if (!hw_accel) {
-      return torch::Device{c10::DeviceType::CPU};
-    }
-#ifdef USE_CUDA
-    torch::Device d{hw_accel.value()};
-    TORCH_CHECK(
-        d.type() == c10::DeviceType::CUDA,
-        "Only CUDA is supported for hardware acceleration. Found:",
-        device.str());
-    return d;
-#else
-    TORCH_CHECK(
-        false,
-        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
-#endif
-  }();
-
-  AVCodecContextPtr ctx =
-      get_codec_ctx(AVMEDIA_TYPE_VIDEO, pFormatContext->oformat, encoder);
+    const torch::Device device,
+    AVBufferRefPtr& hw_device_ctx,
+    AVBufferRefPtr& hw_frame_ctx) {
+  AVCodecContextPtr ctx = get_codec_ctx(AVMEDIA_TYPE_VIDEO, oformat, encoder);
   configure_video_codec(ctx, frame_rate, width, height, encoder_format);
 
-  AVBufferRefPtr hw_device_ctx{};
-  AVBufferRefPtr hw_frame_ctx{};
 #ifdef USE_CUDA
   if (device.type() == c10::DeviceType::CUDA) {
     AVBufferRef* device_ctx = nullptr;
@@ -538,28 +395,117 @@ void StreamWriter::add_video_stream(
 #endif
 
   open_codec(ctx, encoder_option);
+  return ctx;
+}
 
-  enum AVPixelFormat src_fmt = _get_src_pixel_fmt(format);
-  std::unique_ptr<FilterGraph> filter = [&]() {
-    if (src_fmt != ctx->pix_fmt && device.type() == c10::DeviceType::CPU) {
-      return _get_video_filter(src_fmt, ctx);
+enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
+  auto fmt = av_get_sample_fmt(src.c_str());
+  TORCH_CHECK(fmt != AV_SAMPLE_FMT_NONE, "Unknown sample format: ", src);
+  TORCH_CHECK(
+      !av_sample_fmt_is_planar(fmt),
+      "Unexpected sample fotmat value. Valid values are ",
+      av_get_sample_fmt_name(AV_SAMPLE_FMT_U8),
+      ", ",
+      av_get_sample_fmt_name(AV_SAMPLE_FMT_S16),
+      ", ",
+      av_get_sample_fmt_name(AV_SAMPLE_FMT_S32),
+      ", ",
+      av_get_sample_fmt_name(AV_SAMPLE_FMT_S64),
+      ", ",
+      av_get_sample_fmt_name(AV_SAMPLE_FMT_FLT),
+      ", ",
+      av_get_sample_fmt_name(AV_SAMPLE_FMT_DBL),
+      ". ",
+      "Found: ",
+      src);
+  return fmt;
+}
+
+enum AVPixelFormat get_src_pixel_fmt(const std::string& src) {
+  auto fmt = av_get_pix_fmt(src.c_str());
+  switch (fmt) {
+    case AV_PIX_FMT_GRAY8:
+    case AV_PIX_FMT_RGB24:
+    case AV_PIX_FMT_BGR24:
+    case AV_PIX_FMT_YUV444P:
+      return fmt;
+    case AV_PIX_FMT_NONE:
+      TORCH_CHECK(false, "Unknown pixel format: ", src);
+    default:
+      TORCH_CHECK(false, "Unsupported pixel format: ", src);
+  }
+}
+
+} // namespace
+
+void StreamWriter::add_audio_stream(
+    int64_t sample_rate,
+    int64_t num_channels,
+    const std::string& format,
+    const c10::optional<std::string>& encoder,
+    const c10::optional<OptionDict>& encoder_option,
+    const c10::optional<std::string>& encoder_format) {
+  streams.emplace_back(std::make_unique<AudioOutputStream>(
+      pFormatContext,
+      get_src_sample_fmt(format),
+      get_audio_codec(
+          pFormatContext->oformat,
+          sample_rate,
+          num_channels,
+          encoder,
+          encoder_option,
+          encoder_format)));
+}
+
+void StreamWriter::add_video_stream(
+    double frame_rate,
+    int64_t width,
+    int64_t height,
+    const std::string& format,
+    const c10::optional<std::string>& encoder,
+    const c10::optional<OptionDict>& encoder_option,
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<std::string>& hw_accel) {
+  const torch::Device device = [&]() {
+    if (!hw_accel) {
+      return torch::Device{c10::DeviceType::CPU};
     }
-    return std::unique_ptr<FilterGraph>(nullptr);
+#ifdef USE_CUDA
+    torch::Device d{hw_accel.value()};
+    TORCH_CHECK(
+        d.type() == c10::DeviceType::CUDA,
+        "Only CUDA is supported for hardware acceleration. Found:",
+        device.str());
+    return d;
+#else
+    TORCH_CHECK(
+        false,
+        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#endif
   }();
 
-  AVFramePtr src_frame = [&]() {
-    if (device.type() == c10::DeviceType::CUDA) {
-      return get_hw_video_frame(ctx);
-    }
-    return get_video_frame(src_fmt, ctx);
-  }();
+  AVBufferRefPtr hw_device_ctx{};
+  AVBufferRefPtr hw_frame_ctx{};
+
+  AVCodecContextPtr ctx = get_video_codec(
+      pFormatContext->oformat,
+      frame_rate,
+      width,
+      height,
+      encoder,
+      encoder_option,
+      encoder_format,
+      device,
+      hw_device_ctx,
+      hw_frame_ctx);
+
   streams.emplace_back(std::make_unique<VideoOutputStream>(
       pFormatContext,
+      get_src_pixel_fmt(format),
       std::move(ctx),
-      std::move(filter),
-      std::move(src_frame),
       std::move(hw_device_ctx),
-      std::move(hw_frame_ctx)));
+      std::move(hw_frame_ctx),
+      device));
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
