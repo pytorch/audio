@@ -56,6 +56,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
     fi
 )
 
+
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
 python setup.py install
