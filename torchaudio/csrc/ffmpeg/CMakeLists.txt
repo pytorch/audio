@@ -16,6 +16,7 @@ set(
   stream_reader/sink.cpp
   stream_reader/stream_processor.cpp
   stream_reader/stream_reader.cpp
+  stream_writer/encoder.cpp
   stream_writer/output_stream.cpp
   stream_writer/stream_writer.cpp
   compat.cpp

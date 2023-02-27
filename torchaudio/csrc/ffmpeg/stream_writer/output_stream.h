@@ -3,16 +3,15 @@
 #include <torch/types.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/encoder.h>
 
 namespace torchaudio::io {
 
 struct OutputStream {
-  // Reference to the AVFormatContext that this stream belongs to
-  AVFormatContext* format_ctx;
-  // Stream object that OutputStream is responsible for managing
-  AVStream* stream;
-  // Codec context (encoder)
+  // Codec context
   AVCodecContextPtr codec_ctx;
+  // Encoder + Muxer
+  Encoder encoder;
   // Filter for additional processing
   std::unique_ptr<FilterGraph> filter;
   // frame that user-provided input data is written
@@ -21,12 +20,9 @@ struct OutputStream {
   AVFramePtr dst_frame;
   // The number of samples written so far
   int64_t num_frames;
-  // Temporary object used during the encoding
-  AVPacketPtr packet;
 
   OutputStream(
       AVFormatContext* format_ctx,
-      AVStream* stream,
       AVCodecContextPtr&& codec_ctx,
       std::unique_ptr<FilterGraph>&& filter,
       AVFramePtr&& src_frame);
@@ -42,7 +38,6 @@ struct AudioOutputStream : OutputStream {
 
   AudioOutputStream(
       AVFormatContext* format_ctx,
-      AVStream* stream,
       AVCodecContextPtr&& codec_ctx,
       std::unique_ptr<FilterGraph>&& filter,
       AVFramePtr&& src_frame,
@@ -59,7 +54,6 @@ struct VideoOutputStream : OutputStream {
 
   VideoOutputStream(
       AVFormatContext* format_ctx,
-      AVStream* stream,
       AVCodecContextPtr&& codec_ctx,
       std::unique_ptr<FilterGraph>&& filter,
       AVFramePtr&& src_frame,
