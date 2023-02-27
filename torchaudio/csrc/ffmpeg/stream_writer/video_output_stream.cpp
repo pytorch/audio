@@ -8,26 +8,31 @@ namespace torchaudio::io {
 
 namespace {
 
-std::unique_ptr<FilterGraph> get_video_filter(
+FilterGraph get_video_filter(
     AVPixelFormat src_fmt,
     AVCodecContext* codec_ctx,
     const torch::Device& device) {
-  if (src_fmt == codec_ctx->pix_fmt || device.type() != c10::DeviceType::CPU) {
-    return {nullptr};
-  }
-  std::stringstream desc;
-  desc << "format=" << av_get_pix_fmt_name(codec_ctx->pix_fmt);
+  auto desc = [&]() -> std::string {
+    if (src_fmt == codec_ctx->pix_fmt ||
+        device.type() != c10::DeviceType::CPU) {
+      return "null";
+    } else {
+      std::stringstream ss;
+      ss << "format=" << av_get_pix_fmt_name(codec_ctx->pix_fmt);
+      return ss.str();
+    }
+  }();
 
-  auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_VIDEO);
-  p->add_video_src(
+  FilterGraph p{AVMEDIA_TYPE_VIDEO};
+  p.add_video_src(
       src_fmt,
       codec_ctx->time_base,
       codec_ctx->width,
       codec_ctx->height,
       codec_ctx->sample_aspect_ratio);
-  p->add_sink();
-  p->add_process(desc.str());
-  p->create_filter();
+  p.add_sink();
+  p.add_process(desc);
+  p.create_filter();
   return p;
 }
 

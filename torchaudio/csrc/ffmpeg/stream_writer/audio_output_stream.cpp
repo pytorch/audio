@@ -4,23 +4,28 @@ namespace torchaudio::io {
 
 namespace {
 
-std::unique_ptr<FilterGraph> get_audio_filter(
+FilterGraph get_audio_filter(
     AVSampleFormat src_fmt,
     AVCodecContext* codec_ctx) {
-  if (src_fmt == codec_ctx->sample_fmt) {
-    return {nullptr};
-  }
-  std::stringstream desc;
-  desc << "aformat=" << av_get_sample_fmt_name(codec_ctx->sample_fmt);
-  auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_AUDIO);
-  p->add_audio_src(
+  auto desc = [&]() -> std::string {
+    if (src_fmt == codec_ctx->sample_fmt) {
+      return "anull";
+    } else {
+      std::stringstream ss;
+      ss << "aformat=" << av_get_sample_fmt_name(codec_ctx->sample_fmt);
+      return ss.str();
+    }
+  }();
+
+  FilterGraph p{AVMEDIA_TYPE_AUDIO};
+  p.add_audio_src(
       src_fmt,
       codec_ctx->time_base,
       codec_ctx->sample_rate,
       codec_ctx->channel_layout);
-  p->add_sink();
-  p->add_process(desc.str());
-  p->create_filter();
+  p.add_sink();
+  p.add_process(desc);
+  p.create_filter();
   return p;
 }
 

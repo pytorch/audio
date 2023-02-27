@@ -13,7 +13,7 @@ struct OutputStream {
   // Encoder + Muxer
   Encoder encoder;
   // Filter for additional processing
-  std::unique_ptr<FilterGraph> filter;
+  FilterGraph filter;
   // frame that output from FilterGraph is written
   AVFramePtr dst_frame;
   // The number of samples written so far
@@ -22,7 +22,7 @@ struct OutputStream {
   OutputStream(
       AVFormatContext* format_ctx,
       AVCodecContext* codec_ctx,
-      std::unique_ptr<FilterGraph>&& filter);
+      FilterGraph&& filter);
 
   virtual void write_chunk(const torch::Tensor& input) = 0;
   void process_frame(AVFrame* src);
