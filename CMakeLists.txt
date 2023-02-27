@@ -64,6 +64,7 @@ option(USE_ROCM "Enable ROCM support" OFF)
 option(USE_OPENMP "Enable OpenMP support" OFF)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
 
 # check that USE_CUDA and USE_ROCM are not set at the same time
 if(USE_CUDA AND USE_ROCM)
