@@ -4,14 +4,14 @@
 namespace torchaudio::io {
 
 struct AudioOutputStream : OutputStream {
+  AVFramePtr src_frame;
   int64_t frame_capacity;
+  AVCodecContextPtr codec_ctx;
 
   AudioOutputStream(
       AVFormatContext* format_ctx,
-      AVCodecContextPtr&& codec_ctx,
-      std::unique_ptr<FilterGraph>&& filter,
-      AVFramePtr&& src_frame,
-      int64_t frame_capacity);
+      AVSampleFormat src_fmt,
+      AVCodecContextPtr&& codec_ctx);
 
   void write_chunk(const torch::Tensor& waveform) override;
   ~AudioOutputStream() override = default;
