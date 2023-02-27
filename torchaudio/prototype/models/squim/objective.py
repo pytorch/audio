@@ -205,8 +205,6 @@ class AutoPool(nn.Module):
 class SquimObjective(nn.Module):
     """Speech Quality and Intelligibility Measures (SQUIM) model that predicts **objective** metric scores
     for speech enhancement (e.g., STOI, PESQ, and SI-SDR).
-    The model uses *dual-path recurrent neural networks (DPRNN)* :cite:`luo2020dual` to model sequential signals,
-    and multiple transformer branches to estimate the objective metric scores, respectively.
 
     Args:
         encoder (torch.nn.Module): Encoder module to transform 1D waveform to 2D feature representation.
