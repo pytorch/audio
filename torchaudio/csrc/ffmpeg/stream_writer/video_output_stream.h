@@ -19,6 +19,8 @@ struct VideoOutputStream : OutputStream {
       const torch::Device& device);
 
   void write_chunk(const torch::Tensor& frames) override;
+  void process_frame();
+
   ~VideoOutputStream() override = default;
 };
 
