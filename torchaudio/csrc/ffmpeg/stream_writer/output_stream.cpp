@@ -7,144 +7,63 @@
 namespace torchaudio::io {
 
 OutputStream::OutputStream(
-    AVFormatContext* format_ctx_,
-    AVStream* stream_,
+    AVFormatContext* format_ctx,
     AVCodecContextPtr&& codec_ctx_,
     std::unique_ptr<FilterGraph>&& filter_,
     AVFramePtr&& src_frame_)
-    : format_ctx(format_ctx_),
-      stream(stream_),
-      codec_ctx(std::move(codec_ctx_)),
+    : codec_ctx(std::move(codec_ctx_)),
+      encoder(format_ctx, codec_ctx),
       filter(std::move(filter_)),
       src_frame(std::move(src_frame_)),
       dst_frame(),
-      num_frames(0),
-      packet() {}
+      num_frames(0) {}
 
 AudioOutputStream::AudioOutputStream(
-    AVFormatContext* format_ctx_,
-    AVStream* stream_,
-    AVCodecContextPtr&& codec_ctx_,
-    std::unique_ptr<FilterGraph>&& filter_,
-    AVFramePtr&& src_frame_,
+    AVFormatContext* format_ctx,
+    AVCodecContextPtr&& codec_ctx,
+    std::unique_ptr<FilterGraph>&& filter,
+    AVFramePtr&& src_frame,
     int64_t frame_capacity_)
     : OutputStream(
-          format_ctx_,
-          stream_,
-          std::move(codec_ctx_),
-          std::move(filter_),
-          std::move(src_frame_)),
+          format_ctx,
+          std::move(codec_ctx),
+          std::move(filter),
+          std::move(src_frame)),
       frame_capacity(frame_capacity_) {}
 
 VideoOutputStream::VideoOutputStream(
-    AVFormatContext* format_ctx_,
-    AVStream* stream_,
-    AVCodecContextPtr&& codec_ctx_,
-    std::unique_ptr<FilterGraph>&& filter_,
-    AVFramePtr&& src_frame_,
+    AVFormatContext* format_ctx,
+    AVCodecContextPtr&& codec_ctx,
+    std::unique_ptr<FilterGraph>&& filter,
+    AVFramePtr&& src_frame,
     AVBufferRefPtr&& hw_device_ctx_,
     AVBufferRefPtr&& hw_frame_ctx_)
     : OutputStream(
-          format_ctx_,
-          stream_,
-          std::move(codec_ctx_),
-          std::move(filter_),
-          std::move(src_frame_)),
+          format_ctx,
+          std::move(codec_ctx),
+          std::move(filter),
+          std::move(src_frame)),
       hw_device_ctx(std::move(hw_device_ctx_)),
       hw_frame_ctx(std::move(hw_frame_ctx_)) {}
 
-namespace {
-///
-/// Encode the given AVFrame data
-///
-/// @param frame Frame data to encode
-/// @param format Output format context
-/// @param stream Output stream in the output format context
-/// @param codec Encoding context
-/// @param packet Temporaly packet used during encoding.
-void _encode(
-    AVFrame* frame,
-    AVFormatContext* format,
-    AVStream* stream,
-    AVCodecContext* codec,
-    AVPacket* packet) {
-  int ret = avcodec_send_frame(codec, frame);
-  TORCH_CHECK(ret >= 0, "Failed to encode frame (", av_err2string(ret), ").");
-  while (ret >= 0) {
-    ret = avcodec_receive_packet(codec, packet);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-      if (ret == AVERROR_EOF) {
-        // Note:
-        // av_interleaved_write_frame buffers the packets internally as needed
-        // to make sure the packets in the output file are properly interleaved
-        // in the order of increasing dts.
-        // https://ffmpeg.org/doxygen/3.4/group__lavf__encoding.html#ga37352ed2c63493c38219d935e71db6c1
-        // Passing nullptr will (forcefully) flush the queue, and this is
-        // necessary if users mal-configure the streams.
-
-        // Possible follow up: Add flush_buffer method?
-        // An alternative is to use `av_write_frame` functoin, but in that case
-        // client code is responsible for ordering packets, which makes it
-        // complicated to use StreamWriter
-        ret = av_interleaved_write_frame(format, nullptr);
-        TORCH_CHECK(
-            ret >= 0, "Failed to flush packet (", av_err2string(ret), ").");
-      }
-      break;
-    } else {
-      TORCH_CHECK(
-          ret >= 0,
-          "Failed to fetch encoded packet (",
-          av_err2string(ret),
-          ").");
-    }
-    // https://github.com/pytorch/audio/issues/2790
-    // If this is not set, the last frame is not properly saved, as
-    // the encoder cannot figure out when the packet should finish.
-    if (packet->duration == 0 && codec->codec_type == AVMEDIA_TYPE_VIDEO) {
-      // 1 means that 1 frame (in codec time base, which is the frame rate)
-      // This has to be set before av_packet_rescale_ts bellow.
-      packet->duration = 1;
-    }
-    av_packet_rescale_ts(packet, codec->time_base, stream->time_base);
-    packet->stream_index = stream->index;
-
-    ret = av_interleaved_write_frame(format, packet);
-    TORCH_CHECK(ret >= 0, "Failed to write packet (", av_err2string(ret), ").");
+void OutputStream::process_frame(AVFrame* src) {
+  if (!filter) {
+    encoder.encode(src);
+    return;
   }
-}
-
-void _process(
-    AVFrame* src_frame,
-    std::unique_ptr<FilterGraph>& filter,
-    AVFrame* dst_frame,
-    AVFormatContext* format,
-    AVStream* stream,
-    AVCodecContext* codec,
-    AVPacket* packet) {
-  int ret = filter->add_frame(src_frame);
+  int ret = filter->add_frame(src);
   while (ret >= 0) {
     ret = filter->get_frame(dst_frame);
     if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
       if (ret == AVERROR_EOF) {
-        _encode(nullptr, format, stream, codec, packet);
+        encoder.encode(nullptr);
       }
       break;
     }
     if (ret >= 0) {
-      _encode(dst_frame, format, stream, codec, packet);
+      encoder.encode(dst_frame);
     }
     av_frame_unref(dst_frame);
-  }
-}
-
-} // namespace
-
-void OutputStream::process_frame(AVFrame* src) {
-  if (filter) {
-    _process(src, filter, dst_frame, format_ctx, stream, codec_ctx, packet);
-  } else {
-    _encode(src, format_ctx, stream, codec_ctx, packet);
   }
 }
 

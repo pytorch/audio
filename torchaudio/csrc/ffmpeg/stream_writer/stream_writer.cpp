@@ -442,14 +442,12 @@ void StreamWriter::add_audio_stream(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format) {
-  enum AVSampleFormat src_fmt = _get_src_sample_fmt(format);
-
   AVCodecContextPtr ctx =
       get_codec_ctx(AVMEDIA_TYPE_AUDIO, pFormatContext->oformat, encoder);
   configure_audio_codec(ctx, sample_rate, num_channels, encoder_format);
   open_codec(ctx, encoder_option);
-  AVStream* stream = add_stream(ctx);
 
+  enum AVSampleFormat src_fmt = _get_src_sample_fmt(format);
   std::unique_ptr<FilterGraph> filter = src_fmt == ctx->sample_fmt
       ? std::unique_ptr<FilterGraph>(nullptr)
       : _get_audio_filter(src_fmt, ctx);
@@ -458,7 +456,6 @@ void StreamWriter::add_audio_stream(
   AVFramePtr src_frame = get_audio_frame(src_fmt, ctx, frame_capacity);
   streams.emplace_back(std::make_unique<AudioOutputStream>(
       pFormatContext,
-      stream,
       std::move(ctx),
       std::move(filter),
       std::move(src_frame),
@@ -491,7 +488,6 @@ void StreamWriter::add_video_stream(
         "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
 #endif
   }();
-  enum AVPixelFormat src_fmt = _get_src_pixel_fmt(format);
 
   AVCodecContextPtr ctx =
       get_codec_ctx(AVMEDIA_TYPE_VIDEO, pFormatContext->oformat, encoder);
@@ -540,8 +536,8 @@ void StreamWriter::add_video_stream(
 #endif
 
   open_codec(ctx, encoder_option);
-  AVStream* stream = add_stream(ctx);
 
+  enum AVPixelFormat src_fmt = _get_src_pixel_fmt(format);
   std::unique_ptr<FilterGraph> filter = [&]() {
     if (src_fmt != ctx->pix_fmt && device.type() == c10::DeviceType::CPU) {
       return _get_video_filter(src_fmt, ctx);
@@ -557,26 +553,11 @@ void StreamWriter::add_video_stream(
   }();
   streams.emplace_back(std::make_unique<VideoOutputStream>(
       pFormatContext,
-      stream,
       std::move(ctx),
       std::move(filter),
       std::move(src_frame),
       std::move(hw_device_ctx),
       std::move(hw_frame_ctx)));
-}
-
-AVStream* StreamWriter::add_stream(AVCodecContextPtr& codec_ctx) {
-  AVStream* stream = avformat_new_stream(pFormatContext, nullptr);
-  TORCH_CHECK(stream, "Failed to allocate stream.");
-
-  stream->time_base = codec_ctx->time_base;
-  int ret = avcodec_parameters_from_context(stream->codecpar, codec_ctx);
-  TORCH_CHECK(
-      ret >= 0,
-      "Failed to copy the stream parameter. (",
-      av_err2string(ret),
-      ")");
-  return stream;
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
@@ -653,7 +634,7 @@ void StreamWriter::validate_stream(int i, enum AVMediaType type) {
       i);
 
   TORCH_CHECK(
-      streams[i]->stream->codecpar->codec_type == type,
+      streams[i]->codec_ctx->codec_type == type,
       "Stream ",
       i,
       " is not ",
