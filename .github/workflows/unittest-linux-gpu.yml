@@ -16,7 +16,7 @@ jobs:
         python_version: ["3.8", "3.9", "3.10"]
         cuda_arch_version: ["11.7"]
       fail-fast: false
-    uses: atalman/test-infra/.github/workflows/linux_job.yml@make_release_branch
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@feb_21_2023
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
