@@ -33,35 +33,4 @@ struct OutputStream {
   virtual ~OutputStream() = default;
 };
 
-struct AudioOutputStream : OutputStream {
-  int64_t frame_capacity;
-
-  AudioOutputStream(
-      AVFormatContext* format_ctx,
-      AVCodecContextPtr&& codec_ctx,
-      std::unique_ptr<FilterGraph>&& filter,
-      AVFramePtr&& src_frame,
-      int64_t frame_capacity);
-
-  void write_chunk(const torch::Tensor& waveform) override;
-  ~AudioOutputStream() override = default;
-};
-
-struct VideoOutputStream : OutputStream {
-  // Video-only: HW acceleration
-  AVBufferRefPtr hw_device_ctx;
-  AVBufferRefPtr hw_frame_ctx;
-
-  VideoOutputStream(
-      AVFormatContext* format_ctx,
-      AVCodecContextPtr&& codec_ctx,
-      std::unique_ptr<FilterGraph>&& filter,
-      AVFramePtr&& src_frame,
-      AVBufferRefPtr&& hw_device_ctx,
-      AVBufferRefPtr&& hw_frame_ctx);
-
-  void write_chunk(const torch::Tensor& frames) override;
-  ~VideoOutputStream() override = default;
-};
-
 } // namespace torchaudio::io
