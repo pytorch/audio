@@ -22,6 +22,7 @@ jobs:
       repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: ${{ matrix.cuda_arch_version }}
+      test-infra-ref: feb_21_2023
       timeout: 120
 
       script: |
