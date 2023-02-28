@@ -3,28 +3,10 @@
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/output_stream.h>
 
 namespace torchaudio {
 namespace io {
-
-/// @cond
-
-struct OutputStream {
-  AVStream* stream;
-  AVCodecContextPtr codec_ctx;
-  std::unique_ptr<FilterGraph> filter;
-  AVFramePtr src_frame;
-  AVFramePtr dst_frame;
-  // The number of samples written so far
-  int64_t num_frames;
-  // Audio-only: The maximum frames that frame can hold
-  int64_t frame_capacity;
-  // Video-only: HW acceleration
-  AVBufferRefPtr hw_device_ctx;
-  AVBufferRefPtr hw_frame_ctx;
-};
-
-/// @endcond
 
 ///
 /// Encode and write audio/video streams chunk by chunk
@@ -32,7 +14,7 @@ struct OutputStream {
 class StreamWriter {
   AVFormatOutputContextPtr pFormatContext;
   AVBufferRefPtr pHWBufferRef;
-  std::vector<OutputStream> streams;
+  std::vector<std::unique_ptr<OutputStream>> streams;
   AVPacketPtr pkt;
 
  protected:
@@ -164,9 +146,6 @@ class StreamWriter {
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);
 
- private:
-  AVStream* add_stream(AVCodecContextPtr& ctx);
-
   //////////////////////////////////////////////////////////////////////////////
   // Write methods
   //////////////////////////////////////////////////////////////////////////////
@@ -195,22 +174,6 @@ class StreamWriter {
 
  private:
   void validate_stream(int i, enum AVMediaType);
-  void write_planar_video(
-      OutputStream& os,
-      const torch::Tensor& chunk,
-      int num_planes);
-  void write_interlaced_video(OutputStream& os, const torch::Tensor& chunk);
-#ifdef USE_CUDA
-  void write_planar_video_cuda(
-      OutputStream& os,
-      const torch::Tensor& chunk,
-      int num_planes);
-  void write_interlaced_video_cuda(
-      OutputStream& os,
-      const torch::Tensor& chunk,
-      bool pad_extra = true);
-#endif
-  void flush_stream(OutputStream& os);
 };
 
 } // namespace io
