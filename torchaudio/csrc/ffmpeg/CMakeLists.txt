@@ -1,5 +1,7 @@
 message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
 message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
 find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
 add_library(ffmpeg INTERFACE)
 target_include_directories(ffmpeg INTERFACE "${FFMPEG_INCLUDE_DIRS}")
