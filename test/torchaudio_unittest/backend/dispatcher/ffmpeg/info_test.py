@@ -30,6 +30,7 @@ if _mod_utils.is_module_available("requests"):
     import requests
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestInfo(TempDirMixin, PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
@@ -292,6 +293,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
     #     assert info.encoding == "PCM_S"
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestInfoOpus(PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
@@ -317,6 +319,7 @@ class TestInfoOpus(PytorchTestCase):
         assert info.encoding == "OPUS"
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadWithoutExtension(PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
@@ -574,6 +577,7 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
         assert sinfo.encoding == get_encoding(ext, dtype)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestInfoNoSuchFile(PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
