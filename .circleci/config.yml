@@ -1317,12 +1317,6 @@ workflows:
           python_version: '3.10'
           requires:
           - download_third_parties
-      - unittest_linux_cpu:
-          cuda_version: cpu
-          name: unittest_linux_cpu_py3.11
-          python_version: '3.11'
-          requires:
-          - download_third_parties
       - unittest_linux_gpu:
           cuda_version: cu117
           name: unittest_linux_gpu_py3.8
@@ -1339,12 +1333,6 @@ workflows:
           cuda_version: cu117
           name: unittest_linux_gpu_py3.10
           python_version: '3.10'
-          requires:
-          - download_third_parties
-      - unittest_linux_gpu:
-          cuda_version: cu117
-          name: unittest_linux_gpu_py3.11
-          python_version: '3.11'
           requires:
           - download_third_parties
       - unittest_windows_cpu:

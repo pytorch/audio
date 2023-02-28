@@ -251,6 +251,11 @@ def unittest_workflows(indentation=6):
                 continue
 
             for i, python_version in enumerate(unittest_python_versions(os_type)):
+
+                # Turn off unit tests for 3.11, unit test are not setup properly
+                if python_version == "3.11":
+                    continue
+
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
