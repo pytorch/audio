@@ -1,4 +1,6 @@
+message(STATUS "CMAKE_MODULE_PATH(before find Torch)=${CMAKE_MODULE_PATH}")
 find_package(Torch REQUIRED)
+message(STATUS "CMAKE_MODULE_PATH(after find Torch)=${CMAKE_MODULE_PATH}")
 
 function (torchaudio_library name source include_dirs link_libraries compile_defs)
   add_library(${name} SHARED ${source})
