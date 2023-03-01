@@ -22,10 +22,10 @@ class VideoTensorConverter {
   AVFramePtr buffer;
 
   InitFunc init_func{};
-  Generator::ConvertFunc convert_func{};
+  SlicingTensorConverter::ConvertFunc convert_func{};
 
  public:
   VideoTensorConverter(enum AVPixelFormat src_fmt, AVCodecContext* codec_ctx);
-  Generator convert(const torch::Tensor& frames);
+  SlicingTensorConverter convert(const torch::Tensor& frames);
 };
 } // namespace torchaudio::io
