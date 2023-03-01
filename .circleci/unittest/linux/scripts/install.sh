@@ -53,6 +53,10 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
         conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}"
     else
         conda install pytorch ${cudatoolkit} ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT
+
+        # make sure local cuda is set to required cuda version and not CUDA version by default
+        rm -f /usr/local/cuda
+        ln -s /usr/local/cuda-${version} /usr/local/cuda
     fi
 )
 
