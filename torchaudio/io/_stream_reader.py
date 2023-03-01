@@ -429,7 +429,6 @@ class StreamReader:
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
     ):
-        torch._C._log_api_usage_once("torchaudio.io.StreamReader")
         if isinstance(src, str):
             self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReader(src, format, option)
         elif hasattr(src, "read"):

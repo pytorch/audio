@@ -40,7 +40,9 @@ AVFormatContext* get_output_format_context(
 }
 } // namespace
 
-StreamWriter::StreamWriter(AVFormatContext* p) : pFormatContext(p) {}
+StreamWriter::StreamWriter(AVFormatContext* p) : pFormatContext(p) {
+  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamWriter");
+}
 
 StreamWriter::StreamWriter(
     AVIOContext* io_ctx,
