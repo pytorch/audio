@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import BinaryIO, Dict, Optional, Tuple, Union
+from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
 import torchaudio
