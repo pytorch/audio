@@ -58,7 +58,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-python setup.py install
+CUDA_HOME=${CONDA_PREFIX} python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
