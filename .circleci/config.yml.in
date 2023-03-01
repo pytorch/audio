@@ -668,7 +668,7 @@ jobs:
     environment:
       <<: *environment
       CUDA_VERSION: 11.7
-      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
+      image_name: pytorch/manylinux-cuda117
     steps:
       - checkout
       - attach_workspace:
