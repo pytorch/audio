@@ -1,11 +1,11 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/stream_writer/output_stream.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/video_converter.h>
 
 namespace torchaudio::io {
 
 struct VideoOutputStream : OutputStream {
-  AVFramePtr src_frame;
-
+  VideoTensorConverter converter;
   AVBufferRefPtr hw_device_ctx;
   AVBufferRefPtr hw_frame_ctx;
   AVCodecContextPtr codec_ctx;
@@ -18,7 +18,6 @@ struct VideoOutputStream : OutputStream {
       AVBufferRefPtr&& hw_frame_ctx);
 
   void write_chunk(const torch::Tensor& frames) override;
-  void process_frame();
 
   ~VideoOutputStream() override = default;
 };
