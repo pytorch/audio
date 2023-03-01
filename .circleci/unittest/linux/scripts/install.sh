@@ -52,13 +52,13 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
     if [[ -z "$cudatoolkit" ]]; then
         conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}"
     else
-        conda install pytorch ${cudatoolkit} cuda-toolkit ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT
+        conda install pytorch ${cudatoolkit} cuda-toolkit=${CUDA_VERSION} ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT
     fi
 )
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-CUDA_HOME=${CONDA_PREFIX} PATH="${CONDA_PREFIX}/bin:${PATH}" python setup.py install
+CUDA_HOME=${CONDA_PREFIX} python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
