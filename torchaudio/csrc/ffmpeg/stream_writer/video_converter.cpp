@@ -219,6 +219,7 @@ AVFramePtr get_video_frame(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
         av_err2string(ret),
         ").");
   }
+  frame->pts = 0;
   return frame;
 }
 

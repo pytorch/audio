@@ -16,8 +16,6 @@ struct OutputStream {
   FilterGraph filter;
   // frame that output from FilterGraph is written
   AVFramePtr dst_frame;
-  // The number of samples written so far
-  int64_t num_frames;
 
   OutputStream(
       AVFormatContext* format_ctx,

@@ -34,6 +34,7 @@ AVFramePtr get_audio_frame(
     AVCodecContext* codec_ctx,
     int default_frame_size = 10000) {
   AVFramePtr frame{};
+  frame->pts = 0;
   frame->format = src_fmt;
   frame->channel_layout = codec_ctx->channel_layout;
   frame->sample_rate = codec_ctx->sample_rate;
@@ -121,31 +122,23 @@ void AudioOutputStream::write_chunk(const torch::Tensor& waveform) {
   AVRational time_base{1, codec_ctx->sample_rate};
 
   using namespace torch::indexing;
-  AT_DISPATCH_ALL_TYPES(waveform.scalar_type(), "write_audio_frames", [&] {
-    for (int64_t i = 0; i < waveform.size(0); i += frame_capacity) {
-      auto chunk = waveform.index({Slice(i, i + frame_capacity), Slice()});
-      auto num_valid_frames = chunk.size(0);
-      auto byte_size = chunk.numel() * chunk.element_size();
-      chunk = chunk.reshape({-1}).contiguous();
+  for (int64_t i = 0; i < waveform.size(0); i += frame_capacity) {
+    auto chunk = waveform.index({Slice(i, i + frame_capacity), Slice()});
+    auto num_frames = chunk.size(0);
+    auto byte_size = chunk.numel() * chunk.element_size();
+    chunk = chunk.reshape({-1}).contiguous();
 
-      // TODO: make writable
-      // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
-      TORCH_CHECK(
-          av_frame_is_writable(src_frame),
-          "Internal Error: frame is not writable.");
+    // TODO: make writable
+    // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
+    TORCH_CHECK(
+        av_frame_is_writable(src_frame),
+        "Internal Error: frame is not writable.");
 
-      memcpy(
-          src_frame->data[0],
-          static_cast<void*>(chunk.data_ptr<scalar_t>()),
-          byte_size);
-      src_frame->pts =
-          av_rescale_q(num_frames, time_base, codec_ctx->time_base);
-      src_frame->nb_samples = num_valid_frames;
-      num_frames += num_valid_frames;
-
-      process_frame(src_frame);
-    }
-  });
+    memcpy(src_frame->data[0], chunk.data_ptr(), byte_size);
+    src_frame->pts += av_rescale_q(num_frames, time_base, codec_ctx->time_base);
+    src_frame->nb_samples = num_frames;
+    process_frame(src_frame);
+  }
 }
 
 } // namespace torchaudio::io

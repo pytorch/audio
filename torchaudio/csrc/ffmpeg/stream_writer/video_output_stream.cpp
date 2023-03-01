@@ -52,8 +52,7 @@ VideoOutputStream::VideoOutputStream(
 
 void VideoOutputStream::write_chunk(const torch::Tensor& frames) {
   for (const auto& frame : converter.convert(frames)) {
-    frame->pts = num_frames;
-    num_frames += 1;
+    frame->pts += 1;
     process_frame(frame);
   }
 }
