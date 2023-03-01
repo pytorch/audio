@@ -135,9 +135,9 @@ void AudioOutputStream::write_chunk(const torch::Tensor& waveform) {
         "Internal Error: frame is not writable.");
 
     memcpy(src_frame->data[0], chunk.data_ptr(), byte_size);
-    src_frame->pts += av_rescale_q(num_frames, time_base, codec_ctx->time_base);
     src_frame->nb_samples = num_frames;
     process_frame(src_frame);
+    src_frame->pts += av_rescale_q(num_frames, time_base, codec_ctx->time_base);
   }
 }
 
