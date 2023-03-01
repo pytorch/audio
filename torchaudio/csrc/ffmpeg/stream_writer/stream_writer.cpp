@@ -348,14 +348,24 @@ AVCodecContextPtr get_video_codec(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const torch::Device device,
+    const c10::optional<std::string>& hw_accel,
     AVBufferRefPtr& hw_device_ctx,
     AVBufferRefPtr& hw_frame_ctx) {
   AVCodecContextPtr ctx = get_codec_ctx(AVMEDIA_TYPE_VIDEO, oformat, encoder);
   configure_video_codec(ctx, frame_rate, width, height, encoder_format);
 
-#ifdef USE_CUDA
-  if (device.type() == c10::DeviceType::CUDA) {
+  if (hw_accel) {
+#ifndef USE_CUDA
+    TORCH_CHECK(
+        false,
+        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#else
+    torch::Device device{hw_accel.value()};
+    TORCH_CHECK(
+        device.type() == c10::DeviceType::CUDA,
+        "Only CUDA is supported for hardware acceleration. Found: ",
+        device.str());
+
     AVBufferRef* device_ctx = nullptr;
     int ret = av_hwdevice_ctx_create(
         &device_ctx,
@@ -391,8 +401,8 @@ AVCodecContextPtr get_video_codec(
         ctx->hw_frames_ctx,
         "Failed to attach CUDA frames to encoding context: ",
         av_err2string(ret));
-  }
 #endif
+  }
 
   open_codec(ctx, encoder_option);
   return ctx;
@@ -466,24 +476,6 @@ void StreamWriter::add_video_stream(
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel) {
-  const torch::Device device = [&]() {
-    if (!hw_accel) {
-      return torch::Device{c10::DeviceType::CPU};
-    }
-#ifdef USE_CUDA
-    torch::Device d{hw_accel.value()};
-    TORCH_CHECK(
-        d.type() == c10::DeviceType::CUDA,
-        "Only CUDA is supported for hardware acceleration. Found:",
-        device.str());
-    return d;
-#else
-    TORCH_CHECK(
-        false,
-        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
-#endif
-  }();
-
   AVBufferRefPtr hw_device_ctx{};
   AVBufferRefPtr hw_frame_ctx{};
 
@@ -495,7 +487,7 @@ void StreamWriter::add_video_stream(
       encoder,
       encoder_option,
       encoder_format,
-      device,
+      hw_accel,
       hw_device_ctx,
       hw_frame_ctx);
 
@@ -504,8 +496,7 @@ void StreamWriter::add_video_stream(
       get_src_pixel_fmt(format),
       std::move(ctx),
       std::move(hw_device_ctx),
-      std::move(hw_frame_ctx),
-      device));
+      std::move(hw_frame_ctx)));
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {

@@ -8,13 +8,10 @@ namespace torchaudio::io {
 
 namespace {
 
-FilterGraph get_video_filter(
-    AVPixelFormat src_fmt,
-    AVCodecContext* codec_ctx,
-    const torch::Device& device) {
+FilterGraph get_video_filter(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
   auto desc = [&]() -> std::string {
     if (src_fmt == codec_ctx->pix_fmt ||
-        device.type() != c10::DeviceType::CPU) {
+        codec_ctx->pix_fmt == AV_PIX_FMT_CUDA) {
       return "null";
     } else {
       std::stringstream ss;
@@ -36,29 +33,23 @@ FilterGraph get_video_filter(
   return p;
 }
 
-AVFramePtr get_hw_video_frame(AVCodecContext* codec_ctx) {
+AVFramePtr get_video_frame(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
   AVFramePtr frame{};
-  int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
-  TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
-  return frame;
-}
+  if (codec_ctx->pix_fmt == AV_PIX_FMT_CUDA) {
+    int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
+    TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
+  } else {
+    frame->format = src_fmt;
+    frame->width = codec_ctx->width;
+    frame->height = codec_ctx->height;
 
-AVFramePtr get_video_frame(
-    AVPixelFormat src_fmt,
-    AVCodecContext* codec_ctx,
-    const torch::Device& device) {
-  if (device.type() == c10::DeviceType::CUDA) {
-    return get_hw_video_frame(codec_ctx);
+    int ret = av_frame_get_buffer(frame, 0);
+    TORCH_CHECK(
+        ret >= 0,
+        "Error allocating a video buffer (",
+        av_err2string(ret),
+        ").");
   }
-
-  AVFramePtr frame{};
-  frame->format = src_fmt;
-  frame->width = codec_ctx->width;
-  frame->height = codec_ctx->height;
-
-  int ret = av_frame_get_buffer(frame, 0);
-  TORCH_CHECK(
-      ret >= 0, "Error allocating a video buffer (", av_err2string(ret), ").");
   return frame;
 }
 
@@ -69,13 +60,12 @@ VideoOutputStream::VideoOutputStream(
     AVPixelFormat src_fmt,
     AVCodecContextPtr&& codec_ctx_,
     AVBufferRefPtr&& hw_device_ctx_,
-    AVBufferRefPtr&& hw_frame_ctx_,
-    const torch::Device& device)
+    AVBufferRefPtr&& hw_frame_ctx_)
     : OutputStream(
           format_ctx,
           codec_ctx_,
-          get_video_filter(src_fmt, codec_ctx_, device)),
-      src_frame(get_video_frame(src_fmt, codec_ctx_, device)),
+          get_video_filter(src_fmt, codec_ctx_)),
+      src_frame(get_video_frame(src_fmt, codec_ctx_)),
       hw_device_ctx(std::move(hw_device_ctx_)),
       hw_frame_ctx(std::move(hw_frame_ctx_)),
       codec_ctx(std::move(codec_ctx_)) {}
