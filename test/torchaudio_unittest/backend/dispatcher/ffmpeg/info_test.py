@@ -384,6 +384,7 @@ class Unseekable:
         return self.fileobj.read(n)
 
 
+@skipIfNoExec("sox")
 class TestFileObject(FileObjTestBase, PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
 
