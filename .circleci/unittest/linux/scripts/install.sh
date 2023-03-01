@@ -58,6 +58,9 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
         rm -f /usr/local/cuda
         ln -s /usr/local/cuda-${version} /usr/local/cuda
     fi
+
+    # install Kaldi - required for unit tests to pass
+    conda install -y -c conda-forge kaldi
 )
 
 # 2. Install torchaudio
