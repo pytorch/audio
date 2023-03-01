@@ -15,8 +15,7 @@ struct VideoOutputStream : OutputStream {
       AVPixelFormat src_fmt,
       AVCodecContextPtr&& codec_ctx,
       AVBufferRefPtr&& hw_device_ctx,
-      AVBufferRefPtr&& hw_frame_ctx,
-      const torch::Device& device);
+      AVBufferRefPtr&& hw_frame_ctx);
 
   void write_chunk(const torch::Tensor& frames) override;
   void process_frame();

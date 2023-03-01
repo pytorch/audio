@@ -8,13 +8,10 @@ namespace torchaudio::io {
 
 namespace {
 
-FilterGraph get_video_filter(
-    AVPixelFormat src_fmt,
-    AVCodecContext* codec_ctx,
-    const torch::Device& device) {
+FilterGraph get_video_filter(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
   auto desc = [&]() -> std::string {
     if (src_fmt == codec_ctx->pix_fmt ||
-        device.type() != c10::DeviceType::CPU) {
+        codec_ctx->pix_fmt == AV_PIX_FMT_CUDA) {
       return "null";
     } else {
       std::stringstream ss;
@@ -36,29 +33,23 @@ FilterGraph get_video_filter(
   return p;
 }
 
-AVFramePtr get_hw_video_frame(AVCodecContext* codec_ctx) {
+AVFramePtr get_video_frame(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
   AVFramePtr frame{};
-  int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
-  TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
-  return frame;
-}
+  if (codec_ctx->pix_fmt == AV_PIX_FMT_CUDA) {
+    int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
+    TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
+  } else {
+    frame->format = src_fmt;
+    frame->width = codec_ctx->width;
+    frame->height = codec_ctx->height;
 
-AVFramePtr get_video_frame(
-    AVPixelFormat src_fmt,
-    AVCodecContext* codec_ctx,
-    const torch::Device& device) {
-  if (device.type() == c10::DeviceType::CUDA) {
-    return get_hw_video_frame(codec_ctx);
+    int ret = av_frame_get_buffer(frame, 0);
+    TORCH_CHECK(
+        ret >= 0,
+        "Error allocating a video buffer (",
+        av_err2string(ret),
+        ").");
   }
-
-  AVFramePtr frame{};
-  frame->format = src_fmt;
-  frame->width = codec_ctx->width;
-  frame->height = codec_ctx->height;
-
-  int ret = av_frame_get_buffer(frame, 0);
-  TORCH_CHECK(
-      ret >= 0, "Error allocating a video buffer (", av_err2string(ret), ").");
   return frame;
 }
 
@@ -69,13 +60,12 @@ VideoOutputStream::VideoOutputStream(
     AVPixelFormat src_fmt,
     AVCodecContextPtr&& codec_ctx_,
     AVBufferRefPtr&& hw_device_ctx_,
-    AVBufferRefPtr&& hw_frame_ctx_,
-    const torch::Device& device)
+    AVBufferRefPtr&& hw_frame_ctx_)
     : OutputStream(
           format_ctx,
           codec_ctx_,
-          get_video_filter(src_fmt, codec_ctx_, device)),
-      src_frame(get_video_frame(src_fmt, codec_ctx_, device)),
+          get_video_filter(src_fmt, codec_ctx_)),
+      src_frame(get_video_frame(src_fmt, codec_ctx_)),
       hw_device_ctx(std::move(hw_device_ctx_)),
       hw_frame_ctx(std::move(hw_frame_ctx_)),
       codec_ctx(std::move(codec_ctx_)) {}
@@ -117,70 +107,59 @@ void validate_video_input(
       t.sizes());
 }
 
-#ifdef USE_CUDA
 void write_interlaced_video_cuda(
-    VideoOutputStream& os,
-    const torch::Tensor& frames,
+    const torch::Tensor& chunk,
+    AVFrame* buffer,
     bool pad_extra) {
-  const auto num_frames = frames.size(0);
-  const auto num_channels = frames.size(1);
-  const auto height = frames.size(2);
-  const auto width = frames.size(3);
-  const auto num_channels_buffer = num_channels + (pad_extra ? 1 : 0);
+#ifdef USE_CUDA
+  const auto height = chunk.size(0);
+  const auto width = chunk.size(1);
+  const auto num_channels = chunk.size(2) + (pad_extra ? 1 : 0);
+  size_t spitch = width * num_channels;
+  if (cudaSuccess !=
+      cudaMemcpy2D(
+          (void*)(buffer->data[0]),
+          buffer->linesize[0],
+          (const void*)(chunk.data_ptr<uint8_t>()),
+          spitch,
+          spitch,
+          height,
+          cudaMemcpyDeviceToDevice)) {
+    TORCH_CHECK(false, "Failed to copy pixel data from CUDA tensor.");
+  }
+#else
+  TORCH_CHECK(
+      false,
+      "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#endif
+}
 
-  using namespace torch::indexing;
-  torch::Tensor buffer =
-      torch::empty({height, width, num_channels_buffer}, frames.options());
-  size_t spitch = width * num_channels_buffer;
-  for (int i = 0; i < num_frames; ++i) {
-    // Slice frame as HWC
-    auto chunk = frames.index({i}).permute({1, 2, 0});
-    buffer.index_put_({"...", Slice(0, num_channels)}, chunk);
-
+void write_planar_video_cuda(
+    const torch::Tensor& chunk,
+    AVFrame* buffer,
+    int num_planes) {
+#ifdef USE_CUDA
+  const auto height = chunk.size(1);
+  const auto width = chunk.size(2);
+  for (int j = 0; j < num_planes; ++j) {
     if (cudaSuccess !=
         cudaMemcpy2D(
-            (void*)(os.src_frame->data[0]),
-            os.src_frame->linesize[0],
-            (const void*)(buffer.data_ptr<uint8_t>()),
-            spitch,
-            spitch,
+            (void*)(buffer->data[j]),
+            buffer->linesize[j],
+            (const void*)(chunk.index({j}).data_ptr<uint8_t>()),
+            width,
+            width,
             height,
             cudaMemcpyDeviceToDevice)) {
       TORCH_CHECK(false, "Failed to copy pixel data from CUDA tensor.");
     }
-    os.process_frame();
   }
-}
-
-void write_planar_video_cuda(
-    VideoOutputStream& os,
-    const torch::Tensor& frames,
-    int num_planes) {
-  const auto num_frames = frames.size(0);
-  const auto height = frames.size(2);
-  const auto width = frames.size(3);
-
-  using namespace torch::indexing;
-  torch::Tensor buffer = torch::empty({height, width}, frames.options());
-  for (int i = 0; i < num_frames; ++i) {
-    for (int j = 0; j < num_planes; ++j) {
-      buffer.index_put_({"..."}, frames.index({i, j}));
-      if (cudaSuccess !=
-          cudaMemcpy2D(
-              (void*)(os.src_frame->data[j]),
-              os.src_frame->linesize[j],
-              (const void*)(buffer.data_ptr<uint8_t>()),
-              width,
-              width,
-              height,
-              cudaMemcpyDeviceToDevice)) {
-        TORCH_CHECK(false, "Failed to copy pixel data from CUDA tensor.");
-      }
-    }
-    os.process_frame();
-  }
-}
+#else
+  TORCH_CHECK(
+      false,
+      "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
 #endif
+}
 
 // Interlaced video
 // Each frame is composed of one plane, and color components for each pixel are
@@ -193,35 +172,22 @@ void write_planar_video_cuda(
 // 1: RGB RGB ... RGB PAD ... PAD
 //            ...
 // H: RGB RGB ... RGB PAD ... PAD
-void write_interlaced_video(
-    VideoOutputStream& os,
-    const torch::Tensor& frames) {
-  const auto num_frames = frames.size(0);
-  const auto num_channels = frames.size(1);
-  const auto height = frames.size(2);
-  const auto width = frames.size(3);
+void write_interlaced_video(const torch::Tensor& chunk, AVFrame* buffer) {
+  const auto height = chunk.size(0);
+  const auto width = chunk.size(1);
+  const auto num_channels = chunk.size(2);
 
-  using namespace torch::indexing;
   size_t stride = width * num_channels;
-  for (int i = 0; i < num_frames; ++i) {
-    // TODO: writable
-    // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-    TORCH_CHECK(
-        av_frame_is_writable(os.src_frame),
-        "Internal Error: frame is not writable.");
+  // TODO: writable
+  // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
+  TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
 
-    // CHW -> HWC
-    auto chunk =
-        frames.index({i}).permute({1, 2, 0}).reshape({-1}).contiguous();
-
-    uint8_t* src = chunk.data_ptr<uint8_t>();
-    uint8_t* dst = os.src_frame->data[0];
-    for (int h = 0; h < height; ++h) {
-      std::memcpy(dst, src, stride);
-      src += width * num_channels;
-      dst += os.src_frame->linesize[0];
-    }
-    os.process_frame();
+  uint8_t* src = chunk.data_ptr<uint8_t>();
+  uint8_t* dst = buffer->data[0];
+  for (int h = 0; h < height; ++h) {
+    std::memcpy(dst, src, stride);
+    src += width * num_channels;
+    dst += buffer->linesize[0];
   }
 }
 
@@ -247,33 +213,24 @@ void write_interlaced_video(
 // H2:  UV ...  UV PAD ... PAD
 //
 void write_planar_video(
-    VideoOutputStream& os,
-    const torch::Tensor& frames,
+    const torch::Tensor& chunk,
+    AVFrame* buffer,
     int num_planes) {
-  const auto num_frames = frames.size(0);
-  const auto height = frames.size(2);
-  const auto width = frames.size(3);
+  const auto height = chunk.size(1);
+  const auto width = chunk.size(2);
 
-  using namespace torch::indexing;
-  for (int i = 0; i < num_frames; ++i) {
-    // TODO: writable
-    // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-    TORCH_CHECK(
-        av_frame_is_writable(os.src_frame),
-        "Internal Error: frame is not writable.");
+  // TODO: writable
+  // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
+  TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
 
-    for (int j = 0; j < num_planes; ++j) {
-      auto chunk = frames.index({i, j}).contiguous();
-
-      uint8_t* src = chunk.data_ptr<uint8_t>();
-      uint8_t* dst = os.src_frame->data[j];
-      for (int h = 0; h < height; ++h) {
-        memcpy(dst, src, width);
-        src += width;
-        dst += os.src_frame->linesize[j];
-      }
+  for (int j = 0; j < num_planes; ++j) {
+    uint8_t* src = chunk.index({j}).data_ptr<uint8_t>();
+    uint8_t* dst = buffer->data[j];
+    for (int h = 0; h < height; ++h) {
+      memcpy(dst, src, width);
+      src += width;
+      dst += buffer->linesize[j];
     }
-    os.process_frame();
   }
 }
 
@@ -282,21 +239,33 @@ void write_planar_video(
 void VideoOutputStream::write_chunk(const torch::Tensor& frames) {
   enum AVPixelFormat fmt = static_cast<AVPixelFormat>(src_frame->format);
   validate_video_input(fmt, codec_ctx, frames);
+  const auto num_frames = frames.size(0);
 
 #ifdef USE_CUDA
   if (fmt == AV_PIX_FMT_CUDA) {
     fmt = codec_ctx->sw_pix_fmt;
     switch (fmt) {
       case AV_PIX_FMT_RGB0:
-      case AV_PIX_FMT_BGR0:
-        write_interlaced_video_cuda(*this, frames, true);
+      case AV_PIX_FMT_BGR0: {
+        auto chunks = frames.permute({0, 2, 3, 1}).contiguous(); // to NHWC
+        for (int i = 0; i < num_frames; ++i) {
+          write_interlaced_video_cuda(chunks.index({i}), src_frame, true);
+          process_frame();
+        }
         return;
+      }
       case AV_PIX_FMT_GBRP:
       case AV_PIX_FMT_GBRP16LE:
       case AV_PIX_FMT_YUV444P:
-      case AV_PIX_FMT_YUV444P16LE:
-        write_planar_video_cuda(*this, frames, av_pix_fmt_count_planes(fmt));
+      case AV_PIX_FMT_YUV444P16LE: {
+        auto chunks = frames.contiguous();
+        for (int i = 0; i < num_frames; ++i) {
+          write_planar_video_cuda(
+              chunks.index({i}), src_frame, av_pix_fmt_count_planes(fmt));
+          process_frame();
+        }
         return;
+      }
       default:
         TORCH_CHECK(
             false,
@@ -309,12 +278,23 @@ void VideoOutputStream::write_chunk(const torch::Tensor& frames) {
   switch (fmt) {
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_RGB24:
-    case AV_PIX_FMT_BGR24:
-      write_interlaced_video(*this, frames);
+    case AV_PIX_FMT_BGR24: {
+      auto chunks = frames.permute({0, 2, 3, 1}).contiguous();
+      for (int i = 0; i < num_frames; ++i) {
+        write_interlaced_video(chunks.index({i}), src_frame);
+        process_frame();
+      }
       return;
-    case AV_PIX_FMT_YUV444P:
-      write_planar_video(*this, frames, av_pix_fmt_count_planes(fmt));
+    }
+    case AV_PIX_FMT_YUV444P: {
+      auto chunks = frames.contiguous();
+      for (int i = 0; i < num_frames; ++i) {
+        write_planar_video(
+            chunks.index({i}), src_frame, av_pix_fmt_count_planes(fmt));
+        process_frame();
+      }
       return;
+    }
     default:
       TORCH_CHECK(false, "Unexpected pixel format: ", av_get_pix_fmt_name(fmt));
   }
