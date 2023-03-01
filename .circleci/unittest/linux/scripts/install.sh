@@ -52,7 +52,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
     if [[ -z "$cudatoolkit" ]]; then
         conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" $MKL_CONSTRAINT "pytorch-${UPLOAD_CHANNEL}::${pytorch_build}"
     else
-        conda install pytorch ${cudatoolkit} ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT
+        conda install pytorch ${cudatoolkit} cuda-toolkit ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT 
     fi
 )
 
