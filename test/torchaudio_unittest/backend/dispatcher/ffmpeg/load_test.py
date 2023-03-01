@@ -307,6 +307,7 @@ class TestLoad(LoadTestBase):
     #     self.assert_format("amr-nb", sample_rate=8000, num_channels=1, bit_depth=32, duration=1)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadWithoutExtension(PytorchTestCase):
     _load = partial(get_load_func(), backend="ffmpeg")
@@ -587,6 +588,7 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadNoSuchFile(PytorchTestCase):
     _load = partial(get_load_func(), backend="ffmpeg")
