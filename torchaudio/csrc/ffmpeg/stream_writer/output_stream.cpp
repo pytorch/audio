@@ -9,8 +9,7 @@ OutputStream::OutputStream(
     : codec_ctx(codec_ctx_),
       encoder(format_ctx, codec_ctx),
       filter(std::move(filter_)),
-      dst_frame(),
-      num_frames(0) {}
+      dst_frame() {}
 
 void OutputStream::process_frame(AVFrame* src) {
   int ret = filter.add_frame(src);

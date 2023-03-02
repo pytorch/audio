@@ -52,6 +52,7 @@ AVFormatContext* get_input_format_context(
 } // namespace
 
 StreamReader::StreamReader(AVFormatContext* p) : pFormatContext(p) {
+  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReader");
   int ret = avformat_find_stream_info(pFormatContext, nullptr);
   TORCH_CHECK(
       ret >= 0, "Failed to find stream information: ", av_err2string(ret));
