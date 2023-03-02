@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -307,11 +307,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -585,6 +586,25 @@ It indicates the valid length in time axis of each feature Tensor.</p>
 </tbody>
 </table>
 </section>
+<section id="prototype-factory-functions">
+<h1>Prototype Factory Functions<a class="headerlink" href="#prototype-factory-functions" title="Permalink to this heading">¶</a></h1>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.prototype.models.emformer_hubert_model.html#torchaudio.prototype.models.emformer_hubert_model" title="torchaudio.prototype.models.emformer_hubert_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emformer_hubert_model</span></code></a></p></td>
+<td><p>Build a custom Emformer HuBERT model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="torchaudio.prototype.models.emformer_hubert_base.html#torchaudio.prototype.models.emformer_hubert_base" title="torchaudio.prototype.models.emformer_hubert_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emformer_hubert_base</span></code></a></p></td>
+<td><p>Build Emformer HuBERT Model with 20 Emformer layers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_model.html#torchaudio.prototype.models.conformer_wav2vec2_model" title="torchaudio.prototype.models.conformer_wav2vec2_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conformer_wav2vec2_model</span></code></a></p></td>
+<td><p>Build a custom Conformer Wav2Vec2Model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base" title="torchaudio.prototype.models.conformer_wav2vec2_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conformer_wav2vec2_base</span></code></a></p></td>
+<td><p>Build Conformer Wav2Vec2 Model with &quot;small&quot; architecture from <em>Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks</em> <span id="id14">[<a class="reference internal" href="../references.html#id53" title="Sangeeta Srivastava, Yun Wang, Andros Tjandra, Anurag Kumar, Chunxi Liu, Kritika Singh, and Yatharth Saraf. Conformer-based self-supervised learning for non-speech audio tasks. In ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 8862-8866. 2022. doi:10.1109/ICASSP43922.2022.9746490.">Srivastava <em>et al.</em>, 2022</a>]</span></p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="utility-functions">
 <h1>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this heading">¶</a></h1>
 <table class="autosummary longtable docutils align-default">
@@ -651,6 +671,7 @@ It indicates the valid length in time axis of each feature Tensor.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#factory-functions">Factory Functions</a></li>
+<li><a class="reference internal" href="#prototype-factory-functions">Prototype Factory Functions</a></li>
 <li><a class="reference internal" href="#utility-functions">Utility Functions</a></li>
 </ul>
 

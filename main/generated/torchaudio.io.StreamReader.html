@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -312,6 +312,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -416,7 +417,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>file-like object</em><em> or </em><em>Tensor</em>) – <p>The media source.
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>file-like object</em>) – <p>The media source.
 If string-type, it must be a resource indicator that FFmpeg can
 handle. This includes a file path, URL, device identifier or
 filter expression. The supported value depends on the FFmpeg found
@@ -427,8 +428,6 @@ Additionally, if the file-like object has <cite>seek</cite> method, it uses
 the method when parsing media metadata. This improves the reliability
 of codec detection. The signagure of <cite>seek</cite> method must be
 <cite>seek(offset: int, whence: int) -&gt; int</cite>.</p>
-<p>If Tensor, it is interpreted as byte buffer.
-It must be one-dimensional, of type <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code>.</p>
 <p>Please refer to the following for the expected signature and behavior
 of <cite>read</cite> and <cite>seek</cite> method.</p>
 <ul>

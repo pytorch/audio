@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -312,6 +312,7 @@
 <li class="toctree-l1"><a class="reference internal" href="prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -680,7 +681,7 @@ div.rendered_html tbody tr:hover {
 <p>This tutorial shows how to use NVIDIA’s hardware video decoder (NVDEC) and encoder (NVENC) with TorchAudio.</p>
 <p>Using hardware encoder/decoder improves the speed of loading and saving certain types of videos.</p>
 <p>Using them in TorchAduio requires FFmpeg built with NVENC/NVDEC support. Google Colab has such FFmpeg pre-installed, so you can <a class="reference external" href="https://colab.research.google.com/drive/1DDah_IaGULEO66CfQWltRqaVheBkiXdN#sandboxMode=true">run this tutorial on Google Colab</a>.</p>
-<p>If you want to enable GPU decoding/encoding, please refer to <a class="reference external" href="./build.ffmpeg.html">Enabling GPU video decoder/encoder</a>.</p>
+<p>If you want to enable GPU decoding/encoding, please refer to <a class="reference external" href="https://pytorch.org/audio/main/build.ffmpeg.html">Enabling GPU video decoder/encoder</a>.</p>
 <section id="Update-PyTorch-and-TorchAudio-with-nightly-builds">
 <h2>Update PyTorch and TorchAudio with nightly builds<a class="headerlink" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds" title="Permalink to this heading">¶</a></h2>
 <p>Until PyTorch 2.0 is released, we need to use the nightly builds of PyTorch and TorchAudio.</p>
@@ -688,8 +689,9 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip uninstall -y -q torch torchaudio torchvision torchtext
-!pip install --progress-bar off --pre torch torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu117 2&gt; /dev/null
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+pip<span class="w"> </span>uninstall<span class="w"> </span>-y<span class="w"> </span>-q<span class="w"> </span>torch<span class="w"> </span>torchaudio<span class="w"> </span>torchvision<span class="w"> </span>torchtext
+pip<span class="w"> </span>install<span class="w"> </span>--progress-bar<span class="w"> </span>off<span class="w"> </span>--pre<span class="w"> </span>torch<span class="w"> </span>torchaudio<span class="w"> </span>--extra-index-url<span class="w"> </span>https://download.pytorch.org/whl/nightly/cu117<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null
 </pre></div>
 </div>
 </div>
@@ -722,7 +724,8 @@ Successfully installed pytorch-triton-2.0.0+0d7e753227 torch-2.0.0.dev20230209+c
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!pip3 install --progress-bar off boto3 2&gt; /dev/null
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+pip3<span class="w"> </span>install<span class="w"> </span>--progress-bar<span class="w"> </span>off<span class="w"> </span>boto3<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null
 </pre></div>
 </div>
 </div>
@@ -756,7 +759,8 @@ Successfully installed boto3-1.26.67 botocore-1.29.67 jmespath-1.0.1 s3transfer-
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!wget -q -O input.mp4 &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+wget<span class="w"> </span>-q<span class="w"> </span>-O<span class="w"> </span>input.mp4<span class="w"> </span><span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -767,7 +771,8 @@ Successfully installed boto3-1.26.67 botocore-1.29.67 jmespath-1.0.1 s3transfer-
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!nvidia-smi
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+nvidia-smi
 </pre></div>
 </div>
 </div>
@@ -806,7 +811,8 @@ Thu Feb  9 15:54:05 2023
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffmpeg -hide_banner -decoders | grep -i cuvid
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-decoders<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>cuvid
 </pre></div>
 </div>
 </div>
@@ -830,7 +836,8 @@ Thu Feb  9 15:54:05 2023
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffmpeg -hide_banner -encoders | grep -i nvenc
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-encoders<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>nvenc
 </pre></div>
 </div>
 </div>
@@ -851,7 +858,8 @@ Thu Feb  9 15:54:05 2023
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>!ffmpeg -hide_banner -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i &quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot; -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-y<span class="w"> </span>-vsync<span class="w"> </span><span class="m">0</span><span class="w"> </span>-hwaccel<span class="w"> </span>cuvid<span class="w"> </span>-hwaccel_output_format<span class="w"> </span>cuda<span class="w"> </span>-c:v<span class="w"> </span>h264_cuvid<span class="w"> </span>-resize<span class="w"> </span>360x240<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span><span class="w"> </span>-c:a<span class="w"> </span>copy<span class="w"> </span>-c:v<span class="w"> </span>h264_nvenc<span class="w"> </span>-b:v<span class="w"> </span>5M<span class="w"> </span>test.mp4
 </pre></div>
 </div>
 </div>

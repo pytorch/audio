@@ -1,0 +1,6 @@
+torchaudio.prototype.models.hifigan\_vocoder
+============================================
+
+.. currentmodule:: torchaudio.prototype.models
+
+.. autofunction:: hifigan_vocoder

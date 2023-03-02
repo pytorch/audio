@@ -42,4 +42,6 @@ Factory Functions
    ~torchaudio.models.hdemucs_medium
    ~torchaudio.models.hdemucs_high
 
+.. PROTOTYPE FACTORY FUNCTIONS
+
 .. UTILITY FUNCTIONS

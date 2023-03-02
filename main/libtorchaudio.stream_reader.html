@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -312,6 +312,7 @@
 <li class="toctree-l1"><a class="reference internal" href="prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -634,8 +635,8 @@ API/ABI backward compatibility is not guaranteed.</p>
 <section id="process-packet-block">
 <h3>process_packet_block<a class="headerlink" href="#process-packet-block" title="Permalink to this heading">¶</a></h3>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io12StreamReader20process_packet_blockEdd">
-<span class="target" id="classtorchaudio_1_1io_1_1StreamReader_1a5ff15ea29d4f1db0dcfad6319e2b1a80"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="torchaudio::io::StreamReader"><span class="n"><span class="pre">StreamReader</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">process_packet_block</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeout</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backoff</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10torchaudio2io12StreamReader20process_packet_blockEdd" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io12StreamReader20process_packet_blockEKdKd">
+<span class="target" id="classtorchaudio_1_1io_1_1StreamReader_1a50316896e97e9e8a5c422a8e95181865"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="torchaudio::io::StreamReader"><span class="n"><span class="pre">StreamReader</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">process_packet_block</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeout</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backoff</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10torchaudio2io12StreamReader20process_packet_blockEKdKd" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Similar to <code class="docutils literal notranslate"><a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamReader_1ae992e4d7780bb13ce61f44d10a449642"><span class="std std-ref"><span class="pre">process_packet()</span></span></a></code>, but in case it fails due to resource temporarily being unavailable, it automatically retries.</p>
 <p>This behavior is helpful when using device input, such as a microphone, during which the buffer may be busy while sample acquisition is happening.</p>
 <dl class="field-list simple">
@@ -647,6 +648,32 @@ API/ABI backward compatibility is not guaranteed.</p>
 </ul>
 </p></li>
 <li><p><strong>backoff</strong> – Time to wait before retrying in milli seconds. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="process-all-packets">
+<h3>process_all_packets<a class="headerlink" href="#process-all-packets" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io12StreamReader19process_all_packetsEv">
+<span class="target" id="classtorchaudio_1_1io_1_1StreamReader_1afc46437a8d63f5d68afac5860a73b124"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="torchaudio::io::StreamReader"><span class="n"><span class="pre">StreamReader</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">process_all_packets</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10torchaudio2io12StreamReader19process_all_packetsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Process packets unitl EOF. </p>
+</dd></dl>
+
+</section>
+<section id="fill-buffer">
+<h3>fill_buffer<a class="headerlink" href="#fill-buffer" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io12StreamReader11fill_bufferERKN3c108optionalIdEEKd">
+<span class="target" id="classtorchaudio_1_1io_1_1StreamReader_1a5c6e3376d85690bf23db777f17332072"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="torchaudio::io::StreamReader"><span class="n"><span class="pre">StreamReader</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">fill_buffer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">timeout</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backoff</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10.</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10torchaudio2io12StreamReader11fill_bufferERKN3c108optionalIdEEKd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Process packets until all the chunk buffers have at least one chunk</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamReader_1a50316896e97e9e8a5c422a8e95181865"><span class="std std-ref"><span class="pre">process_packet_block()</span></span></a></code> </p></li>
+<li><p><strong>backoff</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamReader_1a50316896e97e9e8a5c422a8e95181865"><span class="std std-ref"><span class="pre">process_packet_block()</span></span></a></code> </p></li>
 </ul>
 </dd>
 </dl>
@@ -928,6 +955,8 @@ API/ABI backward compatibility is not guaranteed.</p>
 <li><a class="reference internal" href="#seek">seek</a></li>
 <li><a class="reference internal" href="#process-packet">process_packet</a></li>
 <li><a class="reference internal" href="#process-packet-block">process_packet_block</a></li>
+<li><a class="reference internal" href="#process-all-packets">process_all_packets</a></li>
+<li><a class="reference internal" href="#fill-buffer">fill_buffer</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#retrieval-methods">Retrieval Methods</a><ul>

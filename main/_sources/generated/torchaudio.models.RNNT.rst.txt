@@ -70,4 +70,19 @@ Factory Functions
    ~torchaudio.models.emformer_rnnt_model
    ~torchaudio.models.emformer_rnnt_base
 
+.. PROTOTYPE FACTORY FUNCTIONS
+
+Prototype Factory Functions
+===========================
+
+.. currentmodule:: torchaudio.prototype.models
+
+.. autosummary::
+   :toctree: ../generated
+   :nosignatures:
+
+
+   ~torchaudio.prototype.models.conformer_rnnt_model
+   ~torchaudio.prototype.models.conformer_rnnt_base
+
 .. UTILITY FUNCTIONS

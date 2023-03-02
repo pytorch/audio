@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -309,6 +309,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -400,11 +401,15 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.prototype.models.rnnt</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">Conformer</span><span class="p">,</span> <span class="n">RNNT</span>
 <span class="kn">from</span> <span class="nn">torchaudio.models.rnnt</span> <span class="kn">import</span> <span class="n">_Joiner</span><span class="p">,</span> <span class="n">_Predictor</span><span class="p">,</span> <span class="n">_TimeReduction</span><span class="p">,</span> <span class="n">_Transcriber</span>
+
+
+<span class="n">TrieNode</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;TrieNode&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span>
 
 
 <span class="k">class</span> <span class="nc">_ConformerEncoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">_Transcriber</span><span class="p">):</span>
@@ -454,7 +459,423 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Conformer does not support streaming inference.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="conformer_rnnt_model"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_rnnt_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_rnnt_model</span><span class="p">(</span>
+<span class="k">class</span> <span class="nc">_JoinerBiasing</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recurrent neural network transducer (RNN-T) joint network.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dim (int): source and target input dimension.</span>
+<span class="sd">        output_dim (int): output dimension.</span>
+<span class="sd">        activation (str, optional): activation function to use in the joiner.</span>
+<span class="sd">            Must be one of (&quot;relu&quot;, &quot;tanh&quot;). (Default: &quot;relu&quot;)</span>
+<span class="sd">        biasing (bool): perform biasing</span>
+<span class="sd">        deepbiasing (bool): perform deep biasing</span>
+<span class="sd">        attndim (int): dimension of the biasing vector hptr</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span>
+        <span class="n">biasing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">deepbiasing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">attndim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="o">=</span> <span class="n">biasing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span> <span class="o">=</span> <span class="n">deepbiasing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">biasinglinear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">attndim</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span> <span class="o">=</span> <span class="n">attndim</span>
+        <span class="k">if</span> <span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;relu&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;tanh&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported activation </span><span class="si">{</span><span class="n">activation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source_encodings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">target_encodings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">target_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">hptr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for training.</span>
+
+<span class="sd">        B: batch size;</span>
+<span class="sd">        T: maximum source sequence length in batch;</span>
+<span class="sd">        U: maximum target sequence length in batch;</span>
+<span class="sd">        D: dimension of each source and target sequence encoding.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source_encodings (torch.Tensor): source encoding sequences, with</span>
+<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
+<span class="sd">                valid sequence length of i-th batch element in ``source_encodings``.</span>
+<span class="sd">            target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.</span>
+<span class="sd">            target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
+<span class="sd">                valid sequence length of i-th batch element in ``target_encodings``.</span>
+<span class="sd">            hptr (torch.Tensor): deep biasing vector with shape `(B, T, U, A)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor, torch.Tensor, torch.Tensor):</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    joint network output, with shape `(B, T, U, output_dim)`.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    output source lengths, with shape `(B,)` and i-th element representing</span>
+<span class="sd">                    number of valid elements along dim 1 for i-th batch element in joint network output.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    output target lengths, with shape `(B,)` and i-th element representing</span>
+<span class="sd">                    number of valid elements along dim 2 for i-th batch element in joint network output.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    joint network second last layer output (i.e. before self.linear), with shape `(B, T, U, D)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">joint_encodings</span> <span class="o">=</span> <span class="n">source_encodings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> <span class="o">+</span> <span class="n">target_encodings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span> <span class="ow">and</span> <span class="n">hptr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasinglinear</span><span class="p">(</span><span class="n">hptr</span><span class="p">)</span>
+            <span class="n">joint_encodings</span> <span class="o">+=</span> <span class="n">hptr</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span><span class="p">:</span>
+            <span class="c1"># Hack here for unused parameters</span>
+            <span class="n">joint_encodings</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasinglinear</span><span class="p">(</span><span class="n">joint_encodings</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span>
+        <span class="n">activation_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">joint_encodings</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">activation_out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">activation_out</span>
+
+
+<span class="k">class</span> <span class="nc">RNNTBiasing</span><span class="p">(</span><span class="n">RNNT</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;torchaudio.models.RNNT()</span>
+
+<span class="sd">    Recurrent neural network transducer (RNN-T) model.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        To build the model, please use one of the factory functions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        transcriber (torch.nn.Module): transcription network.</span>
+<span class="sd">        predictor (torch.nn.Module): prediction network.</span>
+<span class="sd">        joiner (torch.nn.Module): joint network.</span>
+<span class="sd">        attndim (int): TCPGen attention dimension</span>
+<span class="sd">        biasing (bool): If true, use biasing, otherwise use standard RNN-T</span>
+<span class="sd">        deepbiasing (bool): If true, use deep biasing by extracting the biasing vector</span>
+<span class="sd">        embdim (int): dimension of symbol embeddings</span>
+<span class="sd">        jointdim (int): dimension of the joint network joint dimension</span>
+<span class="sd">        charlist (list): The list of word piece tokens in the same order as the output layer</span>
+<span class="sd">        encoutdim (int): dimension of the encoder output vectors</span>
+<span class="sd">        dropout_tcpgen (float): dropout rate for TCPGen</span>
+<span class="sd">        tcpsche (int): The epoch at which TCPGen starts to train</span>
+<span class="sd">        DBaverage (bool): If true, instead of TCPGen, use DBRNNT for biasing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">transcriber</span><span class="p">:</span> <span class="n">_Transcriber</span><span class="p">,</span>
+        <span class="n">predictor</span><span class="p">:</span> <span class="n">_Predictor</span><span class="p">,</span>
+        <span class="n">joiner</span><span class="p">:</span> <span class="n">_Joiner</span><span class="p">,</span>
+        <span class="n">attndim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">biasing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">deepbiasing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">embdim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">jointdim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">charlist</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">encoutdim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">dropout_tcpgen</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">tcpsche</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">DBaverage</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">transcriber</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">joiner</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span> <span class="o">=</span> <span class="n">attndim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span> <span class="o">=</span> <span class="n">deepbiasing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jointdim</span> <span class="o">=</span> <span class="n">jointdim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embdim</span> <span class="o">=</span> <span class="n">embdim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoutdim</span> <span class="o">=</span> <span class="n">encoutdim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_list</span> <span class="o">=</span> <span class="n">charlist</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blank_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;&lt;blank&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DBaverage</span> <span class="o">=</span> <span class="n">DBaverage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="o">=</span> <span class="n">biasing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBaverage</span><span class="p">:</span>
+                <span class="c1"># Deep biasing without TCPGen</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">biasingemb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># TCPGen parameters</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ooKBemb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embdim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qproj_char</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embdim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qproj_acoustic</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoutdim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Kproj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embdim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pointer_gate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attndim</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">jointdim</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_tcpgen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_tcpgen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tcpsche</span> <span class="o">=</span> <span class="n">tcpsche</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sources</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">target_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">tries</span><span class="p">:</span> <span class="n">TrieNode</span><span class="p">,</span>
+        <span class="n">current_epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">predictor_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward pass for training.</span>
+
+<span class="sd">        B: batch size;</span>
+<span class="sd">        T: maximum source sequence length in batch;</span>
+<span class="sd">        U: maximum target sequence length in batch;</span>
+<span class="sd">        D: feature dimension of each source sequence element.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sources (torch.Tensor): source frame sequences right-padded with right context, with</span>
+<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
+<span class="sd">                number of valid frames for i-th batch element in ``sources``.</span>
+<span class="sd">            targets (torch.Tensor): target sequences, with shape `(B, U)` and each element</span>
+<span class="sd">                mapping to a target symbol.</span>
+<span class="sd">            target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
+<span class="sd">                number of valid frames for i-th batch element in ``targets``.</span>
+<span class="sd">            tries (TrieNode): wordpiece prefix trees representing the biasing list to be searched</span>
+<span class="sd">            current_epoch (Int): the current epoch number to determine if TCPGen should be trained</span>
+<span class="sd">                at this epoch</span>
+<span class="sd">            predictor_state (List[List[torch.Tensor]] or None, optional): list of lists of tensors</span>
+<span class="sd">                representing prediction network internal state generated in preceding invocation</span>
+<span class="sd">                of ``forward``. (Default: ``None``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor, torch.Tensor, torch.Tensor, List[List[torch.Tensor]]):</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    joint network output, with shape</span>
+<span class="sd">                    `(B, max output source length, max output target length, output_dim (number of target symbols))`.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    output source lengths, with shape `(B,)` and i-th element representing</span>
+<span class="sd">                    number of valid elements along dim 1 for i-th batch element in joint network output.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    output target lengths, with shape `(B,)` and i-th element representing</span>
+<span class="sd">                    number of valid elements along dim 2 for i-th batch element in joint network output.</span>
+<span class="sd">                List[List[torch.Tensor]]</span>
+<span class="sd">                    output states; list of lists of tensors</span>
+<span class="sd">                    representing prediction network internal state generated in current invocation</span>
+<span class="sd">                    of ``forward``.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    TCPGen distribution, with shape</span>
+<span class="sd">                    `(B, max output source length, max output target length, output_dim (number of target symbols))`.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    Generation probability (or copy probability), with shape</span>
+<span class="sd">                    `(B, max output source length, max output target length, 1)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source_encodings</span><span class="p">,</span> <span class="n">source_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transcriber</span><span class="p">(</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+            <span class="n">lengths</span><span class="o">=</span><span class="n">source_lengths</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">target_encodings</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">predictor_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="p">(</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+            <span class="n">lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">predictor_state</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Forward TCPGen</span>
+        <span class="n">hptr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">tcpgen_dist</span><span class="p">,</span> <span class="n">p_gen</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="ow">and</span> <span class="n">current_epoch</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tcpsche</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">ptrdist_mask</span><span class="p">,</span> <span class="n">p_gen_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tcpgen_step_masks</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">tries</span><span class="p">)</span>
+            <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgen_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_tcpgen</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">,</span> <span class="n">source_encodings</span><span class="p">)</span>
+            <span class="n">hptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_tcpgen</span><span class="p">(</span><span class="n">hptr</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span><span class="p">:</span>
+            <span class="c1"># Hack here to bypass unused parameters</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBaverage</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span><span class="p">:</span>
+                <span class="n">dummy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasingemb</span><span class="p">(</span><span class="n">source_encodings</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">)))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dummy</span> <span class="o">=</span> <span class="n">source_encodings</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embdim</span><span class="p">)</span>
+                <span class="n">dummy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qproj_char</span><span class="p">(</span><span class="n">dummy</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">dummy</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qproj_acoustic</span><span class="p">(</span><span class="n">source_encodings</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">source_encodings</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">dummy</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kproj</span><span class="p">(</span><span class="n">source_encodings</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embdim</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">dummy</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointer_gate</span><span class="p">(</span><span class="n">source_encodings</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attndim</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">jointdim</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">dummy</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ooKBemb</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="n">dummy</span> <span class="o">=</span> <span class="n">dummy</span> <span class="o">*</span> <span class="mi">0</span>
+            <span class="n">source_encodings</span> <span class="o">+=</span> <span class="n">dummy</span>
+
+        <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">jointer_activation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">joiner</span><span class="p">(</span>
+            <span class="n">source_encodings</span><span class="o">=</span><span class="n">source_encodings</span><span class="p">,</span>
+            <span class="n">source_lengths</span><span class="o">=</span><span class="n">source_lengths</span><span class="p">,</span>
+            <span class="n">target_encodings</span><span class="o">=</span><span class="n">target_encodings</span><span class="p">,</span>
+            <span class="n">target_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+            <span class="n">hptr</span><span class="o">=</span><span class="n">hptr</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate Generation Probability</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasing</span> <span class="ow">and</span> <span class="n">hptr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tcpgen_dist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p_gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointer_gate</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">jointer_activation</span><span class="p">,</span> <span class="n">hptr</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="c1"># avoid collapsing to ooKB token in the first few updates</span>
+            <span class="c1"># if current_epoch == self.tcpsche:</span>
+            <span class="c1">#     p_gen = p_gen * 0.1</span>
+            <span class="n">p_gen</span> <span class="o">=</span> <span class="n">p_gen</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">p_gen_mask</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">predictor_state</span><span class="p">,</span> <span class="n">tcpgen_dist</span><span class="p">,</span> <span class="n">p_gen</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_tcpgen_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">):</span>
+        <span class="c1"># Make use of the predictor embedding matrix</span>
+        <span class="n">keyvalues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ooKBemb</span><span class="o">.</span><span class="n">weight</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">keyvalues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_tcpgen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Kproj</span><span class="p">(</span><span class="n">keyvalues</span><span class="p">))</span>
+        <span class="c1"># B * T * U * attndim, nbpe * attndim -&gt; B * T * U * nbpe</span>
+        <span class="n">tcpgendist</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ntuj,ij-&gt;ntui&quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">keyvalues</span><span class="p">)</span>
+        <span class="n">tcpgendist</span> <span class="o">=</span> <span class="n">tcpgendist</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">ptrdist_mask</span> <span class="o">=</span> <span class="n">ptrdist_mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tcpgendist</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">tcpgendist</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">ptrdist_mask</span><span class="o">.</span><span class="n">bool</span><span class="p">(),</span> <span class="o">-</span><span class="mf">1e9</span><span class="p">)</span>
+        <span class="n">tcpgendist</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">tcpgendist</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># B * T * U * nbpe, nbpe * attndim -&gt; B * T * U * attndim</span>
+        <span class="n">hptr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ntui,ij-&gt;ntuj&quot;</span><span class="p">,</span> <span class="n">tcpgendist</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">keyvalues</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">return</span> <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgendist</span>
+
+    <span class="k">def</span> <span class="nf">forward_tcpgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">,</span> <span class="n">source_encodings</span><span class="p">):</span>
+        <span class="n">tcpgen_dist</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBaverage</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span><span class="p">:</span>
+            <span class="n">hptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasingemb</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ptrdist_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">())</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query_char</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+            <span class="n">query_char</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qproj_char</span><span class="p">(</span><span class="n">query_char</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># B * 1 * U * attndim</span>
+            <span class="n">query_acoustic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qproj_acoustic</span><span class="p">(</span><span class="n">source_encodings</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># B * T * 1 * attndim</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query_char</span> <span class="o">+</span> <span class="n">query_acoustic</span>  <span class="c1"># B * T * U * attndim</span>
+            <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgen_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tcpgen_distribution</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgen_dist</span>
+
+    <span class="k">def</span> <span class="nf">get_tcpgen_step_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yseqs</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
+        <span class="n">seqlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">batch_masks</span> <span class="o">=</span> <span class="n">yseqs</span><span class="o">.</span><span class="n">new_ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">),</span> <span class="n">seqlen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">p_gen_masks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yseq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">yseqs</span><span class="p">):</span>
+            <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+            <span class="n">p_gen_mask</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">vy</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">yseq</span><span class="p">):</span>
+                <span class="n">vy</span> <span class="o">=</span> <span class="n">vy</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">vy</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blank_idx</span><span class="p">]:</span>
+                    <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+                    <span class="n">p_gen_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;▁&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">vy</span> <span class="ow">in</span> <span class="n">new_tree</span> <span class="ow">and</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="p">{}:</span>
+                        <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+                    <span class="n">p_gen_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">vy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_tree</span><span class="p">:</span>
+                    <span class="n">new_tree</span> <span class="o">=</span> <span class="p">[{}]</span>
+                    <span class="n">p_gen_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span>
+                    <span class="n">p_gen_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># In the original paper, ooKB node was not masked</span>
+                <span class="c1"># In this implementation, if not masking ooKB, ooKB probability</span>
+                <span class="c1"># would quickly collapse to 1.0 in the first few updates.</span>
+                <span class="c1"># Haven&#39;t found out why this happened.</span>
+                <span class="c1"># batch_masks[i, j, -1] = 0</span>
+            <span class="n">p_gen_masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_gen_mask</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">seqlen</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_gen_mask</span><span class="p">)))</span>
+        <span class="n">p_gen_masks</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">p_gen_masks</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">yseqs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">batch_masks</span><span class="p">,</span> <span class="n">p_gen_masks</span>
+
+    <span class="k">def</span> <span class="nf">get_tcpgen_step_masks_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yseqs</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
+        <span class="c1"># Implemented for prefix-based wordpieces, not tested yet</span>
+        <span class="n">seqlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">batch_masks</span> <span class="o">=</span> <span class="n">yseqs</span><span class="o">.</span><span class="n">new_ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">),</span> <span class="n">seqlen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">p_gen_masks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yseq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">yseqs</span><span class="p">):</span>
+            <span class="n">p_gen_mask</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">vy</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">yseq</span><span class="p">):</span>
+                <span class="n">vy</span> <span class="o">=</span> <span class="n">vy</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">vy</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blank_idx</span><span class="p">]:</span>
+                    <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+                    <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;▁&quot;</span><span class="p">):</span>
+                    <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+                    <span class="k">if</span> <span class="n">vy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">vy</span><span class="p">]</span>
+                        <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">if</span> <span class="n">new_tree</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">resettrie</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_tree</span><span class="p">:</span>
+                        <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+                        <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span>
+                        <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">if</span> <span class="n">new_tree</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="n">batch_masks</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">resettrie</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">p_gen_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># batch_masks[i, j, -1] = 0</span>
+            <span class="n">p_gen_masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_gen_mask</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">seqlen</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_gen_mask</span><span class="p">)))</span>
+        <span class="n">p_gen_masks</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">p_gen_masks</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">yseqs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">batch_masks</span><span class="p">,</span> <span class="n">p_gen_masks</span>
+
+    <span class="k">def</span> <span class="nf">get_tcpgen_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">trie</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
+        <span class="n">new_tree</span> <span class="o">=</span> <span class="n">trie</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">vy</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blank_idx</span><span class="p">]:</span>
+            <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;▁&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">vy</span> <span class="ow">in</span> <span class="n">new_tree</span> <span class="ow">and</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="p">{}:</span>
+                <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
+        <span class="k">elif</span> <span class="n">vy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_tree</span><span class="p">:</span>
+            <span class="n">new_tree</span> <span class="o">=</span> <span class="p">[{}]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">new_tree</span>
+
+    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source_encodings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">target_encodings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">target_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">hptr</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies joint network to source and target encodings.</span>
+
+<span class="sd">        B: batch size;</span>
+<span class="sd">        T: maximum source sequence length in batch;</span>
+<span class="sd">        U: maximum target sequence length in batch;</span>
+<span class="sd">        D: dimension of each source and target sequence encoding.</span>
+<span class="sd">        A: TCPGen attention dimension</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source_encodings (torch.Tensor): source encoding sequences, with</span>
+<span class="sd">                shape `(B, T, D)`.</span>
+<span class="sd">            source_lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
+<span class="sd">                valid sequence length of i-th batch element in ``source_encodings``.</span>
+<span class="sd">            target_encodings (torch.Tensor): target encoding sequences, with shape `(B, U, D)`.</span>
+<span class="sd">            target_lengths (torch.Tensor): with shape `(B,)` and i-th element representing</span>
+<span class="sd">                valid sequence length of i-th batch element in ``target_encodings``.</span>
+<span class="sd">            hptr (torch.Tensor): deep biasing vector with shape `(B, T, U, A)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor, torch.Tensor, torch.Tensor):</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    joint network output, with shape `(B, T, U, output_dim)`.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    output source lengths, with shape `(B,)` and i-th element representing</span>
+<span class="sd">                    number of valid elements along dim 1 for i-th batch element in joint network output.</span>
+<span class="sd">                torch.Tensor</span>
+<span class="sd">                    joint network second last layer output, with shape `(B, T, U, D)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">jointer_activation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">joiner</span><span class="p">(</span>
+            <span class="n">source_encodings</span><span class="o">=</span><span class="n">source_encodings</span><span class="p">,</span>
+            <span class="n">source_lengths</span><span class="o">=</span><span class="n">source_lengths</span><span class="p">,</span>
+            <span class="n">target_encodings</span><span class="o">=</span><span class="n">target_encodings</span><span class="p">,</span>
+            <span class="n">target_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+            <span class="n">hptr</span><span class="o">=</span><span class="n">hptr</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">jointer_activation</span>
+
+
+<div class="viewcode-block" id="conformer_rnnt_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_rnnt_model.html#torchaudio.prototype.models.conformer_rnnt_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_rnnt_model</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">encoding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -526,7 +947,7 @@
     <span class="k">return</span> <span class="n">RNNT</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">joiner</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="conformer_rnnt_base"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_rnnt_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_rnnt_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
+<div class="viewcode-block" id="conformer_rnnt_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_rnnt_base.html#torchaudio.prototype.models.conformer_rnnt_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_rnnt_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds basic version of Conformer RNN-T model.</span>
 
 <span class="sd">    Returns:</span>
@@ -552,6 +973,145 @@
         <span class="n">lstm_dropout</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
         <span class="n">joiner_activation</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">conformer_rnnt_biasing</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">time_reduction_stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">conformer_input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">conformer_ffn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">conformer_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">conformer_num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">conformer_depthwise_conv_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">conformer_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">num_symbols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">symbol_embedding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_lstm_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lstm_hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lstm_layer_norm</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lstm_layer_norm_epsilon</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lstm_dropout</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">joiner_activation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">attndim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">biasing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">charlist</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">deepbiasing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">tcpsche</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">DBaverage</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNTBiasing</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds Conformer-based recurrent neural network transducer (RNN-T) model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dim (int): dimension of input sequence frames passed to transcription network.</span>
+<span class="sd">        encoding_dim (int): dimension of transcription- and prediction-network-generated encodings</span>
+<span class="sd">            passed to joint network.</span>
+<span class="sd">        time_reduction_stride (int): factor by which to reduce length of input sequence.</span>
+<span class="sd">        conformer_input_dim (int): dimension of Conformer input.</span>
+<span class="sd">        conformer_ffn_dim (int): hidden layer dimension of each Conformer layer&#39;s feedforward network.</span>
+<span class="sd">        conformer_num_layers (int): number of Conformer layers to instantiate.</span>
+<span class="sd">        conformer_num_heads (int): number of attention heads in each Conformer layer.</span>
+<span class="sd">        conformer_depthwise_conv_kernel_size (int): kernel size of each Conformer layer&#39;s depthwise convolution layer.</span>
+<span class="sd">        conformer_dropout (float): Conformer dropout probability.</span>
+<span class="sd">        num_symbols (int): cardinality of set of target tokens.</span>
+<span class="sd">        symbol_embedding_dim (int): dimension of each target token embedding.</span>
+<span class="sd">        num_lstm_layers (int): number of LSTM layers to instantiate.</span>
+<span class="sd">        lstm_hidden_dim (int): output dimension of each LSTM layer.</span>
+<span class="sd">        lstm_layer_norm (bool): if ``True``, enables layer normalization for LSTM layers.</span>
+<span class="sd">        lstm_layer_norm_epsilon (float): value of epsilon to use in LSTM layer normalization layers.</span>
+<span class="sd">        lstm_dropout (float): LSTM dropout probability.</span>
+<span class="sd">        joiner_activation (str): activation function to use in the joiner.</span>
+<span class="sd">            Must be one of (&quot;relu&quot;, &quot;tanh&quot;). (Default: &quot;relu&quot;)</span>
+<span class="sd">        attndim (int): TCPGen attention dimension</span>
+<span class="sd">        biasing (bool): If true, use biasing, otherwise use standard RNN-T</span>
+<span class="sd">        charlist (list): The list of word piece tokens in the same order as the output layer</span>
+<span class="sd">        deepbiasing (bool): If true, use deep biasing by extracting the biasing vector</span>
+<span class="sd">        tcpsche (int): The epoch at which TCPGen starts to train</span>
+<span class="sd">        DBaverage (bool): If true, instead of TCPGen, use DBRNNT for biasing</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RNNT:</span>
+<span class="sd">                Conformer RNN-T model with TCPGen-based biasing support.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">_ConformerEncoder</span><span class="p">(</span>
+        <span class="n">input_dim</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
+        <span class="n">output_dim</span><span class="o">=</span><span class="n">encoding_dim</span><span class="p">,</span>
+        <span class="n">time_reduction_stride</span><span class="o">=</span><span class="n">time_reduction_stride</span><span class="p">,</span>
+        <span class="n">conformer_input_dim</span><span class="o">=</span><span class="n">conformer_input_dim</span><span class="p">,</span>
+        <span class="n">conformer_ffn_dim</span><span class="o">=</span><span class="n">conformer_ffn_dim</span><span class="p">,</span>
+        <span class="n">conformer_num_layers</span><span class="o">=</span><span class="n">conformer_num_layers</span><span class="p">,</span>
+        <span class="n">conformer_num_heads</span><span class="o">=</span><span class="n">conformer_num_heads</span><span class="p">,</span>
+        <span class="n">conformer_depthwise_conv_kernel_size</span><span class="o">=</span><span class="n">conformer_depthwise_conv_kernel_size</span><span class="p">,</span>
+        <span class="n">conformer_dropout</span><span class="o">=</span><span class="n">conformer_dropout</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">predictor</span> <span class="o">=</span> <span class="n">_Predictor</span><span class="p">(</span>
+        <span class="n">num_symbols</span><span class="o">=</span><span class="n">num_symbols</span><span class="p">,</span>
+        <span class="n">output_dim</span><span class="o">=</span><span class="n">encoding_dim</span><span class="p">,</span>
+        <span class="n">symbol_embedding_dim</span><span class="o">=</span><span class="n">symbol_embedding_dim</span><span class="p">,</span>
+        <span class="n">num_lstm_layers</span><span class="o">=</span><span class="n">num_lstm_layers</span><span class="p">,</span>
+        <span class="n">lstm_hidden_dim</span><span class="o">=</span><span class="n">lstm_hidden_dim</span><span class="p">,</span>
+        <span class="n">lstm_layer_norm</span><span class="o">=</span><span class="n">lstm_layer_norm</span><span class="p">,</span>
+        <span class="n">lstm_layer_norm_epsilon</span><span class="o">=</span><span class="n">lstm_layer_norm_epsilon</span><span class="p">,</span>
+        <span class="n">lstm_dropout</span><span class="o">=</span><span class="n">lstm_dropout</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">joiner</span> <span class="o">=</span> <span class="n">_JoinerBiasing</span><span class="p">(</span>
+        <span class="n">encoding_dim</span><span class="p">,</span>
+        <span class="n">num_symbols</span><span class="p">,</span>
+        <span class="n">activation</span><span class="o">=</span><span class="n">joiner_activation</span><span class="p">,</span>
+        <span class="n">deepbiasing</span><span class="o">=</span><span class="n">deepbiasing</span><span class="p">,</span>
+        <span class="n">attndim</span><span class="o">=</span><span class="n">attndim</span><span class="p">,</span>
+        <span class="n">biasing</span><span class="o">=</span><span class="n">biasing</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">RNNTBiasing</span><span class="p">(</span>
+        <span class="n">encoder</span><span class="p">,</span>
+        <span class="n">predictor</span><span class="p">,</span>
+        <span class="n">joiner</span><span class="p">,</span>
+        <span class="n">attndim</span><span class="p">,</span>
+        <span class="n">biasing</span><span class="p">,</span>
+        <span class="n">deepbiasing</span><span class="p">,</span>
+        <span class="n">symbol_embedding_dim</span><span class="p">,</span>
+        <span class="n">encoding_dim</span><span class="p">,</span>
+        <span class="n">charlist</span><span class="p">,</span>
+        <span class="n">encoding_dim</span><span class="p">,</span>
+        <span class="n">conformer_dropout</span><span class="p">,</span>
+        <span class="n">tcpsche</span><span class="p">,</span>
+        <span class="n">DBaverage</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">conformer_rnnt_biasing_base</span><span class="p">(</span><span class="n">charlist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">biasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds basic version of Conformer RNN-T model with TCPGen.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RNNT:</span>
+<span class="sd">            Conformer RNN-T model with TCPGen-based biasing support.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">conformer_rnnt_biasing</span><span class="p">(</span>
+        <span class="n">input_dim</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
+        <span class="n">encoding_dim</span><span class="o">=</span><span class="mi">576</span><span class="p">,</span>
+        <span class="n">time_reduction_stride</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">conformer_input_dim</span><span class="o">=</span><span class="mi">144</span><span class="p">,</span>
+        <span class="n">conformer_ffn_dim</span><span class="o">=</span><span class="mi">576</span><span class="p">,</span>
+        <span class="n">conformer_num_layers</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">conformer_num_heads</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">conformer_depthwise_conv_kernel_size</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span>
+        <span class="n">conformer_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">num_symbols</span><span class="o">=</span><span class="mi">601</span><span class="p">,</span>
+        <span class="n">symbol_embedding_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">num_lstm_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">lstm_hidden_dim</span><span class="o">=</span><span class="mi">320</span><span class="p">,</span>
+        <span class="n">lstm_layer_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">lstm_layer_norm_epsilon</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">lstm_dropout</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">joiner_activation</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span><span class="p">,</span>
+        <span class="n">attndim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">biasing</span><span class="o">=</span><span class="n">biasing</span><span class="p">,</span>
+        <span class="n">charlist</span><span class="o">=</span><span class="n">charlist</span><span class="p">,</span>
+        <span class="n">deepbiasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">tcpsche</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">DBaverage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
              </article>

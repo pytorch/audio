@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../../../../../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -309,6 +309,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -654,7 +655,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_intermediate_outputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">masks</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">[docs]</a><span class="k">class</span> <span class="nc">ConformerWav2Vec2PretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">[docs]</a><span class="k">class</span> <span class="nc">ConformerWav2Vec2PretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Conformer Wav2Vec2 pre-train model for training from scratch.</span>
 
 <span class="sd">    Note:</span>
@@ -682,7 +683,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span> <span class="o">=</span> <span class="n">mask_generator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">negative_sampler</span>
 
-<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel.forward"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">audio_lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -720,9 +721,14 @@
 
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">mask_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
 
-        <span class="n">targets</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Unmasked feature is used to generate positive and negative samples.</span>
+        <span class="n">unmasked_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="c1"># Apply masking to x before passing it to Conformer layers.</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">mask_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
+        <span class="c1"># Select the frames from masked indices for negative sampling.</span>
+        <span class="n">unmasked_x</span> <span class="o">=</span> <span class="n">unmasked_x</span><span class="p">[</span><span class="n">mask_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">targets</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span><span class="p">(</span><span class="n">unmasked_x</span><span class="p">)</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -834,7 +840,7 @@
     <span class="k">return</span> <span class="n">NegativeSampler</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="conformer_wav2vec2_model"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_model</span><span class="p">(</span>
+<div class="viewcode-block" id="conformer_wav2vec2_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_model.html#torchaudio.prototype.models.conformer_wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_model</span><span class="p">(</span>
     <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">extractor_stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -898,7 +904,7 @@
     <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="conformer_wav2vec2_base"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_base</span><span class="p">(</span>
+<div class="viewcode-block" id="conformer_wav2vec2_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_base</span><span class="p">(</span>
     <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -933,7 +939,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="conformer_wav2vec2_pretrain_model"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_model.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
     <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">extractor_stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1069,7 +1075,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="conformer_wav2vec2_pretrain_base"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_base</span><span class="p">(</span>
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_base.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_base</span><span class="p">(</span>
     <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1130,7 +1136,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="conformer_wav2vec2_pretrain_large"><a class="viewcode-back" href="../../../../prototype.models.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_large</span><span class="p">(</span>
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_large"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_large.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_large</span><span class="p">(</span>
     <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
     <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>

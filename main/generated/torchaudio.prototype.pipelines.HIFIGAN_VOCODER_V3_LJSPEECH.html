@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="torchaudio.prototype.transforms" href="../prototype.transforms.html" />
+    <link rel="next" title="SquimObjectiveBundle" href="torchaudio.prototype.pipelines.SquimObjectiveBundle.html" />
     <link rel="prev" title="HiFiGANVocoderBundle" href="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" />
   <!-- Google Analytics -->
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -312,6 +312,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -424,7 +425,7 @@ HiFiGAN implementation uses a custom method of generating mel spectrograms from 
 <a class="reference internal" href="torchaudio.transforms.MelSpectrogram.html#torchaudio.transforms.MelSpectrogram" title="torchaudio.transforms.MelSpectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.transforms.MelSpectrogram</span></code></a>. We reimplemented this transform as
 <a class="reference internal" href="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle.get_mel_transform()</span></code></a>, making sure it is equivalent to the original HiFiGAN code <a class="reference external" href="https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72">here</a>.</p>
 <p>The underlying vocoder is constructed by
-<a class="reference internal" href="../prototype.models.html#torchaudio.prototype.models.hifigan_vocoder" title="torchaudio.prototype.models.hifigan_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.models.hifigan_vocoder()</span></code></a>. The weights are converted from the ones published
+<a class="reference internal" href="torchaudio.prototype.models.hifigan_vocoder.html#torchaudio.prototype.models.hifigan_vocoder" title="torchaudio.prototype.models.hifigan_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.models.hifigan_vocoder()</span></code></a>. The weights are converted from the ones published
 with the original paper <span id="id2">[<a class="reference internal" href="../references.html#id56" title="Jungil Kong, Jaehyeon Kim, and Jaekyoung Bae. Hifi-gan: generative adversarial networks for efficient and high fidelity speech synthesis. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin, editors, Advances in Neural Information Processing Systems, volume 33, 17022–17033. Curran Associates, Inc., 2020. URL: https://proceedings.neurips.cc/paper/2020/file/c5d736809766d46260d816d8dbc9eb44-Paper.pdf.">Kong <em>et al.</em>, 2020</a>]</span> under <a class="reference external" href="https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/LICENSE">MIT License</a>. See links to
 pre-trained models on <a class="reference external" href="https://github.com/jik876/hifi-gan#pretrained-model">GitHub</a>.</p>
 <p>Please refer to <a class="reference internal" href="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a> for usage instructions.</p>
@@ -441,7 +442,7 @@ pre-trained models on <a class="reference external" href="https://github.com/jik
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../prototype.transforms.html" class="btn btn-neutral float-right" title="torchaudio.prototype.transforms" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="torchaudio.prototype.pipelines.SquimObjectiveBundle.html" class="btn btn-neutral float-right" title="SquimObjectiveBundle" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" class="btn btn-neutral" title="HiFiGANVocoderBundle" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>

@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="HiFiGANVocoderBundle" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" />
-    <link rel="prev" title="torchaudio.prototype.models" href="prototype.models.html" />
+    <link rel="prev" title="torchaudio.prototype.models.squim_objective_base" href="generated/torchaudio.prototype.models.squim_objective_base.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -312,6 +312,7 @@
 <li class="toctree-l1"><a class="reference internal" href="prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -450,7 +451,7 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a></p></td>
-<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="prototype.models.html#torchaudio.prototype.models.HiFiGANVocoder" title="torchaudio.prototype.models.HiFiGANVocoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoder</span></code></a>.</p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.prototype.models.HiFiGANVocoder.html#torchaudio.prototype.models.HiFiGANVocoder" title="torchaudio.prototype.models.HiFiGANVocoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoder</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -461,6 +462,30 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html#torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH" title="torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HIFIGAN_VOCODER_V3_LJSPEECH</span></code></a></p></td>
 <td><p>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em> <span id="id2">[<a class="reference internal" href="references.html#id6" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="squim-objective">
+<h2>Squim Objective<a class="headerlink" href="#squim-objective" title="Permalink to this heading">¶</a></h2>
+<section id="id3">
+<h3>Interface<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimObjectiveBundle.html#torchaudio.prototype.pipelines.SquimObjectiveBundle" title="torchaudio.prototype.pipelines.SquimObjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimObjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>objecive</strong> metric scores given the input waveform.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimObjectiveBundle.html#torchaudio.prototype.pipelines.SquimObjectiveBundle" title="torchaudio.prototype.pipelines.SquimObjectiveBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquimObjectiveBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.prototype.models.SquimObjective.html#torchaudio.prototype.models.SquimObjective" title="torchaudio.prototype.models.SquimObjective"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimObjective</span></code></a> model.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id4">
+<h3>Pretrained Models<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SQUIM_OBJECTIVE.html#torchaudio.prototype.pipelines.SQUIM_OBJECTIVE" title="torchaudio.prototype.pipelines.SQUIM_OBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_OBJECTIVE</span></code></a></p></td>
+<td><p>SquimObjective pipeline, trained on the <em>DNS 2020 Dataset</em> <span id="id5">[<a class="reference internal" href="references.html#id64" title="Chandan KA Reddy, Vishak Gopal, Ross Cutler, Ebrahim Beyrami, Roger Cheng, Harishchandra Dubey, Sergiy Matusevych, Robert Aichner, Ashkan Aazami, Sebastian Braun, and others. The interspeech 2020 deep noise suppression challenge: datasets, subjective testing framework, and challenge results. arXiv preprint arXiv:2005.13981, 2020.">Reddy <em>et al.</em>, 2020</a>]</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -479,7 +504,7 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
         <a href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" class="btn btn-neutral float-right" title="HiFiGANVocoderBundle" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="prototype.models.html" class="btn btn-neutral" title="torchaudio.prototype.models" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="generated/torchaudio.prototype.models.squim_objective_base.html" class="btn btn-neutral" title="torchaudio.prototype.models.squim_objective_base" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -522,6 +547,11 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 <li><a class="reference internal" href="#hifigan-vocoder">HiFiGAN Vocoder</a><ul>
 <li><a class="reference internal" href="#interface">Interface</a></li>
 <li><a class="reference internal" href="#pretrained-models">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#squim-objective">Squim Objective</a><ul>
+<li><a class="reference internal" href="#id3">Interface</a></li>
+<li><a class="reference internal" href="#id4">Pretrained Models</a></li>
 </ul>
 </li>
 </ul>

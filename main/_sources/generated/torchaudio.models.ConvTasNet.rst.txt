@@ -40,4 +40,6 @@ Factory Functions
 
    ~torchaudio.models.conv_tasnet_base
 
+.. PROTOTYPE FACTORY FUNCTIONS
+
 .. UTILITY FUNCTIONS

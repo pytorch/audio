@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230221) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230302) &#x25BC</a>
     </div>
     
 
@@ -309,6 +309,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -505,70 +506,44 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Frame rate.&quot;&quot;&quot;</span></div>
 
 
-<span class="c1"># Indices of SrcInfo returned by low-level `get_src_stream_info`</span>
-<span class="c1"># - COMMON</span>
-<span class="n">_MEDIA_TYPE</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">_CODEC</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">_CODEC_LONG</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">_FORMAT</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">_BIT_RATE</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">_NUM_FRAMES</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">_BPS</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="n">_METADATA</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="c1"># - AUDIO</span>
-<span class="n">_SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">_NUM_CHANNELS</span> <span class="o">=</span> <span class="mi">9</span>
-<span class="c1"># - VIDEO</span>
-<span class="n">_WIDTH</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">_HEIGHT</span> <span class="o">=</span> <span class="mi">11</span>
-<span class="n">_FRAME_RATE</span> <span class="o">=</span> <span class="mi">12</span>
-
-
 <span class="k">def</span> <span class="nf">_parse_si</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-    <span class="n">media_type</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_MEDIA_TYPE</span><span class="p">]</span>
-    <span class="n">codec_name</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_CODEC</span><span class="p">]</span>
-    <span class="n">codec_long_name</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_CODEC_LONG</span><span class="p">]</span>
-    <span class="n">fmt</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_FORMAT</span><span class="p">]</span>
-    <span class="n">bit_rate</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_BIT_RATE</span><span class="p">]</span>
-    <span class="n">num_frames</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_NUM_FRAMES</span><span class="p">]</span>
-    <span class="n">bps</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_BPS</span><span class="p">]</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">_METADATA</span><span class="p">]</span>
+    <span class="n">media_type</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">media_type</span>
     <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SourceAudioStream</span><span class="p">(</span>
-            <span class="n">media_type</span><span class="o">=</span><span class="n">media_type</span><span class="p">,</span>
-            <span class="n">codec</span><span class="o">=</span><span class="n">codec_name</span><span class="p">,</span>
-            <span class="n">codec_long_name</span><span class="o">=</span><span class="n">codec_long_name</span><span class="p">,</span>
-            <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
-            <span class="n">bit_rate</span><span class="o">=</span><span class="n">bit_rate</span><span class="p">,</span>
-            <span class="n">num_frames</span><span class="o">=</span><span class="n">num_frames</span><span class="p">,</span>
-            <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">bps</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
-            <span class="n">sample_rate</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_SAMPLE_RATE</span><span class="p">],</span>
-            <span class="n">num_channels</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_NUM_CHANNELS</span><span class="p">],</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+            <span class="n">codec</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_name</span><span class="p">,</span>
+            <span class="n">codec_long_name</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_long_name</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">bit_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span>
+            <span class="n">num_frames</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_frames</span><span class="p">,</span>
+            <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bits_per_sample</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">num_channels</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SourceVideoStream</span><span class="p">(</span>
-            <span class="n">media_type</span><span class="o">=</span><span class="n">media_type</span><span class="p">,</span>
-            <span class="n">codec</span><span class="o">=</span><span class="n">codec_name</span><span class="p">,</span>
-            <span class="n">codec_long_name</span><span class="o">=</span><span class="n">codec_long_name</span><span class="p">,</span>
-            <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
-            <span class="n">bit_rate</span><span class="o">=</span><span class="n">bit_rate</span><span class="p">,</span>
-            <span class="n">num_frames</span><span class="o">=</span><span class="n">num_frames</span><span class="p">,</span>
-            <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">bps</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
-            <span class="n">width</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_WIDTH</span><span class="p">],</span>
-            <span class="n">height</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_HEIGHT</span><span class="p">],</span>
-            <span class="n">frame_rate</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="n">_FRAME_RATE</span><span class="p">],</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+            <span class="n">codec</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_name</span><span class="p">,</span>
+            <span class="n">codec_long_name</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_long_name</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">bit_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span>
+            <span class="n">num_frames</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_frames</span><span class="p">,</span>
+            <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bits_per_sample</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">frame_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">frame_rate</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">SourceStream</span><span class="p">(</span>
-        <span class="n">media_type</span><span class="o">=</span><span class="n">media_type</span><span class="p">,</span>
-        <span class="n">codec</span><span class="o">=</span><span class="n">codec_name</span><span class="p">,</span>
-        <span class="n">codec_long_name</span><span class="o">=</span><span class="n">codec_long_name</span><span class="p">,</span>
+        <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+        <span class="n">codec</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_name</span><span class="p">,</span>
+        <span class="n">codec_long_name</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_long_name</span><span class="p">,</span>
         <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">bit_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">num_frames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">bits_per_sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -582,10 +557,6 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Index of the source stream that this output stream is connected.&quot;&quot;&quot;</span>
     <span class="n">filter_description</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Description of filter graph applied to the source stream.&quot;&quot;&quot;</span></div>
-
-
-<span class="k">def</span> <span class="nf">_parse_oi</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">OutputStream</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
 <span class="k">def</span> <span class="nf">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
@@ -790,7 +761,7 @@
 <span class="sd">    For the detailed usage of this class, please refer to the tutorial.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        src (str, file-like object or Tensor): The media source.</span>
+<span class="sd">        src (str, file-like object): The media source.</span>
 <span class="sd">            If string-type, it must be a resource indicator that FFmpeg can</span>
 <span class="sd">            handle. This includes a file path, URL, device identifier or</span>
 <span class="sd">            filter expression. The supported value depends on the FFmpeg found</span>
@@ -802,9 +773,6 @@
 <span class="sd">            the method when parsing media metadata. This improves the reliability</span>
 <span class="sd">            of codec detection. The signagure of `seek` method must be</span>
 <span class="sd">            `seek(offset: int, whence: int) -&gt; int`.</span>
-
-<span class="sd">            If Tensor, it is interpreted as byte buffer.</span>
-<span class="sd">            It must be one-dimensional, of type ``torch.uint8``.</span>
 
 <span class="sd">            Please refer to the following for the expected signature and behavior</span>
 <span class="sd">            of `read` and `seek` method.</span>
@@ -864,11 +832,8 @@
         <span class="n">option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_log_api_usage_once</span><span class="p">(</span><span class="s2">&quot;torchaudio.io.StreamReader&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamReader</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ffmpeg_StreamReaderTensor</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">StreamReaderFileObj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -940,7 +905,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            OutputStream</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OutputStream</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">filter_description</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.seek"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;precise&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Seek the stream to the given timestamp [second]</span>
@@ -1250,7 +1216,7 @@
             <span class="k">if</span> <span class="n">chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChunkTensor</span><span class="p">(</span><span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChunkTensor</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">pts</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="StreamReader.fill_buffer"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>

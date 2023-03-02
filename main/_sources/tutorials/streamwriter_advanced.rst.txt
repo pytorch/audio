@@ -302,7 +302,7 @@ Now we start streaming. Pressing "Q" will stop the video.
        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-sdl-demo.mp4">
    </video>
 
-[`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`_]
+[`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`__]
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 253-260
@@ -348,7 +348,7 @@ The call to ``open`` is blocked until a request is received.
        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-rtmp-demo.mp4">
    </video>
 
-[`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`_]
+[`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`__]
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 300-328
@@ -379,7 +379,7 @@ The streaming process are not aware of client process.
        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-udp-demo.mp4">
    </video>
 
-[`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`_]
+[`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`__]
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 331-332
