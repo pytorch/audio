@@ -872,7 +872,7 @@ jobs:
           environment:
             BUILD_GALLERY: 1
             TORCH_SHOW_CPP_STACKTRACES: 1
-          no_output_timeout: 30m
+          no_output_timeout: 60m
       - persist_to_workspace:
           root: ./
           paths:
