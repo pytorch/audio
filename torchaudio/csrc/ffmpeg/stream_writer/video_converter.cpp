@@ -11,7 +11,7 @@ namespace torchaudio::io {
 ////////////////////////////////////////////////////////////////////////////////
 
 using InitFunc = VideoTensorConverter::InitFunc;
-using ConvertFunc = Generator::ConvertFunc;
+using ConvertFunc = SlicingTensorConverter::ConvertFunc;
 
 namespace {
 
@@ -27,9 +27,12 @@ namespace {
 //            ...
 // H: RGB RGB ... RGB PAD ... PAD
 void write_interlaced_video(const torch::Tensor& frame, AVFrame* buffer) {
-  const auto height = frame.size(0);
-  const auto width = frame.size(1);
-  const auto num_channels = frame.size(2);
+  TORCH_INTERNAL_ASSERT(
+      frame.size(0) == 1,
+      "The first dimension of the image dimension must be one.");
+  const auto height = frame.size(1);
+  const auto width = frame.size(2);
+  const auto num_channels = frame.size(3);
 
   size_t stride = width * num_channels;
   // TODO: writable
@@ -70,15 +73,18 @@ void write_planar_video(
     const torch::Tensor& frame,
     AVFrame* buffer,
     int num_planes) {
-  const auto height = frame.size(1);
-  const auto width = frame.size(2);
+  TORCH_INTERNAL_ASSERT(
+      frame.size(0) == 1,
+      "The first dimension of the image dimension must be one.");
+  const auto height = frame.size(2);
+  const auto width = frame.size(3);
 
   // TODO: writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
   TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
 
   for (int j = 0; j < num_planes; ++j) {
-    uint8_t* src = frame.index({j}).data_ptr<uint8_t>();
+    uint8_t* src = frame.index({0, j}).data_ptr<uint8_t>();
     uint8_t* dst = buffer->data[j];
     for (int h = 0; h < height; ++h) {
       memcpy(dst, src, width);
@@ -97,9 +103,12 @@ void write_interlaced_video_cuda(
       false,
       "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
 #else
-  const auto height = frame.size(0);
-  const auto width = frame.size(1);
-  const auto num_channels = frame.size(2) + (pad_extra ? 1 : 0);
+  TORCH_INTERNAL_ASSERT(
+      frame.size(0) == 1,
+      "The first dimension of the image dimension must be one.");
+  const auto height = frame.size(1);
+  const auto width = frame.size(2);
+  const auto num_channels = frame.size(3) + (pad_extra ? 1 : 0);
   size_t spitch = width * num_channels;
   if (cudaSuccess !=
       cudaMemcpy2D(
@@ -124,14 +133,17 @@ void write_planar_video_cuda(
       false,
       "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
 #else
-  const auto height = frame.size(1);
-  const auto width = frame.size(2);
+  TORCH_INTERNAL_ASSERT(
+      frame.size(0) == 1,
+      "The first dimension of the image dimension must be one.");
+  const auto height = frame.size(2);
+  const auto width = frame.size(3);
   for (int j = 0; j < num_planes; ++j) {
     if (cudaSuccess !=
         cudaMemcpy2D(
             (void*)(buffer->data[j]),
             buffer->linesize[j],
-            (const void*)(frame.index({j}).data_ptr<uint8_t>()),
+            (const void*)(frame.index({0, j}).data_ptr<uint8_t>()),
             width,
             width,
             height,
@@ -269,9 +281,10 @@ VideoTensorConverter::VideoTensorConverter(
   std::tie(init_func, convert_func) = get_func(src_fmt, codec_ctx->sw_pix_fmt);
 }
 
-Generator VideoTensorConverter::convert(const torch::Tensor& frames) {
+SlicingTensorConverter VideoTensorConverter::convert(
+    const torch::Tensor& frames) {
   validate_video_input(src_fmt, codec_ctx, frames);
-  return Generator{init_func(frames), buffer, convert_func};
+  return SlicingTensorConverter{init_func(frames), buffer, convert_func};
 }
 
 } // namespace torchaudio::io

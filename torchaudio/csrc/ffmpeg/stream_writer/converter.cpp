@@ -2,21 +2,28 @@
 
 namespace torchaudio::io {
 
-using Iterator = Generator::Iterator;
-using ConvertFunc = Generator::ConvertFunc;
+using Iterator = SlicingTensorConverter::Iterator;
+using ConvertFunc = SlicingTensorConverter::ConvertFunc;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Generator
+// SlicingTensorConverter
 ////////////////////////////////////////////////////////////////////////////////
 
-Generator::Generator(torch::Tensor frames_, AVFrame* buff, ConvertFunc& func)
-    : frames(std::move(frames_)), buffer(buff), convert_func(func) {}
+SlicingTensorConverter::SlicingTensorConverter(
+    torch::Tensor frames_,
+    AVFrame* buff,
+    ConvertFunc& func,
+    int64_t step_)
+    : frames(std::move(frames_)),
+      buffer(buff),
+      convert_func(func),
+      step(step_) {}
 
-Iterator Generator::begin() const {
-  return Iterator{frames, buffer, convert_func};
+Iterator SlicingTensorConverter::begin() const {
+  return Iterator{frames, buffer, convert_func, step};
 }
 
-int64_t Generator::end() const {
+int64_t SlicingTensorConverter::end() const {
   return frames.size(0);
 }
 
@@ -27,21 +34,28 @@ int64_t Generator::end() const {
 Iterator::Iterator(
     const torch::Tensor frames_,
     AVFrame* buffer_,
-    ConvertFunc& convert_func_)
-    : frames(frames_), buffer(buffer_), convert_func(convert_func_) {}
+    ConvertFunc& convert_func_,
+    int64_t step_)
+    : frames(frames_),
+      buffer(buffer_),
+      convert_func(convert_func_),
+      step(step_) {}
 
 Iterator& Iterator::operator++() {
-  ++i;
+  i += step;
   return *this;
 }
 
 AVFrame* Iterator::operator*() const {
-  convert_func(frames.index({i}), buffer);
+  using namespace torch::indexing;
+  convert_func(frames.index({Slice{i, i + step}}), buffer);
   return buffer;
 }
 
-bool Iterator::operator!=(const int64_t other) const {
-  return i != other;
+bool Iterator::operator!=(const int64_t end) const {
+  // This is used for detecting the end of iteraton.
+  // For audio, iteration is done by
+  return i < end;
 }
 
 } // namespace torchaudio::io
