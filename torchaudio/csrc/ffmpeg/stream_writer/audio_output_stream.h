@@ -1,10 +1,11 @@
 #pragma once
+#include <torchaudio/csrc/ffmpeg/stream_writer/audio_converter.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/output_stream.h>
 
 namespace torchaudio::io {
 
 struct AudioOutputStream : OutputStream {
-  AVFramePtr src_frame;
+  AudioTensorConverter converter;
   int64_t frame_capacity;
   AVCodecContextPtr codec_ctx;
 

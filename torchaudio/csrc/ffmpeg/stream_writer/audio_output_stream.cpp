@@ -29,28 +29,6 @@ FilterGraph get_audio_filter(
   return p;
 }
 
-AVFramePtr get_audio_frame(
-    AVSampleFormat src_fmt,
-    AVCodecContext* codec_ctx,
-    int default_frame_size = 10000) {
-  AVFramePtr frame{};
-  frame->pts = 0;
-  frame->format = src_fmt;
-  frame->channel_layout = codec_ctx->channel_layout;
-  frame->sample_rate = codec_ctx->sample_rate;
-  frame->nb_samples =
-      codec_ctx->frame_size ? codec_ctx->frame_size : default_frame_size;
-  if (frame->nb_samples) {
-    int ret = av_frame_get_buffer(frame, 0);
-    TORCH_CHECK(
-        ret >= 0,
-        "Error allocating an audio buffer (",
-        av_err2string(ret),
-        ").");
-  }
-  return frame;
-}
-
 } // namespace
 
 AudioOutputStream::AudioOutputStream(
@@ -61,83 +39,15 @@ AudioOutputStream::AudioOutputStream(
           format_ctx,
           codec_ctx_,
           get_audio_filter(src_fmt, codec_ctx_)),
-      src_frame(get_audio_frame(src_fmt, codec_ctx_)),
-      frame_capacity(src_frame->nb_samples),
+      converter(src_fmt, codec_ctx_),
       codec_ctx(std::move(codec_ctx_)) {}
 
-namespace {
-
-void validate_audio_input(
-    enum AVSampleFormat fmt,
-    AVCodecContext* ctx,
-    const torch::Tensor& t) {
-  auto dtype = t.dtype().toScalarType();
-  switch (fmt) {
-    case AV_SAMPLE_FMT_U8:
-      TORCH_CHECK(
-          dtype == c10::ScalarType::Byte, "Expected Tensor of uint8 type.");
-      break;
-    case AV_SAMPLE_FMT_S16:
-      TORCH_CHECK(
-          dtype == c10::ScalarType::Short, "Expected Tensor of int16 type.");
-      break;
-    case AV_SAMPLE_FMT_S32:
-      TORCH_CHECK(
-          dtype == c10::ScalarType::Int, "Expected Tensor of int32 type.");
-      break;
-    case AV_SAMPLE_FMT_S64:
-      TORCH_CHECK(
-          dtype == c10::ScalarType::Long, "Expected Tensor of int64 type.");
-      break;
-    case AV_SAMPLE_FMT_FLT:
-      TORCH_CHECK(
-          dtype == c10::ScalarType::Float, "Expected Tensor of float32 type.");
-      break;
-    case AV_SAMPLE_FMT_DBL:
-      TORCH_CHECK(
-          dtype == c10::ScalarType::Double, "Expected Tensor of float64 type.");
-      break;
-    default:
-      TORCH_CHECK(
-          false,
-          "Internal error: Audio encoding stream is not properly configured.");
-  }
-  TORCH_CHECK(t.device().is_cpu(), "Input tensor has to be on CPU.");
-  TORCH_CHECK(t.dim() == 2, "Input Tensor has to be 2D.");
-  const auto num_channels = t.size(1);
-  TORCH_CHECK(
-      num_channels == ctx->channels,
-      "Expected waveform with ",
-      ctx->channels,
-      " channels. Found ",
-      num_channels);
-}
-
-} // namespace
-
 void AudioOutputStream::write_chunk(const torch::Tensor& waveform) {
-  validate_audio_input(
-      static_cast<AVSampleFormat>(src_frame->format), codec_ctx, waveform);
-
   AVRational time_base{1, codec_ctx->sample_rate};
-
-  using namespace torch::indexing;
-  for (int64_t i = 0; i < waveform.size(0); i += frame_capacity) {
-    auto chunk = waveform.index({Slice(i, i + frame_capacity), Slice()});
-    auto num_frames = chunk.size(0);
-    auto byte_size = chunk.numel() * chunk.element_size();
-    chunk = chunk.reshape({-1}).contiguous();
-
-    // TODO: make writable
-    // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
-    TORCH_CHECK(
-        av_frame_is_writable(src_frame),
-        "Internal Error: frame is not writable.");
-
-    memcpy(src_frame->data[0], chunk.data_ptr(), byte_size);
-    src_frame->nb_samples = num_frames;
-    process_frame(src_frame);
-    src_frame->pts += av_rescale_q(num_frames, time_base, codec_ctx->time_base);
+  for (const auto& frame : converter.convert(waveform)) {
+    process_frame(frame);
+    frame->pts +=
+        av_rescale_q(frame->nb_samples, time_base, codec_ctx->time_base);
   }
 }
 
