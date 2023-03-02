@@ -18,6 +18,38 @@ case "$(uname -s)" in
     *) os=Linux
 esac
 
+function install_117 {
+    echo "Installing CUDA 11.7 and CuDNN 8.5 and NCCL 2.14"
+    rm -rf /usr/local/cuda-11.7 /usr/local/cuda
+    # install CUDA 11.7.0 in the same container
+    wget -q https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda_11.7.0_515.43.04_linux.run
+    chmod +x cuda_11.7.0_515.43.04_linux.run
+    ./cuda_11.7.0_515.43.04_linux.run --toolkit --silent
+    rm -f cuda_11.7.0_515.43.04_linux.run
+    rm -f /usr/local/cuda
+    ln -s /usr/local/cuda-11.7 /usr/local/cuda
+
+    # cuDNN license: https://developer.nvidia.com/cudnn/license_agreement
+    mkdir tmp_cudnn && cd tmp_cudnn
+    wget -q https://ossci-linux.s3.amazonaws.com/cudnn-linux-x86_64-8.5.0.96_cuda11-archive.tar.xz -O cudnn-linux-x86_64-8.5.0.96_cuda11-archive.tar.xz
+    tar xf cudnn-linux-x86_64-8.5.0.96_cuda11-archive.tar.xz
+    cp -a cudnn-linux-x86_64-8.5.0.96_cuda11-archive/include/* /usr/local/cuda/include/
+    cp -a cudnn-linux-x86_64-8.5.0.96_cuda11-archive/lib/* /usr/local/cuda/lib64/
+    cd ..
+    rm -rf tmp_cudnn
+    ldconfig
+
+    # NCCL license: https://docs.nvidia.com/deeplearning/nccl/#licenses
+    mkdir tmp_nccl && cd tmp_nccl
+    wget -q https://developer.download.nvidia.com/compute/redist/nccl/v2.14/nccl_2.14.3-1+cuda11.7_x86_64.txz
+    tar xf nccl_2.14.3-1+cuda11.7_x86_64.txz
+    cp -a nccl_2.14.3-1+cuda11.7_x86_64/include/* /usr/local/cuda/include/
+    cp -a nccl_2.14.3-1+cuda11.7_x86_64/lib/* /usr/local/cuda/lib64/
+    cd ..
+    rm -rf tmp_nccl
+    ldconfig
+}
+
 # 0. Activate conda env
 eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 conda activate "${env_dir}"
@@ -34,6 +66,8 @@ else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
     export CUDATOOLKIT_CHANNEL="nvidia"
     cudatoolkit="pytorch-cuda=${version}"
+
+    install_117
 fi
 
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
