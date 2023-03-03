@@ -59,17 +59,13 @@ AVFramePtr get_video_frame(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
 VideoOutputStream::VideoOutputStream(
     AVFormatContext* format_ctx,
     AVPixelFormat src_fmt,
-    AVCodecContextPtr&& codec_ctx_,
-    AVBufferRefPtr&& hw_device_ctx_,
-    AVBufferRefPtr&& hw_frame_ctx_)
+    AVCodecContextPtr&& codec_ctx_)
     : OutputStream(
           format_ctx,
           codec_ctx_,
           get_video_filter(src_fmt, codec_ctx_)),
       buffer(get_video_frame(src_fmt, codec_ctx_)),
       converter(buffer),
-      hw_device_ctx(std::move(hw_device_ctx_)),
-      hw_frame_ctx(std::move(hw_frame_ctx_)),
       codec_ctx(std::move(codec_ctx_)) {}
 
 void VideoOutputStream::write_chunk(const torch::Tensor& frames) {
