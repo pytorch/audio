@@ -5,6 +5,7 @@
 namespace torchaudio::io {
 
 struct VideoOutputStream : OutputStream {
+  AVFramePtr buffer;
   VideoTensorConverter converter;
   AVBufferRefPtr hw_device_ctx;
   AVBufferRefPtr hw_frame_ctx;
