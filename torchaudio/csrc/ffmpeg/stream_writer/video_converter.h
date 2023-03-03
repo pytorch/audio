@@ -17,15 +17,13 @@ class VideoTensorConverter {
   using InitFunc = std::function<torch::Tensor(const torch::Tensor&)>;
 
  private:
-  enum AVPixelFormat src_fmt;
-  AVCodecContext* codec_ctx;
-  AVFramePtr buffer;
+  AVFrame* buffer;
 
   InitFunc init_func{};
   SlicingTensorConverter::ConvertFunc convert_func{};
 
  public:
-  VideoTensorConverter(enum AVPixelFormat src_fmt, AVCodecContext* codec_ctx);
+  explicit VideoTensorConverter(AVFrame* buffer);
   SlicingTensorConverter convert(const torch::Tensor& frames);
 };
 } // namespace torchaudio::io
