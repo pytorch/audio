@@ -342,6 +342,56 @@ AVCodecContextPtr get_audio_codec(
   return ctx;
 }
 
+void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
+  torch::Device device{hw_accel};
+  TORCH_CHECK(
+      device.type() == c10::DeviceType::CUDA,
+      "Only CUDA is supported for hardware acceleration. Found: ",
+      device.str());
+
+  // NOTES:
+  // 1. Examples like
+  // https://ffmpeg.org/doxygen/4.1/hw_decode_8c-example.html#a9 wraps the HW
+  // device context and the HW frames context with av_buffer_ref. This
+  // increments the reference counting and the resource won't be automatically
+  // dallocated at the time AVCodecContex is destructed. (We will need to
+  // decrement once ourselves), so we do not do it. When adding support to share
+  // context objects, this needs to be reviewed.
+  //
+  // 2. When encoding, it is technically not necessary to attach HW device
+  // context to AVCodecContext. But this way, it will be deallocated
+  // automatically at the time AVCodecContext is freed, so we do that.
+
+  int ret = av_hwdevice_ctx_create(
+      &ctx->hw_device_ctx,
+      AV_HWDEVICE_TYPE_CUDA,
+      std::to_string(device.index()).c_str(),
+      nullptr,
+      0);
+  TORCH_CHECK(
+      ret >= 0, "Failed to create CUDA device context: ", av_err2string(ret));
+  assert(ctx->hw_device_ctx);
+
+  ctx->sw_pix_fmt = ctx->pix_fmt;
+  ctx->pix_fmt = AV_PIX_FMT_CUDA;
+
+  ctx->hw_frames_ctx = av_hwframe_ctx_alloc(ctx->hw_device_ctx);
+  TORCH_CHECK(ctx->hw_frames_ctx, "Failed to create CUDA frame context.");
+
+  auto frames_ctx = (AVHWFramesContext*)(ctx->hw_frames_ctx->data);
+  frames_ctx->format = ctx->pix_fmt;
+  frames_ctx->sw_format = ctx->sw_pix_fmt;
+  frames_ctx->width = ctx->width;
+  frames_ctx->height = ctx->height;
+  frames_ctx->initial_pool_size = 5;
+
+  ret = av_hwframe_ctx_init(ctx->hw_frames_ctx);
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to initialize CUDA frame context: ",
+      av_err2string(ret));
+}
+
 AVCodecContextPtr get_video_codec(
     AVFORMAT_CONST AVOutputFormat* oformat,
     double frame_rate,
@@ -350,59 +400,18 @@ AVCodecContextPtr get_video_codec(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<std::string>& hw_accel,
-    AVBufferRefPtr& hw_device_ctx,
-    AVBufferRefPtr& hw_frame_ctx) {
+    const c10::optional<std::string>& hw_accel) {
   AVCodecContextPtr ctx = get_codec_ctx(AVMEDIA_TYPE_VIDEO, oformat, encoder);
   configure_video_codec(ctx, frame_rate, width, height, encoder_format);
 
   if (hw_accel) {
-#ifndef USE_CUDA
+#ifdef USE_CUDA
+    configure_hw_accel(ctx, hw_accel.value());
+#else
     TORCH_CHECK(
         false,
-        "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
-#else
-    torch::Device device{hw_accel.value()};
-    TORCH_CHECK(
-        device.type() == c10::DeviceType::CUDA,
-        "Only CUDA is supported for hardware acceleration. Found: ",
-        device.str());
-
-    AVBufferRef* device_ctx = nullptr;
-    int ret = av_hwdevice_ctx_create(
-        &device_ctx,
-        AV_HWDEVICE_TYPE_CUDA,
-        std::to_string(device.index()).c_str(),
-        nullptr,
-        0);
-    TORCH_CHECK(
-        ret >= 0, "Failed to create CUDA device context: ", av_err2string(ret));
-    hw_device_ctx.reset(device_ctx);
-
-    AVBufferRef* frames_ref = av_hwframe_ctx_alloc(device_ctx);
-    TORCH_CHECK(frames_ref, "Failed to create CUDA frame context.");
-    hw_frame_ctx.reset(frames_ref);
-
-    AVHWFramesContext* frames_ctx = (AVHWFramesContext*)(frames_ref->data);
-    frames_ctx->format = AV_PIX_FMT_CUDA;
-    frames_ctx->sw_format = ctx->pix_fmt;
-    frames_ctx->width = ctx->width;
-    frames_ctx->height = ctx->height;
-    frames_ctx->initial_pool_size = 20;
-    ctx->sw_pix_fmt = ctx->pix_fmt;
-    ctx->pix_fmt = AV_PIX_FMT_CUDA;
-
-    ret = av_hwframe_ctx_init(frames_ref);
-    TORCH_CHECK(
-        ret >= 0,
-        "Failed to initialize CUDA frame context: ",
-        av_err2string(ret));
-
-    ctx->hw_frames_ctx = av_buffer_ref(frames_ref);
-    TORCH_CHECK(
-        ctx->hw_frames_ctx,
-        "Failed to attach CUDA frames to encoding context: ",
-        av_err2string(ret));
+        "torchaudio is not compiled with CUDA support. ",
+        "Hardware acceleration is not available.");
 #endif
   }
 
@@ -478,27 +487,18 @@ void StreamWriter::add_video_stream(
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel) {
-  AVBufferRefPtr hw_device_ctx{};
-  AVBufferRefPtr hw_frame_ctx{};
-
-  AVCodecContextPtr ctx = get_video_codec(
-      pFormatContext->oformat,
-      frame_rate,
-      width,
-      height,
-      encoder,
-      encoder_option,
-      encoder_format,
-      hw_accel,
-      hw_device_ctx,
-      hw_frame_ctx);
-
   streams.emplace_back(std::make_unique<VideoOutputStream>(
       pFormatContext,
       get_src_pixel_fmt(format),
-      std::move(ctx),
-      std::move(hw_device_ctx),
-      std::move(hw_frame_ctx)));
+      get_video_codec(
+          pFormatContext->oformat,
+          frame_rate,
+          width,
+          height,
+          encoder,
+          encoder_option,
+          encoder_format,
+          hw_accel)));
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {

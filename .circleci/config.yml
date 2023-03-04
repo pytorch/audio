@@ -690,6 +690,7 @@ jobs:
           environment:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS: true
           command: |
             docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
