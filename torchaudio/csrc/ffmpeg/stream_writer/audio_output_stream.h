@@ -5,8 +5,8 @@
 namespace torchaudio::io {
 
 struct AudioOutputStream : OutputStream {
+  AVFramePtr buffer;
   AudioTensorConverter converter;
-  int64_t frame_capacity;
   AVCodecContextPtr codec_ctx;
 
   AudioOutputStream(

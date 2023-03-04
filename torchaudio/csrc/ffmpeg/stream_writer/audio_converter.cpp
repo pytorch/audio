@@ -4,34 +4,9 @@ namespace torchaudio::io {
 
 namespace {
 
-AVFramePtr get_audio_frame(
-    AVSampleFormat src_fmt,
-    AVCodecContext* codec_ctx,
-    int default_frame_size) {
-  AVFramePtr frame{};
-  frame->pts = 0;
-  frame->format = src_fmt;
-  frame->channel_layout = codec_ctx->channel_layout;
-  frame->sample_rate = codec_ctx->sample_rate;
-  frame->nb_samples =
-      codec_ctx->frame_size ? codec_ctx->frame_size : default_frame_size;
-  if (frame->nb_samples) {
-    int ret = av_frame_get_buffer(frame, 0);
-    TORCH_CHECK(
-        ret >= 0,
-        "Error allocating an audio buffer (",
-        av_err2string(ret),
-        ").");
-  }
-  return frame;
-}
-
-void validate_audio_input(
-    enum AVSampleFormat fmt,
-    AVCodecContext* ctx,
-    const torch::Tensor& t) {
+void validate_audio_input(AVFrame* buffer, const torch::Tensor& t) {
   auto dtype = t.dtype().toScalarType();
-  switch (fmt) {
+  switch (static_cast<AVSampleFormat>(buffer->format)) {
     case AV_SAMPLE_FMT_U8:
       TORCH_CHECK(
           dtype == c10::ScalarType::Byte, "Expected Tensor of uint8 type.");
@@ -65,9 +40,9 @@ void validate_audio_input(
   TORCH_CHECK(t.dim() == 2, "Input Tensor has to be 2D.");
   const auto num_channels = t.size(1);
   TORCH_CHECK(
-      num_channels == ctx->channels,
+      num_channels == buffer->channels,
       "Expected waveform with ",
-      ctx->channels,
+      buffer->channels,
       " channels. Found ",
       num_channels);
 }
@@ -87,18 +62,13 @@ void convert_func_(const torch::Tensor& chunk, AVFrame* buffer) {
 } // namespace
 
 AudioTensorConverter::AudioTensorConverter(
-    enum AVSampleFormat src_fmt_,
-    AVCodecContext* codec_ctx_,
-    int default_frame_size)
-    : src_fmt(src_fmt_),
-      codec_ctx(codec_ctx_),
-      buffer(get_audio_frame(src_fmt_, codec_ctx_, default_frame_size)),
-      buffer_size(buffer->nb_samples),
-      convert_func(convert_func_) {}
+    AVFrame* buffer_,
+    const int64_t buffer_size_)
+    : buffer(buffer_), buffer_size(buffer_size_), convert_func(convert_func_) {}
 
 SlicingTensorConverter AudioTensorConverter::convert(
     const torch::Tensor& frames) {
-  validate_audio_input(src_fmt, codec_ctx, frames);
+  validate_audio_input(buffer, frames);
   return SlicingTensorConverter{
       frames.contiguous(),
       buffer,
