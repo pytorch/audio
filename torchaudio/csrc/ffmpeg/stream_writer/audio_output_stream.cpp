@@ -29,6 +29,28 @@ FilterGraph get_audio_filter(
   return p;
 }
 
+AVFramePtr get_audio_frame(
+    AVSampleFormat src_fmt,
+    AVCodecContext* codec_ctx,
+    int default_frame_size = 10000) {
+  AVFramePtr frame{};
+  frame->pts = 0;
+  frame->format = src_fmt;
+  frame->channel_layout = codec_ctx->channel_layout;
+  frame->sample_rate = codec_ctx->sample_rate;
+  frame->nb_samples =
+      codec_ctx->frame_size ? codec_ctx->frame_size : default_frame_size;
+  if (frame->nb_samples) {
+    int ret = av_frame_get_buffer(frame, 0);
+    TORCH_CHECK(
+        ret >= 0,
+        "Error allocating an audio buffer (",
+        av_err2string(ret),
+        ").");
+  }
+  return frame;
+}
+
 } // namespace
 
 AudioOutputStream::AudioOutputStream(
@@ -39,7 +61,8 @@ AudioOutputStream::AudioOutputStream(
           format_ctx,
           codec_ctx_,
           get_audio_filter(src_fmt, codec_ctx_)),
-      converter(src_fmt, codec_ctx_),
+      buffer(get_audio_frame(src_fmt, codec_ctx_)),
+      converter(buffer, buffer->nb_samples),
       codec_ctx(std::move(codec_ctx_)) {}
 
 void AudioOutputStream::write_chunk(const torch::Tensor& waveform) {

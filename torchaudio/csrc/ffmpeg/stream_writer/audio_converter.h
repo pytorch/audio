@@ -11,17 +11,12 @@ namespace torchaudio::io {
 // conversion process (InitFunc and ConvertFunc) based on the input sample
 // format information, and own them.
 class AudioTensorConverter {
-  enum AVSampleFormat src_fmt;
-  AVCodecContext* codec_ctx;
-  AVFramePtr buffer;
+  AVFrame* buffer;
   const int64_t buffer_size;
   SlicingTensorConverter::ConvertFunc convert_func;
 
  public:
-  AudioTensorConverter(
-      enum AVSampleFormat src_fmt,
-      AVCodecContext* codec_ctx,
-      int default_frame_size = 10000);
+  AudioTensorConverter(AVFrame* buffer, const int64_t buffer_size);
   SlicingTensorConverter convert(const torch::Tensor& frames);
 };
 } // namespace torchaudio::io
