@@ -10,6 +10,11 @@ Overview
 
 :mod:`torchaudio.backend` module provides implementations for audio file I/O functionalities, which are ``torchaudio.info``, ``torchaudio.load``, and ``torchaudio.save``.
 
+.. note::
+   Release 2.1 will revise ``torchaudio.info``, ``torchaudio.load``, and ``torchaudio.save`` to allow for backend selection via function parameter rather than ``torchaudio.set_audio_backend``, with FFmpeg being the default backend.
+   The new logic can be enabled in the current release by setting environment variable ``TORCHAUDIO_USE_BACKEND_DISPATCHER=1``.
+   See :ref:`future_api` for details on the new API.
+
 There are currently two implementations available.
 
 * :py:mod:`"sox_io" <torchaudio.backends.sox_io_backend>` (default on Linux/macOS)
