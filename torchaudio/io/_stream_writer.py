@@ -109,9 +109,8 @@ class StreamWriter:
         format: Optional[str] = None,
         buffer_size: int = 4096,
     ):
-        torch._C._log_api_usage_once("torchaudio.io.StreamWriter")
         if isinstance(dst, str):
-            self._s = torch.classes.torchaudio.ffmpeg_StreamWriter(dst, format)
+            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriter(dst, format)
         elif hasattr(dst, "write"):
             self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
         else:

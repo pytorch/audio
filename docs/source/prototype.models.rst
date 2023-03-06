@@ -4,108 +4,38 @@ torchaudio.prototype.models
 .. py:module:: torchaudio.prototype.models
 .. currentmodule:: torchaudio.prototype.models
 
-conformer_rnnt_model
-~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: conformer_rnnt_model
+The ``torchaudio.prototype.models`` subpackage contains definitions of models for addressing common audio tasks.
 
-conformer_rnnt_base
-~~~~~~~~~~~~~~~~~~~
+.. note::
+   For models with pre-trained parameters, please refer to :mod:`torchaudio.prototype.pipelines` module.
 
-.. autofunction:: conformer_rnnt_base
+Model defintions are responsible for constructing computation graphs and executing them.
 
-emformer_hubert_model
-~~~~~~~~~~~~~~~~~~~~~
+Some models have complex structure and variations.
+For such models, factory functions are provided.
 
-.. autofunction:: emformer_hubert_model
+.. autosummary::
+  :toctree: generated
+  :nosignatures:
+  :template: autosummary/prototype_model_class.rst
 
-emformer_hubert_base
-~~~~~~~~~~~~~~~~~~~~
+  ConformerWav2Vec2PretrainModel
+  ConvEmformer
+  HiFiGANVocoder
+  SquimObjective
 
-.. autofunction:: emformer_hubert_base
+Prototype Factory Functions of Beta Models
+==========================================
 
-ConvEmformer
-~~~~~~~~~~~~
+.. currentmodule:: torchaudio.models
 
-.. autoclass:: ConvEmformer
+Some model definitions are in beta, but there are new factory functions that are still in prototype. Please check "Prototype Factory Functions" section in each model.
 
-  .. automethod:: forward
+.. autosummary::
+  :toctree: generated
+  :nosignatures:
+  :template: autosummary/model_class.rst
 
-  .. automethod:: infer
-
-ConformerWav2Vec2PretrainModel
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: ConformerWav2Vec2PretrainModel
-
-  .. automethod:: forward
-
-conformer_wav2vec2_model
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_model
-
-conformer_wav2vec2_base
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_base
-
-conformer_wav2vec2_pretrain_model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_pretrain_model
-
-conformer_wav2vec2_pretrain_base
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_pretrain_base
-
-conformer_wav2vec2_pretrain_large
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: conformer_wav2vec2_pretrain_large
-
-HiFiGANVocoder
-~~~~~~~~~~~~~~
-
-.. autoclass:: HiFiGANVocoder
-
-  .. automethod:: forward
-
-hifigan_vocoder
-~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder
-
-hifigan_vocoder_v1
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder_v1
-
-hifigan_vocoder_v2
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder_v2
-
-hifigan_vocoder_v3
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: hifigan_vocoder_v3
-
-
-SQUIM_OBJECTIVE
-~~~~~~~~~~~~~~~
-
-.. autoclass:: SQUIM_OBJECTIVE
-
-  .. automethod:: forward
-
-squim_objective_model
-~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: squim_objective_model
-
-squim_objective_base
-~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: squim_objective_base
+  Wav2Vec2Model
+  RNNT

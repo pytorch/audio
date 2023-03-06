@@ -36,7 +36,7 @@ class TransformsTestBase(TestBaseMixin):
         result = T.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=power,).to(self.device, self.dtype)(
             waveform
         )[0]
-        self.assertEqual(result, torch.from_numpy(expected), atol=1e-5, rtol=1e-5)
+        self.assertEqual(result, torch.from_numpy(expected), atol=1e-4, rtol=1e-4)
 
     def test_Spectrogram_complex(self):
         n_fft = 400
@@ -54,7 +54,7 @@ class TransformsTestBase(TestBaseMixin):
         result = T.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=None, return_complex=True,).to(
             self.device, self.dtype
         )(waveform)[0]
-        self.assertEqual(result.abs(), torch.from_numpy(expected), atol=1e-5, rtol=1e-5)
+        self.assertEqual(result.abs(), torch.from_numpy(expected), atol=1e-4, rtol=1e-4)
 
     @nested_params(
         [

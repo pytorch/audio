@@ -52,6 +52,7 @@ AVFormatContext* get_input_format_context(
 } // namespace
 
 StreamReader::StreamReader(AVFormatContext* p) : pFormatContext(p) {
+  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReader");
   int ret = avformat_find_stream_info(pFormatContext, nullptr);
   TORCH_CHECK(
       ret >= 0, "Failed to find stream information: ", av_err2string(ret));
@@ -128,7 +129,7 @@ OptionDict parse_metadata(const AVDictionary* metadata) {
   AVDictionaryEntry* tag = nullptr;
   OptionDict ret;
   while ((tag = av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
-    ret.insert(std::string(tag->key), std::string(tag->value));
+    ret.emplace(std::string(tag->key), std::string(tag->value));
   }
   return ret;
 }
@@ -420,6 +421,39 @@ int StreamReader::process_packet_block(double timeout, double backoff) {
     //
     std::this_thread::sleep_for(sleep);
   }
+}
+
+void StreamReader::process_all_packets() {
+  int64_t ret = 0;
+  do {
+    ret = process_packet();
+  } while (!ret);
+}
+
+int StreamReader::process_packet(
+    const c10::optional<double>& timeout,
+    const double backoff) {
+  int code = [&]() -> int {
+    if (timeout.has_value()) {
+      return process_packet_block(timeout.value(), backoff);
+    }
+    return process_packet();
+  }();
+  TORCH_CHECK(
+      code >= 0, "Failed to process a packet. (" + av_err2string(code) + "). ");
+  return code;
+}
+
+int StreamReader::fill_buffer(
+    const c10::optional<double>& timeout,
+    const double backoff) {
+  while (!is_buffer_ready()) {
+    int code = process_packet(timeout, backoff);
+    if (code != 0) {
+      return code;
+    }
+  }
+  return 0;
 }
 
 // <0: Some error happened.

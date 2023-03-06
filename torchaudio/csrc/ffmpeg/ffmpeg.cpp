@@ -14,8 +14,8 @@ namespace io {
 AVDictionary* get_option_dict(const c10::optional<OptionDict>& option) {
   AVDictionary* opt = nullptr;
   if (option) {
-    for (const auto& it : option.value()) {
-      av_dict_set(&opt, it.key().c_str(), it.value().c_str(), 0);
+    for (auto const& [key, value] : option.value()) {
+      av_dict_set(&opt, key.c_str(), value.c_str(), 0);
     }
   }
   return opt;

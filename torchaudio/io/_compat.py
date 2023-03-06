@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import BinaryIO, Dict, Optional, Tuple, Union
+from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -9,31 +9,12 @@ from torchaudio.io import StreamWriter
 
 
 # Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
-def _info_audio(
-    s: torch.classes.torchaudio.ffmpeg_StreamReader,
-):
-    i = s.find_best_audio_stream()
-    sinfo = s.get_src_stream_info(i)
-    if sinfo[5] == 0:
-        waveform, _ = _load_audio(s)
-        num_frames = waveform.size(1)
-    else:
-        num_frames = sinfo[5]
-    return AudioMetaData(
-        int(sinfo[8]),
-        num_frames,
-        sinfo[9],
-        sinfo[6],
-        sinfo[1].upper(),
-    )
-
-
 def info_audio(
     src: str,
     format: Optional[str],
 ) -> AudioMetaData:
-    s = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, None)
-    return _info_audio(s)
+    i = torch.ops.torchaudio.compat_info(src, format)
+    return AudioMetaData(i[0], i[1], i[2], i[3], i[4].upper())
 
 
 def info_audio_fileobj(
@@ -42,7 +23,20 @@ def info_audio_fileobj(
     buffer_size: int = 4096,
 ) -> AudioMetaData:
     s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
-    return _info_audio(s)
+    i = s.find_best_audio_stream()
+    sinfo = s.get_src_stream_info(i)
+    if sinfo.num_frames == 0:
+        waveform = _load_audio_fileobj(s)
+        num_frames = waveform.size(1)
+    else:
+        num_frames = sinfo.num_frames
+    return AudioMetaData(
+        int(sinfo.sample_rate),
+        num_frames,
+        sinfo.num_channels,
+        sinfo.bits_per_sample,
+        sinfo.codec_name.upper(),
+    )
 
 
 def _get_load_filter(
@@ -72,28 +66,19 @@ def _get_load_filter(
     return "{},{}".format(atrim, aformat)
 
 
-# Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
-def _load_audio(
-    s: torch.classes.torchaudio.ffmpeg_StreamReader,
-    frame_offset: int = 0,
-    num_frames: int = -1,
-    convert: bool = True,
+def _load_audio_fileobj(
+    s: torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj,
+    filter: Optional[str] = None,
     channels_first: bool = True,
-) -> Tuple[torch.Tensor, int]:
+) -> torch.Tensor:
     i = s.find_best_audio_stream()
-    sinfo = s.get_src_stream_info(i)
-    sample_rate = int(sinfo[8])
-    option: Dict[str, str] = {}
-    s.add_audio_stream(i, -1, -1, _get_load_filter(frame_offset, num_frames, convert), None, option)
+    s.add_audio_stream(i, -1, -1, filter, None, None)
     s.process_all_packets()
     chunk = s.pop_chunks()[0]
     if chunk is None:
         raise RuntimeError("Failed to decode audio.")
-    assert chunk is not None
-    waveform = chunk[0]
-    if channels_first:
-        waveform = waveform.T
-    return waveform, sample_rate
+    waveform = chunk.frames
+    return waveform.T if channels_first else waveform
 
 
 def load_audio(
@@ -104,8 +89,8 @@ def load_audio(
     channels_first: bool = True,
     format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
-    s = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, None)
-    return _load_audio(s, frame_offset, num_frames, convert, channels_first)
+    filter = _get_load_filter(frame_offset, num_frames, convert)
+    return torch.ops.torchaudio.compat_load(src, format, filter, channels_first)
 
 
 def load_audio_fileobj(
@@ -118,7 +103,10 @@ def load_audio_fileobj(
     buffer_size: int = 4096,
 ) -> Tuple[torch.Tensor, int]:
     s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
-    return _load_audio(s, frame_offset, num_frames, convert, channels_first)
+    sample_rate = int(s.get_src_stream_info(s.find_best_audio_stream()).sample_rate)
+    filter = _get_load_filter(frame_offset, num_frames, convert)
+    waveform = _load_audio_fileobj(s, filter, channels_first)
+    return waveform, sample_rate
 
 
 def _get_sample_format(dtype: torch.dtype) -> str:

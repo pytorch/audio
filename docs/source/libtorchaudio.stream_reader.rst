@@ -76,11 +76,19 @@ seek
 
 process_packet
 ^^^^^^^^^^^^^^
-.. doxygenfunction:: torchaudio::io::StreamReader::process_packet
+.. doxygenfunction:: torchaudio::io::StreamReader::process_packet()
 
 process_packet_block
 ^^^^^^^^^^^^^^^^^^^^
 .. doxygenfunction:: torchaudio::io::StreamReader::process_packet_block
+
+process_all_packets
+^^^^^^^^^^^^^^^^^^^
+.. doxygenfunction:: torchaudio::io::StreamReader::process_all_packets
+
+fill_buffer
+^^^^^^^^^^^
+.. doxygenfunction:: torchaudio::io::StreamReader::fill_buffer
 
 Retrieval Methods
 -----------------

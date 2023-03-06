@@ -142,6 +142,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         self.assertEqual(found, expected)
 
 
+@skipIfNoExec("sox")
 @skipIfNoExec("ffmpeg")
 @skipIfNoFFmpeg
 class SaveTest(SaveTestBase):
@@ -332,6 +333,7 @@ class SaveTest(SaveTestBase):
         self.assert_save_consistency("wav", encoding="PCM_S", bits_per_sample=16, num_channels=num_channels)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `self._save`"""
@@ -378,6 +380,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         self.assertEqual(data, expected)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestSaveNonExistingDirectory(PytorchTestCase):
     _save = partial(get_save_func(), backend="ffmpeg")

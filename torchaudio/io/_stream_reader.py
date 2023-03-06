@@ -103,70 +103,44 @@ class SourceVideoStream(SourceStream):
     """Frame rate."""
 
 
-# Indices of SrcInfo returned by low-level `get_src_stream_info`
-# - COMMON
-_MEDIA_TYPE = 0
-_CODEC = 1
-_CODEC_LONG = 2
-_FORMAT = 3
-_BIT_RATE = 4
-_NUM_FRAMES = 5
-_BPS = 6
-_METADATA = 7
-# - AUDIO
-_SAMPLE_RATE = 8
-_NUM_CHANNELS = 9
-# - VIDEO
-_WIDTH = 10
-_HEIGHT = 11
-_FRAME_RATE = 12
-
-
 def _parse_si(i):
-    media_type = i[_MEDIA_TYPE]
-    codec_name = i[_CODEC]
-    codec_long_name = i[_CODEC_LONG]
-    fmt = i[_FORMAT]
-    bit_rate = i[_BIT_RATE]
-    num_frames = i[_NUM_FRAMES]
-    bps = i[_BPS]
-    metadata = i[_METADATA]
+    media_type = i.media_type
     if media_type == "audio":
         return SourceAudioStream(
-            media_type=media_type,
-            codec=codec_name,
-            codec_long_name=codec_long_name,
-            format=fmt,
-            bit_rate=bit_rate,
-            num_frames=num_frames,
-            bits_per_sample=bps,
-            metadata=metadata,
-            sample_rate=i[_SAMPLE_RATE],
-            num_channels=i[_NUM_CHANNELS],
+            media_type=i.media_type,
+            codec=i.codec_name,
+            codec_long_name=i.codec_long_name,
+            format=i.format,
+            bit_rate=i.bit_rate,
+            num_frames=i.num_frames,
+            bits_per_sample=i.bits_per_sample,
+            metadata=i.metadata,
+            sample_rate=i.sample_rate,
+            num_channels=i.num_channels,
         )
     if media_type == "video":
         return SourceVideoStream(
-            media_type=media_type,
-            codec=codec_name,
-            codec_long_name=codec_long_name,
-            format=fmt,
-            bit_rate=bit_rate,
-            num_frames=num_frames,
-            bits_per_sample=bps,
-            metadata=metadata,
-            width=i[_WIDTH],
-            height=i[_HEIGHT],
-            frame_rate=i[_FRAME_RATE],
+            media_type=i.media_type,
+            codec=i.codec_name,
+            codec_long_name=i.codec_long_name,
+            format=i.format,
+            bit_rate=i.bit_rate,
+            num_frames=i.num_frames,
+            bits_per_sample=i.bits_per_sample,
+            metadata=i.metadata,
+            width=i.width,
+            height=i.height,
+            frame_rate=i.frame_rate,
         )
     return SourceStream(
-        media_type=media_type,
-        codec=codec_name,
-        codec_long_name=codec_long_name,
+        media_type=i.media_type,
+        codec=i.codec_name,
+        codec_long_name=i.codec_long_name,
         format=None,
         bit_rate=None,
         num_frames=None,
         bits_per_sample=None,
-        metadata=metadata,
+        metadata=i.metadata,
     )
 
 
@@ -180,10 +154,6 @@ class OutputStream:
     """Index of the source stream that this output stream is connected."""
     filter_description: str
     """Description of filter graph applied to the source stream."""
-
-
-def _parse_oi(i):
-    return OutputStream(i[0], i[1])
 
 
 def _get_afilter_desc(sample_rate: Optional[int], fmt: Optional[str]):
@@ -388,7 +358,7 @@ class StreamReader:
     For the detailed usage of this class, please refer to the tutorial.
 
     Args:
-        src (str, file-like object or Tensor): The media source.
+        src (str, file-like object): The media source.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. This includes a file path, URL, device identifier or
             filter expression. The supported value depends on the FFmpeg found
@@ -400,9 +370,6 @@ class StreamReader:
             the method when parsing media metadata. This improves the reliability
             of codec detection. The signagure of `seek` method must be
             `seek(offset: int, whence: int) -> int`.
-
-            If Tensor, it is interpreted as byte buffer.
-            It must be one-dimensional, of type ``torch.uint8``.
 
             Please refer to the following for the expected signature and behavior
             of `read` and `seek` method.
@@ -462,11 +429,8 @@ class StreamReader:
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
     ):
-        torch._C._log_api_usage_once("torchaudio.io.StreamReader")
         if isinstance(src, str):
-            self._be = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, option)
-        elif isinstance(src, torch.Tensor):
-            self._be = torch.classes.torchaudio.ffmpeg_StreamReaderTensor(src, format, option, buffer_size)
+            self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReader(src, format, option)
         elif hasattr(src, "read"):
             self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
@@ -538,7 +502,8 @@ class StreamReader:
         Returns:
             OutputStream
         """
-        return _parse_oi(self._be.get_out_stream_info(i))
+        info = self._be.get_out_stream_info(i)
+        return OutputStream(info.source_index, info.filter_description)
 
     def seek(self, timestamp: float, mode: str = "precise"):
         """Seek the stream to the given timestamp [second]
@@ -848,7 +813,7 @@ class StreamReader:
             if chunk is None:
                 ret.append(None)
             else:
-                ret.append(ChunkTensor(chunk[0], chunk[1]))
+                ret.append(ChunkTensor(chunk.frames, chunk.pts))
         return ret
 
     def fill_buffer(self, timeout: Optional[float] = None, backoff: float = 10.0) -> int:
