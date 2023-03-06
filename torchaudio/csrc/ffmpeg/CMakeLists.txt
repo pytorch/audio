@@ -16,14 +16,10 @@ set(
   stream_reader/sink.cpp
   stream_reader/stream_processor.cpp
   stream_reader/stream_reader.cpp
+  stream_writer/encode_process.cpp
   stream_writer/encoder.cpp
-  stream_writer/converter.cpp
-  stream_writer/output_stream.cpp
-  stream_writer/audio_converter.cpp
-  stream_writer/audio_output_stream.cpp
-  stream_writer/video_converter.cpp
-  stream_writer/video_output_stream.cpp
   stream_writer/stream_writer.cpp
+  stream_writer/tensor_converter.cpp
   compat.cpp
   utils.cpp
   )
