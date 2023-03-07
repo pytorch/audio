@@ -16,6 +16,7 @@ class StreamWriter {
   AVBufferRefPtr pHWBufferRef;
   std::vector<EncodeProcess> processes;
   AVPacketPtr pkt;
+  bool is_open = false;
 
  protected:
   /// @cond
