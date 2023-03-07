@@ -130,6 +130,8 @@ def parse_args():
         help="learning rate exponential decay constant",
     )
     parser.add_argument("--momentum", default=0.8, type=float, metavar="M", help="momentum")
+    parser.add_argument("--beta_1", default=0.9, type=float, metavar="BETA_1", help="beta_1")
+    parser.add_argument("--beta_2", default=0.999, type=float, metavar="BETA_2", help="beta_2")
     parser.add_argument("--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay")
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
@@ -472,15 +474,17 @@ def main(rank, args):
         optimizer = Adam(
             model.parameters(),
             lr=args.learning_rate,
-            momentum=args.momentum,
+            betas=(args.beta_1, args.beta_2),
             weight_decay=args.weight_decay,
+            eps=args.eps,
         )
     elif args.optimizer == "adamw":
         optimizer = AdamW(
             model.parameters(),
             lr=args.learning_rate,
-            momentum=args.momentum,
+            betas=(args.beta_1, args.beta_2),
             weight_decay=args.weight_decay,
+            eps=args.eps,
         )
     else:
         raise ValueError("Selected optimizer not supported")
