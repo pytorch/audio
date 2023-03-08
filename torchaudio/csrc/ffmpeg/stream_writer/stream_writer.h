@@ -3,7 +3,7 @@
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
-#include <torchaudio/csrc/ffmpeg/stream_writer/output_stream.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
 
 namespace torchaudio {
 namespace io {
@@ -14,8 +14,9 @@ namespace io {
 class StreamWriter {
   AVFormatOutputContextPtr pFormatContext;
   AVBufferRefPtr pHWBufferRef;
-  std::vector<std::unique_ptr<OutputStream>> streams;
+  std::vector<EncodeProcess> processes;
   AVPacketPtr pkt;
+  bool is_open = false;
 
  protected:
   /// @cond
@@ -171,9 +172,6 @@ class StreamWriter {
   void write_video_chunk(int i, const torch::Tensor& chunk);
   /// Flush the frames from encoders and write the frames to the destination.
   void flush();
-
- private:
-  void validate_stream(int i, enum AVMediaType);
 };
 
 } // namespace io

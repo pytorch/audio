@@ -76,7 +76,7 @@ seek
 
 process_packet
 ^^^^^^^^^^^^^^
-.. doxygenfunction:: torchaudio::io::StreamReader::process_packet
+.. doxygenfunction:: torchaudio::io::StreamReader::process_packet()
 
 process_packet_block
 ^^^^^^^^^^^^^^^^^^^^

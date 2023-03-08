@@ -246,7 +246,7 @@ with s.open():
 #        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-sdl-demo.mp4">
 #    </video>
 #
-# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`_]
+# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`__]
 #
 
 ######################################################################
@@ -292,7 +292,7 @@ with s.open():
 #        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-rtmp-demo.mp4">
 #    </video>
 #
-# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`_]
+# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`__]
 #
 
 
@@ -324,7 +324,7 @@ with s.open():
 #        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-udp-demo.mp4">
 #    </video>
 #
-# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`_]
+# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`__]
 #
 
 ######################################################################

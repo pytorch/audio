@@ -6,7 +6,14 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from torch import Tensor
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, rnnt_utils, TestBaseMixin
+from torchaudio_unittest.common_utils import (
+    get_spectrogram,
+    get_whitenoise,
+    nested_params,
+    rnnt_utils,
+    TestBaseMixin,
+    use_deterministic_algorithms,
+)
 
 
 class Autograd(TestBaseMixin):
@@ -71,26 +78,30 @@ class Autograd(TestBaseMixin):
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         a.requires_grad = True
-        self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
 
     def test_filtfilt_b(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         b.requires_grad = True
-        self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
 
     def test_filtfilt_all_inputs(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
-        self.assert_grad(F.filtfilt, (x, a, b))
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b))
 
     def test_filtfilt_batching(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([[0.7, 0.2, 0.6], [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9], [0.7, 0.2, 0.6]])
-        self.assert_grad(F.filtfilt, (x, a, b))
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b))
 
     def test_biquad(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=1)
