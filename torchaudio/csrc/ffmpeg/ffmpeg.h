@@ -1,6 +1,6 @@
 // One stop header for all ffmepg needs
 #pragma once
-#include <torch/torch.h>
+#include <torch/types.h>
 #include <cstdint>
 #include <map>
 #include <memory>

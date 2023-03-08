@@ -92,6 +92,22 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         with open(self.get_temp_path(path), "rb") as fileobj:
             return fileobj.read()
 
+    def test_unopened_error(self):
+        """If dst is not opened when attempting to write data, runtime error should be raised"""
+        path = self.get_dst("test.mp4")
+        s = StreamWriter(path, format="mp4")
+        s.set_metadata(metadata={"artist": "torchaudio", "title": self.id()})
+        s.add_audio_stream(sample_rate=16000, num_channels=2)
+        s.add_video_stream(frame_rate=30, width=16, height=16)
+
+        dummy = torch.zeros((3, 2))
+        with self.assertRaises(RuntimeError):
+            s.write_audio_chunk(0, dummy)
+
+        dummy = torch.zeros((3, 3, 16, 16))
+        with self.assertRaises(RuntimeError):
+            s.write_video_chunk(1, dummy)
+
     @skipIfNoModule("tinytag")
     def test_metadata_overwrite(self):
         """When set_metadata is called multiple times, only entries from the last call are saved"""

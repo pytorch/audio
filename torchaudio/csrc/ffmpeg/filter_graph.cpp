@@ -184,8 +184,15 @@ int FilterGraph::get_output_sample_rate() const {
 
 int FilterGraph::get_output_channels() const {
   TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
+  // Since FFmpeg 5.1
+  // https://github.com/FFmpeg/FFmpeg/blob/release/5.1/doc/APIchanges#L45-L54
+#if LIBAVFILTER_VERSION_MAJOR >= 8 && LIBAVFILTER_VERSION_MINOR >= 44
+  return buffersink_ctx->inputs[0]->ch_layout.nb_channels;
+#else
+  // Before FFmpeg 5.1
   return av_get_channel_layout_nb_channels(
       buffersink_ctx->inputs[0]->channel_layout);
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

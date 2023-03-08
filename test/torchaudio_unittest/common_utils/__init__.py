@@ -1,3 +1,4 @@
+from .autograd_utils import use_deterministic_algorithms
 from .backend_utils import set_audio_backend
 from .case_utils import (
     HttpServerMixin,
@@ -66,5 +67,6 @@ __all__ = [
     "get_image",
     "rgb_to_gray",
     "rgb_to_yuv_ccir",
+    "use_deterministic_algorithms",
     "zip_equal",
 ]
