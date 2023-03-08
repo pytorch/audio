@@ -275,17 +275,24 @@ class StreamWriter:
             self._s.close()
             self._is_open = False
 
-    def write_audio_chunk(self, i: int, chunk: torch.Tensor):
+    def write_audio_chunk(self, i: int, chunk: torch.Tensor, pts: Optional[float] = None):
         """Write audio data
 
         Args:
             i (int): Stream index.
             chunk (Tensor): Waveform tensor. Shape: `(frame, channel)`.
                 The ``dtype`` must match what was passed to :py:meth:`add_audio_stream` method.
-        """
-        self._s.write_audio_chunk(i, chunk)
+            pts (float, optional, or None): If provided, overwrite the presentation timestamp.
 
-    def write_video_chunk(self, i: int, chunk: torch.Tensor):
+                .. note::
+
+                   The provided value is converted to integer value expressed in basis of
+                   sample rate. Therefore, it is truncated to the nearest value of
+                   ``n / sample_rate``.
+        """
+        self._s.write_audio_chunk(i, chunk, pts)
+
+    def write_video_chunk(self, i: int, chunk: torch.Tensor, pts: Optional[float] = None):
         """Write video/image data
 
         Args:
@@ -295,8 +302,15 @@ class StreamWriter:
                 The ``dtype`` must be ``torch.uint8``.
                 The shape (height, width and the number of channels) must match
                 what was configured when calling :py:meth:`add_video_stream`
+            pts (float, optional or None): If provided, overwrite the presentation timestamp.
+
+                .. note::
+
+                   The provided value is converted to integer value expressed in basis of
+                   frame rate. Therefore, it is truncated to the nearest value of
+                   ``n / frame_rate``.
         """
-        self._s.write_video_chunk(i, chunk)
+        self._s.write_video_chunk(i, chunk, pts)
 
     def flush(self):
         """Flush the frames from encoders and write the frames to the destination."""

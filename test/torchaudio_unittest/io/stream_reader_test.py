@@ -59,6 +59,7 @@ class ChunkTensorTest(TorchaudioTestCase):
         w.add_audio_stream(8000, 2)
         with w.open():
             w.write_audio_chunk(0, c)
+            w.write_audio_chunk(0, c, c.pts)
 
 
 ################################################################################
