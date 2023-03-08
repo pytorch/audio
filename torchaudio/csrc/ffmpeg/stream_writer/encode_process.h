@@ -39,7 +39,10 @@ class EncodeProcess {
       const c10::optional<std::string>& encoder_format,
       const c10::optional<std::string>& hw_accel);
 
-  void process(AVMediaType type, const torch::Tensor& tensor);
+  void process(
+      AVMediaType type,
+      const torch::Tensor& tensor,
+      const c10::optional<double>& pts);
 
   void process_frame(AVFrame* src);
 

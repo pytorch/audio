@@ -218,8 +218,8 @@ AVFramePtr get_audio_frame(
   AVFramePtr frame{};
   frame->pts = 0;
   frame->format = src_fmt;
-  // note: channels attribute is not required for encoding, but TensorConverter
-  // refers to it
+  // Note: `channels` attribute is not required for encoding, but
+  // TensorConverter refers to it
   frame->channels = num_channels;
   frame->channel_layout = codec_ctx->channel_layout;
   frame->sample_rate = sample_rate;
@@ -461,6 +461,10 @@ AVFramePtr get_video_frame(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
         av_err2string(ret),
         ").");
   }
+  // Note: `nb_samples` attribute is not used for video, but we set it
+  // anyways so that we can make the logic of PTS increment agnostic to
+  // audio and video.
+  frame->nb_samples = 1;
   frame->pts = 0;
   return frame;
 }
@@ -511,7 +515,10 @@ EncodeProcess::EncodeProcess(
       src_frame(get_video_frame(format, codec_ctx)),
       converter(AVMEDIA_TYPE_VIDEO, src_frame) {}
 
-void EncodeProcess::process(AVMediaType type, const torch::Tensor& tensor) {
+void EncodeProcess::process(
+    AVMediaType type,
+    const torch::Tensor& tensor,
+    const c10::optional<double>& pts) {
   TORCH_CHECK(
       codec_ctx->codec_type == type,
       "Attempted to write ",
@@ -519,16 +526,18 @@ void EncodeProcess::process(AVMediaType type, const torch::Tensor& tensor) {
       " to ",
       av_get_media_type_string(codec_ctx->codec_type),
       " stream.");
-
-  AVRational codec_tb = codec_ctx->time_base;
+  if (pts) {
+    AVRational tb = codec_ctx->time_base;
+    auto val = static_cast<int64_t>(std::round(pts.value() * tb.den / tb.num));
+    if (src_frame->pts > val) {
+      TORCH_WARN_ONCE(
+          "The provided PTS value is smaller than the next expected value.");
+    }
+    src_frame->pts = val;
+  }
   for (const auto& frame : converter.convert(tensor)) {
     process_frame(frame);
-    if (type == AVMEDIA_TYPE_VIDEO) {
-      frame->pts += 1;
-    } else {
-      AVRational sr_tb{1, codec_ctx->sample_rate};
-      frame->pts += av_rescale_q(frame->nb_samples, sr_tb, codec_tb);
-    }
+    frame->pts += frame->nb_samples;
   }
 }
 
