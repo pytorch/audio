@@ -20,6 +20,7 @@ StreamProcessor::StreamProcessor(
 KeyType StreamProcessor::add_stream(
     int frames_per_chunk,
     int num_chunks,
+    AVRational frame_rate,
     const c10::optional<std::string>& filter_description,
     const torch::Device& device) {
   switch (stream->codecpar->codec_type) {
@@ -38,6 +39,7 @@ KeyType StreamProcessor::add_stream(
           stream->codecpar,
           frames_per_chunk,
           num_chunks,
+          frame_rate,
           filter_description,
           device));
   return key;
@@ -58,6 +60,11 @@ void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
 ////////////////////////////////////////////////////////////////////////////////
 std::string StreamProcessor::get_filter_description(KeyType key) const {
   return sinks.at(key).get_filter_description();
+}
+
+FilterGraphOutputInfo StreamProcessor::get_filter_output_info(
+    KeyType key) const {
+  return sinks.at(key).get_filter_output_info();
 }
 
 bool StreamProcessor::is_buffer_ready() const {

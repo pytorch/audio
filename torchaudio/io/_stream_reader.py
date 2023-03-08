@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import BinaryIO, Dict, Iterator, Optional, Tuple, Union
+from typing import BinaryIO, Dict, Iterator, Optional, Tuple, TypeVar, Union
 
 import torch
 import torchaudio
@@ -154,6 +154,80 @@ class OutputStream:
     """Index of the source stream that this output stream is connected."""
     filter_description: str
     """Description of filter graph applied to the source stream."""
+    media_type: str
+    """The type of the stream. ``"audio"`` or ``"video"``."""
+    format: str
+    """Media format. Such as ``"s16"`` and ``"yuv420p"``.
+
+    Commonly found audio values are;
+
+    - ``"u8"``, ``"u8p"``: Unsigned 8-bit unsigned interger.
+    - ``"s16"``, ``"s16p"``: 16-bit signed integer.
+    - ``"s32"``, ``"s32p"``: 32-bit signed integer.
+    - ``"flt"``, ``"fltp"``: 32-bit floating-point.
+
+    .. note::
+
+       `p` at the end indicates the format is `planar`.
+       Channels are grouped together instead of interspersed in memory."""
+
+
+@dataclass
+class OutputAudioStream(OutputStream):
+    """Information about an audio output stream configured with
+    :meth:`~torchaudio.io.StreamReader.add_audio_stream` or
+    :meth:`~torchaudio.io.StreamReader.add_basic_audio_stream`.
+
+    In addition to the attributes reported by :class:`OutputStream`,
+    the following attributes are reported.
+    """
+
+    sample_rate: float
+    """Sample rate of the audio."""
+    num_channels: int
+    """Number of channels."""
+
+
+@dataclass
+class OutputVideoStream(OutputStream):
+    """Information about a video output stream configured with
+    :meth:`~torchaudio.io.StreamReader.add_video_stream` or
+    :meth:`~torchaudio.io.StreamReader.add_basic_video_stream`.
+
+    In addition to the attributes reported by :class:`OutputStream`,
+    the following attributes are reported.
+    """
+
+    width: int
+    """Width of the video frame in pixel."""
+    height: int
+    """Height of the video frame in pixel."""
+    frame_rate: float
+    """Frame rate."""
+
+
+def _parse_oi(i):
+    media_type = i.media_type
+    if media_type == "audio":
+        return OutputAudioStream(
+            source_index=i.source_index,
+            filter_description=i.filter_description,
+            media_type=i.media_type,
+            format=i.format,
+            sample_rate=i.sample_rate,
+            num_channels=i.num_channels,
+        )
+    if media_type == "video":
+        return OutputVideoStream(
+            source_index=i.source_index,
+            filter_description=i.filter_description,
+            media_type=i.media_type,
+            format=i.format,
+            width=i.width,
+            height=i.height,
+            frame_rate=i.frame_rate,
+        )
+    raise ValueError(f"Unexpected media_type: {i.media_type}({i})")
 
 
 def _get_afilter_desc(sample_rate: Optional[int], fmt: Optional[str]):
@@ -351,6 +425,10 @@ _format_video_args = _format_doc(
 )
 
 
+InputStreamTypes = TypeVar("InputStream", bound=SourceStream)
+OutputStreamTypes = TypeVar("OutputStream", bound=OutputStream)
+
+
 @torchaudio._extension.fail_if_no_ffmpeg
 class StreamReader:
     """Fetch and decode audio/video streams chunk by chunk.
@@ -481,29 +559,33 @@ class StreamReader:
         """
         return self._be.get_metadata()
 
-    def get_src_stream_info(self, i: int) -> Union[SourceStream, SourceAudioStream, SourceVideoStream]:
+    def get_src_stream_info(self, i: int) -> InputStreamTypes:
         """Get the metadata of source stream
 
         Args:
             i (int): Stream index.
         Returns:
-            Information about the source stream.
-            If the source stream is audio type, then :class:`SourceAudioStream` returned.
-            If it is video type, then :class:`SourceVideoStream` is returned.
-            Otherwise :class:`SourceStream` class is returned.
+            InputStreamTypes:
+                Information about the source stream.
+                If the source stream is audio type, then :class:`~torchaudio.io._stream_reader.SourceAudioStream` returned.
+                If it is video type, then :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.
+                Otherwise :class:`~torchaudio.io._stream_reader.SourceStream` class is returned.
         """
         return _parse_si(self._be.get_src_stream_info(i))
 
-    def get_out_stream_info(self, i: int) -> OutputStream:
+    def get_out_stream_info(self, i: int) -> OutputStreamTypes:
         """Get the metadata of output stream
 
         Args:
             i (int): Stream index.
         Returns:
-            OutputStream
+            OutputStreamTypes
+                Information about the output stream.
+                If the output stream is audio type, then :class:`~torchaudio.io._stream_reader.OutputAudioStream` returned.
+                If it is video type, then :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.
         """
         info = self._be.get_out_stream_info(i)
-        return OutputStream(info.source_index, info.filter_description)
+        return _parse_oi(info)
 
     def seek(self, timestamp: float, mode: str = "precise"):
         """Seek the stream to the given timestamp [second]

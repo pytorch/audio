@@ -59,6 +59,7 @@ class StreamProcessor {
   KeyType add_stream(
       int frames_per_chunk,
       int num_chunks,
+      AVRational frame_rate,
       const c10::optional<std::string>& filter_description,
       const torch::Device& device);
 
@@ -72,7 +73,9 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
-  std::string get_filter_description(KeyType key) const;
+  [[nodiscard]] std::string get_filter_description(KeyType key) const;
+  [[nodiscard]] FilterGraphOutputInfo get_filter_output_info(KeyType key) const;
+
   bool is_buffer_ready() const;
 
   //////////////////////////////////////////////////////////////////////////////
