@@ -4,6 +4,21 @@
 namespace torchaudio {
 namespace io {
 
+/// Used to report the output formats of filter graph.
+struct FilterGraphOutputInfo {
+  AVMediaType type = AVMEDIA_TYPE_UNKNOWN;
+  int format = -1;
+
+  // Audio
+  int sample_rate = -1;
+  int num_channels = -1;
+
+  // Video
+  AVRational frame_rate = {0, 1};
+  int height = -1;
+  int width = -1;
+};
+
 class FilterGraph {
   AVMediaType media_type;
 
@@ -37,6 +52,7 @@ class FilterGraph {
   void add_video_src(
       AVPixelFormat format,
       AVRational time_base,
+      AVRational frame_rate,
       int width,
       int height,
       AVRational sample_aspect_ratio);
@@ -53,8 +69,7 @@ class FilterGraph {
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
   [[nodiscard]] AVRational get_output_timebase() const;
-  [[nodiscard]] int get_output_sample_rate() const;
-  [[nodiscard]] int get_output_channels() const;
+  [[nodiscard]] FilterGraphOutputInfo get_output_info() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Streaming process

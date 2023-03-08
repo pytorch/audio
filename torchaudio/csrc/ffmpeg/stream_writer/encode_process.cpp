@@ -435,6 +435,7 @@ FilterGraph get_video_filter(AVPixelFormat src_fmt, AVCodecContext* codec_ctx) {
   p.add_video_src(
       src_fmt,
       codec_ctx->time_base,
+      codec_ctx->framerate,
       codec_ctx->width,
       codec_ctx->height,
       codec_ctx->sample_aspect_ratio);

@@ -50,6 +50,7 @@ std::unique_ptr<Buffer> get_buffer(
 std::unique_ptr<FilterGraph> get_filter_graph(
     AVRational input_time_base,
     AVCodecParameters* codecpar,
+    AVRational frame_rate,
     const std::string& filter_description) {
   auto p = std::make_unique<FilterGraph>(codecpar->codec_type);
 
@@ -65,6 +66,7 @@ std::unique_ptr<FilterGraph> get_filter_graph(
       p->add_video_src(
           static_cast<AVPixelFormat>(codecpar->format),
           input_time_base,
+          frame_rate,
           codecpar->width,
           codecpar->height,
           codecpar->sample_aspect_ratio);
@@ -85,13 +87,19 @@ Sink::Sink(
     AVCodecParameters* codecpar_,
     int frames_per_chunk,
     int num_chunks,
+    AVRational frame_rate_,
     const c10::optional<std::string>& filter_description_,
     const torch::Device& device)
     : input_time_base(input_time_base_),
       codecpar(codecpar_),
+      frame_rate(frame_rate_),
       filter_description(filter_description_.value_or(
           codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
-      filter(get_filter_graph(input_time_base_, codecpar_, filter_description)),
+      filter(get_filter_graph(
+          input_time_base_,
+          codecpar_,
+          frame_rate,
+          filter_description)),
       output_time_base(filter->get_output_timebase()),
       buffer(get_buffer(
           codecpar_->codec_type,
@@ -125,8 +133,13 @@ std::string Sink::get_filter_description() const {
   return filter_description;
 }
 
+FilterGraphOutputInfo Sink::get_filter_output_info() const {
+  return filter->get_output_info();
+}
+
 void Sink::flush() {
-  filter = get_filter_graph(input_time_base, codecpar, filter_description);
+  filter = get_filter_graph(
+      input_time_base, codecpar, frame_rate, filter_description);
   buffer->flush();
 }
 
