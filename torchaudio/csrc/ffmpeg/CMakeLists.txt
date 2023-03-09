@@ -12,7 +12,6 @@ set(
   stream_reader/buffer/common.cpp
   stream_reader/buffer/chunked_buffer.cpp
   stream_reader/buffer/unchunked_buffer.cpp
-  stream_reader/decoder.cpp
   stream_reader/sink.cpp
   stream_reader/stream_processor.cpp
   stream_reader/stream_reader.cpp
