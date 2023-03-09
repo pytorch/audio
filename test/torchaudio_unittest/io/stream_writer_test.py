@@ -1,3 +1,5 @@
+import math
+
 import torch
 import torchaudio
 
@@ -435,3 +437,53 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             num_samples += chunk.size(0)
             print(chunk.pts, expected)
             assert abs(chunk.pts - expected) < 1e-10
+
+    @parameterized.expand(
+        [
+            (10, 100),
+            (15, 150),
+            (24, 240),
+            (25, 200),
+            (30, 300),
+            (50, 500),
+            (60, 600),
+            # PTS value conversion involves float <-> int conversion, which can
+            # introduce rounding error.
+            # This test is a spot-check for popular 29.97 Hz
+            (30000 / 1001, 10010),
+        ]
+    )
+    def test_video_pts_overwrite(self, frame_rate, num_frames):
+        """Can overwrite PTS"""
+
+        ext = "mp4"
+        filename = f"test.{ext}"
+        width, height = 8, 8
+
+        # Write data
+        dst = self.get_dst(filename)
+        writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        writer.add_video_stream(frame_rate=frame_rate, width=width, height=height)
+
+        video = torch.zeros((1, 3, height, width), dtype=torch.uint8)
+        reference_pts = []
+        with writer.open():
+            for i in range(num_frames):
+                pts = i / frame_rate
+                reference_pts.append(pts)
+                writer.write_video_chunk(0, video, pts)
+
+        # check
+        if self.test_fileobj:
+            dst.flush()
+
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        reader.add_video_stream(1)
+        pts = [chunk.pts for (chunk,) in reader.stream()]
+        assert len(pts) == len(reference_pts)
+
+        for val, ref in zip(pts, reference_pts):
+            # torch provides isclose, but we don't know if converting floats to tensor
+            # could introduce a descrepancy, so we compare floats and use math.isclose
+            # for that.
+            assert math.isclose(val, ref)

@@ -36,7 +36,7 @@ class Spectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float or None, optional): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc.
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc.
             If None, then the complex spectrum is returned instead. (Default: ``2``)
         normalized (bool or str, optional): Whether to normalize by magnitude after stft. If input is str, choices are
             ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
@@ -227,7 +227,7 @@ class GriffinLim(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc. (Default: ``2``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         momentum (float, optional): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
@@ -560,7 +560,7 @@ class MelSpectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so

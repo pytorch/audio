@@ -57,8 +57,44 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def("close", &StreamWriterFileObj::close);
   py::class_<OutputStreamInfo>(m, "OutputStreamInfo", py::module_local())
       .def_readonly("source_index", &OutputStreamInfo::source_index)
-      .def_readonly(
-          "filter_description", &OutputStreamInfo::filter_description);
+      .def_readonly("filter_description", &OutputStreamInfo::filter_description)
+      .def_property_readonly(
+          "media_type",
+          [](const OutputStreamInfo& o) -> std::string {
+            return av_get_media_type_string(o.media_type);
+          })
+      .def_property_readonly(
+          "format",
+          [](const OutputStreamInfo& o) -> std::string {
+            switch (o.media_type) {
+              case AVMEDIA_TYPE_AUDIO:
+                return av_get_sample_fmt_name((AVSampleFormat)(o.format));
+              case AVMEDIA_TYPE_VIDEO:
+                return av_get_pix_fmt_name((AVPixelFormat)(o.format));
+              default:
+                TORCH_INTERNAL_ASSERT(
+                    false,
+                    "FilterGraph is returning unexpected media type: ",
+                    av_get_media_type_string(o.media_type));
+            }
+          })
+      .def_readonly("sample_rate", &OutputStreamInfo::sample_rate)
+      .def_readonly("num_channels", &OutputStreamInfo::num_channels)
+      .def_readonly("width", &OutputStreamInfo::width)
+      .def_readonly("height", &OutputStreamInfo::height)
+      .def_property_readonly(
+          "frame_rate", [](const OutputStreamInfo& o) -> double {
+            if (o.frame_rate.den == 0) {
+              TORCH_WARN(
+                  o.frame_rate.den,
+                  "Invalid frame rate is found: ",
+                  o.frame_rate.num,
+                  "/",
+                  o.frame_rate.den);
+              return -1;
+            }
+            return static_cast<double>(o.frame_rate.num) / o.frame_rate.den;
+          });
   py::class_<SrcStreamInfo>(m, "SourceStreamInfo", py::module_local())
       .def_property_readonly(
           "media_type",

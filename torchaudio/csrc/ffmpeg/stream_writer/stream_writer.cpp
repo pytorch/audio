@@ -200,7 +200,10 @@ void StreamWriter::close() {
   is_open = false;
 }
 
-void StreamWriter::write_audio_chunk(int i, const torch::Tensor& waveform) {
+void StreamWriter::write_audio_chunk(
+    int i,
+    const torch::Tensor& waveform,
+    const c10::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(processes.size()),
@@ -208,10 +211,13 @@ void StreamWriter::write_audio_chunk(int i, const torch::Tensor& waveform) {
       processes.size(),
       "). Found: ",
       i);
-  processes[i].process(AVMEDIA_TYPE_AUDIO, waveform);
+  processes[i].process(AVMEDIA_TYPE_AUDIO, waveform, pts);
 }
 
-void StreamWriter::write_video_chunk(int i, const torch::Tensor& frames) {
+void StreamWriter::write_video_chunk(
+    int i,
+    const torch::Tensor& frames,
+    const c10::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(processes.size()),
@@ -219,7 +225,7 @@ void StreamWriter::write_video_chunk(int i, const torch::Tensor& frames) {
       processes.size(),
       "). Found: ",
       i);
-  processes[i].process(AVMEDIA_TYPE_VIDEO, frames);
+  processes[i].process(AVMEDIA_TYPE_VIDEO, frames, pts);
 }
 
 void StreamWriter::flush() {
