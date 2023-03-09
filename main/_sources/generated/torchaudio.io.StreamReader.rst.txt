@@ -177,3 +177,15 @@ OutputStream
 
 .. autoclass:: torchaudio.io._stream_reader.OutputStream()
    :members:
+
+OutputAudioStream
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.io._stream_reader.OutputAudioStream()
+   :members:
+
+OutputVideoStream
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.io._stream_reader.OutputVideoStream()
+   :members:

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230308) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230309) &#x25BC</a>
     </div>
     
 
@@ -678,17 +678,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="StreamWriter.write_audio_chunk"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_audio_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">write_audio_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamWriter.write_audio_chunk"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_audio_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">write_audio_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">pts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write audio data</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            i (int): Stream index.</span>
 <span class="sd">            chunk (Tensor): Waveform tensor. Shape: `(frame, channel)`.</span>
 <span class="sd">                The ``dtype`` must match what was passed to :py:meth:`add_audio_stream` method.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span></div>
+<span class="sd">            pts (float, optional, or None): If provided, overwrite the presentation timestamp.</span>
 
-<div class="viewcode-block" id="StreamWriter.write_video_chunk"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_video_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">write_video_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="sd">                .. note::</span>
+
+<span class="sd">                   The provided value is converted to integer value expressed in basis of</span>
+<span class="sd">                   sample rate. Therefore, it is truncated to the nearest value of</span>
+<span class="sd">                   ``n / sample_rate``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">pts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamWriter.write_video_chunk"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_video_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">write_video_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">pts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write video/image data</span>
 
 <span class="sd">        Args:</span>
@@ -698,8 +705,15 @@
 <span class="sd">                The ``dtype`` must be ``torch.uint8``.</span>
 <span class="sd">                The shape (height, width and the number of channels) must match</span>
 <span class="sd">                what was configured when calling :py:meth:`add_video_stream`</span>
+<span class="sd">            pts (float, optional or None): If provided, overwrite the presentation timestamp.</span>
+
+<span class="sd">                .. note::</span>
+
+<span class="sd">                   The provided value is converted to integer value expressed in basis of</span>
+<span class="sd">                   frame rate. Therefore, it is truncated to the nearest value of</span>
+<span class="sd">                   ``n / frame_rate``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">pts</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamWriter.flush"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Flush the frames from encoders and write the frames to the destination.&quot;&quot;&quot;</span>

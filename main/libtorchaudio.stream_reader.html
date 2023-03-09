@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0.dev20230308) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0.dev20230309) &#x25BC</a>
     </div>
     
 
@@ -868,6 +868,42 @@ API/ABI backward compatibility is not guaranteed.</p>
 <span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutputStreamInfo</span></span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfoE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Information about output stream configured by user code. </p>
 <div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-audio-specific-members">AUDIO-SPECIFIC MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo11sample_rateE">
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a92d7cdf9f8e2fd969274fdac35953dd4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sample_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo11sample_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Sample rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo12num_channelsE">
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a881d7cfc8c6af337afa48a948ea1702a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_channels</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo12num_channelsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The number of channels. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-video-specific-members">VIDEO-SPECIFIC MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo5widthE">
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a31c672a77aad08f546bdad629a2dab3a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">width</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo5widthE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Width. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo6heightE">
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a53854faaf6ea8dcf916824131bacea69"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">height</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo6heightE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Height. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo10frame_rateE">
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1acf5ea1b881ae9ead06b8904183cea10e"></span><span class="n"><span class="pre">AVRational</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frame_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo10frame_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Frame rate. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo12source_indexE">
@@ -876,8 +912,22 @@ API/ABI backward compatibility is not guaranteed.</p>
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo10media_typeE">
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a00d9124ff57c436871c612cc3f9c32d0"></span><span class="n"><span class="pre">AVMediaType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">media_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">AVMEDIA_TYPE_UNKNOWN</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo10media_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The stream media type.</p>
+<p>Please see refer to <a class="reference external" href="https://ffmpeg.org/doxygen/4.1/group__lavu__misc.html#ga9a84bba4713dfced21a1a56163be1f48">the FFmpeg documentation</a> for the available values</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Introduce own enum and get rid of FFmpeg dependency </p>
+</dd></dl>
+
+</p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io16OutputStreamInfo18filter_descriptionE">
-<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a31b418444f34316d552f8abf4cb89d9d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">filter_description</span></span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo18filter_descriptionE" title="Permalink to this definition">¶</a><br /></dt>
+<span class="target" id="structtorchaudio_1_1io_1_1OutputStreamInfo_1a31b418444f34316d552f8abf4cb89d9d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">filter_description</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io16OutputStreamInfo18filter_descriptionE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Filter graph definition, such as <code class="docutils literal notranslate"><span class="pre">&quot;aresample=16000,aformat=sample_fmts=fltp&quot;</span></code>. </p>
 </dd></dl>
 

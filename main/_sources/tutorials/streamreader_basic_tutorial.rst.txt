@@ -97,8 +97,8 @@ Preparation
 
  .. code-block:: none
 
-    2.1.0.dev20230308
-    2.0.0.dev20230308
+    2.1.0.dev20230309
+    2.0.0.dev20230309
 
 
 
@@ -712,10 +712,10 @@ Checking the output streams.
 
  .. code-block:: none
 
-    OutputStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp')
-    OutputStream(source_index=1, filter_description='aresample=16000,aformat=sample_fmts=fltp')
-    OutputStream(source_index=0, filter_description='fps=1,scale=width=960:height=540,format=pix_fmts=rgb24')
-    OutputStream(source_index=0, filter_description='fps=3,scale=width=320:height=320,format=pix_fmts=gray')
+    OutputAudioStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp', media_type='audio', format='fltp', sample_rate=8000.0, num_channels=2)
+    OutputAudioStream(source_index=1, filter_description='aresample=16000,aformat=sample_fmts=fltp', media_type='audio', format='fltp', sample_rate=16000.0, num_channels=2)
+    OutputVideoStream(source_index=0, filter_description='fps=1,scale=width=960:height=540,format=pix_fmts=rgb24', media_type='video', format='rgb24', width=960, height=540, frame_rate=1.0)
+    OutputVideoStream(source_index=0, filter_description='fps=3,scale=width=320:height=320,format=pix_fmts=gray', media_type='video', format='gray', width=320, height=320, frame_rate=3.0)
 
 
 
@@ -742,9 +742,9 @@ Remove the second audio stream.
 
  .. code-block:: none
 
-    OutputStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp')
-    OutputStream(source_index=0, filter_description='fps=1,scale=width=960:height=540,format=pix_fmts=rgb24')
-    OutputStream(source_index=0, filter_description='fps=3,scale=width=320:height=320,format=pix_fmts=gray')
+    OutputAudioStream(source_index=1, filter_description='aresample=8000,aformat=sample_fmts=fltp', media_type='audio', format='fltp', sample_rate=8000.0, num_channels=2)
+    OutputVideoStream(source_index=0, filter_description='fps=1,scale=width=960:height=540,format=pix_fmts=rgb24', media_type='video', format='rgb24', width=960, height=540, frame_rate=1.0)
+    OutputVideoStream(source_index=0, filter_description='fps=3,scale=width=320:height=320,format=pix_fmts=gray', media_type='video', format='gray', width=320, height=320, frame_rate=3.0)
 
 
 
@@ -887,7 +887,7 @@ Tag: :obj:`torchaudio.io`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.461 seconds)
+   **Total running time of the script:** ( 0 minutes  8.314 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_basic_tutorial.py:

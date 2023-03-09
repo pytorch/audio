@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230308) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230309) &#x25BC</a>
     </div>
     
 
@@ -484,8 +484,8 @@ please file a feature request.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230308
-2.0.0.dev20230308
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230309
+2.0.0.dev20230309
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
@@ -906,10 +906,10 @@ consistent across output streams.</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;)
-OutputStream(source_index=1, filter_description=&#39;aresample=16000,aformat=sample_fmts=fltp&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=1,scale=width=960:height=540,format=pix_fmts=rgb24&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputAudioStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;, media_type=&#39;audio&#39;, format=&#39;fltp&#39;, sample_rate=8000.0, num_channels=2)
+OutputAudioStream(source_index=1, filter_description=&#39;aresample=16000,aformat=sample_fmts=fltp&#39;, media_type=&#39;audio&#39;, format=&#39;fltp&#39;, sample_rate=16000.0, num_channels=2)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=1,scale=width=960:height=540,format=pix_fmts=rgb24&#39;, media_type=&#39;video&#39;, format=&#39;rgb24&#39;, width=960, height=540, frame_rate=1.0)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;, media_type=&#39;video&#39;, format=&#39;gray&#39;, width=320, height=320, frame_rate=3.0)
 </pre></div>
 </div>
 <p>Remove the second audio stream.</p>
@@ -918,9 +918,9 @@ OutputStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:heigh
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=1,scale=width=960:height=540,format=pix_fmts=rgb24&#39;)
-OutputStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputAudioStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;, media_type=&#39;audio&#39;, format=&#39;fltp&#39;, sample_rate=8000.0, num_channels=2)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=1,scale=width=960:height=540,format=pix_fmts=rgb24&#39;, media_type=&#39;video&#39;, format=&#39;rgb24&#39;, width=960, height=540, frame_rate=1.0)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;, media_type=&#39;video&#39;, format=&#39;gray&#39;, width=320, height=320, frame_rate=3.0)
 </pre></div>
 </div>
 </section>
@@ -986,7 +986,7 @@ torch.Size([3, 1, 320, 320])
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_streamreader_basic_tutorial_001.png" srcset="../_images/sphx_glr_streamreader_basic_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.461 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.314 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-basic-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/dc81b404e96c6cb650e0c5a8115bc1f1/streamreader_basic_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_basic_tutorial.py</span></code></a></p>

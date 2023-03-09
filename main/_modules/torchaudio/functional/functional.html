@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230308) &#x25BC</a>
+      <a href="../../../../versions.html">Nightly Build (2.0.0.dev20230309) &#x25BC</a>
     </div>
     
 
@@ -486,7 +486,7 @@
 <span class="sd">        hop_length (int): Length of hop between STFT windows</span>
 <span class="sd">        win_length (int): Window size</span>
 <span class="sd">        power (float or None): Exponent for the magnitude spectrogram,</span>
-<span class="sd">            (must be &gt; 0) e.g., 1 for energy, 2 for power, etc.</span>
+<span class="sd">            (must be &gt; 0) e.g., 1 for magnitude, 2 for power, etc.</span>
 <span class="sd">            If None, then the complex spectrum is returned instead.</span>
 <span class="sd">        normalized (bool or str): Whether to normalize by magnitude after stft. If input is str, choices are</span>
 <span class="sd">            ``&quot;window&quot;`` and ``&quot;frame_length&quot;``, if specific normalization type is desirable. ``True`` maps to</span>
@@ -689,7 +689,7 @@
 <span class="sd">            Default: ``win_length // 2``)</span>
 <span class="sd">        win_length (int): Window size. (Default: ``n_fft``)</span>
 <span class="sd">        power (float): Exponent for the magnitude spectrogram,</span>
-<span class="sd">            (must be &gt; 0) e.g., 1 for energy, 2 for power, etc.</span>
+<span class="sd">            (must be &gt; 0) e.g., 1 for magnitude, 2 for power, etc.</span>
 <span class="sd">        n_iter (int): Number of iteration for phase recovery process.</span>
 <span class="sd">        momentum (float): The momentum parameter for fast Griffin-Lim.</span>
 <span class="sd">            Setting this to 0 recovers the original Griffin-Lim method.</span>

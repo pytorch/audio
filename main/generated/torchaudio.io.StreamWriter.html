@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230308) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230309) &#x25BC</a>
     </div>
     
 
@@ -681,7 +681,7 @@ when exiting from <code class="docutils literal notranslate"><span class="pre">w
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.write_audio_chunk">
-<span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">write_audio_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.write_audio_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.write_audio_chunk" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">write_audio_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.write_audio_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.write_audio_chunk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write audio data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -689,6 +689,14 @@ when exiting from <code class="docutils literal notranslate"><span class="pre">w
 <li><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Stream index.</p></li>
 <li><p><strong>chunk</strong> (<em>Tensor</em>) – Waveform tensor. Shape: <cite>(frame, channel)</cite>.
 The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must match what was passed to <a class="reference internal" href="#torchaudio.io.StreamWriter.add_audio_stream" title="torchaudio.io.StreamWriter.add_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_audio_stream()</span></code></a> method.</p></li>
+<li><p><strong>pts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em><em>, or </em><em>None</em>) – <p>If provided, overwrite the presentation timestamp.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The provided value is converted to integer value expressed in basis of
+sample rate. Therefore, it is truncated to the nearest value of
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">sample_rate</span></code>.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -701,7 +709,7 @@ The <code class="docutils literal notranslate"><span class="pre">dtype</span></c
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.io.StreamWriter.write_video_chunk">
-<span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">write_video_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.write_video_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.write_video_chunk" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">StreamWriter.</span></span><span class="sig-name descname"><span class="pre">write_video_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/io/_stream_writer.html#StreamWriter.write_video_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.io.StreamWriter.write_video_chunk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write video/image data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -712,6 +720,14 @@ Shape: <cite>(time, channel, height, width)</cite>.
 The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must be <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code>.
 The shape (height, width and the number of channels) must match
 what was configured when calling <a class="reference internal" href="#torchaudio.io.StreamWriter.add_video_stream" title="torchaudio.io.StreamWriter.add_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_video_stream()</span></code></a></p></li>
+<li><p><strong>pts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em><em> or </em><em>None</em>) – <p>If provided, overwrite the presentation timestamp.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The provided value is converted to integer value expressed in basis of
+frame rate. Therefore, it is truncated to the nearest value of
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">frame_rate</span></code>.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 </dl>
