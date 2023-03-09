@@ -1,0 +1,2420 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GPU video decoder/encoder &mdash; Torchaudio nightly documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Audio Resampling" href="tutorials/audio_resampling_tutorial.html" />
+    <link rel="prev" title="StreamWriter Advanced Usage" href="tutorials/streamwriter_advanced.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../versions.html">Nightly Build (2.0.0+64af805) &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>GPU video decoder/encoder</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/hw_acceleration_tutorial.ipynb.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">hw_acceleration_tutorial</div>
+
+      <div id="google-colab-link">
+        <img class="call-to-action-img" src="_static/images/pytorch-colab.svg"/>
+        <div class="call-to-action-desktop-view">Run in Google Colab</div>
+        <div class="call-to-action-mobile-view">Colab</div>
+      </div>
+      <div id="download-notebook-link">
+        <img class="call-to-action-notebook-img" src="_static/images/pytorch-download.svg"/>
+        <div class="call-to-action-desktop-view">Download Notebook</div>
+        <div class="call-to-action-mobile-view">Notebook</div>
+      </div>
+      <div id="github-view-link">
+        <img class="call-to-action-img" src="_static/images/pytorch-github.svg"/>
+        <div class="call-to-action-desktop-view">View on GitHub</div>
+        <div class="call-to-action-mobile-view">GitHub</div>
+      </div>
+    </div>
+
+    
+    
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="GPU-video-decoder/encoder">
+<h1>GPU video decoder/encoder<a class="headerlink" href="#GPU-video-decoder/encoder" title="Permalink to this heading">¶</a></h1>
+<p><strong>Author</strong>: <a class="reference external" href="mailto:moto&#37;&#52;&#48;meta&#46;com">Moto Hira</a></p>
+<p>This tutorial shows how to use NVIDIA’s hardware video decoder (NVDEC) and encoder (NVENC) with TorchAudio.</p>
+<p>Using hardware encoder/decoder improves the speed of loading and saving certain types of videos.</p>
+<p>Using them in TorchAduio requires FFmpeg built with NVENC/NVDEC support. Google Colab has such FFmpeg pre-installed, so you can <a class="reference external" href="https://colab.research.google.com/drive/1DDah_IaGULEO66CfQWltRqaVheBkiXdN#sandboxMode=true">run this tutorial on Google Colab</a>.</p>
+<p>If you want to enable GPU decoding/encoding, please refer to <a class="reference external" href="https://pytorch.org/audio/main/build.ffmpeg.html">Enabling GPU video decoder/encoder</a>.</p>
+<section id="Update-PyTorch-and-TorchAudio-with-nightly-builds">
+<h2>Update PyTorch and TorchAudio with nightly builds<a class="headerlink" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds" title="Permalink to this heading">¶</a></h2>
+<p>Until PyTorch 2.0 is released, we need to use the nightly builds of PyTorch and TorchAudio.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+pip<span class="w"> </span>uninstall<span class="w"> </span>-y<span class="w"> </span>-q<span class="w"> </span>torch<span class="w"> </span>torchaudio<span class="w"> </span>torchvision<span class="w"> </span>torchtext
+pip<span class="w"> </span>install<span class="w"> </span>--progress-bar<span class="w"> </span>off<span class="w"> </span>--pre<span class="w"> </span>torch<span class="w"> </span>torchaudio<span class="w"> </span>--extra-index-url<span class="w"> </span>https://download.pytorch.org/whl/nightly/cu117<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/, https://download.pytorch.org/whl/nightly/cu117
+Collecting torch
+  Downloading https://download.pytorch.org/whl/nightly/cu117/torch-2.0.0.dev20230209%2Bcu117-cp38-cp38-linux_x86_64.whl (1837.7 MB)
+Collecting torchaudio
+  Downloading https://download.pytorch.org/whl/nightly/cu117/torchaudio-2.0.0.dev20230208%2Bcu117-cp38-cp38-linux_x86_64.whl (4.4 MB)
+Requirement already satisfied: filelock in /usr/local/lib/python3.8/dist-packages (from torch) (3.9.0)
+Collecting pytorch-triton==2.0.0+0d7e753227
+  Downloading https://download.pytorch.org/whl/nightly/pytorch_triton-2.0.0%2B0d7e753227-cp38-cp38-linux_x86_64.whl (18.7 MB)
+Requirement already satisfied: typing-extensions in /usr/local/lib/python3.8/dist-packages (from torch) (4.4.0)
+Requirement already satisfied: networkx in /usr/local/lib/python3.8/dist-packages (from torch) (3.0)
+Requirement already satisfied: sympy in /usr/local/lib/python3.8/dist-packages (from torch) (1.7.1)
+Requirement already satisfied: cmake in /usr/local/lib/python3.8/dist-packages (from pytorch-triton==2.0.0+0d7e753227-&gt;torch) (3.22.6)
+Requirement already satisfied: mpmath&gt;=0.19 in /usr/local/lib/python3.8/dist-packages (from sympy-&gt;torch) (1.2.1)
+Installing collected packages: pytorch-triton, torch, torchaudio
+Successfully installed pytorch-triton-2.0.0+0d7e753227 torch-2.0.0.dev20230209+cu117 torchaudio-2.0.0.dev20230208+cu117
+</pre></div></div>
+</div>
+</section>
+<section id="Install-third-party-libraries-and-download-assets">
+<h2>Install third party libraries and download assets<a class="headerlink" href="#Install-third-party-libraries-and-download-assets" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+pip3<span class="w"> </span>install<span class="w"> </span>--progress-bar<span class="w"> </span>off<span class="w"> </span>boto3<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
+Collecting boto3
+  Downloading boto3-1.26.67-py3-none-any.whl (132 kB)
+Collecting botocore&lt;1.30.0,&gt;=1.29.67
+  Downloading botocore-1.29.67-py3-none-any.whl (10.4 MB)
+Collecting jmespath&lt;2.0.0,&gt;=0.7.1
+  Downloading jmespath-1.0.1-py3-none-any.whl (20 kB)
+Collecting s3transfer&lt;0.7.0,&gt;=0.6.0
+  Downloading s3transfer-0.6.0-py3-none-any.whl (79 kB)
+Requirement already satisfied: python-dateutil&lt;3.0.0,&gt;=2.1 in /usr/local/lib/python3.8/dist-packages (from botocore&lt;1.30.0,&gt;=1.29.67-&gt;boto3) (2.8.2)
+Collecting urllib3&lt;1.27,&gt;=1.25.4
+  Downloading urllib3-1.26.14-py2.py3-none-any.whl (140 kB)
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.8/dist-packages (from python-dateutil&lt;3.0.0,&gt;=2.1-&gt;botocore&lt;1.30.0,&gt;=1.29.67-&gt;boto3) (1.15.0)
+Installing collected packages: urllib3, jmespath, botocore, s3transfer, boto3
+  Attempting uninstall: urllib3
+    Found existing installation: urllib3 1.24.3
+    Uninstalling urllib3-1.24.3:
+      Successfully uninstalled urllib3-1.24.3
+Successfully installed boto3-1.26.67 botocore-1.29.67 jmespath-1.0.1 s3transfer-0.6.0 urllib3-1.26.14
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+wget<span class="w"> </span>-q<span class="w"> </span>-O<span class="w"> </span>input.mp4<span class="w"> </span><span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Check-the-available-GPU">
+<h2>Check the available GPU<a class="headerlink" href="#Check-the-available-GPU" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+nvidia-smi
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Thu Feb  9 15:54:05 2023
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 510.47.03    Driver Version: 510.47.03    CUDA Version: 11.6     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:00:04.0 Off |                    0 |
+| N/A   58C    P0    28W /  70W |      0MiB / 15360MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+</pre></div></div>
+</div>
+</section>
+<section id="Check-FFmpeg-installation">
+<h2>Check FFmpeg installation<a class="headerlink" href="#Check-FFmpeg-installation" title="Permalink to this heading">¶</a></h2>
+<p>Let’s do a quick sanity check to confirm that the FFmpeg we built works.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-decoders<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>cuvid
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ V..... h264_cuvid           Nvidia CUVID H264 decoder (codec h264)
+ V..... hevc_cuvid           Nvidia CUVID HEVC decoder (codec hevc)
+ V..... mjpeg_cuvid          Nvidia CUVID MJPEG decoder (codec mjpeg)
+ V..... mpeg1_cuvid          Nvidia CUVID MPEG1VIDEO decoder (codec mpeg1video)
+ V..... mpeg2_cuvid          Nvidia CUVID MPEG2VIDEO decoder (codec mpeg2video)
+ V..... mpeg4_cuvid          Nvidia CUVID MPEG4 decoder (codec mpeg4)
+ V..... vc1_cuvid            Nvidia CUVID VC1 decoder (codec vc1)
+ V..... vp8_cuvid            Nvidia CUVID VP8 decoder (codec vp8)
+ V..... vp9_cuvid            Nvidia CUVID VP9 decoder (codec vp9)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-encoders<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>nvenc
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ V..... h264_nvenc           NVIDIA NVENC H.264 encoder (codec h264)
+ V..... nvenc                NVIDIA NVENC H.264 encoder (codec h264)
+ V..... nvenc_h264           NVIDIA NVENC H.264 encoder (codec h264)
+ V..... nvenc_hevc           NVIDIA NVENC hevc encoder (codec hevc)
+ V..... hevc_nvenc           NVIDIA NVENC hevc encoder (codec hevc)
+</pre></div></div>
+</div>
+<p>The following command fetches video from remote server, decode with NVDEC (cuvid) and re-encode with NVENC. If this command does not work, then there is an issue with FFmpeg installation, and TorchAudio would not be able to use them either.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-y<span class="w"> </span>-vsync<span class="w"> </span><span class="m">0</span><span class="w"> </span>-hwaccel<span class="w"> </span>cuvid<span class="w"> </span>-hwaccel_output_format<span class="w"> </span>cuda<span class="w"> </span>-c:v<span class="w"> </span>h264_cuvid<span class="w"> </span>-resize<span class="w"> </span>360x240<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span><span class="w"> </span>-c:a<span class="w"> </span>copy<span class="w"> </span>-c:v<span class="w"> </span>h264_nvenc<span class="w"> </span>-b:v<span class="w"> </span>5M<span class="w"> </span>test.mp4
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&#39;:
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 512
+    compatible_brands: mp42iso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:03:26.04, start: 0.000000, bitrate: 1294 kb/s
+    Stream #0:0(eng): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709), 960x540 [SAR 1:1 DAR 16:9], 1156 kb/s, 29.97 fps, 29.97 tbr, 30k tbn, 59.94 tbc (default)
+    Metadata:
+      handler_name    : ?Mainconcept Video Media Handler
+    Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : #Mainconcept MP4 Sound Media Handler
+Stream mapping:
+  Stream #0:0 -&gt; #0:0 (h264 (h264_cuvid) -&gt; h264 (h264_nvenc))
+  Stream #0:1 -&gt; #0:1 (copy)
+Press [q] to stop, [?] for help
+Output #0, mp4, to &#39;test.mp4&#39;:
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 512
+    compatible_brands: mp42iso2avc1mp41
+    encoder         : Lavf58.29.100
+    Stream #0:0(eng): Video: h264 (h264_nvenc) (Main) (avc1 / 0x31637661), cuda, 360x240 [SAR 1:1 DAR 3:2], q=-1--1, 5000 kb/s, 29.97 fps, 30k tbn, 29.97 tbc (default)
+    Metadata:
+      handler_name    : ?Mainconcept Video Media Handler
+      encoder         : Lavc58.54.100 h264_nvenc
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/5000000 buffer size: 10000000 vbv_delay: -1
+    Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : #Mainconcept MP4 Sound Media Handler
+frame= 6175 fps=1673 q=8.0 Lsize=   41278kB time=00:03:26.17 bitrate=1640.1kbits/s speed=55.9x
+video:37869kB audio:3234kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.424815%
+</pre></div></div>
+</div>
+</section>
+<section id="Check-the-TorchAudio-/-FFmpeg-integration">
+<h2>Check the TorchAudio / FFmpeg integration<a class="headerlink" href="#Check-the-TorchAudio-/-FFmpeg-integration" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span><span class="p">,</span> <span class="n">StreamWriter</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.0.0.dev20230209+cu117
+2.0.0.dev20230208+cu117
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">ffmpeg_utils</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Library versions:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_versions</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Build config:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_build_config</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Decoders:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_video_decoders</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;cuvid&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Encoders:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_video_encoders</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;nvenc&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Library versions:
+{&#39;libavutil&#39;: (56, 31, 100), &#39;libavcodec&#39;: (58, 54, 100), &#39;libavformat&#39;: (58, 29, 100), &#39;libavfilter&#39;: (7, 57, 100), &#39;libavdevice&#39;: (58, 8, 100)}
+
+Build config:
+--prefix=/usr --extra-version=0ubuntu0.1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --enable-avresample --disable-filter=resample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libaom --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libcodec2 --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libjack --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librsvg --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-lv2 --enable-omx --enable-openal --enable-opencl --enable-opengl --enable-sdl2 --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-nvenc --enable-chromaprint --enable-frei0r --enable-libx264 --enable-shared
+
+Decoders:
+[&#39;h264_cuvid&#39;, &#39;hevc_cuvid&#39;, &#39;mjpeg_cuvid&#39;, &#39;mpeg1_cuvid&#39;, &#39;mpeg2_cuvid&#39;, &#39;mpeg4_cuvid&#39;, &#39;vc1_cuvid&#39;, &#39;vp8_cuvid&#39;, &#39;vp9_cuvid&#39;]
+
+Encoders:
+[&#39;h264_nvenc&#39;, &#39;nvenc&#39;, &#39;nvenc_h264&#39;, &#39;nvenc_hevc&#39;, &#39;hevc_nvenc&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Benchmarking-GPU-Encoding-and-Decoding">
+<h2>Benchmarking GPU Encoding and Decoding<a class="headerlink" href="#Benchmarking-GPU-Encoding-and-Decoding" title="Permalink to this heading">¶</a></h2>
+<p>Now that FFmpeg and the resulting libraries are ready to use, we test NVDEC/NVENC with TorchAudio. For the basics of TorchAudio’s streaming APIs, please refer to <a class="reference external" href="https://pytorch.org/audio/main/tutorials.io.html">Media I/O tutorials</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Benchmark-NVDEC-with-StreamReader">
+<h2>Benchmark NVDEC with <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code><a class="headerlink" href="#Benchmark-NVDEC-with-StreamReader" title="Permalink to this heading">¶</a></h2>
+<p>First we test hardware decoding, and we fetch video from multiple locations (local file, network file, AWS S3) and use NVDEC to decod them.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.config</span> <span class="kn">import</span> <span class="n">Config</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">boto3</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.26.67
+</pre></div></div>
+</div>
+<p>First, we define the functions we’ll use for testing.</p>
+<p>Funcion <code class="docutils literal notranslate"><span class="pre">test_decode</span></code> decodes the given source from start to end, and it reports the elapsed time, and returns one image frmae as a sample.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+
+
+<span class="k">def</span> <span class="nf">test_decode</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">):</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Configuration:&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Source:&quot;</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+
+  <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">)</span>
+
+  <span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">stream</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; - Chunk:&#39;</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">i_sample</span><span class="p">:</span>
+      <span class="n">sample</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_frames</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+  <span class="nb">print</span><span class="p">()</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2"> frames.&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Elapsed: </span><span class="si">{</span><span class="n">elapsed</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">()</span>
+
+  <span class="k">return</span> <span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+<section id="Decode-MP4-from-local-file">
+<h3>Decode MP4 from local file<a class="headerlink" href="#Decode-MP4-from-local-file" title="Permalink to this heading">¶</a></h3>
+<p>For the first test, we compare the time it takes for CPU and NVDEC to decode 250MB of MP4 video.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">local_src</span> <span class="o">=</span> <span class="s2">&quot;input.mp4&quot;</span>
+
+<span class="n">i_sample</span> <span class="o">=</span> <span class="mi">520</span>
+</pre></div>
+</div>
+</div>
+<section id="CPU">
+<h4>CPU<a class="headerlink" href="#CPU" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpu_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264&quot;</span><span class="p">,</span>  <span class="c1"># CPU decoding</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
+* Source: input.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 43.65067997 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="CUDA">
+<h4>CUDA<a class="headerlink" href="#CUDA" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Source: input.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 5.754925530000008 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Decode-MP4-from-network">
+<h3>Decode MP4 from network<a class="headerlink" href="#Decode-MP4-from-network" title="Permalink to this heading">¶</a></h3>
+<p>Let’s run the same test on the source retrieved via network on-the-fly.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">network_src</span> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+<span class="n">i_sample</span> <span class="o">=</span> <span class="mi">750</span>
+</pre></div>
+</div>
+</div>
+<section id="id1">
+<h4>CPU<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
+* Source: https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 33.74701378400002 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h4>CUDA<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">network_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Source: https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 15.769149663000007 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Decode-MP4-directly-from-S3">
+<h3>Decode MP4 directly from S3<a class="headerlink" href="#Decode-MP4-directly-from-S3" title="Permalink to this heading">¶</a></h3>
+<p>Using file-like object input, we can fetch a video stored on AWS S3 and decode it without saving it on local file system.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;pytorch&quot;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+
+<span class="n">s3_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">))</span>
+<span class="n">i_sample</span> <span class="o">=</span> <span class="mi">115</span>
+</pre></div>
+</div>
+</div>
+<section id="Defining-Helper-class">
+<h4>Defining Helper class<a class="headerlink" href="#Defining-Helper-class" title="Permalink to this heading">¶</a></h4>
+<p>StreamReader supports file-like objects with <code class="docutils literal notranslate"><span class="pre">read</span></code> method. In addition to this, if the file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader attempts to use it for more reliable detection of media formats.</p>
+<p>However, the seek method of <code class="docutils literal notranslate"><span class="pre">boto3</span></code>’s S3 client response object only raises errors to let users know that seek operation is not supported. Therefore we wrap it with a class that does not have <code class="docutils literal notranslate"><span class="pre">seek</span></code> method. This way, StreamReader won’t try to use the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method.</p>
+<p><strong>Note</strong></p>
+<p>Due to the nature of streaming, when using file-like object without seek method, some formats are not supported. For example, MP4 formats contain metadata at the beginning of file or at the end. If metadata is located at the end, without <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader cannot decode streams.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Wrapper to hide the native `seek` method of boto3, which</span>
+<span class="c1"># only raises an error.</span>
+<span class="k">class</span> <span class="nc">UnseekableWrapper</span><span class="p">:</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+
+  <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h4>CPU<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">])</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264&#39;}
+* Source: &lt;botocore.response.StreamingBody object at 0x7fcc9b0b83a0&gt;
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cpu torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 29.465254898000012 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h4>CUDA<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">])</span>
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Source: &lt;botocore.response.StreamingBody object at 0x7fcc9b0b8730&gt;
+========================================
+ - Chunk: torch.Size([5, 3, 540, 960]) cuda:0 torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 3.475249672000018 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Decoding-and-resizing">
+<h3>Decoding and resizing<a class="headerlink" href="#Decoding-and-resizing" title="Permalink to this heading">¶</a></h3>
+<p>In the next test, we add preprocessing. NVDEC supports several preprocessing schemes, which are also performed on the chosen hardware. For CPU, we apply the same kind of software preprocessing through FFmpeg’s filter graph.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">i_sample</span> <span class="o">=</span> <span class="mi">1085</span>
+</pre></div>
+</div>
+</div>
+<section id="id5">
+<h4>CPU<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpu_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264&quot;</span><span class="p">,</span>  <span class="c1"># CPU decoding</span>
+    <span class="s2">&quot;filter_desc&quot;</span><span class="p">:</span> <span class="s2">&quot;scale=360:240&quot;</span><span class="p">,</span>  <span class="c1"># Software filter</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cpu_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264&#39;, &#39;filter_desc&#39;: &#39;scale=360:240&#39;}
+* Source: input.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 240, 360]) cpu torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 17.26762169899996 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h4>CUDA<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>  <span class="c1"># Use CUDA HW decoder</span>
+    <span class="s2">&quot;decoder_option&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;360x240&quot;</span><span class="p">,</span>  <span class="c1"># Then apply HW preprocessing (resize)</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Then keep the memory on CUDA:0</span>
+<span class="p">}</span>
+
+<span class="n">elapsed</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">test_decode</span><span class="p">(</span><span class="n">local_src</span><span class="p">,</span> <span class="n">cuda_conf</span><span class="p">,</span> <span class="n">i_sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;decoder&#39;: &#39;h264_cuvid&#39;, &#39;decoder_option&#39;: {&#39;resize&#39;: &#39;360x240&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Source: input.mp4
+========================================
+ - Chunk: torch.Size([5, 3, 240, 360]) cuda:0 torch.uint8
+
+ - Processed 6175 frames.
+ - Elapsed: 15.233130482000035 seconds.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">elapsed</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Results">
+<h3>Results<a class="headerlink" href="#Results" title="Permalink to this heading">¶</a></h3>
+<p>The following table summarizes the time it took to decode the same media with CPU and NVDEC. We see significant speedup with NVDEC.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+    <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Decoding (local file)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding (network file)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding (file-like object, S3)&quot;</span><span class="p">,</span> <span class="s2">&quot;Decoding + Resize&quot;</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="s2">&quot;NVDEC&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                                       CPU      NVDEC
+Decoding (local file)            43.650681   5.754926
+Decoding (network file)          33.747013  15.769150
+Decoding (file-like object, S3)  29.465256   3.475250
+Decoding + Resize                17.267622  15.233130
+</pre></div></div>
+</div>
+<p>The following code shows some frames generated by CPU decoding and NVDEC. They produce seemingly identical results.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">yuv_to_rgb</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+  <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+  <span class="n">u</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+  <span class="n">v</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+  <span class="n">y</span> <span class="o">/=</span> <span class="mi">255</span>
+  <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">/</span> <span class="mi">255</span> <span class="o">-</span> <span class="mf">0.5</span>
+  <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="mi">255</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+  <span class="n">r</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">1.14</span> <span class="o">*</span> <span class="n">v</span>
+  <span class="n">g</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="o">-</span><span class="mf">0.396</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">0.581</span> <span class="o">*</span> <span class="n">v</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">2.029</span> <span class="o">*</span> <span class="n">u</span>
+
+  <span class="n">rgb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+  <span class="n">rgb</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">rgb</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">19.2</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;CPU&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;NVDEC&#39;</span><span class="si">}{</span><span class="s1">&#39; with resize&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/hw_acceleration_tutorial_60_1.png" src="_images/hw_acceleration_tutorial_60_1.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Benchmark-NVENC-with-StreamWriter">
+<h2>Benchmark NVENC with <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code><a class="headerlink" href="#Benchmark-NVENC-with-StreamWriter" title="Permalink to this heading">¶</a></h2>
+<p>Next, we benchmark encoding speed with StreamWriter and NVENC.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_encode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">):</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Configuration:&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Destination:&quot;</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+
+  <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="n">StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
+  <span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">write_video_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+  <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+  <span class="nb">print</span><span class="p">()</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames.&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Elapsed: </span><span class="si">{</span><span class="n">elapsed</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">elapsed</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>We use <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code> to generate test data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+  <span class="n">src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;testsrc2=rate=</span><span class="si">{</span><span class="n">frame_rate</span><span class="si">}</span><span class="s2">:size=</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">:duration=</span><span class="si">{</span><span class="n">duration</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lavfi&quot;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span>
+  <span class="n">video</span><span class="p">,</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">video</span>
+</pre></div>
+</div>
+</div>
+<section id="Encode-MP4---360P">
+<h3>Encode MP4 - 360P<a class="headerlink" href="#Encode-MP4---360P" title="Permalink to this heading">¶</a></h3>
+<p>For the first test, we compare the time it takes for CPU and NVENC to encode 15 seconds of video with small resolution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pict_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">360</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">640</span><span class="p">,</span>
+    <span class="s2">&quot;frame_rate&quot;</span><span class="p">:</span> <span class="mi">30000</span><span class="o">/</span><span class="mi">1001</span><span class="p">,</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="o">**</span><span class="n">pict_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="id7">
+<h4>CPU<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;360p_cpu.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 360, &#39;width&#39;: 640, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;libx264&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 360p_cpu.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 6.311792093000008 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="CUDA-(from-CPU-Tensor)">
+<h4>CUDA (from CPU Tensor)<a class="headerlink" href="#CUDA-(from-CPU-Tensor)" title="Permalink to this heading">¶</a></h4>
+<p>Now we test NVENC. This time, the data is sent from CPU memory to GPU memory as part of encoding.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>  <span class="c1"># Use NVENC</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>  <span class="c1"># Run encoding on the cuda:0 device</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;360p_cuda.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 360, &#39;width&#39;: 640, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}}
+* Destination: 360p_cuda.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.5352325430000064 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="CUDA-(from-CUDA-Tensor)">
+<h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#CUDA-(from-CUDA-Tensor)" title="Permalink to this heading">¶</a></h4>
+<p>If the data is already present on CUDA, then we can pass it to GPU encoder directly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+
+<span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>  <span class="c1"># GPU Encoder</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>  <span class="c1"># Run encoding on the cuda:0 device</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>  <span class="c1"># Data comes from cuda:0 device</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="s2">&quot;360p_cuda_hw.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 360, &#39;width&#39;: 640, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Destination: 360p_cuda_hw.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.7045466739999711 seconds.
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Encode-MP4---720P">
+<h3>Encode MP4 - 720P<a class="headerlink" href="#Encode-MP4---720P" title="Permalink to this heading">¶</a></h3>
+<p>Let’s run the same tests on video with larger resolution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pict_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">720</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1280</span><span class="p">,</span>
+    <span class="s2">&quot;frame_rate&quot;</span><span class="p">:</span> <span class="mi">30000</span><span class="o">/</span><span class="mi">1001</span><span class="p">,</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="o">**</span><span class="n">pict_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="id8">
+<h4>CPU<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;720p_cpu.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 720, &#39;width&#39;: 1280, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;libx264&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 720p_cpu.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 14.017578084000036 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id9">
+<h4>CUDA (from CPU Tensor)<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;720p_cuda.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 720, &#39;width&#39;: 1280, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 720p_cuda.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.9797491379999883 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id10">
+<h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+
+<span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="s2">&quot;720p_cuda_hw.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 720, &#39;width&#39;: 1280, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Destination: 720p_cuda_hw.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 0.7259890020000057 seconds.
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Encode-MP4---1080P">
+<h3>Encode MP4 - 1080P<a class="headerlink" href="#Encode-MP4---1080P" title="Permalink to this heading">¶</a></h3>
+<p>We make the video with even larger.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pict_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">1080</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+    <span class="s2">&quot;frame_rate&quot;</span><span class="p">:</span> <span class="mi">30000</span><span class="o">/</span><span class="mi">1001</span><span class="p">,</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="o">**</span><span class="n">pict_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="id11">
+<h4>CPU<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;libx264&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;1080p_cpu.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 1080, &#39;width&#39;: 1920, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;libx264&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 1080p_cpu.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 29.441768007999997 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id12">
+<h4>CUDA (from CPU Tensor)<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="s2">&quot;1080p_cuda.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 1080, &#39;width&#39;: 1920, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;}
+* Destination: 1080p_cuda.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 1.5768605540000067 seconds.
+
+</pre></div></div>
+</div>
+</section>
+<section id="id13">
+<h4>CUDA (from CUDA Tensor)<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+
+<span class="n">encode_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="s2">&quot;h264_nvenc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_format&quot;</span><span class="p">:</span> <span class="s2">&quot;yuv444p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoder_option&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;hw_accel&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_encode</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="s2">&quot;1080p_cuda_hw.mp4&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">pict_config</span><span class="p">,</span> <span class="o">**</span><span class="n">encode_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+========================================
+* Configuration: {&#39;height&#39;: 1080, &#39;width&#39;: 1920, &#39;frame_rate&#39;: 29.97002997002997, &#39;format&#39;: &#39;yuv444p&#39;, &#39;encoder&#39;: &#39;h264_nvenc&#39;, &#39;encoder_format&#39;: &#39;yuv444p&#39;, &#39;encoder_option&#39;: {&#39;gpu&#39;: &#39;0&#39;}, &#39;hw_accel&#39;: &#39;cuda:0&#39;}
+* Destination: 1080p_cuda_hw.mp4
+========================================
+
+ - Processed 450 frames.
+ - Elapsed: 1.4002963130000126 seconds.
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Result">
+<h3>Result<a class="headerlink" href="#Result" title="Permalink to this heading">¶</a></h3>
+<p>Here is the result.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="s2">&quot;CUDA (from CPU Tensor)&quot;</span><span class="p">,</span> <span class="s2">&quot;CUDA (from CUDA Tensor)&quot;</span><span class="p">]</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;360P&quot;</span><span class="p">,</span> <span class="s2">&quot;720P&quot;</span><span class="p">,</span> <span class="s2">&quot;1080P&quot;</span><span class="p">]</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                             360P       720P      1080P
+CPU                      6.311792  14.017578  29.441769
+CUDA (from CPU Tensor)   0.535233   0.979749   1.576861
+CUDA (from CUDA Tensor)  0.704547   0.725989   1.400296
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)],</span> <span class="n">columns</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/hw_acceleration_tutorial_91_0.png" src="_images/hw_acceleration_tutorial_91_0.png" />
+</div>
+</div>
+<p>The resulting videos look like the following.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+
+<span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">&lt;div&gt;</span>
+<span class="s1">  &lt;video width=360 controls autoplay&gt;</span>
+<span class="s1">    &lt;source src=&quot;https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cpu.mp4&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s1">  &lt;/video&gt;</span>
+<span class="s1">  &lt;video width=360 controls autoplay&gt;</span>
+<span class="s1">    &lt;source src=&quot;https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda.mp4&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s1">  &lt;/video&gt;</span>
+<span class="s1">  &lt;video width=360 controls autoplay&gt;</span>
+<span class="s1">    &lt;source src=&quot;https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda_hw.mp4&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s1">  &lt;/video&gt;</span>
+<span class="s1">&lt;/div&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+  <video width=360 controls autoplay>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cpu.mp4" type="video/mp4">
+  </video>
+  <video width=360 controls autoplay>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda.mp4" type="video/mp4">
+  </video>
+  <video width=360 controls autoplay>
+    <source src="https://download.pytorch.org/torchaudio/tutorial-assets/streamwriter_360p_cuda_hw.mp4" type="video/mp4">
+  </video>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Conclusion">
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this heading">¶</a></h2>
+<p>We looked at how to build FFmpeg libraries with NVDEC/NVENC support and use them from TorchAudio. NVDEC/NVENC provide significant speed up when saving/loading a video.</p>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorials/audio_resampling_tutorial.html" class="btn btn-neutral float-right" title="Audio Resampling" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="tutorials/streamwriter_advanced.html" class="btn btn-neutral" title="StreamWriter Advanced Usage" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2023, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">GPU video decoder/encoder</a><ul>
+<li><a class="reference internal" href="#Update-PyTorch-and-TorchAudio-with-nightly-builds">Update PyTorch and TorchAudio with nightly builds</a></li>
+<li><a class="reference internal" href="#Install-third-party-libraries-and-download-assets">Install third party libraries and download assets</a></li>
+<li><a class="reference internal" href="#Check-the-available-GPU">Check the available GPU</a></li>
+<li><a class="reference internal" href="#Check-FFmpeg-installation">Check FFmpeg installation</a></li>
+<li><a class="reference internal" href="#Check-the-TorchAudio-/-FFmpeg-integration">Check the TorchAudio / FFmpeg integration</a></li>
+<li><a class="reference internal" href="#Benchmarking-GPU-Encoding-and-Decoding">Benchmarking GPU Encoding and Decoding</a></li>
+<li><a class="reference internal" href="#Benchmark-NVDEC-with-StreamReader">Benchmark NVDEC with <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code></a><ul>
+<li><a class="reference internal" href="#Decode-MP4-from-local-file">Decode MP4 from local file</a><ul>
+<li><a class="reference internal" href="#CPU">CPU</a></li>
+<li><a class="reference internal" href="#CUDA">CUDA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Decode-MP4-from-network">Decode MP4 from network</a><ul>
+<li><a class="reference internal" href="#id1">CPU</a></li>
+<li><a class="reference internal" href="#id2">CUDA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Decode-MP4-directly-from-S3">Decode MP4 directly from S3</a><ul>
+<li><a class="reference internal" href="#Defining-Helper-class">Defining Helper class</a></li>
+<li><a class="reference internal" href="#id3">CPU</a></li>
+<li><a class="reference internal" href="#id4">CUDA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Decoding-and-resizing">Decoding and resizing</a><ul>
+<li><a class="reference internal" href="#id5">CPU</a></li>
+<li><a class="reference internal" href="#id6">CUDA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Results">Results</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Benchmark-NVENC-with-StreamWriter">Benchmark NVENC with <code class="docutils literal notranslate"><span class="pre">StreamWriter</span></code></a><ul>
+<li><a class="reference internal" href="#Encode-MP4---360P">Encode MP4 - 360P</a><ul>
+<li><a class="reference internal" href="#id7">CPU</a></li>
+<li><a class="reference internal" href="#CUDA-(from-CPU-Tensor)">CUDA (from CPU Tensor)</a></li>
+<li><a class="reference internal" href="#CUDA-(from-CUDA-Tensor)">CUDA (from CUDA Tensor)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Encode-MP4---720P">Encode MP4 - 720P</a><ul>
+<li><a class="reference internal" href="#id8">CPU</a></li>
+<li><a class="reference internal" href="#id9">CUDA (from CPU Tensor)</a></li>
+<li><a class="reference internal" href="#id10">CUDA (from CUDA Tensor)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Encode-MP4---1080P">Encode MP4 - 1080P</a><ul>
+<li><a class="reference internal" href="#id11">CPU</a></li>
+<li><a class="reference internal" href="#id12">CUDA (from CPU Tensor)</a></li>
+<li><a class="reference internal" href="#id13">CUDA (from CUDA Tensor)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Result">Result</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

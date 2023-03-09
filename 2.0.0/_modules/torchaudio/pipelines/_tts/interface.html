@@ -1,0 +1,995 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.pipelines._tts.interface &mdash; Torchaudio nightly documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../../../../versions.html">Nightly Build (2.0.0+64af805) &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../../../index.html">Module code</a> &gt;</li>
+        
+      <li>torchaudio.pipelines._tts.interface</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torchaudio.pipelines._tts.interface</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">Tacotron2</span>
+
+
+<span class="k">class</span> <span class="nc">_TextProcessor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The tokens that the each value in the processed tensor represent.</span>
+
+<span class="sd">        :type: List[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode the given (batch of) texts into numerical tensors</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text (str or list of str): The input texts.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Tensor):</span>
+<span class="sd">            Tensor:</span>
+<span class="sd">                The encoded texts. Shape: `(batch, max length)`</span>
+<span class="sd">            Tensor:</span>
+<span class="sd">                The valid length of each sample in the batch. Shape: `(batch, )`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">_Vocoder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sample rate of the resulting waveform</span>
+
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate waveform from the given input, such as spectrogram</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            specgrams (Tensor):</span>
+<span class="sd">                The input spectrogram. Shape: `(batch, frequency bins, time)`.</span>
+<span class="sd">                The expected shape depends on the implementation.</span>
+<span class="sd">            lengths (Tensor, or None, optional):</span>
+<span class="sd">                The valid length of each sample in the batch. Shape: `(batch, )`.</span>
+<span class="sd">                (Default: `None`)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Optional[Tensor]):</span>
+<span class="sd">            Tensor:</span>
+<span class="sd">                The generated waveform. Shape: `(batch, max length)`</span>
+<span class="sd">            Tensor or None:</span>
+<span class="sd">                The valid length of each sample in the batch. Shape: `(batch, )`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Tacotron2TTSBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle">[docs]</a><span class="k">class</span> <span class="nc">Tacotron2TTSBundle</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained Tacotron2 and vocoder.</span>
+
+<span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
+<span class="sd">    the information necessary to retrieve pretrained weights and additional data</span>
+<span class="sd">    to be used with the model.</span>
+
+<span class="sd">    Torchaudio library instantiates objects of this class, each of which represents</span>
+<span class="sd">    a different pretrained model. Client code should access pretrained models via these</span>
+<span class="sd">    instances.</span>
+
+<span class="sd">    Please see below for the usage and the available values.</span>
+
+<span class="sd">    Example - Character-based TTS pipeline with Tacotron2 and WaveRNN</span>
+<span class="sd">        &gt;&gt;&gt; import torchaudio</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; text = &quot;Hello, T T S !&quot;</span>
+<span class="sd">        &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Build processor, Tacotron2 and WaveRNN model</span>
+<span class="sd">        &gt;&gt;&gt; processor = bundle.get_text_processor()</span>
+<span class="sd">        &gt;&gt;&gt; tacotron2 = bundle.get_tacotron2()</span>
+<span class="sd">        Downloading:</span>
+<span class="sd">        100%|███████████████████████████████| 107M/107M [00:01&lt;00:00, 87.9MB/s]</span>
+<span class="sd">        &gt;&gt;&gt; vocoder = bundle.get_vocoder()</span>
+<span class="sd">        Downloading:</span>
+<span class="sd">        100%|███████████████████████████████| 16.7M/16.7M [00:00&lt;00:00, 78.1MB/s]</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Encode text</span>
+<span class="sd">        &gt;&gt;&gt; input, lengths = processor(text)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Generate (mel-scale) spectrogram</span>
+<span class="sd">        &gt;&gt;&gt; specgram, lengths, _ = tacotron2.infer(input, lengths)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Convert spectrogram to waveform</span>
+<span class="sd">        &gt;&gt;&gt; waveforms, lengths = vocoder(specgram, lengths)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;hello-tts.wav&#39;, waveforms, vocoder.sample_rate)</span>
+
+<span class="sd">    Example - Phoneme-based TTS pipeline with Tacotron2 and WaveRNN</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Note:</span>
+<span class="sd">        &gt;&gt;&gt; #     This bundle uses pre-trained DeepPhonemizer as</span>
+<span class="sd">        &gt;&gt;&gt; #     the text pre-processor.</span>
+<span class="sd">        &gt;&gt;&gt; #     Please install deep-phonemizer.</span>
+<span class="sd">        &gt;&gt;&gt; #     See https://github.com/as-ideas/DeepPhonemizer</span>
+<span class="sd">        &gt;&gt;&gt; #     The pretrained weight is automatically downloaded.</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; import torchaudio</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; text = &quot;Hello, TTS!&quot;</span>
+<span class="sd">        &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Build processor, Tacotron2 and WaveRNN model</span>
+<span class="sd">        &gt;&gt;&gt; processor = bundle.get_text_processor()</span>
+<span class="sd">        Downloading:</span>
+<span class="sd">        100%|███████████████████████████████| 63.6M/63.6M [00:04&lt;00:00, 15.3MB/s]</span>
+<span class="sd">        &gt;&gt;&gt; tacotron2 = bundle.get_tacotron2()</span>
+<span class="sd">        Downloading:</span>
+<span class="sd">        100%|███████████████████████████████| 107M/107M [00:01&lt;00:00, 87.9MB/s]</span>
+<span class="sd">        &gt;&gt;&gt; vocoder = bundle.get_vocoder()</span>
+<span class="sd">        Downloading:</span>
+<span class="sd">        100%|███████████████████████████████| 16.7M/16.7M [00:00&lt;00:00, 78.1MB/s]</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Encode text</span>
+<span class="sd">        &gt;&gt;&gt; input, lengths = processor(text)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Generate (mel-scale) spectrogram</span>
+<span class="sd">        &gt;&gt;&gt; specgram, lengths, _ = tacotron2.infer(input, lengths)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Convert spectrogram to waveform</span>
+<span class="sd">        &gt;&gt;&gt; waveforms, lengths = vocoder(specgram, lengths)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;hello-tts.wav&#39;, waveforms, vocoder.sample_rate)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Using the inner class so that these interfaces are not directly exposed on</span>
+    <span class="c1"># `torchaudio.pipelines`, but still listed in documentation.</span>
+    <span class="c1"># The thing is, text processing and vocoder are generic and we do not know what kind of</span>
+    <span class="c1"># new text processing and vocoder will be added in the future, so we want to make these</span>
+    <span class="c1"># interfaces specific to this Tacotron2TTS pipeline.</span>
+
+    <span class="k">class</span> <span class="nc">TextProcessor</span><span class="p">(</span><span class="n">_TextProcessor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interface of the text processing part of Tacotron2TTS pipeline</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor` for the usage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Vocoder</span><span class="p">(</span><span class="n">_Vocoder</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interface of the vocoder part of Tacotron2TTS pipeline</span>
+
+<span class="sd">        See :func:`torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder` for the usage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Tacotron2TTSBundle.get_text_processor"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_text_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TextProcessor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a text processor</span>
+
+<span class="sd">        For character-based pipeline, this processor splits the input text by character.</span>
+<span class="sd">        For phoneme-based pipeline, this processor converts the input text (grapheme) to</span>
+<span class="sd">        phonemes.</span>
+
+<span class="sd">        If a pre-trained weight file is necessary,</span>
+<span class="sd">        :func:`torch.hub.download_url_to_file` is used to downloaded it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dl_kwargs (dictionary of keyword arguments,):</span>
+<span class="sd">                Passed to :func:`torch.hub.download_url_to_file`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TextProcessor:</span>
+<span class="sd">                A callable which takes a string or a list of strings as input and</span>
+<span class="sd">                returns Tensor of encoded texts and Tensor of valid lengths.</span>
+<span class="sd">                The object also has ``tokens`` property, which allows to recover the</span>
+<span class="sd">                tokenized form.</span>
+
+<span class="sd">        Example - Character-based</span>
+<span class="sd">            &gt;&gt;&gt; text = [</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;Hello World!&quot;,</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;Text-to-speech!&quot;,</span>
+<span class="sd">            &gt;&gt;&gt; ]</span>
+<span class="sd">            &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH</span>
+<span class="sd">            &gt;&gt;&gt; processor = bundle.get_text_processor()</span>
+<span class="sd">            &gt;&gt;&gt; input, lengths = processor(text)</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print(input)</span>
+<span class="sd">            tensor([[19, 16, 23, 23, 26, 11, 34, 26, 29, 23, 15,  2,  0,  0,  0],</span>
+<span class="sd">                    [31, 16, 35, 31,  1, 31, 26,  1, 30, 27, 16, 16, 14, 19,  2]],</span>
+<span class="sd">                   dtype=torch.int32)</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print(lengths)</span>
+<span class="sd">            tensor([12, 15], dtype=torch.int32)</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[0, :lengths[0]]])</span>
+<span class="sd">            [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;]</span>
+<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[1, :lengths[1]]])</span>
+<span class="sd">            [&#39;t&#39;, &#39;e&#39;, &#39;x&#39;, &#39;t&#39;, &#39;-&#39;, &#39;t&#39;, &#39;o&#39;, &#39;-&#39;, &#39;s&#39;, &#39;p&#39;, &#39;e&#39;, &#39;e&#39;, &#39;c&#39;, &#39;h&#39;, &#39;!&#39;]</span>
+
+<span class="sd">        Example - Phoneme-based</span>
+<span class="sd">            &gt;&gt;&gt; text = [</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;Hello, T T S !&quot;,</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;Text-to-speech!&quot;,</span>
+<span class="sd">            &gt;&gt;&gt; ]</span>
+<span class="sd">            &gt;&gt;&gt; bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
+<span class="sd">            &gt;&gt;&gt; processor = bundle.get_text_processor()</span>
+<span class="sd">            Downloading:</span>
+<span class="sd">            100%|███████████████████████████████| 63.6M/63.6M [00:04&lt;00:00, 15.3MB/s]</span>
+<span class="sd">            &gt;&gt;&gt; input, lengths = processor(text)</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print(input)</span>
+<span class="sd">            tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2,  0,  0,  0,  0],</span>
+<span class="sd">                    [81, 40, 64, 79, 81,  1, 81, 20,  1, 79, 77, 59, 37,  2]],</span>
+<span class="sd">                   dtype=torch.int32)</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print(lengths)</span>
+<span class="sd">            tensor([10, 14], dtype=torch.int32)</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[0]])</span>
+<span class="sd">            [&#39;HH&#39;, &#39;AH&#39;, &#39;L&#39;, &#39;OW&#39;, &#39; &#39;, &#39;W&#39;, &#39;ER&#39;, &#39;L&#39;, &#39;D&#39;, &#39;!&#39;, &#39;_&#39;, &#39;_&#39;, &#39;_&#39;, &#39;_&#39;]</span>
+<span class="sd">            &gt;&gt;&gt; print([processor.tokens[i] for i in input[1]])</span>
+<span class="sd">            [&#39;T&#39;, &#39;EH&#39;, &#39;K&#39;, &#39;S&#39;, &#39;T&#39;, &#39;-&#39;, &#39;T&#39;, &#39;AH&#39;, &#39;-&#39;, &#39;S&#39;, &#39;P&#39;, &#39;IY&#39;, &#39;CH&#39;, &#39;!&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Tacotron2TTSBundle.get_vocoder"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_vocoder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vocoder</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a vocoder module, based off of either WaveRNN or GriffinLim.</span>
+
+<span class="sd">        If a pre-trained weight file is necessary,</span>
+<span class="sd">        :func:`torch.hub.load_state_dict_from_url` is used to downloaded it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dl_kwargs (dictionary of keyword arguments):</span>
+<span class="sd">                Passed to :func:`torch.hub.load_state_dict_from_url`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Vocoder:</span>
+<span class="sd">                A vocoder module, which takes spectrogram Tensor and an optional</span>
+<span class="sd">                length Tensor, then returns resulting waveform Tensor and an optional</span>
+<span class="sd">                length Tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Tacotron2TTSBundle.get_tacotron2"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_tacotron2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tacotron2</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Tacotron2 model with pre-trained weight.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dl_kwargs (dictionary of keyword arguments):</span>
+<span class="sd">                Passed to :func:`torch.hub.load_state_dict_from_url`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tacotron2:</span>
+<span class="sd">                The resulting model.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2023, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+         <script src="../../../../_static/jquery.js"></script>
+         <script src="../../../../_static/underscore.js"></script>
+         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../../../../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../../../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>
