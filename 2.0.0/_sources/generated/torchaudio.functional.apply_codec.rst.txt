@@ -1,0 +1,6 @@
+﻿torchaudio.functional.apply\_codec
+==================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: apply_codec
