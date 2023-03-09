@@ -1,6 +1,5 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <vector>

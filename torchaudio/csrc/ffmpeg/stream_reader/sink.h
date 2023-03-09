@@ -12,7 +12,7 @@ class Sink {
 
   // Parameters for recreating FilterGraph
   AVRational input_time_base;
-  AVCodecParameters* codecpar;
+  AVCodecContext* codec_ctx;
   AVRational frame_rate;
   std::string filter_description;
   std::unique_ptr<FilterGraph> filter;
@@ -23,7 +23,7 @@ class Sink {
   std::unique_ptr<Buffer> buffer;
   Sink(
       AVRational input_time_base,
-      AVCodecParameters* codecpar,
+      AVCodecContext* codec_ctx,
       int frames_per_chunk,
       int num_chunks,
       AVRational frame_rate,
