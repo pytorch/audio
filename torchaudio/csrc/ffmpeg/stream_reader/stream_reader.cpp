@@ -89,27 +89,24 @@ StreamReader::StreamReader(
 //////////////////////////////////////////////////////////////////////////////
 // Helper methods
 //////////////////////////////////////////////////////////////////////////////
-void StreamReader::validate_open_stream() const {
-  TORCH_CHECK(pFormatContext, "Stream is not open.");
+void validate_open_stream(AVFormatContext* format_ctx) {
+  TORCH_CHECK(format_ctx, "Stream is not open.");
 }
 
-void StreamReader::validate_src_stream_index(int i) const {
-  validate_open_stream();
+void validate_src_stream_index(AVFormatContext* format_ctx, int i) {
+  validate_open_stream(format_ctx);
   TORCH_CHECK(
-      i >= 0 && i < static_cast<int>(pFormatContext->nb_streams),
+      i >= 0 && i < static_cast<int>(format_ctx->nb_streams),
       "Source stream index out of range");
 }
 
-void StreamReader::validate_output_stream_index(int i) const {
+void validate_src_stream_type(
+    AVFormatContext* format_ctx,
+    int i,
+    AVMediaType type) {
+  validate_src_stream_index(format_ctx, i);
   TORCH_CHECK(
-      i >= 0 && i < static_cast<int>(stream_indices.size()),
-      "Output stream index out of range");
-}
-
-void StreamReader::validate_src_stream_type(int i, AVMediaType type) {
-  validate_src_stream_index(i);
-  TORCH_CHECK(
-      pFormatContext->streams[i]->codecpar->codec_type == type,
+      format_ctx->streams[i]->codecpar->codec_type == type,
       "Stream ",
       i,
       " is not ",
@@ -140,7 +137,8 @@ OptionDict StreamReader::get_metadata() const {
 }
 
 SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
-  validate_src_stream_index(i);
+  validate_src_stream_index(pFormatContext, i);
+
   AVStream* stream = pFormatContext->streams[i];
   AVCodecParameters* codecpar = stream->codecpar;
 
@@ -186,7 +184,9 @@ int64_t StreamReader::num_out_streams() const {
 }
 
 OutputStreamInfo StreamReader::get_out_stream_info(int i) const {
-  validate_output_stream_index(i);
+  TORCH_CHECK(
+      i >= 0 && static_cast<size_t>(i) < stream_indices.size(),
+      "Output stream index out of range");
   int i_src = stream_indices[i].first;
   KeyType key = stream_indices[i].second;
   FilterGraphOutputInfo info = processors[i_src]->get_filter_output_info(key);
@@ -337,7 +337,7 @@ void StreamReader::add_stream(
     const c10::optional<std::string>& decoder,
     const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
-  validate_src_stream_type(i, media_type);
+  validate_src_stream_type(pFormatContext, i, media_type);
 
   AVStream* stream = pFormatContext->streams[i];
   // When media source is file-like object, it is possible that source codec is
@@ -372,7 +372,9 @@ void StreamReader::add_stream(
 }
 
 void StreamReader::remove_stream(int64_t i) {
-  validate_output_stream_index(static_cast<int>(i));
+  TORCH_CHECK(
+      i >= 0 && static_cast<size_t>(i) < stream_indices.size(),
+      "Output stream index out of range");
   auto it = stream_indices.begin() + i;
   int iP = it->first;
   processors[iP]->remove_stream(it->second);
