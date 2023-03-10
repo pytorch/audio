@@ -180,6 +180,7 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
       " (",
       av_err2string(ret),
       ")");
+  is_open = true;
 }
 
 void StreamWriter::close() {
@@ -196,29 +197,39 @@ void StreamWriter::close() {
     // avio_closep can be only applied to AVIOContext opened by avio_open
     avio_closep(&(pFormatContext->pb));
   }
+  is_open = false;
 }
 
-void StreamWriter::write_audio_chunk(int i, const torch::Tensor& waveform) {
+void StreamWriter::write_audio_chunk(
+    int i,
+    const torch::Tensor& waveform,
+    const c10::optional<double>& pts) {
+  TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(processes.size()),
       "Invalid stream index. Index must be in range of [0, ",
       processes.size(),
       "). Found: ",
       i);
-  processes[i].process(AVMEDIA_TYPE_AUDIO, waveform);
+  processes[i].process(AVMEDIA_TYPE_AUDIO, waveform, pts);
 }
 
-void StreamWriter::write_video_chunk(int i, const torch::Tensor& frames) {
+void StreamWriter::write_video_chunk(
+    int i,
+    const torch::Tensor& frames,
+    const c10::optional<double>& pts) {
+  TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(processes.size()),
       "Invalid stream index. Index must be in range of [0, ",
       processes.size(),
       "). Found: ",
       i);
-  processes[i].process(AVMEDIA_TYPE_VIDEO, frames);
+  processes[i].process(AVMEDIA_TYPE_VIDEO, frames, pts);
 }
 
 void StreamWriter::flush() {
+  TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   for (auto& p : processes) {
     p.flush();
   }

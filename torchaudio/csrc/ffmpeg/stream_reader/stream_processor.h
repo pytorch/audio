@@ -2,7 +2,6 @@
 
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <map>
@@ -15,13 +14,12 @@ class StreamProcessor {
   using KeyType = int;
 
  private:
-  // Link to the corresponding stream object
-  const AVStream* stream;
+  // Stream time base which is not stored in AVCodecContextPtr
+  AVRational stream_time_base;
+  AVCodecContextPtr codec_ctx;
 
   // Components for decoding source media
-  AVFramePtr pFrame1;
-  AVFramePtr pFrame2;
-  Decoder decoder;
+  AVFramePtr frame;
 
   KeyType current_key = 0;
   std::map<KeyType, Sink> sinks;
@@ -35,7 +33,8 @@ class StreamProcessor {
 
  public:
   StreamProcessor(
-      AVStream* stream,
+      const AVRational& time_base,
+      const AVCodecParameters* codecpar,
       const c10::optional<std::string>& decoder_name,
       const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);
@@ -59,6 +58,7 @@ class StreamProcessor {
   KeyType add_stream(
       int frames_per_chunk,
       int num_chunks,
+      AVRational frame_rate,
       const c10::optional<std::string>& filter_description,
       const torch::Device& device);
 
@@ -72,7 +72,9 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
-  std::string get_filter_description(KeyType key) const;
+  [[nodiscard]] std::string get_filter_description(KeyType key) const;
+  [[nodiscard]] FilterGraphOutputInfo get_filter_output_info(KeyType key) const;
+
   bool is_buffer_ready() const;
 
   //////////////////////////////////////////////////////////////////////////////

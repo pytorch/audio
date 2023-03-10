@@ -1,6 +1,5 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <vector>
@@ -91,15 +90,6 @@ class StreamReader {
   StreamReader& operator=(StreamReader&&) = default;
 
   /// @endcond
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Helper methods
-  //////////////////////////////////////////////////////////////////////////////
- private:
-  void validate_open_stream() const;
-  void validate_src_stream_index(int i) const;
-  void validate_output_stream_index(int i) const;
-  void validate_src_stream_type(int i, AVMediaType type);
 
   //////////////////////////////////////////////////////////////////////////////
   // Query methods

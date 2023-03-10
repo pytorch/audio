@@ -41,6 +41,7 @@ std::string get_audio_src_args(
 std::string get_video_src_args(
     AVPixelFormat format,
     AVRational time_base,
+    AVRational frame_rate,
     int width,
     int height,
     AVRational sample_aspect_ratio) {
@@ -48,12 +49,14 @@ std::string get_video_src_args(
   std::snprintf(
       args,
       sizeof(args),
-      "video_size=%dx%d:pix_fmt=%s:time_base=%d/%d:pixel_aspect=%d/%d",
+      "video_size=%dx%d:pix_fmt=%s:time_base=%d/%d:frame_rate=%d/%d:pixel_aspect=%d/%d",
       width,
       height,
       av_get_pix_fmt_name(format),
       time_base.num,
       time_base.den,
+      frame_rate.num,
+      frame_rate.den,
       sample_aspect_ratio.num,
       sample_aspect_ratio.den);
   return std::string(args);
@@ -76,13 +79,14 @@ void FilterGraph::add_audio_src(
 void FilterGraph::add_video_src(
     AVPixelFormat format,
     AVRational time_base,
+    AVRational frame_rate,
     int width,
     int height,
     AVRational sample_aspect_ratio) {
   TORCH_CHECK(
       media_type == AVMEDIA_TYPE_VIDEO, "The filter graph is not video type.");
-  std::string args =
-      get_video_src_args(format, time_base, width, height, sample_aspect_ratio);
+  std::string args = get_video_src_args(
+      format, time_base, frame_rate, width, height, sample_aspect_ratio);
   add_src(args);
 }
 
@@ -164,7 +168,7 @@ void FilterGraph::add_process(const std::string& filter_description) {
 void FilterGraph::create_filter() {
   int ret = avfilter_graph_config(pFilterGraph, nullptr);
   TORCH_CHECK(ret >= 0, "Failed to configure the graph: " + av_err2string(ret));
-  // char* desc = avfilter_graph_dump(pFilterGraph.get(), NULL);
+  // char* desc = avfilter_graph_dump(pFilterGraph, NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
   // av_free(static_cast<void*>(desc));
 }
@@ -177,15 +181,26 @@ AVRational FilterGraph::get_output_timebase() const {
   return buffersink_ctx->inputs[0]->time_base;
 }
 
-int FilterGraph::get_output_sample_rate() const {
+FilterGraphOutputInfo FilterGraph::get_output_info() const {
   TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
-  return buffersink_ctx->inputs[0]->sample_rate;
-}
-
-int FilterGraph::get_output_channels() const {
-  TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
-  return av_get_channel_layout_nb_channels(
-      buffersink_ctx->inputs[0]->channel_layout);
+  AVFilterLink* l = buffersink_ctx->inputs[0];
+  FilterGraphOutputInfo ret{};
+  ret.type = l->type;
+  ret.format = l->format;
+  if (l->type == AVMEDIA_TYPE_AUDIO) {
+    ret.sample_rate = l->sample_rate;
+#if LIBAVFILTER_VERSION_MAJOR >= 8 && LIBAVFILTER_VERSION_MINOR >= 44
+    ret.num_channels = l->ch_layout.nb_channels;
+#else
+    // Before FFmpeg 5.1
+    ret.num_channels = av_get_channel_layout_nb_channels(l->channel_layout);
+#endif
+  } else {
+    ret.frame_rate = l->frame_rate;
+    ret.height = l->h;
+    ret.width = l->w;
+  }
+  return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
