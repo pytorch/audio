@@ -348,7 +348,7 @@ void StreamReader::add_stream(
 
   if (!processors[i]) {
     processors[i] = std::make_unique<StreamProcessor>(
-        stream, decoder, decoder_option, device);
+        stream->time_base, stream->codecpar, decoder, decoder_option, device);
     processors[i]->set_discard_timestamp(seek_timestamp);
   }
   stream->discard = AVDISCARD_DEFAULT;
