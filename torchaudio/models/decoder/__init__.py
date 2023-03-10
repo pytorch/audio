@@ -9,7 +9,8 @@ _LAZILY_IMPORTED = [
 ]
 _LAZILY_IMPORTED_CUCTC = [
     "CUCTCDecoder",
-    "cuda_ctc_decoder"
+    "CUCTCHypothesis",
+    "cuda_ctc_decoder",
 ]
 
 def __getattr__(name: str):
@@ -29,7 +30,7 @@ def __getattr__(name: str):
             from . import _cuda_ctc_decoder
         except AttributeError as err:
             raise RuntimeError(
-                "CTC decoder requires the decoder extension. Please set BUILD_CTC_DECODER=1 when building from source."
+                "CUCTC decoder requires the decoder extension. Please set BUILD_CUDA_CTC_DECODER=1 when building from source."
             ) from err
 
         item = getattr(_cuda_ctc_decoder, name)
@@ -39,7 +40,7 @@ def __getattr__(name: str):
 
 
 def __dir__():
-    return sorted(__all__ + _LAZILY_IMPORTED)
+    return sorted(__all__ + _LAZILY_IMPORTED + _LAZILY_IMPORTED_CUCTC)
 
 
 __all__ = []

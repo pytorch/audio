@@ -46,7 +46,7 @@ class CUCTCHypothesis(NamedTuple):
 class CUCTCDecoder:
     """CUDA CTC beam search decoder.
 
-    .. devices:: GPU
+    .. devices:: CUDA
 
     Note:
         To build the decoder, please use the factory function :func:`cuda_ctc_decoder`.
@@ -73,7 +73,7 @@ class CUCTCDecoder:
         cuda_stream_ = cuda_stream.cuda_stream if cuda_stream else torch.cuda.current_stream().cuda_stream
         self.internal_data = cuctc.prefixCTC_alloc(cuda_stream_)
         self.memory = torch.empty(0, dtype=torch.int8, device=torch.device('cuda'))
-        self.blank_id = 0 # TODO: allow to customize blank_id
+        self.blank_id = 0 # blank id has to be zero
         self.vocab_list = vocab_list
         self.space_id = 0
         self.nbest = nbest
@@ -81,7 +81,8 @@ class CUCTCDecoder:
         self.beam_size = beam_size
 
     def __del__(self):
-        cuctc.prefixCTC_free(self.internal_data)
+        if cuctc is not None:
+            cuctc.prefixCTC_free(self.internal_data)
 
     def __call__(self, log_prob: torch.Tensor, encoder_out_lens: torch.Tensor):
         """
