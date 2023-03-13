@@ -176,11 +176,6 @@ else:
     version = f"Nightly Build ({torchaudio.__version__})"
     release = "nightly"
 
-#
-# Override version for testing
-#
-version = '0.12.1'
-
 
 #
 # Specify the version of the current stable release.
@@ -188,7 +183,7 @@ version = '0.12.1'
 #
 # https://stackoverflow.com/a/33845358/1106930
 #
-html_context = { 'version_stable': '0.13.1' }
+html_context = {"version_stable": "0.13.1"}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -371,18 +366,6 @@ def inject_minigalleries(app, what, name, obj, options, lines):
 
 def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
-
-
-#
-# Get the version of the current stable build
-# Expects the argument to be versions.html
-#
-def get_stable ( versions_file ):
-    versions = open( versions_file )
-
-    for version_line in versions:
-        if "stable release" in version_line:
-            print( version_line.split( "v" )[1].split( " " )[ 0 ] )
 
 
 from custom_directives import CustomCardEnd, CustomCardItem, CustomCardStart, SupportedDevices, SupportedProperties
