@@ -61,6 +61,8 @@ Support Structures
     "SourceAudioStream",
     "SourceVideoStream",
     "OutputStream",
+    "OutputAudioStream",
+    "OutputVideoStream",
 ] %}
 
 {{ item | underline("~") }}

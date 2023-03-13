@@ -49,25 +49,27 @@ std::unique_ptr<Buffer> get_buffer(
 
 std::unique_ptr<FilterGraph> get_filter_graph(
     AVRational input_time_base,
-    AVCodecParameters* codecpar,
+    AVCodecContext* codec_ctx,
+    AVRational frame_rate,
     const std::string& filter_description) {
-  auto p = std::make_unique<FilterGraph>(codecpar->codec_type);
+  auto p = std::make_unique<FilterGraph>(codec_ctx->codec_type);
 
-  switch (codecpar->codec_type) {
+  switch (codec_ctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
       p->add_audio_src(
-          static_cast<AVSampleFormat>(codecpar->format),
+          codec_ctx->sample_fmt,
           input_time_base,
-          codecpar->sample_rate,
-          codecpar->channel_layout);
+          codec_ctx->sample_rate,
+          codec_ctx->channel_layout);
       break;
     case AVMEDIA_TYPE_VIDEO:
       p->add_video_src(
-          static_cast<AVPixelFormat>(codecpar->format),
+          codec_ctx->pix_fmt,
           input_time_base,
-          codecpar->width,
-          codecpar->height,
-          codecpar->sample_aspect_ratio);
+          frame_rate,
+          codec_ctx->width,
+          codec_ctx->height,
+          codec_ctx->sample_aspect_ratio);
       break;
     default:
       TORCH_CHECK(false, "Only audio/video are supported.");
@@ -82,19 +84,25 @@ std::unique_ptr<FilterGraph> get_filter_graph(
 
 Sink::Sink(
     AVRational input_time_base_,
-    AVCodecParameters* codecpar_,
+    AVCodecContext* codec_ctx_,
     int frames_per_chunk,
     int num_chunks,
+    AVRational frame_rate_,
     const c10::optional<std::string>& filter_description_,
     const torch::Device& device)
     : input_time_base(input_time_base_),
-      codecpar(codecpar_),
+      codec_ctx(codec_ctx_),
+      frame_rate(frame_rate_),
       filter_description(filter_description_.value_or(
-          codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
-      filter(get_filter_graph(input_time_base_, codecpar_, filter_description)),
+          codec_ctx->codec_type == AVMEDIA_TYPE_AUDIO ? "anull" : "null")),
+      filter(get_filter_graph(
+          input_time_base_,
+          codec_ctx,
+          frame_rate,
+          filter_description)),
       output_time_base(filter->get_output_timebase()),
       buffer(get_buffer(
-          codecpar_->codec_type,
+          codec_ctx->codec_type,
           frames_per_chunk,
           num_chunks,
           double(output_time_base.num) / output_time_base.den,
@@ -125,8 +133,13 @@ std::string Sink::get_filter_description() const {
   return filter_description;
 }
 
+FilterGraphOutputInfo Sink::get_filter_output_info() const {
+  return filter->get_output_info();
+}
+
 void Sink::flush() {
-  filter = get_filter_graph(input_time_base, codecpar, filter_description);
+  filter = get_filter_graph(
+      input_time_base, codec_ctx, frame_rate, filter_description);
   buffer->flush();
 }
 

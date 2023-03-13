@@ -12,7 +12,8 @@ class Sink {
 
   // Parameters for recreating FilterGraph
   AVRational input_time_base;
-  AVCodecParameters* codecpar;
+  AVCodecContext* codec_ctx;
+  AVRational frame_rate;
   std::string filter_description;
   std::unique_ptr<FilterGraph> filter;
   // time_base of filter graph output, used for PTS calc
@@ -22,13 +23,16 @@ class Sink {
   std::unique_ptr<Buffer> buffer;
   Sink(
       AVRational input_time_base,
-      AVCodecParameters* codecpar,
+      AVCodecContext* codec_ctx,
       int frames_per_chunk,
       int num_chunks,
+      AVRational frame_rate,
       const c10::optional<std::string>& filter_description,
       const torch::Device& device);
 
-  std::string get_filter_description() const;
+  [[nodiscard]] std::string get_filter_description() const;
+  [[nodiscard]] FilterGraphOutputInfo get_filter_output_info() const;
+
   int process_frame(AVFrame* frame);
   bool is_buffer_ready() const;
 

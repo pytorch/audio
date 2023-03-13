@@ -3,7 +3,7 @@
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
-#include <torchaudio/csrc/ffmpeg/stream_writer/output_stream.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
 
 namespace torchaudio {
 namespace io {
@@ -14,8 +14,9 @@ namespace io {
 class StreamWriter {
   AVFormatOutputContextPtr pFormatContext;
   AVBufferRefPtr pHWBufferRef;
-  std::vector<std::unique_ptr<OutputStream>> streams;
+  std::vector<EncodeProcess> processes;
   AVPacketPtr pkt;
+  bool is_open = false;
 
  protected:
   /// @cond
@@ -161,19 +162,44 @@ class StreamWriter {
   /// @param i Stream index.
   /// @param chunk Waveform tensor. Shape: ``(frame, channel)``.
   /// The ``dtype`` must match what was passed to ``add_audio_stream()`` method.
-  void write_audio_chunk(int i, const torch::Tensor& chunk);
+  /// @param pts
+  /// @parblock
+  /// Presentation timestamp. If provided, it overwrites the PTS of
+  /// the first frame with the provided one. Otherwise, PTS are incremented per
+  /// an inverse of sample rate. Only values exceed the PTS values processed
+  /// internally.
+  ///
+  /// __NOTE__: The provided value is converted to integer value expressed
+  /// in basis of sample rate.
+  /// Therefore, it is truncated to the nearest value of ``n / sample_rate``.
+  /// @endparblock
+  void write_audio_chunk(
+      int i,
+      const torch::Tensor& frames,
+      const c10::optional<double>& pts = {});
   /// Write video data
   /// @param i Stream index.
   /// @param chunk Video/image tensor. Shape: ``(time, channel, height,
   /// width)``. The ``dtype`` must be ``torch.uint8``. The shape ``(height,
   /// width and the number of channels)`` must match what was configured when
   /// calling ``add_video_stream()``.
-  void write_video_chunk(int i, const torch::Tensor& chunk);
+  /// @param pts
+  /// @parblock
+  /// Presentation timestamp. If provided, it overwrites the PTS of
+  /// the first frame with the provided one. Otherwise, PTS are incremented per
+  /// an inverse of frame rate. Only values exceed the PTS values processed
+  /// internally.
+  ///
+  /// __NOTE__: The provided value is converted to integer value expressed
+  /// in basis of frame rate.
+  /// Therefore, it is truncated to the nearest value of ``n / frame_rate``.
+  /// @endparblock
+  void write_video_chunk(
+      int i,
+      const torch::Tensor& frames,
+      const c10::optional<double>& pts = {});
   /// Flush the frames from encoders and write the frames to the destination.
   void flush();
-
- private:
-  void validate_stream(int i, enum AVMediaType);
 };
 
 } // namespace io
