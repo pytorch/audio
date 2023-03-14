@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230313) &#x25BC</a>
+      <a href="../../versions.html">Nightly Build (2.0.0.dev20230314) &#x25BC</a>
     </div>
     
 
@@ -465,8 +465,8 @@ labels. They are bundled together and available under
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230313
-2.0.0.dev20230313
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230314
+2.0.0.dev20230314
 cpu
 </pre></div>
 </div>
@@ -478,7 +478,7 @@ cpu
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/106k [00:00&lt;?, ?B/s]
-100%|##########| 106k/106k [00:00&lt;00:00, 41.9MB/s]
+100%|##########| 106k/106k [00:00&lt;00:00, 16.3MB/s]
 </pre></div>
 </div>
 </section>
@@ -521,17 +521,16 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
-  9%|8         | 30.7M/360M [00:00&lt;00:01, 321MB/s]
- 17%|#7        | 61.3M/360M [00:00&lt;00:01, 265MB/s]
- 28%|##7       | 99.4M/360M [00:00&lt;00:00, 320MB/s]
- 37%|###6      | 132M/360M [00:00&lt;00:00, 327MB/s]
- 45%|####5     | 164M/360M [00:00&lt;00:00, 256MB/s]
- 56%|#####6    | 203M/360M [00:00&lt;00:00, 300MB/s]
- 65%|######5   | 234M/360M [00:00&lt;00:00, 259MB/s]
- 75%|#######4  | 270M/360M [00:00&lt;00:00, 287MB/s]
- 84%|########3 | 302M/360M [00:01&lt;00:00, 300MB/s]
- 92%|#########2| 332M/360M [00:01&lt;00:00, 305MB/s]
-100%|##########| 360M/360M [00:01&lt;00:00, 300MB/s]
+  8%|8         | 29.1M/360M [00:00&lt;00:01, 305MB/s]
+ 17%|#7        | 62.9M/360M [00:00&lt;00:00, 334MB/s]
+ 26%|##6       | 94.7M/360M [00:00&lt;00:00, 308MB/s]
+ 37%|###6      | 133M/360M [00:00&lt;00:00, 343MB/s]
+ 48%|####7     | 171M/360M [00:00&lt;00:00, 363MB/s]
+ 59%|#####8    | 212M/360M [00:00&lt;00:00, 385MB/s]
+ 70%|#######   | 252M/360M [00:00&lt;00:00, 397MB/s]
+ 81%|########  | 290M/360M [00:00&lt;00:00, 397MB/s]
+ 91%|#########1| 328M/360M [00:00&lt;00:00, 384MB/s]
+100%|##########| 360M/360M [00:01&lt;00:00, 366MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -703,7 +702,7 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.096 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.743 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
