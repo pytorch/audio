@@ -1,8 +1,8 @@
 {% extends "!layout.html" %}
 
 {% block sidebartitle %}
-    <div class="version" style="font-weight:bold">
-      <a style="font-size:103%" href="{{ pathto('../versions.html', 1) }}">{{ version }} &#x25BC</a>
+    <div class="version">
+      <a href="{{ pathto('../versions.html', 1) }}"><span style="font-size:110%">{{ version }} &#x25BC</span></a>
     </div>
     {% include "searchbox.html" %}
 {% endblock %}
