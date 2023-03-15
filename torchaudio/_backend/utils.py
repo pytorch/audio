@@ -309,14 +309,13 @@ def get_info_func():
 
                     * ``path-like``: file path
                     * ``file-like``: Object with ``read(size: int) -> bytes`` method,
-                        which returns byte string of at most ``size`` length.
+                      which returns byte string of at most ``size`` length.
 
                 Note:
-
-                    * When the input type is file-like object, this function cannot
-                        get the correct length (``num_samples``) for certain formats,
-                        such as ``vorbis``.
-                        In this case, the value of ``num_samples`` is ``0``.
+                    When the input type is file-like object, this function cannot
+                    get the correct length (``num_samples``) for certain formats,
+                    such as ``vorbis``.
+                    In this case, the value of ``num_samples`` is ``0``.
 
             format (str or None, optional):
                 If not ``None``, interpreted as hint that may allow backend to override the detected format.
@@ -386,21 +385,21 @@ def get_load_func():
 
         .. warning::
 
-        ``normalize`` argument does not perform volume normalization.
-        It only converts the sample type to `torch.float32` from the native sample
-        type.
+            ``normalize`` argument does not perform volume normalization.
+            It only converts the sample type to `torch.float32` from the native sample
+            type.
 
-        When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
-        signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
-        this function can return integer Tensor, where the samples are expressed within the whole range
-        of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
-        ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
-        support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
+            When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+            signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
+            this function can return integer Tensor, where the samples are expressed within the whole range
+            of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
+            ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
+            support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
 
-        ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as
-        ``flac`` and ``mp3``.
+            ``normalize`` argument has no effect on 32-bit floating-point WAV and other formats, such as
+            ``flac`` and ``mp3``.
 
-        For these formats, this function always returns ``float32`` Tensor with values.
+            For these formats, this function always returns ``float32`` Tensor with values.
 
 
         Args:

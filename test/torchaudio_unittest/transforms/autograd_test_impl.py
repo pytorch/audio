@@ -112,7 +112,7 @@ class AutogradTestMixin(TestBaseMixin):
         sample_rate = 8000
         transform = T.MFCC(sample_rate=sample_rate, log_mels=log_mels)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     @parameterized.expand([(False,), (True,)])
     def test_lfcc(self, log_lf):
