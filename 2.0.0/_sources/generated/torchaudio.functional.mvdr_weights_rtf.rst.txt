@@ -1,6 +1,0 @@
-﻿torchaudio.functional.mvdr\_weights\_rtf
-========================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: mvdr_weights_rtf

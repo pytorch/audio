@@ -1,6 +1,0 @@
-﻿torchaudio.functional.equalizer\_biquad
-=======================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: equalizer_biquad

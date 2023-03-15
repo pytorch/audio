@@ -1,6 +1,0 @@
-﻿torchaudio.functional.inverse\_spectrogram
-==========================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: inverse_spectrogram

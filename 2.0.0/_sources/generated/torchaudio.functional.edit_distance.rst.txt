@@ -1,6 +1,0 @@
-﻿torchaudio.functional.edit\_distance
-====================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: edit_distance

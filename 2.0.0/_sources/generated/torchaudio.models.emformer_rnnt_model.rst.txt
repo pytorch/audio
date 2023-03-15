@@ -1,6 +1,0 @@
-torchaudio.models.emformer\_rnnt\_model
-=======================================
-
-.. currentmodule:: torchaudio.models
-
-.. autofunction:: emformer_rnnt_model

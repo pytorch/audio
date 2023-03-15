@@ -1,6 +1,0 @@
-﻿torchaudio.functional.detect\_pitch\_frequency
-==============================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: detect_pitch_frequency

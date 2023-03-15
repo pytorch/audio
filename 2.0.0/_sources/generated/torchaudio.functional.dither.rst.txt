@@ -1,6 +1,0 @@
-﻿torchaudio.functional.dither
-============================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: dither
