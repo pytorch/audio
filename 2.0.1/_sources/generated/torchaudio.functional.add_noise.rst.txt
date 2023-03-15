@@ -1,0 +1,6 @@
+﻿torchaudio.functional.add\_noise
+================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: add_noise
