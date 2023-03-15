@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html">Nightly Build (2.0.0+64af805) &#x25BC</a>
+      <a href="../versions.html">Nightly Build (2.0.0+1a2228a) &#x25BC</a>
     </div>
     
 
@@ -390,6 +390,12 @@
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="#module-torchaudio.backend" title="torchaudio.backend"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code></a> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Release 2.1 will revise <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> to allow for backend selection via function parameter rather than <code class="docutils literal notranslate"><span class="pre">torchaudio.set_audio_backend</span></code>, with FFmpeg being the default backend.
+The new logic can be enabled in the current release by setting environment variable <code class="docutils literal notranslate"><span class="pre">TORCHAUDIO_USE_BACKEND_DISPATCHER=1</span></code>.
+See <a class="reference internal" href="torchaudio.html#future-api"><span class="std std-ref">Future API</span></a> for details on the new API.</p>
+</div>
 <p>There are currently two implementations available.</p>
 <ul class="simple">
 <li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> (default on Linux/macOS)</p></li>
