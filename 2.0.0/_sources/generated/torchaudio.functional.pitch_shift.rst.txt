@@ -1,6 +1,0 @@
-﻿torchaudio.functional.pitch\_shift
-==================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: pitch_shift

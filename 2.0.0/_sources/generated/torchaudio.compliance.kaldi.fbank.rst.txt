@@ -1,6 +1,0 @@
-﻿torchaudio.compliance.kaldi.fbank
-=================================
-
-.. currentmodule:: torchaudio.compliance.kaldi
-
-.. autofunction:: fbank

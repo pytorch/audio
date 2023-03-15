@@ -1,6 +1,0 @@
-﻿torchaudio.functional.melscale\_fbanks
-======================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: melscale_fbanks

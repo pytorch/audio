@@ -1,6 +1,0 @@
-﻿torchaudio.functional.create\_dct
-=================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: create_dct

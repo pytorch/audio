@@ -1,6 +1,0 @@
-﻿torchaudio.functional.speed
-===========================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: speed

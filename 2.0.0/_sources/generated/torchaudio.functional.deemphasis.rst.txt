@@ -1,6 +1,0 @@
-﻿torchaudio.functional.deemphasis
-================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: deemphasis

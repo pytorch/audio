@@ -1,6 +1,0 @@
-﻿torchaudio.functional.preemphasis
-=================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: preemphasis

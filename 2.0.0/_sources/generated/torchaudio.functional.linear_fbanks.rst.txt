@@ -1,6 +1,0 @@
-﻿torchaudio.functional.linear\_fbanks
-====================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: linear_fbanks

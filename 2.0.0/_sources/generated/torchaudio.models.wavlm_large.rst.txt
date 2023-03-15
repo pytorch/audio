@@ -1,6 +1,0 @@
-torchaudio.models.wavlm\_large
-==============================
-
-.. currentmodule:: torchaudio.models
-
-.. autofunction:: wavlm_large

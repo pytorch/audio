@@ -1,6 +1,0 @@
-﻿torchaudio.functional.sliding\_window\_cmn
-==========================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: sliding_window_cmn

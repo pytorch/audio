@@ -1,6 +1,0 @@
-﻿torchaudio.functional.flanger
-=============================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: flanger
