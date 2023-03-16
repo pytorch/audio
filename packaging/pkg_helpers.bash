@@ -234,7 +234,7 @@ setup_conda_pytorch_constraint() {
     arch_name="$(uname -m)"
     if [[ "${arch_name}" != "arm64" && "${PYTHON_VERSION}" != "3.11" ]]; then
       # Use less than equal to avoid version conflict in python=3.6 environment
-      export CONDA_EXTRA_BUILD_CONSTRAINT="- mkl<=2021.2.0"
+      export CONDA_EXTRA_BUILD_CONSTRAINT="- mkl<=2023.0.0"
     fi
   fi
 }
