@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html">Nightly Build (2.0.0.dev20230315) &#x25BC</a>
+      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.0.0.dev20230316) &#x25BC</span></a>
     </div>
     
 
@@ -373,7 +373,10 @@
         
           <li><a href="../transforms.html">torchaudio.transforms</a> &gt;</li>
         
-      <li>AddNoise</li>
+      <li>AddNoise &gt;</li>
+      
+      <li>Nightly (unstable)</li>
+      
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -418,14 +421,14 @@ See <a class="reference internal" href="torchaudio.functional.add_noise.html#tor
 <a class="reference external image-reference" href="../supported_features.html#properties"><img alt="This API supports the following properties: Autograd, TorchScript" class="shield-badge" src="../_images/842c6e7cf1798066d580c63886e1f8f16beadb856d19a33e879858e991748432.svg" /></a>
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.transforms.AddNoise.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/transforms/_transforms.html#AddNoise.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.AddNoise.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/transforms/_transforms.html#AddNoise.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.transforms.AddNoise.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Input waveform, with shape <cite>(…, L)</cite>.</p></li>
-<li><p><strong>noise</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Noise, with shape <cite>(…, L)</cite> (same shape as <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p></li>
-<li><p><strong>snr</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a>) – Signal-to-noise ratios in dB, with shape <cite>(…,)</cite>.</p></li>
-<li><p><strong>lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)"><em>torch.Tensor</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Valid lengths of signals in <code class="docutils literal notranslate"><span class="pre">waveform</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code>,</p></li>
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Input waveform, with shape <cite>(…, L)</cite>.</p></li>
+<li><p><strong>noise</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Noise, with shape <cite>(…, L)</cite> (same shape as <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p></li>
+<li><p><strong>snr</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Signal-to-noise ratios in dB, with shape <cite>(…,)</cite>.</p></li>
+<li><p><strong>lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Valid lengths of signals in <code class="docutils literal notranslate"><span class="pre">waveform</span></code> and <code class="docutils literal notranslate"><span class="pre">noise</span></code>,</p></li>
 <li><p><strong>`</strong> (<em>with shape</em>) – </p></li>
 <li><p><strong>(Default</strong> (<em>elements in waveform and noise are treated as valid.</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
@@ -435,7 +438,7 @@ See <a class="reference internal" href="torchaudio.functional.add_noise.html#tor
 (same shape as <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.13)">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
