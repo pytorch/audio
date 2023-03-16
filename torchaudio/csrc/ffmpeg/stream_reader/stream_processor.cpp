@@ -50,6 +50,29 @@ enum AVPixelFormat get_hw_format(
   const AVCodecHWConfig* cfg = static_cast<AVCodecHWConfig*>(codec_ctx->opaque);
   for (const enum AVPixelFormat* p = pix_fmts; *p != -1; p++) {
     if (*p == cfg->pix_fmt) {
+      // Note
+      // The HW decode example uses generic approach
+      // https://ffmpeg.org/doxygen/4.1/hw__decode_8c_source.html#l00063
+      // But this approach finalizes the codec configuration when the first
+      // frame comes in.
+      // We need to inspect the codec configuration right after the codec is
+      // opened.
+      // So we add short cut for known patterns.
+      // yuv420p (h264) -> nv12
+      // yuv420p10le (hevc/h265) -> p010le
+      switch (codec_ctx->pix_fmt) {
+        case AV_PIX_FMT_YUV420P: {
+          codec_ctx->pix_fmt = AV_PIX_FMT_CUDA;
+          codec_ctx->sw_pix_fmt = AV_PIX_FMT_NV12;
+          break;
+        }
+        case AV_PIX_FMT_YUV420P10LE: {
+          codec_ctx->pix_fmt = AV_PIX_FMT_CUDA;
+          codec_ctx->sw_pix_fmt = AV_PIX_FMT_P010LE;
+          break;
+        }
+        default:;
+      }
       return *p;
     }
   }
