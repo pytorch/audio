@@ -33,6 +33,9 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
   py::class_<Chunk>(m, "Chunk", py::module_local())
       .def_readwrite("frames", &Chunk::frames)
       .def_readwrite("pts", &Chunk::pts);
+  py::class_<EncodingConfig>(m, "EncodingConfig", py::module_local())
+      .def(py::init<int, int, int, int>())
+      .def_readwrite("bit_rate", &EncodingConfig::bit_rate);
   py::class_<StreamWriter>(m, "StreamWriter", py::module_local())
       .def(py::init<const std::string&, const c10::optional<std::string>&>())
       .def("set_metadata", &StreamWriter::set_metadata)
