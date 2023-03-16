@@ -2,14 +2,13 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer.h>
 
-namespace torchaudio {
-namespace io {
-namespace detail {
+namespace torchaudio::io::detail {
 
 //////////////////////////////////////////////////////////////////////////////
 // Chunked Buffer Implementation
 //////////////////////////////////////////////////////////////////////////////
 // Common to both audio and video
+template <typename Converter>
 class ChunkedBuffer : public Buffer {
   // Each AVFrame is converted to a Tensor and stored here.
   std::deque<torch::Tensor> chunks;
@@ -28,40 +27,35 @@ class ChunkedBuffer : public Buffer {
   // one Tensor contains multiple samples, so we track here.
   int64_t num_buffered_frames = 0;
 
- protected:
-  ChunkedBuffer(int frames_per_chunk, int num_chunks, double frame_duration);
-
-  void push_tensor(torch::Tensor frame, double pts);
+  Converter converter;
 
  public:
-  bool is_ready() const override;
-  void flush() override;
-  c10::optional<Chunk> pop_chunk() override;
-};
-
-class ChunkedAudioBuffer : public ChunkedBuffer {
- public:
-  ChunkedAudioBuffer(
-      int frames_per_chunk,
-      int num_chunks,
-      double frame_duration);
-
-  void push_frame(AVFrame* frame, double pts) override;
-};
-
-class ChunkedVideoBuffer : public ChunkedBuffer {
-  const torch::Device device;
-
- public:
-  ChunkedVideoBuffer(
+  ChunkedBuffer(
       int frames_per_chunk,
       int num_chunks,
       double frame_duration,
-      const torch::Device& device);
+      Converter&& converter);
 
-  void push_frame(AVFrame* frame, double pts) override;
+  bool is_ready() const override;
+  void flush() override;
+  c10::optional<Chunk> pop_chunk() override;
+  void push_frame(AVFrame* frame_, double pts_) override;
 };
 
-} // namespace detail
-} // namespace io
-} // namespace torchaudio
+std::unique_ptr<Buffer> get_chunked_buffer(
+    int frames_per_chunk,
+    int num_chunks,
+    double frame_duration,
+    AVSampleFormat fmt,
+    int num_channels);
+
+std::unique_ptr<Buffer> get_chunked_buffer(
+    int frames_per_chunk,
+    int num_chunks,
+    double frame_duration,
+    AVPixelFormat fmt,
+    int height,
+    int width,
+    const torch::Device& device);
+
+} // namespace torchaudio::io::detail
