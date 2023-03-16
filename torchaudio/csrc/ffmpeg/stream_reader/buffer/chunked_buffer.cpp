@@ -1,37 +1,28 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/conversion.h>
 
-namespace torchaudio {
-namespace io {
-namespace detail {
+namespace torchaudio::io::detail {
 
-ChunkedBuffer::ChunkedBuffer(
-    int frames_per_chunk,
-    int num_chunks,
-    double frame_duration)
-    : frame_duration(frame_duration),
-      frames_per_chunk(frames_per_chunk),
-      num_chunks(num_chunks) {}
+template <typename Converter>
+ChunkedBuffer<Converter>::ChunkedBuffer(
+    int frames_per_chunk_,
+    int num_chunks_,
+    double frame_duration_,
+    Converter&& converter_)
+    : frame_duration(frame_duration_),
+      frames_per_chunk(frames_per_chunk_),
+      num_chunks(num_chunks_),
+      converter(std::move(converter_)){};
 
-ChunkedAudioBuffer::ChunkedAudioBuffer(
-    int frames_per_chunk,
-    int num_chunks,
-    double frame_duration)
-    : ChunkedBuffer(frames_per_chunk, num_chunks, frame_duration) {}
-
-ChunkedVideoBuffer::ChunkedVideoBuffer(
-    int frames_per_chunk,
-    int num_chunks,
-    double frame_duration,
-    const torch::Device& device_)
-    : ChunkedBuffer(frames_per_chunk, num_chunks, frame_duration),
-      device(device_) {}
-
-bool ChunkedBuffer::is_ready() const {
+template <typename Converter>
+bool ChunkedBuffer<Converter>::is_ready() const {
   return num_buffered_frames >= frames_per_chunk;
 }
 
-void ChunkedBuffer::push_tensor(torch::Tensor frame, double pts_) {
+template <typename Converter>
+void ChunkedBuffer<Converter>::push_frame(AVFrame* frame_, double pts_) {
+  torch::Tensor frame = converter.convert(frame_);
+
   using namespace torch::indexing;
   // Note:
   // Audio tensors contain multiple frames while video tensors contain only
@@ -122,7 +113,8 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame, double pts_) {
   }
 }
 
-c10::optional<Chunk> ChunkedBuffer::pop_chunk() {
+template <typename Converter>
+c10::optional<Chunk> ChunkedBuffer<Converter>::pop_chunk() {
   using namespace torch::indexing;
   if (!num_buffered_frames) {
     return {};
@@ -138,19 +130,171 @@ c10::optional<Chunk> ChunkedBuffer::pop_chunk() {
   return {Chunk{chunk, pts_val}};
 }
 
-void ChunkedAudioBuffer::push_frame(AVFrame* frame, double pts_) {
-  push_tensor(convert_audio(frame), pts_);
-}
-
-void ChunkedVideoBuffer::push_frame(AVFrame* frame, double pts_) {
-  push_tensor(convert_image(frame, device), pts_);
-}
-
-void ChunkedBuffer::flush() {
+template <typename Converter>
+void ChunkedBuffer<Converter>::flush() {
   num_buffered_frames = 0;
   chunks.clear();
 }
 
-} // namespace detail
-} // namespace io
-} // namespace torchaudio
+std::unique_ptr<Buffer> get_chunked_buffer(
+    int frames_per_chunk,
+    int num_chunks,
+    double frame_duration,
+    AVSampleFormat fmt,
+    int channels) {
+  switch (fmt) {
+    case AV_SAMPLE_FMT_U8: {
+      using Converter = AudioConverter<torch::kUInt8, false>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_S16: {
+      using Converter = AudioConverter<torch::kInt16, false>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_S32: {
+      using Converter = AudioConverter<torch::kInt32, false>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_S64: {
+      using Converter = AudioConverter<torch::kInt64, false>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_FLT: {
+      using Converter = AudioConverter<torch::kFloat32, false>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_DBL: {
+      using Converter = AudioConverter<torch::kFloat64, false>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_U8P: {
+      using Converter = AudioConverter<torch::kUInt8, true>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_S16P: {
+      using Converter = AudioConverter<torch::kInt16, true>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_S32P: {
+      using Converter = AudioConverter<torch::kInt32, true>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_S64P: {
+      using Converter = AudioConverter<torch::kInt64, true>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_FLTP: {
+      using Converter = AudioConverter<torch::kFloat32, true>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    case AV_SAMPLE_FMT_DBLP: {
+      using Converter = AudioConverter<torch::kFloat64, true>;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{channels});
+    }
+    default:
+      TORCH_INTERNAL_ASSERT(
+          false, "Unexpected audio type:", av_get_sample_fmt_name(fmt));
+  }
+}
+
+std::unique_ptr<Buffer> get_chunked_buffer(
+    int frames_per_chunk,
+    int num_chunks,
+    double frame_duration,
+    AVPixelFormat fmt,
+    int h,
+    int w,
+    const torch::Device& device) {
+  if (device.type() == at::DeviceType::CUDA) {
+#ifndef USE_CUDA
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+        false,
+        "USE_CUDA is not defined, and it should be guarded before here.");
+#else
+    switch (fmt) {
+      case AV_PIX_FMT_NV12: {
+        using Conv = NV12CudaConverter;
+        return std::make_unique<ChunkedBuffer<Conv>>(
+            frames_per_chunk, num_chunks, frame_duration, Conv{h, w, device});
+      }
+      case AV_PIX_FMT_P010: {
+        using Conv = P010CudaConverter;
+        return std::make_unique<ChunkedBuffer<Conv>>(
+            frames_per_chunk, num_chunks, frame_duration, Conv{h, w, device});
+      }
+      case AV_PIX_FMT_P016: {
+        TORCH_CHECK(
+            false,
+            "Unsupported video format found in CUDA HW: ",
+            av_get_pix_fmt_name(fmt));
+      }
+      default: {
+        TORCH_CHECK(
+            false,
+            "Unexpected video format found in CUDA HW: ",
+            av_get_pix_fmt_name(fmt));
+      }
+    }
+#endif
+  }
+
+  switch (fmt) {
+    case AV_PIX_FMT_RGB24:
+    case AV_PIX_FMT_BGR24: {
+      using Converter = InterlacedImageConverter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w, 3});
+    }
+    case AV_PIX_FMT_ARGB:
+    case AV_PIX_FMT_RGBA:
+    case AV_PIX_FMT_ABGR:
+    case AV_PIX_FMT_BGRA: {
+      using Converter = InterlacedImageConverter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w, 4});
+    }
+    case AV_PIX_FMT_GRAY8: {
+      using Converter = InterlacedImageConverter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w, 1});
+    }
+    case AV_PIX_FMT_RGB48LE: {
+      using Converter = Interlaced16BitImageConverter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w, 3});
+    }
+    case AV_PIX_FMT_YUV444P: {
+      using Converter = PlanarImageConverter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w, 3});
+    }
+    case AV_PIX_FMT_YUV420P: {
+      using Converter = YUV420PConverter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w});
+    }
+    case AV_PIX_FMT_NV12: {
+      using Converter = NV12Converter;
+      return std::make_unique<ChunkedBuffer<Converter>>(
+          frames_per_chunk, num_chunks, frame_duration, Converter{h, w});
+    }
+    default: {
+      TORCH_INTERNAL_ASSERT(
+          false, "Unexpected video format found: ", av_get_pix_fmt_name(fmt));
+    }
+  }
+}
+
+} // namespace torchaudio::io::detail

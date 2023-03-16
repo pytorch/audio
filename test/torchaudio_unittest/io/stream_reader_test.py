@@ -832,11 +832,49 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         if self.test_type == "fileobj":
             src.seek(0)
         self._test_wav(src, original, fmt=None)
-        # convert to float32
-        expected = _to_fltp(original)
-        if self.test_type == "fileobj":
-            src.seek(0)
-        self._test_wav(src, expected, fmt="fltp")
+
+    def test_audio_stream_format(self):
+        num_channels = 2
+        src, s32 = self.get_src(8000, dtype="int32", num_channels=num_channels)
+        args = {
+            "num_channels": num_channels,
+            "normalize": False,
+            "channels_first": False,
+            "num_frames": 1 << 16,
+        }
+        u8 = get_wav_data("uint8", **args)
+        s16 = get_wav_data("int16", **args)
+        s64 = s32.to(torch.int64) * (1 << 32)
+        f32 = get_wav_data("float32", **args)
+        f64 = get_wav_data("float64", **args)
+
+        s = StreamReader(src)
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="u8")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="u8p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s16")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s16p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s32")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s32p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s64")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s64p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="flt")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="fltp")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="dbl")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="dblp")
+        s.process_all_packets()
+        chunks = s.pop_chunks()
+        self.assertEqual(chunks[0], u8, atol=1, rtol=0)
+        self.assertEqual(chunks[1], u8, atol=1, rtol=0)
+        self.assertEqual(chunks[2], s16)
+        self.assertEqual(chunks[3], s16)
+        self.assertEqual(chunks[4], s32)
+        self.assertEqual(chunks[5], s32)
+        self.assertEqual(chunks[6], s64)
+        self.assertEqual(chunks[7], s64)
+        self.assertEqual(chunks[8], f32)
+        self.assertEqual(chunks[9], f32)
+        self.assertEqual(chunks[10], f64)
+        self.assertEqual(chunks[11], f64)
 
     @nested_params(
         ["int16", "uint8", "int32"],  # "float", "double", "int64"]
@@ -969,6 +1007,7 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         rgb = torch.empty(1, 3, 256, 256, dtype=torch.uint8)
         rgb[0, 0] = torch.arange(256, dtype=torch.uint8).reshape([1, -1])
         rgb[0, 1] = torch.arange(256, dtype=torch.uint8).reshape([-1, 1])
+        alpha = torch.full((1, 1, 256, 256), 255, dtype=torch.uint8)
         for i in range(256):
             rgb[0, 2] = i
             path = self.get_temp_path(f"ref_{i}.png")
@@ -979,6 +1018,10 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             yuv = rgb_to_yuv_ccir(rgb)
             bgr = rgb[:, [2, 1, 0], :, :]
             gray = rgb_to_gray(rgb)
+            argb = torch.cat([alpha, rgb], dim=1)
+            rgba = torch.cat([rgb, alpha], dim=1)
+            abgr = torch.cat([alpha, bgr], dim=1)
+            bgra = torch.cat([bgr, alpha], dim=1)
 
             s = StreamReader(path)
             s.add_basic_video_stream(frames_per_chunk=-1, format="yuv444p")
@@ -988,12 +1031,20 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             s.add_basic_video_stream(frames_per_chunk=-1, format="bgr24")
             s.add_basic_video_stream(frames_per_chunk=-1, format="gray8")
             s.add_basic_video_stream(frames_per_chunk=-1, format="rgb48le")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="argb")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="rgba")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="abgr")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="bgra")
             s.process_all_packets()
-            yuv444, yuv420, nv12, rgb24, bgr24, gray8, rgb48le = s.pop_chunks()
-            self.assertEqual(yuv, yuv444, atol=1, rtol=0)
-            self.assertEqual(yuv, yuv420, atol=1, rtol=0)
-            self.assertEqual(yuv, nv12, atol=1, rtol=0)
-            self.assertEqual(rgb, rgb24, atol=0, rtol=0)
-            self.assertEqual(bgr, bgr24, atol=0, rtol=0)
-            self.assertEqual(gray, gray8, atol=1, rtol=0)
-            self.assertEqual(rgb16, rgb48le, atol=256, rtol=0)
+            chunks = s.pop_chunks()
+            self.assertEqual(chunks[0], yuv, atol=1, rtol=0)
+            self.assertEqual(chunks[1], yuv, atol=1, rtol=0)
+            self.assertEqual(chunks[2], yuv, atol=1, rtol=0)
+            self.assertEqual(chunks[3], rgb, atol=0, rtol=0)
+            self.assertEqual(chunks[4], bgr, atol=0, rtol=0)
+            self.assertEqual(chunks[5], gray, atol=1, rtol=0)
+            self.assertEqual(chunks[6], rgb16, atol=256, rtol=0)
+            self.assertEqual(chunks[7], argb, atol=0, rtol=0)
+            self.assertEqual(chunks[8], rgba, atol=0, rtol=0)
+            self.assertEqual(chunks[9], abgr, atol=0, rtol=0)
+            self.assertEqual(chunks[10], bgra, atol=0, rtol=0)
