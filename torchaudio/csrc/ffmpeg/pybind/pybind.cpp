@@ -1,4 +1,5 @@
 #include <torch/extension.h>
+#include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/pybind/fileobj.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
@@ -30,6 +31,7 @@ struct StreamWriterFileObj : private FileObj, public StreamWriter {
 };
 
 PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
+  m.def("clear_cuda_context_cache", &clear_cuda_context_cache);
   py::class_<Chunk>(m, "Chunk", py::module_local())
       .def_readwrite("frames", &Chunk::frames)
       .def_readwrite("pts", &Chunk::pts);
