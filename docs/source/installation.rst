@@ -63,7 +63,7 @@ Please refer to the following table for the matching versions.
      - ``TorchAudio``
      - ``Python``
    * - ``2.0.0``
-     - ``2.0.0``
+     - ``2.0.1``
      - ``>=3.8``, ``<=3.11``
    * - ``1.13.1``
      - ``0.13.1``
