@@ -53,7 +53,7 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
  .. code-block:: none
 
     2.1.0.dev20230316
-    2.0.0.dev20230316
+    2.0.0.dev20230317
     cpu
 
 
@@ -247,7 +247,7 @@ detail of CTC algorithm, please refer to the *Sequence Modeling with CTC*
         # The extra dim for time axis is for simplification of the code.
         trellis = torch.empty((num_frame + 1, num_tokens + 1))
         trellis[0, 0] = 0
-        trellis[1:, 0] = torch.cumsum(emission[:, 0], 0)
+        trellis[1:, 0] = torch.cumsum(emission[:, blank_id], 0)
         trellis[0, -num_tokens:] = -float("inf")
         trellis[-num_tokens:, 0] = float("inf")
 
@@ -1210,7 +1210,7 @@ perform CTC segmentation for forced alignment.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.709 seconds)
+   **Total running time of the script:** ( 0 minutes  2.701 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_tutorial.py:

@@ -64,3 +64,12 @@ write_video_chunk
 .. container:: py attribute
 
    .. automethod:: torchaudio.io.StreamWriter.write_video_chunk
+
+Support Structures
+------------------
+
+EncodeConfig
+~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.io::StreamWriter.EncodeConfig()
+   :members:

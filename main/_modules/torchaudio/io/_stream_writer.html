@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.0.0.dev20230316) &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.0.0.dev20230317) &#x25BC</span></a>
     </div>
     
 
@@ -404,10 +404,17 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.io._stream_writer</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
+
+
+<span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_INITIALIZED</span><span class="p">:</span>
+    <span class="n">ConfigBase</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">EncodingConfig</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">ConfigBase</span> <span class="o">=</span> <span class="nb">object</span>
 
 
 <span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -509,6 +516,25 @@
 <span class="sd">            Default: `4096`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="StreamWriter.EncodeConfig"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.EncodeConfig">[docs]</a>    <span class="nd">@dataclass</span>
+    <span class="k">class</span> <span class="nc">EncodeConfig</span><span class="p">(</span><span class="n">ConfigBase</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encoding configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">bit_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bit rate&quot;&quot;&quot;</span>
+
+        <span class="n">compression_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compression level&quot;&quot;&quot;</span>
+
+        <span class="n">gop_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of pictures in a group of pictures, or 0 for intra_only&quot;&quot;&quot;</span>
+
+        <span class="n">max_b_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;maximum number of B-frames between non-B-frames.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gop_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_b_frames</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">],</span>
@@ -532,6 +558,7 @@
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EncodeConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an output audio stream.</span>
 
@@ -558,7 +585,7 @@
 
 <span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamWriter.add_video_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.add_video_stream">[docs]</a>    <span class="nd">@_format_common_args</span>
     <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
@@ -571,6 +598,7 @@
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EncodeConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an output video stream.</span>
 
@@ -612,7 +640,9 @@
 <span class="sd">                If `None`, the video chunk Tensor has to be CPU Tensor.</span>
 <span class="sd">                Default: ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">,</span> <span class="n">hw_accel</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
+            <span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">,</span> <span class="n">hw_accel</span><span class="p">,</span> <span class="n">config</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamWriter.set_metadata"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set file-level metadata</span>

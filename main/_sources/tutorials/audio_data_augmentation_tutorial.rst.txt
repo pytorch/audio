@@ -51,7 +51,7 @@ At the end, we synthesize noisy speech over phone from clean speech.
  .. code-block:: none
 
     2.1.0.dev20230316
-    2.0.0.dev20230316
+    2.0.0.dev20230317
 
 
 
@@ -90,9 +90,9 @@ First, we import the modules and download the audio assets we use in this tutori
 
  .. code-block:: none
 
-      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 41.4MB/s]
-      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 33.3MB/s]
-      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 54.1MB/s]
+      0%|          | 0.00/427k [00:00<?, ?B/s]    100%|##########| 427k/427k [00:00<00:00, 95.8MB/s]
+      0%|          | 0.00/31.3k [00:00<?, ?B/s]    100%|##########| 31.3k/31.3k [00:00<00:00, 28.7MB/s]
+      0%|          | 0.00/78.2k [00:00<?, ?B/s]    100%|##########| 78.2k/78.2k [00:00<00:00, 45.7MB/s]
 
 
 
@@ -1319,7 +1319,7 @@ Codec applied:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.288 seconds)
+   **Total running time of the script:** ( 0 minutes  17.018 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_data_augmentation_tutorial.py:
