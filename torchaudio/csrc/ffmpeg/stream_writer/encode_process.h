@@ -4,6 +4,7 @@
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encoder.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/tensor_converter.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/types.h>
 
 namespace torchaudio::io {
 
@@ -25,7 +26,8 @@ class EncodeProcess {
       const enum AVSampleFormat format,
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format);
+      const c10::optional<std::string>& encoder_format,
+      const c10::optional<EncodingConfig>& config);
 
   // constructor for video
   EncodeProcess(
@@ -37,7 +39,8 @@ class EncodeProcess {
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
       const c10::optional<std::string>& encoder_format,
-      const c10::optional<std::string>& hw_accel);
+      const c10::optional<std::string>& hw_accel,
+      const c10::optional<EncodingConfig>& config);
 
   void process(
       AVMediaType type,

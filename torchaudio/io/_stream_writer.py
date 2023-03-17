@@ -1,7 +1,14 @@
+from dataclasses import dataclass
 from typing import BinaryIO, Dict, Optional, Union
 
 import torch
 import torchaudio
+
+
+if torchaudio._extension._FFMPEG_INITIALIZED:
+    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.EncodingConfig
+else:
+    ConfigBase = object
 
 
 def _format_doc(**kwargs):
@@ -103,6 +110,25 @@ class StreamWriter:
             Default: `4096`.
     """
 
+    @dataclass
+    class EncodeConfig(ConfigBase):
+        """Encoding configuration."""
+
+        bit_rate: int = -1
+        """Bit rate"""
+
+        compression_level: int = -1
+        """Compression level"""
+
+        gop_size: int = -1
+        """The number of pictures in a group of pictures, or 0 for intra_only"""
+
+        max_b_frames: int = -1
+        """maximum number of B-frames between non-B-frames."""
+
+        def __post_init__(self):
+            super().__init__(self.bit_rate, self.compression_level, self.gop_size, self.max_b_frames)
+
     def __init__(
         self,
         dst: Union[str, BinaryIO],
@@ -126,6 +152,7 @@ class StreamWriter:
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
+        config: Optional[EncodeConfig] = None,
     ):
         """Add an output audio stream.
 
@@ -152,7 +179,7 @@ class StreamWriter:
 
             encoder_format (str or None, optional): {encoder_format}
         """
-        self._s.add_audio_stream(sample_rate, num_channels, format, encoder, encoder_option, encoder_format)
+        self._s.add_audio_stream(sample_rate, num_channels, format, encoder, encoder_option, encoder_format, config)
 
     @_format_common_args
     def add_video_stream(
@@ -165,6 +192,7 @@ class StreamWriter:
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
         hw_accel: Optional[str] = None,
+        config: Optional[EncodeConfig] = None,
     ):
         """Add an output video stream.
 
@@ -206,7 +234,9 @@ class StreamWriter:
                 If `None`, the video chunk Tensor has to be CPU Tensor.
                 Default: ``None``.
         """
-        self._s.add_video_stream(frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel)
+        self._s.add_video_stream(
+            frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel, config
+        )
 
     def set_metadata(self, metadata: Dict[str, str]):
         """Set file-level metadata

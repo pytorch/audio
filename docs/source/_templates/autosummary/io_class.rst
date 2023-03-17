@@ -38,7 +38,12 @@ Methods
 -------
 
 {%- for item in members %}
-{%- if not item.startswith('_') and item not in inherited_members and item not in attributes %}
+{%- if
+   not item.startswith('_')
+   and item not in inherited_members
+   and item not in attributes
+   and item != "EncodeConfig"
+   %}
 
 {{ item | underline("~") }}
 
@@ -49,6 +54,7 @@ Methods
 {%- endif %}
 {%- endfor %}
 {%- endif %}
+
 
 {%- if name == "StreamReader" %}
 
@@ -71,4 +77,15 @@ Support Structures
    :members:
 
 {%- endfor %}
+{%- elif name == "StreamWriter" %}
+
+Support Structures
+------------------
+
+EncodeConfig
+~~~~~~~~~~~~
+
+.. autoclass:: torchaudio.io::StreamWriter.EncodeConfig()
+   :members:
+
 {%- endif %}

@@ -1,3 +1,4 @@
+import io
 import math
 
 import torch
@@ -487,3 +488,48 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             # could introduce a descrepancy, so we compare floats and use math.isclose
             # for that.
             assert math.isclose(val, ref)
+
+    def test_encode_config(self):
+        """Can successfully set configuration and write audio."""
+        ext = "mp3"
+        filename = f"test.{ext}"
+        sample_rate = 44100
+        num_channels = 2
+
+        # Write data
+        dst = self.get_dst(filename)
+        writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        config = torchaudio.io.StreamWriter.EncodeConfig(bit_rate=198_000, compression_level=3)
+        writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, config=config)
+
+        audio = torch.zeros((8000, 2))
+        with writer.open():
+            writer.write_audio_chunk(0, audio)
+
+    def test_encode_config_bit_rate_output(self):
+        """Increasing the specified bit rate yields a larger encoded output."""
+        ext = "mp3"
+        sample_rate = 44100
+        num_channels = 2
+        audio = torch.rand((8000, num_channels))
+
+        def write_audio(buffer, bit_rate):
+            writer = torchaudio.io.StreamWriter(dst=buffer, format=ext)
+            writer.add_audio_stream(
+                sample_rate=sample_rate,
+                num_channels=num_channels,
+                config=torchaudio.io.StreamWriter.EncodeConfig(bit_rate=bit_rate),
+            )
+
+            with writer.open():
+                writer.write_audio_chunk(0, audio)
+
+        dst = io.BytesIO()
+        write_audio(dst, 198_000)
+        out0_size = dst.tell()
+
+        dst = io.BytesIO()
+        write_audio(dst, 320_000)
+        out1_size = dst.tell()
+
+        self.assertGreater(out1_size, out0_size)
