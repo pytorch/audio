@@ -15,7 +15,7 @@ class Sink {
   AVCodecContext* codec_ctx;
   AVRational frame_rate;
   std::string filter_description;
-  std::unique_ptr<FilterGraph> filter;
+  FilterGraph filter;
   // time_base of filter graph output, used for PTS calc
   AVRational output_time_base;
 

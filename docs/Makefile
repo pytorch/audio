@@ -26,6 +26,7 @@ docset: html
 %: Makefile
 	doxygen source/Doxyfile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@python post_process_dispatcher.py $(BUILDDIR)
 
 clean:
 	rm -rf $(BUILDDIR)/*
