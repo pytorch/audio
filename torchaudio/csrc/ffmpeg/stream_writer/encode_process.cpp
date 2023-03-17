@@ -89,7 +89,8 @@ void configure_audio_codec(
     AVCodecContextPtr& ctx,
     int64_t sample_rate,
     int64_t num_channels,
-    const c10::optional<std::string>& format) {
+    const c10::optional<std::string>& format,
+    const c10::optional<EncodingConfig>& config) {
   // TODO: Review options and make them configurable?
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00122
   //  - bit_rate
@@ -160,6 +161,17 @@ void configure_audio_codec(
     }
   }
   ctx->channel_layout = static_cast<uint64_t>(layout);
+
+  // Set optional stuff
+  if (config) {
+    auto& cfg = config.value();
+    if (cfg.bit_rate > 0) {
+      ctx->bit_rate = cfg.bit_rate;
+    }
+    if (cfg.compression_level != -1) {
+      ctx->compression_level = cfg.compression_level;
+    }
+  }
 }
 
 void open_codec(
@@ -177,9 +189,10 @@ AVCodecContextPtr get_audio_codec(
     int64_t num_channels,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format) {
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<EncodingConfig>& config) {
   AVCodecContextPtr ctx = get_codec_ctx(AVMEDIA_TYPE_AUDIO, oformat, encoder);
-  configure_audio_codec(ctx, sample_rate, num_channels, encoder_format);
+  configure_audio_codec(ctx, sample_rate, num_channels, encoder_format, config);
   open_codec(ctx, encoder_option);
   return ctx;
 }
@@ -275,7 +288,8 @@ void configure_video_codec(
     double frame_rate,
     int64_t width,
     int64_t height,
-    const c10::optional<std::string>& format) {
+    const c10::optional<std::string>& format,
+    const c10::optional<EncodingConfig>& config) {
   // TODO: Review other options and make them configurable?
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00147
   //  - bit_rate
@@ -340,6 +354,23 @@ void configure_video_codec(
     }
     return ret;
   }();
+
+  // Set optional stuff
+  if (config) {
+    auto& cfg = config.value();
+    if (cfg.bit_rate > 0) {
+      ctx->bit_rate = cfg.bit_rate;
+    }
+    if (cfg.compression_level != -1) {
+      ctx->compression_level = cfg.compression_level;
+    }
+    if (cfg.gop_size != -1) {
+      ctx->gop_size = cfg.gop_size;
+    }
+    if (cfg.max_b_frames != -1) {
+      ctx->max_b_frames = cfg.max_b_frames;
+    }
+  }
 }
 
 void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
@@ -400,9 +431,10 @@ AVCodecContextPtr get_video_codec(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<std::string>& hw_accel) {
+    const c10::optional<std::string>& hw_accel,
+    const c10::optional<EncodingConfig>& config) {
   AVCodecContextPtr ctx = get_codec_ctx(AVMEDIA_TYPE_VIDEO, oformat, encoder);
-  configure_video_codec(ctx, frame_rate, width, height, encoder_format);
+  configure_video_codec(ctx, frame_rate, width, height, encoder_format, config);
 
   if (hw_accel) {
 #ifdef USE_CUDA
@@ -479,14 +511,16 @@ EncodeProcess::EncodeProcess(
     const enum AVSampleFormat format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format)
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<EncodingConfig>& config)
     : codec_ctx(get_audio_codec(
           format_ctx->oformat,
           sample_rate,
           num_channels,
           encoder,
           encoder_option,
-          encoder_format)),
+          encoder_format,
+          config)),
       encoder(format_ctx, codec_ctx),
       filter(get_audio_filter(format, codec_ctx)),
       src_frame(get_audio_frame(format, sample_rate, num_channels, codec_ctx)),
@@ -501,7 +535,8 @@ EncodeProcess::EncodeProcess(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<std::string>& hw_accel)
+    const c10::optional<std::string>& hw_accel,
+    const c10::optional<EncodingConfig>& config)
     : codec_ctx(get_video_codec(
           format_ctx->oformat,
           frame_rate,
@@ -510,7 +545,8 @@ EncodeProcess::EncodeProcess(
           encoder,
           encoder_option,
           encoder_format,
-          hw_accel)),
+          hw_accel,
+          config)),
       encoder(format_ctx, codec_ctx),
       filter(get_video_filter(format, codec_ctx)),
       src_frame(get_video_frame(format, codec_ctx)),

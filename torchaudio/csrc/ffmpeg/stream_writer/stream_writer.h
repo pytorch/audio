@@ -4,6 +4,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/types.h>
 
 namespace torchaudio {
 namespace io {
@@ -104,7 +105,9 @@ class StreamWriter {
       const std::string& format,
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format);
+      const c10::optional<std::string>& encoder_format,
+      const c10::optional<EncodingConfig>& config);
+
   /// Add an output video stream.
   ///
   /// @param frame_rate Frame rate
@@ -142,7 +145,8 @@ class StreamWriter {
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
       const c10::optional<std::string>& encoder_format,
-      const c10::optional<std::string>& hw_accel);
+      const c10::optional<std::string>& hw_accel,
+      const c10::optional<EncodingConfig>& config);
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);

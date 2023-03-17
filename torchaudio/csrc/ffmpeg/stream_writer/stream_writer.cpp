@@ -101,7 +101,8 @@ void StreamWriter::add_audio_stream(
     const std::string& format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format) {
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<EncodingConfig>& config) {
   processes.emplace_back(
       pFormatContext,
       sample_rate,
@@ -109,7 +110,8 @@ void StreamWriter::add_audio_stream(
       get_src_sample_fmt(format),
       encoder,
       encoder_option,
-      encoder_format);
+      encoder_format,
+      config);
 }
 
 void StreamWriter::add_video_stream(
@@ -120,7 +122,8 @@ void StreamWriter::add_video_stream(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<std::string>& hw_accel) {
+    const c10::optional<std::string>& hw_accel,
+    const c10::optional<EncodingConfig>& config) {
   processes.emplace_back(
       pFormatContext,
       frame_rate,
@@ -130,7 +133,8 @@ void StreamWriter::add_video_stream(
       encoder,
       encoder_option,
       encoder_format,
-      hw_accel);
+      hw_accel,
+      config);
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
