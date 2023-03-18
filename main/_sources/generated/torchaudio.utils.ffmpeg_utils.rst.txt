@@ -11,6 +11,11 @@ ffmpeg_utils
 
 .. currentmodule:: torchaudio.utils.ffmpeg_utils
 
+clear_cuda_context_cache
+------------------------
+
+.. autofunction:: clear_cuda_context_cache
+
 get_audio_decoders
 ------------------
 
