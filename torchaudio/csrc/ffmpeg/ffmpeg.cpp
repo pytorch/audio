@@ -128,8 +128,8 @@ void AutoBufferUnref::operator()(AVBufferRef* p) {
   av_buffer_unref(&p);
 }
 
-AVBufferRefPtr::AVBufferRefPtr()
-    : Wrapper<AVBufferRef, AutoBufferUnref>(nullptr) {}
+AVBufferRefPtr::AVBufferRefPtr(AVBufferRef* p)
+    : Wrapper<AVBufferRef, AutoBufferUnref>(p) {}
 
 void AVBufferRefPtr::reset(AVBufferRef* p) {
   TORCH_CHECK(

@@ -1,3 +1,4 @@
+#include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <stdexcept>
 
@@ -99,6 +100,7 @@ void configure_codec_context(
     // 2. Set pCodecContext->get_format call back function which
     // will retrieve the HW pixel format from opaque pointer.
     codec_ctx->get_format = get_hw_format;
+    codec_ctx->hw_device_ctx = av_buffer_ref(get_cuda_context(device.index()));
 #endif
   }
 }
