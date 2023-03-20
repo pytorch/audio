@@ -6,8 +6,10 @@ namespace io {
 namespace detail {
 
 template <typename Converter>
-UnchunkedBuffer<Converter>::UnchunkedBuffer(Converter&& converter_)
-    : converter(std::move(converter_)) {}
+UnchunkedBuffer<Converter>::UnchunkedBuffer(
+    AVRational time_base,
+    Converter&& converter)
+    : time_base(time_base), converter(std::move(converter)) {}
 
 template <typename Converter>
 bool UnchunkedBuffer<Converter>::is_ready() const {
@@ -15,9 +17,9 @@ bool UnchunkedBuffer<Converter>::is_ready() const {
 }
 
 template <typename Converter>
-void UnchunkedBuffer<Converter>::push_frame(AVFrame* frame, double pts_) {
+void UnchunkedBuffer<Converter>::push_frame(AVFrame* frame) {
   if (chunks.size() == 0) {
-    pts = pts_;
+    pts = double(frame->pts) * time_base.num / time_base.den;
   }
   chunks.push_back(converter.convert(frame));
 }
@@ -39,55 +41,70 @@ void UnchunkedBuffer<Converter>::flush() {
   chunks.clear();
 }
 
-std::unique_ptr<Buffer> get_unchunked_buffer(AVSampleFormat fmt, int channels) {
+std::unique_ptr<Buffer> get_unchunked_buffer(
+    AVRational tb,
+    AVSampleFormat fmt,
+    int channels) {
   switch (fmt) {
     case AV_SAMPLE_FMT_U8: {
       using Converter = AudioConverter<torch::kUInt8, false>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_S16: {
       using Converter = AudioConverter<torch::kInt16, false>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_S32: {
       using Converter = AudioConverter<torch::kInt32, false>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_S64: {
       using Converter = AudioConverter<torch::kInt64, false>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_FLT: {
       using Converter = AudioConverter<torch::kFloat32, false>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_DBL: {
       using Converter = AudioConverter<torch::kFloat64, false>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_U8P: {
       using Converter = AudioConverter<torch::kUInt8, true>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_S16P: {
       using Converter = AudioConverter<torch::kInt16, true>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_S32P: {
       using Converter = AudioConverter<torch::kInt32, true>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_S64P: {
       using Converter = AudioConverter<torch::kInt64, true>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_FLTP: {
       using Converter = AudioConverter<torch::kFloat32, true>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     case AV_SAMPLE_FMT_DBLP: {
       using Converter = AudioConverter<torch::kFloat64, true>;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{channels});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{channels});
     }
     default:
       TORCH_INTERNAL_ASSERT(
@@ -96,6 +113,7 @@ std::unique_ptr<Buffer> get_unchunked_buffer(AVSampleFormat fmt, int channels) {
 }
 
 std::unique_ptr<Buffer> get_unchunked_buffer(
+    AVRational tb,
     AVPixelFormat fmt,
     int h,
     int w,
@@ -109,11 +127,11 @@ std::unique_ptr<Buffer> get_unchunked_buffer(
     switch (fmt) {
       case AV_PIX_FMT_NV12: {
         using Conv = NV12CudaConverter;
-        return std::make_unique<UnchunkedBuffer<Conv>>(Conv{h, w, device});
+        return std::make_unique<UnchunkedBuffer<Conv>>(tb, Conv{h, w, device});
       }
       case AV_PIX_FMT_P010: {
         using Conv = P010CudaConverter;
-        return std::make_unique<UnchunkedBuffer<Conv>>(Conv{h, w, device});
+        return std::make_unique<UnchunkedBuffer<Conv>>(tb, Conv{h, w, device});
       }
       case AV_PIX_FMT_P016: {
         TORCH_CHECK(
@@ -135,34 +153,39 @@ std::unique_ptr<Buffer> get_unchunked_buffer(
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24: {
       using Converter = InterlacedImageConverter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w, 3});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{h, w, 3});
     }
     case AV_PIX_FMT_ARGB:
     case AV_PIX_FMT_RGBA:
     case AV_PIX_FMT_ABGR:
     case AV_PIX_FMT_BGRA: {
       using Converter = InterlacedImageConverter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w, 4});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{h, w, 4});
     }
     case AV_PIX_FMT_GRAY8: {
       using Converter = InterlacedImageConverter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w, 1});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{h, w, 1});
     }
     case AV_PIX_FMT_RGB48LE: {
       using Converter = Interlaced16BitImageConverter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w, 3});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{h, w, 3});
     }
     case AV_PIX_FMT_YUV444P: {
       using Converter = PlanarImageConverter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w, 3});
+      return std::make_unique<UnchunkedBuffer<Converter>>(
+          tb, Converter{h, w, 3});
     }
     case AV_PIX_FMT_YUV420P: {
       using Converter = YUV420PConverter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w});
+      return std::make_unique<UnchunkedBuffer<Converter>>(tb, Converter{h, w});
     }
     case AV_PIX_FMT_NV12: {
       using Converter = NV12Converter;
-      return std::make_unique<UnchunkedBuffer<Converter>>(Converter{h, w});
+      return std::make_unique<UnchunkedBuffer<Converter>>(tb, Converter{h, w});
     }
     default: {
       TORCH_INTERNAL_ASSERT(
