@@ -350,6 +350,15 @@ void StreamReader::add_stream(
     processors[i] = std::make_unique<StreamProcessor>(
         stream->time_base, stream->codecpar, decoder, decoder_option, device);
     processors[i]->set_discard_timestamp(seek_timestamp);
+  } else {
+    if (decoder) {
+      // TODO: Validate that the decoder is consistent as the one used to define
+      // previous output streams.
+      // i.e. the following is not permitted.
+      // reader.add_video_stream(..., decoder="h264")
+      // reader.add_video_stream(..., decoder="x264")
+      // reader.add_video_stream(..., decoder="h264_cuvid")
+    }
   }
   stream->discard = AVDISCARD_DEFAULT;
 

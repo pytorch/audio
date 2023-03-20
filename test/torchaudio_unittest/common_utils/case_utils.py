@@ -12,6 +12,7 @@ import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import is_module_available
+from torchaudio.utils.ffmpeg_utils import get_video_decoders, get_video_encoders
 
 from .backend_utils import set_audio_backend
 
@@ -268,6 +269,19 @@ skipIfNoMacOS = _skipIf(
     reason="This feature is only available for MacOS.",
     key="NO_MACOS",
 )
+
+
+def skipIfNoHWAccel(name):
+    key = "NO_HW_ACCEL"
+    if not is_ffmpeg_available():
+        return _skipIf(True, reason="ffmpeg features are not available.", key=key)
+    if not torch.cuda.is_available():
+        return _skipIf(True, reason="CUDA is not available.", key=key)
+    if torchaudio._extension._check_cuda_version() is None:
+        return _skipIf(True, "Torchaudio is not compiled with CUDA.", key=key)
+    if name not in get_video_decoders() and name not in get_video_encoders():
+        return _skipIf(True, f"{name} is not in the list of available decoders or encoders", key=key)
+    return _pass
 
 
 def zip_equal(*iterables):

@@ -81,6 +81,27 @@ enum AVPixelFormat get_hw_format(
   return AV_PIX_FMT_NONE;
 }
 
+AVBufferRef* get_hw_frames_ctx(AVCodecContext* codec_ctx) {
+  AVBufferRef* p = av_hwframe_ctx_alloc(codec_ctx->hw_device_ctx);
+  TORCH_CHECK(
+      p,
+      "Failed to allocate CUDA frame context from device context at ",
+      codec_ctx->hw_device_ctx);
+  auto frames_ctx = (AVHWFramesContext*)(p->data);
+  frames_ctx->format = codec_ctx->pix_fmt;
+  frames_ctx->sw_format = codec_ctx->sw_pix_fmt;
+  frames_ctx->width = codec_ctx->width;
+  frames_ctx->height = codec_ctx->height;
+  frames_ctx->initial_pool_size = 5;
+  int ret = av_hwframe_ctx_init(p);
+  if (ret >= 0) {
+    return p;
+  }
+  av_buffer_unref(&p);
+  TORCH_CHECK(
+      false, "Failed to initialize CUDA frame context: ", av_err2string(ret));
+}
+
 void configure_codec_context(
     AVCodecContext* codec_ctx,
     const AVCodecParameters* params,
@@ -135,6 +156,9 @@ AVCodecContextPtr get_codec_ctx(
       alloc_codec_context(params->codec_id, decoder_name);
   configure_codec_context(codec_ctx, params, device);
   open_codec(codec_ctx, decoder_option);
+  if (codec_ctx->hw_device_ctx) {
+    codec_ctx->hw_frames_ctx = av_buffer_ref(get_hw_frames_ctx(codec_ctx));
+  }
   return codec_ctx;
 }
 
@@ -160,6 +184,38 @@ KeyType StreamProcessor::add_stream(
     AVRational frame_rate,
     const c10::optional<std::string>& filter_description,
     const torch::Device& device) {
+  // If device is provided, then check that codec_ctx has hw_device_ctx set.
+  // In case, defining an output stream with HW accel on an input stream that
+  // has decoder set without HW accel, it will cause seg fault.
+  // i.e.
+  // The following should be rejected here.
+  // reader = StreamReader(...)
+  // reader.add_video_stream(..., decoder="h264_cuvid")
+  // reader.add_video_stream(..., decoder="h264_cuvid", hw_accel="cuda")
+  // TODO:
+  // One idea to work around this is to always define HW device context, and
+  // if HW acceleration is not required, insert `hwdownload` filter.
+  // This way it will be possible to handle both cases at the same time.
+  switch (device.type()) {
+    case torch::kCPU:
+      TORCH_CHECK(
+          !codec_ctx->hw_device_ctx,
+          "Decoding without Hardware acceleration is requested, however, "
+          "the decoder has been already defined with a HW acceleration. "
+          "Decoding a stream with and without HW acceleration simultaneously "
+          "is not supported.");
+      break;
+    case torch::kCUDA:
+      TORCH_CHECK(
+          codec_ctx->hw_device_ctx,
+          "CUDA Hardware acceleration is requested, however, the decoder has "
+          "been already defined without a HW acceleration. "
+          "Decoding a stream with and without HW acceleration simultaneously "
+          "is not supported.");
+      break;
+    default:;
+  }
+
   switch (codec_ctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
     case AVMEDIA_TYPE_VIDEO:
