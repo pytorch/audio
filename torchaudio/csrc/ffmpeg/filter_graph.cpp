@@ -165,7 +165,8 @@ void FilterGraph::add_process(const std::string& filter_description) {
           av_err2string(ret) + ".)");
 }
 
-void FilterGraph::create_filter() {
+void FilterGraph::create_filter(AVBufferRef* hw_frames_ctx) {
+  buffersrc_ctx->outputs[0]->hw_frames_ctx = hw_frames_ctx;
   int ret = avfilter_graph_config(pFilterGraph, nullptr);
   TORCH_CHECK(ret >= 0, "Failed to configure the graph: " + av_err2string(ret));
   // char* desc = avfilter_graph_dump(pFilterGraph, NULL);
@@ -196,6 +197,10 @@ FilterGraphOutputInfo FilterGraph::get_output_info() const {
     ret.num_channels = av_get_channel_layout_nb_channels(l->channel_layout);
 #endif
   } else {
+    if (l->format == AV_PIX_FMT_CUDA && l->hw_frames_ctx) {
+      auto frames_ctx = (AVHWFramesContext*)(l->hw_frames_ctx->data);
+      ret.format = frames_ctx->sw_format;
+    }
     ret.frame_rate = l->frame_rate;
     ret.height = l->h;
     ret.width = l->w;

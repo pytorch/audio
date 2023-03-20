@@ -1,3 +1,4 @@
+#include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
@@ -47,14 +48,8 @@ std::unique_ptr<Buffer> get_buffer(
           codec_ctx->channels);
     }
   } else {
-    // Note
-    // When using HW decoder, the pixel format is CUDA, and FilterGraph does
-    // not yet support CUDA frames, nor propagating the software pixel format,
-    // so here, we refer to AVCodecContext* to look at the pixel format.
     AVPixelFormat fmt = (AVPixelFormat)(info.format);
-    if (fmt == AV_PIX_FMT_CUDA) {
-      fmt = codec_ctx->sw_pix_fmt;
-    }
+    TORCH_INTERNAL_ASSERT(fmt != AV_PIX_FMT_CUDA);
 
     if (frames_per_chunk == -1) {
       return detail::get_unchunked_buffer(fmt, info.height, info.width, device);
@@ -77,7 +72,6 @@ FilterGraph get_filter_graph(
     AVRational frame_rate,
     const std::string& filter_description) {
   auto p = FilterGraph{codec_ctx->codec_type};
-
   switch (codec_ctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
       p.add_audio_src(
@@ -100,7 +94,11 @@ FilterGraph get_filter_graph(
   }
   p.add_sink();
   p.add_process(filter_description);
-  p.create_filter();
+  if (codec_ctx->hw_frames_ctx) {
+    p.create_filter(av_buffer_ref(codec_ctx->hw_frames_ctx));
+  } else {
+    p.create_filter(nullptr);
+  }
   return p;
 }
 
