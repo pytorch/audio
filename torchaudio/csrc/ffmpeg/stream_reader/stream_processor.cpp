@@ -157,7 +157,7 @@ AVCodecContextPtr get_codec_ctx(
   configure_codec_context(codec_ctx, params, device);
   open_codec(codec_ctx, decoder_option);
   if (codec_ctx->hw_device_ctx) {
-    codec_ctx->hw_frames_ctx = av_buffer_ref(get_hw_frames_ctx(codec_ctx));
+    codec_ctx->hw_frames_ctx = get_hw_frames_ctx(codec_ctx);
   }
   return codec_ctx;
 }
