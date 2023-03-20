@@ -3,7 +3,7 @@ deep-phonemizer
 boto3
 cython
 pandas
-librosa
+librosa==0.10.0
 sentencepiece
 pandoc
 mir_eval
