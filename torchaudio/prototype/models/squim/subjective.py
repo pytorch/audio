@@ -114,9 +114,9 @@ class SquimSubjective(nn.Module):
         waveform, reference = self._align_shapes(waveform, reference)
         waveform = self.projector(self.ssl_model.extract_features(waveform)[0][-1])
         reference = self.projector(self.ssl_model.extract_features(reference)[0][-1])
-        concat = torch.cat((waveform, reference), dim=2)
-        score = self.predictor(concat)
-        return score
+        concat = torch.cat((reference, waveform), dim=2)
+        score_diff = self.predictor(concat)  # Score difference compared to the reference
+        return 5 - score_diff
 
 
 def squim_subjective_model(
