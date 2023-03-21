@@ -9,6 +9,8 @@ struct FilterGraphOutputInfo {
   AVMediaType type = AVMEDIA_TYPE_UNKNOWN;
   int format = -1;
 
+  AVRational time_base = {1, 1};
+
   // Audio
   int sample_rate = -1;
   int num_channels = -1;
@@ -63,12 +65,11 @@ class FilterGraph {
 
   void add_process(const std::string& filter_description);
 
-  void create_filter();
+  void create_filter(AVBufferRef* hw_frames_ctx = nullptr);
 
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
-  [[nodiscard]] AVRational get_output_timebase() const;
   [[nodiscard]] FilterGraphOutputInfo get_output_info() const;
 
   //////////////////////////////////////////////////////////////////////////////

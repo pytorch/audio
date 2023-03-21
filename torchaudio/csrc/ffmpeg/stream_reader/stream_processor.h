@@ -59,7 +59,7 @@ class StreamProcessor {
       int frames_per_chunk,
       int num_chunks,
       AVRational frame_rate,
-      const c10::optional<std::string>& filter_description,
+      const std::string& filter_description,
       const torch::Device& device);
 
   // 1. Remove the stream

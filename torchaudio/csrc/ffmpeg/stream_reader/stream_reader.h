@@ -229,7 +229,7 @@ class StreamReader {
       AVMediaType media_type,
       int frames_per_chunk,
       int num_chunks,
-      const c10::optional<std::string>& filter_desc,
+      const std::string& filter_desc,
       const c10::optional<std::string>& decoder,
       const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);

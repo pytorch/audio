@@ -14,9 +14,11 @@ from torchaudio_unittest.common_utils import (
     save_image,
     save_wav,
     skipIfNoFFmpeg,
+    skipIfNoHWAccel,
     TempDirMixin,
     TorchaudioTestCase,
 )
+
 
 if is_ffmpeg_available():
     from torchaudio.io import StreamReader, StreamWriter
@@ -1048,3 +1050,105 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             self.assertEqual(chunks[8], rgba, atol=0, rtol=0)
             self.assertEqual(chunks[9], abgr, atol=0, rtol=0)
             self.assertEqual(chunks[10], bgra, atol=0, rtol=0)
+
+
+@skipIfNoHWAccel("h264_cuvid")
+class CuvidHWAccelInterfaceTest(TorchaudioTestCase):
+    def test_dup_hw_acel(self):
+        """Specifying the same source stream with and without HW accel should fail (instead of segfault later)"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        r.add_video_stream(-1, decoder="h264_cuvid")
+        with self.assertRaises(RuntimeError):
+            r.add_video_stream(-1, decoder="h264_cuvid", hw_accel="cuda")
+
+        r = StreamReader(src)
+        r.add_video_stream(-1, decoder="h264_cuvid", hw_accel="cuda")
+        with self.assertRaises(RuntimeError):
+            r.add_video_stream(-1, decoder="h264_cuvid")
+
+
+@_media_source
+class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid(self):
+        """GPU decoder works for H264"""
+        src = self.get_src(get_asset_path("nasa_13013.mp4"))
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="h264_cuvid")
+
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cpu"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 270, 480]))
+            num_frames += chunk.size(0)
+        assert num_frames == 390
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid_hw_accel(self):
+        """GPU decoder works for H264 with HW acceleration, and put the frames on CUDA tensor"""
+        src = self.get_src(get_asset_path("nasa_13013.mp4"))
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda")
+
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cuda:0"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 270, 480]))
+            num_frames += chunk.size(0)
+        assert num_frames == 390
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid(self):
+        """GPU decoder works for H265/HEVC"""
+        src = self.get_src(get_asset_path("testsrc.hevc"))
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="hevc_cuvid")
+
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cpu"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 144, 256]))
+            num_frames += chunk.size(0)
+        assert num_frames == 300
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid_hw_accel(self):
+        """GPU decoder works for H265/HEVC with HW acceleration, and put the frames on CUDA tensor"""
+        src = self.get_src(get_asset_path("testsrc.hevc"))
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="hevc_cuvid", hw_accel="cuda")
+
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cuda:0"))
+            self.assertEqual(chunk.dtype, torch.int16)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 144, 256]))
+            num_frames += chunk.size(0)
+        assert num_frames == 300
+
+
+@skipIfNoHWAccel("h264_cuvid")
+class FilterGraphWithCudaAccel(TorchaudioTestCase):
+    def test_sclae_cuda_change_size(self):
+        """scale_cuda filter can be used when HW accel is on"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=iw/2:ih/2")
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cuda:0"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 135, 240]))
+            num_frames += chunk.size(0)
+        assert num_frames == 390
+
+    def test_scale_cuda_format(self):
+        """yuv444p format conversion does not work (yet)"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        with self.assertRaises(RuntimeError):
+            r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
