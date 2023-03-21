@@ -17,6 +17,10 @@
             "squim_objective_model",
             "squim_objective_base",
         ],
+        "torchaudio.prototype.models.SquimSubjective": [
+            "squim_subjective_model",
+            "squim_subjective_base",
+        ],
         "torchaudio.prototype.models.ConformerWav2Vec2PretrainModel": [
             "conformer_wav2vec2_pretrain_model",
             "conformer_wav2vec2_pretrain_base",
