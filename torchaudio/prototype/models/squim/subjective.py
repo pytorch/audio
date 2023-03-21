@@ -68,7 +68,8 @@ class Predictor(nn.Module):
 
 class SquimSubjective(nn.Module):
     """Speech Quality and Intelligibility Measures (SQUIM) model that predicts **subjective** metric scores
-    for speech enhancement (e.g., MOS).
+    for speech enhancement (e.g., Mean Opinion Score (MOS)). The model is adopted from *NORESQA-MOS*
+    :cite:`manocha2022speech` which predicts MOS scores given the input speech and a non-matching reference.
 
     Args:
         ssl_model (torch.nn.Module): The self-supervised learning model for feature extraction.
