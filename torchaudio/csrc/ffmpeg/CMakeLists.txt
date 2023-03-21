@@ -13,7 +13,7 @@ set(
   stream_reader/buffer/chunked_buffer.cpp
   stream_reader/buffer/unchunked_buffer.cpp
   stream_reader/conversion.cpp
-  stream_reader/sink.cpp
+  stream_reader/post_process.cpp
   stream_reader/stream_processor.cpp
   stream_reader/stream_reader.cpp
   stream_writer/encode_process.cpp
