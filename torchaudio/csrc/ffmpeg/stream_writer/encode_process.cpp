@@ -178,6 +178,37 @@ void open_codec(
     AVCodecContextPtr& codec_ctx,
     const c10::optional<OptionDict>& option) {
   AVDictionary* opt = get_option_dict(option);
+
+  // Enable experimental feature if required
+  // Note:
+  // "vorbis" refers to FFmpeg's native encoder,
+  // https://ffmpeg.org/doxygen/4.1/vorbisenc_8c.html#a8c2e524b0f125f045fef39c747561450
+  // while "libvorbis" refers to the one depends on libvorbis,
+  // which is not experimental
+  // https://ffmpeg.org/doxygen/4.1/libvorbisenc_8c.html#a5dd5fc671e2df9c5b1f97b2ee53d4025
+  // similarly, "opus" refers to FFmpeg's native encoder
+  // https://ffmpeg.org/doxygen/4.1/opusenc_8c.html#a05b203d4a9a231cc1fd5a7ddeb68cebc
+  // while "libopus" refers to the one depends on libopusenc
+  // https://ffmpeg.org/doxygen/4.1/libopusenc_8c.html#aa1d649e48cd2ec00cfe181cf9d0f3251
+  if (std::strcmp(codec_ctx->codec->name, "vorbis") == 0) {
+    if (!av_dict_get(opt, "strict", nullptr, 0)) {
+      TORCH_WARN_ONCE(
+          "\"vorbis\" encoder is selected. Enabling '-strict experimental'. ",
+          "If this is not desired, please provide \"strict\" encoder option ",
+          "with desired value.");
+      av_dict_set(&opt, "strict", "experimental", 0);
+    }
+  }
+  if (std::strcmp(codec_ctx->codec->name, "opus") == 0) {
+    if (!av_dict_get(opt, "strict", nullptr, 0)) {
+      TORCH_WARN_ONCE(
+          "\"opus\" encoder is selected. Enabling '-strict experimental'. ",
+          "If this is not desired, please provide \"strict\" encoder option ",
+          "with desired value.");
+      av_dict_set(&opt, "strict", "experimental", 0);
+    }
+  }
+
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
   clean_up_dict(opt);
   TORCH_CHECK(ret >= 0, "Failed to open codec: (", av_err2string(ret), ")");

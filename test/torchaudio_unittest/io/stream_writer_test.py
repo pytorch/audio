@@ -155,21 +155,26 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
     @parameterized.expand(
         [
-            ("mp3", 8000, 1, "s32p", None),
-            ("mp3", 16000, 2, "fltp", None),
-            ("mp3", 44100, 1, "s16p", {"abr": "true"}),
-            ("flac", 8000, 1, "s16", None),
-            ("flac", 16000, 2, "s32", None),
-            ("opus", 48000, 2, None, {"strict": "experimental"}),
-            ("adts", 8000, 1, "fltp", None),  # AAC format
+            ("mp3", 8000, 1, None, "s32p", None),
+            ("mp3", 16000, 2, None, "fltp", None),
+            ("mp3", 44100, 1, None, "s16p", {"abr": "true"}),
+            ("flac", 8000, 1, None, "s16", None),
+            ("flac", 16000, 2, None, "s32", None),
+            ("opus", 48000, 2, "opus", None, None),
+            ("ogg", 48000, 2, "vorbis", None, None),
+            ("adts", 8000, 1, None, "fltp", None),  # AAC format
         ]
     )
-    def test_valid_audio_muxer_and_codecs(self, ext, sample_rate, num_channels, encoder_format, encoder_option):
+    def test_valid_audio_muxer_and_codecs(
+        self, ext, sample_rate, num_channels, encoder, encoder_format, encoder_option
+    ):
         """Tensor of various dtypes can be saved as given format."""
         path = self.get_dst(f"test.{ext}")
         s = StreamWriter(path, format=ext)
         s.set_metadata(metadata={"artist": "torchaudio", "title": self.id()})
-        s.add_audio_stream(sample_rate, num_channels, encoder_option=encoder_option, encoder_format=encoder_format)
+        s.add_audio_stream(
+            sample_rate, num_channels, encoder=encoder, encoder_option=encoder_option, encoder_format=encoder_format
+        )
 
         chunk = get_audio_chunk("flt", sample_rate, num_channels)
         with s.open():
