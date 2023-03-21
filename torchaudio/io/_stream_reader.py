@@ -567,8 +567,10 @@ class StreamReader:
         Returns:
             InputStreamTypes:
                 Information about the source stream.
-                If the source stream is audio type, then :class:`~torchaudio.io._stream_reader.SourceAudioStream` returned.
-                If it is video type, then :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.
+                If the source stream is audio type, then
+                :class:`~torchaudio.io._stream_reader.SourceAudioStream` is returned.
+                If it is video type, then
+                :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.
                 Otherwise :class:`~torchaudio.io._stream_reader.SourceStream` class is returned.
         """
         return _parse_si(self._be.get_src_stream_info(i))
@@ -581,8 +583,10 @@ class StreamReader:
         Returns:
             OutputStreamTypes
                 Information about the output stream.
-                If the output stream is audio type, then :class:`~torchaudio.io._stream_reader.OutputAudioStream` returned.
-                If it is video type, then :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.
+                If the output stream is audio type, then
+                :class:`~torchaudio.io._stream_reader.OutputAudioStream` is returned.
+                If it is video type, then
+                :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.
         """
         info = self._be.get_out_stream_info(i)
         return _parse_oi(info)
