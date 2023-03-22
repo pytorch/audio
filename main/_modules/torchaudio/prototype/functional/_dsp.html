@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230320) &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230322) &#x25BC</span></a>
     </div>
     
 
@@ -417,6 +417,7 @@
     <span class="n">amplitudes</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Synthesize waveform from the given instantaneous frequencies and amplitudes.</span>
 
@@ -444,6 +445,8 @@
 <span class="sd">        sample_rate (float): Sample rate</span>
 <span class="sd">        reduction (str): Reduction to perform.</span>
 <span class="sd">            Valid values are ``&quot;sum&quot;``, ``&quot;mean&quot;`` or ``&quot;none&quot;``. Default: ``&quot;sum&quot;``</span>
+<span class="sd">        dtype (torch.dtype or None, optional): The data type on which cumulative sum operation is performed.</span>
+<span class="sd">            Default: ``torch.float64``. Pass ``None`` to disable the casting.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor:</span>
@@ -470,16 +473,11 @@
         <span class="p">)</span>
         <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">invalid</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">)</span>
 
-    <span class="c1"># Note:</span>
-    <span class="c1"># In magenta/ddsp, there is an option to reduce the number of summation to reduce</span>
-    <span class="c1"># the accumulation error.</span>
-    <span class="c1"># https://github.com/magenta/ddsp/blob/7cb3c37f96a3e5b4a2b7e94fdcc801bfd556021b/ddsp/core.py#L950-L955</span>
-    <span class="c1"># It mentions some performance penalty.</span>
-    <span class="c1"># In torchaudio, a simple way to work around is to use float64.</span>
-    <span class="c1"># We might add angular_cumsum if it turned out to be undesirable.</span>
     <span class="n">pi2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">freqs</span> <span class="o">=</span> <span class="n">frequencies</span> <span class="o">*</span> <span class="n">pi2</span> <span class="o">/</span> <span class="n">sample_rate</span> <span class="o">%</span> <span class="n">pi2</span>
-    <span class="n">phases</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">phases</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">freqs</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
+        <span class="n">phases</span> <span class="o">=</span> <span class="n">phases</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">freqs</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">amplitudes</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>

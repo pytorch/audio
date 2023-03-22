@@ -42,8 +42,8 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="HiFiGANVocoderBundle" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" />
-    <link rel="prev" title="torchaudio.prototype.models.squim_objective_base" href="generated/torchaudio.prototype.models.squim_objective_base.html" />
+    <link rel="next" title="EMFORMER_RNNT_BASE_MUSTC" href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC.html" />
+    <link rel="prev" title="torchaudio.prototype.models.squim_subjective_base" href="generated/torchaudio.prototype.models.squim_subjective_base.html" />
   <!-- Google Analytics -->
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230320) &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230322) &#x25BC</span></a>
     </div>
     
 
@@ -415,35 +415,18 @@
 <p>The pipelines subpackage contains APIs to models with pretrained weights and relevant utilities.</p>
 <section id="rnn-t-streaming-non-streaming-asr">
 <h2>RNN-T Streaming/Non-Streaming ASR<a class="headerlink" href="#rnn-t-streaming-non-streaming-asr" title="Permalink to this heading">¶</a></h2>
-<section id="emformer-rnnt-base-mustc">
-<h3>EMFORMER_RNNT_BASE_MUSTC<a class="headerlink" href="#emformer-rnnt-base-mustc" title="Permalink to this heading">¶</a></h3>
-<div class="py attribute docutils container">
-<dl class="py data">
-<dt class="sig sig-object py" id="torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></span><span class="sig-name descname"><span class="pre">EMFORMER_RNNT_BASE_MUSTC</span></span><a class="headerlink" href="#torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.
-The underlying model is constructed by <a class="reference internal" href="generated/torchaudio.models.emformer_rnnt_base.html#torchaudio.models.emformer_rnnt_base" title="torchaudio.models.emformer_rnnt_base"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.models.emformer_rnnt_base()</span></code></a> and utilizes weights
-trained on <em>MuST-C release v2.0</em> <span id="id1">[<a class="reference internal" href="references.html#id50" title="Roldano Cattoni, Mattia Antonino Di Gangi, Luisa Bentivogli, Matteo Negri, and Marco Turchi. Must-c: a multilingual corpus for end-to-end speech translation. Computer Speech &amp; Language, 66:101155, 2021. URL: https://www.sciencedirect.com/science/article/pii/S0885230820300887, doi:https://doi.org/10.1016/j.csl.2020.101155.">Cattoni <em>et al.</em>, 2021</a>]</span> dataset using training script <code class="docutils literal notranslate"><span class="pre">train.py</span></code>
-<a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">here</a> with <code class="docutils literal notranslate"><span class="pre">num_symbols=501</span></code>.
-Please refer to <a class="reference internal" href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle" title="torchaudio.pipelines.RNNTBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.pipelines.RNNTBundle</span></code></a> for usage instructions.</p>
-</dd></dl>
-
-</div>
-</section>
-<section id="emformer-rnnt-base-tedlium3">
-<h3>EMFORMER_RNNT_BASE_TEDLIUM3<a class="headerlink" href="#emformer-rnnt-base-tedlium3" title="Permalink to this heading">¶</a></h3>
-<div class="py attribute docutils container">
-<dl class="py data">
-<dt class="sig sig-object py" id="torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></span><span class="sig-name descname"><span class="pre">EMFORMER_RNNT_BASE_TEDLIUM3</span></span><a class="headerlink" href="#torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</p>
-<p>The underlying model is constructed by <a class="reference internal" href="generated/torchaudio.models.emformer_rnnt_base.html#torchaudio.models.emformer_rnnt_base" title="torchaudio.models.emformer_rnnt_base"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.models.emformer_rnnt_base()</span></code></a>
-and utilizes weights trained on TED-LIUM Release 3 dataset using training script <code class="docutils literal notranslate"><span class="pre">train.py</span></code>
-<a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">here</a> with <code class="docutils literal notranslate"><span class="pre">num_symbols=501</span></code>.</p>
-<p>Please refer to <a class="reference internal" href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle" title="torchaudio.pipelines.RNNTBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.pipelines.RNNTBundle</span></code></a> for usage instructions.</p>
-</dd></dl>
-
-</div>
+<section id="pretrained-models">
+<h3>Pretrained Models<a class="headerlink" href="#pretrained-models" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC.html#torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC" title="torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EMFORMER_RNNT_BASE_MUSTC</span></code></a></p></td>
+<td><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3.html#torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3" title="torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EMFORMER_RNNT_BASE_TEDLIUM3</span></code></a></p></td>
+<td><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 <section id="hifigan-vocoder">
@@ -459,8 +442,8 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
 </tbody>
 </table>
 </section>
-<section id="pretrained-models">
-<h3>Pretrained Models<a class="headerlink" href="#pretrained-models" title="Permalink to this heading">¶</a></h3>
+<section id="id1">
+<h3>Pretrained Models<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html#torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH" title="torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HIFIGAN_VOCODER_V3_LJSPEECH</span></code></a></p></td>
@@ -504,10 +487,10 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html" class="btn btn-neutral float-right" title="HiFiGANVocoderBundle" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC.html" class="btn btn-neutral float-right" title="EMFORMER_RNNT_BASE_MUSTC" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="generated/torchaudio.prototype.models.squim_objective_base.html" class="btn btn-neutral" title="torchaudio.prototype.models.squim_objective_base" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="generated/torchaudio.prototype.models.squim_subjective_base.html" class="btn btn-neutral" title="torchaudio.prototype.models.squim_subjective_base" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -543,13 +526,12 @@ and utilizes weights trained on TED-LIUM Release 3 dataset using training script
               <ul>
 <li><a class="reference internal" href="#">torchaudio.prototype.pipelines</a><ul>
 <li><a class="reference internal" href="#rnn-t-streaming-non-streaming-asr">RNN-T Streaming/Non-Streaming ASR</a><ul>
-<li><a class="reference internal" href="#emformer-rnnt-base-mustc">EMFORMER_RNNT_BASE_MUSTC</a></li>
-<li><a class="reference internal" href="#emformer-rnnt-base-tedlium3">EMFORMER_RNNT_BASE_TEDLIUM3</a></li>
+<li><a class="reference internal" href="#pretrained-models">Pretrained Models</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#hifigan-vocoder">HiFiGAN Vocoder</a><ul>
 <li><a class="reference internal" href="#interface">Interface</a></li>
-<li><a class="reference internal" href="#pretrained-models">Pretrained Models</a></li>
+<li><a class="reference internal" href="#id1">Pretrained Models</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#squim-objective">Squim Objective</a><ul>

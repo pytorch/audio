@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230320) &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230322) &#x25BC</span></a>
     </div>
     
 
@@ -973,8 +973,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            InputStreamTypes:</span>
 <span class="sd">                Information about the source stream.</span>
-<span class="sd">                If the source stream is audio type, then :class:`~torchaudio.io._stream_reader.SourceAudioStream` returned.</span>
-<span class="sd">                If it is video type, then :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.</span>
+<span class="sd">                If the source stream is audio type, then</span>
+<span class="sd">                :class:`~torchaudio.io._stream_reader.SourceAudioStream` is returned.</span>
+<span class="sd">                If it is video type, then</span>
+<span class="sd">                :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.</span>
 <span class="sd">                Otherwise :class:`~torchaudio.io._stream_reader.SourceStream` class is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
@@ -987,8 +989,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            OutputStreamTypes</span>
 <span class="sd">                Information about the output stream.</span>
-<span class="sd">                If the output stream is audio type, then :class:`~torchaudio.io._stream_reader.OutputAudioStream` returned.</span>
-<span class="sd">                If it is video type, then :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.</span>
+<span class="sd">                If the output stream is audio type, then</span>
+<span class="sd">                :class:`~torchaudio.io._stream_reader.OutputAudioStream` is returned.</span>
+<span class="sd">                If it is video type, then</span>
+<span class="sd">                :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="n">info</span><span class="p">)</span></div>

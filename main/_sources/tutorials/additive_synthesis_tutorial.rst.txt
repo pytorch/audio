@@ -58,8 +58,8 @@ Subtractive synthesis creates timbre by applying filters.
 
  .. code-block:: none
 
-    2.1.0.dev20230316
-    2.1.0.dev20230320
+    2.1.0.dev20230322
+    2.1.0.dev20230322
 
 
 
@@ -282,7 +282,7 @@ Now synthesize a waveform
 
  .. code-block:: none
 
-    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:60: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -332,7 +332,7 @@ time-varying tone based on sawtooth wave.
 
  .. code-block:: none
 
-    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:60: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -413,7 +413,7 @@ only odd-integer harmonics.
 
  .. code-block:: none
 
-    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:60: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -494,7 +494,7 @@ also only contains odd-integer harmonics.
 
  .. code-block:: none
 
-    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:60: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /usr/local/envs/python3.8/lib/python3.8/site-packages/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -633,7 +633,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  32.443 seconds)
+   **Total running time of the script:** ( 2 minutes  27.417 seconds)
 
 
 .. _sphx_glr_download_tutorials_additive_synthesis_tutorial.py:
