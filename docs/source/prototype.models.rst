@@ -24,6 +24,7 @@ For such models, factory functions are provided.
   ConvEmformer
   HiFiGANVocoder
   SquimObjective
+  SquimSubjective
 
 Prototype Factory Functions of Beta Models
 ==========================================

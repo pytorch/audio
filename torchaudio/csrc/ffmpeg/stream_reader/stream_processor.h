@@ -2,7 +2,7 @@
 
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/post_process.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <map>
 
@@ -22,7 +22,7 @@ class StreamProcessor {
   AVFramePtr frame;
 
   KeyType current_key = 0;
-  std::map<KeyType, Sink> sinks;
+  std::map<KeyType, std::unique_ptr<IPostDecodeProcess>> post_processes;
 
   // Used for precise seek.
   // 0: no discard

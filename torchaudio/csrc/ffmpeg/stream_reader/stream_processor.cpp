@@ -218,28 +218,36 @@ KeyType StreamProcessor::add_stream(
 
   switch (codec_ctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
+      post_processes.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(current_key),
+          std::forward_as_tuple(get_audio_process(
+              stream_time_base,
+              codec_ctx,
+              filter_description,
+              frames_per_chunk,
+              num_chunks)));
+      return current_key++;
     case AVMEDIA_TYPE_VIDEO:
-      break;
+      post_processes.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(current_key),
+          std::forward_as_tuple(get_video_process(
+              stream_time_base,
+              frame_rate,
+              codec_ctx,
+              filter_description,
+              frames_per_chunk,
+              num_chunks,
+              device)));
+      return current_key++;
     default:
       TORCH_CHECK(false, "Only Audio and Video are supported");
   }
-  KeyType key = current_key++;
-  sinks.emplace(
-      std::piecewise_construct,
-      std::forward_as_tuple(key),
-      std::forward_as_tuple(
-          stream_time_base,
-          codec_ctx,
-          frames_per_chunk,
-          num_chunks,
-          frame_rate,
-          filter_description,
-          device));
-  return key;
 }
 
 void StreamProcessor::remove_stream(KeyType key) {
-  sinks.erase(key);
+  post_processes.erase(key);
 }
 
 void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
@@ -252,17 +260,17 @@ void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
 std::string StreamProcessor::get_filter_description(KeyType key) const {
-  return sinks.at(key).filter_description;
+  return post_processes.at(key)->get_filter_desc();
 }
 
 FilterGraphOutputInfo StreamProcessor::get_filter_output_info(
     KeyType key) const {
-  return sinks.at(key).filter.get_output_info();
+  return post_processes.at(key)->get_filter_output_info();
 }
 
 bool StreamProcessor::is_buffer_ready() const {
-  for (const auto& it : sinks) {
-    if (!it.second.buffer->is_ready()) {
+  for (const auto& it : post_processes) {
+    if (!it.second->is_buffer_ready()) {
       return false;
     }
   }
@@ -331,8 +339,8 @@ int StreamProcessor::process_packet(AVPacket* packet) {
 
 void StreamProcessor::flush() {
   avcodec_flush_buffers(codec_ctx);
-  for (auto& ite : sinks) {
-    ite.second.flush();
+  for (auto& ite : post_processes) {
+    ite.second->flush();
   }
 }
 
@@ -340,8 +348,8 @@ void StreamProcessor::flush() {
 // <0: Some error happened
 int StreamProcessor::send_frame(AVFrame* frame_) {
   int ret = 0;
-  for (auto& ite : sinks) {
-    int ret2 = ite.second.process_frame(frame_);
+  for (auto& ite : post_processes) {
+    int ret2 = ite.second->process_frame(frame_);
     if (ret2 < 0)
       ret = ret2;
   }
@@ -352,7 +360,7 @@ int StreamProcessor::send_frame(AVFrame* frame_) {
 // Retrieval
 ////////////////////////////////////////////////////////////////////////////////
 c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
-  return sinks.at(key).buffer->pop_chunk();
+  return post_processes.at(key)->pop_chunk();
 }
 
 } // namespace io
