@@ -27,7 +27,7 @@ For such models, factory functions are provided.
   SquimSubjective
 
 Prototype Factory Functions of Beta Models
-==========================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: torchaudio.models
 
