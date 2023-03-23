@@ -72,7 +72,7 @@ Pretrained Models
    SQUIM_OBJECTIVE
 
 Squim Subjective
----------------
+----------------
 
 Interface
 ~~~~~~~~~
