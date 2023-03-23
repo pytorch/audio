@@ -1,5 +1,5 @@
 #include <c10/cuda/CUDAStream.h>
-#include <torch/script.h>
+#include <torch/types.h>
 #include <torchaudio/csrc/rnnt/gpu/gpu_transducer.h>
 
 namespace torchaudio {
