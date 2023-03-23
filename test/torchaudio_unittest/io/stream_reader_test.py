@@ -1147,8 +1147,14 @@ class FilterGraphWithCudaAccel(TorchaudioTestCase):
         assert num_frames == 390
 
     def test_scale_cuda_format(self):
-        """yuv444p format conversion does not work (yet)"""
+        """yuv444p format conversion should work"""
         src = get_asset_path("nasa_13013.mp4")
         r = StreamReader(src)
-        with self.assertRaises(RuntimeError):
-            r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
+        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cuda:0"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 270, 480]))
+            num_frames += chunk.size(0)
+        assert num_frames == 390
