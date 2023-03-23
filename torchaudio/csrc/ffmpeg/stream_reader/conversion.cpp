@@ -491,6 +491,59 @@ torch::Tensor P010CudaConverter::convert(const AVFrame* src) {
   return buffer;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// YUV444P CUDA
+////////////////////////////////////////////////////////////////////////////////
+YUV444PCudaConverter::YUV444PCudaConverter(
+    int h,
+    int w,
+    const torch::Device& device)
+    : ImageConverterBase(h, w, 3), device(device) {}
+
+void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src->height == height);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src->width == width);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(1) == 3);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(2) == height);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(3) == width);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.dtype() == torch::kUInt8);
+
+  auto fmt = (AVPixelFormat)(src->format);
+  AVHWFramesContext* hwctx = (AVHWFramesContext*)src->hw_frames_ctx->data;
+  AVPixelFormat sw_fmt = hwctx->sw_format;
+
+  TORCH_INTERNAL_ASSERT(
+      AV_PIX_FMT_CUDA == fmt,
+      "Expected CUDA frame. Found: ",
+      av_get_pix_fmt_name(fmt));
+  TORCH_INTERNAL_ASSERT(
+      AV_PIX_FMT_YUV444P == sw_fmt,
+      "Expected YUV444P format. Found: ",
+      av_get_pix_fmt_name(sw_fmt));
+
+  // Write Y plane directly
+  for (int i = 0; i < num_channels; ++i) {
+    auto status = cudaMemcpy2D(
+        dst.index({0, i}).data_ptr(),
+        width,
+        src->data[i],
+        src->linesize[i],
+        width,
+        height,
+        cudaMemcpyDeviceToDevice);
+    TORCH_CHECK(
+        cudaSuccess == status, "Failed to copy plane ", i, " to CUDA tensor.");
+  }
+}
+
+torch::Tensor YUV444PCudaConverter::convert(const AVFrame* src) {
+  torch::Tensor buffer =
+      get_image_buffer({1, num_channels, height, width}, device);
+  convert(src, buffer);
+  return buffer;
+}
+
 #endif
 
 } // namespace torchaudio::io
