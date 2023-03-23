@@ -97,6 +97,6 @@ Pre-trained Model License
 
 The pre-trained models provided in this library may have their own licenses or terms and conditions derived from the dataset used for training. It is your responsibility to determine whether you have permission to use the models for your use case.
 
-For instance, SquimObjective model is released under the Creative Commons Attribution 4.0 International license. See [DNS 2020 license](https://github.com/microsoft/DNS-Challenge/blob/interspeech2020/master/LICENSE) for additional details.
+For instance, SquimSubjective model is released under the Creative Commons Attribution Non Commercial 4.0 International (CC-BY-NC 4.0) license. See [the link](https://zenodo.org/record/4660670#.ZBtWPOxuerN) for additional details.
 
 Other pre-trained models that have different license are noted in documentation. Please checkout the [documentation page](https://pytorch.org/audio/main/).
