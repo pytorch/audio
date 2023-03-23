@@ -207,7 +207,12 @@ torch::Tensor PlanarImageConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 YUV420PConverter::YUV420PConverter(int h, int w)
     : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer({1, 2, height / 2, width / 2})) {}
+      tmp_uv(get_image_buffer({1, 2, height / 2, width / 2})) {
+  TORCH_WARN_ONCE(
+      "The output format YUV420P is selected. "
+      "This will be implicitly converted to YUV444P, "
+      "in which all the color components Y, U, V have the same dimension.");
+}
 
 void YUV420PConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
@@ -269,7 +274,12 @@ torch::Tensor YUV420PConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 NV12Converter::NV12Converter(int h, int w)
     : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer({1, height / 2, width / 2, 2})) {}
+      tmp_uv(get_image_buffer({1, height / 2, width / 2, 2})) {
+  TORCH_WARN_ONCE(
+      "The output format NV12 is selected. "
+      "This will be implicitly converted to YUV444P, "
+      "in which all the color components Y, U, V have the same dimension.");
+}
 
 void NV12Converter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
@@ -331,7 +341,12 @@ NV12CudaConverter::NV12CudaConverter(int h, int w, const torch::Device& device)
       tmp_uv(get_image_buffer(
           {1, height / 2, width / 2, 2},
           device,
-          torch::kUInt8)) {}
+          torch::kUInt8)) {
+  TORCH_WARN_ONCE(
+      "The output format NV12 is selected. "
+      "This will be implicitly converted to YUV444P, "
+      "in which all the color components Y, U, V have the same dimension.");
+}
 
 void NV12CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
@@ -403,7 +418,12 @@ P010CudaConverter::P010CudaConverter(int h, int w, const torch::Device& device)
       tmp_uv(get_image_buffer(
           {1, height / 2, width / 2, 2},
           device,
-          torch::kInt16)) {}
+          torch::kInt16)) {
+  TORCH_WARN_ONCE(
+      "The output format P010 is selected. "
+      "This will be implicitly converted to YUV444P, "
+      "in which all the color components Y, U, V have the same dimension.");
+}
 
 void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
