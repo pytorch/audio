@@ -130,7 +130,7 @@ def squim_subjective_model(
     Args:
         ssl_type (str): Type of self-supervised learning (SSL) models.
             Must be one of ["wav2vec2_base", "wav2vec2_large"].
-        feature_dim (int): Feature dimension of the SSL feature representation.
+        feat_dim (int): Feature dimension of the SSL feature representation.
         proj_dim (int): Output dimension of projection layer.
         att_dim (int): Dimension of attention scores.
     """

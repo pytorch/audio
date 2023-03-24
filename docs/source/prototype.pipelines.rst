@@ -70,3 +70,28 @@ Pretrained Models
    :template: autosummary/bundle_data.rst
 
    SQUIM_OBJECTIVE
+
+Squim Subjective
+----------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimSubjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **subjective** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimSubjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_SUBJECTIVE

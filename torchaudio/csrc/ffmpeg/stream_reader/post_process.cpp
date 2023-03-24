@@ -402,6 +402,11 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_cuda_video_process(
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter), C{i.height, i.width, device}, B{i.time_base});
     }
+    case AV_PIX_FMT_YUV444P: {
+      using C = YUV444PCudaConverter;
+      return std::make_unique<ProcessImpl<C, B>>(
+          std::move(filter), C{i.height, i.width, device}, B{i.time_base});
+    }
     case AV_PIX_FMT_P016: {
       TORCH_CHECK(
           false,
@@ -509,6 +514,13 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_cuda_video_process(
     }
     case AV_PIX_FMT_P010: {
       using C = P010CudaConverter;
+      return std::make_unique<ProcessImpl<C, B>>(
+          std::move(filter),
+          C{i.height, i.width, device},
+          B{i.time_base, frames_per_chunk, num_chunks});
+    }
+    case AV_PIX_FMT_YUV444P: {
+      using C = YUV444PCudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter),
           C{i.height, i.width, device},

@@ -102,5 +102,14 @@ class P010CudaConverter : ImageConverterBase {
   torch::Tensor convert(const AVFrame* src);
 };
 
+class YUV444PCudaConverter : ImageConverterBase {
+  const torch::Device device;
+
+ public:
+  YUV444PCudaConverter(int height, int width, const torch::Device& device);
+  void convert(const AVFrame* src, torch::Tensor& dst);
+  torch::Tensor convert(const AVFrame* src);
+};
+
 #endif
 } // namespace torchaudio::io
