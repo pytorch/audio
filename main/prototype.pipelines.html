@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230323) &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230324) &#x25BC</span></a>
     </div>
     
 
@@ -312,7 +312,6 @@
 <li class="toctree-l1"><a class="reference internal" href="prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -477,6 +476,30 @@
 </table>
 </section>
 </section>
+<section id="squim-subjective">
+<h2>Squim Subjective<a class="headerlink" href="#squim-subjective" title="Permalink to this heading">¶</a></h2>
+<section id="id6">
+<h3>Interface<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle" title="torchaudio.prototype.pipelines.SquimSubjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>subjective</strong> metric scores given the input waveform.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle" title="torchaudio.prototype.pipelines.SquimSubjectiveBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.prototype.models.SquimSubjective.html#torchaudio.prototype.models.SquimSubjective" title="torchaudio.prototype.models.SquimSubjective"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjective</span></code></a> model.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id7">
+<h3>Pretrained Models<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE.html#torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE" title="torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_SUBJECTIVE</span></code></a></p></td>
+<td><p>SquimSubjective pipeline, trained on the <em>BVCC</em> <span id="id8">[<a class="reference internal" href="references.html#id66" title="Erica Cooper and Junichi Yamagishi. How do voices from past speech synthesis challenges compare today? arXiv preprint arXiv:2105.02373, 2021.">Cooper and Yamagishi, 2021</a>]</span> and <em>DAPS</em> <span id="id9">[<a class="reference internal" href="references.html#id67" title="Gautham J Mysore. Can we automatically transform speech recorded on common consumer devices in real-world environments into professional production quality speech?—a dataset, insights, and challenges. IEEE Signal Processing Letters, 22(8):1006–1010, 2014.">Mysore, 2014</a>]</span> datasets.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 </section>
 
 
@@ -537,6 +560,11 @@
 <li><a class="reference internal" href="#squim-objective">Squim Objective</a><ul>
 <li><a class="reference internal" href="#id3">Interface</a></li>
 <li><a class="reference internal" href="#id4">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#squim-subjective">Squim Subjective</a><ul>
+<li><a class="reference internal" href="#id6">Interface</a></li>
+<li><a class="reference internal" href="#id7">Pretrained Models</a></li>
 </ul>
 </li>
 </ul>

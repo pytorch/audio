@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230323) &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230324) &#x25BC</span></a>
     </div>
     
 
@@ -309,7 +309,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html#prototype-factory-functions-of-beta-models">Prototype Factory Functions of Beta Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
 </ul>
@@ -408,7 +407,7 @@
 
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio.prototype.models</span> <span class="kn">import</span> <span class="n">squim_objective_base</span><span class="p">,</span> <span class="n">SquimObjective</span>
+<span class="kn">from</span> <span class="nn">torchaudio.prototype.models</span> <span class="kn">import</span> <span class="n">squim_objective_base</span><span class="p">,</span> <span class="n">squim_subjective_base</span><span class="p">,</span> <span class="n">SquimObjective</span><span class="p">,</span> <span class="n">SquimSubjective</span>
 
 
 <div class="viewcode-block" id="SquimObjectiveBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.SquimObjectiveBundle.html#torchaudio.prototype.pipelines.SquimObjectiveBundle">[docs]</a><span class="nd">@dataclass</span>
@@ -493,6 +492,93 @@
 <span class="s2">    &lt;https://github.com/microsoft/DNS-Challenge/blob/interspeech2020/master/LICENSE&gt;`__.</span>
 
 <span class="s2">    Please refer to :py:class:`SquimObjectiveBundle` for usage instructions.</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="SquimSubjectiveBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SquimSubjectiveBundle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained</span>
+<span class="sd">    :py:class:`~torchaudio.prototype.models.SquimSubjective` model.</span>
+
+<span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
+<span class="sd">    the information necessary to retrieve pretrained weights and additional data</span>
+<span class="sd">    to be used with the model.</span>
+
+<span class="sd">    Torchaudio library instantiates objects of this class, each of which represents</span>
+<span class="sd">    a different pretrained model. Client code should access pretrained models via these</span>
+<span class="sd">    instances.</span>
+
+<span class="sd">    This bundle can estimate subjective metric scores for speech enhancement, such as MOS.</span>
+<span class="sd">    A typical use case would be a flow like `waveform -&gt; score`. Please see below for the code example.</span>
+
+<span class="sd">    Example: Estimate the subjective metric scores for the input waveform.</span>
+<span class="sd">        &gt;&gt;&gt; import torch</span>
+<span class="sd">        &gt;&gt;&gt; import torchaudio</span>
+<span class="sd">        &gt;&gt;&gt; # Since SquimSubjective bundle is in prototypes, it needs to be exported explicitly</span>
+<span class="sd">        &gt;&gt;&gt; from torchaudio.prototype.pipelines import SQUIM_SUBJECTIVE as bundle</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Load the SquimSubjective bundle</span>
+<span class="sd">        &gt;&gt;&gt; model = bundle.get_model()</span>
+<span class="sd">        Downloading: &quot;https://download.pytorch.org/torchaudio/models/squim_subjective_bvcc_daps.pth&quot;</span>
+<span class="sd">        100%|████████████| 360M/360M [00:09&lt;00:00, 41.1MB/s]</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Resample audio to the expected sampling rate</span>
+<span class="sd">        &gt;&gt;&gt; waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; # Use a clean reference (doesn&#39;t need to be the reference for the waveform) as the second input</span>
+<span class="sd">        &gt;&gt;&gt; reference = torchaudio.functional.resample(reference, sample_rate, bundle.sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Estimate subjective metric scores</span>
+<span class="sd">        &gt;&gt;&gt; score = model(waveform, reference)</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;MOS: {score}.&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+    <span class="n">_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">_sample_rate</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="k">def</span> <span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://download.pytorch.org/torchaudio/models/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">dl_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">dl_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dl_kwargs</span>
+        <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">dl_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state_dict</span>
+
+<div class="viewcode-block" id="SquimSubjectiveBundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SquimSubjective</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the SquimSubjective model, and load the pretrained weight.</span>
+
+<span class="sd">        The weight file is downloaded from the internet and cached with</span>
+<span class="sd">        :func:`torch.hub.load_state_dict_from_url`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Variation of :py:class:`~torchaudio.prototype.models.SquimObjective`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">squim_subjective_base</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_state_dict</span><span class="p">(</span><span class="n">dl_kwargs</span><span class="p">))</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">model</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample rate of the audio that the model is trained on.</span>
+
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span></div>
+
+
+<span class="n">SQUIM_SUBJECTIVE</span> <span class="o">=</span> <span class="n">SquimSubjectiveBundle</span><span class="p">(</span>
+    <span class="s2">&quot;squim_subjective_bvcc_daps.pth&quot;</span><span class="p">,</span>
+    <span class="n">_sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">SQUIM_SUBJECTIVE</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SquimSubjective pipeline, trained on the *BVCC*</span>
+<span class="s2">    :cite:`cooper2021voices` and *DAPS* :cite:`mysore2014can` datasets.</span>
+
+<span class="s2">    The underlying model is constructed by :py:func:`torchaudio.prototype.models.squim_subjective_base`.</span>
+<span class="s2">    The weights are under `Creative Commons Attribution Non Commercial 4.0 International</span>
+<span class="s2">    &lt;https://zenodo.org/record/4660670#.ZBtWPOxuerN&gt;`__.</span>
+
+<span class="s2">    Please refer to :py:class:`SquimSubjectiveBundle` for usage instructions.</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </pre></div>
 
