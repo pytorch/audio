@@ -409,6 +409,9 @@ std::unique_ptr<FilterGraph> _get_audio_filter(
     AVCodecContextPtr& ctx) {
   std::stringstream desc;
   desc << "aformat=" << av_get_sample_fmt_name(ctx->sample_fmt);
+  if (ctx->frame_size) {
+    desc << ",asetnsamples=n=" << ctx->frame_size << ":p=0";
+  }
 
   auto p = std::make_unique<FilterGraph>(AVMEDIA_TYPE_AUDIO);
   p->add_audio_src(fmt, ctx->time_base, ctx->sample_rate, ctx->channel_layout);
