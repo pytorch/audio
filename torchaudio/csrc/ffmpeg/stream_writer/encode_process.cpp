@@ -233,10 +233,19 @@ FilterGraph get_audio_filter(
     AVCodecContext* codec_ctx) {
   auto desc = [&]() -> std::string {
     if (src_fmt == codec_ctx->sample_fmt) {
-      return "anull";
+      if (!codec_ctx->frame_size) {
+        return "anull";
+      } else {
+        std::stringstream ss;
+        ss << "asetnsamples=n=" << codec_ctx->frame_size << ":p=0";
+        return ss.str();
+      }
     } else {
       std::stringstream ss;
       ss << "aformat=" << av_get_sample_fmt_name(codec_ctx->sample_fmt);
+      if (codec_ctx->frame_size) {
+        ss << ",asetnsamples=n=" << codec_ctx->frame_size << ":p=0";
+      }
       return ss.str();
     }
   }();

@@ -40,9 +40,12 @@ void convert_func_(const torch::Tensor& chunk, AVFrame* buffer) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(chunk.dim() == 2);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(chunk.size(1) == buffer->channels);
 
-  // TODO: make writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
-  TORCH_CHECK(av_frame_is_writable(buffer), "frame is not writable.");
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
+    TORCH_INTERNAL_ASSERT(
+        ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
+  }
 
   auto byte_size = chunk.numel() * chunk.element_size();
   memcpy(buffer->data[0], chunk.data_ptr(), byte_size);
