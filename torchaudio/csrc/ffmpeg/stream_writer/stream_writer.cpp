@@ -53,88 +53,54 @@ StreamWriter::StreamWriter(
     const c10::optional<std::string>& format)
     : StreamWriter(get_output_format_context(dst, format, nullptr)) {}
 
-namespace {
-
-enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
-  auto fmt = av_get_sample_fmt(src.c_str());
-  TORCH_CHECK(fmt != AV_SAMPLE_FMT_NONE, "Unknown sample format: ", src);
-  TORCH_CHECK(
-      !av_sample_fmt_is_planar(fmt),
-      "Unexpected sample fotmat value. Valid values are ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_U8),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_S16),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_S32),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_S64),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_FLT),
-      ", ",
-      av_get_sample_fmt_name(AV_SAMPLE_FMT_DBL),
-      ". ",
-      "Found: ",
-      src);
-  return fmt;
-}
-
-enum AVPixelFormat get_src_pixel_fmt(const std::string& src) {
-  auto fmt = av_get_pix_fmt(src.c_str());
-  switch (fmt) {
-    case AV_PIX_FMT_GRAY8:
-    case AV_PIX_FMT_RGB24:
-    case AV_PIX_FMT_BGR24:
-    case AV_PIX_FMT_YUV444P:
-      return fmt;
-    case AV_PIX_FMT_NONE:
-      TORCH_CHECK(false, "Unknown pixel format: ", src);
-    default:
-      TORCH_CHECK(false, "Unsupported pixel format: ", src);
-  }
-}
-
-} // namespace
-
 void StreamWriter::add_audio_stream(
-    int64_t sample_rate,
-    int64_t num_channels,
+    int sample_rate,
+    int num_channels,
     const std::string& format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<EncodingConfig>& config) {
-  processes.emplace_back(
+  TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
+  TORCH_INTERNAL_ASSERT(
+      pFormatContext->nb_streams == processes.size(),
+      "The number of encode process and the number of output streams do not match.");
+  processes.emplace_back(get_audio_encode_process(
       pFormatContext,
       sample_rate,
       num_channels,
-      get_src_sample_fmt(format),
+      format,
       encoder,
       encoder_option,
       encoder_format,
-      config);
+      config));
 }
 
 void StreamWriter::add_video_stream(
     double frame_rate,
-    int64_t width,
-    int64_t height,
+    int width,
+    int height,
     const std::string& format,
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel,
     const c10::optional<EncodingConfig>& config) {
-  processes.emplace_back(
+  TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
+  TORCH_INTERNAL_ASSERT(
+      pFormatContext->nb_streams == processes.size(),
+      "The number of encode process and the number of output streams do not match.");
+  processes.emplace_back(get_video_encode_process(
       pFormatContext,
       frame_rate,
       width,
       height,
-      get_src_pixel_fmt(format),
+      format,
       encoder,
       encoder_option,
       encoder_format,
       hw_accel,
-      config);
+      config));
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
@@ -149,6 +115,10 @@ void StreamWriter::dump_format(int64_t i) {
 }
 
 void StreamWriter::open(const c10::optional<OptionDict>& option) {
+  TORCH_INTERNAL_ASSERT(
+      pFormatContext->nb_streams == processes.size(),
+      "The number of encode process and the number of output streams do not match.");
+
   int ret = 0;
 
   // Open the file if it was not provided by client code (i.e. when not
@@ -210,12 +180,17 @@ void StreamWriter::write_audio_chunk(
     const c10::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
-      0 <= i && i < static_cast<int>(processes.size()),
+      0 <= i && i < static_cast<int>(pFormatContext->nb_streams),
       "Invalid stream index. Index must be in range of [0, ",
-      processes.size(),
+      pFormatContext->nb_streams,
       "). Found: ",
       i);
-  processes[i].process(AVMEDIA_TYPE_AUDIO, waveform, pts);
+  TORCH_CHECK(
+      pFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO,
+      "Stream ",
+      i,
+      " is not audio type.");
+  processes[i].process(waveform, pts);
 }
 
 void StreamWriter::write_video_chunk(
@@ -224,12 +199,17 @@ void StreamWriter::write_video_chunk(
     const c10::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
-      0 <= i && i < static_cast<int>(processes.size()),
+      0 <= i && i < static_cast<int>(pFormatContext->nb_streams),
       "Invalid stream index. Index must be in range of [0, ",
-      processes.size(),
+      pFormatContext->nb_streams,
       "). Found: ",
       i);
-  processes[i].process(AVMEDIA_TYPE_VIDEO, frames, pts);
+  TORCH_CHECK(
+      pFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO,
+      "Stream ",
+      i,
+      " is not video type.");
+  processes[i].process(frames, pts);
 }
 
 void StreamWriter::flush() {

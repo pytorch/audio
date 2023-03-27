@@ -100,8 +100,8 @@ class StreamWriter {
   ///  To list supported formats for the encoder, you can use
   /// ``ffmpeg -h encoder=<ENCODER>`` command.
   void add_audio_stream(
-      int64_t sample_rate,
-      int64_t num_channels,
+      int sample_rate,
+      int num_channels,
       const std::string& format,
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
@@ -139,8 +139,8 @@ class StreamWriter {
   /// @endparblock
   void add_video_stream(
       double frame_rate,
-      int64_t width,
-      int64_t height,
+      int width,
+      int height,
       const std::string& format,
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
