@@ -536,7 +536,7 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             # for that.
             assert math.isclose(val, ref)
 
-    def test_encode_config(self):
+    def test_codec_config(self):
         """Can successfully set configuration and write audio."""
         ext = "mp3"
         filename = f"test.{ext}"
@@ -546,14 +546,14 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         # Write data
         dst = self.get_dst(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
-        config = torchaudio.io.StreamWriter.EncodeConfig(bit_rate=198_000, compression_level=3)
-        writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, config=config)
+        codec_config = torchaudio.io.StreamWriter.CodecConfig(bit_rate=198_000, compression_level=3)
+        writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, codec_config=codec_config)
 
         audio = torch.zeros((8000, 2))
         with writer.open():
             writer.write_audio_chunk(0, audio)
 
-    def test_encode_config_bit_rate_output(self):
+    def test_codec_config_bit_rate_output(self):
         """Increasing the specified bit rate yields a larger encoded output."""
         ext = "mp3"
         sample_rate = 44100
@@ -565,7 +565,7 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             writer.add_audio_stream(
                 sample_rate=sample_rate,
                 num_channels=num_channels,
-                config=torchaudio.io.StreamWriter.EncodeConfig(bit_rate=bit_rate),
+                codec_config=torchaudio.io.StreamWriter.CodecConfig(bit_rate=bit_rate),
             )
 
             with writer.open():

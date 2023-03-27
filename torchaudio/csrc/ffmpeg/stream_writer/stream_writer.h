@@ -99,6 +99,7 @@ class StreamWriter {
   /// override the format used for encoding.
   ///  To list supported formats for the encoder, you can use
   /// ``ffmpeg -h encoder=<ENCODER>`` command.
+  /// @param codec_config Codec configuration.
   void add_audio_stream(
       int sample_rate,
       int num_channels,
@@ -106,7 +107,7 @@ class StreamWriter {
       const c10::optional<std::string>& encoder,
       const c10::optional<OptionDict>& encoder_option,
       const c10::optional<std::string>& encoder_format,
-      const c10::optional<EncodingConfig>& config);
+      const c10::optional<CodecConfig>& codec_config);
 
   /// Add an output video stream.
   ///
@@ -129,6 +130,7 @@ class StreamWriter {
   /// @param encoder_option See ``add_audio_stream()``.
   /// @param encoder_format See ``add_audio_stream()``.
   /// @param hw_accel Enable hardware acceleration.
+  /// @param codec_config Codec configuration.
   /// @parblock
   /// When video is encoded on CUDA hardware, for example
   /// `encoder="h264_nvenc"`, passing CUDA device indicator to `hw_accel`
@@ -146,7 +148,7 @@ class StreamWriter {
       const c10::optional<OptionDict>& encoder_option,
       const c10::optional<std::string>& encoder_format,
       const c10::optional<std::string>& hw_accel,
-      const c10::optional<EncodingConfig>& config);
+      const c10::optional<CodecConfig>& codec_config);
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);
@@ -164,7 +166,7 @@ class StreamWriter {
 
   /// Write audio data
   /// @param i Stream index.
-  /// @param chunk Waveform tensor. Shape: ``(frame, channel)``.
+  /// @param frames Waveform tensor. Shape: ``(frame, channel)``.
   /// The ``dtype`` must match what was passed to ``add_audio_stream()`` method.
   /// @param pts
   /// @parblock
@@ -183,7 +185,7 @@ class StreamWriter {
       const c10::optional<double>& pts = {});
   /// Write video data
   /// @param i Stream index.
-  /// @param chunk Video/image tensor. Shape: ``(time, channel, height,
+  /// @param frames Video/image tensor. Shape: ``(time, channel, height,
   /// width)``. The ``dtype`` must be ``torch.uint8``. The shape ``(height,
   /// width and the number of channels)`` must match what was configured when
   /// calling ``add_video_stream()``.

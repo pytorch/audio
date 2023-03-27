@@ -6,7 +6,7 @@ import torchaudio
 
 
 if torchaudio._extension._FFMPEG_INITIALIZED:
-    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.EncodingConfig
+    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.CodecConfig
 else:
     ConfigBase = object
 
@@ -47,11 +47,17 @@ _encoder_format = """Format used to encode media.
 
                 Default: ``None``."""
 
+_codec_config = """Codec configuration. Please refer to :py:class:`CodecConfig` for
+                configuration options.
+
+                Default: ``None``."""
+
 
 _format_common_args = _format_doc(
     encoder=_encoder,
     encoder_option=_encoder_option,
     encoder_format=_encoder_format,
+    codec_config=_codec_config,
 )
 
 
@@ -111,8 +117,8 @@ class StreamWriter:
     """
 
     @dataclass
-    class EncodeConfig(ConfigBase):
-        """Encoding configuration."""
+    class CodecConfig(ConfigBase):
+        """Codec configuration."""
 
         bit_rate: int = -1
         """Bit rate"""
@@ -152,7 +158,7 @@ class StreamWriter:
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
-        config: Optional[EncodeConfig] = None,
+        codec_config: Optional[CodecConfig] = None,
     ):
         """Add an output audio stream.
 
@@ -178,8 +184,12 @@ class StreamWriter:
             encoder_option (dict or None, optional): {encoder_option}
 
             encoder_format (str or None, optional): {encoder_format}
+
+            codec_config (CodecConfig or None, optional): {codec_config}
         """
-        self._s.add_audio_stream(sample_rate, num_channels, format, encoder, encoder_option, encoder_format, config)
+        self._s.add_audio_stream(
+            sample_rate, num_channels, format, encoder, encoder_option, encoder_format, codec_config
+        )
 
     @_format_common_args
     def add_video_stream(
@@ -192,7 +202,7 @@ class StreamWriter:
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
         hw_accel: Optional[str] = None,
-        config: Optional[EncodeConfig] = None,
+        codec_config: Optional[CodecConfig] = None,
     ):
         """Add an output video stream.
 
@@ -233,9 +243,11 @@ class StreamWriter:
 
                 If `None`, the video chunk Tensor has to be CPU Tensor.
                 Default: ``None``.
+
+            codec_config (CodecConfig or None, optional): {codec_config}
         """
         self._s.add_video_stream(
-            frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel, config
+            frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel, codec_config
         )
 
     def set_metadata(self, metadata: Dict[str, str]):

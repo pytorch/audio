@@ -309,7 +309,7 @@ void configure_audio_codec_ctx(
     int sample_rate,
     int num_channels,
     uint64_t channel_layout,
-    const c10::optional<EncodingConfig>& config) {
+    const c10::optional<CodecConfig>& codec_config) {
   codec_ctx->sample_fmt = format;
   codec_ctx->sample_rate = sample_rate;
   codec_ctx->time_base = av_inv_q(av_d2q(sample_rate, 1 << 24));
@@ -317,8 +317,8 @@ void configure_audio_codec_ctx(
   codec_ctx->channel_layout = channel_layout;
 
   // Set optional stuff
-  if (config) {
-    auto& cfg = config.value();
+  if (codec_config) {
+    auto& cfg = codec_config.value();
     if (cfg.bit_rate > 0) {
       codec_ctx->bit_rate = cfg.bit_rate;
     }
@@ -411,7 +411,7 @@ void configure_video_codec_ctx(
     AVRational frame_rate,
     int width,
     int height,
-    const c10::optional<EncodingConfig>& config) {
+    const c10::optional<CodecConfig>& codec_config) {
   // TODO: Review other options and make them configurable?
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00147
   //  - bit_rate_tolerance
@@ -423,8 +423,8 @@ void configure_video_codec_ctx(
   ctx->time_base = av_inv_q(frame_rate);
 
   // Set optional stuff
-  if (config) {
-    auto& cfg = config.value();
+  if (codec_config) {
+    auto& cfg = codec_config.value();
     if (cfg.bit_rate > 0) {
       ctx->bit_rate = cfg.bit_rate;
     }
@@ -624,7 +624,7 @@ EncodeProcess get_audio_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<EncodingConfig>& config) {
+    const c10::optional<CodecConfig>& codec_config) {
   // 1. Check the source format, rate and channels
   const AVSampleFormat src_fmt = get_sample_fmt(format);
   TORCH_CHECK(
@@ -658,7 +658,7 @@ EncodeProcess get_audio_encode_process(
       src_sample_rate,
       src_num_channels,
       channel_layout,
-      config);
+      codec_config);
   open_codec(codec_ctx, encoder_option);
 
   // 5. Build filter graph
@@ -701,7 +701,7 @@ EncodeProcess get_video_encode_process(
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel,
-    const c10::optional<EncodingConfig>& config) {
+    const c10::optional<CodecConfig>& codec_config) {
   // 1. Checkc the source format, rate and resolution
   const AVPixelFormat src_fmt = get_pix_fmt(format);
   AVRational src_rate = av_d2q(frame_rate, 1 << 24);
@@ -727,7 +727,7 @@ EncodeProcess get_video_encode_process(
   AVCodecContextPtr codec_ctx =
       get_codec_ctx(codec, format_ctx->oformat->flags);
   configure_video_codec_ctx(
-      codec_ctx, enc_fmt, src_rate, src_width, src_height, config);
+      codec_ctx, enc_fmt, src_rate, src_width, src_height, codec_config);
   if (hw_accel) {
 #ifdef USE_CUDA
     configure_hw_accel(codec_ctx, hw_accel.value());
