@@ -60,7 +60,7 @@ void StreamWriter::add_audio_stream(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<EncodingConfig>& config) {
+    const c10::optional<CodecConfig>& codec_config) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
       pFormatContext->nb_streams == processes.size(),
@@ -73,7 +73,7 @@ void StreamWriter::add_audio_stream(
       encoder,
       encoder_option,
       encoder_format,
-      config));
+      codec_config));
 }
 
 void StreamWriter::add_video_stream(
@@ -85,7 +85,7 @@ void StreamWriter::add_video_stream(
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel,
-    const c10::optional<EncodingConfig>& config) {
+    const c10::optional<CodecConfig>& codec_config) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
       pFormatContext->nb_streams == processes.size(),
@@ -100,7 +100,7 @@ void StreamWriter::add_video_stream(
       encoder_option,
       encoder_format,
       hw_accel,
-      config));
+      codec_config));
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {

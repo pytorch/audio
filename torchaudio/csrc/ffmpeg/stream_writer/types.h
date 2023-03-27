@@ -1,7 +1,7 @@
 #pragma once
 namespace torchaudio::io {
 
-struct EncodingConfig {
+struct CodecConfig {
   int bit_rate = -1;
   int compression_level = -1;
 
