@@ -68,8 +68,8 @@ write_video_chunk
 Support Structures
 ------------------
 
-EncodeConfig
-~~~~~~~~~~~~
+CodecConfig
+~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io::StreamWriter.EncodeConfig()
+.. autoclass:: torchaudio.io::StreamWriter.CodecConfig()
    :members:
