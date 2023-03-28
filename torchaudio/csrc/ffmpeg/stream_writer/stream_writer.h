@@ -100,6 +100,8 @@ class StreamWriter {
   ///  To list supported formats for the encoder, you can use
   /// ``ffmpeg -h encoder=<ENCODER>`` command.
   /// @param codec_config Codec configuration.
+  /// @param filter_desc Additional processing to apply before
+  /// encoding the input data
   void add_audio_stream(
       int sample_rate,
       int num_channels,
@@ -107,7 +109,8 @@ class StreamWriter {
       const c10::optional<std::string>& encoder = c10::nullopt,
       const c10::optional<OptionDict>& encoder_option = c10::nullopt,
       const c10::optional<std::string>& encoder_format = c10::nullopt,
-      const c10::optional<CodecConfig>& codec_config = c10::nullopt);
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
 
   /// Add an output video stream.
   ///
@@ -139,6 +142,8 @@ class StreamWriter {
   ///
   /// If `None`, the video chunk Tensor has to be a CPU Tensor.
   /// @endparblock
+  /// @param filter_desc Additional processing to apply before
+  /// encoding the input data
   void add_video_stream(
       double frame_rate,
       int width,
@@ -148,7 +153,8 @@ class StreamWriter {
       const c10::optional<OptionDict>& encoder_option = c10::nullopt,
       const c10::optional<std::string>& encoder_format = c10::nullopt,
       const c10::optional<std::string>& hw_accel = c10::nullopt,
-      const c10::optional<CodecConfig>& codec_config = c10::nullopt);
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);

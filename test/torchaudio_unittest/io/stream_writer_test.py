@@ -580,3 +580,57 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         out1_size = dst.tell()
 
         self.assertGreater(out1_size, out0_size)
+
+    def test_filter_graph_audio(self):
+        """Can apply additional effect with filter graph"""
+        sample_rate = 8000
+        num_channels = 2
+        ext = "wav"
+        filename = f"test.{ext}"
+
+        original = get_audio_chunk("s16", num_channels=num_channels, sample_rate=sample_rate)
+
+        dst = self.get_dst(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_audio_stream(sample_rate=8000, num_channels=num_channels, filter_desc="areverse", format="s16")
+
+        with w.open():
+            w.write_audio_chunk(0, original)
+
+        # check
+        if self.test_fileobj:
+            dst.flush()
+
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        reader.add_audio_stream(-1)
+        reader.process_all_packets()
+        (output,) = reader.pop_chunks()
+
+        self.assertEqual(output, original.flip(0))
+
+    def test_filter_graph_video(self):
+        """Can apply additional effect with filter graph"""
+        rate = 30
+        num_frames, width, height = 400, 160, 90
+        ext = "mp4"
+        filename = f"test.{ext}"
+
+        original = torch.zeros((num_frames, 3, height, width), dtype=torch.uint8)
+
+        dst = self.get_dst(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_video_stream(frame_rate=rate, format="rgb24", height=height, width=width, filter_desc="framestep=2")
+
+        with w.open():
+            w.write_video_chunk(0, original)
+
+        # check
+        if self.test_fileobj:
+            dst.flush()
+
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        reader.add_video_stream(-1)
+        reader.process_all_packets()
+        (output,) = reader.pop_chunks()
+
+        self.assertEqual(output.shape, [num_frames // 2, 3, height, width])
