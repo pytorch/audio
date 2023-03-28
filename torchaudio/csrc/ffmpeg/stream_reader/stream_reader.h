@@ -58,8 +58,8 @@ class StreamReader {
   /// (opening source).
   explicit StreamReader(
       const std::string& src,
-      const c10::optional<std::string>& format = {},
-      const c10::optional<OptionDict>& option = {});
+      const c10::optional<std::string>& format = c10::nullopt,
+      const c10::optional<OptionDict>& option = c10::nullopt);
 
   /// @cond
 
@@ -72,8 +72,8 @@ class StreamReader {
   // TODO: Move this to wrapper class
   explicit StreamReader(
       AVIOContext* io_ctx,
-      const c10::optional<std::string>& format = {},
-      const c10::optional<OptionDict>& option = {});
+      const c10::optional<std::string>& format = c10::nullopt,
+      const c10::optional<OptionDict>& option = c10::nullopt);
 
   /// @endcond
 
@@ -190,9 +190,9 @@ class StreamReader {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const c10::optional<std::string>& filter_desc,
-      const c10::optional<std::string>& decoder,
-      const c10::optional<OptionDict>& decoder_option);
+      const c10::optional<std::string>& filter_desc = c10::nullopt,
+      const c10::optional<std::string>& decoder = c10::nullopt,
+      const c10::optional<OptionDict>& decoder_option = c10::nullopt);
   /// Define an output video stream.
   ///
   /// @param i,frames_per_chunk,num_chunks,filter_desc,decoder,decoder_option
@@ -211,10 +211,10 @@ class StreamReader {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const c10::optional<std::string>& filter_desc,
-      const c10::optional<std::string>& decoder,
-      const c10::optional<OptionDict>& decoder_option,
-      const c10::optional<std::string>& hw_accel);
+      const c10::optional<std::string>& filter_desc = c10::nullopt,
+      const c10::optional<std::string>& decoder = c10::nullopt,
+      const c10::optional<OptionDict>& decoder_option = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt);
   /// Remove an output stream.
   ///
   /// @param i The index of the output stream to be removed.
@@ -288,7 +288,7 @@ class StreamReader {
   /// @param timeout See `process_packet_block()`
   /// @param backoff See `process_packet_block()`
   int fill_buffer(
-      const c10::optional<double>& timeout = {},
+      const c10::optional<double>& timeout = c10::nullopt,
       const double backoff = 10.);
 
   ///@}
