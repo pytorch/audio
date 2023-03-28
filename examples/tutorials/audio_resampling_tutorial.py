@@ -325,7 +325,7 @@ print("torchaudio and librosa kaiser fast MSE:", mse)
 #
 # Below are benchmarks for downsampling and upsampling waveforms between
 # two pairs of sampling rates. We demonstrate the performance implications
-# that the ``lowpass_filter_wdith``, window type, and sample rates can
+# that the ``lowpass_filter_width``, window type, and sample rates can
 # have. Additionally, we provide a comparison against ``librosa``\ ’s
 # ``kaiser_best`` and ``kaiser_fast`` using their corresponding parameters
 # in ``torchaudio``.
