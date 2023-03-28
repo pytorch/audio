@@ -2,28 +2,11 @@
 
 namespace torchaudio::io {
 
-namespace {
-
-AVStream* add_stream(AVFormatContext* format_ctx, AVCodecContext* codec_ctx) {
-  AVStream* stream = avformat_new_stream(format_ctx, nullptr);
-  TORCH_CHECK(stream, "Failed to allocate stream.");
-
-  stream->time_base = codec_ctx->time_base;
-  int ret = avcodec_parameters_from_context(stream->codecpar, codec_ctx);
-  TORCH_CHECK(
-      ret >= 0,
-      "Failed to copy the stream parameter. (",
-      av_err2string(ret),
-      ")");
-  return stream;
-}
-
-} // namespace
-
-Encoder::Encoder(AVFormatContext* format_ctx_, AVCodecContext* codec_ctx_)
-    : format_ctx(format_ctx_),
-      codec_ctx(codec_ctx_),
-      stream(add_stream(format_ctx, codec_ctx)) {}
+Encoder::Encoder(
+    AVFormatContext* format_ctx,
+    AVCodecContext* codec_ctx,
+    AVStream* stream) noexcept
+    : format_ctx(format_ctx), codec_ctx(codec_ctx), stream(stream) {}
 
 ///
 /// Encode the given AVFrame data

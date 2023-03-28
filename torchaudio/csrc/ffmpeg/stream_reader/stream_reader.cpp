@@ -306,9 +306,7 @@ void StreamReader::add_video_stream(
 #ifdef USE_CUDA
     torch::Device d{hw_accel.value()};
     TORCH_CHECK(
-        d.type() == c10::DeviceType::CUDA,
-        "Only CUDA is supported for hardware acceleration. Found: ",
-        device.str());
+        d.is_cuda(), "Only CUDA is supported for HW acceleration. Found: ", d);
     return d;
 #else
     TORCH_CHECK(

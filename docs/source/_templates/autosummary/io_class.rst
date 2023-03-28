@@ -42,7 +42,7 @@ Methods
    not item.startswith('_')
    and item not in inherited_members
    and item not in attributes
-   and item != "EncodeConfig"
+   and item != "CodecConfig"
    %}
 
 {{ item | underline("~") }}
@@ -82,10 +82,10 @@ Support Structures
 Support Structures
 ------------------
 
-EncodeConfig
-~~~~~~~~~~~~
+CodecConfig
+~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io::StreamWriter.EncodeConfig()
+.. autoclass:: torchaudio.io::StreamWriter.CodecConfig()
    :members:
 
 {%- endif %}
