@@ -1,3 +1,4 @@
+#include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
 
 namespace torchaudio::io {
@@ -460,15 +461,9 @@ void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
   // context to AVCodecContext. But this way, it will be deallocated
   // automatically at the time AVCodecContext is freed, so we do that.
 
-  int ret = av_hwdevice_ctx_create(
-      &ctx->hw_device_ctx,
-      AV_HWDEVICE_TYPE_CUDA,
-      std::to_string(device.index()).c_str(),
-      nullptr,
-      0);
-  TORCH_CHECK(
-      ret >= 0, "Failed to create CUDA device context: ", av_err2string(ret));
-  assert(ctx->hw_device_ctx);
+  ctx->hw_device_ctx = av_buffer_ref(get_cuda_context(device.index()));
+  TORCH_INTERNAL_ASSERT(
+      ctx->hw_device_ctx, "Failed to reference HW device context.");
 
   ctx->sw_pix_fmt = ctx->pix_fmt;
   ctx->pix_fmt = AV_PIX_FMT_CUDA;
@@ -483,7 +478,7 @@ void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
   frames_ctx->height = ctx->height;
   frames_ctx->initial_pool_size = 5;
 
-  ret = av_hwframe_ctx_init(ctx->hw_frames_ctx);
+  int ret = av_hwframe_ctx_init(ctx->hw_frames_ctx);
   TORCH_CHECK(
       ret >= 0,
       "Failed to initialize CUDA frame context: ",

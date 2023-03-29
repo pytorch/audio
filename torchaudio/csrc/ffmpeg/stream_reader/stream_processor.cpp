@@ -122,6 +122,8 @@ void configure_codec_context(
     // will retrieve the HW pixel format from opaque pointer.
     codec_ctx->get_format = get_hw_format;
     codec_ctx->hw_device_ctx = av_buffer_ref(get_cuda_context(device.index()));
+    TORCH_INTERNAL_ASSERT(
+        codec_ctx->hw_device_ctx, "Failed to reference HW device context.");
 #endif
   }
 }
