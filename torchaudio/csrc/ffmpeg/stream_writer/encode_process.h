@@ -41,7 +41,8 @@ EncodeProcess get_audio_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<CodecConfig>& codec_config);
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc);
 
 EncodeProcess get_video_encode_process(
     AVFormatContext* format_ctx,
@@ -53,6 +54,7 @@ EncodeProcess get_video_encode_process(
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel,
-    const c10::optional<CodecConfig>& codec_config);
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc);
 
 }; // namespace torchaudio::io

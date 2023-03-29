@@ -144,9 +144,12 @@ void write_interlaced_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(2) == buffer->width);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3) == num_channels);
 
-  // TODO: writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
+    TORCH_INTERNAL_ASSERT(
+        ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
+  }
 
   size_t stride = buffer->width * num_channels;
   uint8_t* src = frame.data_ptr<uint8_t>();
@@ -191,9 +194,12 @@ void write_planar_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(2), buffer->height);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3), buffer->width);
 
-  // TODO: writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
+    TORCH_INTERNAL_ASSERT(
+        ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
+  }
 
   for (int j = 0; j < num_colors; ++j) {
     uint8_t* src = frame.index({0, j}).data_ptr<uint8_t>();

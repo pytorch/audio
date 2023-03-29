@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torch/torch.h>
+#include <torch/types.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
@@ -34,7 +34,7 @@ class StreamWriter {
   /// ``dst``.
   explicit StreamWriter(
       const std::string& dst,
-      const c10::optional<std::string>& format = {});
+      const c10::optional<std::string>& format = c10::nullopt);
 
   /// @cond
 
@@ -45,7 +45,7 @@ class StreamWriter {
   // TODO: Move this into wrapper class.
   explicit StreamWriter(
       AVIOContext* io_ctx,
-      const c10::optional<std::string>& format);
+      const c10::optional<std::string>& format = c10::nullopt);
 
   /// @endcond
 
@@ -100,14 +100,17 @@ class StreamWriter {
   ///  To list supported formats for the encoder, you can use
   /// ``ffmpeg -h encoder=<ENCODER>`` command.
   /// @param codec_config Codec configuration.
+  /// @param filter_desc Additional processing to apply before
+  /// encoding the input data
   void add_audio_stream(
       int sample_rate,
       int num_channels,
       const std::string& format,
-      const c10::optional<std::string>& encoder,
-      const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format,
-      const c10::optional<CodecConfig>& codec_config);
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
 
   /// Add an output video stream.
   ///
@@ -139,16 +142,19 @@ class StreamWriter {
   ///
   /// If `None`, the video chunk Tensor has to be a CPU Tensor.
   /// @endparblock
+  /// @param filter_desc Additional processing to apply before
+  /// encoding the input data
   void add_video_stream(
       double frame_rate,
       int width,
       int height,
       const std::string& format,
-      const c10::optional<std::string>& encoder,
-      const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format,
-      const c10::optional<std::string>& hw_accel,
-      const c10::optional<CodecConfig>& codec_config);
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);
@@ -160,7 +166,7 @@ class StreamWriter {
   /// Open the output file / device and write the header.
   ///
   /// @param opt Private options for protocol, device and muxer.
-  void open(const c10::optional<OptionDict>& opt);
+  void open(const c10::optional<OptionDict>& opt = c10::nullopt);
   /// Close the output file / device and finalize metadata.
   void close();
 
@@ -182,7 +188,7 @@ class StreamWriter {
   void write_audio_chunk(
       int i,
       const torch::Tensor& frames,
-      const c10::optional<double>& pts = {});
+      const c10::optional<double>& pts = c10::nullopt);
   /// Write video data
   /// @param i Stream index.
   /// @param frames Video/image tensor. Shape: ``(time, channel, height,
@@ -203,7 +209,7 @@ class StreamWriter {
   void write_video_chunk(
       int i,
       const torch::Tensor& frames,
-      const c10::optional<double>& pts = {});
+      const c10::optional<double>& pts = c10::nullopt);
   /// Flush the frames from encoders and write the frames to the destination.
   void flush();
 };

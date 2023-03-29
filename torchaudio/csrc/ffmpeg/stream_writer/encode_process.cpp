@@ -513,19 +513,26 @@ FilterGraph get_audio_filter_graph(
     AVSampleFormat src_fmt,
     int sample_rate,
     uint64_t channel_layout,
+    const c10::optional<std::string>& filter_desc,
     AVSampleFormat enc_fmt,
     int nb_samples) {
-  const std::string filter_desc = [&]() -> const std::string {
+  const std::string desc = [&]() -> const std::string {
     if (src_fmt == enc_fmt) {
       if (nb_samples == 0) {
-        return "anull";
+        return filter_desc.value_or("anull");
       } else {
         std::stringstream ss;
+        if (filter_desc) {
+          ss << filter_desc.value() << ",";
+        }
         ss << "asetnsamples=n=" << nb_samples << ":p=0";
         return ss.str();
       }
     } else {
       std::stringstream ss;
+      if (filter_desc) {
+        ss << filter_desc.value() << ",";
+      }
       ss << "aformat=" << av_get_sample_fmt_name(enc_fmt);
       if (nb_samples > 0) {
         ss << ",asetnsamples=n=" << nb_samples << ":p=0";
@@ -537,7 +544,7 @@ FilterGraph get_audio_filter_graph(
   FilterGraph f{AVMEDIA_TYPE_AUDIO};
   f.add_audio_src(src_fmt, {1, sample_rate}, sample_rate, channel_layout);
   f.add_sink();
-  f.add_process(filter_desc);
+  f.add_process(desc);
   f.create_filter();
   return f;
 }
@@ -547,13 +554,17 @@ FilterGraph get_video_filter_graph(
     AVRational rate,
     int width,
     int height,
+    const c10::optional<std::string>& filter_desc,
     AVPixelFormat enc_fmt,
     bool is_cuda) {
   auto desc = [&]() -> std::string {
     if (src_fmt == enc_fmt || is_cuda) {
-      return "null";
+      return filter_desc.value_or("null");
     } else {
       std::stringstream ss;
+      if (filter_desc) {
+        ss << filter_desc.value() << ",";
+      }
       ss << "format=" << av_get_pix_fmt_name(enc_fmt);
       return ss.str();
     }
@@ -624,7 +635,8 @@ EncodeProcess get_audio_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
-    const c10::optional<CodecConfig>& codec_config) {
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc) {
   // 1. Check the source format, rate and channels
   const AVSampleFormat src_fmt = get_sample_fmt(format);
   TORCH_CHECK(
@@ -663,7 +675,12 @@ EncodeProcess get_audio_encode_process(
 
   // 5. Build filter graph
   FilterGraph filter_graph = get_audio_filter_graph(
-      src_fmt, src_sample_rate, channel_layout, enc_fmt, codec_ctx->frame_size);
+      src_fmt,
+      src_sample_rate,
+      channel_layout,
+      filter_desc,
+      enc_fmt,
+      codec_ctx->frame_size);
 
   // 6. Instantiate source frame
   AVFramePtr src_frame = get_audio_frame(
@@ -701,7 +718,8 @@ EncodeProcess get_video_encode_process(
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
     const c10::optional<std::string>& hw_accel,
-    const c10::optional<CodecConfig>& codec_config) {
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc) {
   // 1. Checkc the source format, rate and resolution
   const AVPixelFormat src_fmt = get_pix_fmt(format);
   AVRational src_rate = av_d2q(frame_rate, 1 << 24);
@@ -742,7 +760,13 @@ EncodeProcess get_video_encode_process(
 
   // 5. Build filter graph
   FilterGraph filter_graph = get_video_filter_graph(
-      src_fmt, src_rate, src_width, src_height, enc_fmt, hw_accel.has_value());
+      src_fmt,
+      src_rate,
+      src_width,
+      src_height,
+      filter_desc,
+      enc_fmt,
+      hw_accel.has_value());
 
   // 6. Instantiate source frame
   AVFramePtr src_frame = [&]() {

@@ -53,11 +53,15 @@ _codec_config = """Codec configuration. Please refer to :py:class:`CodecConfig` 
                 Default: ``None``."""
 
 
+_filter_desc = """Additional processing to apply before encoding the input media.
+                """
+
 _format_common_args = _format_doc(
     encoder=_encoder,
     encoder_option=_encoder_option,
     encoder_format=_encoder_format,
     codec_config=_codec_config,
+    filter_desc=_filter_desc,
 )
 
 
@@ -159,6 +163,7 @@ class StreamWriter:
         encoder_option: Optional[Dict[str, str]] = None,
         encoder_format: Optional[str] = None,
         codec_config: Optional[CodecConfig] = None,
+        filter_desc: Optional[str] = None,
     ):
         """Add an output audio stream.
 
@@ -186,9 +191,11 @@ class StreamWriter:
             encoder_format (str or None, optional): {encoder_format}
 
             codec_config (CodecConfig or None, optional): {codec_config}
+
+            filter_desc (str or None, optional): {filter_desc}
         """
         self._s.add_audio_stream(
-            sample_rate, num_channels, format, encoder, encoder_option, encoder_format, codec_config
+            sample_rate, num_channels, format, encoder, encoder_option, encoder_format, codec_config, filter_desc
         )
 
     @_format_common_args
@@ -203,6 +210,7 @@ class StreamWriter:
         encoder_format: Optional[str] = None,
         hw_accel: Optional[str] = None,
         codec_config: Optional[CodecConfig] = None,
+        filter_desc: Optional[str] = None,
     ):
         """Add an output video stream.
 
@@ -245,9 +253,20 @@ class StreamWriter:
                 Default: ``None``.
 
             codec_config (CodecConfig or None, optional): {codec_config}
+
+            filter_desc (str or None, optional): {filter_desc}
         """
         self._s.add_video_stream(
-            frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel, codec_config
+            frame_rate,
+            width,
+            height,
+            format,
+            encoder,
+            encoder_option,
+            encoder_format,
+            hw_accel,
+            codec_config,
+            filter_desc,
         )
 
     def set_metadata(self, metadata: Dict[str, str]):
