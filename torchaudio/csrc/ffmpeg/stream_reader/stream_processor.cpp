@@ -363,5 +363,24 @@ c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return post_processes.at(key)->pop_chunk();
 }
 
+std::unique_ptr<StreamProcessor> get_stream_processor(
+    AVStream* stream,
+    int64_t seek_timestamp,
+    const c10::optional<std::string>& decoder,
+    const c10::optional<OptionDict>& decoder_option,
+    const torch::Device& device) {
+  // When media source is file-like object, it is possible that source codec
+  // is not detected properly.
+  TORCH_CHECK(
+      stream->codecpar->format != -1,
+      "Failed to detect the source stream format.");
+  std::unique_ptr<StreamProcessor> processor =
+      std::make_unique<StreamProcessor>(
+          stream->time_base, stream->codecpar, decoder, decoder_option, device);
+  processor->set_discard_timestamp(seek_timestamp);
+  stream->discard = AVDISCARD_DEFAULT;
+  return processor;
+}
+
 } // namespace io
 } // namespace torchaudio

@@ -101,5 +101,12 @@ class StreamProcessor {
   c10::optional<Chunk> pop_chunk(KeyType key);
 };
 
+std::unique_ptr<StreamProcessor> get_stream_processor(
+    AVStream* stream,
+    int64_t seek_timestamp,
+    const c10::optional<std::string>& decoder,
+    const c10::optional<OptionDict>& decoder_option,
+    const torch::Device& device);
+
 } // namespace io
 } // namespace torchaudio

@@ -881,15 +881,22 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
     @nested_params(
         ["int16", "uint8", "int32"],  # "float", "double", "int64"]
         [1, 2, 4, 8],
+        [True, False],
     )
-    def test_audio_stream(self, dtype, num_channels):
+    def test_audio_stream(self, dtype, num_channels, split_src_dst_config):
         """`add_audio_stream` can apply filter"""
         src, original = self.get_src(8000, dtype=dtype, num_channels=num_channels)
 
         expected = torch.flip(original, dims=(0,))
 
         s = StreamReader(src)
-        s.add_audio_stream(frames_per_chunk=-1, filter_desc="areverse")
+
+        if split_src_dst_config:
+            s.set_audio_decoder()
+            s.add_out_audio_stream(frames_per_chunk=-1, filter_desc="areverse")
+        else:
+            s.add_audio_stream(frames_per_chunk=-1, filter_desc="areverse")
+
         s.process_all_packets()
         (output,) = s.pop_chunks()
         self.assertEqual(expected, output)
@@ -897,8 +904,9 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
     @nested_params(
         ["int16", "uint8", "int32"],  # "float", "double", "int64"]
         [1, 2, 4, 8],
+        [True, False],
     )
-    def test_audio_seek(self, dtype, num_channels):
+    def test_audio_seek(self, dtype, num_channels, split_src_dst_config):
         """`seek` changes the position properly"""
         src, original = self.get_src(1, dtype=dtype, num_channels=num_channels, num_frames=30)
 
@@ -907,18 +915,32 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             if self.test_type == "fileobj":
                 src.seek(0)
             s = StreamReader(src)
-            s.add_audio_stream(frames_per_chunk=-1)
+
+            if split_src_dst_config:
+                s.set_audio_decoder()
+                s.add_out_audio_stream(frames_per_chunk=-1)
+            else:
+                s.add_audio_stream(frames_per_chunk=-1)
+
             s.seek(float(t))
             s.process_all_packets()
             (output,) = s.pop_chunks()
             self.assertEqual(expected, output)
 
-    def test_audio_seek_multiple(self):
+    @nested_params(
+        [True, False],
+    )
+    def test_audio_seek_multiple(self, split_src_dst_config):
         """Calling `seek` after streaming is started should change the position properly"""
         src, original = self.get_src(1, dtype="int16", num_channels=2, num_frames=30)
 
         s = StreamReader(src)
-        s.add_audio_stream(frames_per_chunk=-1)
+
+        if split_src_dst_config:
+            s.set_audio_decoder()
+            s.add_out_audio_stream(frames_per_chunk=-1)
+        else:
+            s.add_audio_stream(frames_per_chunk=-1)
 
         ts = list(range(20)) + list(range(20, 0, -1)) + list(range(20))
         for t in ts:
@@ -935,8 +957,9 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             (18, 32, 1),  # num_frames is shorter than frames_per_chunk
         ],
         [1, 2, 4, 8],
+        [True, False],
     )
-    def test_audio_frames_per_chunk(self, frame_param, num_channels):
+    def test_audio_frames_per_chunk(self, frame_param, num_channels, split_src_dst_config):
         """Different chunk parameter covers the source media properly"""
         num_frames, frames_per_chunk, buffer_chunk_size = frame_param
         src, original = self.get_src(
@@ -944,7 +967,13 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         )
 
         s = StreamReader(src)
-        s.add_audio_stream(frames_per_chunk=frames_per_chunk, buffer_chunk_size=buffer_chunk_size)
+
+        if split_src_dst_config:
+            s.set_audio_decoder()
+            s.add_out_audio_stream(frames_per_chunk=frames_per_chunk, buffer_chunk_size=buffer_chunk_size)
+        else:
+            s.add_audio_stream(frames_per_chunk=frames_per_chunk, buffer_chunk_size=buffer_chunk_size)
+
         i, outputs = 0, []
         for (output,) in s.stream():
             expected = original[frames_per_chunk * i : frames_per_chunk * (i + 1), :]
@@ -987,17 +1016,24 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
 
     @parameterized.expand(
         [
-            ("hflip", 2),
-            ("vflip", 1),
+            ("hflip", 2, False),
+            ("vflip", 1, False),
+            ("vflip", 1, True),
         ]
     )
-    def test_png_effect(self, filter_desc, index):
+    def test_png_effect(self, filter_desc, index, split_src_dst_config):
         h, w = 111, 250
         src, original = self.get_src(w, h, grayscale=False)
         expected = torch.flip(original, dims=(index,))[None, ...]
 
         s = StreamReader(src)
-        s.add_video_stream(frames_per_chunk=-1, filter_desc=filter_desc)
+
+        if split_src_dst_config:
+            s.set_video_decoder()
+            s.add_out_video_stream(frames_per_chunk=-1, filter_desc=filter_desc)
+        else:
+            s.add_video_stream(frames_per_chunk=-1, filter_desc=filter_desc)
+
         s.process_all_packets()
         output = s.pop_chunks()[0]
         print("expected", expected)
@@ -1067,15 +1103,36 @@ class CuvidHWAccelInterfaceTest(TorchaudioTestCase):
         with self.assertRaises(RuntimeError):
             r.add_video_stream(-1, decoder="h264_cuvid")
 
+    def test_dup_hw_acel_src_dst_config(self):
+        """Specifying the same source stream with and without HW accel should fail (instead of segfault later)"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        r.set_video_decoder(decoder="h264_cuvid")
+        r.add_out_video_stream(-1)
+        with self.assertRaises(RuntimeError):
+            r.add_out_video_stream(-1, hw_accel="cuda")
+
+        r = StreamReader(src)
+        r.set_video_decoder(decoder="h264_cuvid")
+        r.add_out_video_stream(-1, hw_accel="cuda")
+        with self.assertRaises(RuntimeError):
+            r.add_out_video_stream(-1)
+
 
 @_media_source
 class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
+    @nested_params([True, False])
     @skipIfNoHWAccel("h264_cuvid")
-    def test_h264_cuvid(self):
+    def test_h264_cuvid(self, split_src_dst_config):
         """GPU decoder works for H264"""
         src = self.get_src(get_asset_path("nasa_13013.mp4"))
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="h264_cuvid")
+
+        if split_src_dst_config:
+            r.set_video_decoder(decoder="h264_cuvid")
+            r.add_out_video_stream(10)
+        else:
+            r.add_video_stream(10, decoder="h264_cuvid")
 
         num_frames = 0
         for (chunk,) in r.stream():
@@ -1085,12 +1142,18 @@ class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
             num_frames += chunk.size(0)
         assert num_frames == 390
 
+    @nested_params([True, False])
     @skipIfNoHWAccel("h264_cuvid")
-    def test_h264_cuvid_hw_accel(self):
+    def test_h264_cuvid_hw_accel(self, split_src_dst_config):
         """GPU decoder works for H264 with HW acceleration, and put the frames on CUDA tensor"""
         src = self.get_src(get_asset_path("nasa_13013.mp4"))
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda")
+
+        if split_src_dst_config:
+            r.set_video_decoder(decoder="h264_cuvid", hw_accel="cuda")
+            r.add_out_video_stream(10, hw_accel="cuda")
+        else:
+            r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda")
 
         num_frames = 0
         for (chunk,) in r.stream():
@@ -1100,12 +1163,18 @@ class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
             num_frames += chunk.size(0)
         assert num_frames == 390
 
+    @nested_params([True, False])
     @skipIfNoHWAccel("hevc_cuvid")
-    def test_hevc_cuvid(self):
+    def test_hevc_cuvid(self, split_src_dst_config):
         """GPU decoder works for H265/HEVC"""
         src = self.get_src(get_asset_path("testsrc.hevc"))
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="hevc_cuvid")
+
+        if split_src_dst_config:
+            r.set_video_decoder(decoder="hevc_cuvid")
+            r.add_out_video_stream(10)
+        else:
+            r.add_video_stream(10, decoder="hevc_cuvid")
 
         num_frames = 0
         for (chunk,) in r.stream():
@@ -1115,12 +1184,18 @@ class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
             num_frames += chunk.size(0)
         assert num_frames == 300
 
+    @nested_params([True, False])
     @skipIfNoHWAccel("hevc_cuvid")
-    def test_hevc_cuvid_hw_accel(self):
+    def test_hevc_cuvid_hw_accel(self, split_src_dst_config):
         """GPU decoder works for H265/HEVC with HW acceleration, and put the frames on CUDA tensor"""
         src = self.get_src(get_asset_path("testsrc.hevc"))
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="hevc_cuvid", hw_accel="cuda")
+
+        if split_src_dst_config:
+            r.set_video_decoder(decoder="hevc_cuvid", hw_accel="cuda")
+            r.add_out_video_stream(10, hw_accel="cuda")
+        else:
+            r.add_video_stream(10, decoder="hevc_cuvid", hw_accel="cuda")
 
         num_frames = 0
         for (chunk,) in r.stream():
@@ -1133,11 +1208,18 @@ class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
 
 @skipIfNoHWAccel("h264_cuvid")
 class FilterGraphWithCudaAccel(TorchaudioTestCase):
-    def test_sclae_cuda_change_size(self):
+    @nested_params([True, False])
+    def test_scale_cuda_change_size(self, split_src_dst_config):
         """scale_cuda filter can be used when HW accel is on"""
         src = get_asset_path("nasa_13013.mp4")
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=iw/2:ih/2")
+
+        if split_src_dst_config:
+            r.set_video_decoder(decoder="h264_cuvid", hw_accel="cuda")
+            r.add_out_video_stream(10, hw_accel="cuda", filter_desc="scale_cuda=iw/2:ih/2")
+        else:
+            r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=iw/2:ih/2")
+
         num_frames = 0
         for (chunk,) in r.stream():
             self.assertEqual(chunk.device, torch.device("cuda:0"))
@@ -1146,11 +1228,18 @@ class FilterGraphWithCudaAccel(TorchaudioTestCase):
             num_frames += chunk.size(0)
         assert num_frames == 390
 
-    def test_scale_cuda_format(self):
+    @nested_params([True, False])
+    def test_scale_cuda_format(self, split_src_dst_config):
         """yuv444p format conversion should work"""
         src = get_asset_path("nasa_13013.mp4")
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
+
+        if split_src_dst_config:
+            r.set_video_decoder(decoder="h264_cuvid", hw_accel="cuda")
+            r.add_out_video_stream(10, hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
+        else:
+            r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
+
         num_frames = 0
         for (chunk,) in r.stream():
             self.assertEqual(chunk.device, torch.device("cuda:0"))

@@ -958,3 +958,51 @@ class StreamReader:
             if all(c is None for c in chunks):
                 return
             yield chunks
+
+    def set_audio_decoder(
+        self,
+        stream_index: Optional[int] = None,
+        decoder: Optional[str] = None,
+        decoder_option: Optional[Dict[str, str]] = None,
+    ):
+        i = self.default_audio_stream if stream_index is None else stream_index
+        if i is None:
+            raise RuntimeError("There is no audio stream.")
+        self._be.set_audio_decoder(i, decoder, decoder_option)
+
+    def add_out_audio_stream(
+        self,
+        frames_per_chunk: int,
+        buffer_chunk_size: int = 3,
+        stream_index: Optional[int] = None,
+        filter_desc: Optional[str] = None,
+    ):
+        i = self.default_audio_stream if stream_index is None else stream_index
+        if i is None:
+            raise RuntimeError("There is no audio stream.")
+        self._be.add_out_audio_stream(i, frames_per_chunk, buffer_chunk_size, filter_desc)
+
+    def set_video_decoder(
+        self,
+        stream_index: Optional[int] = None,
+        decoder: Optional[str] = None,
+        decoder_option: Optional[Dict[str, str]] = None,
+        hw_accel: Optional[str] = None,
+    ):
+        i = self.default_video_stream if stream_index is None else stream_index
+        if i is None:
+            raise RuntimeError("There is no video stream.")
+        self._be.set_video_decoder(i, decoder, decoder_option, hw_accel)
+
+    def add_out_video_stream(
+        self,
+        frames_per_chunk: int,
+        buffer_chunk_size: int = 3,
+        stream_index: Optional[int] = None,
+        filter_desc: Optional[str] = None,
+        hw_accel: Optional[str] = None,
+    ):
+        i = self.default_video_stream if stream_index is None else stream_index
+        if i is None:
+            raise RuntimeError("There is no video stream.")
+        self._be.add_out_video_stream(i, frames_per_chunk, buffer_chunk_size, filter_desc, hw_accel)

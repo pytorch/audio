@@ -220,6 +220,95 @@ class StreamReader {
   /// @param i The index of the output stream to be removed.
   /// The valid value range is `[0, num_out_streams())`.
   void remove_stream(int64_t i);
+  /// Sets decoder for source audio stream.
+  /// @param decoder The name of the decoder to be used.
+  ///   When provided, use the specified decoder instead of the default one.
+  /// @param decoder_option Options passed to decoder.
+  /// @parblock
+  ///   To list decoder options for a decoder, you can use
+  ///   `ffmpeg -h decoder=<DECODER>` command.
+  ///
+  ///   In addition to decoder-specific options, you can also pass options
+  ///   related to multithreading. They are effective only if the decoder
+  ///   supports them. If neither of them are provided, StreamReader defaults to
+  ///   single thread.
+  ///    - ``"threads"``: The number of threads or the value ``"0"``
+  ///      to let FFmpeg decide based on its heuristics.
+  ///    - ``"thread_type"``: Which multithreading method to use.
+  ///      The valid values are ``"frame"`` or ``"slice"``.
+  ///      Note that each decoder supports a different set of methods.
+  ///      If not provided, a default value is used.
+  ///       - ``"frame"``: Decode more than one frame at once.
+  ///         Each thread handles one frame.
+  ///         This will increase decoding delay by one frame per thread
+  ///       - ``"slice"``: Decode more than one part of a single frame at once.
+  /// @endparblock
+  void set_audio_decoder(
+      int i,
+      const c10::optional<std::string>& decoder = c10::nullopt,
+      const c10::optional<OptionDict>& decoder_option = c10::nullopt);
+  /// Defines an output audio stream for a source audio stream.
+  /// If a decoder was not set for the selected source stream
+  /// prior to running this function, the function will first assign the default
+  /// decoder to the source stream before adding the output stream.
+  /// @param i The index of the source stream.
+  /// @param frames_per_chunk Number of frames returned as one chunk.
+  /// @param num_chunks Internal buffer size.
+  /// @parblock
+  ///   When the number of buffered chunks exceeds this number, old chunks are
+  ///   dropped. For example, if `frames_per_chunk` is 5 and `buffer_chunk_size`
+  ///   is 3, then frames older than 15 are dropped.
+  ///
+  ///   Providing ``-1`` disables this behavior, forcing the retention of all
+  ///   chunks.
+  /// @param filter_desc Description of filter graph applied to the source
+  /// stream.
+  void add_out_audio_stream(
+      int i,
+      int frames_per_chunk,
+      int num_chunks,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+  /// Sets decoder for source video stream.
+  /// @param i,decoder,decoder_option
+  /// See `configure_audio_decoder()`.
+  ///
+  /// @param hw_accel Enable hardware acceleration.
+  /// @parblock
+  /// When video is decoded on CUDA hardware, (for example by specifying
+  /// `"h264_cuvid"` decoder), passing CUDA device indicator to ``hw_accel``
+  /// (i.e. ``hw_accel="cuda:0"``) will make StreamReader place the resulting
+  /// frames directly on the specified CUDA device as a CUDA tensor.
+  ///
+  /// If `None`, the chunk will be moved to CPU memory.
+  /// @endparblock
+  void set_video_decoder(
+      int i,
+      const c10::optional<std::string>& decoder = c10::nullopt,
+      const c10::optional<OptionDict>& decoder_option = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt);
+  /// Defines an output video stream for a source video stream.
+  /// If a decoder was not set for the selected source stream
+  /// prior to running this function, the function will first assign the default
+  /// decoder to the source stream before adding the output stream.
+  ///
+  /// @param i,frames_per_chunk,num_chunks,filter_desc
+  /// See `add_dst_audio_stream()`.
+  ///
+  /// @param hw_accel Enable hardware acceleration.
+  /// @parblock
+  /// When video is decoded on CUDA hardware, (for example by specifying
+  /// `"h264_cuvid"` decoder), passing CUDA device indicator to ``hw_accel``
+  /// (i.e. ``hw_accel="cuda:0"``) will make StreamReader place the resulting
+  /// frames directly on the specified CUDA device as a CUDA tensor.
+  ///
+  /// If `None`, the chunk will be moved to CPU memory.
+  /// @endparblock
+  void add_out_video_stream(
+      int i,
+      int frames_per_chunk,
+      int num_chunks,
+      const c10::optional<std::string>& filter_desc = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt);
 
   ///@}
 
@@ -232,6 +321,19 @@ class StreamReader {
       const std::string& filter_desc,
       const c10::optional<std::string>& decoder,
       const c10::optional<OptionDict>& decoder_option,
+      const torch::Device& device);
+  void set_decoder(
+      int i,
+      AVMediaType media_type,
+      const c10::optional<std::string>& decoder,
+      const c10::optional<OptionDict>& decoder_option,
+      const torch::Device& device);
+  void add_out_stream(
+      int i,
+      AVMediaType media_type,
+      int frames_per_chunk,
+      int num_chunks,
+      const std::string& filter_desc,
       const torch::Device& device);
 
   //////////////////////////////////////////////////////////////////////////////

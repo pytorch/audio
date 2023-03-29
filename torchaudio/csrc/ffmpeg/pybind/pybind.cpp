@@ -140,7 +140,11 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def("process_all_packets", &StreamReader::process_all_packets)
       .def("fill_buffer", &StreamReader::fill_buffer)
       .def("is_buffer_ready", &StreamReader::is_buffer_ready)
-      .def("pop_chunks", &StreamReader::pop_chunks);
+      .def("pop_chunks", &StreamReader::pop_chunks)
+      .def("set_audio_decoder", &StreamReader::set_audio_decoder)
+      .def("add_out_audio_stream", &StreamReader::add_out_audio_stream)
+      .def("set_video_decoder", &StreamReader::set_video_decoder)
+      .def("add_out_video_stream", &StreamReader::add_out_video_stream);
   py::class_<StreamReaderFileObj>(m, "StreamReaderFileObj", py::module_local())
       .def(py::init<
            py::object,
@@ -169,7 +173,11 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def("process_all_packets", &StreamReaderFileObj::process_all_packets)
       .def("fill_buffer", &StreamReaderFileObj::fill_buffer)
       .def("is_buffer_ready", &StreamReaderFileObj::is_buffer_ready)
-      .def("pop_chunks", &StreamReaderFileObj::pop_chunks);
+      .def("pop_chunks", &StreamReaderFileObj::pop_chunks)
+      .def("set_audio_decoder", &StreamReaderFileObj::set_audio_decoder)
+      .def("add_out_audio_stream", &StreamReaderFileObj::add_out_audio_stream)
+      .def("set_video_decoder", &StreamReaderFileObj::set_video_decoder)
+      .def("add_out_video_stream", &StreamReaderFileObj::add_out_video_stream);
 }
 
 } // namespace

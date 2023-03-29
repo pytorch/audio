@@ -49,6 +49,24 @@ AVFormatContext* get_input_format_context(
       ").");
   return p;
 }
+
+torch::Device get_device(const c10::optional<std::string>& hw_accel) {
+  if (!hw_accel) {
+    return torch::Device{c10::DeviceType::CPU};
+  }
+#ifdef USE_CUDA
+  torch::Device d{hw_accel.value()};
+  TORCH_CHECK(
+      d.type() == c10::DeviceType::CUDA,
+      "Only CUDA is supported for hardware acceleration. Found: ",
+      d.str());
+  return d;
+#else
+  TORCH_CHECK(
+      false,
+      "torchaudio is not compiled with CUDA support. Hardware acceleration is not available.");
+#endif
+}
 } // namespace
 
 StreamReader::StreamReader(AVFormatContext* p) : pFormatContext(p) {
@@ -336,46 +354,25 @@ void StreamReader::add_stream(
     const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
   validate_src_stream_type(pFormatContext, i, media_type);
-
-  AVStream* stream = pFormatContext->streams[i];
-  // When media source is file-like object, it is possible that source codec is
-  // not detected properly.
-  TORCH_CHECK(
-      stream->codecpar->format != -1,
-      "Failed to detect the source stream format.");
-
   if (!processors[i]) {
-    processors[i] = std::make_unique<StreamProcessor>(
-        stream->time_base, stream->codecpar, decoder, decoder_option, device);
-    processors[i]->set_discard_timestamp(seek_timestamp);
+    processors[i] = get_stream_processor(
+        pFormatContext->streams[i],
+        seek_timestamp,
+        decoder,
+        decoder_option,
+        device);
   } else {
     if (decoder) {
-      // TODO: Validate that the decoder is consistent as the one used to define
-      // previous output streams.
+      // TODO: Validate that the decoder is consistent as the one used to
+      // define previous output streams.
       // i.e. the following is not permitted.
       // reader.add_video_stream(..., decoder="h264")
       // reader.add_video_stream(..., decoder="x264")
       // reader.add_video_stream(..., decoder="h264_cuvid")
     }
   }
-  stream->discard = AVDISCARD_DEFAULT;
-
-  auto frame_rate = [&]() -> AVRational {
-    switch (media_type) {
-      case AVMEDIA_TYPE_AUDIO:
-        return AVRational{0, 1};
-      case AVMEDIA_TYPE_VIDEO:
-        return av_guess_frame_rate(pFormatContext, stream, nullptr);
-      default:
-        TORCH_INTERNAL_ASSERT(
-            false,
-            "Unexpected media type is given: ",
-            av_get_media_type_string(media_type));
-    }
-  }();
-  int key = processors[i]->add_stream(
-      frames_per_chunk, num_chunks, frame_rate, filter_desc, device);
-  stream_indices.push_back(std::make_pair<>(i, key));
+  add_out_stream(
+      i, media_type, frames_per_chunk, num_chunks, filter_desc, device);
 }
 
 void StreamReader::remove_stream(int64_t i) {
@@ -398,6 +395,109 @@ void StreamReader::remove_stream(int64_t i) {
   if (!still_used) {
     processors[iP].reset(nullptr);
   }
+}
+
+void StreamReader::set_audio_decoder(
+    int i,
+    const c10::optional<std::string>& decoder,
+    const c10::optional<OptionDict>& decoder_option) {
+  set_decoder(
+      i,
+      AVMEDIA_TYPE_AUDIO,
+      decoder,
+      decoder_option,
+      torch::Device(torch::DeviceType::CPU));
+}
+
+void StreamReader::set_video_decoder(
+    int i,
+    const c10::optional<std::string>& decoder,
+    const c10::optional<OptionDict>& decoder_option,
+    const c10::optional<std::string>& hw_accel) {
+  set_decoder(
+      i, AVMEDIA_TYPE_VIDEO, decoder, decoder_option, get_device(hw_accel));
+}
+
+void StreamReader::set_decoder(
+    int i,
+    AVMediaType media_type,
+    const c10::optional<std::string>& decoder,
+    const c10::optional<OptionDict>& decoder_option,
+    const torch::Device& device) {
+  validate_src_stream_type(pFormatContext, i, media_type);
+  TORCH_INTERNAL_ASSERT(
+      !processors[i],
+      "The selected source stream has already been configured.");
+  processors[i] = get_stream_processor(
+      pFormatContext->streams[i],
+      seek_timestamp,
+      decoder,
+      decoder_option,
+      device);
+}
+
+void StreamReader::add_out_stream(
+    int i,
+    AVMediaType media_type,
+    int frames_per_chunk,
+    int num_chunks,
+    const std::string& filter_desc,
+    const torch::Device& device) {
+  validate_src_stream_type(pFormatContext, i, media_type);
+  if (!processors[i]) {
+    processors[i] = get_stream_processor(
+        pFormatContext->streams[i],
+        seek_timestamp,
+        c10::nullopt,
+        c10::nullopt,
+        device);
+  }
+  AVStream* stream = pFormatContext->streams[i];
+  auto frame_rate = [&]() -> AVRational {
+    switch (media_type) {
+      case AVMEDIA_TYPE_AUDIO:
+        return AVRational{0, 1};
+      case AVMEDIA_TYPE_VIDEO:
+        return av_guess_frame_rate(pFormatContext, stream, nullptr);
+      default:
+        TORCH_INTERNAL_ASSERT(
+            false,
+            "Unexpected media type is given: ",
+            av_get_media_type_string(media_type));
+    }
+  }();
+  int key = processors[i]->add_stream(
+      frames_per_chunk, num_chunks, frame_rate, filter_desc, device);
+  stream_indices.push_back(std::make_pair<>(i, key));
+}
+
+void StreamReader::add_out_audio_stream(
+    int i,
+    int frames_per_chunk,
+    int num_chunks,
+    const c10::optional<std::string>& filter_desc) {
+  add_out_stream(
+      i,
+      AVMEDIA_TYPE_AUDIO,
+      frames_per_chunk,
+      num_chunks,
+      filter_desc.value_or("anull"),
+      torch::Device(torch::DeviceType::CPU));
+}
+
+void StreamReader::add_out_video_stream(
+    int i,
+    int frames_per_chunk,
+    int num_chunks,
+    const c10::optional<std::string>& filter_desc,
+    const c10::optional<std::string>& hw_accel) {
+  add_out_stream(
+      i,
+      AVMEDIA_TYPE_VIDEO,
+      frames_per_chunk,
+      num_chunks,
+      filter_desc.value_or("null"),
+      get_device(hw_accel));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
