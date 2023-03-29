@@ -504,48 +504,6 @@ print(f"{bytes2[:10]}...{bytes2[-10:]}\n")
 assert bytes1 == bytes2
 
 ######################################################################
-# Note on slicing and AAC
-# ~~~~~~~~~~~~~~~~~~~~~~~
-#
-# .. warning::
-#
-#    FFmpeg's native AAC encoder (which is used by default when
-#    saving video with MP4 format) has a bug that affects the audibility.
-#
-#    Please refer to the examples bellow.
-#
-
-def test_slice(audio_encoder, slice_size, ext="mp4"):
-    path = get_path(f"slice_{slice_size}.{ext}")
-
-    s = StreamWriter(dst=path)
-    s.add_audio_stream(SAMPLE_RATE, NUM_CHANNELS, encoder=audio_encoder)
-    with s.open():
-        for start in range(0, NUM_FRAMES, slice_size):
-            end = start + slice_size
-            s.write_audio_chunk(0, WAVEFORM[start:end, ...])
-    return path
-
-######################################################################
-#
-# This causes some artifacts.
-
-# note:
-# Chrome does not support playing AAC audio directly while Safari does.
-# Using MP4 container and specifying AAC allows Chrome to play it.
-Video(test_slice(audio_encoder="aac", slice_size=8000, ext="mp4"), embed=True)
-
-######################################################################
-#
-# It is more noticeable when using smaller slice.
-Video(test_slice(audio_encoder="aac", slice_size=512, ext="mp4"), embed=True)
-
-######################################################################
-#
-# Lame MP3 encoder works fine for the same slice size.
-Audio(test_slice(audio_encoder="libmp3lame", slice_size=512, ext="mp3"))
-
-######################################################################
 #
 # Example - Spectrum Visualizer
 # -----------------------------
