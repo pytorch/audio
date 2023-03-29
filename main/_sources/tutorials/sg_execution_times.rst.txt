@@ -5,48 +5,48 @@
 
 Computation times
 =================
-**11:54.122** total execution time for **tutorials** files:
+**11:53.020** total execution time for **tutorials** files:
 
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_tacotron2_pipeline_tutorial.py` (``tacotron2_pipeline_tutorial.py``)                         | 02:32.258 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_tacotron2_pipeline_tutorial.py` (``tacotron2_pipeline_tutorial.py``)                         | 02:37.638 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_additive_synthesis_tutorial.py` (``additive_synthesis_tutorial.py``)                         | 02:29.058 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_additive_synthesis_tutorial.py` (``additive_synthesis_tutorial.py``)                         | 02:26.735 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_asr_inference_with_ctc_decoder_tutorial.py` (``asr_inference_with_ctc_decoder_tutorial.py``) | 02:13.054 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_asr_inference_with_ctc_decoder_tutorial.py` (``asr_inference_with_ctc_decoder_tutorial.py``) | 02:13.162 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_online_asr_tutorial.py` (``online_asr_tutorial.py``)                                         | 01:10.645 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_online_asr_tutorial.py` (``online_asr_tutorial.py``)                                         | 01:13.228 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_oscillator_tutorial.py` (``oscillator_tutorial.py``)                                         | 01:03.165 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_oscillator_tutorial.py` (``oscillator_tutorial.py``)                                         | 00:57.500 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_hybrid_demucs_tutorial.py` (``hybrid_demucs_tutorial.py``)                                   | 00:48.387 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_hybrid_demucs_tutorial.py` (``hybrid_demucs_tutorial.py``)                                   | 00:43.849 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_streamreader_advanced_tutorial.py` (``streamreader_advanced_tutorial.py``)                   | 00:20.040 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_streamreader_advanced_tutorial.py` (``streamreader_advanced_tutorial.py``)                   | 00:21.300 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_audio_data_augmentation_tutorial.py` (``audio_data_augmentation_tutorial.py``)               | 00:16.182 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_audio_data_augmentation_tutorial.py` (``audio_data_augmentation_tutorial.py``)               | 00:16.542 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_audio_feature_extractions_tutorial.py` (``audio_feature_extractions_tutorial.py``)           | 00:11.727 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_audio_feature_extractions_tutorial.py` (``audio_feature_extractions_tutorial.py``)           | 00:11.543 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_subtractive_synthesis_tutorial.py` (``subtractive_synthesis_tutorial.py``)                   | 00:09.479 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_subtractive_synthesis_tutorial.py` (``subtractive_synthesis_tutorial.py``)                   | 00:09.903 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_streamwriter_basic_tutorial.py` (``streamwriter_basic_tutorial.py``)                         | 00:07.604 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_streamwriter_basic_tutorial.py` (``streamwriter_basic_tutorial.py``)                         | 00:08.221 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_filter_design_tutorial.py` (``filter_design_tutorial.py``)                                   | 00:05.479 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_streamreader_basic_tutorial.py` (``streamreader_basic_tutorial.py``)                         | 00:06.186 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_streamreader_basic_tutorial.py` (``streamreader_basic_tutorial.py``)                         | 00:05.340 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_filter_design_tutorial.py` (``filter_design_tutorial.py``)                                   | 00:05.437 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_speech_recognition_pipeline_tutorial.py` (``speech_recognition_pipeline_tutorial.py``)       | 00:05.202 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_speech_recognition_pipeline_tutorial.py` (``speech_recognition_pipeline_tutorial.py``)       | 00:04.799 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_audio_resampling_tutorial.py` (``audio_resampling_tutorial.py``)                             | 00:04.139 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_audio_resampling_tutorial.py` (``audio_resampling_tutorial.py``)                             | 00:04.290 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_audio_feature_augmentation_tutorial.py` (``audio_feature_augmentation_tutorial.py``)         | 00:03.504 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_audio_feature_augmentation_tutorial.py` (``audio_feature_augmentation_tutorial.py``)         | 00:03.779 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_forced_alignment_tutorial.py` (``forced_alignment_tutorial.py``)                             | 00:02.645 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_forced_alignment_tutorial.py` (``forced_alignment_tutorial.py``)                             | 00:02.780 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_mvdr_tutorial.py` (``mvdr_tutorial.py``)                                                     | 00:02.254 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_mvdr_tutorial.py` (``mvdr_tutorial.py``)                                                     | 00:02.204 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_audio_io_tutorial.py` (``audio_io_tutorial.py``)                                             | 00:02.006 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_audio_datasets_tutorial.py` (``audio_datasets_tutorial.py``)                                 | 00:02.014 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_tutorials_audio_datasets_tutorial.py` (``audio_datasets_tutorial.py``)                                 | 00:01.953 | 0.0 MB |
+| :ref:`sphx_glr_tutorials_audio_io_tutorial.py` (``audio_io_tutorial.py``)                                             | 00:01.912 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_tutorials_device_asr.py` (``device_asr.py``)                                                           | 00:00.000 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------------------+-----------+--------+
