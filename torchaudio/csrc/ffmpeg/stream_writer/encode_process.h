@@ -28,9 +28,10 @@ class EncodeProcess {
 
   void process(const torch::Tensor& tensor, const c10::optional<double>& pts);
 
-  void process_frame(AVFrame* src);
-
   void flush();
+
+ private:
+  void process_frame(AVFrame* src);
 };
 
 EncodeProcess get_audio_encode_process(
@@ -41,6 +42,8 @@ EncodeProcess get_audio_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
+    const c10::optional<int>& encoder_sample_rate,
+    const c10::optional<int>& encoder_num_channels,
     const c10::optional<CodecConfig>& codec_config,
     const c10::optional<std::string>& filter_desc);
 
@@ -53,6 +56,9 @@ EncodeProcess get_video_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
+    const c10::optional<double>& encoder_frame_rate,
+    const c10::optional<int>& encoder_width,
+    const c10::optional<int>& encoder_height,
     const c10::optional<std::string>& hw_accel,
     const c10::optional<CodecConfig>& codec_config,
     const c10::optional<std::string>& filter_desc);
