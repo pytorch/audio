@@ -64,7 +64,7 @@ SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-
 # Generate frame-wise label probability
 # -------------------------------------
 #
-# The first step is to generate the label class porbability of each aduio
+# The first step is to generate the label class porbability of each audio
 # frame. We can use a Wav2Vec2 model that is trained for ASR. Here we use
 # :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
 #
