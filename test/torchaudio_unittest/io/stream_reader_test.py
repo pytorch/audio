@@ -6,6 +6,7 @@ from parameterized import parameterized, parameterized_class
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     get_image,
+    get_sinusoid,
     get_wav_data,
     is_ffmpeg_available,
     nested_params,
@@ -836,6 +837,7 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         self._test_wav(src, original, fmt=None)
 
     def test_audio_stream_format(self):
+        "`format` argument properly changes the sample format of decoded audio"
         num_channels = 2
         src, s32 = self.get_src(8000, dtype="int32", num_channels=num_channels)
         args = {
@@ -877,6 +879,40 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         self.assertEqual(chunks[9], f32)
         self.assertEqual(chunks[10], f64)
         self.assertEqual(chunks[11], f64)
+
+    @nested_params([4000, 16000])
+    def test_basic_audio_stream_sample_rate(self, sr):
+        """`sample_rate` argument changes the sample_rate of decoded audio"""
+        src_num_channels, src_sr = 2, 8000
+        data = get_sinusoid(sample_rate=src_sr, n_channels=src_num_channels, channels_first=False)
+        path = self.get_temp_path("ref.wav")
+        save_wav(path, data, src_sr, channels_first=False)
+
+        s = StreamReader(path)
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="flt", sample_rate=sr)
+        self.assertEqual(s.get_src_stream_info(0).sample_rate, src_sr)
+        self.assertEqual(s.get_out_stream_info(0).sample_rate, sr)
+
+        s.process_all_packets()
+        (chunks,) = s.pop_chunks()
+        self.assertEqual(chunks.shape, [sr, src_num_channels])
+
+    @nested_params([1, 2, 3, 8, 16])
+    def test_basic_audio_stream_num_channels(self, num_channels):
+        """`sample_rate` argument changes the number of channels of decoded audio"""
+        src_num_channels, sr = 2, 8000
+        data = get_sinusoid(sample_rate=sr, n_channels=src_num_channels, channels_first=False)
+        path = self.get_temp_path("ref.wav")
+        save_wav(path, data, sr, channels_first=False)
+
+        s = StreamReader(path)
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="flt", num_channels=num_channels)
+        self.assertEqual(s.get_src_stream_info(0).num_channels, src_num_channels)
+        self.assertEqual(s.get_out_stream_info(0).num_channels, num_channels)
+
+        s.process_all_packets()
+        (chunks,) = s.pop_chunks()
+        self.assertEqual(chunks.shape, [sr, num_channels])
 
     @nested_params(
         ["int16", "uint8", "int32"],  # "float", "double", "int64"]
