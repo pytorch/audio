@@ -203,30 +203,37 @@ class StreamWriter:
 
             encoder_format (str or None, optional): {encoder_format}
 
-            encoder_sample_rate (int or None, optional): Override the sample rate used encoding time.
+            encoder_sample_rate (int or None, optional): Override the sample rate used for encoding time.
                 Some encoders pose restriction on the sample rate used for encoding.
                 If the source sample rate is not supported by the encoder, the source sample rate is used,
                 otherwise a default one is picked.
 
-                For example, ``"opus"`` encoder only supports 48k Hz, so, when encoding a waveform with ``"opus"`` encoder,
-                it is always encoded as 48k Hz.
-                Meanwhile ``"mp3"`` (``"libmp3lame"``) supports 44.1k, 48k, 32k, 22.05k, 24k, 16k, 11.025k, 12k and 8k Hz.
-                If the original sample rate is one of these, then the original sample rate will be used, otherwise it will be
-                resampled to a default (44.1k).
-                When encoding into WAV format, there is no restriction on sample rate, so the original sample rate will be used.
+                For example, ``"opus"`` encoder only supports 48k Hz, so, when encoding a
+                waveform with ``"opus"`` encoder, it is always encoded as 48k Hz.
+                Meanwhile ``"mp3"`` (``"libmp3lame"``) supports 44.1k, 48k, 32k, 22.05k,
+                24k, 16k, 11.025k, 12k and 8k Hz.
+                If the original sample rate is one of these, then the original sample rate
+                is used, otherwise it will be resampled to a default one (44.1k).
+                When encoding into WAV format, there is no restriction on sample rate,
+                so the original sample rate will be used.
 
-                Providing ``encoder_sample_rate`` will override this behavior and encoder attempts to use the provided sample rate.
+                Providing ``encoder_sample_rate`` will override this behavior and
+                make encoder attempt to use the provided sample rate.
                 The provided value must be one support by the encoder.
 
-            encoder_num_channels (int or None, optional): Override the number of channels used at encoding time.
-                Similar to sample rate, some encoders pose restriction on the numbe of channels that can be used for encoding.
+            encoder_num_channels (int or None, optional): Override the number of channels used for encoding.
 
-                If the original number of channels is supported by encoder, then it will be used, otherwise, the encoder attempts to
+                Similar to sample rate, some encoders (such as ``"opus"``,
+                ``"vorbis"`` and ``"g722"``) pose restriction on
+                the numbe of channels that can be used for encoding.
+
+                If the original number of channels is supported by encoder,
+                then it will be used, otherwise, the encoder attempts to
                 remix the channel to one of the supported ones.
 
-                Providing ``encoder_num_channels`` will override this behavior and encoder attempts to use the provided number of channels.
+                Providing ``encoder_num_channels`` will override this behavior and
+                make encoder attempt to use the provided number of channels.
                 The provided value must be one support by the encoder.
-
 
             codec_config (CodecConfig or None, optional): {codec_config}
 
@@ -292,12 +299,16 @@ class StreamWriter:
 
             encoder_format (str or None, optional): {encoder_format}
 
-            encoder_frame_rate (float or None, optional): Override the frame rate used encoding time.
-                Some encoders pose restriction on the frame rate used for encoding.
-                If the source frame rate is not supported by the encoder, the source frame rate is used,
-                otherwise a default one is picked.
+            encoder_frame_rate (float or None, optional): Override the frame rate used for encoding.
 
-                Providing ``encoder_frame_rate`` will override this behavior and make encoder attempts to use the provided sample rate.
+                Some encoders, (such as ``"mpeg1"`` and ``"mpeg2"``) pose restriction on the
+                frame rate that can be used for encoding.
+                If such case, if the source frame rate (provided as ``frame_rate``) is not
+                one of the supported frame rate, then a default one is picked, and the frame rate
+                is changed on-the-fly. Otherwise the source frame rate is used.
+
+                Providing ``encoder_frame_rate`` will override this behavior and
+                make encoder attempts to use the provided sample rate.
                 The provided value must be one support by the encoder.
 
             encoder_width (int or None, optional): Width of the image used for encoding.
