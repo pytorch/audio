@@ -370,6 +370,10 @@ void configure_audio_codec_ctx(
     if (cfg.compression_level != -1) {
       codec_ctx->compression_level = cfg.compression_level;
     }
+    if (cfg.qscale) {
+      codec_ctx->flags |= AV_CODEC_FLAG_QSCALE;
+      codec_ctx->global_quality = FF_QP2LAMBDA * cfg.qscale.value();
+    }
   }
 }
 
@@ -499,6 +503,10 @@ void configure_video_codec_ctx(
     }
     if (cfg.max_b_frames != -1) {
       ctx->max_b_frames = cfg.max_b_frames;
+    }
+    if (cfg.qscale) {
+      ctx->flags |= AV_CODEC_FLAG_QSCALE;
+      ctx->global_quality = FF_QP2LAMBDA * cfg.qscale.value();
     }
   }
 }
