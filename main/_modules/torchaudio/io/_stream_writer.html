@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230330) &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230331) &#x25BC</span></a>
     </div>
     
 
@@ -450,7 +450,18 @@
 <span class="s2">                To list supported formats for the encoder, you can use</span>
 <span class="s2">                ``ffmpeg -h encoder=&lt;ENCODER&gt;`` command.</span>
 
-<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+<span class="s2">                Default: ``None``.</span>
+
+<span class="s2">                Note:</span>
+<span class="s2">                    When ``encoder_format`` option is not provided, encoder uses its default format.</span>
+
+<span class="s2">                    For example, when encoding audio into wav format, 16-bit signed integer is used,</span>
+<span class="s2">                    and when encoding video into mp4 format (h264 encoder), one of YUV format is used.</span>
+
+<span class="s2">                    This is because typically, 32-bit or 16-bit floating point is used in audio models but</span>
+<span class="s2">                    they are not commonly used in audio formats. Similarly, RGB24 is commonly used in vision</span>
+<span class="s2">                    models, but video formats usually (and better) support YUV formats.</span>
+<span class="s2">                &quot;&quot;&quot;</span>
 
 <span class="n">_codec_config</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Codec configuration. Please refer to :py:class:`CodecConfig` for</span>
 <span class="s2">                configuration options.</span>
@@ -535,6 +546,13 @@
         <span class="n">compression_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compression level&quot;&quot;&quot;</span>
 
+        <span class="n">qscale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Global quality factor. Enables variable bit rate. Valid values depend on encoder.</span>
+
+<span class="sd">        For example: MP3 takes ``0`` - ``9`` (https://trac.ffmpeg.org/wiki/Encode/MP3) while</span>
+<span class="sd">        libvorbis takes ``-1`` - ``10``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">gop_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of pictures in a group of pictures, or 0 for intra_only&quot;&quot;&quot;</span>
 
@@ -542,7 +560,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;maximum number of B-frames between non-B-frames.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gop_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_b_frames</span><span class="p">)</span></div>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qscale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gop_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_b_frames</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -567,6 +585,8 @@
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_num_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">codec_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CodecConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -595,12 +615,53 @@
 
 <span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
 
+<span class="sd">            encoder_sample_rate (int or None, optional): Override the sample rate used for encoding time.</span>
+<span class="sd">                Some encoders pose restriction on the sample rate used for encoding.</span>
+<span class="sd">                If the source sample rate is not supported by the encoder, the source sample rate is used,</span>
+<span class="sd">                otherwise a default one is picked.</span>
+
+<span class="sd">                For example, ``&quot;opus&quot;`` encoder only supports 48k Hz, so, when encoding a</span>
+<span class="sd">                waveform with ``&quot;opus&quot;`` encoder, it is always encoded as 48k Hz.</span>
+<span class="sd">                Meanwhile ``&quot;mp3&quot;`` (``&quot;libmp3lame&quot;``) supports 44.1k, 48k, 32k, 22.05k,</span>
+<span class="sd">                24k, 16k, 11.025k, 12k and 8k Hz.</span>
+<span class="sd">                If the original sample rate is one of these, then the original sample rate</span>
+<span class="sd">                is used, otherwise it will be resampled to a default one (44.1k).</span>
+<span class="sd">                When encoding into WAV format, there is no restriction on sample rate,</span>
+<span class="sd">                so the original sample rate will be used.</span>
+
+<span class="sd">                Providing ``encoder_sample_rate`` will override this behavior and</span>
+<span class="sd">                make encoder attempt to use the provided sample rate.</span>
+<span class="sd">                The provided value must be one support by the encoder.</span>
+
+<span class="sd">            encoder_num_channels (int or None, optional): Override the number of channels used for encoding.</span>
+
+<span class="sd">                Similar to sample rate, some encoders (such as ``&quot;opus&quot;``,</span>
+<span class="sd">                ``&quot;vorbis&quot;`` and ``&quot;g722&quot;``) pose restriction on</span>
+<span class="sd">                the numbe of channels that can be used for encoding.</span>
+
+<span class="sd">                If the original number of channels is supported by encoder,</span>
+<span class="sd">                then it will be used, otherwise, the encoder attempts to</span>
+<span class="sd">                remix the channel to one of the supported ones.</span>
+
+<span class="sd">                Providing ``encoder_num_channels`` will override this behavior and</span>
+<span class="sd">                make encoder attempt to use the provided number of channels.</span>
+<span class="sd">                The provided value must be one support by the encoder.</span>
+
 <span class="sd">            codec_config (CodecConfig or None, optional): {codec_config}</span>
 
 <span class="sd">            filter_desc (str or None, optional): {filter_desc}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
-            <span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">encoder_option</span><span class="p">,</span> <span class="n">encoder_format</span><span class="p">,</span> <span class="n">codec_config</span><span class="p">,</span> <span class="n">filter_desc</span>
+            <span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">num_channels</span><span class="p">,</span>
+            <span class="nb">format</span><span class="p">,</span>
+            <span class="n">encoder</span><span class="p">,</span>
+            <span class="n">encoder_option</span><span class="p">,</span>
+            <span class="n">encoder_format</span><span class="p">,</span>
+            <span class="n">encoder_sample_rate</span><span class="p">,</span>
+            <span class="n">encoder_num_channels</span><span class="p">,</span>
+            <span class="n">codec_config</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamWriter.add_video_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.add_video_stream">[docs]</a>    <span class="nd">@_format_common_args</span>
@@ -613,6 +674,9 @@
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">codec_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CodecConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -647,6 +711,24 @@
 
 <span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
 
+<span class="sd">            encoder_frame_rate (float or None, optional): Override the frame rate used for encoding.</span>
+
+<span class="sd">                Some encoders, (such as ``&quot;mpeg1&quot;`` and ``&quot;mpeg2&quot;``) pose restriction on the</span>
+<span class="sd">                frame rate that can be used for encoding.</span>
+<span class="sd">                If such case, if the source frame rate (provided as ``frame_rate``) is not</span>
+<span class="sd">                one of the supported frame rate, then a default one is picked, and the frame rate</span>
+<span class="sd">                is changed on-the-fly. Otherwise the source frame rate is used.</span>
+
+<span class="sd">                Providing ``encoder_frame_rate`` will override this behavior and</span>
+<span class="sd">                make encoder attempts to use the provided sample rate.</span>
+<span class="sd">                The provided value must be one support by the encoder.</span>
+
+<span class="sd">            encoder_width (int or None, optional): Width of the image used for encoding.</span>
+<span class="sd">                This allows to change the image size during encoding.</span>
+
+<span class="sd">            encoder_height (int or None, optional): Height of the image used for encoding.</span>
+<span class="sd">                This allows to change the image size during encoding.</span>
+
 <span class="sd">            hw_accel (str or None, optional): Enable hardware acceleration.</span>
 
 <span class="sd">                When video is encoded on CUDA hardware, for example</span>
@@ -669,6 +751,9 @@
             <span class="n">encoder</span><span class="p">,</span>
             <span class="n">encoder_option</span><span class="p">,</span>
             <span class="n">encoder_format</span><span class="p">,</span>
+            <span class="n">encoder_frame_rate</span><span class="p">,</span>
+            <span class="n">encoder_width</span><span class="p">,</span>
+            <span class="n">encoder_height</span><span class="p">,</span>
             <span class="n">hw_accel</span><span class="p">,</span>
             <span class="n">codec_config</span><span class="p">,</span>
             <span class="n">filter_desc</span><span class="p">,</span>
