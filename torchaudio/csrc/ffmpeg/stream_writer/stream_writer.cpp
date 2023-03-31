@@ -60,6 +60,8 @@ void StreamWriter::add_audio_stream(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
+    const c10::optional<int>& encoder_sample_rate,
+    const c10::optional<int>& encoder_num_channels,
     const c10::optional<CodecConfig>& codec_config,
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
@@ -74,6 +76,8 @@ void StreamWriter::add_audio_stream(
       encoder,
       encoder_option,
       encoder_format,
+      encoder_sample_rate,
+      encoder_num_channels,
       codec_config,
       filter_desc));
 }
@@ -86,6 +90,9 @@ void StreamWriter::add_video_stream(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
+    const c10::optional<double>& encoder_frame_rate,
+    const c10::optional<int>& encoder_width,
+    const c10::optional<int>& encoder_height,
     const c10::optional<std::string>& hw_accel,
     const c10::optional<CodecConfig>& codec_config,
     const c10::optional<std::string>& filter_desc) {
@@ -102,6 +109,9 @@ void StreamWriter::add_video_stream(
       encoder,
       encoder_option,
       encoder_format,
+      encoder_frame_rate,
+      encoder_width,
+      encoder_height,
       hw_accel,
       codec_config,
       filter_desc));

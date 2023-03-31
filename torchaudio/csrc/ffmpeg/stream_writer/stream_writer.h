@@ -109,6 +109,8 @@ class StreamWriter {
       const c10::optional<std::string>& encoder = c10::nullopt,
       const c10::optional<OptionDict>& encoder_option = c10::nullopt,
       const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<int>& encoder_sample_rate = c10::nullopt,
+      const c10::optional<int>& encoder_num_channels = c10::nullopt,
       const c10::optional<CodecConfig>& codec_config = c10::nullopt,
       const c10::optional<std::string>& filter_desc = c10::nullopt);
 
@@ -152,6 +154,9 @@ class StreamWriter {
       const c10::optional<std::string>& encoder = c10::nullopt,
       const c10::optional<OptionDict>& encoder_option = c10::nullopt,
       const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<double>& encoder_frame_rate = c10::nullopt,
+      const c10::optional<int>& encoder_width = c10::nullopt,
+      const c10::optional<int>& encoder_height = c10::nullopt,
       const c10::optional<std::string>& hw_accel = c10::nullopt,
       const c10::optional<CodecConfig>& codec_config = c10::nullopt,
       const c10::optional<std::string>& filter_desc = c10::nullopt);

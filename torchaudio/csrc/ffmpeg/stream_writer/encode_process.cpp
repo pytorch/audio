@@ -1,5 +1,6 @@
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
+#include <cmath>
 
 namespace torchaudio::io {
 
@@ -23,8 +24,13 @@ void EncodeProcess::process(
     const torch::Tensor& tensor,
     const c10::optional<double>& pts) {
   if (pts) {
+    const double& pts_val = pts.value();
+    TORCH_CHECK(
+        std::isfinite(pts_val) && pts_val >= 0.0,
+        "The value of PTS must be positive and finite. Found: ",
+        pts_val)
     AVRational tb = codec_ctx->time_base;
-    auto val = static_cast<int64_t>(std::round(pts.value() * tb.den / tb.num));
+    auto val = static_cast<int64_t>(std::round(pts_val * tb.den / tb.num));
     if (src_frame->pts > val) {
       TORCH_WARN_ONCE(
           "The provided PTS value is smaller than the next expected value.");
@@ -64,7 +70,7 @@ void EncodeProcess::flush() {
 
 namespace {
 
-enum AVSampleFormat get_sample_fmt(const std::string& src) {
+enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
   auto fmt = av_get_sample_fmt(src.c_str());
   if (fmt != AV_SAMPLE_FMT_NONE && !av_sample_fmt_is_planar(fmt)) {
     return fmt;
@@ -90,7 +96,7 @@ enum AVSampleFormat get_sample_fmt(const std::string& src) {
       ".");
 }
 
-enum AVPixelFormat get_pix_fmt(const std::string& src) {
+enum AVPixelFormat get_src_pix_fmt(const std::string& src) {
   AVPixelFormat fmt = av_get_pix_fmt(src.c_str());
   switch (fmt) {
     case AV_PIX_FMT_GRAY8:
@@ -205,14 +211,13 @@ bool supported_sample_fmt(
   return false;
 }
 
-std::vector<std::string> get_supported_formats(
-    const AVSampleFormat* sample_fmts) {
+std::string get_supported_formats(const AVSampleFormat* sample_fmts) {
   std::vector<std::string> ret;
   while (*sample_fmts != AV_SAMPLE_FMT_NONE) {
     ret.emplace_back(av_get_sample_fmt_name(*sample_fmts));
     ++sample_fmts;
   }
-  return ret;
+  return c10::Join(", ", ret);
 }
 
 AVSampleFormat get_enc_fmt(
@@ -230,7 +235,7 @@ AVSampleFormat get_enc_fmt(
         " does not support ",
         encoder_format.value(),
         " format. Supported values are; ",
-        c10::Join(", ", get_supported_formats(codec->sample_fmts)));
+        get_supported_formats(codec->sample_fmts));
     return fmt;
   }
   if (codec->sample_fmts) {
@@ -239,22 +244,21 @@ AVSampleFormat get_enc_fmt(
   return src_fmt;
 };
 
-bool supported_sample_rate(
-    const int sample_rate,
-    const int* supported_samplerates) {
-  if (!supported_samplerates) {
+bool supported_sample_rate(const int sample_rate, const AVCodec* codec) {
+  if (!codec->supported_samplerates) {
     return true;
   }
-  while (*supported_samplerates) {
-    if (sample_rate == *supported_samplerates) {
+  const int* it = codec->supported_samplerates;
+  while (*it) {
+    if (sample_rate == *it) {
       return true;
     }
-    ++supported_samplerates;
+    ++it;
   }
   return false;
 }
 
-std::vector<int> get_supported_samplerates(const int* supported_samplerates) {
+std::string get_supported_samplerates(const int* supported_samplerates) {
   std::vector<int> ret;
   if (supported_samplerates) {
     while (*supported_samplerates) {
@@ -262,59 +266,99 @@ std::vector<int> get_supported_samplerates(const int* supported_samplerates) {
       ++supported_samplerates;
     }
   }
-  return ret;
+  return c10::Join(", ", ret);
 }
 
-void validate_sample_rate(int sample_rate, const AVCodec* codec) {
-  TORCH_CHECK(
-      supported_sample_rate(sample_rate, codec->supported_samplerates),
-      codec->name,
-      " does not support sample rate ",
-      sample_rate,
-      ". Supported values are; ",
-      c10::Join(", ", get_supported_samplerates(codec->supported_samplerates)));
+int get_enc_sr(
+    int src_sample_rate,
+    const c10::optional<int>& encoder_sample_rate,
+    const AVCodec* codec) {
+  if (encoder_sample_rate) {
+    const int& encoder_sr = encoder_sample_rate.value();
+    TORCH_CHECK(
+        encoder_sr > 0,
+        "Encoder sample rate must be positive. Found: ",
+        encoder_sr);
+    TORCH_CHECK(
+        supported_sample_rate(encoder_sr, codec),
+        codec->name,
+        " does not support sample rate ",
+        encoder_sr,
+        ". Supported values are; ",
+        get_supported_samplerates(codec->supported_samplerates));
+    return encoder_sr;
+  }
+  if (codec->supported_samplerates &&
+      !supported_sample_rate(src_sample_rate, codec)) {
+    return codec->supported_samplerates[0];
+  }
+  return src_sample_rate;
 }
 
-std::vector<std::string> get_supported_channels(
-    const uint64_t* channel_layouts) {
-  std::vector<std::string> ret;
+std::string get_supported_channels(const uint64_t* channel_layouts) {
+  std::vector<std::string> names;
   while (*channel_layouts) {
-    ret.emplace_back(av_get_channel_name(*channel_layouts));
+    std::stringstream ss;
+    ss << av_get_channel_layout_nb_channels(*channel_layouts);
+    ss << " (" << av_get_channel_name(*channel_layouts) << ")";
+    names.emplace_back(ss.str());
     ++channel_layouts;
   }
-  return ret;
+  return c10::Join(", ", names);
 }
 
-uint64_t get_channel_layout(int num_channels, const AVCodec* codec) {
-  if (!codec->channel_layouts) {
-    return static_cast<uint64_t>(av_get_default_channel_layout(num_channels));
+uint64_t get_channel_layout(
+    const uint64_t src_ch_layout,
+    const c10::optional<int> enc_num_channels,
+    const AVCodec* codec) {
+  // If the override is presented, and if it is supported by codec, we use it.
+  if (enc_num_channels) {
+    const int& val = enc_num_channels.value();
+    TORCH_CHECK(
+        val > 0, "The number of channels must be greater than 0. Found: ", val);
+    if (!codec->channel_layouts) {
+      return static_cast<uint64_t>(av_get_default_channel_layout(val));
+    }
+    for (const uint64_t* it = codec->channel_layouts; *it; ++it) {
+      if (av_get_channel_layout_nb_channels(*it) == val) {
+        return *it;
+      }
+    }
+    TORCH_CHECK(
+        false,
+        "Codec ",
+        codec->name,
+        " does not support a channel layout consists of ",
+        val,
+        " channels. Supported values are: ",
+        get_supported_channels(codec->channel_layouts));
   }
+  // If the codec does not have restriction on channel layout, we reuse the
+  // source channel layout
+  if (!codec->channel_layouts) {
+    return src_ch_layout;
+  }
+  // If the codec has restriction, and source layout is supported, we reuse the
+  // source channel layout
   for (const uint64_t* it = codec->channel_layouts; *it; ++it) {
-    if (av_get_channel_layout_nb_channels(*it) == num_channels) {
-      return *it;
+    if (*it == src_ch_layout) {
+      return src_ch_layout;
     }
   }
-  TORCH_CHECK(
-      false,
-      "Codec ",
-      codec->name,
-      " does not support a channel layout consists of ",
-      num_channels,
-      " channels. Supported values are: ",
-      c10::Join(", ", get_supported_channels(codec->channel_layouts)));
+  // Use the default layout of the codec.
+  return codec->channel_layouts[0];
 }
 
 void configure_audio_codec_ctx(
     AVCodecContext* codec_ctx,
     AVSampleFormat format,
     int sample_rate,
-    int num_channels,
     uint64_t channel_layout,
     const c10::optional<CodecConfig>& codec_config) {
   codec_ctx->sample_fmt = format;
   codec_ctx->sample_rate = sample_rate;
   codec_ctx->time_base = av_inv_q(av_d2q(sample_rate, 1 << 24));
-  codec_ctx->channels = num_channels;
+  codec_ctx->channels = av_get_channel_layout_nb_channels(channel_layout);
   codec_ctx->channel_layout = channel_layout;
 
   // Set optional stuff
@@ -325,6 +369,10 @@ void configure_audio_codec_ctx(
     }
     if (cfg.compression_level != -1) {
       codec_ctx->compression_level = cfg.compression_level;
+    }
+    if (cfg.qscale) {
+      codec_ctx->flags |= AV_CODEC_FLAG_QSCALE;
+      codec_ctx->global_quality = FF_QP2LAMBDA * cfg.qscale.value();
     }
   }
 }
@@ -346,13 +394,13 @@ bool supported_pix_fmt(const AVPixelFormat fmt, const AVPixelFormat* pix_fmts) {
   return false;
 }
 
-std::vector<std::string> get_supported_formats(const AVPixelFormat* pix_fmts) {
+std::string get_supported_formats(const AVPixelFormat* pix_fmts) {
   std::vector<std::string> ret;
   while (*pix_fmts != AV_PIX_FMT_NONE) {
     ret.emplace_back(av_get_pix_fmt_name(*pix_fmts));
     ++pix_fmts;
   }
-  return ret;
+  return c10::Join(", ", ret);
 }
 
 AVPixelFormat get_enc_fmt(
@@ -360,14 +408,15 @@ AVPixelFormat get_enc_fmt(
     const c10::optional<std::string>& encoder_format,
     const AVCodec* codec) {
   if (encoder_format) {
-    auto fmt = get_pix_fmt(encoder_format.value());
+    const auto& val = encoder_format.value();
+    auto fmt = av_get_pix_fmt(val.c_str());
     TORCH_CHECK(
         supported_pix_fmt(fmt, codec->pix_fmts),
         codec->name,
         " does not support ",
-        encoder_format.value(),
+        val,
         " format. Supported values are; ",
-        c10::Join(", ", get_supported_formats(codec->pix_fmts)));
+        get_supported_formats(codec->pix_fmts));
     return fmt;
   }
   if (codec->pix_fmts) {
@@ -388,22 +437,39 @@ bool supported_frame_rate(AVRational rate, const AVRational* rates) {
   return false;
 }
 
-void validate_frame_rate(AVRational rate, const AVCodec* codec) {
-  TORCH_CHECK(
-      supported_frame_rate(rate, codec->supported_framerates),
-      codec->name,
-      " does not support frame rate ",
-      c10::Join("/", std::array<int, 2>{rate.num, rate.den}),
-      ". Supported values are; ",
-      [&]() {
-        std::vector<std::string> ret;
-        for (auto r = codec->supported_framerates;
-             !(r->num == 0 && r->den == 0);
-             ++r) {
-          ret.push_back(c10::Join("/", std::array<int, 2>{r->num, r->den}));
-        }
-        return c10::Join(", ", ret);
-      }());
+AVRational get_enc_rate(
+    AVRational src_rate,
+    const c10::optional<double>& encoder_sample_rate,
+    const AVCodec* codec) {
+  if (encoder_sample_rate) {
+    const double& enc_rate = encoder_sample_rate.value();
+    TORCH_CHECK(
+        std::isfinite(enc_rate) && enc_rate > 0,
+        "Encoder sample rate must be positive and fininte. Found: ",
+        enc_rate);
+    AVRational rate = av_d2q(enc_rate, 1 << 24);
+    TORCH_CHECK(
+        supported_frame_rate(rate, codec->supported_framerates),
+        codec->name,
+        " does not support frame rate: ",
+        enc_rate,
+        ". Supported values are; ",
+        [&]() {
+          std::vector<std::string> ret;
+          for (auto r = codec->supported_framerates;
+               !(r->num == 0 && r->den == 0);
+               ++r) {
+            ret.push_back(c10::Join("/", std::array<int, 2>{r->num, r->den}));
+          }
+          return c10::Join(", ", ret);
+        }());
+    return rate;
+  }
+  if (codec->supported_framerates &&
+      !supported_frame_rate(src_rate, codec->supported_framerates)) {
+    return codec->supported_framerates[0];
+  }
+  return src_rate;
 }
 
 void configure_video_codec_ctx(
@@ -437,6 +503,10 @@ void configure_video_codec_ctx(
     }
     if (cfg.max_b_frames != -1) {
       ctx->max_b_frames = cfg.max_b_frames;
+    }
+    if (cfg.qscale) {
+      ctx->flags |= AV_CODEC_FLAG_QSCALE;
+      ctx->global_quality = FF_QP2LAMBDA * cfg.qscale.value();
     }
   }
 }
@@ -506,38 +576,40 @@ AVStream* get_stream(AVFormatContext* format_ctx, AVCodecContext* codec_ctx) {
 
 FilterGraph get_audio_filter_graph(
     AVSampleFormat src_fmt,
-    int sample_rate,
-    uint64_t channel_layout,
+    int src_sample_rate,
+    uint64_t src_ch_layout,
     const c10::optional<std::string>& filter_desc,
     AVSampleFormat enc_fmt,
+    int enc_sample_rate,
+    uint64_t enc_ch_layout,
     int nb_samples) {
-  const std::string desc = [&]() -> const std::string {
-    if (src_fmt == enc_fmt) {
-      if (nb_samples == 0) {
-        return filter_desc.value_or("anull");
-      } else {
-        std::stringstream ss;
-        if (filter_desc) {
-          ss << filter_desc.value() << ",";
-        }
-        ss << "asetnsamples=n=" << nb_samples << ":p=0";
-        return ss.str();
-      }
-    } else {
-      std::stringstream ss;
-      if (filter_desc) {
-        ss << filter_desc.value() << ",";
-      }
-      ss << "aformat=" << av_get_sample_fmt_name(enc_fmt);
-      if (nb_samples > 0) {
-        ss << ",asetnsamples=n=" << nb_samples << ":p=0";
-      }
-      return ss.str();
+  const auto desc = [&]() -> const std::string {
+    std::vector<std::string> parts;
+    if (filter_desc) {
+      parts.push_back(filter_desc.value());
     }
+    if (filter_desc || src_fmt != enc_fmt ||
+        src_sample_rate != enc_sample_rate || src_ch_layout != enc_ch_layout) {
+      std::stringstream ss;
+      ss << "aformat=sample_fmts=" << av_get_sample_fmt_name(enc_fmt)
+         << ":sample_rates=" << enc_sample_rate << ":channel_layouts=0x"
+         << std::hex << enc_ch_layout;
+      parts.push_back(ss.str());
+    }
+    if (nb_samples > 0) {
+      std::stringstream ss;
+      ss << "asetnsamples=n=" << nb_samples << ":p=0";
+      parts.push_back(ss.str());
+    }
+    if (parts.size()) {
+      return c10::Join(",", parts);
+    }
+    return "anull";
   }();
 
   FilterGraph f{AVMEDIA_TYPE_AUDIO};
-  f.add_audio_src(src_fmt, {1, sample_rate}, sample_rate, channel_layout);
+  f.add_audio_src(
+      src_fmt, {1, src_sample_rate}, src_sample_rate, src_ch_layout);
   f.add_sink();
   f.add_process(desc);
   f.create_filter();
@@ -546,27 +618,48 @@ FilterGraph get_audio_filter_graph(
 
 FilterGraph get_video_filter_graph(
     AVPixelFormat src_fmt,
-    AVRational rate,
-    int width,
-    int height,
+    AVRational src_rate,
+    int src_width,
+    int src_height,
     const c10::optional<std::string>& filter_desc,
     AVPixelFormat enc_fmt,
+    AVRational enc_rate,
+    int enc_width,
+    int enc_height,
     bool is_cuda) {
-  auto desc = [&]() -> std::string {
-    if (src_fmt == enc_fmt || is_cuda) {
+  const auto desc = [&]() -> const std::string {
+    if (is_cuda) {
       return filter_desc.value_or("null");
-    } else {
-      std::stringstream ss;
-      if (filter_desc) {
-        ss << filter_desc.value() << ",";
-      }
-      ss << "format=" << av_get_pix_fmt_name(enc_fmt);
-      return ss.str();
     }
+    std::vector<std::string> parts;
+    if (filter_desc) {
+      parts.push_back(filter_desc.value());
+    }
+    if (filter_desc || (src_width != enc_width || src_height != enc_height)) {
+      std::stringstream ss;
+      ss << "scale=" << enc_width << ":" << enc_height;
+      parts.emplace_back(ss.str());
+    }
+    if (filter_desc || src_fmt != enc_fmt) {
+      std::stringstream ss;
+      ss << "format=" << av_get_pix_fmt_name(enc_fmt);
+      parts.emplace_back(ss.str());
+    }
+    if (filter_desc ||
+        (src_rate.num != enc_rate.num || src_rate.den != enc_rate.den)) {
+      std::stringstream ss;
+      ss << "fps=" << enc_rate.num << "/" << enc_rate.den;
+      parts.emplace_back(ss.str());
+    }
+    if (parts.size()) {
+      return c10::Join(",", parts);
+    }
+    return "null";
   }();
 
   FilterGraph f{AVMEDIA_TYPE_VIDEO};
-  f.add_video_src(src_fmt, av_inv_q(rate), rate, width, height, {1, 1});
+  f.add_video_src(
+      src_fmt, av_inv_q(src_rate), src_rate, src_width, src_height, {1, 1});
   f.add_sink();
   f.add_process(desc);
   f.create_filter();
@@ -587,7 +680,7 @@ AVFramePtr get_audio_frame(
   frame->format = format;
   frame->channel_layout = channel_layout;
   frame->sample_rate = sample_rate;
-  frame->nb_samples = nb_samples ? nb_samples : 1024;
+  frame->nb_samples = nb_samples;
   int ret = av_frame_get_buffer(frame, 0);
   TORCH_CHECK(
       ret >= 0, "Error allocating the source audio frame:", av_err2string(ret));
@@ -630,10 +723,11 @@ EncodeProcess get_audio_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
+    const c10::optional<int>& encoder_sample_rate,
+    const c10::optional<int>& encoder_num_channels,
     const c10::optional<CodecConfig>& codec_config,
     const c10::optional<std::string>& filter_desc) {
   // 1. Check the source format, rate and channels
-  const AVSampleFormat src_fmt = get_sample_fmt(format);
   TORCH_CHECK(
       src_sample_rate > 0,
       "Sample rate must be positive. Found: ",
@@ -642,6 +736,9 @@ EncodeProcess get_audio_encode_process(
       src_num_channels > 0,
       "The number of channels must be positive. Found: ",
       src_num_channels);
+  const AVSampleFormat src_fmt = get_src_sample_fmt(format);
+  const auto src_ch_layout =
+      static_cast<uint64_t>(av_get_default_channel_layout(src_num_channels));
 
   // 2. Fetch codec from default or override
   TORCH_CHECK(
@@ -651,30 +748,37 @@ EncodeProcess get_audio_encode_process(
   const AVCodec* codec = get_codec(format_ctx->oformat->audio_codec, encoder);
 
   // 3. Check that encoding sample format, sample rate and channels
-  // TODO: introduce encoder_sampel_rate option and allow to change sample rate
   const AVSampleFormat enc_fmt = get_enc_fmt(src_fmt, encoder_format, codec);
-  validate_sample_rate(src_sample_rate, codec);
-  uint64_t channel_layout = get_channel_layout(src_num_channels, codec);
+  const int enc_sr = get_enc_sr(src_sample_rate, encoder_sample_rate, codec);
+  const uint64_t enc_ch_layout = [&]() -> uint64_t {
+    if (std::strcmp(codec->name, "vorbis") == 0) {
+      // Special case for vorbis.
+      // It only supports 2 channels, but it is not listed in channel_layouts
+      // attributes.
+      // https://github.com/FFmpeg/FFmpeg/blob/0684e58886881a998f1a7b510d73600ff1df2b90/libavcodec/vorbisenc.c#L1277
+      // This is the case for at least until FFmpeg 6.0, so it will be
+      // like this for a while.
+      return static_cast<uint64_t>(av_get_default_channel_layout(2));
+    }
+    return get_channel_layout(src_ch_layout, encoder_num_channels, codec);
+  }();
 
   // 4. Initialize codec context
   AVCodecContextPtr codec_ctx =
       get_codec_ctx(codec, format_ctx->oformat->flags);
   configure_audio_codec_ctx(
-      codec_ctx,
-      enc_fmt,
-      src_sample_rate,
-      src_num_channels,
-      channel_layout,
-      codec_config);
+      codec_ctx, enc_fmt, enc_sr, enc_ch_layout, codec_config);
   open_codec(codec_ctx, encoder_option);
 
   // 5. Build filter graph
   FilterGraph filter_graph = get_audio_filter_graph(
       src_fmt,
       src_sample_rate,
-      channel_layout,
+      src_ch_layout,
       filter_desc,
       enc_fmt,
+      enc_sr,
+      enc_ch_layout,
       codec_ctx->frame_size);
 
   // 6. Instantiate source frame
@@ -682,8 +786,8 @@ EncodeProcess get_audio_encode_process(
       src_fmt,
       src_sample_rate,
       src_num_channels,
-      channel_layout,
-      codec_ctx->frame_size);
+      src_ch_layout,
+      codec_ctx->frame_size > 0 ? codec_ctx->frame_size : 256);
 
   // 7. Instantiate Converter
   TensorConverter converter{
@@ -712,18 +816,21 @@ EncodeProcess get_video_encode_process(
     const c10::optional<std::string>& encoder,
     const c10::optional<OptionDict>& encoder_option,
     const c10::optional<std::string>& encoder_format,
+    const c10::optional<double>& encoder_frame_rate,
+    const c10::optional<int>& encoder_width,
+    const c10::optional<int>& encoder_height,
     const c10::optional<std::string>& hw_accel,
     const c10::optional<CodecConfig>& codec_config,
     const c10::optional<std::string>& filter_desc) {
   // 1. Checkc the source format, rate and resolution
-  const AVPixelFormat src_fmt = get_pix_fmt(format);
-  AVRational src_rate = av_d2q(frame_rate, 1 << 24);
   TORCH_CHECK(
-      src_rate.num > 0 && src_rate.den != 0,
+      std::isfinite(frame_rate) && frame_rate > 0,
       "Frame rate must be positive and finite. Found: ",
       frame_rate);
   TORCH_CHECK(src_width > 0, "width must be positive. Found: ", src_width);
   TORCH_CHECK(src_height > 0, "height must be positive. Found: ", src_height);
+  const AVPixelFormat src_fmt = get_src_pix_fmt(format);
+  const AVRational src_rate = av_d2q(frame_rate, 1 << 24);
 
   // 2. Fetch codec from default or override
   TORCH_CHECK(
@@ -734,13 +841,29 @@ EncodeProcess get_video_encode_process(
 
   // 3. Check that encoding format, rate
   const AVPixelFormat enc_fmt = get_enc_fmt(src_fmt, encoder_format, codec);
-  validate_frame_rate(src_rate, codec);
+  const AVRational enc_rate = get_enc_rate(src_rate, encoder_frame_rate, codec);
+  const int enc_width = [&]() -> int {
+    if (!encoder_width) {
+      return src_width;
+    }
+    const int& val = encoder_width.value();
+    TORCH_CHECK(val > 0, "Encoder width must be positive. Found: ", val);
+    return val;
+  }();
+  const int enc_height = [&]() -> int {
+    if (!encoder_height) {
+      return src_height;
+    }
+    const int& val = encoder_height.value();
+    TORCH_CHECK(val > 0, "Encoder height must be positive. Found: ", val);
+    return val;
+  }();
 
   // 4. Initialize codec context
   AVCodecContextPtr codec_ctx =
       get_codec_ctx(codec, format_ctx->oformat->flags);
   configure_video_codec_ctx(
-      codec_ctx, enc_fmt, src_rate, src_width, src_height, codec_config);
+      codec_ctx, enc_fmt, enc_rate, enc_width, enc_height, codec_config);
   if (hw_accel) {
 #ifdef USE_CUDA
     configure_hw_accel(codec_ctx, hw_accel.value());
@@ -761,6 +884,9 @@ EncodeProcess get_video_encode_process(
       src_height,
       filter_desc,
       enc_fmt,
+      enc_rate,
+      enc_width,
+      enc_height,
       hw_accel.has_value());
 
   // 6. Instantiate source frame

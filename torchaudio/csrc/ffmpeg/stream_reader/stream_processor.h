@@ -16,9 +16,9 @@ class StreamProcessor {
  private:
   // Stream time base which is not stored in AVCodecContextPtr
   AVRational stream_time_base;
-  AVCodecContextPtr codec_ctx;
 
   // Components for decoding source media
+  AVCodecContextPtr codec_ctx{nullptr};
   AVFramePtr frame;
 
   KeyType current_key = 0;
@@ -32,12 +32,7 @@ class StreamProcessor {
   int64_t discard_before_pts = 0;
 
  public:
-  StreamProcessor(
-      const AVRational& time_base,
-      const AVCodecParameters* codecpar,
-      const c10::optional<std::string>& decoder_name,
-      const c10::optional<OptionDict>& decoder_option,
-      const torch::Device& device);
+  explicit StreamProcessor(const AVRational& time_base);
   ~StreamProcessor() = default;
   // Non-copyable
   StreamProcessor(const StreamProcessor&) = delete;
@@ -69,6 +64,12 @@ class StreamProcessor {
   // The input timestamp must be expressed in AV_TIME_BASE unit.
   void set_discard_timestamp(int64_t timestamp);
 
+  void set_decoder(
+      const AVCodecParameters* codecpar,
+      const c10::optional<std::string>& decoder_name,
+      const c10::optional<OptionDict>& decoder_option,
+      const torch::Device& device);
+
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
@@ -76,6 +77,7 @@ class StreamProcessor {
   [[nodiscard]] FilterGraphOutputInfo get_filter_output_info(KeyType key) const;
 
   bool is_buffer_ready() const;
+  [[nodiscard]] bool is_decoder_set() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // The streaming process
