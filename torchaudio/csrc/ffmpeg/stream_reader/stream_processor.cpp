@@ -168,14 +168,8 @@ AVCodecContextPtr get_codec_ctx(
 
 using KeyType = StreamProcessor::KeyType;
 
-StreamProcessor::StreamProcessor(
-    const AVRational& time_base,
-    const AVCodecParameters* params,
-    const c10::optional<std::string>& decoder_name,
-    const c10::optional<OptionDict>& decoder_option,
-    const torch::Device& device)
-    : stream_time_base(time_base),
-      codec_ctx(get_codec_ctx(params, decoder_name, decoder_option, device)) {}
+StreamProcessor::StreamProcessor(const AVRational& time_base)
+    : stream_time_base(time_base) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configurations
@@ -186,6 +180,8 @@ KeyType StreamProcessor::add_stream(
     AVRational frame_rate,
     const std::string& filter_description,
     const torch::Device& device) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      is_decoder_set(), "Decoder hasn't been set.");
   // If device is provided, then check that codec_ctx has hw_device_ctx set.
   // In case, defining an output stream with HW accel on an input stream that
   // has decoder set without HW accel, it will cause seg fault.
@@ -258,6 +254,15 @@ void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
       av_rescale_q(timestamp, av_get_time_base_q(), stream_time_base);
 }
 
+void StreamProcessor::set_decoder(
+    const AVCodecParameters* codecpar,
+    const c10::optional<std::string>& decoder_name,
+    const c10::optional<OptionDict>& decoder_option,
+    const torch::Device& device) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(!codec_ctx, "Decoder has already been set.");
+  codec_ctx = get_codec_ctx(codecpar, decoder_name, decoder_option, device);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,12 +284,19 @@ bool StreamProcessor::is_buffer_ready() const {
   return true;
 }
 
+bool StreamProcessor::is_decoder_set() const {
+  return codec_ctx;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // The streaming process
 ////////////////////////////////////////////////////////////////////////////////
 // 0: some kind of success
 // <0: Some error happened
 int StreamProcessor::process_packet(AVPacket* packet) {
+  if (!is_decoder_set()) {
+    return 0;
+  }
   int ret = avcodec_send_packet(codec_ctx, packet);
   while (ret >= 0) {
     ret = avcodec_receive_frame(codec_ctx, frame);
@@ -340,9 +352,11 @@ int StreamProcessor::process_packet(AVPacket* packet) {
 }
 
 void StreamProcessor::flush() {
-  avcodec_flush_buffers(codec_ctx);
-  for (auto& ite : post_processes) {
-    ite.second->flush();
+  if (is_decoder_set()) {
+    avcodec_flush_buffers(codec_ctx);
+    for (auto& ite : post_processes) {
+      ite.second->flush();
+    }
   }
 }
 
