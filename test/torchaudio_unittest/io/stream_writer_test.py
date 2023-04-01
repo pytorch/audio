@@ -17,8 +17,10 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
 )
 
+from .common import lt42
+
 if is_ffmpeg_available():
-    from torchaudio.io import StreamReader, StreamWriter
+    from torchaudio.io import CodecConfig, StreamReader, StreamWriter
 
 
 def get_audio_chunk(fmt, sample_rate, num_channels):
@@ -380,20 +382,11 @@ class StreamWriterCorrectnessTest(TempDirMixin, TorchaudioTestCase):
         s.process_all_packets()
         (saved,) = s.pop_chunks()
 
-        # This test fails for OPUS if FFmpeg is 4.1, but it passes for 4.2+
-        # 4.1 produces 48312 samples (extra 312)
-        # Probably this commit fixes it.
-        # https://github.com/FFmpeg/FFmpeg/commit/18aea7bdd96b320a40573bccabea56afeccdd91c
-        # TODO: issue warning if 4.1?
-        if ext == "opus":
-            ver = torchaudio.utils.ffmpeg_utils.get_versions()["libavcodec"]
-            # 5.1 libavcodec     59. 18.100
-            # 4.4 libavcodec     58.134.100
-            # 4.3 libavcodec     58. 91.100
-            # 4.2 libavcodec     58. 54.100
-            # 4.1 libavcodec     58. 35.100
-            if ver[0] < 59 and ver[1] < 54:
-                return
+        # On 4.1 OPUS produces 48312 samples (extra 312)
+        # this has been fixed on 4.2+
+        # TODO: issue warning if on 4.1?
+        if ext == "opus" and lt42():
+            return
         self.assertEqual(saved.shape, data.shape)
 
     def test_preserve_fps(self):
@@ -534,7 +527,7 @@ class StreamWriterCorrectnessTest(TempDirMixin, TorchaudioTestCase):
         # Write data
         dst = self.get_temp_path(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
-        codec_config = torchaudio.io.StreamWriter.CodecConfig(bit_rate=198_000, compression_level=3)
+        codec_config = CodecConfig(bit_rate=198_000, compression_level=3)
         writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, codec_config=codec_config)
 
         audio = torch.zeros((8000, 2))
@@ -553,7 +546,7 @@ class StreamWriterCorrectnessTest(TempDirMixin, TorchaudioTestCase):
             writer.add_audio_stream(
                 sample_rate=sample_rate,
                 num_channels=num_channels,
-                codec_config=torchaudio.io.StreamWriter.CodecConfig(bit_rate=bit_rate),
+                codec_config=CodecConfig(bit_rate=bit_rate),
             )
 
             with writer.open():
