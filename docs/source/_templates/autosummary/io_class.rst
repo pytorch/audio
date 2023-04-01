@@ -42,7 +42,6 @@ Methods
    not item.startswith('_')
    and item not in inherited_members
    and item not in attributes
-   and item != "CodecConfig"
    %}
 
 {{ item | underline("~") }}
@@ -56,11 +55,12 @@ Methods
 {%- endif %}
 
 
-{%- if name == "StreamReader" %}
+{%- if name in ["StreamReader", "StreamWriter"] %}
 
 Support Structures
 ------------------
 
+{%- if name == "StreamReader" %}
 {%- for item in [
     "ChunkTensor",
     "SourceStream",
@@ -77,15 +77,14 @@ Support Structures
    :members:
 
 {%- endfor %}
-{%- elif name == "StreamWriter" %}
 
-Support Structures
-------------------
+{%- elif name == "StreamWriter" %}
 
 CodecConfig
 ~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io::StreamWriter.CodecConfig()
+.. autoclass:: torchaudio.io::CodecConfig
    :members:
 
+{%- endif %}
 {%- endif %}
