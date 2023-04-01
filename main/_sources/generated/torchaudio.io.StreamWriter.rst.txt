@@ -71,5 +71,5 @@ Support Structures
 CodecConfig
 ~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io::StreamWriter.CodecConfig()
+.. autoclass:: torchaudio.io::CodecConfig
    :members:

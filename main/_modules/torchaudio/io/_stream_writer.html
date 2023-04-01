@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230331) &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230401) &#x25BC</span></a>
     </div>
     
 
@@ -416,6 +416,33 @@
     <span class="n">ConfigBase</span> <span class="o">=</span> <span class="nb">object</span>
 
 
+<div class="viewcode-block" id="CodecConfig"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">CodecConfig</span><span class="p">(</span><span class="n">ConfigBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Codec configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">bit_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bit rate&quot;&quot;&quot;</span>
+
+    <span class="n">compression_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compression level&quot;&quot;&quot;</span>
+
+    <span class="n">qscale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Global quality factor. Enables variable bit rate. Valid values depend on encoder.</span>
+
+<span class="sd">    For example: MP3 takes ``0`` - ``9`` (https://trac.ffmpeg.org/wiki/Encode/MP3) while</span>
+<span class="sd">    libvorbis takes ``-1`` - ``10``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gop_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The number of pictures in a group of pictures, or 0 for intra_only&quot;&quot;&quot;</span>
+
+    <span class="n">max_b_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;maximum number of B-frames between non-B-frames.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qscale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gop_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_b_frames</span><span class="p">)</span></div>
+
+
 <span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -535,32 +562,6 @@
 
 <span class="sd">            Default: `4096`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="StreamWriter.CodecConfig"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.CodecConfig">[docs]</a>    <span class="nd">@dataclass</span>
-    <span class="k">class</span> <span class="nc">CodecConfig</span><span class="p">(</span><span class="n">ConfigBase</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Codec configuration.&quot;&quot;&quot;</span>
-
-        <span class="n">bit_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bit rate&quot;&quot;&quot;</span>
-
-        <span class="n">compression_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compression level&quot;&quot;&quot;</span>
-
-        <span class="n">qscale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Global quality factor. Enables variable bit rate. Valid values depend on encoder.</span>
-
-<span class="sd">        For example: MP3 takes ``0`` - ``9`` (https://trac.ffmpeg.org/wiki/Encode/MP3) while</span>
-<span class="sd">        libvorbis takes ``-1`` - ``10``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">gop_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of pictures in a group of pictures, or 0 for intra_only&quot;&quot;&quot;</span>
-
-        <span class="n">max_b_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;maximum number of B-frames between non-B-frames.&quot;&quot;&quot;</span>
-
-        <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qscale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gop_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_b_frames</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
