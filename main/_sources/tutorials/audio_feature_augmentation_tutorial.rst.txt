@@ -48,7 +48,7 @@ Audio Feature Augmentation
  .. code-block:: none
 
     2.1.0.dev20230330
-    2.1.0.dev20230401
+    2.1.0.dev20230402
 
 
 
@@ -297,7 +297,7 @@ FrequencyMasking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.542 seconds)
+   **Total running time of the script:** ( 0 minutes  3.536 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:
