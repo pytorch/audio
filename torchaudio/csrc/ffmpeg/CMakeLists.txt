@@ -21,7 +21,6 @@ set(
   stream_writer/stream_writer.cpp
   stream_writer/tensor_converter.cpp
   compat.cpp
-  utils.cpp
   )
 
 if (USE_CUDA)
