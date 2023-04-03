@@ -1,6 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <stdexcept>
+#include <string_view>
 
 namespace torchaudio {
 namespace io {
@@ -149,6 +150,11 @@ void open_codec(
       ret >= 0, "Failed to initialize CodecContext: ", av_err2string(ret));
 }
 
+bool ends_with(std::string_view str, std::string_view suffix) {
+  return str.size() >= suffix.size() &&
+      0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
+
 AVCodecContextPtr get_codec_ctx(
     const AVCodecParameters* params,
     const c10::optional<std::string>& decoder_name,
@@ -160,6 +166,9 @@ AVCodecContextPtr get_codec_ctx(
   open_codec(codec_ctx, decoder_option);
   if (codec_ctx->hw_device_ctx) {
     codec_ctx->hw_frames_ctx = get_hw_frames_ctx(codec_ctx);
+  }
+  if (ends_with(codec_ctx->codec->name, "_cuvid")) {
+    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReaderCUDA");
   }
   return codec_ctx;
 }

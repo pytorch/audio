@@ -807,6 +807,15 @@ EncodeProcess get_audio_encode_process(
       std::move(codec_ctx)};
 }
 
+namespace {
+
+bool ends_with(std::string_view str, std::string_view suffix) {
+  return str.size() >= suffix.size() &&
+      0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
+
+} // namespace
+
 EncodeProcess get_video_encode_process(
     AVFormatContext* format_ctx,
     double frame_rate,
@@ -875,6 +884,10 @@ EncodeProcess get_video_encode_process(
 #endif
   }
   open_codec(codec_ctx, encoder_option);
+
+  if (ends_with(codec_ctx->codec->name, "_nvenc")) {
+    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReaderCUDA");
+  }
 
   // 5. Build filter graph
   FilterGraph filter_graph = get_video_filter_graph(
