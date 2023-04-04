@@ -50,8 +50,8 @@ available datasets.
 
  .. code-block:: none
 
-    2.1.0.dev20230330
-    2.1.0.dev20230403
+    2.1.0.dev20230404
+    2.1.0.dev20230404
 
 
 
@@ -173,7 +173,7 @@ Here, we show how to use the
 
  .. code-block:: none
 
-      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 40.0k/4.49M [00:00<00:20, 231kB/s]      4%|4         | 200k/4.49M [00:00<00:07, 634kB/s]      19%|#8        | 864k/4.49M [00:00<00:01, 2.08MB/s]     72%|#######1  | 3.22M/4.49M [00:00<00:00, 6.73MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 6.48MB/s]
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      1%|          | 32.0k/4.49M [00:00<00:26, 179kB/s]      5%|4         | 208k/4.49M [00:00<00:06, 647kB/s]      19%|#9        | 888k/4.49M [00:00<00:01, 2.06MB/s]     67%|######7   | 3.02M/4.49M [00:00<00:00, 7.40MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 6.27MB/s]
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
     <IPython.lib.display.Audio object>
@@ -184,7 +184,7 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.915 seconds)
+   **Total running time of the script:** ( 0 minutes  1.933 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:

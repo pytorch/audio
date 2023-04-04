@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230403) &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230404) &#x25BC</span></a>
     </div>
     
 
@@ -674,6 +674,12 @@
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">_LexiconFreeDecoder</span><span class="p">(</span><span class="n">decoder_options</span><span class="p">,</span> <span class="n">lm</span><span class="p">,</span> <span class="n">silence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span> <span class="n">transitions</span><span class="p">)</span>
+        <span class="c1"># https://github.com/pytorch/audio/issues/3218</span>
+        <span class="c1"># If lm is passed like rvalue reference, the lm object gets garbage collected,</span>
+        <span class="c1"># and later call to the lm fails.</span>
+        <span class="c1"># This ensures that lm object is not deleted as long as the decoder is alive.</span>
+        <span class="c1"># https://github.com/pybind/pybind11/discussions/4013</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span> <span class="o">=</span> <span class="n">lm</span>
 
     <span class="k">def</span> <span class="nf">_get_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">:</span>
         <span class="n">idxs</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">idxs</span><span class="p">))</span>
