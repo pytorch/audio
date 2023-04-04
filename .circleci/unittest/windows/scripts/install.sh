@@ -50,7 +50,6 @@ fi
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-export BUILD_CTC_DECODER=0
 "$root_dir/packaging/vc_env_helper.bat" python setup.py install
 
 # 3. Install Test tools
