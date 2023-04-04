@@ -247,7 +247,7 @@ def unittest_workflows(indentation=6):
     jobs += build_download_job(None)
     for os_type in ["linux", "windows", "macos"]:
         for device_type in ["cpu", "gpu"]:
-            if os_type == "macos" and device_type == "gpu":
+            if os_type != "windows" and device_type == "gpu":
                 continue
 
             for i, python_version in enumerate(unittest_python_versions(os_type)):

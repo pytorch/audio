@@ -57,11 +57,11 @@ jobs:
         # Install torchaudio
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         python3 -m pip --quiet install cmake>=3.18.0 ninja
-        USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
+        BUILD_CTC_DECODER=0 USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
 
         # Install test tools
         conda install -y --quiet -c conda-forge -c numba/label/dev 'librosa==0.10.0' parameterized 'requests>=2.20'
-        python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag
+        python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag flashlight-text git+https://github.com/kpu/kenlm/
         python3 -m pip install --quiet git+https://github.com/pytorch/fairseq.git@e47a4c8
 
         # Run tests

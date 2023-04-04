@@ -169,3 +169,19 @@ class CTCDecoderTest(TempDirMixin, TorchaudioTestCase):
 
         expected_tokens = ["|", "f", "|", "o", "a"]
         self.assertEqual(tokens, expected_tokens)
+
+    def test_lm_lifecycle(self):
+        """Passing lm without assiging it to a vaiable won't cause runtime error
+
+        https://github.com/pytorch/audio/issues/3218
+        """
+        from torchaudio.models.decoder import ctc_decoder
+
+        from .ctc_decoder_utils import CustomZeroLM
+
+        decoder = ctc_decoder(
+            lexicon=get_asset_path("decoder/lexicon.txt"),
+            tokens=get_asset_path("decoder/tokens.txt"),
+            lm=CustomZeroLM(),
+        )
+        decoder(torch.zeros((1, 3, NUM_TOKENS), dtype=torch.float32))

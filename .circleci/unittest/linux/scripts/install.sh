@@ -58,7 +58,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-python setup.py install
+BUILD_CTC_DECODER=0 python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
@@ -72,7 +72,7 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics
+    pip install kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

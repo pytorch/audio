@@ -72,7 +72,10 @@ jobs:
         # TODO: Enable NVDec/NVEnc
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
-        USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
+        BUILD_CTC_DECODER=0 USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
+
+        # Install runtime dependencies
+        pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
 
         # Install build tools
         conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
