@@ -1615,6 +1615,19 @@ def resample(
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
 
+def to_mono(waveform: torch.Tensor) -> torch.Tensor:
+    r"""
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., time)
+
+    Returns:
+        Tensor: Output signal of dimension (1, time)
+    """
+
+    if waveform.shape[0] == 1 or waveform.ndim == 1:
+        return waveform
+    
+    return torch.mean(waveform, axis=0)
 
 @torch.jit.unused
 def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
