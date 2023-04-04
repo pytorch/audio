@@ -303,9 +303,9 @@ bool StreamProcessor::is_decoder_set() const {
 // 0: some kind of success
 // <0: Some error happened
 int StreamProcessor::process_packet(AVPacket* packet) {
-  if (!is_decoder_set()) {
-    return 0;
-  }
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      is_decoder_set(),
+      "Decoder must have been set prior to calling this function.");
   int ret = avcodec_send_packet(codec_ctx, packet);
   while (ret >= 0) {
     ret = avcodec_receive_frame(codec_ctx, frame);
@@ -361,11 +361,12 @@ int StreamProcessor::process_packet(AVPacket* packet) {
 }
 
 void StreamProcessor::flush() {
-  if (is_decoder_set()) {
-    avcodec_flush_buffers(codec_ctx);
-    for (auto& ite : post_processes) {
-      ite.second->flush();
-    }
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      is_decoder_set(),
+      "Decoder must have been set prior to calling this function.");
+  avcodec_flush_buffers(codec_ctx);
+  for (auto& ite : post_processes) {
+    ite.second->flush();
   }
 }
 
