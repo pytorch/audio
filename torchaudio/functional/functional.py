@@ -1615,19 +1615,21 @@ def resample(
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
 
-def to_mono(waveform: torch.Tensor) -> torch.Tensor:
+def to_mono(waveform: torch.Tensor, channel_dim: int=-2) -> torch.Tensor:
     r"""
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., time)
+        waveform (Tensor): Tensor of audio of dimension (..., channels, ...).
+        channel_dim (int, optional): the index of the channel dimension 
+            of the input Tensor. (Default: ``-2``)
 
     Returns:
-        Tensor: Output signal of dimension (1, time)
+        Tensor: Output signal of dimension ()
     """
 
-    if waveform.shape[0] == 1 or waveform.ndim == 1:
+    if waveform.shape[channel_dim] == 1 or waveform.ndim == 1:
         return waveform
     
-    return torch.mean(waveform, axis=0)
+    return torch.mean(waveform, axis=channel_dim)
 
 @torch.jit.unused
 def edit_distance(seq1: Sequence, seq2: Sequence) -> int:

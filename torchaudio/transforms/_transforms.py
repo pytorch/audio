@@ -1010,24 +1010,32 @@ class Resample(torch.nn.Module):
         return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd, self.kernel, self.width)
 
 class ToMono(torch.nn.Module):
-    r""" Converts a multi-channel signal into a mono 
+    r""" Converts a multi-channel signal into a mono
 
-        .. devices:: CPU CUDA
+    .. devices:: CPU CUDA
+
+    Args:
+        channel_dim (int, optional): the index of the channel dimension 
+            of the input Tensor. (Default: ``-2``)
     """
 
-    def __init__(self) -> None:
+    def __init__(self, channel_dim: int=-2) -> None:
         super().__init__()
+        self.channel_dim = channel_dim
 
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time)
+            waveform (Tensor): Tensor of audio of dimension (..., channels, ...)
 
         Returns:
-            Tensor: Output signal of dimension (1, time)
+            Tensor: Output signal of dimension ()
         """
-        return torch.mean(waveform, axis=0)
+        if waveform.shape[self.channel_dim] == 1 or waveform.ndim == 1:
+            return waveform
+        
+        return torch.mean(waveform, axis=self.channel_dim)
 
 class ComputeDeltas(torch.nn.Module):
     r"""Compute delta coefficients of a tensor, usually a spectrogram.
