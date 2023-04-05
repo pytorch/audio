@@ -1013,6 +1013,7 @@ class ToMono(torch.nn.Module):
     r"""Converts a multi-channel signal into a monoaural signal.
 
     .. devices:: CPU CUDA
+    .. properties:: TorchScript
 
     Args:
         channel_dim (int, optional): the index of the channel dimension 
@@ -1034,7 +1035,7 @@ class ToMono(torch.nn.Module):
         """
         is_valid_idx = -len(waveform.shape) <= self.channel_dim < len(waveform.shape)
         if not is_valid_idx:
-            raise ValueError("Invalid channel index")
+            raise ValueError("Invalid channel dimension index")
         
         if waveform.shape[self.channel_dim] == 1 or waveform.ndim == 1:
             return waveform

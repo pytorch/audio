@@ -1619,6 +1619,7 @@ def to_mono(waveform: torch.Tensor, channel_dim: int=-2) -> torch.Tensor:
     r"""Converts a multi-channel signal into a monoaural signal.
 
     .. devices:: CPU CUDA
+    .. properties:: TorchScript
 
     Args:
         waveform (Tensor): Tensor of the audio signal of dimension (..., channels, ...).
@@ -1630,7 +1631,7 @@ def to_mono(waveform: torch.Tensor, channel_dim: int=-2) -> torch.Tensor:
     """
     is_valid_idx = -len(waveform.shape) <= channel_dim < len(waveform.shape)
     if not is_valid_idx:
-        raise ValueError("Invalid channel index")
+        raise ValueError("Invalid channel dimension index")
 
     if waveform.shape[channel_dim] == 1 or waveform.ndim == 1:
         return waveform
