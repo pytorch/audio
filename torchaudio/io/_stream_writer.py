@@ -178,11 +178,12 @@ class StreamWriter:
         sample_rate: int,
         num_channels: int,
         format: str = "flt",
+        *,
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
-        encoder_format: Optional[str] = None,
         encoder_sample_rate: Optional[int] = None,
         encoder_num_channels: Optional[int] = None,
+        encoder_format: Optional[str] = None,
         codec_config: Optional[CodecConfig] = None,
         filter_desc: Optional[str] = None,
     ):
@@ -208,8 +209,6 @@ class StreamWriter:
             encoder (str or None, optional): {encoder}
 
             encoder_option (dict or None, optional): {encoder_option}
-
-            encoder_format (str or None, optional): {encoder_format}
 
             encoder_sample_rate (int or None, optional): Override the sample rate used for encoding time.
                 Some encoders pose restriction on the sample rate used for encoding.
@@ -243,6 +242,8 @@ class StreamWriter:
                 make encoder attempt to use the provided number of channels.
                 The provided value must be one support by the encoder.
 
+            encoder_format (str or None, optional): {encoder_format}
+
             codec_config (CodecConfig or None, optional): {codec_config}
 
             filter_desc (str or None, optional): {filter_desc}
@@ -267,15 +268,16 @@ class StreamWriter:
         width: int,
         height: int,
         format: str = "rgb24",
+        *,
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
-        encoder_format: Optional[str] = None,
         encoder_frame_rate: Optional[float] = None,
         encoder_width: Optional[int] = None,
         encoder_height: Optional[int] = None,
-        hw_accel: Optional[str] = None,
+        encoder_format: Optional[str] = None,
         codec_config: Optional[CodecConfig] = None,
         filter_desc: Optional[str] = None,
+        hw_accel: Optional[str] = None,
     ):
         """Add an output video stream.
 
@@ -305,8 +307,6 @@ class StreamWriter:
 
             encoder_option (dict or None, optional): {encoder_option}
 
-            encoder_format (str or None, optional): {encoder_format}
-
             encoder_frame_rate (float or None, optional): Override the frame rate used for encoding.
 
                 Some encoders, (such as ``"mpeg1"`` and ``"mpeg2"``) pose restriction on the
@@ -325,6 +325,12 @@ class StreamWriter:
             encoder_height (int or None, optional): Height of the image used for encoding.
                 This allows to change the image size during encoding.
 
+            encoder_format (str or None, optional): {encoder_format}
+
+            codec_config (CodecConfig or None, optional): {codec_config}
+
+            filter_desc (str or None, optional): {filter_desc}
+
             hw_accel (str or None, optional): Enable hardware acceleration.
 
                 When video is encoded on CUDA hardware, for example
@@ -334,10 +340,6 @@ class StreamWriter:
 
                 If `None`, the video chunk Tensor has to be CPU Tensor.
                 Default: ``None``.
-
-            codec_config (CodecConfig or None, optional): {codec_config}
-
-            filter_desc (str or None, optional): {filter_desc}
         """
         self._s.add_video_stream(
             frame_rate,

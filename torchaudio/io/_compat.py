@@ -216,11 +216,10 @@ def save_audio(
         src = src.T
     s.add_audio_stream(
         sample_rate,
-        src.size(-1),
-        _get_sample_format(src.dtype),
-        _get_encoder(src.dtype, format, encoding, bits_per_sample),
-        {"strict": "experimental"},
-        _get_encoder_format(format, bits_per_sample),
+        num_channels=src.size(-1),
+        format=_get_sample_format(src.dtype),
+        encoder=_get_encoder(src.dtype, format, encoding, bits_per_sample),
+        encoder_format=_get_encoder_format(format, bits_per_sample),
     )
     with s.open():
         s.write_audio_chunk(0, src)

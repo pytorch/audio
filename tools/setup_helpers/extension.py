@@ -37,7 +37,7 @@ _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX"
 _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KALDI", True)
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
-_BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", True)
+_BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", False)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
