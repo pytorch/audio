@@ -722,7 +722,7 @@ class MFCC(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of the audio signal of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
             Tensor: specgram_mel_db of size (..., ``n_mfcc``, time).
@@ -1006,7 +1006,7 @@ class Resample(torch.nn.Module):
             Tensor: Output signal of dimension (..., time).
         """
         if self.orig_freq == self.new_freq:
-            return waveform
+            return waveform 
         return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd, self.kernel, self.width)
 
 class ToMono(torch.nn.Module):
