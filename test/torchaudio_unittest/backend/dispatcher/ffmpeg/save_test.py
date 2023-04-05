@@ -1,5 +1,6 @@
 import io
 import os
+import pathlib
 import subprocess
 import sys
 from functools import partial
@@ -146,6 +147,17 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
 @skipIfNoExec("ffmpeg")
 @skipIfNoFFmpeg
 class SaveTest(SaveTestBase):
+    def test_pathlike(self):
+        """FFmpeg dispatcher can save audio data to pathlike object"""
+        sample_rate = 16000
+        dtype = "float32"
+        num_channels = 2
+        duration = 1
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        self._save(pathlib.Path(path), data, sample_rate)
+
     @nested_params(
         ["path", "fileobj", "bytesio"],
         [
