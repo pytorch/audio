@@ -722,7 +722,7 @@ class MFCC(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of the audio signal of dimension (..., time).
 
         Returns:
             Tensor: specgram_mel_db of size (..., ``n_mfcc``, time).

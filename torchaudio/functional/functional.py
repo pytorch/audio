@@ -1618,7 +1618,7 @@ def resample(
 def to_mono(waveform: torch.Tensor, channel_dim: int=-2) -> torch.Tensor:
     r"""
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., channels, ...).
+        waveform (Tensor): Tensor of the audio signal of dimension (..., channels, ...).
         channel_dim (int, optional): the index of the channel dimension 
             of the input Tensor. (Default: ``-2``)
 
