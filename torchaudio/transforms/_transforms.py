@@ -1010,7 +1010,7 @@ class Resample(torch.nn.Module):
         return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd, self.kernel, self.width)
 
 class ToMono(torch.nn.Module):
-    r""" Converts a multi-channel signal into a mono
+    r"""Converts a multi-channel signal into a monoaural signal.
 
     .. devices:: CPU CUDA
 
@@ -1032,6 +1032,10 @@ class ToMono(torch.nn.Module):
         Returns:
             Tensor: Output signal of dimension ()
         """
+        is_valid_idx = -len(waveform.shape) <= self.channel_dim < len(waveform.shape)
+        if not is_valid_idx:
+            raise ValueError("Invalid channel index")
+        
         if waveform.shape[self.channel_dim] == 1 or waveform.ndim == 1:
             return waveform
         
