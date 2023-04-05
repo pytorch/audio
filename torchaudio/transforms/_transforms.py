@@ -1006,7 +1006,7 @@ class Resample(torch.nn.Module):
             Tensor: Output signal of dimension (..., time).
         """
         if self.orig_freq == self.new_freq:
-            return waveform 
+            return waveform
         return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd, self.kernel, self.width)
 
 class ToMono(torch.nn.Module):
