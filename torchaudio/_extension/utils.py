@@ -88,9 +88,9 @@ def _init_ffmpeg():
 
     import torchaudio.lib._torchaudio_ffmpeg  # noqa
 
-    torch.ops.torchaudio.ffmpeg_init()
-    if torch.ops.torchaudio.ffmpeg_get_log_level() > 8:
-        torch.ops.torchaudio.ffmpeg_set_log_level(8)
+    torchaudio.lib._torchaudio_ffmpeg.init()
+    if torchaudio.lib._torchaudio_ffmpeg.get_log_level() > 8:
+        torchaudio.lib._torchaudio_ffmpeg.set_log_level(8)
 
 
 def _init_dll_path():

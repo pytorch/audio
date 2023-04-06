@@ -17,8 +17,10 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
 )
 
+from .common import lt42
+
 if is_ffmpeg_available():
-    from torchaudio.io import StreamReader, StreamWriter
+    from torchaudio.io import CodecConfig, StreamReader, StreamWriter
 
 
 def get_audio_chunk(fmt, sample_rate, num_channels):
@@ -91,10 +93,6 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
     def get_dst(self, path):
         return super().get_dst(self.get_temp_path(path))
 
-    def get_buf(self, path):
-        with open(self.get_temp_path(path), "rb") as fileobj:
-            return fileobj.read()
-
     def test_unopened_error(self):
         """If dst is not opened when attempting to write data, runtime error should be raised"""
         path = self.get_dst("test.mp4")
@@ -155,21 +153,26 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
 
     @parameterized.expand(
         [
-            ("mp3", 8000, 1, "s32p", None),
-            ("mp3", 16000, 2, "fltp", None),
-            ("mp3", 44100, 1, "s16p", {"abr": "true"}),
-            ("flac", 8000, 1, "s16", None),
-            ("flac", 16000, 2, "s32", None),
-            ("opus", 48000, 2, None, {"strict": "experimental"}),
-            ("adts", 8000, 1, "fltp", None),  # AAC format
+            ("mp3", 8000, 1, None, "s32p", None),
+            ("mp3", 16000, 2, None, "fltp", None),
+            ("mp3", 44100, 1, None, "s16p", {"abr": "true"}),
+            ("flac", 8000, 1, None, "s16", None),
+            ("flac", 16000, 2, None, "s32", None),
+            ("opus", 48000, 2, "opus", None, None),
+            ("ogg", 48000, 2, "vorbis", None, None),
+            ("adts", 8000, 1, None, "fltp", None),  # AAC format
         ]
     )
-    def test_valid_audio_muxer_and_codecs(self, ext, sample_rate, num_channels, encoder_format, encoder_option):
+    def test_valid_audio_muxer_and_codecs(
+        self, ext, sample_rate, num_channels, encoder, encoder_format, encoder_option
+    ):
         """Tensor of various dtypes can be saved as given format."""
         path = self.get_dst(f"test.{ext}")
         s = StreamWriter(path, format=ext)
         s.set_metadata(metadata={"artist": "torchaudio", "title": self.id()})
-        s.add_audio_stream(sample_rate, num_channels, encoder_option=encoder_option, encoder_format=encoder_format)
+        s.add_audio_stream(
+            sample_rate, num_channels, encoder=encoder, encoder_option=encoder_option, encoder_format=encoder_format
+        )
 
         chunk = get_audio_chunk("flt", sample_rate, num_channels)
         with s.open():
@@ -222,6 +225,19 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             s.write_audio_chunk(0, audio)
             s.write_video_chunk(1, video)
 
+
+@skipIfNoFFmpeg
+class StreamWriterCorrectnessTest(TempDirMixin, TorchaudioTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        torchaudio.utils.ffmpeg_utils.set_log_level(32)
+
+    @classmethod
+    def tearDownClass(cls):
+        torchaudio.utils.ffmpeg_utils.set_log_level(8)
+        super().tearDownClass()
+
     @nested_params(
         [
             ("gray8", "gray8"),
@@ -247,16 +263,16 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         chunk = torch.randint(low=0, high=255, size=src_size, dtype=torch.uint8)
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         s = StreamWriter(dst, format="rawvideo")
         s.add_video_stream(frame_rate, width, height, format=src_fmt, encoder_format=encoder_fmt)
         with s.open():
             s.write_video_chunk(0, chunk)
 
         # Fetch the written data
-        if self.test_fileobj:
-            dst.flush()
-        buf = self.get_buf(filename)
+        with open(dst, "rb") as fileobj:
+            buf = fileobj.read()
+
         result = torch.frombuffer(buf, dtype=torch.uint8)
         if encoder_fmt.endswith("p"):
             result = result.reshape(src_size)
@@ -281,14 +297,12 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         h, w = resolution
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         s = torchaudio.io.StreamWriter(dst=dst, format=ext)
         s.add_video_stream(frame_rate=framerate, height=h, width=w, format=format)
         chunk = torch.stack([torch.full((3, h, w), i, dtype=torch.uint8) for i in torch.linspace(0, 255, 256)])
         with s.open():
             s.write_video_chunk(0, chunk)
-        if self.test_fileobj:
-            dst.flush()
 
         # Load data
         s = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
@@ -313,30 +327,22 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             pass
 
     @nested_params(
-        ["wav", "mp3", "flac"],
+        ["wav", "flac"],
         [8000, 16000, 44100],
         [1, 2],
     )
-    def test_audio_num_frames(self, ext, sample_rate, num_channels):
-        """"""
+    def test_audio_num_frames_lossless(self, ext, sample_rate, num_channels):
+        """Lossless format preserves the data"""
         filename = f"test.{ext}"
 
-        # Write data
-        dst = self.get_dst(filename)
-        s = torchaudio.io.StreamWriter(dst=dst, format=ext)
-        s.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels)
+        data = get_sinusoid(sample_rate=sample_rate, n_channels=num_channels, dtype="int16", channels_first=False)
 
-        freq = 300
-        duration = 60
-        theta = torch.linspace(0, freq * 2 * 3.14 * duration, sample_rate * duration)
-        if num_channels == 1:
-            chunk = torch.sin(theta).unsqueeze(-1)
-        else:
-            chunk = torch.stack([torch.sin(theta), torch.cos(theta)], dim=-1)
+        # Write data
+        dst = self.get_temp_path(filename)
+        s = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        s.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, format="s16")
         with s.open():
-            s.write_audio_chunk(0, chunk)
-        if self.test_fileobj:
-            dst.flush()
+            s.write_audio_chunk(0, data)
 
         # Load data
         s = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
@@ -344,9 +350,44 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         s.process_all_packets()
         (saved,) = s.pop_chunks()
 
-        assert saved.shape == chunk.shape
-        if format in ["wav", "flac"]:
-            self.assertEqual(saved, chunk)
+        self.assertEqual(saved, data)
+
+    @parameterized.expand(
+        [
+            ("mp3", 1, 8000),
+            ("mp3", 1, 16000),
+            ("mp3", 1, 44100),
+            ("mp3", 2, 8000),
+            ("mp3", 2, 16000),
+            ("mp3", 2, 44100),
+            ("opus", 1, 48000),
+        ]
+    )
+    def test_audio_num_frames_lossy(self, ext, num_channels, sample_rate):
+        """Saving audio preserves the number of channels and frames"""
+        filename = f"test.{ext}"
+
+        data = get_sinusoid(sample_rate=sample_rate, n_channels=num_channels, channels_first=False)
+
+        # Write data
+        dst = self.get_temp_path(filename)
+        s = torchaudio.io.StreamWriter(dst=dst, format=ext)
+        s.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels)
+        with s.open():
+            s.write_audio_chunk(0, data)
+
+        # Load data
+        s = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        s.add_audio_stream(-1)
+        s.process_all_packets()
+        (saved,) = s.pop_chunks()
+
+        # On 4.1 OPUS produces 48312 samples (extra 312)
+        # this has been fixed on 4.2+
+        # TODO: issue warning if on 4.1?
+        if ext == "opus" and lt42():
+            return
+        self.assertEqual(saved.shape, data.shape)
 
     def test_preserve_fps(self):
         """Decimal point frame rate is properly saved
@@ -359,16 +400,13 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         width, height = 96, 128
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
         writer.add_video_stream(frame_rate=frame_rate, width=width, height=height)
 
         video = torch.randint(256, (90, 3, height, width), dtype=torch.uint8)
         with writer.open():
             writer.write_video_chunk(0, video)
-        if self.test_fileobj:
-            dst.flush()
-
         # Load data
         reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
         assert reader.get_src_stream_info(0).frame_rate == frame_rate
@@ -383,16 +421,13 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         width, height = 96, 128
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
         writer.add_video_stream(frame_rate=frame_rate, width=width, height=height)
 
         video = torch.randint(256, (num_frames, 3, height, width), dtype=torch.uint8)
         with writer.open():
             writer.write_video_chunk(0, video)
-
-        if self.test_fileobj:
-            dst.flush()
 
         reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
         reader.add_video_stream(1)
@@ -412,7 +447,7 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         num_channels = 2
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
         writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels)
 
@@ -420,9 +455,6 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         num_frames = audio.size(0)
         with writer.open():
             writer.write_audio_chunk(0, audio)
-
-        if self.test_fileobj:
-            dst.flush()
 
         reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
         frames_per_chunk = sample_rate // 4
@@ -462,7 +494,7 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         width, height = 8, 8
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
         writer.add_video_stream(frame_rate=frame_rate, width=width, height=height)
 
@@ -473,10 +505,6 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
                 pts = i / frame_rate
                 reference_pts.append(pts)
                 writer.write_video_chunk(0, video, pts)
-
-        # check
-        if self.test_fileobj:
-            dst.flush()
 
         reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
         reader.add_video_stream(1)
@@ -489,7 +517,7 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             # for that.
             assert math.isclose(val, ref)
 
-    def test_encode_config(self):
+    def test_codec_config(self):
         """Can successfully set configuration and write audio."""
         ext = "mp3"
         filename = f"test.{ext}"
@@ -497,16 +525,16 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         num_channels = 2
 
         # Write data
-        dst = self.get_dst(filename)
+        dst = self.get_temp_path(filename)
         writer = torchaudio.io.StreamWriter(dst=dst, format=ext)
-        config = torchaudio.io.StreamWriter.EncodeConfig(bit_rate=198_000, compression_level=3)
-        writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, config=config)
+        codec_config = CodecConfig(bit_rate=198_000, compression_level=3)
+        writer.add_audio_stream(sample_rate=sample_rate, num_channels=num_channels, codec_config=codec_config)
 
         audio = torch.zeros((8000, 2))
         with writer.open():
             writer.write_audio_chunk(0, audio)
 
-    def test_encode_config_bit_rate_output(self):
+    def test_codec_config_bit_rate_output(self):
         """Increasing the specified bit rate yields a larger encoded output."""
         ext = "mp3"
         sample_rate = 44100
@@ -518,7 +546,7 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             writer.add_audio_stream(
                 sample_rate=sample_rate,
                 num_channels=num_channels,
-                config=torchaudio.io.StreamWriter.EncodeConfig(bit_rate=bit_rate),
+                codec_config=CodecConfig(bit_rate=bit_rate),
             )
 
             with writer.open():
@@ -533,3 +561,185 @@ class StreamWriterInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         out1_size = dst.tell()
 
         self.assertGreater(out1_size, out0_size)
+
+    def test_filter_graph_audio(self):
+        """Can apply additional effect with filter graph"""
+        sample_rate = 8000
+        num_channels = 2
+        ext = "wav"
+        filename = f"test.{ext}"
+
+        original = get_audio_chunk("s16", num_channels=num_channels, sample_rate=sample_rate)
+
+        dst = self.get_temp_path(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_audio_stream(sample_rate=8000, num_channels=num_channels, filter_desc="areverse", format="s16")
+
+        with w.open():
+            w.write_audio_chunk(0, original)
+
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        reader.add_audio_stream(-1)
+        reader.process_all_packets()
+        (output,) = reader.pop_chunks()
+
+        self.assertEqual(output, original.flip(0))
+
+    def test_filter_graph_video(self):
+        """Can apply additional effect with filter graph"""
+        src_rate = 30
+        num_frames, width, height = 400, 160, 90
+        filter_desc = "framestep=2"
+        enc_rate = 15
+        ext = "mp4"
+        filename = f"test.{ext}"
+
+        original = torch.zeros((num_frames, 3, height, width), dtype=torch.uint8)
+
+        dst = self.get_temp_path(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_video_stream(
+            frame_rate=src_rate,
+            format="rgb24",
+            height=height,
+            width=width,
+            filter_desc=filter_desc,
+            encoder_format="yuv420p",
+            encoder_frame_rate=enc_rate,
+        )
+
+        with w.open():
+            w.write_video_chunk(0, original)
+
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        reader.add_video_stream(-1)
+        reader.process_all_packets()
+        (output,) = reader.pop_chunks()
+
+        self.assertEqual(output.shape, [num_frames // 2, 3, height, width])
+
+    @parameterized.expand(
+        [
+            ("wav", "pcm_s16le", 8000, 16000, 1, 2),
+            ("wav", "pcm_s16le", 8000, 16000, 2, 1),
+            ("wav", "pcm_s16le", 8000, 16000, 2, 4),
+            ("wav", "pcm_s16le", 16000, 8000, 1, 2),
+            ("wav", "pcm_s16le", 16000, 8000, 2, 1),
+            ("wav", "pcm_s16le", 16000, 8000, 2, 4),
+            ("wav", "pcm_f32le", 8000, 16000, 1, 2),
+            ("wav", "pcm_f32le", 8000, 16000, 2, 1),
+            ("wav", "pcm_f32le", 8000, 16000, 2, 4),
+            ("wav", "pcm_f32le", 16000, 8000, 1, 2),
+            ("wav", "pcm_f32le", 16000, 8000, 2, 1),
+            ("wav", "pcm_f32le", 16000, 8000, 2, 4),
+            ("ogg", "opus", 8000, 48000, 1, 2),
+            ("ogg", "opus", 8000, 48000, 2, 1),
+            ("ogg", "flac", 8000, 41000, 1, 2),
+            ("ogg", "flac", 8000, 41000, 2, 1),
+            ("ogg", "vorbis", 16000, 8000, 1, 2),
+            ("ogg", "vorbis", 16000, 8000, 4, 2),
+        ]
+    )
+    def test_change_audio_encoder_spec(self, ext, encoder, src_sr, enc_sr, src_num_channels, enc_num_channels):
+        """Can change sample rate and channels on-the-fly"""
+        filename = f"test.{ext}"
+
+        original = get_sinusoid(sample_rate=src_sr, n_channels=src_num_channels, channels_first=False, duration=0.1)
+
+        dst = self.get_temp_path(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_audio_stream(
+            sample_rate=src_sr,
+            format="flt",
+            num_channels=src_num_channels,
+            encoder=encoder,
+            encoder_sample_rate=enc_sr,
+            encoder_num_channels=enc_num_channels,
+        )
+
+        with w.open():
+            w.write_audio_chunk(0, original)
+
+        # check
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        i = reader.get_src_stream_info(0)
+        self.assertEqual(i.sample_rate, enc_sr)
+        self.assertEqual(i.num_channels, enc_num_channels)
+
+    @parameterized.expand(
+        [
+            # opus only supports 48kHz
+            ("ogg", "opus", 8000, 48000, 1, 1),
+            ("ogg", "opus", 16000, 48000, 2, 2),
+            # vorbis only supports 2 channels
+            ("ogg", "vorbis", 16000, 16000, 1, 2),
+            ("ogg", "vorbis", 16000, 16000, 2, 2),
+            ("ogg", "vorbis", 16000, 16000, 4, 2),
+        ]
+    )
+    def test_change_encoder_spec_default(
+        self, ext, encoder, src_sr, expected_sr, src_num_channels, expected_num_channels
+    ):
+        """If input rate/channels are not supported, encoder picks supported one automatically."""
+        filename = f"test.{ext}"
+
+        original = get_sinusoid(sample_rate=src_sr, n_channels=src_num_channels, channels_first=False, duration=0.1)
+
+        dst = self.get_temp_path(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_audio_stream(
+            sample_rate=src_sr,
+            format="flt",
+            num_channels=src_num_channels,
+            encoder=encoder,
+        )
+
+        with w.open():
+            w.write_audio_chunk(0, original)
+
+        # check
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        i = reader.get_src_stream_info(0)
+        self.assertEqual(i.sample_rate, expected_sr)
+        self.assertEqual(i.num_channels, expected_num_channels)
+
+    @parameterized.expand(
+        [
+            ("mp4", None, 10, 30, (100, 160), (200, 320)),
+            ("mp4", None, 10, 30, (100, 160), (50, 80)),
+            ("mp4", None, 30, 10, (100, 160), (200, 320)),
+            ("mp4", None, 30, 10, (100, 160), (50, 80)),
+        ]
+    )
+    def test_change_video_encoder_spec(self, ext, encoder, src_rate, enc_rate, src_size, enc_size):
+        """Can change the frame rate and image size on-the-fly"""
+        width, height = src_size
+        enc_width, enc_height = enc_size
+        ext = "mp4"
+        filename = f"test.{ext}"
+        num_frames = 256
+
+        original = torch.zeros((num_frames, 3, height, width), dtype=torch.uint8)
+
+        dst = self.get_temp_path(filename)
+        w = StreamWriter(dst, format=ext)
+        w.add_video_stream(
+            frame_rate=src_rate,
+            format="rgb24",
+            height=height,
+            width=width,
+            encoder_format="yuv420p",
+            encoder_frame_rate=enc_rate,
+            encoder_width=enc_width,
+            encoder_height=enc_height,
+        )
+
+        with w.open():
+            w.write_video_chunk(0, original)
+
+        # check
+        reader = torchaudio.io.StreamReader(src=self.get_temp_path(filename))
+        i = reader.get_src_stream_info(0)
+        self.assertEqual(i.frame_rate, enc_rate)
+        self.assertEqual(i.width, enc_width)
+        self.assertEqual(i.height, enc_height)

@@ -12,16 +12,17 @@ class Encoder {
   AVFormatContext* format_ctx;
   // Reference to codec context (encoder)
   AVCodecContext* codec_ctx;
-  // Stream object
-  // Encoder object creates AVStream, but it will be deallocated along with
-  // AVFormatContext, So Encoder does not own it.
+  // Stream object as reference. Owned by AVFormatContext.
   AVStream* stream;
   // Temporary object used during the encoding
   // Encoder owns it.
   AVPacketPtr packet{};
 
  public:
-  Encoder(AVFormatContext* format_ctx, AVCodecContext* codec_ctx);
+  Encoder(
+      AVFormatContext* format_ctx,
+      AVCodecContext* codec_ctx,
+      AVStream* stream) noexcept;
 
   void encode(AVFrame* frame);
 };

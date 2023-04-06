@@ -285,7 +285,7 @@ void StreamReader::add_audio_stream(
       AVMEDIA_TYPE_AUDIO,
       static_cast<int>(frames_per_chunk),
       static_cast<int>(num_chunks),
-      filter_desc,
+      filter_desc.value_or("anull"),
       decoder,
       decoder_option,
       torch::Device(torch::DeviceType::CPU));
@@ -306,9 +306,7 @@ void StreamReader::add_video_stream(
 #ifdef USE_CUDA
     torch::Device d{hw_accel.value()};
     TORCH_CHECK(
-        d.type() == c10::DeviceType::CUDA,
-        "Only CUDA is supported for hardware acceleration. Found: ",
-        device.str());
+        d.is_cuda(), "Only CUDA is supported for HW acceleration. Found: ", d);
     return d;
 #else
     TORCH_CHECK(
@@ -322,7 +320,7 @@ void StreamReader::add_video_stream(
       AVMEDIA_TYPE_VIDEO,
       static_cast<int>(frames_per_chunk),
       static_cast<int>(num_chunks),
-      filter_desc,
+      filter_desc.value_or("null"),
       decoder,
       decoder_option,
       device);
@@ -333,7 +331,7 @@ void StreamReader::add_stream(
     AVMediaType media_type,
     int frames_per_chunk,
     int num_chunks,
-    const c10::optional<std::string>& filter_desc,
+    const std::string& filter_desc,
     const c10::optional<std::string>& decoder,
     const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
@@ -347,10 +345,18 @@ void StreamReader::add_stream(
       "Failed to detect the source stream format.");
 
   if (!processors[i]) {
-    processors[i] = std::make_unique<StreamProcessor>(
-        stream->time_base, stream->codecpar, decoder, decoder_option, device);
+    processors[i] = std::make_unique<StreamProcessor>(stream->time_base);
     processors[i]->set_discard_timestamp(seek_timestamp);
   }
+  if (!processors[i]->is_decoder_set()) {
+    processors[i]->set_decoder(
+        stream->codecpar, decoder, decoder_option, device);
+  } else {
+    TORCH_CHECK(
+        !decoder && (!decoder_option || decoder_option.value().size() == 0),
+        "Decoder options were provided, but the decoder has already been initialized.")
+  }
+
   stream->discard = AVDISCARD_DEFAULT;
 
   auto frame_rate = [&]() -> AVRational {

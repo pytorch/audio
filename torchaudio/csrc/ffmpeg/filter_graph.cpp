@@ -165,7 +165,8 @@ void FilterGraph::add_process(const std::string& filter_description) {
           av_err2string(ret) + ".)");
 }
 
-void FilterGraph::create_filter() {
+void FilterGraph::create_filter(AVBufferRef* hw_frames_ctx) {
+  buffersrc_ctx->outputs[0]->hw_frames_ctx = hw_frames_ctx;
   int ret = avfilter_graph_config(pFilterGraph, nullptr);
   TORCH_CHECK(ret >= 0, "Failed to configure the graph: " + av_err2string(ret));
   // char* desc = avfilter_graph_dump(pFilterGraph, NULL);
@@ -176,29 +177,35 @@ void FilterGraph::create_filter() {
 //////////////////////////////////////////////////////////////////////////////
 // Query methods
 //////////////////////////////////////////////////////////////////////////////
-AVRational FilterGraph::get_output_timebase() const {
-  TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
-  return buffersink_ctx->inputs[0]->time_base;
-}
-
 FilterGraphOutputInfo FilterGraph::get_output_info() const {
   TORCH_INTERNAL_ASSERT(buffersink_ctx, "FilterGraph is not initialized.");
   AVFilterLink* l = buffersink_ctx->inputs[0];
   FilterGraphOutputInfo ret{};
   ret.type = l->type;
   ret.format = l->format;
-  if (l->type == AVMEDIA_TYPE_AUDIO) {
-    ret.sample_rate = l->sample_rate;
+  ret.time_base = l->time_base;
+  switch (l->type) {
+    case AVMEDIA_TYPE_AUDIO: {
+      ret.sample_rate = l->sample_rate;
 #if LIBAVFILTER_VERSION_MAJOR >= 8 && LIBAVFILTER_VERSION_MINOR >= 44
-    ret.num_channels = l->ch_layout.nb_channels;
+      ret.num_channels = l->ch_layout.nb_channels;
 #else
-    // Before FFmpeg 5.1
-    ret.num_channels = av_get_channel_layout_nb_channels(l->channel_layout);
+      // Before FFmpeg 5.1
+      ret.num_channels = av_get_channel_layout_nb_channels(l->channel_layout);
 #endif
-  } else {
-    ret.frame_rate = l->frame_rate;
-    ret.height = l->h;
-    ret.width = l->w;
+      break;
+    }
+    case AVMEDIA_TYPE_VIDEO: {
+      if (l->format == AV_PIX_FMT_CUDA && l->hw_frames_ctx) {
+        auto frames_ctx = (AVHWFramesContext*)(l->hw_frames_ctx->data);
+        ret.format = frames_ctx->sw_format;
+      }
+      ret.frame_rate = l->frame_rate;
+      ret.height = l->h;
+      ret.width = l->w;
+      break;
+    }
+    default:;
   }
   return ret;
 }

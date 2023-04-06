@@ -1,5 +1,7 @@
+#include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <stdexcept>
+#include <string_view>
 
 namespace torchaudio {
 namespace io {
@@ -80,6 +82,27 @@ enum AVPixelFormat get_hw_format(
   return AV_PIX_FMT_NONE;
 }
 
+AVBufferRef* get_hw_frames_ctx(AVCodecContext* codec_ctx) {
+  AVBufferRef* p = av_hwframe_ctx_alloc(codec_ctx->hw_device_ctx);
+  TORCH_CHECK(
+      p,
+      "Failed to allocate CUDA frame context from device context at ",
+      codec_ctx->hw_device_ctx);
+  auto frames_ctx = (AVHWFramesContext*)(p->data);
+  frames_ctx->format = codec_ctx->pix_fmt;
+  frames_ctx->sw_format = codec_ctx->sw_pix_fmt;
+  frames_ctx->width = codec_ctx->width;
+  frames_ctx->height = codec_ctx->height;
+  frames_ctx->initial_pool_size = 5;
+  int ret = av_hwframe_ctx_init(p);
+  if (ret >= 0) {
+    return p;
+  }
+  av_buffer_unref(&p);
+  TORCH_CHECK(
+      false, "Failed to initialize CUDA frame context: ", av_err2string(ret));
+}
+
 void configure_codec_context(
     AVCodecContext* codec_ctx,
     const AVCodecParameters* params,
@@ -99,6 +122,9 @@ void configure_codec_context(
     // 2. Set pCodecContext->get_format call back function which
     // will retrieve the HW pixel format from opaque pointer.
     codec_ctx->get_format = get_hw_format;
+    codec_ctx->hw_device_ctx = av_buffer_ref(get_cuda_context(device.index()));
+    TORCH_INTERNAL_ASSERT(
+        codec_ctx->hw_device_ctx, "Failed to reference HW device context.");
 #endif
   }
 }
@@ -124,6 +150,11 @@ void open_codec(
       ret >= 0, "Failed to initialize CodecContext: ", av_err2string(ret));
 }
 
+bool ends_with(std::string_view str, std::string_view suffix) {
+  return str.size() >= suffix.size() &&
+      0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
+
 AVCodecContextPtr get_codec_ctx(
     const AVCodecParameters* params,
     const c10::optional<std::string>& decoder_name,
@@ -133,6 +164,12 @@ AVCodecContextPtr get_codec_ctx(
       alloc_codec_context(params->codec_id, decoder_name);
   configure_codec_context(codec_ctx, params, device);
   open_codec(codec_ctx, decoder_option);
+  if (codec_ctx->hw_device_ctx) {
+    codec_ctx->hw_frames_ctx = get_hw_frames_ctx(codec_ctx);
+  }
+  if (ends_with(codec_ctx->codec->name, "_cuvid")) {
+    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReaderCUDA");
+  }
   return codec_ctx;
 }
 
@@ -140,14 +177,8 @@ AVCodecContextPtr get_codec_ctx(
 
 using KeyType = StreamProcessor::KeyType;
 
-StreamProcessor::StreamProcessor(
-    const AVRational& time_base,
-    const AVCodecParameters* params,
-    const c10::optional<std::string>& decoder_name,
-    const c10::optional<OptionDict>& decoder_option,
-    const torch::Device& device)
-    : stream_time_base(time_base),
-      codec_ctx(get_codec_ctx(params, decoder_name, decoder_option, device)) {}
+StreamProcessor::StreamProcessor(const AVRational& time_base)
+    : stream_time_base(time_base) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configurations
@@ -156,32 +187,74 @@ KeyType StreamProcessor::add_stream(
     int frames_per_chunk,
     int num_chunks,
     AVRational frame_rate,
-    const c10::optional<std::string>& filter_description,
+    const std::string& filter_description,
     const torch::Device& device) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      is_decoder_set(), "Decoder hasn't been set.");
+  // If device is provided, then check that codec_ctx has hw_device_ctx set.
+  // In case, defining an output stream with HW accel on an input stream that
+  // has decoder set without HW accel, it will cause seg fault.
+  // i.e.
+  // The following should be rejected here.
+  // reader = StreamReader(...)
+  // reader.add_video_stream(..., decoder="h264_cuvid")
+  // reader.add_video_stream(..., decoder="h264_cuvid", hw_accel="cuda")
+  // TODO:
+  // One idea to work around this is to always define HW device context, and
+  // if HW acceleration is not required, insert `hwdownload` filter.
+  // This way it will be possible to handle both cases at the same time.
+  switch (device.type()) {
+    case torch::kCPU:
+      TORCH_CHECK(
+          !codec_ctx->hw_device_ctx,
+          "Decoding without Hardware acceleration is requested, however, "
+          "the decoder has been already defined with a HW acceleration. "
+          "Decoding a stream with and without HW acceleration simultaneously "
+          "is not supported.");
+      break;
+    case torch::kCUDA:
+      TORCH_CHECK(
+          codec_ctx->hw_device_ctx,
+          "CUDA Hardware acceleration is requested, however, the decoder has "
+          "been already defined without a HW acceleration. "
+          "Decoding a stream with and without HW acceleration simultaneously "
+          "is not supported.");
+      break;
+    default:;
+  }
+
   switch (codec_ctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
+      post_processes.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(current_key),
+          std::forward_as_tuple(get_audio_process(
+              stream_time_base,
+              codec_ctx,
+              filter_description,
+              frames_per_chunk,
+              num_chunks)));
+      return current_key++;
     case AVMEDIA_TYPE_VIDEO:
-      break;
+      post_processes.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(current_key),
+          std::forward_as_tuple(get_video_process(
+              stream_time_base,
+              frame_rate,
+              codec_ctx,
+              filter_description,
+              frames_per_chunk,
+              num_chunks,
+              device)));
+      return current_key++;
     default:
       TORCH_CHECK(false, "Only Audio and Video are supported");
   }
-  KeyType key = current_key++;
-  sinks.emplace(
-      std::piecewise_construct,
-      std::forward_as_tuple(key),
-      std::forward_as_tuple(
-          stream_time_base,
-          codec_ctx,
-          frames_per_chunk,
-          num_chunks,
-          frame_rate,
-          filter_description,
-          device));
-  return key;
 }
 
 void StreamProcessor::remove_stream(KeyType key) {
-  sinks.erase(key);
+  post_processes.erase(key);
 }
 
 void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
@@ -190,25 +263,38 @@ void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
       av_rescale_q(timestamp, av_get_time_base_q(), stream_time_base);
 }
 
+void StreamProcessor::set_decoder(
+    const AVCodecParameters* codecpar,
+    const c10::optional<std::string>& decoder_name,
+    const c10::optional<OptionDict>& decoder_option,
+    const torch::Device& device) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(!codec_ctx, "Decoder has already been set.");
+  codec_ctx = get_codec_ctx(codecpar, decoder_name, decoder_option, device);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
 std::string StreamProcessor::get_filter_description(KeyType key) const {
-  return sinks.at(key).get_filter_description();
+  return post_processes.at(key)->get_filter_desc();
 }
 
 FilterGraphOutputInfo StreamProcessor::get_filter_output_info(
     KeyType key) const {
-  return sinks.at(key).get_filter_output_info();
+  return post_processes.at(key)->get_filter_output_info();
 }
 
 bool StreamProcessor::is_buffer_ready() const {
-  for (const auto& it : sinks) {
-    if (!it.second.buffer->is_ready()) {
+  for (const auto& it : post_processes) {
+    if (!it.second->is_buffer_ready()) {
       return false;
     }
   }
   return true;
+}
+
+bool StreamProcessor::is_decoder_set() const {
+  return codec_ctx;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -217,6 +303,9 @@ bool StreamProcessor::is_buffer_ready() const {
 // 0: some kind of success
 // <0: Some error happened
 int StreamProcessor::process_packet(AVPacket* packet) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      is_decoder_set(),
+      "Decoder must have been set prior to calling this function.");
   int ret = avcodec_send_packet(codec_ctx, packet);
   while (ret >= 0) {
     ret = avcodec_receive_frame(codec_ctx, frame);
@@ -272,9 +361,12 @@ int StreamProcessor::process_packet(AVPacket* packet) {
 }
 
 void StreamProcessor::flush() {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      is_decoder_set(),
+      "Decoder must have been set prior to calling this function.");
   avcodec_flush_buffers(codec_ctx);
-  for (auto& ite : sinks) {
-    ite.second.flush();
+  for (auto& ite : post_processes) {
+    ite.second->flush();
   }
 }
 
@@ -282,8 +374,8 @@ void StreamProcessor::flush() {
 // <0: Some error happened
 int StreamProcessor::send_frame(AVFrame* frame_) {
   int ret = 0;
-  for (auto& ite : sinks) {
-    int ret2 = ite.second.process_frame(frame_);
+  for (auto& ite : post_processes) {
+    int ret2 = ite.second->process_frame(frame_);
     if (ret2 < 0)
       ret = ret2;
   }
@@ -294,7 +386,7 @@ int StreamProcessor::send_frame(AVFrame* frame_) {
 // Retrieval
 ////////////////////////////////////////////////////////////////////////////////
 c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
-  return sinks.at(key).buffer->pop_chunk();
+  return post_processes.at(key)->pop_chunk();
 }
 
 } // namespace io

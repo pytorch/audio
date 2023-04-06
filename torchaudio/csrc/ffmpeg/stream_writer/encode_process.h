@@ -9,47 +9,59 @@
 namespace torchaudio::io {
 
 class EncodeProcess {
-  // In the reverse order of the process
-  AVCodecContextPtr codec_ctx;
-  Encoder encoder;
-  AVFramePtr dst_frame{};
-  FilterGraph filter;
-  AVFramePtr src_frame;
   TensorConverter converter;
+  AVFramePtr src_frame;
+  FilterGraph filter;
+  AVFramePtr dst_frame{};
+  Encoder encoder;
+  AVCodecContextPtr codec_ctx;
 
  public:
-  // Constructor for audio
   EncodeProcess(
-      AVFormatContext* format_ctx,
-      int sample_rate,
-      int num_channels,
-      const enum AVSampleFormat format,
-      const c10::optional<std::string>& encoder,
-      const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format,
-      const c10::optional<EncodingConfig>& config);
+      TensorConverter&& converter,
+      AVFramePtr&& frame,
+      FilterGraph&& filter_graph,
+      Encoder&& encoder,
+      AVCodecContextPtr&& codec_ctx) noexcept;
 
-  // constructor for video
-  EncodeProcess(
-      AVFormatContext* format_ctx,
-      double frame_rate,
-      int width,
-      int height,
-      const enum AVPixelFormat format,
-      const c10::optional<std::string>& encoder,
-      const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format,
-      const c10::optional<std::string>& hw_accel,
-      const c10::optional<EncodingConfig>& config);
+  EncodeProcess(EncodeProcess&&) noexcept = default;
 
-  void process(
-      AVMediaType type,
-      const torch::Tensor& tensor,
-      const c10::optional<double>& pts);
+  void process(const torch::Tensor& tensor, const c10::optional<double>& pts);
 
   void process_frame(AVFrame* src);
 
   void flush();
 };
+
+EncodeProcess get_audio_encode_process(
+    AVFormatContext* format_ctx,
+    int sample_rate,
+    int num_channels,
+    const std::string& format,
+    const c10::optional<std::string>& encoder,
+    const c10::optional<OptionDict>& encoder_option,
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<int>& encoder_sample_rate,
+    const c10::optional<int>& encoder_num_channels,
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc,
+    bool disable_converter = false);
+
+EncodeProcess get_video_encode_process(
+    AVFormatContext* format_ctx,
+    double frame_rate,
+    int width,
+    int height,
+    const std::string& format,
+    const c10::optional<std::string>& encoder,
+    const c10::optional<OptionDict>& encoder_option,
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<double>& encoder_frame_rate,
+    const c10::optional<int>& encoder_width,
+    const c10::optional<int>& encoder_height,
+    const c10::optional<std::string>& hw_accel,
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc,
+    bool disable_converter = false);
 
 }; // namespace torchaudio::io

@@ -230,12 +230,17 @@ def _parse_oi(i):
     raise ValueError(f"Unexpected media_type: {i.media_type}({i})")
 
 
-def _get_afilter_desc(sample_rate: Optional[int], fmt: Optional[str]):
+def _get_afilter_desc(sample_rate: Optional[int], fmt: Optional[str], num_channels: Optional[int]):
     descs = []
     if sample_rate is not None:
         descs.append(f"aresample={sample_rate}")
-    if fmt is not None:
-        descs.append(f"aformat=sample_fmts={fmt}")
+    if fmt is not None or num_channels is not None:
+        parts = []
+        if fmt is not None:
+            parts.append(f"sample_fmts={fmt}")
+        if num_channels is not None:
+            parts.append(f"channel_layouts={num_channels}c")
+        descs.append(f"aformat={':'.join(parts)}")
     return ",".join(descs) if descs else None
 
 
@@ -567,8 +572,10 @@ class StreamReader:
         Returns:
             InputStreamTypes:
                 Information about the source stream.
-                If the source stream is audio type, then :class:`~torchaudio.io._stream_reader.SourceAudioStream` returned.
-                If it is video type, then :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.
+                If the source stream is audio type, then
+                :class:`~torchaudio.io._stream_reader.SourceAudioStream` is returned.
+                If it is video type, then
+                :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.
                 Otherwise :class:`~torchaudio.io._stream_reader.SourceStream` class is returned.
         """
         return _parse_si(self._be.get_src_stream_info(i))
@@ -581,8 +588,10 @@ class StreamReader:
         Returns:
             OutputStreamTypes
                 Information about the output stream.
-                If the output stream is audio type, then :class:`~torchaudio.io._stream_reader.OutputAudioStream` returned.
-                If it is video type, then :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.
+                If the output stream is audio type, then
+                :class:`~torchaudio.io._stream_reader.OutputAudioStream` is returned.
+                If it is video type, then
+                :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.
         """
         info = self._be.get_out_stream_info(i)
         return _parse_oi(info)
@@ -621,11 +630,13 @@ class StreamReader:
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
+        *,
         stream_index: Optional[int] = None,
         decoder: Optional[str] = None,
         decoder_option: Optional[Dict[str, str]] = None,
         format: Optional[str] = "fltp",
         sample_rate: Optional[int] = None,
+        num_channels: Optional[int] = None,
     ):
         """Add output audio stream
 
@@ -658,14 +669,16 @@ class StreamReader:
                 Default: ``"fltp"``.
 
             sample_rate (int or None, optional): If provided, resample the audio.
+
+            num_channels (int, or None, optional): If provided, change the number of channels.
         """
         self.add_audio_stream(
             frames_per_chunk,
             buffer_chunk_size,
-            stream_index,
-            decoder,
-            decoder_option,
-            _get_afilter_desc(sample_rate, format),
+            stream_index=stream_index,
+            decoder=decoder,
+            decoder_option=decoder_option,
+            filter_desc=_get_afilter_desc(sample_rate, format, num_channels),
         )
 
     @_format_video_args
@@ -673,14 +686,15 @@ class StreamReader:
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
+        *,
         stream_index: Optional[int] = None,
         decoder: Optional[str] = None,
         decoder_option: Optional[Dict[str, str]] = None,
-        hw_accel: Optional[str] = None,
         format: Optional[str] = "rgb24",
         frame_rate: Optional[int] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
+        hw_accel: Optional[str] = None,
     ):
         """Add output video stream
 
@@ -694,8 +708,6 @@ class StreamReader:
             decoder (str or None, optional): {decoder}
 
             decoder_option (dict or None, optional): {decoder_option}
-
-            hw_accel (str or None, optional): {hw_accel}
 
             format (str, optional): Change the format of image channels. Valid values are,
 
@@ -711,15 +723,17 @@ class StreamReader:
             width (int or None, optional): If provided, change the image width. Unit: Pixel.
 
             height (int or None, optional): If provided, change the image height. Unit: Pixel.
+
+            hw_accel (str or None, optional): {hw_accel}
         """
         self.add_video_stream(
             frames_per_chunk,
             buffer_chunk_size,
-            stream_index,
-            decoder,
-            decoder_option,
-            hw_accel,
-            _get_vfilter_desc(frame_rate, width, height, format),
+            stream_index=stream_index,
+            decoder=decoder,
+            decoder_option=decoder_option,
+            filter_desc=_get_vfilter_desc(frame_rate, width, height, format),
+            hw_accel=hw_accel,
         )
 
     @_format_audio_args
@@ -727,6 +741,7 @@ class StreamReader:
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
+        *,
         stream_index: Optional[int] = None,
         decoder: Optional[str] = None,
         decoder_option: Optional[Dict[str, str]] = None,
@@ -768,11 +783,12 @@ class StreamReader:
         self,
         frames_per_chunk: int,
         buffer_chunk_size: int = 3,
+        *,
         stream_index: Optional[int] = None,
         decoder: Optional[str] = None,
         decoder_option: Optional[Dict[str, str]] = None,
-        hw_accel: Optional[str] = None,
         filter_desc: Optional[str] = None,
+        hw_accel: Optional[str] = None,
     ):
         """Add output video stream
 

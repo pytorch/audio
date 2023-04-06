@@ -71,7 +71,7 @@ esac
 # Note: installing librosa via pip fail because it will try to compile numba.
 (
     set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
     pip install \
@@ -91,7 +91,9 @@ esac
         'protobuf<4.21.0' \
         demucs \
         tinytag \
-        pyroomacoustics
+        pyroomacoustics \
+        flashlight-text \
+        git+https://github.com/kpu/kenlm/
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

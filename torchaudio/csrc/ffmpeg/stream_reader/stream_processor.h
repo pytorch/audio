@@ -2,7 +2,7 @@
 
 #include <torch/torch.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/post_process.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <map>
 
@@ -16,13 +16,13 @@ class StreamProcessor {
  private:
   // Stream time base which is not stored in AVCodecContextPtr
   AVRational stream_time_base;
-  AVCodecContextPtr codec_ctx;
 
   // Components for decoding source media
+  AVCodecContextPtr codec_ctx{nullptr};
   AVFramePtr frame;
 
   KeyType current_key = 0;
-  std::map<KeyType, Sink> sinks;
+  std::map<KeyType, std::unique_ptr<IPostDecodeProcess>> post_processes;
 
   // Used for precise seek.
   // 0: no discard
@@ -32,12 +32,7 @@ class StreamProcessor {
   int64_t discard_before_pts = 0;
 
  public:
-  StreamProcessor(
-      const AVRational& time_base,
-      const AVCodecParameters* codecpar,
-      const c10::optional<std::string>& decoder_name,
-      const c10::optional<OptionDict>& decoder_option,
-      const torch::Device& device);
+  explicit StreamProcessor(const AVRational& time_base);
   ~StreamProcessor() = default;
   // Non-copyable
   StreamProcessor(const StreamProcessor&) = delete;
@@ -59,7 +54,7 @@ class StreamProcessor {
       int frames_per_chunk,
       int num_chunks,
       AVRational frame_rate,
-      const c10::optional<std::string>& filter_description,
+      const std::string& filter_description,
       const torch::Device& device);
 
   // 1. Remove the stream
@@ -69,6 +64,12 @@ class StreamProcessor {
   // The input timestamp must be expressed in AV_TIME_BASE unit.
   void set_discard_timestamp(int64_t timestamp);
 
+  void set_decoder(
+      const AVCodecParameters* codecpar,
+      const c10::optional<std::string>& decoder_name,
+      const c10::optional<OptionDict>& decoder_option,
+      const torch::Device& device);
+
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
@@ -76,6 +77,7 @@ class StreamProcessor {
   [[nodiscard]] FilterGraphOutputInfo get_filter_output_info(KeyType key) const;
 
   bool is_buffer_ready() const;
+  [[nodiscard]] bool is_decoder_set() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // The streaming process

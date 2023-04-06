@@ -1,3 +1,4 @@
+
 torchaudio.prototype.pipelines
 ==============================
 
@@ -9,22 +10,16 @@ The pipelines subpackage contains APIs to models with pretrained weights and rel
 RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
-EMFORMER_RNNT_BASE_MUSTC
-~~~~~~~~~~~~~~~~~~~~~~~~
+Pretrained Models
+~~~~~~~~~~~~~~~~~
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-   .. autodata:: EMFORMER_RNNT_BASE_MUSTC
-      :no-value:
-
-EMFORMER_RNNT_BASE_TEDLIUM3
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
-      :no-value:
-
+   EMFORMER_RNNT_BASE_MUSTC
+   EMFORMER_RNNT_BASE_TEDLIUM3
 
 HiFiGAN Vocoder
 ---------------
@@ -75,3 +70,28 @@ Pretrained Models
    :template: autosummary/bundle_data.rst
 
    SQUIM_OBJECTIVE
+
+Squim Subjective
+----------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimSubjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **subjective** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimSubjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_SUBJECTIVE

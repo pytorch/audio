@@ -164,7 +164,7 @@ struct AutoBufferUnref {
 };
 
 struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
-  AVBufferRefPtr();
+  AVBufferRefPtr(AVBufferRef* p = nullptr);
   void reset(AVBufferRef* p);
 };
 

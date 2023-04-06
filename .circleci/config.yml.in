@@ -654,46 +654,10 @@ jobs:
           command: .circleci/unittest/linux/scripts/run_test.sh
           environment:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_HW_ACCEL: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS: true
-      - store_test_results:
-          path: test-results
-      - store_artifacts:
-          path: test/htmlcov
-
-  unittest_linux_gpu:
-    <<: *binary_common
-    machine:
-      image: ubuntu-2004-cuda-11.4:202110-01
-    resource_class: gpu.nvidia.medium
-    environment:
-      <<: *environment
-      CUDA_VERSION: 11.7
-      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
-    steps:
-      - checkout
-      - attach_workspace:
-          at: third_party
-      - designate_upload_channel
-      - load_conda_channel_flags
-      - run:
-          name: Pull Docker image
-          command: docker pull --quiet "${image_name}"
-      - run:
-          name: Setup
-          command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
-      - run:
-          name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e CUDA_VERSION -e USE_FFMPEG=1 -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
-      - run:
-          name: Run tests
-          environment:
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
-              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS: true
-          command: |
-            docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "CI=${CI}" -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310 -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY -e TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -726,6 +690,7 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_HW_ACCEL: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
@@ -814,6 +779,7 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_HW_ACCEL: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece: true

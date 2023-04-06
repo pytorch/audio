@@ -74,6 +74,9 @@ jobs:
         pip --quiet install cmake>=3.18.0 ninja
         USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
 
+        # Install runtime dependencies
+        pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
+
         # Install build tools
         conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
         pip install --quiet -r docs/requirements.txt -r docs/requirements-tutorials.txt

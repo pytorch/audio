@@ -6,9 +6,36 @@ import torchaudio
 
 
 if torchaudio._extension._FFMPEG_INITIALIZED:
-    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.EncodingConfig
+    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.CodecConfig
 else:
     ConfigBase = object
+
+
+@dataclass
+class CodecConfig(ConfigBase):
+    """Codec configuration."""
+
+    bit_rate: int = -1
+    """Bit rate"""
+
+    compression_level: int = -1
+    """Compression level"""
+
+    qscale: Optional[int] = None
+    """Global quality factor. Enables variable bit rate. Valid values depend on encoder.
+
+    For example: MP3 takes ``0`` - ``9`` (https://trac.ffmpeg.org/wiki/Encode/MP3) while
+    libvorbis takes ``-1`` - ``10``.
+    """
+
+    gop_size: int = -1
+    """The number of pictures in a group of pictures, or 0 for intra_only"""
+
+    max_b_frames: int = -1
+    """maximum number of B-frames between non-B-frames."""
+
+    def __post_init__(self):
+        super().__init__(self.bit_rate, self.compression_level, self.qscale, self.gop_size, self.max_b_frames)
 
 
 def _format_doc(**kwargs):
@@ -45,13 +72,34 @@ _encoder_format = """Format used to encode media.
                 To list supported formats for the encoder, you can use
                 ``ffmpeg -h encoder=<ENCODER>`` command.
 
+                Default: ``None``.
+
+                Note:
+                    When ``encoder_format`` option is not provided, encoder uses its default format.
+
+                    For example, when encoding audio into wav format, 16-bit signed integer is used,
+                    and when encoding video into mp4 format (h264 encoder), one of YUV format is used.
+
+                    This is because typically, 32-bit or 16-bit floating point is used in audio models but
+                    they are not commonly used in audio formats. Similarly, RGB24 is commonly used in vision
+                    models, but video formats usually (and better) support YUV formats.
+                """
+
+_codec_config = """Codec configuration. Please refer to :py:class:`CodecConfig` for
+                configuration options.
+
                 Default: ``None``."""
 
+
+_filter_desc = """Additional processing to apply before encoding the input media.
+                """
 
 _format_common_args = _format_doc(
     encoder=_encoder,
     encoder_option=_encoder_option,
     encoder_format=_encoder_format,
+    codec_config=_codec_config,
+    filter_desc=_filter_desc,
 )
 
 
@@ -110,25 +158,6 @@ class StreamWriter:
             Default: `4096`.
     """
 
-    @dataclass
-    class EncodeConfig(ConfigBase):
-        """Encoding configuration."""
-
-        bit_rate: int = -1
-        """Bit rate"""
-
-        compression_level: int = -1
-        """Compression level"""
-
-        gop_size: int = -1
-        """The number of pictures in a group of pictures, or 0 for intra_only"""
-
-        max_b_frames: int = -1
-        """maximum number of B-frames between non-B-frames."""
-
-        def __post_init__(self):
-            super().__init__(self.bit_rate, self.compression_level, self.gop_size, self.max_b_frames)
-
     def __init__(
         self,
         dst: Union[str, BinaryIO],
@@ -149,10 +178,14 @@ class StreamWriter:
         sample_rate: int,
         num_channels: int,
         format: str = "flt",
+        *,
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
+        encoder_sample_rate: Optional[int] = None,
+        encoder_num_channels: Optional[int] = None,
         encoder_format: Optional[str] = None,
-        config: Optional[EncodeConfig] = None,
+        codec_config: Optional[CodecConfig] = None,
+        filter_desc: Optional[str] = None,
     ):
         """Add an output audio stream.
 
@@ -177,9 +210,56 @@ class StreamWriter:
 
             encoder_option (dict or None, optional): {encoder_option}
 
+            encoder_sample_rate (int or None, optional): Override the sample rate used for encoding time.
+                Some encoders pose restriction on the sample rate used for encoding.
+                If the source sample rate is not supported by the encoder, the source sample rate is used,
+                otherwise a default one is picked.
+
+                For example, ``"opus"`` encoder only supports 48k Hz, so, when encoding a
+                waveform with ``"opus"`` encoder, it is always encoded as 48k Hz.
+                Meanwhile ``"mp3"`` (``"libmp3lame"``) supports 44.1k, 48k, 32k, 22.05k,
+                24k, 16k, 11.025k, 12k and 8k Hz.
+                If the original sample rate is one of these, then the original sample rate
+                is used, otherwise it will be resampled to a default one (44.1k).
+                When encoding into WAV format, there is no restriction on sample rate,
+                so the original sample rate will be used.
+
+                Providing ``encoder_sample_rate`` will override this behavior and
+                make encoder attempt to use the provided sample rate.
+                The provided value must be one support by the encoder.
+
+            encoder_num_channels (int or None, optional): Override the number of channels used for encoding.
+
+                Similar to sample rate, some encoders (such as ``"opus"``,
+                ``"vorbis"`` and ``"g722"``) pose restriction on
+                the numbe of channels that can be used for encoding.
+
+                If the original number of channels is supported by encoder,
+                then it will be used, otherwise, the encoder attempts to
+                remix the channel to one of the supported ones.
+
+                Providing ``encoder_num_channels`` will override this behavior and
+                make encoder attempt to use the provided number of channels.
+                The provided value must be one support by the encoder.
+
             encoder_format (str or None, optional): {encoder_format}
+
+            codec_config (CodecConfig or None, optional): {codec_config}
+
+            filter_desc (str or None, optional): {filter_desc}
         """
-        self._s.add_audio_stream(sample_rate, num_channels, format, encoder, encoder_option, encoder_format, config)
+        self._s.add_audio_stream(
+            sample_rate,
+            num_channels,
+            format,
+            encoder,
+            encoder_option,
+            encoder_format,
+            encoder_sample_rate,
+            encoder_num_channels,
+            codec_config,
+            filter_desc,
+        )
 
     @_format_common_args
     def add_video_stream(
@@ -188,11 +268,16 @@ class StreamWriter:
         width: int,
         height: int,
         format: str = "rgb24",
+        *,
         encoder: Optional[str] = None,
         encoder_option: Optional[Dict[str, str]] = None,
+        encoder_frame_rate: Optional[float] = None,
+        encoder_width: Optional[int] = None,
+        encoder_height: Optional[int] = None,
         encoder_format: Optional[str] = None,
+        codec_config: Optional[CodecConfig] = None,
+        filter_desc: Optional[str] = None,
         hw_accel: Optional[str] = None,
-        config: Optional[EncodeConfig] = None,
     ):
         """Add an output video stream.
 
@@ -222,7 +307,29 @@ class StreamWriter:
 
             encoder_option (dict or None, optional): {encoder_option}
 
+            encoder_frame_rate (float or None, optional): Override the frame rate used for encoding.
+
+                Some encoders, (such as ``"mpeg1"`` and ``"mpeg2"``) pose restriction on the
+                frame rate that can be used for encoding.
+                If such case, if the source frame rate (provided as ``frame_rate``) is not
+                one of the supported frame rate, then a default one is picked, and the frame rate
+                is changed on-the-fly. Otherwise the source frame rate is used.
+
+                Providing ``encoder_frame_rate`` will override this behavior and
+                make encoder attempts to use the provided sample rate.
+                The provided value must be one support by the encoder.
+
+            encoder_width (int or None, optional): Width of the image used for encoding.
+                This allows to change the image size during encoding.
+
+            encoder_height (int or None, optional): Height of the image used for encoding.
+                This allows to change the image size during encoding.
+
             encoder_format (str or None, optional): {encoder_format}
+
+            codec_config (CodecConfig or None, optional): {codec_config}
+
+            filter_desc (str or None, optional): {filter_desc}
 
             hw_accel (str or None, optional): Enable hardware acceleration.
 
@@ -235,7 +342,19 @@ class StreamWriter:
                 Default: ``None``.
         """
         self._s.add_video_stream(
-            frame_rate, width, height, format, encoder, encoder_option, encoder_format, hw_accel, config
+            frame_rate,
+            width,
+            height,
+            format,
+            encoder,
+            encoder_option,
+            encoder_format,
+            encoder_frame_rate,
+            encoder_width,
+            encoder_height,
+            hw_accel,
+            codec_config,
+            filter_desc,
         )
 
     def set_metadata(self, metadata: Dict[str, str]):

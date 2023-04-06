@@ -40,9 +40,12 @@ void convert_func_(const torch::Tensor& chunk, AVFrame* buffer) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(chunk.dim() == 2);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(chunk.size(1) == buffer->channels);
 
-  // TODO: make writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
-  TORCH_CHECK(av_frame_is_writable(buffer), "frame is not writable.");
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
+    TORCH_INTERNAL_ASSERT(
+        ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
+  }
 
   auto byte_size = chunk.numel() * chunk.element_size();
   memcpy(buffer->data[0], chunk.data_ptr(), byte_size);
@@ -141,9 +144,12 @@ void write_interlaced_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(2) == buffer->width);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3) == num_channels);
 
-  // TODO: writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
+    TORCH_INTERNAL_ASSERT(
+        ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
+  }
 
   size_t stride = buffer->width * num_channels;
   uint8_t* src = frame.data_ptr<uint8_t>();
@@ -188,9 +194,12 @@ void write_planar_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(2), buffer->height);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3), buffer->width);
 
-  // TODO: writable
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  TORCH_INTERNAL_ASSERT(av_frame_is_writable(buffer), "frame is not writable.");
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
+    TORCH_INTERNAL_ASSERT(
+        ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
+  }
 
   for (int j = 0; j < num_colors; ++j) {
     uint8_t* src = frame.index({0, j}).data_ptr<uint8_t>();
@@ -334,6 +343,26 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Unknown (for supporting frame writing)
+////////////////////////////////////////////////////////////////////////////////
+std::pair<InitFunc, ConvertFunc> get_frame_func() {
+  InitFunc init_func = [](const torch::Tensor& tensor,
+                          AVFrame* buffer) -> torch::Tensor {
+    TORCH_CHECK(
+        false,
+        "This shouldn't have been called. "
+        "If you intended to write frames, please select a stream that supports doing so.");
+  };
+  ConvertFunc convert_func = [](const torch::Tensor& tensor, AVFrame* buffer) {
+    TORCH_CHECK(
+        false,
+        "This shouldn't have been called. "
+        "If you intended to write frames, please select a stream that supports doing so.");
+  };
+  return {init_func, convert_func};
+}
+
 } // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -348,6 +377,9 @@ TensorConverter::TensorConverter(AVMediaType type, AVFrame* buf, int buf_size)
       break;
     case AVMEDIA_TYPE_VIDEO:
       std::tie(init_func, convert_func) = get_video_func(buffer);
+      break;
+    case AVMEDIA_TYPE_UNKNOWN:
+      std::tie(init_func, convert_func) = get_frame_func();
       break;
     default:
       TORCH_INTERNAL_ASSERT(
