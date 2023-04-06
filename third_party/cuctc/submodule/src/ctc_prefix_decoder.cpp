@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
-#include <sys/time.h>
 #include "include/ctc_prefix_decoder_host.h"
 #include "include/ctc_prefix_decoder.h"
 

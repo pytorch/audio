@@ -69,7 +69,8 @@ class CUCTCDecoder:
 
         """
         if cuda_stream:
-            assert (isinstance(cuda_stream, torch.cuda.streams.Stream))
+            if not isinstance(cuda_stream, torch.cuda.streams.Stream):
+                raise AssertionError("cuda_stream must be torch.cuda.streams.Stream")
         cuda_stream_ = cuda_stream.cuda_stream if cuda_stream else torch.cuda.current_stream().cuda_stream
         self.internal_data = cuctc.prefixCTC_alloc(cuda_stream_)
         self.memory = torch.empty(0, dtype=torch.int8, device=torch.device('cuda'))
@@ -96,9 +97,12 @@ class CUCTCDecoder:
             List[List[CUCTCHypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
         """
-        assert(encoder_out_lens.dtype==torch.int32), "encoder_out_lens must be torch.int32"
-        assert(log_prob.dtype == torch.float32), "log_prob must be torch.float32"
-        assert log_prob.is_cuda and encoder_out_lens.is_cuda, "inputs must be cuda tensors"
+        if not isinstance(encoder_out_lens.dtype, torch.int32):
+            raise AssertionError("encoder_out_lens must be torch.int32")
+        if not isinstance(log_prob.dtype, torch.float32):
+            raise AssertionError("log_prob must be torch.float32")
+        if not (log_prob.is_cuda and encoder_out_lens.is_cuda):
+            raise AssertionError("inputs must be cuda tensors")
         required_size, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(self.internal_data, self.memory.data_ptr(),
                                                        self.memory.size(0), log_prob.data_ptr(),
                                                        encoder_out_lens.data_ptr(), log_prob.size(),
