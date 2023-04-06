@@ -204,8 +204,11 @@ def save_audio(
     bits_per_sample: Optional[int] = None,
     buffer_size: int = 4096,
 ) -> None:
-    if hasattr(uri, "write") and format is None:
-        raise RuntimeError("'format' is required when saving to file object.")
+    if hasattr(uri, "write"):
+        if format is None:
+            raise RuntimeError("'format' is required when saving to file object.")
+    else:
+        uri = os.path.normpath(uri)
     s = StreamWriter(uri, format=format, buffer_size=buffer_size)
     if format is None:
         tokens = str(uri).split(".")
