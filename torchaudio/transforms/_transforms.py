@@ -956,6 +956,7 @@ class Resample(torch.nn.Module):
             cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
             providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
             carried out on ``torch.float64``.
+        device (torch.device): The location to allocate for PyTorch tensors. (Default: ``cpu``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -973,6 +974,7 @@ class Resample(torch.nn.Module):
         beta: Optional[float] = None,
         *,
         dtype: Optional[torch.dtype] = None,
+        device: Optional[torch.device] = torch.device("cpu"),
     ) -> None:
         super().__init__()
 
@@ -994,6 +996,7 @@ class Resample(torch.nn.Module):
                 self.resampling_method,
                 beta,
                 dtype=dtype,
+                device=device
             )
             self.register_buffer("kernel", kernel)
 
