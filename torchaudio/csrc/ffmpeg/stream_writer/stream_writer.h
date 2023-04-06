@@ -160,6 +160,42 @@ class StreamWriter {
       const c10::optional<std::string>& hw_accel = c10::nullopt,
       const c10::optional<CodecConfig>& codec_config = c10::nullopt,
       const c10::optional<std::string>& filter_desc = c10::nullopt);
+  /// @cond
+  /// Add output audio frame stream.
+  /// Allows for writing frames rather than tensors via `write_frame`.
+  ///
+  /// See `add_audio_stream` for more detail on input parameters.
+  void add_audio_frame_stream(
+      int sample_rate,
+      int num_channels,
+      const std::string& format,
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<int>& encoder_sample_rate = c10::nullopt,
+      const c10::optional<int>& encoder_num_channels = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+
+  /// Add output video frame stream.
+  /// Allows for writing frames rather than tensors via `write_frame`.
+  ///
+  /// See `add_video_stream` for more detail on input parameters.
+  void add_video_frame_stream(
+      double frame_rate,
+      int width,
+      int height,
+      const std::string& format,
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<double>& encoder_frame_rate = c10::nullopt,
+      const c10::optional<int>& encoder_width = c10::nullopt,
+      const c10::optional<int>& encoder_height = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+  /// @endcond
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);
@@ -215,6 +251,12 @@ class StreamWriter {
       int i,
       const torch::Tensor& frames,
       const c10::optional<double>& pts = c10::nullopt);
+  /// @cond
+  /// Write frame to stream.
+  /// @param i Stream index.
+  /// @param frame Frame to write.
+  void write_frame(int i, AVFrame* frame);
+  /// @endcond
   /// Flush the frames from encoders and write the frames to the destination.
   void flush();
 };

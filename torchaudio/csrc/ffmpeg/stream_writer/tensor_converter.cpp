@@ -343,6 +343,26 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Unknown (for supporting frame writing)
+////////////////////////////////////////////////////////////////////////////////
+std::pair<InitFunc, ConvertFunc> get_frame_func() {
+  InitFunc init_func = [](const torch::Tensor& tensor,
+                          AVFrame* buffer) -> torch::Tensor {
+    TORCH_CHECK(
+        false,
+        "This shouldn't have been called. "
+        "If you intended to write frames, please select a stream that supports doing so.");
+  };
+  ConvertFunc convert_func = [](const torch::Tensor& tensor, AVFrame* buffer) {
+    TORCH_CHECK(
+        false,
+        "This shouldn't have been called. "
+        "If you intended to write frames, please select a stream that supports doing so.");
+  };
+  return {init_func, convert_func};
+}
+
 } // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -357,6 +377,9 @@ TensorConverter::TensorConverter(AVMediaType type, AVFrame* buf, int buf_size)
       break;
     case AVMEDIA_TYPE_VIDEO:
       std::tie(init_func, convert_func) = get_video_func(buffer);
+      break;
+    case AVMEDIA_TYPE_UNKNOWN:
+      std::tie(init_func, convert_func) = get_frame_func();
       break;
     default:
       TORCH_INTERNAL_ASSERT(

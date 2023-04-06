@@ -2,9 +2,3 @@
 	path = third_party/kaldi/submodule
 	url = https://github.com/kaldi-asr/kaldi
 	ignore = dirty
-[submodule "third_party/kenlm/submodule"]
-	path = third_party/kenlm/kenlm
-	url = https://github.com/kpu/kenlm
-[submodule "flashlight-text"]
-	path = third_party/flashlight-text/submodule
-	url = https://github.com/flashlight/text

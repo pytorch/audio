@@ -1,5 +1,6 @@
 import io
 import itertools
+import pathlib
 import tarfile
 from functools import partial
 
@@ -124,6 +125,21 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 @skipIfNoFFmpeg
 class TestLoad(LoadTestBase):
     """Test the correctness of `self._load` for various formats"""
+
+    def test_pathlike(self):
+        """FFmpeg dispatcher can load waveform from pathlike object"""
+        sample_rate = 16000
+        dtype = "float32"
+        num_channels = 2
+        duration = 1
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(path, data, sample_rate)
+
+        waveform, sr = self._load(pathlib.Path(path))
+        self.assertEqual(sr, sample_rate)
+        self.assertEqual(waveform, data)
 
     @parameterized.expand(
         list(

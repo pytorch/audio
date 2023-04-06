@@ -117,6 +117,72 @@ void StreamWriter::add_video_stream(
       filter_desc));
 }
 
+void StreamWriter::add_audio_frame_stream(
+    int sample_rate,
+    int num_channels,
+    const std::string& format,
+    const c10::optional<std::string>& encoder,
+    const c10::optional<OptionDict>& encoder_option,
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<int>& encoder_sample_rate,
+    const c10::optional<int>& encoder_num_channels,
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc) {
+  TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
+  TORCH_INTERNAL_ASSERT(
+      pFormatContext->nb_streams == processes.size(),
+      "The number of encode process and the number of output streams do not match.");
+  processes.emplace_back(get_audio_encode_process(
+      pFormatContext,
+      sample_rate,
+      num_channels,
+      format,
+      encoder,
+      encoder_option,
+      encoder_format,
+      encoder_sample_rate,
+      encoder_num_channels,
+      codec_config,
+      filter_desc,
+      true));
+}
+
+void StreamWriter::add_video_frame_stream(
+    double frame_rate,
+    int width,
+    int height,
+    const std::string& format,
+    const c10::optional<std::string>& encoder,
+    const c10::optional<OptionDict>& encoder_option,
+    const c10::optional<std::string>& encoder_format,
+    const c10::optional<double>& encoder_frame_rate,
+    const c10::optional<int>& encoder_width,
+    const c10::optional<int>& encoder_height,
+    const c10::optional<std::string>& hw_accel,
+    const c10::optional<CodecConfig>& codec_config,
+    const c10::optional<std::string>& filter_desc) {
+  TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
+  TORCH_INTERNAL_ASSERT(
+      pFormatContext->nb_streams == processes.size(),
+      "The number of encode process and the number of output streams do not match.");
+  processes.emplace_back(get_video_encode_process(
+      pFormatContext,
+      frame_rate,
+      width,
+      height,
+      format,
+      encoder,
+      encoder_option,
+      encoder_format,
+      encoder_frame_rate,
+      encoder_width,
+      encoder_height,
+      hw_accel,
+      codec_config,
+      filter_desc,
+      true));
+}
+
 void StreamWriter::set_metadata(const OptionDict& metadata) {
   av_dict_free(&pFormatContext->metadata);
   for (auto const& [key, value] : metadata) {
@@ -224,6 +290,17 @@ void StreamWriter::write_video_chunk(
       i,
       " is not video type.");
   processes[i].process(frames, pts);
+}
+
+void StreamWriter::write_frame(int i, AVFrame* frame) {
+  TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
+  TORCH_CHECK(
+      0 <= i && i < static_cast<int>(pFormatContext->nb_streams),
+      "Invalid stream index. Index must be in range of [0, ",
+      pFormatContext->nb_streams,
+      "). Found: ",
+      i);
+  processes[i].process_frame(frame);
 }
 
 void StreamWriter::flush() {
