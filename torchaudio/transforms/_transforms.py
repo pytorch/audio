@@ -996,7 +996,7 @@ class Resample(torch.nn.Module):
                 self.resampling_method,
                 beta,
                 dtype=dtype,
-                device=device
+                device=device,
             )
             self.register_buffer("kernel", kernel)
 
@@ -1207,7 +1207,6 @@ class _AxisMasking(torch.nn.Module):
     __constants__ = ["mask_param", "axis", "iid_masks", "p"]
 
     def __init__(self, mask_param: int, axis: int, iid_masks: bool, p: float = 1.0) -> None:
-
         super(_AxisMasking, self).__init__()
         self.mask_param = mask_param
         self.axis = axis
