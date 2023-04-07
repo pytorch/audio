@@ -22,9 +22,7 @@ struct FilterGraphOutputInfo {
 };
 
 class FilterGraph {
-  AVMediaType media_type;
-
-  AVFilterGraphPtr pFilterGraph;
+  AVFilterGraphPtr graph;
 
   // AVFilterContext is freed as a part of AVFilterGraph
   // so we do not manage the resource.
@@ -32,7 +30,7 @@ class FilterGraph {
   AVFilterContext* buffersink_ctx = nullptr;
 
  public:
-  explicit FilterGraph(AVMediaType media_type);
+  explicit FilterGraph();
   // Custom destructor to release AVFilterGraph*
   ~FilterGraph() = default;
   // Non-copyable
@@ -59,17 +57,23 @@ class FilterGraph {
       int height,
       AVRational sample_aspect_ratio);
 
-  void add_src(const std::string& arg);
+  void add_audio_sink();
 
-  void add_sink();
+  void add_video_sink();
 
   void add_process(const std::string& filter_description);
 
   void create_filter(AVBufferRef* hw_frames_ctx = nullptr);
 
+ private:
+  void add_src(const AVFilter* buffersrc, const std::string& arg);
+
+  void add_sink(const AVFilter* buffersrc);
+
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
+ public:
   [[nodiscard]] FilterGraphOutputInfo get_output_info() const;
 
   //////////////////////////////////////////////////////////////////////////////
