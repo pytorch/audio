@@ -80,7 +80,7 @@ SQUIM_OBJECTIVE = SquimObjectiveBundle(
     _sample_rate=16000,
 )
 SQUIM_OBJECTIVE.__doc__ = """SquimObjective pipeline trained using approach described in
-    [*Kumar et al., 2023* :cite:`kumar2023torchaudio`] on the *DNS 2020 Dataset* :cite:`reddy2020interspeech`.
+    :cite:`kumar2023torchaudio` on the *DNS 2020 Dataset* :cite:`reddy2020interspeech`.
 
     The underlying model is constructed by :py:func:`torchaudio.prototype.models.squim_objective_base`.
     The weights are under `Creative Commons Attribution 4.0 International License
@@ -167,7 +167,7 @@ SQUIM_SUBJECTIVE = SquimSubjectiveBundle(
     _sample_rate=16000,
 )
 SQUIM_SUBJECTIVE.__doc__ = """SquimSubjective pipeline trained
-    as described in [*Manocha et al., 2022* :cite:`manocha2022speech`; *Kumar et al., 2023* :cite:`kumar2023torchaudio`]
+    as described in :cite:`manocha2022speech` and :cite:`kumar2023torchaudio`
     on the *BVCC* :cite:`cooper2021voices` and *DAPS* :cite:`mysore2014can` datasets.
 
     The underlying model is constructed by :py:func:`torchaudio.prototype.models.squim_subjective_base`.
