@@ -1,6 +1,7 @@
 import io
 import itertools
 import os
+import pathlib
 import tarfile
 from contextlib import contextmanager
 from functools import partial
@@ -34,6 +35,24 @@ if _mod_utils.is_module_available("requests"):
 @skipIfNoFFmpeg
 class TestInfo(TempDirMixin, PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
+
+    def test_pathlike(self):
+        """FFmpeg dispatcher can query audio data from pathlike object"""
+        sample_rate = 16000
+        dtype = "float32"
+        num_channels = 2
+        duration = 1
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(path, data, sample_rate)
+
+        info = self._info(pathlib.Path(path))
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
+        assert info.encoding == get_encoding("wav", dtype)
 
     @parameterized.expand(
         list(
