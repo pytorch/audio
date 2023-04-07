@@ -95,7 +95,7 @@ struct FilterGraphWrapper {
 template <typename Converter, typename Buffer>
 struct ProcessImpl : public IPostDecodeProcess {
  private:
-  AVFramePtr frame{};
+  AVFramePtr frame{alloc_avframe()};
   FilterGraphWrapper filter_wrapper;
 
  public:

@@ -13,7 +13,7 @@ namespace io {
 ///
 class StreamReader {
   AVFormatInputContextPtr pFormatContext;
-  AVPacketPtr pPacket;
+  AVPacketPtr pPacket{alloc_avpacket()};
 
   std::vector<std::unique_ptr<StreamProcessor>> processors;
   // Mapping from user-facing stream index to internal index.

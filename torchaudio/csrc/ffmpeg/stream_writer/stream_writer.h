@@ -15,11 +15,10 @@ namespace io {
 ///
 class StreamWriter {
   AVFormatOutputContextPtr pFormatContext;
-  AVBufferRefPtr pHWBufferRef;
   std::map<int, EncodeProcess> processes;
   std::map<int, PacketWriter> packet_writers;
 
-  AVPacketPtr pkt;
+  AVPacketPtr pkt{alloc_avpacket()};
   bool is_open = false;
   int current_key = 0;
 

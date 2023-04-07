@@ -4,7 +4,17 @@
 namespace torchaudio {
 namespace io {
 
-FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
+namespace {
+AVFilterGraph* get_filter_graph() {
+  AVFilterGraph* ptr = avfilter_graph_alloc();
+  TORCH_CHECK(ptr, "Failed to allocate resouce.");
+  ptr->nb_threads = 1;
+  return ptr;
+}
+} // namespace
+
+FilterGraph::FilterGraph(AVMediaType media_type)
+    : media_type(media_type), pFilterGraph(get_filter_graph()) {
   switch (media_type) {
     case AVMEDIA_TYPE_AUDIO:
     case AVMEDIA_TYPE_VIDEO:
@@ -12,8 +22,6 @@ FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
     default:
       TORCH_CHECK(false, "Only audio and video type is supported.");
   }
-
-  pFilterGraph->nb_threads = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -73,16 +73,13 @@ void AVPacketDeleter::operator()(AVPacket* p) {
   av_packet_free(&p);
 };
 
-namespace {
-AVPacket* get_av_packet() {
-  AVPacket* pPacket = av_packet_alloc();
-  TORCH_CHECK(pPacket, "Failed to allocate AVPacket object.");
-  return pPacket;
-}
-} // namespace
+AVPacketPtr::AVPacketPtr(AVPacket* p) : Wrapper<AVPacket, AVPacketDeleter>(p) {}
 
-AVPacketPtr::AVPacketPtr()
-    : Wrapper<AVPacket, AVPacketDeleter>(get_av_packet()) {}
+AVPacketPtr alloc_avpacket() {
+  AVPacket* p = av_packet_alloc();
+  TORCH_CHECK(p, "Failed to allocate AVPacket object.");
+  return AVPacketPtr{p};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket - buffer unref
@@ -101,15 +98,14 @@ AutoPacketUnref::operator AVPacket*() const {
 void AVFrameDeleter::operator()(AVFrame* p) {
   av_frame_free(&p);
 };
-namespace {
-AVFrame* get_av_frame() {
-  AVFrame* pFrame = av_frame_alloc();
-  TORCH_CHECK(pFrame, "Failed to allocate AVFrame object.");
-  return pFrame;
-}
-} // namespace
 
-AVFramePtr::AVFramePtr() : Wrapper<AVFrame, AVFrameDeleter>(get_av_frame()) {}
+AVFramePtr::AVFramePtr(AVFrame* p) : Wrapper<AVFrame, AVFrameDeleter>(p) {}
+
+AVFramePtr alloc_avframe() {
+  AVFrame* p = av_frame_alloc();
+  TORCH_CHECK(p, "Failed to allocate AVFrame object.");
+  return AVFramePtr{p};
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVCodecContext
@@ -131,13 +127,6 @@ void AutoBufferUnref::operator()(AVBufferRef* p) {
 AVBufferRefPtr::AVBufferRefPtr(AVBufferRef* p)
     : Wrapper<AVBufferRef, AutoBufferUnref>(p) {}
 
-void AVBufferRefPtr::reset(AVBufferRef* p) {
-  TORCH_CHECK(
-      !ptr,
-      "InternalError: A valid AVBufferRefPtr is being reset. Please file an issue.");
-  ptr.reset(p);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,19 +134,8 @@ void AVFilterGraphDeleter::operator()(AVFilterGraph* p) {
   avfilter_graph_free(&p);
 };
 
-namespace {
-AVFilterGraph* get_filter_graph() {
-  AVFilterGraph* ptr = avfilter_graph_alloc();
-  TORCH_CHECK(ptr, "Failed to allocate resouce.");
-  return ptr;
-}
-} // namespace
-AVFilterGraphPtr::AVFilterGraphPtr()
-    : Wrapper<AVFilterGraph, AVFilterGraphDeleter>(get_filter_graph()) {}
-
-void AVFilterGraphPtr::reset() {
-  ptr.reset(get_filter_graph());
-}
+AVFilterGraphPtr::AVFilterGraphPtr(AVFilterGraph* p)
+    : Wrapper<AVFilterGraph, AVFilterGraphDeleter>(p) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVCodecParameters
@@ -166,15 +144,8 @@ void AVCodecParametersDeleter::operator()(AVCodecParameters* codecpar) {
   avcodec_parameters_free(&codecpar);
 }
 
-namespace {
-AVCodecParameters* get_codecpar() {
-  AVCodecParameters* ptr = avcodec_parameters_alloc();
-  TORCH_CHECK(ptr, "Failed to allocate resource.");
-  return ptr;
-}
-} // namespace
+AVCodecParametersPtr::AVCodecParametersPtr(AVCodecParameters* p)
+    : Wrapper<AVCodecParameters, AVCodecParametersDeleter>(p) {}
 
-AVCodecParametersPtr::AVCodecParametersPtr()
-    : Wrapper<AVCodecParameters, AVCodecParametersDeleter>(get_codecpar()) {}
 } // namespace io
 } // namespace torchaudio

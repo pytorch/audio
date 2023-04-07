@@ -19,7 +19,7 @@ class StreamProcessor {
 
   // Components for decoding source media
   AVCodecContextPtr codec_ctx{nullptr};
-  AVFramePtr frame;
+  AVFramePtr frame{alloc_avframe()};
 
   KeyType current_key = 0;
   std::map<KeyType, std::unique_ptr<IPostDecodeProcess>> post_processes;

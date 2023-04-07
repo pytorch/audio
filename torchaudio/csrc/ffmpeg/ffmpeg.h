@@ -54,7 +54,6 @@ av_always_inline std::string av_err2string(int errnum) {
 // The resource allocation will be provided by custom constructors.
 template <typename T, typename Deleter>
 class Wrapper {
- protected:
   std::unique_ptr<T, Deleter> ptr;
 
  public:
@@ -123,8 +122,10 @@ struct AVPacketDeleter {
 };
 
 struct AVPacketPtr : public Wrapper<AVPacket, AVPacketDeleter> {
-  AVPacketPtr();
+  explicit AVPacketPtr(AVPacket* p);
 };
+
+AVPacketPtr alloc_avpacket();
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket - buffer unref
@@ -152,8 +153,10 @@ struct AVFrameDeleter {
 };
 
 struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
-  AVFramePtr();
+  explicit AVFramePtr(AVFrame* p);
 };
+
+AVFramePtr alloc_avframe();
 
 ////////////////////////////////////////////////////////////////////////////////
 // AutoBufferUnrer is responsible for performing unref at the end of lifetime
@@ -164,8 +167,7 @@ struct AutoBufferUnref {
 };
 
 struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
-  AVBufferRefPtr(AVBufferRef* p = nullptr);
-  void reset(AVBufferRef* p);
+  explicit AVBufferRefPtr(AVBufferRef* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,8 +188,7 @@ struct AVFilterGraphDeleter {
   void operator()(AVFilterGraph* p);
 };
 struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
-  AVFilterGraphPtr();
-  void reset();
+  explicit AVFilterGraphPtr(AVFilterGraph* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,11 +200,11 @@ struct AVCodecParametersDeleter {
 
 struct AVCodecParametersPtr
     : public Wrapper<AVCodecParameters, AVCodecParametersDeleter> {
-  AVCodecParametersPtr();
+  explicit AVCodecParametersPtr(AVCodecParameters* p);
 };
 
 struct StreamParams {
-  AVCodecParametersPtr codec_params;
+  AVCodecParametersPtr codec_params{nullptr};
   AVRational time_base{};
   int stream_index{};
 };

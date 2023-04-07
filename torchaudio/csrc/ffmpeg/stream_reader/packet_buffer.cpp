@@ -4,9 +4,9 @@ namespace torchaudio {
 namespace io {
 void PacketBuffer::push_packet(AVPacket* packet) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(packet, "Packet is null.");
-  AVPacketPtr pPacket;
-  av_packet_ref(pPacket, packet);
-  packets.push_back(std::move(pPacket));
+  AVPacket* p = av_packet_clone(packet);
+  TORCH_INTERNAL_ASSERT(p, "Failed to clone packet.");
+  packets.emplace_back(p);
 }
 std::vector<AVPacketPtr> PacketBuffer::pop_packets() {
   std::vector<AVPacketPtr> ret{
