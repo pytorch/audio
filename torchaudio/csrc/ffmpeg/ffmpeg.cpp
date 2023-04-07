@@ -158,5 +158,23 @@ AVFilterGraphPtr::AVFilterGraphPtr()
 void AVFilterGraphPtr::reset() {
   ptr.reset(get_filter_graph());
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// AVCodecParameters
+////////////////////////////////////////////////////////////////////////////////
+void AVCodecParametersDeleter::operator()(AVCodecParameters* codecpar) {
+  avcodec_parameters_free(&codecpar);
+}
+
+namespace {
+AVCodecParameters* get_codecpar() {
+  AVCodecParameters* ptr = avcodec_parameters_alloc();
+  TORCH_CHECK(ptr, "Failed to allocate resource.");
+  return ptr;
+}
+} // namespace
+
+AVCodecParametersPtr::AVCodecParametersPtr()
+    : Wrapper<AVCodecParameters, AVCodecParametersDeleter>(get_codecpar()) {}
 } // namespace io
 } // namespace torchaudio
