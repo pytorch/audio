@@ -676,7 +676,7 @@ AVFramePtr get_audio_frame(
     int num_channels,
     uint64_t channel_layout,
     int nb_samples) {
-  AVFramePtr frame{};
+  AVFramePtr frame{alloc_avframe()};
   frame->format = format;
   frame->channel_layout = channel_layout;
   frame->sample_rate = sample_rate;
@@ -693,7 +693,7 @@ AVFramePtr get_audio_frame(
 }
 
 AVFramePtr get_video_frame(AVPixelFormat src_fmt, int width, int height) {
-  AVFramePtr frame{};
+  AVFramePtr frame{alloc_avframe()};
   frame->format = src_fmt;
   frame->width = width;
   frame->height = height;
@@ -921,7 +921,7 @@ EncodeProcess get_video_encode_process(
   // 6. Instantiate source frame
   AVFramePtr src_frame = [&]() {
     if (codec_ctx->hw_frames_ctx) {
-      AVFramePtr frame{};
+      AVFramePtr frame{alloc_avframe()};
       int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
       TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
       return frame;

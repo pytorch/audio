@@ -179,19 +179,26 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   return ret;
 }
 
+namespace {
+AVCodecParameters* get_codecpar() {
+  AVCodecParameters* ptr = avcodec_parameters_alloc();
+  TORCH_CHECK(ptr, "Failed to allocate resource.");
+  return ptr;
+}
+} // namespace
+
 StreamParams StreamReader::get_src_stream_params(int i) {
-  StreamParams params;
   validate_src_stream_index(pFormatContext, i);
   AVStream* stream = pFormatContext->streams[i];
-  int ret = avcodec_parameters_copy(params.codec_params, stream->codecpar);
+
+  AVCodecParametersPtr codec_params(get_codecpar());
+  int ret = avcodec_parameters_copy(codec_params, stream->codecpar);
   TORCH_CHECK(
       ret >= 0,
       "Failed to copy the stream's codec parameters. (",
       av_err2string(ret),
       ")");
-  params.time_base = stream->time_base;
-  params.stream_index = i;
-  return params;
+  return {std::move(codec_params), stream->time_base, i};
 }
 
 int64_t StreamReader::num_out_streams() const {
