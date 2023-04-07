@@ -179,6 +179,21 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   return ret;
 }
 
+StreamParams StreamReader::get_src_stream_params(int i) {
+  StreamParams params;
+  validate_src_stream_index(pFormatContext, i);
+  AVStream* stream = pFormatContext->streams[i];
+  int ret = avcodec_parameters_copy(params.codec_params, stream->codecpar);
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to copy the stream's codec parameters. (",
+      av_err2string(ret),
+      ")");
+  params.time_base = stream->time_base;
+  params.stream_index = i;
+  return params;
+}
+
 int64_t StreamReader::num_out_streams() const {
   return static_cast<int64_t>(stream_indices.size());
 }
@@ -222,9 +237,17 @@ int64_t StreamReader::find_best_video_stream() const {
 }
 
 bool StreamReader::is_buffer_ready() const {
-  for (const auto& it : processors) {
-    if (it && !it->is_buffer_ready()) {
-      return false;
+  if (processors.empty()) {
+    // If no decoding output streams exist, then determine overall readiness
+    // from the readiness of packet buffer.
+    return packet_buffer->has_packets();
+  } else {
+    // Otherwise, determine readiness solely from the readiness of the decoding
+    // output streams.
+    for (const auto& it : processors) {
+      if (it && !it->is_buffer_ready()) {
+        return false;
+      }
     }
   }
   return true;
@@ -326,6 +349,14 @@ void StreamReader::add_video_stream(
       device);
 }
 
+void StreamReader::add_packet_stream(int i) {
+  validate_src_stream_index(pFormatContext, i);
+  if (!packet_buffer) {
+    packet_buffer = std::make_unique<PacketBuffer>();
+  }
+  packet_stream_indices.emplace(i);
+}
+
 void StreamReader::add_stream(
     int i,
     AVMediaType media_type,
@@ -338,8 +369,8 @@ void StreamReader::add_stream(
   validate_src_stream_type(pFormatContext, i, media_type);
 
   AVStream* stream = pFormatContext->streams[i];
-  // When media source is file-like object, it is possible that source codec is
-  // not detected properly.
+  // When media source is file-like object, it is possible that source codec
+  // is not detected properly.
   TORCH_CHECK(
       stream->codecpar->format != -1,
       "Failed to detect the source stream format.");
@@ -417,7 +448,14 @@ int StreamReader::process_packet() {
     return ret;
   }
   AutoPacketUnref packet{pPacket};
-  auto& processor = processors[pPacket->stream_index];
+
+  int stream_index = pPacket->stream_index;
+
+  if (packet_stream_indices.count(stream_index)) {
+    packet_buffer->push_packet(packet);
+  }
+
+  auto& processor = processors[stream_index];
   if (!processor) {
     return 0;
   }
@@ -517,5 +555,8 @@ std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
   return ret;
 }
 
+std::vector<AVPacketPtr> StreamReader::pop_packets() {
+  return packet_buffer->pop_packets();
+}
 } // namespace io
 } // namespace torchaudio

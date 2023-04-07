@@ -189,6 +189,24 @@ struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
   AVFilterGraphPtr();
   void reset();
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// AVCodecParameters
+////////////////////////////////////////////////////////////////////////////////
+struct AVCodecParametersDeleter {
+  void operator()(AVCodecParameters* p);
+};
+
+struct AVCodecParametersPtr
+    : public Wrapper<AVCodecParameters, AVCodecParametersDeleter> {
+  AVCodecParametersPtr();
+};
+
+struct StreamParams {
+  AVCodecParametersPtr codec_params;
+  AVRational time_base{};
+  int stream_index{};
+};
 } // namespace io
 } // namespace torchaudio
 

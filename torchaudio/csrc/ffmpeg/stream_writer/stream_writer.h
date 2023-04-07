@@ -4,6 +4,7 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/packet_writer.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/types.h>
 
 namespace torchaudio {
@@ -15,9 +16,12 @@ namespace io {
 class StreamWriter {
   AVFormatOutputContextPtr pFormatContext;
   AVBufferRefPtr pHWBufferRef;
-  std::vector<EncodeProcess> processes;
+  std::map<int, EncodeProcess> processes;
+  std::map<int, PacketWriter> packet_writers;
+
   AVPacketPtr pkt;
   bool is_open = false;
+  int current_key = 0;
 
  protected:
   /// @cond
@@ -195,7 +199,16 @@ class StreamWriter {
       const c10::optional<std::string>& hw_accel = c10::nullopt,
       const c10::optional<CodecConfig>& codec_config = c10::nullopt,
       const c10::optional<std::string>& filter_desc = c10::nullopt);
+
+  /// Add packet stream. Intended to be used in conjunction with
+  /// ``StreamReader`` to perform packet passthrough.
+  /// @param stream_params Stream parameters returned by
+  /// ``StreamReader::get_src_stream_params()`` for the packet stream to pass
+  /// through.
+  void add_packet_stream(const StreamParams& stream_params);
+
   /// @endcond
+
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);
@@ -256,9 +269,16 @@ class StreamWriter {
   /// @param i Stream index.
   /// @param frame Frame to write.
   void write_frame(int i, AVFrame* frame);
+  /// Write packet.
+  /// @param packet Packet to write, passed from ``StreamReader``.
+  void write_packet(const AVPacketPtr& packet);
   /// @endcond
+
   /// Flush the frames from encoders and write the frames to the destination.
   void flush();
+
+ private:
+  int num_output_streams();
 };
 
 } // namespace io

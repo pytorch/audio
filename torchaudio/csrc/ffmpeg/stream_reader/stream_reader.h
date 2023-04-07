@@ -1,5 +1,6 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/packet_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <vector>
@@ -19,6 +20,11 @@ class StreamReader {
   // The first one is processor index,
   // the second is the map key inside of processor.
   std::vector<std::pair<int, int>> stream_indices;
+
+  // For supporting reading raw packets.
+  std::unique_ptr<PacketBuffer> packet_buffer;
+  // Set of source stream indices to read packets for.
+  std::unordered_set<int> packet_stream_indices;
 
   // timestamp to seek to expressed in AV_TIME_BASE
   //
@@ -128,6 +134,14 @@ class StreamReader {
   /// Check if all the buffers of the output streams have enough decoded frames.
   bool is_buffer_ready() const;
 
+  /// @cond
+  /// Get source stream parameters. Necessary on the write side for packet
+  /// passthrough.
+  ///
+  /// @param i Source stream index.
+  StreamParams get_src_stream_params(int i);
+  /// @endcond
+
   ///@}
 
   //////////////////////////////////////////////////////////////////////////////
@@ -215,6 +229,16 @@ class StreamReader {
       const c10::optional<std::string>& decoder = c10::nullopt,
       const c10::optional<OptionDict>& decoder_option = c10::nullopt,
       const c10::optional<std::string>& hw_accel = c10::nullopt);
+
+  /// @cond
+  /// Add a output packet stream.
+  /// Allows for passing packets directly from the source stream, bypassing
+  /// the decode path, to ``StreamWriter`` for remuxing.
+  ///
+  /// @param i The index of the source stream.
+  void add_packet_stream(int i);
+  /// @endcond
+
   /// Remove an output stream.
   ///
   /// @param i The index of the output stream to be removed.
@@ -306,6 +330,10 @@ class StreamReader {
   /// Pop one chunk from each output stream if it is available.
   std::vector<c10::optional<Chunk>> pop_chunks();
 
+  /// @cond
+  /// Pop packets from buffer, if available.
+  std::vector<AVPacketPtr> pop_packets();
+  /// @endcond
   ///@}
 };
 
