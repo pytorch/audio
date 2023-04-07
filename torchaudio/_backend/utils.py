@@ -122,7 +122,7 @@ class FFmpegBackend(Backend):
         buffer_size: int = 4096,
     ) -> None:
         save_audio(
-            os.path.normpath(uri),
+            uri,
             src,
             sample_rate,
             channels_first,
