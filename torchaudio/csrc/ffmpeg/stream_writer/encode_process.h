@@ -12,7 +12,7 @@ class EncodeProcess {
   TensorConverter converter;
   AVFramePtr src_frame;
   FilterGraph filter;
-  AVFramePtr dst_frame{};
+  AVFramePtr dst_frame{alloc_avframe()};
   Encoder encoder;
   AVCodecContextPtr codec_ctx;
 

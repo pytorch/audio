@@ -21,9 +21,9 @@ FilterGraphFactory get_audio_factory(
           rate = codec_ctx->sample_rate,
           channel_layout = codec_ctx->channel_layout](
              const std::string& filter_desc) -> FilterGraph {
-    FilterGraph f{AVMEDIA_TYPE_AUDIO};
+    FilterGraph f;
     f.add_audio_src(fmt, time_base, rate, channel_layout);
-    f.add_sink();
+    f.add_audio_sink();
     f.add_process(filter_desc);
     f.create_filter();
     return f;
@@ -43,9 +43,9 @@ FilterGraphFactory get_video_factory(
           ratio = codec_ctx->sample_aspect_ratio,
           hw_frames_ctx = codec_ctx->hw_frames_ctx](
              const std::string& filter_desc) -> FilterGraph {
-    FilterGraph f{AVMEDIA_TYPE_VIDEO};
+    FilterGraph f;
     f.add_video_src(fmt, time_base, frame_rate, w, h, ratio);
-    f.add_sink();
+    f.add_video_sink();
     f.add_process(filter_desc);
     if (hw_frames_ctx) {
       f.create_filter(av_buffer_ref(hw_frames_ctx));
@@ -95,7 +95,7 @@ struct FilterGraphWrapper {
 template <typename Converter, typename Buffer>
 struct ProcessImpl : public IPostDecodeProcess {
  private:
-  AVFramePtr frame{};
+  AVFramePtr frame{alloc_avframe()};
   FilterGraphWrapper filter_wrapper;
 
  public:
