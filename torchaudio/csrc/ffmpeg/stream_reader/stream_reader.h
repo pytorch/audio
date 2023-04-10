@@ -299,10 +299,12 @@ class StreamReader {
   /// @param backoff Time to wait before retrying in milli seconds.
   int process_packet_block(const double timeout, const double backoff);
 
+  /// @cond
   // High-level method used by Python bindings.
   int process_packet(
       const c10::optional<double>& timeout,
       const double backoff);
+  /// @endcond
 
   /// Process packets unitl EOF
   void process_all_packets();
