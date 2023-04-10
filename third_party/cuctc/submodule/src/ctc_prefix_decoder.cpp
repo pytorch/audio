@@ -25,9 +25,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cuda_runtime.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <float.h>
 #include "include/ctc_prefix_decoder_host.h"
 #include "include/ctc_prefix_decoder.h"
 

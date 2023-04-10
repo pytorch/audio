@@ -44,6 +44,7 @@ __all__ = [
     "is_ffmpeg_available",
     "skipIfNoAudioDevice",
     "skipIfNoCtcDecoder",
+    "skipIfNoCuCtcDecoder",
     "skipIfNoCuda",
     "skipIfCudaSmallMemory",
     "skipIfNoExec",

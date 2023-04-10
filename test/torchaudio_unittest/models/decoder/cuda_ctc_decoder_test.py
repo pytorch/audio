@@ -1,5 +1,3 @@
-import itertools
-
 import torch
 from parameterized import parameterized
 from torchaudio_unittest.common_utils import get_asset_path, skipIfNoCuCtcDecoder, TempDirMixin, TorchaudioTestCase
@@ -16,7 +14,7 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
             tokens = get_asset_path("decoder/tokens.txt")
 
         return cuda_ctc_decoder(
-            tokens=tokens
+            tokens=tokens,
             **kwargs,
         )
 
@@ -24,7 +22,7 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         B, T, N = 4, 15, NUM_TOKENS
 
         emissions = torch.rand(B, T, N).cuda()
-        emissions = torch.nn.functional.log_softmax(emissions,-1)
+        emissions = torch.nn.functional.log_softmax(emissions, -1)
 
         return emissions
 
@@ -40,4 +38,4 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         decoder = self._get_decoder()
 
         results = decoder(log_probs, encoder_out_lens)
-        self.assertEqual(len(results), emissions.shape[0])
+        self.assertEqual(len(results), log_probs.shape[0])

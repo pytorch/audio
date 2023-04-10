@@ -54,7 +54,8 @@ import IPython
 import matplotlib.pyplot as plt
 from torchaudio.models.decoder import cuda_ctc_decoder
 from torchaudio.utils import download_asset
-import os
+from pathlib import Path
+import sentencepiece as spm
 
 ######################################################################
 #
@@ -63,9 +64,15 @@ import os
 # dataset <http://www.openslr.org/12>`__. The model is jointly trained with CTC and Transducer loss functions.
 # In this tutorial, we only use CTC head of the model.
 
-model_link="https://huggingface.co/Zengwei/icefall-asr-librispeech-pruned-transducer-stateless7-ctc-2022-12-01/resolve/main/exp/cpu_jit.pt"
-os.system(f"wget -nc  {model_link}")
-model_path="./cpu_jit.pt"
+def download_asset_external(url, key):
+    path = Path(torch.hub.get_dir()) / "torchaudio" / Path(key)
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        torch.hub.download_url_to_file(url, path)
+    return str(path)
+
+model_link = "https://huggingface.co/Zengwei/icefall-asr-librispeech-pruned-transducer-stateless7-ctc-2022-12-01/resolve/main/exp/cpu_jit.pt"
+model_path = download_asset_external(model_link, "cuda_ctc_decoder/cpu_jit.pt")
 
 
 ######################################################################
@@ -120,10 +127,8 @@ IPython.display.Audio(speech_file)
 #    _AND
 #    ...
 #
-import sentencepiece as spm
-bpe_link=model_link="https://huggingface.co/Zengwei/icefall-asr-librispeech-pruned-transducer-stateless7-ctc-2022-12-01/resolve/main/data/lang_bpe_500/bpe.model"
-os.system(f"wget -nc  {bpe_link}")
-bpe_path = "./bpe.model"
+bpe_link = "https://huggingface.co/Zengwei/icefall-asr-librispeech-pruned-transducer-stateless7-ctc-2022-12-01/resolve/main/data/lang_bpe_500/bpe.model"
+bpe_path = download_asset_external(bpe_link, "cuda_ctc_decoder/bpe.model")
 
 bpe_model = spm.SentencePieceProcessor()
 bpe_model.load(bpe_path)
