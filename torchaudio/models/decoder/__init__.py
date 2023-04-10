@@ -1,5 +1,4 @@
-_INITIALIZED = False
-_LAZILY_IMPORTED = [
+_CTC_DECODERS = [
     "CTCHypothesis",
     "CTCDecoder",
     "CTCDecoderLM",
@@ -7,25 +6,25 @@ _LAZILY_IMPORTED = [
     "ctc_decoder",
     "download_pretrained_files",
 ]
-_LAZILY_IMPORTED_CUCTC = [
+_CUDA_CTC_DECODERS = [
     "CUCTCDecoder",
     "CUCTCHypothesis",
     "cuda_ctc_decoder",
 ]
 
 def __getattr__(name: str):
-    if name in _LAZILY_IMPORTED:
+    if name in _CTC_DECODERS:
         try:
             from . import _ctc_decoder
-        except AttributeError as err:
+        except Exception as err:
             raise RuntimeError(
-                "CTC decoder requires the decoder extension. Please set BUILD_CTC_DECODER=1 when building from source."
+                "CTC Decoder suit requires flashlight-text package and optionally KenLM. Please install them."
             ) from err
 
         item = getattr(_ctc_decoder, name)
         globals()[name] = item
         return item
-    elif name in _LAZILY_IMPORTED_CUCTC:
+    elif name in _CUDA_CTC_DECODERS:
         try:
             from . import _cuda_ctc_decoder
         except AttributeError as err:
@@ -40,7 +39,7 @@ def __getattr__(name: str):
 
 
 def __dir__():
-    return sorted(__all__ + _LAZILY_IMPORTED + _LAZILY_IMPORTED_CUCTC)
+    return sorted(__all__)
 
 
-__all__ = []
+__all__ = [_CTC_DECODERS, _CUDA_CTC_DECODERS]
