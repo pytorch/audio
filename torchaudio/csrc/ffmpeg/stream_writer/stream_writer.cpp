@@ -66,20 +66,24 @@ void StreamWriter::add_audio_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == processes.size(),
+      pFormatContext->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
-  processes.emplace_back(get_audio_encode_process(
-      pFormatContext,
-      sample_rate,
-      num_channels,
-      format,
-      encoder,
-      encoder_option,
-      encoder_format,
-      encoder_sample_rate,
-      encoder_num_channels,
-      codec_config,
-      filter_desc));
+  processes.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(current_key),
+      std::forward_as_tuple(get_audio_encode_process(
+          pFormatContext,
+          sample_rate,
+          num_channels,
+          format,
+          encoder,
+          encoder_option,
+          encoder_format,
+          encoder_sample_rate,
+          encoder_num_channels,
+          codec_config,
+          filter_desc)));
+  current_key++;
 }
 
 void StreamWriter::add_video_stream(
@@ -98,23 +102,35 @@ void StreamWriter::add_video_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == processes.size(),
+      pFormatContext->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
-  processes.emplace_back(get_video_encode_process(
-      pFormatContext,
-      frame_rate,
-      width,
-      height,
-      format,
-      encoder,
-      encoder_option,
-      encoder_format,
-      encoder_frame_rate,
-      encoder_width,
-      encoder_height,
-      hw_accel,
-      codec_config,
-      filter_desc));
+  processes.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(current_key),
+      std::forward_as_tuple(get_video_encode_process(
+          pFormatContext,
+          frame_rate,
+          width,
+          height,
+          format,
+          encoder,
+          encoder_option,
+          encoder_format,
+          encoder_frame_rate,
+          encoder_width,
+          encoder_height,
+          hw_accel,
+          codec_config,
+          filter_desc)));
+  current_key++;
+}
+
+void StreamWriter::add_packet_stream(const StreamParams& stream_params) {
+  packet_writers.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(stream_params.stream_index),
+      std::forward_as_tuple(pFormatContext, stream_params));
+  current_key++;
 }
 
 void StreamWriter::add_audio_frame_stream(
@@ -130,21 +146,25 @@ void StreamWriter::add_audio_frame_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == processes.size(),
+      pFormatContext->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
-  processes.emplace_back(get_audio_encode_process(
-      pFormatContext,
-      sample_rate,
-      num_channels,
-      format,
-      encoder,
-      encoder_option,
-      encoder_format,
-      encoder_sample_rate,
-      encoder_num_channels,
-      codec_config,
-      filter_desc,
-      true));
+  processes.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(current_key),
+      std::forward_as_tuple(get_audio_encode_process(
+          pFormatContext,
+          sample_rate,
+          num_channels,
+          format,
+          encoder,
+          encoder_option,
+          encoder_format,
+          encoder_sample_rate,
+          encoder_num_channels,
+          codec_config,
+          filter_desc,
+          true)));
+  current_key++;
 }
 
 void StreamWriter::add_video_frame_stream(
@@ -163,24 +183,28 @@ void StreamWriter::add_video_frame_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == processes.size(),
+      pFormatContext->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
-  processes.emplace_back(get_video_encode_process(
-      pFormatContext,
-      frame_rate,
-      width,
-      height,
-      format,
-      encoder,
-      encoder_option,
-      encoder_format,
-      encoder_frame_rate,
-      encoder_width,
-      encoder_height,
-      hw_accel,
-      codec_config,
-      filter_desc,
-      true));
+  processes.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(current_key),
+      std::forward_as_tuple(get_video_encode_process(
+          pFormatContext,
+          frame_rate,
+          width,
+          height,
+          format,
+          encoder,
+          encoder_option,
+          encoder_format,
+          encoder_frame_rate,
+          encoder_width,
+          encoder_height,
+          hw_accel,
+          codec_config,
+          filter_desc,
+          true)));
+  current_key++;
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
@@ -196,7 +220,7 @@ void StreamWriter::dump_format(int64_t i) {
 
 void StreamWriter::open(const c10::optional<OptionDict>& option) {
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == processes.size(),
+      pFormatContext->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
 
   int ret = 0;
@@ -270,7 +294,7 @@ void StreamWriter::write_audio_chunk(
       "Stream ",
       i,
       " is not audio type.");
-  processes[i].process(waveform, pts);
+  processes.at(i).process(waveform, pts);
 }
 
 void StreamWriter::write_video_chunk(
@@ -289,7 +313,17 @@ void StreamWriter::write_video_chunk(
       "Stream ",
       i,
       " is not video type.");
-  processes[i].process(frames, pts);
+  processes.at(i).process(frames, pts);
+}
+
+void StreamWriter::write_packet(const AVPacketPtr& packet) {
+  TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
+  int src_stream_index = packet->stream_index;
+  TORCH_CHECK(
+      packet_writers.count(src_stream_index),
+      "Invalid packet stream source index ",
+      src_stream_index);
+  packet_writers.at(src_stream_index).write_packet(packet);
 }
 
 void StreamWriter::write_frame(int i, AVFrame* frame) {
@@ -300,15 +334,18 @@ void StreamWriter::write_frame(int i, AVFrame* frame) {
       pFormatContext->nb_streams,
       "). Found: ",
       i);
-  processes[i].process_frame(frame);
+  processes.at(i).process_frame(frame);
 }
 
 void StreamWriter::flush() {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   for (auto& p : processes) {
-    p.flush();
+    p.second.flush();
   }
 }
 
+int StreamWriter::num_output_streams() {
+  return static_cast<int>(processes.size() + packet_writers.size());
+}
 } // namespace io
 } // namespace torchaudio
