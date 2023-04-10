@@ -14,7 +14,7 @@ namespace io {
 /// Encode and write audio/video streams chunk by chunk
 ///
 class StreamWriter {
-  AVFormatOutputContextPtr pFormatContext;
+  AVFormatOutputContextPtr format_ctx;
   std::map<int, EncodeProcess> processes;
   std::map<int, PacketWriter> packet_writers;
 
