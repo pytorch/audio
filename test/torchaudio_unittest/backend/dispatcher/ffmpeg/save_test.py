@@ -25,7 +25,7 @@ from torchaudio_unittest.common_utils import (
 
 
 def _convert_audio_file(src_path, dst_path, format=None, acodec=None):
-    command = ["ffmpeg", "-i", src_path, "-strict", "-2"]
+    command = ["ffmpeg", "-y", "-i", src_path, "-strict", "-2"]
     if format:
         command += ["-sample_fmt", format]
     if acodec:
