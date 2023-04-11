@@ -113,6 +113,7 @@ struct OutputStreamInfo {
   /// @todo Introduce own enum and get rid of FFmpeg dependency
   ///
   AVMediaType media_type = AVMEDIA_TYPE_UNKNOWN;
+  /// Media format. AVSampleFormat for audio or AVPixelFormat for video.
   int format = -1;
 
   /// Filter graph definition, such as
