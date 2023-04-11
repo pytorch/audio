@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230404) &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230411) &#x25BC</span></a>
     </div>
     
 
@@ -583,11 +583,12 @@
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flt&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_num_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">codec_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CodecConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -613,8 +614,6 @@
 <span class="sd">            encoder (str or None, optional): {encoder}</span>
 
 <span class="sd">            encoder_option (dict or None, optional): {encoder_option}</span>
-
-<span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
 
 <span class="sd">            encoder_sample_rate (int or None, optional): Override the sample rate used for encoding time.</span>
 <span class="sd">                Some encoders pose restriction on the sample rate used for encoding.</span>
@@ -648,6 +647,8 @@
 <span class="sd">                make encoder attempt to use the provided number of channels.</span>
 <span class="sd">                The provided value must be one support by the encoder.</span>
 
+<span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
+
 <span class="sd">            codec_config (CodecConfig or None, optional): {codec_config}</span>
 
 <span class="sd">            filter_desc (str or None, optional): {filter_desc}</span>
@@ -672,15 +673,16 @@
         <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">encoder_height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoder_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">codec_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CodecConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an output video stream.</span>
 
@@ -710,8 +712,6 @@
 
 <span class="sd">            encoder_option (dict or None, optional): {encoder_option}</span>
 
-<span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
-
 <span class="sd">            encoder_frame_rate (float or None, optional): Override the frame rate used for encoding.</span>
 
 <span class="sd">                Some encoders, (such as ``&quot;mpeg1&quot;`` and ``&quot;mpeg2&quot;``) pose restriction on the</span>
@@ -730,6 +730,12 @@
 <span class="sd">            encoder_height (int or None, optional): Height of the image used for encoding.</span>
 <span class="sd">                This allows to change the image size during encoding.</span>
 
+<span class="sd">            encoder_format (str or None, optional): {encoder_format}</span>
+
+<span class="sd">            codec_config (CodecConfig or None, optional): {codec_config}</span>
+
+<span class="sd">            filter_desc (str or None, optional): {filter_desc}</span>
+
 <span class="sd">            hw_accel (str or None, optional): Enable hardware acceleration.</span>
 
 <span class="sd">                When video is encoded on CUDA hardware, for example</span>
@@ -739,10 +745,6 @@
 
 <span class="sd">                If `None`, the video chunk Tensor has to be CPU Tensor.</span>
 <span class="sd">                Default: ``None``.</span>
-
-<span class="sd">            codec_config (CodecConfig or None, optional): {codec_config}</span>
-
-<span class="sd">            filter_desc (str or None, optional): {filter_desc}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
             <span class="n">frame_rate</span><span class="p">,</span>

@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230404) &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230411) &#x25BC</span></a>
     </div>
     
 
@@ -1035,6 +1035,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1079,10 +1080,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
-            <span class="n">stream_index</span><span class="p">,</span>
-            <span class="n">decoder</span><span class="p">,</span>
-            <span class="n">decoder_option</span><span class="p">,</span>
-            <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">),</span>
+            <span class="n">stream_index</span><span class="o">=</span><span class="n">stream_index</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="o">=</span><span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.add_basic_video_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
@@ -1090,14 +1091,15 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
         <span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add output video stream</span>
 
@@ -1111,8 +1113,6 @@
 <span class="sd">            decoder (str or None, optional): {decoder}</span>
 
 <span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
-
-<span class="sd">            hw_accel (str or None, optional): {hw_accel}</span>
 
 <span class="sd">            format (str, optional): Change the format of image channels. Valid values are,</span>
 
@@ -1128,15 +1128,17 @@
 <span class="sd">            width (int or None, optional): If provided, change the image width. Unit: Pixel.</span>
 
 <span class="sd">            height (int or None, optional): If provided, change the image height. Unit: Pixel.</span>
+
+<span class="sd">            hw_accel (str or None, optional): {hw_accel}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
             <span class="n">frames_per_chunk</span><span class="p">,</span>
             <span class="n">buffer_chunk_size</span><span class="p">,</span>
-            <span class="n">stream_index</span><span class="p">,</span>
-            <span class="n">decoder</span><span class="p">,</span>
-            <span class="n">decoder_option</span><span class="p">,</span>
-            <span class="n">hw_accel</span><span class="p">,</span>
-            <span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
+            <span class="n">stream_index</span><span class="o">=</span><span class="n">stream_index</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="o">=</span><span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
+            <span class="n">hw_accel</span><span class="o">=</span><span class="n">hw_accel</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="StreamReader.add_audio_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
@@ -1144,6 +1146,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1185,11 +1188,12 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add output video stream</span>
 

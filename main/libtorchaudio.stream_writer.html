@@ -212,7 +212,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230404) &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230411) &#x25BC</span></a>
     </div>
     
 
@@ -468,6 +468,8 @@ API/ABI backward compatibility is not guaranteed.</p>
 </p></li>
 <li><p><strong>encoder_option</strong> – Options passed to encoder. To list encoder options for a encoder, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">encoder=&lt;ENCODER&gt;</span></code>. </p></li>
 <li><p><strong>encoder_format</strong> – Format used to encode media. When encoder supports multiple formats, passing this argument will override the format used for encoding. To list supported formats for the encoder, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">encoder=&lt;ENCODER&gt;</span></code> command. </p></li>
+<li><p><strong>encoder_sample_rate</strong> – If provided, perform resampling before encoding. </p></li>
+<li><p><strong>encoder_num_channels</strong> – If provided, change channel configuration before encoding. </p></li>
 <li><p><strong>codec_config</strong> – Codec configuration. </p></li>
 <li><p><strong>filter_desc</strong> – Additional processing to apply before encoding the input data </p></li>
 </ul>
@@ -501,6 +503,9 @@ API/ABI backward compatibility is not guaranteed.</p>
 <li><p><strong>encoder</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamWriter_1ad478bbb621a8c98a4dfbd032826699ec"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>. </p></li>
 <li><p><strong>encoder_option</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamWriter_1ad478bbb621a8c98a4dfbd032826699ec"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>. </p></li>
 <li><p><strong>encoder_format</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamWriter_1ad478bbb621a8c98a4dfbd032826699ec"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>. </p></li>
+<li><p><strong>encoder_frame_rate</strong> – If provided, change frame rate before encoding. </p></li>
+<li><p><strong>encoder_width</strong> – If provided, resize image before encoding. </p></li>
+<li><p><strong>encoder_height</strong> – If provided, resize image before encoding. </p></li>
 <li><p><strong>hw_accel</strong> – Enable hardware acceleration. </p></li>
 <li><p><strong>codec_config</strong> – Codec configuration. <p>When video is encoded on CUDA hardware, for example <code class="docutils literal notranslate"><span class="pre">encoder=&quot;h264_nvenc&quot;</span></code>, passing CUDA device indicator to <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> (i.e. <code class="docutils literal notranslate"><span class="pre">hw_accel=&quot;cuda:0&quot;</span></code>) will make <a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamWriter"><span class="std std-ref">StreamWriter</span></a> expect video chunk to be a CUDA Tensor. Passing CPU Tensor will result in an error.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the video chunk Tensor has to be a CPU Tensor. </p>

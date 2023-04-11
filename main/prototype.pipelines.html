@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230404) &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230411) &#x25BC</span></a>
     </div>
     
 
@@ -470,7 +470,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SQUIM_OBJECTIVE.html#torchaudio.prototype.pipelines.SQUIM_OBJECTIVE" title="torchaudio.prototype.pipelines.SQUIM_OBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_OBJECTIVE</span></code></a></p></td>
-<td><p>SquimObjective pipeline, trained on the <em>DNS 2020 Dataset</em> <span id="id5">[<a class="reference internal" href="references.html#id64" title="Chandan KA Reddy, Vishak Gopal, Ross Cutler, Ebrahim Beyrami, Roger Cheng, Harishchandra Dubey, Sergiy Matusevych, Robert Aichner, Ashkan Aazami, Sebastian Braun, and others. The interspeech 2020 deep noise suppression challenge: datasets, subjective testing framework, and challenge results. arXiv preprint arXiv:2005.13981, 2020.">Reddy <em>et al.</em>, 2020</a>]</span>.</p></td>
+<td><p>SquimObjective pipeline trained using approach described in <span id="id5">[<a class="reference internal" href="references.html#id68" title="Anurag Kumar, Ke Tan, Zhaoheng Ni, Pranay Manocha, Xiaohui Zhang, Ethan Henderson, and Buye Xu. Torchaudio-squim: reference-less speech quality and intelligibility measures in torchaudio. arXiv preprint arXiv:2304.01448, 2023.">Kumar <em>et al.</em>, 2023</a>]</span> on the <em>DNS 2020 Dataset</em> <span id="id6">[<a class="reference internal" href="references.html#id64" title="Chandan KA Reddy, Vishak Gopal, Ross Cutler, Ebrahim Beyrami, Roger Cheng, Harishchandra Dubey, Sergiy Matusevych, Robert Aichner, Ashkan Aazami, Sebastian Braun, and others. The interspeech 2020 deep noise suppression challenge: datasets, subjective testing framework, and challenge results. arXiv preprint arXiv:2005.13981, 2020.">Reddy <em>et al.</em>, 2020</a>]</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -478,8 +478,8 @@
 </section>
 <section id="squim-subjective">
 <h2>Squim Subjective<a class="headerlink" href="#squim-subjective" title="Permalink to this heading">¶</a></h2>
-<section id="id6">
-<h3>Interface<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<section id="id7">
+<h3>Interface<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
 <p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle" title="torchaudio.prototype.pipelines.SquimSubjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>subjective</strong> metric scores given the input waveform.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -489,12 +489,12 @@
 </tbody>
 </table>
 </section>
-<section id="id7">
-<h3>Pretrained Models<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<section id="id8">
+<h3>Pretrained Models<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE.html#torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE" title="torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_SUBJECTIVE</span></code></a></p></td>
-<td><p>SquimSubjective pipeline, trained on the <em>BVCC</em> <span id="id8">[<a class="reference internal" href="references.html#id66" title="Erica Cooper and Junichi Yamagishi. How do voices from past speech synthesis challenges compare today? arXiv preprint arXiv:2105.02373, 2021.">Cooper and Yamagishi, 2021</a>]</span> and <em>DAPS</em> <span id="id9">[<a class="reference internal" href="references.html#id67" title="Gautham J Mysore. Can we automatically transform speech recorded on common consumer devices in real-world environments into professional production quality speech?—a dataset, insights, and challenges. IEEE Signal Processing Letters, 22(8):1006–1010, 2014.">Mysore, 2014</a>]</span> datasets.</p></td>
+<td><p>SquimSubjective pipeline trained as described in <span id="id9">[<a class="reference internal" href="references.html#id65" title="Pranay Manocha and Anurag Kumar. Speech quality assessment through mos using non-matching references. arXiv preprint arXiv:2206.12285, 2022.">Manocha and Kumar, 2022</a>]</span> and <span id="id10">[<a class="reference internal" href="references.html#id68" title="Anurag Kumar, Ke Tan, Zhaoheng Ni, Pranay Manocha, Xiaohui Zhang, Ethan Henderson, and Buye Xu. Torchaudio-squim: reference-less speech quality and intelligibility measures in torchaudio. arXiv preprint arXiv:2304.01448, 2023.">Kumar <em>et al.</em>, 2023</a>]</span> on the <em>BVCC</em> <span id="id11">[<a class="reference internal" href="references.html#id66" title="Erica Cooper and Junichi Yamagishi. How do voices from past speech synthesis challenges compare today? arXiv preprint arXiv:2105.02373, 2021.">Cooper and Yamagishi, 2021</a>]</span> and <em>DAPS</em> <span id="id12">[<a class="reference internal" href="references.html#id67" title="Gautham J Mysore. Can we automatically transform speech recorded on common consumer devices in real-world environments into professional production quality speech?—a dataset, insights, and challenges. IEEE Signal Processing Letters, 22(8):1006–1010, 2014.">Mysore, 2014</a>]</span> datasets.</p></td>
 </tr>
 </tbody>
 </table>
@@ -563,8 +563,8 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#squim-subjective">Squim Subjective</a><ul>
-<li><a class="reference internal" href="#id6">Interface</a></li>
-<li><a class="reference internal" href="#id7">Pretrained Models</a></li>
+<li><a class="reference internal" href="#id7">Interface</a></li>
+<li><a class="reference internal" href="#id8">Pretrained Models</a></li>
 </ul>
 </li>
 </ul>
