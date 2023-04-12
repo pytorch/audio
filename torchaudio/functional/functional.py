@@ -1615,7 +1615,7 @@ def resample(
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
 
-def to_mono(waveform: torch.Tensor, channel_dim: int=-2) -> torch.Tensor:
+def to_mono(waveform: torch.Tensor, sample_rate: int=16000,channel_dim: int=-2) -> torch.Tensor:
     r"""Converts a multi-channel signal into a monoaural signal.
 
     .. devices:: CPU CUDA
@@ -1636,7 +1636,19 @@ def to_mono(waveform: torch.Tensor, channel_dim: int=-2) -> torch.Tensor:
     if waveform.shape[channel_dim] == 1 or waveform.ndim == 1:
         return waveform
     
-    return torch.mean(waveform, axis=channel_dim)
+    effector = torchaudio.io.AudioEffector(
+        effect=(
+            "asplit[a],"
+            "aphasemeter=video=0,"
+            "ametadata=select:key=lavfi.aphasemeter.phase:value=-0.005:function=less,"
+            "pan=1c|c0=c0,"
+            "aresample=async=1:first_pts=0,"
+            "[a]amix")
+    )
+
+    applied = effector.apply(waveform, sample_rate=sample_rate)
+    
+    return torch.mean(applied, axis=channel_dim)
 
 @torch.jit.unused
 def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
