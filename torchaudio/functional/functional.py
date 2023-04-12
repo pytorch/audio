@@ -2580,3 +2580,28 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
     return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+
+
+def process_rir(rir: Optional[Tensor] = None) -> Tensor:
+    r"""Process RIR file, download sample file if no RIR is provided
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        rir (Tensor, None): Room Impulse Response waveform,
+        with shape `(1, time)`.
+    Returns:
+        Tensor: The processed RIR waveform
+    """
+    if rir is None:
+        path = torchaudio.utils.download_asset(
+            "tutorial-assets/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo-8000hz.wav"
+        )
+        rir, sample_rate = torchaudio.load(path)
+
+        rir = rir[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
+        rir = rir / torch.norm(rir, p=2)
+        rir = torch.flip(rir, [1])
+    return rir

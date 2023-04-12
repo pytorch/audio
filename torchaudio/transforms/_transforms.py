@@ -2087,3 +2087,43 @@ class Deemphasis(torch.nn.Module):
             torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
         """
         return F.deemphasis(waveform, coeff=self.coeff)
+
+
+class ConvolutionalReverb(torch.nn.Module):
+    r"""Apply convolutional reverberation to a waveform using FFT
+    and a Room Impulse Response (RIR) tensor.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        rir (Tensor, None): Room Impulse Response waveform.
+        apply_processing_rir (bool, optional): Whether the RIR waveform should be
+            processed (Default: ``True``).
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("speech.wav")
+        >>> transform = torchaudio.transforms.ConvolutionalReverb()
+        >>> augmented = transform(waveform)
+    """
+
+    def __init__(
+            self,
+            rir: Optional[Tensor] = None,
+            apply_processing_rir: bool = True
+    ) -> None:
+        super().__init__()
+
+        self.rir = rir
+        if rir is None or apply_processing_rir:
+            self.rir = F.process_rir(rir)
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        """
+        Args:
+            waveform (Tensor): Tensor of audio of shape `(..., time)`.
+        Returns:
+            Tensor: The reverberated audio of shape `(..., time)`.
+        """
+        return F.fftconvolve(waveform, self.rir)
