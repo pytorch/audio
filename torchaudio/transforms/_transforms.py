@@ -2108,11 +2108,7 @@ class ConvolutionalReverb(torch.nn.Module):
         >>> augmented = transform(waveform)
     """
 
-    def __init__(
-            self,
-            rir: Optional[Tensor] = None,
-            apply_processing_rir: bool = True
-    ) -> None:
+    def __init__(self, rir: Optional[Tensor] = None, apply_processing_rir: bool = True) -> None:
         super().__init__()
 
         self.rir = rir

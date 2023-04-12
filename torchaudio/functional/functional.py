@@ -2596,9 +2596,7 @@ def process_rir(rir: Optional[Tensor] = None) -> Tensor:
         Tensor: The processed RIR waveform
     """
     if rir is None:
-        path = torchaudio.utils.download_asset(
-            "tutorial-assets/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo-8000hz.wav"
-        )
+        path = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo-8000hz.wav")
         rir, sample_rate = torchaudio.load(path)
 
         rir = rir[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
