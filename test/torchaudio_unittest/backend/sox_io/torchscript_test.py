@@ -20,11 +20,11 @@ from .common import get_enc_params, name_func
 
 
 def py_info_func(filepath: str) -> torchaudio.backend.sox_io_backend.AudioMetaData:
-    return torchaudio.info(filepath)
+    return torchaudio.backend.sox_io_backend.info(filepath)
 
 
 def py_load_func(filepath: str, normalize: bool, channels_first: bool):
-    return torchaudio.load(filepath, normalize=normalize, channels_first=channels_first)
+    return torchaudio.backend.sox_io_backend.load(filepath, normalize=normalize, channels_first=channels_first)
 
 
 def py_save_func(
@@ -36,15 +36,15 @@ def py_save_func(
     encoding: Optional[str] = None,
     bits_per_sample: Optional[int] = None,
 ):
-    torchaudio.save(filepath, tensor, sample_rate, channels_first, compression, None, encoding, bits_per_sample)
+    torchaudio.backend.sox_io_backend.save(
+        filepath, tensor, sample_rate, channels_first, compression, None, encoding, bits_per_sample
+    )
 
 
 @skipIfNoExec("sox")
 @skipIfNoSox
 class SoxIO(TempDirMixin, TorchaudioTestCase):
     """TorchScript-ability Test suite for `sox_io_backend`"""
-
-    backend = "sox_io"
 
     @parameterized.expand(
         list(
