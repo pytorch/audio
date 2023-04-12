@@ -29,6 +29,7 @@ from ._transforms import (
     SpeedPerturbation,
     TimeMasking,
     TimeStretch,
+    ToMono,
     Vad,
     Vol,
 )
@@ -68,6 +69,7 @@ __all__ = [
     "SpeedPerturbation",
     "TimeMasking",
     "TimeStretch",
+    "ToMono",
     "Vad",
     "Vol",
 ]
