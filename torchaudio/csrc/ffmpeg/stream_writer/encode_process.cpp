@@ -607,10 +607,10 @@ FilterGraph get_audio_filter_graph(
     return "anull";
   }();
 
-  FilterGraph f{AVMEDIA_TYPE_AUDIO};
+  FilterGraph f;
   f.add_audio_src(
       src_fmt, {1, src_sample_rate}, src_sample_rate, src_ch_layout);
-  f.add_sink();
+  f.add_audio_sink();
   f.add_process(desc);
   f.create_filter();
   return f;
@@ -657,10 +657,10 @@ FilterGraph get_video_filter_graph(
     return "null";
   }();
 
-  FilterGraph f{AVMEDIA_TYPE_VIDEO};
+  FilterGraph f;
   f.add_video_src(
       src_fmt, av_inv_q(src_rate), src_rate, src_width, src_height, {1, 1});
-  f.add_sink();
+  f.add_video_sink();
   f.add_process(desc);
   f.create_filter();
   return f;
@@ -676,7 +676,7 @@ AVFramePtr get_audio_frame(
     int num_channels,
     uint64_t channel_layout,
     int nb_samples) {
-  AVFramePtr frame{};
+  AVFramePtr frame{alloc_avframe()};
   frame->format = format;
   frame->channel_layout = channel_layout;
   frame->sample_rate = sample_rate;
@@ -693,7 +693,7 @@ AVFramePtr get_audio_frame(
 }
 
 AVFramePtr get_video_frame(AVPixelFormat src_fmt, int width, int height) {
-  AVFramePtr frame{};
+  AVFramePtr frame{alloc_avframe()};
   frame->format = src_fmt;
   frame->width = width;
   frame->height = height;
@@ -726,7 +726,8 @@ EncodeProcess get_audio_encode_process(
     const c10::optional<int>& encoder_sample_rate,
     const c10::optional<int>& encoder_num_channels,
     const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc) {
+    const c10::optional<std::string>& filter_desc,
+    bool disable_converter) {
   // 1. Check the source format, rate and channels
   TORCH_CHECK(
       src_sample_rate > 0,
@@ -736,7 +737,13 @@ EncodeProcess get_audio_encode_process(
       src_num_channels > 0,
       "The number of channels must be positive. Found: ",
       src_num_channels);
-  const AVSampleFormat src_fmt = get_src_sample_fmt(format);
+  // Note that disable_converter = true indicates that the caller is looking to
+  // directly supply frames and bypass tensor conversion. Therefore, in this
+  // case, restrictions on the format to support tensor inputs do not apply, and
+  // so we directly get the format via FFmpeg.
+  const AVSampleFormat src_fmt = (disable_converter)
+      ? av_get_sample_fmt(format.c_str())
+      : get_src_sample_fmt(format);
   const auto src_ch_layout =
       static_cast<uint64_t>(av_get_default_channel_layout(src_num_channels));
 
@@ -791,7 +798,9 @@ EncodeProcess get_audio_encode_process(
 
   // 7. Instantiate Converter
   TensorConverter converter{
-      AVMEDIA_TYPE_AUDIO, src_frame, src_frame->nb_samples};
+      (disable_converter) ? AVMEDIA_TYPE_UNKNOWN : AVMEDIA_TYPE_AUDIO,
+      src_frame,
+      src_frame->nb_samples};
 
   // 8. encoder
   // Note: get_stream modifies AVFormatContext and adds new stream.
@@ -830,7 +839,8 @@ EncodeProcess get_video_encode_process(
     const c10::optional<int>& encoder_height,
     const c10::optional<std::string>& hw_accel,
     const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc) {
+    const c10::optional<std::string>& filter_desc,
+    bool disable_converter) {
   // 1. Checkc the source format, rate and resolution
   TORCH_CHECK(
       std::isfinite(frame_rate) && frame_rate > 0,
@@ -838,7 +848,13 @@ EncodeProcess get_video_encode_process(
       frame_rate);
   TORCH_CHECK(src_width > 0, "width must be positive. Found: ", src_width);
   TORCH_CHECK(src_height > 0, "height must be positive. Found: ", src_height);
-  const AVPixelFormat src_fmt = get_src_pix_fmt(format);
+  // Note that disable_converter = true indicates that the caller is looking to
+  // directly supply frames and bypass tensor conversion. Therefore, in this
+  // case, restrictions on the format to support tensor inputs do not apply, and
+  // so we directly get the format via FFmpeg.
+  const AVPixelFormat src_fmt = (disable_converter)
+      ? av_get_pix_fmt(format.c_str())
+      : get_src_pix_fmt(format);
   const AVRational src_rate = av_d2q(frame_rate, 1 << 24);
 
   // 2. Fetch codec from default or override
@@ -905,7 +921,7 @@ EncodeProcess get_video_encode_process(
   // 6. Instantiate source frame
   AVFramePtr src_frame = [&]() {
     if (codec_ctx->hw_frames_ctx) {
-      AVFramePtr frame{};
+      AVFramePtr frame{alloc_avframe()};
       int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
       TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
       return frame;
@@ -914,7 +930,9 @@ EncodeProcess get_video_encode_process(
   }();
 
   // 7. Converter
-  TensorConverter converter{AVMEDIA_TYPE_VIDEO, src_frame};
+  TensorConverter converter{
+      (disable_converter) ? AVMEDIA_TYPE_UNKNOWN : AVMEDIA_TYPE_VIDEO,
+      src_frame};
 
   // 8. encoder
   // Note: get_stream modifies AVFormatContext and adds new stream.

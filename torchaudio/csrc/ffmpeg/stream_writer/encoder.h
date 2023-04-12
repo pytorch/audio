@@ -16,7 +16,7 @@ class Encoder {
   AVStream* stream;
   // Temporary object used during the encoding
   // Encoder owns it.
-  AVPacketPtr packet{};
+  AVPacketPtr packet{alloc_avpacket()};
 
  public:
   Encoder(

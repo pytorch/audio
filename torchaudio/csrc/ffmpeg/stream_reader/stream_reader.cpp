@@ -51,21 +51,21 @@ AVFormatContext* get_input_format_context(
 }
 } // namespace
 
-StreamReader::StreamReader(AVFormatContext* p) : pFormatContext(p) {
+StreamReader::StreamReader(AVFormatContext* p) : format_ctx(p) {
   C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReader");
-  int ret = avformat_find_stream_info(pFormatContext, nullptr);
+  int ret = avformat_find_stream_info(format_ctx, nullptr);
   TORCH_CHECK(
       ret >= 0, "Failed to find stream information: ", av_err2string(ret));
 
   processors =
-      std::vector<std::unique_ptr<StreamProcessor>>(pFormatContext->nb_streams);
-  for (int i = 0; i < pFormatContext->nb_streams; ++i) {
-    switch (pFormatContext->streams[i]->codecpar->codec_type) {
+      std::vector<std::unique_ptr<StreamProcessor>>(format_ctx->nb_streams);
+  for (int i = 0; i < format_ctx->nb_streams; ++i) {
+    switch (format_ctx->streams[i]->codecpar->codec_type) {
       case AVMEDIA_TYPE_AUDIO:
       case AVMEDIA_TYPE_VIDEO:
         break;
       default:
-        pFormatContext->streams[i]->discard = AVDISCARD_ALL;
+        format_ctx->streams[i]->discard = AVDISCARD_ALL;
     }
   }
 }
@@ -118,7 +118,7 @@ void validate_src_stream_type(
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
 int64_t StreamReader::num_src_streams() const {
-  return pFormatContext->nb_streams;
+  return format_ctx->nb_streams;
 }
 
 namespace {
@@ -133,13 +133,13 @@ OptionDict parse_metadata(const AVDictionary* metadata) {
 } // namespace
 
 OptionDict StreamReader::get_metadata() const {
-  return parse_metadata(pFormatContext->metadata);
+  return parse_metadata(format_ctx->metadata);
 }
 
 SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
-  validate_src_stream_index(pFormatContext, i);
+  validate_src_stream_index(format_ctx, i);
 
-  AVStream* stream = pFormatContext->streams[i];
+  AVStream* stream = format_ctx->streams[i];
   AVCodecParameters* codecpar = stream->codecpar;
 
   SrcStreamInfo ret;
@@ -179,6 +179,28 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   return ret;
 }
 
+namespace {
+AVCodecParameters* get_codecpar() {
+  AVCodecParameters* ptr = avcodec_parameters_alloc();
+  TORCH_CHECK(ptr, "Failed to allocate resource.");
+  return ptr;
+}
+} // namespace
+
+StreamParams StreamReader::get_src_stream_params(int i) {
+  validate_src_stream_index(format_ctx, i);
+  AVStream* stream = format_ctx->streams[i];
+
+  AVCodecParametersPtr codec_params(get_codecpar());
+  int ret = avcodec_parameters_copy(codec_params, stream->codecpar);
+  TORCH_CHECK(
+      ret >= 0,
+      "Failed to copy the stream's codec parameters. (",
+      av_err2string(ret),
+      ")");
+  return {std::move(codec_params), stream->time_base, i};
+}
+
 int64_t StreamReader::num_out_streams() const {
   return static_cast<int64_t>(stream_indices.size());
 }
@@ -213,18 +235,26 @@ OutputStreamInfo StreamReader::get_out_stream_info(int i) const {
 
 int64_t StreamReader::find_best_audio_stream() const {
   return av_find_best_stream(
-      pFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+      format_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
 }
 
 int64_t StreamReader::find_best_video_stream() const {
   return av_find_best_stream(
-      pFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+      format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
 }
 
 bool StreamReader::is_buffer_ready() const {
-  for (const auto& it : processors) {
-    if (it && !it->is_buffer_ready()) {
-      return false;
+  if (processors.empty()) {
+    // If no decoding output streams exist, then determine overall readiness
+    // from the readiness of packet buffer.
+    return packet_buffer->has_packets();
+  } else {
+    // Otherwise, determine readiness solely from the readiness of the decoding
+    // output streams.
+    for (const auto& it : processors) {
+      if (it && !it->is_buffer_ready()) {
+        return false;
+      }
     }
   }
   return true;
@@ -236,7 +266,7 @@ bool StreamReader::is_buffer_ready() const {
 void StreamReader::seek(double timestamp_s, int64_t mode) {
   TORCH_CHECK(timestamp_s >= 0, "timestamp must be non-negative.");
   TORCH_CHECK(
-      pFormatContext->nb_streams > 0,
+      format_ctx->nb_streams > 0,
       "At least one stream must exist in this context");
 
   int64_t timestamp_av_tb = static_cast<int64_t>(timestamp_s * AV_TIME_BASE);
@@ -259,7 +289,7 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
       TORCH_CHECK(false, "Invalid mode value: ", mode);
   }
 
-  int ret = av_seek_frame(pFormatContext, -1, timestamp_av_tb, flag);
+  int ret = av_seek_frame(format_ctx, -1, timestamp_av_tb, flag);
 
   if (ret < 0) {
     seek_timestamp = 0;
@@ -326,6 +356,14 @@ void StreamReader::add_video_stream(
       device);
 }
 
+void StreamReader::add_packet_stream(int i) {
+  validate_src_stream_index(format_ctx, i);
+  if (!packet_buffer) {
+    packet_buffer = std::make_unique<PacketBuffer>();
+  }
+  packet_stream_indices.emplace(i);
+}
+
 void StreamReader::add_stream(
     int i,
     AVMediaType media_type,
@@ -335,11 +373,11 @@ void StreamReader::add_stream(
     const c10::optional<std::string>& decoder,
     const c10::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
-  validate_src_stream_type(pFormatContext, i, media_type);
+  validate_src_stream_type(format_ctx, i, media_type);
 
-  AVStream* stream = pFormatContext->streams[i];
-  // When media source is file-like object, it is possible that source codec is
-  // not detected properly.
+  AVStream* stream = format_ctx->streams[i];
+  // When media source is file-like object, it is possible that source codec
+  // is not detected properly.
   TORCH_CHECK(
       stream->codecpar->format != -1,
       "Failed to detect the source stream format.");
@@ -364,7 +402,7 @@ void StreamReader::add_stream(
       case AVMEDIA_TYPE_AUDIO:
         return AVRational{0, 1};
       case AVMEDIA_TYPE_VIDEO:
-        return av_guess_frame_rate(pFormatContext, stream, nullptr);
+        return av_guess_frame_rate(format_ctx, stream, nullptr);
       default:
         TORCH_INTERNAL_ASSERT(
             false,
@@ -408,7 +446,7 @@ void StreamReader::remove_stream(int64_t i) {
 // 1: It's done, caller should stop calling
 // <0: Some error happened
 int StreamReader::process_packet() {
-  int ret = av_read_frame(pFormatContext, pPacket);
+  int ret = av_read_frame(format_ctx, packet);
   if (ret == AVERROR_EOF) {
     ret = drain();
     return (ret < 0) ? ret : 1;
@@ -416,8 +454,15 @@ int StreamReader::process_packet() {
   if (ret < 0) {
     return ret;
   }
-  AutoPacketUnref packet{pPacket};
-  auto& processor = processors[pPacket->stream_index];
+  AutoPacketUnref auto_unref{packet};
+
+  int stream_index = packet->stream_index;
+
+  if (packet_stream_indices.count(stream_index)) {
+    packet_buffer->push_packet(packet);
+  }
+
+  auto& processor = processors[stream_index];
   if (!processor) {
     return 0;
   }
@@ -517,5 +562,8 @@ std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
   return ret;
 }
 
+std::vector<AVPacketPtr> StreamReader::pop_packets() {
+  return packet_buffer->pop_packets();
+}
 } // namespace io
 } // namespace torchaudio

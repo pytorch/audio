@@ -1,5 +1,6 @@
 import io
 import os
+import pathlib
 import subprocess
 import sys
 from functools import partial
@@ -24,7 +25,7 @@ from torchaudio_unittest.common_utils import (
 
 
 def _convert_audio_file(src_path, dst_path, format=None, acodec=None):
-    command = ["ffmpeg", "-i", src_path, "-strict", "-2"]
+    command = ["ffmpeg", "-y", "-i", src_path, "-strict", "-2"]
     if format:
         command += ["-sample_fmt", format]
     if acodec:
@@ -146,6 +147,17 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
 @skipIfNoExec("ffmpeg")
 @skipIfNoFFmpeg
 class SaveTest(SaveTestBase):
+    def test_pathlike(self):
+        """FFmpeg dispatcher can save audio data to pathlike object"""
+        sample_rate = 16000
+        dtype = "float32"
+        num_channels = 2
+        duration = 1
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        self._save(pathlib.Path(path), data, sample_rate)
+
     @nested_params(
         ["path", "fileobj", "bytesio"],
         [

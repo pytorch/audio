@@ -82,7 +82,7 @@ class FFmpegBackend(Backend):
         if hasattr(uri, "read"):
             metadata = info_audio_fileobj(uri, format, buffer_size=buffer_size)
         else:
-            metadata = info_audio(uri, format)
+            metadata = info_audio(os.path.normpath(uri), format)
         metadata.bits_per_sample = _get_bits_per_sample(metadata.encoding, metadata.bits_per_sample)
         metadata.encoding = _map_encoding(metadata.encoding)
         return metadata
@@ -108,7 +108,7 @@ class FFmpegBackend(Backend):
                 buffer_size,
             )
         else:
-            return load_audio(uri, frame_offset, num_frames, normalize, channels_first, format)
+            return load_audio(os.path.normpath(uri), frame_offset, num_frames, normalize, channels_first, format)
 
     @staticmethod
     def save(

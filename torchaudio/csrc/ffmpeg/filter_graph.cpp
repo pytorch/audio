@@ -4,17 +4,16 @@
 namespace torchaudio {
 namespace io {
 
-FilterGraph::FilterGraph(AVMediaType media_type) : media_type(media_type) {
-  switch (media_type) {
-    case AVMEDIA_TYPE_AUDIO:
-    case AVMEDIA_TYPE_VIDEO:
-      break;
-    default:
-      TORCH_CHECK(false, "Only audio and video type is supported.");
-  }
-
-  pFilterGraph->nb_threads = 1;
+namespace {
+AVFilterGraph* get_filter_graph() {
+  AVFilterGraph* ptr = avfilter_graph_alloc();
+  TORCH_CHECK(ptr, "Failed to allocate resouce.");
+  ptr->nb_threads = 1;
+  return ptr;
 }
+} // namespace
+
+FilterGraph::FilterGraph() : graph(get_filter_graph()) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configuration methods
@@ -69,11 +68,9 @@ void FilterGraph::add_audio_src(
     AVRational time_base,
     int sample_rate,
     uint64_t channel_layout) {
-  TORCH_CHECK(
-      media_type == AVMEDIA_TYPE_AUDIO, "The filter graph is not audio type.");
-  std::string args =
-      get_audio_src_args(format, time_base, sample_rate, channel_layout);
-  add_src(args);
+  add_src(
+      avfilter_get_by_name("abuffer"),
+      get_audio_src_args(format, time_base, sample_rate, channel_layout));
 }
 
 void FilterGraph::add_video_src(
@@ -83,28 +80,31 @@ void FilterGraph::add_video_src(
     int width,
     int height,
     AVRational sample_aspect_ratio) {
-  TORCH_CHECK(
-      media_type == AVMEDIA_TYPE_VIDEO, "The filter graph is not video type.");
-  std::string args = get_video_src_args(
-      format, time_base, frame_rate, width, height, sample_aspect_ratio);
-  add_src(args);
+  add_src(
+      avfilter_get_by_name("buffer"),
+      get_video_src_args(
+          format, time_base, frame_rate, width, height, sample_aspect_ratio));
 }
 
-void FilterGraph::add_src(const std::string& args) {
-  const AVFilter* buffersrc = avfilter_get_by_name(
-      media_type == AVMEDIA_TYPE_AUDIO ? "abuffer" : "buffer");
+void FilterGraph::add_src(const AVFilter* buffersrc, const std::string& args) {
   int ret = avfilter_graph_create_filter(
-      &buffersrc_ctx, buffersrc, "in", args.c_str(), NULL, pFilterGraph);
+      &buffersrc_ctx, buffersrc, "in", args.c_str(), nullptr, graph);
   TORCH_CHECK(
       ret >= 0,
       "Failed to create input filter: \"" + args + "\" (" + av_err2string(ret) +
           ")");
 }
 
-void FilterGraph::add_sink() {
+void FilterGraph::add_audio_sink() {
+  add_sink(avfilter_get_by_name("abuffersink"));
+}
+
+void FilterGraph::add_video_sink() {
+  add_sink(avfilter_get_by_name("buffersink"));
+}
+
+void FilterGraph::add_sink(const AVFilter* buffersink) {
   TORCH_CHECK(!buffersink_ctx, "Sink buffer is already allocated.");
-  const AVFilter* buffersink = avfilter_get_by_name(
-      media_type == AVMEDIA_TYPE_AUDIO ? "abuffersink" : "buffersink");
   // Note
   // Originally, the code here followed the example
   // https://ffmpeg.org/doxygen/4.1/filtering_audio_8c-example.html
@@ -115,7 +115,7 @@ void FilterGraph::add_sink() {
   // https://ffmpeg.org/doxygen/4.1/filter_audio_8c-example.html
   // `abuffersink` should not take options, and this resolved issue.
   int ret = avfilter_graph_create_filter(
-      &buffersink_ctx, buffersink, "out", nullptr, nullptr, pFilterGraph);
+      &buffersink_ctx, buffersink, "out", nullptr, nullptr, graph);
   TORCH_CHECK(ret >= 0, "Failed to create output filter.");
 }
 
@@ -157,7 +157,7 @@ void FilterGraph::add_process(const std::string& filter_description) {
   InOuts in{"in", buffersrc_ctx}, out{"out", buffersink_ctx};
 
   int ret = avfilter_graph_parse_ptr(
-      pFilterGraph, filter_description.c_str(), out, in, nullptr);
+      graph, filter_description.c_str(), out, in, nullptr);
 
   TORCH_CHECK(
       ret >= 0,
@@ -167,9 +167,9 @@ void FilterGraph::add_process(const std::string& filter_description) {
 
 void FilterGraph::create_filter(AVBufferRef* hw_frames_ctx) {
   buffersrc_ctx->outputs[0]->hw_frames_ctx = hw_frames_ctx;
-  int ret = avfilter_graph_config(pFilterGraph, nullptr);
+  int ret = avfilter_graph_config(graph, nullptr);
   TORCH_CHECK(ret >= 0, "Failed to configure the graph: " + av_err2string(ret));
-  // char* desc = avfilter_graph_dump(pFilterGraph, NULL);
+  // char* desc = avfilter_graph_dump(graph, NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
   // av_free(static_cast<void*>(desc));
 }
