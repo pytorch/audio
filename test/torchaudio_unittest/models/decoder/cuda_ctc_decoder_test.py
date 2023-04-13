@@ -1,6 +1,6 @@
 import torch
 from parameterized import parameterized
-from torchaudio_unittest.common_utils import get_asset_path, skipIfNoCuCtcDecoder, TempDirMixin, TorchaudioTestCase
+from torchaudio_unittest.common_utils import get_asset_path, skipIfNoCuCtcDecoder, skipIfNoCuda, TempDirMixin, TorchaudioTestCase
 
 NUM_TOKENS = 8
 
