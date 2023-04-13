@@ -183,6 +183,17 @@ class WavLMSelfAttention(nn.Module):
 
             attn_mask_rel_pos = attn_mask_rel_pos.view((bsz, self.num_heads, seq_len, seq_len))
 
+        if attn_mask_rel_pos is not None and key_padding_mask is not None:
+            key_padding_mask = key_padding_mask.view(bsz, 1, 1, seq_len).expand(-1, self.num_heads, -1, -1)
+            key_padding_mask = torch.nn.functional._canonical_mask(
+                mask=key_padding_mask,
+                mask_name="key_padding_mask",
+                other_type=torch.nn.functional._none_or_dtype(attn_mask_rel_pos),
+                other_name="",
+                target_type=query.dtype,
+            )
+        if attn_mask_rel_pos is not None and key_padding_mask is not None:
+            attn_mask_rel_pos = attn_mask_rel_pos + key_padding_mask
         query_projected = torch.nn.functional.linear(query, self.attention.in_proj_weight, self.attention.in_proj_bias)
         query, key, value = query_projected.chunk(3, -1)
         shape = (bsz, seq_len, self.num_heads, self.head_dim)
