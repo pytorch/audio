@@ -14,7 +14,7 @@ namespace io {
 /// Encode and write audio/video streams chunk by chunk
 ///
 class StreamWriter {
-  AVFormatOutputContextPtr pFormatContext;
+  AVFormatOutputContextPtr format_ctx;
   std::map<int, EncodeProcess> processes;
   std::map<int, PacketWriter> packet_writers;
 
@@ -102,6 +102,10 @@ class StreamWriter {
   /// override the format used for encoding.
   ///  To list supported formats for the encoder, you can use
   /// ``ffmpeg -h encoder=<ENCODER>`` command.
+  /// @param encoder_sample_rate If provided, perform resampling
+  /// before encoding.
+  /// @param encoder_num_channels If provided, change channel configuration
+  /// before encoding.
   /// @param codec_config Codec configuration.
   /// @param filter_desc Additional processing to apply before
   /// encoding the input data
@@ -137,6 +141,9 @@ class StreamWriter {
   /// @param encoder See ``add_audio_stream()``.
   /// @param encoder_option See ``add_audio_stream()``.
   /// @param encoder_format See ``add_audio_stream()``.
+  /// @param encoder_frame_rate If provided, change frame rate before encoding.
+  /// @param encoder_width If provided, resize image before encoding.
+  /// @param encoder_height If provided, resize image before encoding.
   /// @param hw_accel Enable hardware acceleration.
   /// @param codec_config Codec configuration.
   /// @parblock

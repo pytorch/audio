@@ -38,7 +38,7 @@ AVFormatContext* get_output_format_context(
 }
 } // namespace
 
-StreamWriter::StreamWriter(AVFormatContext* p) : pFormatContext(p) {
+StreamWriter::StreamWriter(AVFormatContext* p) : format_ctx(p) {
   C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamWriter");
 }
 
@@ -66,13 +66,13 @@ void StreamWriter::add_audio_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == num_output_streams(),
+      format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
   processes.emplace(
       std::piecewise_construct,
       std::forward_as_tuple(current_key),
       std::forward_as_tuple(get_audio_encode_process(
-          pFormatContext,
+          format_ctx,
           sample_rate,
           num_channels,
           format,
@@ -102,13 +102,13 @@ void StreamWriter::add_video_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == num_output_streams(),
+      format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
   processes.emplace(
       std::piecewise_construct,
       std::forward_as_tuple(current_key),
       std::forward_as_tuple(get_video_encode_process(
-          pFormatContext,
+          format_ctx,
           frame_rate,
           width,
           height,
@@ -129,7 +129,7 @@ void StreamWriter::add_packet_stream(const StreamParams& stream_params) {
   packet_writers.emplace(
       std::piecewise_construct,
       std::forward_as_tuple(stream_params.stream_index),
-      std::forward_as_tuple(pFormatContext, stream_params));
+      std::forward_as_tuple(format_ctx, stream_params));
   current_key++;
 }
 
@@ -146,13 +146,13 @@ void StreamWriter::add_audio_frame_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == num_output_streams(),
+      format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
   processes.emplace(
       std::piecewise_construct,
       std::forward_as_tuple(current_key),
       std::forward_as_tuple(get_audio_encode_process(
-          pFormatContext,
+          format_ctx,
           sample_rate,
           num_channels,
           format,
@@ -183,13 +183,13 @@ void StreamWriter::add_video_frame_stream(
     const c10::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == num_output_streams(),
+      format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
   processes.emplace(
       std::piecewise_construct,
       std::forward_as_tuple(current_key),
       std::forward_as_tuple(get_video_encode_process(
-          pFormatContext,
+          format_ctx,
           frame_rate,
           width,
           height,
@@ -208,53 +208,49 @@ void StreamWriter::add_video_frame_stream(
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
-  av_dict_free(&pFormatContext->metadata);
+  av_dict_free(&format_ctx->metadata);
   for (auto const& [key, value] : metadata) {
-    av_dict_set(&pFormatContext->metadata, key.c_str(), value.c_str(), 0);
+    av_dict_set(&format_ctx->metadata, key.c_str(), value.c_str(), 0);
   }
 }
 
 void StreamWriter::dump_format(int64_t i) {
-  av_dump_format(pFormatContext, (int)i, pFormatContext->url, 1);
+  av_dump_format(format_ctx, (int)i, format_ctx->url, 1);
 }
 
 void StreamWriter::open(const c10::optional<OptionDict>& option) {
   TORCH_INTERNAL_ASSERT(
-      pFormatContext->nb_streams == num_output_streams(),
+      format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
 
   int ret = 0;
 
   // Open the file if it was not provided by client code (i.e. when not
   // file-like object)
-  AVFORMAT_CONST AVOutputFormat* fmt = pFormatContext->oformat;
+  AVFORMAT_CONST AVOutputFormat* fmt = format_ctx->oformat;
   AVDictionary* opt = get_option_dict(option);
   if (!(fmt->flags & AVFMT_NOFILE) &&
-      !(pFormatContext->flags & AVFMT_FLAG_CUSTOM_IO)) {
+      !(format_ctx->flags & AVFMT_FLAG_CUSTOM_IO)) {
     ret = avio_open2(
-        &pFormatContext->pb,
-        pFormatContext->url,
-        AVIO_FLAG_WRITE,
-        nullptr,
-        &opt);
+        &format_ctx->pb, format_ctx->url, AVIO_FLAG_WRITE, nullptr, &opt);
     if (ret < 0) {
       av_dict_free(&opt);
       TORCH_CHECK(
           false,
           "Failed to open dst: ",
-          pFormatContext->url,
+          format_ctx->url,
           " (",
           av_err2string(ret),
           ")");
     }
   }
 
-  ret = avformat_write_header(pFormatContext, &opt);
+  ret = avformat_write_header(format_ctx, &opt);
   clean_up_dict(opt);
   TORCH_CHECK(
       ret >= 0,
       "Failed to write header: ",
-      pFormatContext->url,
+      format_ctx->url,
       " (",
       av_err2string(ret),
       ")");
@@ -262,18 +258,18 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
 }
 
 void StreamWriter::close() {
-  int ret = av_write_trailer(pFormatContext);
+  int ret = av_write_trailer(format_ctx);
   if (ret < 0) {
     LOG(WARNING) << "Failed to write trailer. (" << av_err2string(ret) << ").";
   }
 
   // Close the file if it was not provided by client code (i.e. when not
   // file-like object)
-  AVFORMAT_CONST AVOutputFormat* fmt = pFormatContext->oformat;
+  AVFORMAT_CONST AVOutputFormat* fmt = format_ctx->oformat;
   if (!(fmt->flags & AVFMT_NOFILE) &&
-      !(pFormatContext->flags & AVFMT_FLAG_CUSTOM_IO)) {
+      !(format_ctx->flags & AVFMT_FLAG_CUSTOM_IO)) {
     // avio_closep can be only applied to AVIOContext opened by avio_open
-    avio_closep(&(pFormatContext->pb));
+    avio_closep(&(format_ctx->pb));
   }
   is_open = false;
 }
@@ -284,13 +280,13 @@ void StreamWriter::write_audio_chunk(
     const c10::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
-      0 <= i && i < static_cast<int>(pFormatContext->nb_streams),
+      0 <= i && i < static_cast<int>(format_ctx->nb_streams),
       "Invalid stream index. Index must be in range of [0, ",
-      pFormatContext->nb_streams,
+      format_ctx->nb_streams,
       "). Found: ",
       i);
   TORCH_CHECK(
-      pFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO,
+      format_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO,
       "Stream ",
       i,
       " is not audio type.");
@@ -303,13 +299,13 @@ void StreamWriter::write_video_chunk(
     const c10::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
-      0 <= i && i < static_cast<int>(pFormatContext->nb_streams),
+      0 <= i && i < static_cast<int>(format_ctx->nb_streams),
       "Invalid stream index. Index must be in range of [0, ",
-      pFormatContext->nb_streams,
+      format_ctx->nb_streams,
       "). Found: ",
       i);
   TORCH_CHECK(
-      pFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO,
+      format_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO,
       "Stream ",
       i,
       " is not video type.");
@@ -329,9 +325,9 @@ void StreamWriter::write_packet(const AVPacketPtr& packet) {
 void StreamWriter::write_frame(int i, AVFrame* frame) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
-      0 <= i && i < static_cast<int>(pFormatContext->nb_streams),
+      0 <= i && i < static_cast<int>(format_ctx->nb_streams),
       "Invalid stream index. Index must be in range of [0, ",
-      pFormatContext->nb_streams,
+      format_ctx->nb_streams,
       "). Found: ",
       i);
   processes.at(i).process_frame(frame);

@@ -12,8 +12,8 @@ namespace io {
 /// Fetch and decode audio/video streams chunk by chunk.
 ///
 class StreamReader {
-  AVFormatInputContextPtr pFormatContext;
-  AVPacketPtr pPacket{alloc_avpacket()};
+  AVFormatInputContextPtr format_ctx;
+  AVPacketPtr packet{alloc_avpacket()};
 
   std::vector<std::unique_ptr<StreamProcessor>> processors;
   // Mapping from user-facing stream index to internal index.
@@ -49,9 +49,9 @@ class StreamReader {
   /// This is a low level constructor interact with FFmpeg directly.
   /// One can provide custom AVFormatContext in case the other constructor
   /// does not meet a requirement.
-  /// @param pFormatContext An initialized AVFormatContext. StreamReader will
+  /// @param format_ctx An initialized AVFormatContext. StreamReader will
   /// own the resources and release it at the end.
-  explicit StreamReader(AVFormatContext* pFormatContext);
+  explicit StreamReader(AVFormatContext* format_ctx);
 
   /// @endcond
 
@@ -299,10 +299,12 @@ class StreamReader {
   /// @param backoff Time to wait before retrying in milli seconds.
   int process_packet_block(const double timeout, const double backoff);
 
+  /// @cond
   // High-level method used by Python bindings.
   int process_packet(
       const c10::optional<double>& timeout,
       const double backoff);
+  /// @endcond
 
   /// Process packets unitl EOF
   void process_all_packets();
