@@ -7,6 +7,7 @@ from .case_utils import (
     skipIfCudaSmallMemory,
     skipIfNoAudioDevice,
     skipIfNoCtcDecoder,
+    skipIfNoCuCtcDecoder,
     skipIfNoCuda,
     skipIfNoExec,
     skipIfNoFFmpeg,

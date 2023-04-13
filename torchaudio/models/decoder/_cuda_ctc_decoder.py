@@ -97,9 +97,9 @@ class CUCTCDecoder:
             List[List[CUCTCHypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
         """
-        if not isinstance(encoder_out_lens.dtype, torch.int32):
+        if not encoder_out_lens.dtype == torch.int32:
             raise AssertionError("encoder_out_lens must be torch.int32")
-        if not isinstance(log_prob.dtype, torch.float32):
+        if not log_prob.dtype == torch.float32:
             raise AssertionError("log_prob must be torch.float32")
         if not (log_prob.is_cuda and encoder_out_lens.is_cuda):
             raise AssertionError("inputs must be cuda tensors")
