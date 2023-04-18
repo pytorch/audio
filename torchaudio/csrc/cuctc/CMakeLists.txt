@@ -10,8 +10,8 @@ endif()
 
 set(
   libctc_prefix_decoder_src
-  submodule/src/ctc_prefix_decoder.cpp
-  submodule/src/ctc_prefix_decoder_kernel_v2.cu
+  src/ctc_prefix_decoder.cpp
+  src/ctc_prefix_decoder_kernel_v2.cu
   )
 
 set(
@@ -27,7 +27,7 @@ list(
 torchaudio_library(
   libctc_prefix_decoder
   "${libctc_prefix_decoder_src}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/submodule"
+  "${CMAKE_CURRENT_SOURCE_DIR}"
   "${additional_libs}"
   ""
   )
@@ -35,8 +35,8 @@ torchaudio_library(
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   torchaudio_extension(
     pybind11_prefixctc
-    submodule/src/python_binding.cpp
-    submodule
+    src/python_binding.cpp
+    "${CMAKE_CURRENT_SOURCE_DIR}"
     "libctc_prefix_decoder;${additional_libs}"
     ""
     )

@@ -4,8 +4,8 @@ compatibly licensed.  We list some here.
 Name: cuctc
 License: BSD-2-Clause (Files without specific notes)
 BSD-3-Clause File:
-     third_party/cuctc/submodule/src/ctc_fast_divmod.cuh,
+     torchaudio/csrc/cuctc/src/ctc_fast_divmod.cuh,
 Apache 2.0 Files:
-     third_party/cuctc/submodule/src/bitonic_topk
+     torchaudio/csrc/cuctc/src/bitonic_topk
   For details, see: cuctc/LICENSE,
-     third_party/cuctc/submodule/src/bitonic_topk/LICENSE
+     torchaudio/csrc/cuctc/src/bitonic_topk/LICENSE

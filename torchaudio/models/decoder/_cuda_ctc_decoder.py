@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import itertools as it
+import math
 
 import warnings
 from abc import abstractmethod
 from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Tuple, Union
-import math
 
 import torch
 import torchaudio
@@ -16,11 +16,8 @@ torchaudio._extension._load_lib("libctc_prefix_decoder")
 import torchaudio.lib.pybind11_prefixctc as cuctc
 
 
-__all__ = [
-    "CUCTCHypothesis",
-    "CUCTCDecoder",
-    "cuda_ctc_decoder"
-]
+__all__ = ["CUCTCHypothesis", "CUCTCDecoder", "cuda_ctc_decoder"]
+
 
 def _get_vocab_list(vocab_file):
     vocab = []
@@ -43,6 +40,7 @@ class CUCTCHypothesis(NamedTuple):
     score: float
     """Score corresponding to hypothesis"""
 
+
 class CUCTCDecoder:
     """CUDA CTC beam search decoder.
 
@@ -51,13 +49,16 @@ class CUCTCDecoder:
     Note:
         To build the decoder, please use the factory function :func:`cuda_ctc_decoder`.
     """
-    def __init__(self,
-                 vocab_list: List[str],
-                 blank_id: int = 0,
-                 beam_size: int = 10,
-                 nbest: int = 1,
-                 blank_skip_threshold: float = math.log(0.95),
-                 cuda_stream: torch.cuda.streams.Stream = None):
+
+    def __init__(
+        self,
+        vocab_list: List[str],
+        blank_id: int = 0,
+        beam_size: int = 10,
+        nbest: int = 1,
+        blank_skip_threshold: float = math.log(0.95),
+        cuda_stream: torch.cuda.streams.Stream = None,
+    ):
         """
         Args:
             blank_id (int): token id corresopnding to blank (Default: 0)
@@ -73,8 +74,8 @@ class CUCTCDecoder:
                 raise AssertionError("cuda_stream must be torch.cuda.streams.Stream")
         cuda_stream_ = cuda_stream.cuda_stream if cuda_stream else torch.cuda.current_stream().cuda_stream
         self.internal_data = cuctc.prefixCTC_alloc(cuda_stream_)
-        self.memory = torch.empty(0, dtype=torch.int8, device=torch.device('cuda'))
-        self.blank_id = 0 # blank id has to be zero
+        self.memory = torch.empty(0, dtype=torch.int8, device=torch.device("cuda"))
+        self.blank_id = 0  # blank id has to be zero
         self.vocab_list = vocab_list
         self.space_id = 0
         self.nbest = nbest
@@ -103,19 +104,34 @@ class CUCTCDecoder:
             raise AssertionError("log_prob must be torch.float32")
         if not (log_prob.is_cuda and encoder_out_lens.is_cuda):
             raise AssertionError("inputs must be cuda tensors")
-        required_size, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(self.internal_data, self.memory.data_ptr(),
-                                                       self.memory.size(0), log_prob.data_ptr(),
-                                                       encoder_out_lens.data_ptr(), log_prob.size(),
-                                                       log_prob.stride(), self.beam_size, self.blank_id,
-                                                       self.space_id, self.blank_skip_threshold)
-        if (required_size > 0):
-            self.memory = torch.empty(
-                required_size, dtype=torch.int8, device=log_prob.device).contiguous()
-            _, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(self.internal_data, self.memory.data_ptr(),
-                                                                       self.memory.size(0), log_prob.data_ptr(),
-                                                                       encoder_out_lens.data_ptr(), log_prob.size(),
-                                                                       log_prob.stride(), self.beam_size, self.blank_id,
-                                                                       self.space_id, self.blank_skip_threshold)
+        required_size, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
+            self.internal_data,
+            self.memory.data_ptr(),
+            self.memory.size(0),
+            log_prob.data_ptr(),
+            encoder_out_lens.data_ptr(),
+            log_prob.size(),
+            log_prob.stride(),
+            self.beam_size,
+            self.blank_id,
+            self.space_id,
+            self.blank_skip_threshold,
+        )
+        if required_size > 0:
+            self.memory = torch.empty(required_size, dtype=torch.int8, device=log_prob.device).contiguous()
+            _, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
+                self.internal_data,
+                self.memory.data_ptr(),
+                self.memory.size(0),
+                log_prob.data_ptr(),
+                encoder_out_lens.data_ptr(),
+                log_prob.size(),
+                log_prob.stride(),
+                self.beam_size,
+                self.blank_id,
+                self.space_id,
+                self.blank_skip_threshold,
+            )
         batch_size = len(score_hyps)
         hypos = []
         for i in range(batch_size):
@@ -124,18 +140,16 @@ class CUCTCDecoder:
                     CUCTCHypothesis(
                         tokens=score_hyps[i][j][1],
                         words=[self.vocab_list[word_id] for word_id in score_hyps[i][j][1]],
-                        score=score_hyps[i][j][0]
+                        score=score_hyps[i][j][0],
                     )
                     for j in range(self.nbest)
                 ]
             )
         return hypos
 
+
 def cuda_ctc_decoder(
-    tokens: Union[str, List[str]],
-    nbest: int = 1,
-    beam_size: int = 10,
-    blank_skip_threshold: float = math.log(0.95)
+    tokens: Union[str, List[str]], nbest: int = 1, beam_size: int = 10, blank_skip_threshold: float = math.log(0.95)
 ) -> CUCTCDecoder:
     """Builds an instance of :class:`CUCTCDecoder`.
 
@@ -146,7 +160,7 @@ def cuda_ctc_decoder(
         nbest (int): number of best decodings to return
         blank_id (int): token id corresopnding to blank symbol
         blank_skip_threshold (float): skip frames if log_prob(blank) > blank_skip_threshold, to speed up decoding
-        
+
     Returns:
         CUCTCDecoder: decoder
 
@@ -160,9 +174,4 @@ def cuda_ctc_decoder(
     if type(tokens) == str:
         tokens = _get_vocab_list(tokens)
 
-    return CUCTCDecoder(
-        vocab_list=tokens,
-        beam_size=beam_size,
-        nbest=nbest,
-        blank_skip_threshold=blank_skip_threshold
-    )
+    return CUCTCDecoder(vocab_list=tokens, beam_size=beam_size, nbest=nbest, blank_skip_threshold=blank_skip_threshold)

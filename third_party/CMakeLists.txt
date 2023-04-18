@@ -29,7 +29,3 @@ if (BUILD_CTC_DECODER)
   add_subdirectory(kenlm)
   add_subdirectory(flashlight-text)
 endif()
-
-if (BUILD_CUDA_CTC_DECODER)
-  add_subdirectory(cuctc)
-endif()

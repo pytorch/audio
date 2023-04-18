@@ -34,4 +34,3 @@ The table below contains throughput and WER benchmark results on librispeech tes
 |CUDA decoder|blank_skip_threshold=1.0 (no frame-skip)| 5.81 | 4.09 | 6.24 |
 |flashlight decoder|beam_size_token=10| 5.86 | 4.30 | 28.61 |
 |flashlight decoder|beam_size_token=vocab_size| 5.86 | 4.30 | 791.80 |
-

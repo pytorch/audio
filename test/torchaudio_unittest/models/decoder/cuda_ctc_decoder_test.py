@@ -1,8 +1,15 @@
 import torch
 from parameterized import parameterized
-from torchaudio_unittest.common_utils import get_asset_path, skipIfNoCuCtcDecoder, skipIfNoCuda, TempDirMixin, TorchaudioTestCase
+from torchaudio_unittest.common_utils import (
+    get_asset_path,
+    skipIfNoCuCtcDecoder,
+    skipIfNoCuda,
+    TempDirMixin,
+    TorchaudioTestCase,
+)
 
 NUM_TOKENS = 8
+
 
 @skipIfNoCuda
 @skipIfNoCuCtcDecoder
@@ -28,13 +35,13 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
 
     @parameterized.expand(
         [get_asset_path("decoder/tokens.txt"), ["-", "|", "f", "o", "b", "a", "r"]],
-        )
+    )
     def test_construct_basic_decoder(self, tokens):
         self._get_decoder(tokens=tokens)
 
     def test_shape(self):
         log_probs = self._get_emissions()
-        encoder_out_lens = torch.tensor([15,14,13,12], dtype=torch.int32).cuda()
+        encoder_out_lens = torch.tensor([15, 14, 13, 12], dtype=torch.int32).cuda()
         decoder = self._get_decoder()
 
         results = decoder(log_probs, encoder_out_lens)

@@ -30,15 +30,34 @@
 
 #include <tuple>
 #include <vector>
-namespace cu_ctc
-{
+namespace cu_ctc {
 
-  struct InternalData;
-  std::uintptr_t prefixCTC_alloc(std::uintptr_t stream_ptr);
-  void prefixCTC_free(std::uintptr_t inter_data_ptr);
+struct InternalData;
+std::uintptr_t prefixCTC_alloc(std::uintptr_t stream_ptr);
+void prefixCTC_free(std::uintptr_t inter_data_ptr);
 
-  std::tuple<size_t, int> calculate_require_buff_and_init_internal_data(InternalData *inter_data, int batch_size, int seq_len, int vocab_size, int beam, std::uintptr_t buff_ptr, size_t buff_size, float *log_prob_data_ptr, int *original_lens, const std::vector<int> &prob_sizes, const std::vector<int> &prob_strides, int blid, float threshold);
-  int ctc_beam_search_decoder_batch_gpu(InternalData *inter_data, float *pp, int blid, int spid, int *clist, int *clen, float *score);
+std::tuple<size_t, int> calculate_require_buff_and_init_internal_data(
+    InternalData* inter_data,
+    int batch_size,
+    int seq_len,
+    int vocab_size,
+    int beam,
+    std::uintptr_t buff_ptr,
+    size_t buff_size,
+    float* log_prob_data_ptr,
+    int* original_lens,
+    const std::vector<int>& prob_sizes,
+    const std::vector<int>& prob_strides,
+    int blid,
+    float threshold);
+int ctc_beam_search_decoder_batch_gpu(
+    InternalData* inter_data,
+    float* pp,
+    int blid,
+    int spid,
+    int* clist,
+    int* clen,
+    float* score);
 
 } // namespace cu_ctc
 

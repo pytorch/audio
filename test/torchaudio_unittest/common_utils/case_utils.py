@@ -130,6 +130,7 @@ def is_ctc_decoder_available():
             _IS_CTC_DECODER_AVAILABLE = False
     return _IS_CTC_DECODER_AVAILABLE
 
+
 def is_cuda_ctc_decoder_available():
     global _IS_CUDA_CTC_DECODER_AVAILABLE
     if _IS_CUDA_CTC_DECODER_AVAILABLE is None:

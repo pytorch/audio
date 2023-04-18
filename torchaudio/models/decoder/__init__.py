@@ -12,6 +12,7 @@ _CUDA_CTC_DECODERS = [
     "cuda_ctc_decoder",
 ]
 
+
 def __getattr__(name: str):
     if name in _CTC_DECODERS:
         try:

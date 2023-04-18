@@ -305,4 +305,3 @@ del cuda_decoder
 # +--------------+------------------------------------------+---------+-----------------------+-----------------------------+
 #
 # From the above table, CUDA decoder could give a slight improvement in WER and a significant increase in throughput.
-
