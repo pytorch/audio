@@ -507,7 +507,7 @@ class StreamReader:
 
     def __init__(
         self,
-        src: Union[str, BinaryIO, torch.Tensor],
+        src: Union[str, BinaryIO],
         format: Optional[str] = None,
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
@@ -517,7 +517,7 @@ class StreamReader:
         elif hasattr(src, "read"):
             self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
         else:
-            raise ValueError("`src` must be either string, Tensor or file-like object.")
+            raise ValueError("`src` must be either a string or file-like object.")
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i
