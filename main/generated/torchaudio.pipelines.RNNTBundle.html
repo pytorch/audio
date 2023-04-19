@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230418) &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230419) &#x25BC</span></a>
     </div>
     
 
@@ -428,7 +428,7 @@ e.g. <a class="reference internal" href="torchaudio.pipelines.EMFORMER_RNNT_BASE
 <dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.pipelines</span> <span class="kn">import</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Non-streaming inference.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build feature extractor, decoder with RNN-T model, and token processor.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_feature_extractor</span><span class="p">()</span>
@@ -438,34 +438,34 @@ e.g. <a class="reference internal" href="torchaudio.pipelines.EMFORMER_RNNT_BASE
 <span class="go">100%|███████████████████████████████| 293M/293M [00:07&lt;00:00, 42.1MB/s]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">token_processor</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_token_processor</span><span class="p">()</span>
 <span class="go">100%|███████████████████████████████| 295k/295k [00:00&lt;00:00, 25.4MB/s]</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Instantiate LibriSpeech dataset; retrieve waveform for first sample.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">LIBRISPEECH</span><span class="p">(</span><span class="s2">&quot;/home/librispeech&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-clean&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataset</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># Produce mel-scale spectrogram features.</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">features</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># Generate top-10 hypotheses.</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">hypotheses</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># For top hypothesis, convert predicted tokens to text.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">token_processor</span><span class="p">(</span><span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 <span class="go">he hoped there would be stew for dinner turnips and carrots and bruised potatoes and fat mutton pieces to [...]</span>
-<span class="go">&gt;&gt;&gt;</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Streaming inference.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hop_length</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">hop_length</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_samples_segment</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">segment_length</span> <span class="o">*</span> <span class="n">hop_length</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_samples_segment_right_context</span> <span class="o">=</span> <span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">num_samples_segment</span> <span class="o">+</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">right_context_length</span> <span class="o">*</span> <span class="n">hop_length</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build streaming inference feature extractor.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">streaming_feature_extractor</span> <span class="o">=</span> <span class="n">EMFORMER_RNNT_BASE_LIBRISPEECH</span><span class="o">.</span><span class="n">get_streaming_feature_extractor</span><span class="p">()</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Process same waveform as before, this time sequentially across overlapping segments</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># to simulate streaming inference. Note the usage of ``streaming_feature_extractor`` and ``decoder.infer``.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>

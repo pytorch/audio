@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230418) &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230419) &#x25BC</span></a>
     </div>
     
 
@@ -447,14 +447,14 @@ effects applied. Sample rate can also be different based on the effects applied.
 </dd>
 </dl>
 <dl>
-<dt>Example - Basic usage</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
+<dt>Example - Basic usage</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Defines the effects to apply</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">effects</span> <span class="o">=</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;gain&#39;</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">],</span>  <span class="c1"># normalises to 0dB</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;pitch&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">],</span>  <span class="c1"># 5 cent pitch shift</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;rate&#39;</span><span class="p">,</span> <span class="s1">&#39;8000&#39;</span><span class="p">],</span>  <span class="c1"># resample to 8000 Hz</span>
 <span class="gp">... </span><span class="p">]</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate pseudo wave:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># normalized, channels first, 2ch, sampling rate 16000, 1 second</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mi">16000</span>
@@ -464,11 +464,11 @@ effects applied. Sample rate can also be different based on the effects applied.
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span>
 <span class="go">tensor([[ 0.3138,  0.7620, -0.9019,  ..., -0.7495, -0.4935,  0.5442],</span>
 <span class="go">        [-0.0832,  0.0061,  0.8233,  ..., -0.5176, -0.9140, -0.2434]])</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply effects</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">apply_effects_tensor</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">wave_form</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Check the result</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># The new waveform is sampling rate 8000, 1 second.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># normalization and channel order are preserved</span>
@@ -482,10 +482,10 @@ effects applied. Sample rate can also be different based on the effects applied.
 </pre></div>
 </div>
 </dd>
-<dt>Example - Torchscript-able transform</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
+<dt>Example - Torchscript-able transform</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Use `apply_effects_tensor` in `torch.nn.Module` and dump it to file,</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># then run sox effect via Torchscript runtime.</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SoxEffectTransform</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 <span class="gp">...</span>
@@ -504,12 +504,12 @@ effects applied. Sample rate can also be different based on the effects applied.
 <span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;8000&quot;</span><span class="p">],</span>  <span class="c1"># change sample rate to 8000</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">SoxEffectTensorTransform</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="n">input_sample_rate</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Dump it to file and load</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;sox_effect.zip&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="go">&gt;&gt;&gt;&gt; # Run transform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">input_sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;input.wav&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">input_sample_rate</span><span class="p">)</span>

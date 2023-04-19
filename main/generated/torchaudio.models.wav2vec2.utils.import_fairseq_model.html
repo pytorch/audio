@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230418) &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230419) &#x25BC</span></a>
     </div>
     
 
@@ -434,17 +434,17 @@ One of <code class="docutils literal notranslate"><span class="pre">fairseq.mode
 </dl>
 <dl>
 <dt>Example - Loading pretrain-only model</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2.utils</span> <span class="kn">import</span> <span class="n">import_fairseq_model</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load model using fairseq</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model_file</span> <span class="o">=</span> <span class="s1">&#39;wav2vec_small.pt&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fairseq</span><span class="o">.</span><span class="n">checkpoint_utils</span><span class="o">.</span><span class="n">load_model_ensemble_and_task</span><span class="p">([</span><span class="n">model_file</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">imported</span> <span class="o">=</span> <span class="n">import_fairseq_model</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform feature extraction</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;audio.wav&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">features</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imported</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compare result with the original model from fairseq</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reference</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
@@ -452,17 +452,17 @@ One of <code class="docutils literal notranslate"><span class="pre">fairseq.mode
 </div>
 </dd>
 <dt>Example - Fine-tuned model</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2.utils</span> <span class="kn">import</span> <span class="n">import_fairseq_model</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load model using fairseq</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model_file</span> <span class="o">=</span> <span class="s1">&#39;wav2vec_small_960h.pt&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fairseq</span><span class="o">.</span><span class="n">checkpoint_utils</span><span class="o">.</span><span class="n">load_model_ensemble_and_task</span><span class="p">([</span><span class="n">model_file</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">imported</span> <span class="o">=</span> <span class="n">import_fairseq_model</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">w2v_encoder</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform encoding</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;audio.wav&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">emission</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imported</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compare result with the original model from fairseq</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reference</span> <span class="o">=</span> <span class="n">original</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">mask</span><span class="p">)[</span><span class="s1">&#39;encoder_out&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>

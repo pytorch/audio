@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230418) &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230419) &#x25BC</span></a>
     </div>
     
 
@@ -424,10 +424,10 @@ instances.</p>
 <p>Please see below for the usage and the available values.</p>
 <dl>
 <dt>Example - Character-based TTS pipeline with Tacotron2 and WaveRNN</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Hello, T T S !&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_CHAR_LJSPEECH</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build processor, Tacotron2 and WaveRNN model</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_text_processor</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tacotron2</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_tacotron2</span><span class="p">()</span>
@@ -436,33 +436,33 @@ instances.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vocoder</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_vocoder</span><span class="p">()</span>
 <span class="go">Downloading:</span>
 <span class="go">100%|███████████████████████████████| 16.7M/16.7M [00:00&lt;00:00, 78.1MB/s]</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Encode text</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate (mel-scale) spectrogram</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">specgram</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tacotron2</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Convert spectrogram to waveform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;hello-tts.wav&#39;</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">,</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
-<dt>Example - Phoneme-based TTS pipeline with Tacotron2 and WaveRNN</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
+<dt>Example - Phoneme-based TTS pipeline with Tacotron2 and WaveRNN</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Note:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#     This bundle uses pre-trained DeepPhonemizer as</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#     the text pre-processor.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#     Please install deep-phonemizer.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#     See https://github.com/as-ideas/DeepPhonemizer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#     The pretrained weight is automatically downloaded.</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Hello, TTS!&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Build processor, Tacotron2 and WaveRNN model</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_text_processor</span><span class="p">()</span>
 <span class="go">Downloading:</span>
@@ -473,16 +473,16 @@ instances.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vocoder</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_vocoder</span><span class="p">()</span>
 <span class="go">Downloading:</span>
 <span class="go">100%|███████████████████████████████| 16.7M/16.7M [00:00&lt;00:00, 78.1MB/s]</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Encode text</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate (mel-scale) spectrogram</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">specgram</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tacotron2</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Convert spectrogram to waveform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">waveforms</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;hello-tts.wav&#39;</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">,</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -550,15 +550,15 @@ tokenized form.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_CHAR_LJSPEECH</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_text_processor</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 <span class="go">tensor([[19, 16, 23, 23, 26, 11, 34, 26, 29, 23, 15,  2,  0,  0,  0],</span>
 <span class="go">        [31, 16, 35, 31,  1, 31, 26,  1, 30, 27, 16, 16, 14, 19,  2]],</span>
 <span class="go">       dtype=torch.int32)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
 <span class="go">tensor([12, 15], dtype=torch.int32)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
 <span class="go">[&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39; &#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;, &#39;!&#39;]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">lengths</span><span class="p">[</span><span class="mi">1</span><span class="p">]]])</span>
@@ -575,15 +575,15 @@ tokenized form.</p>
 <span class="go">Downloading:</span>
 <span class="go">100%|███████████████████████████████| 63.6M/63.6M [00:04&lt;00:00, 15.3MB/s]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 <span class="go">tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2,  0,  0,  0,  0],</span>
 <span class="go">        [81, 40, 64, 79, 81,  1, 81, 20,  1, 79, 77, 59, 37,  2]],</span>
 <span class="go">       dtype=torch.int32)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
 <span class="go">tensor([10, 14], dtype=torch.int32)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
 <span class="go">[&#39;HH&#39;, &#39;AH&#39;, &#39;L&#39;, &#39;OW&#39;, &#39; &#39;, &#39;W&#39;, &#39;ER&#39;, &#39;L&#39;, &#39;D&#39;, &#39;!&#39;, &#39;_&#39;, &#39;_&#39;, &#39;_&#39;, &#39;_&#39;]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
