@@ -176,6 +176,15 @@ else:
     version = f"Nightly Build ({torchaudio.__version__})"
     release = "nightly"
 
+
+#
+# Specify the version of the current stable release.
+# Used in `docs/source/_templates/breadcrumbs.html`
+#
+# https://stackoverflow.com/a/33845358/1106930
+#
+html_context = {"version_stable": "2.0.1"}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
