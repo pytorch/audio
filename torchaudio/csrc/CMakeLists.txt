@@ -73,10 +73,6 @@ if(OpenMP_CXX_FOUND)
     )
 endif()
 
-if (BUILD_CUDA_CTC_DECODER)
-  add_subdirectory(cuctc)
-endif()
-
 #------------------------------------------------------------------------------#
 # END OF CUSTOMIZATION LOGICS
 #------------------------------------------------------------------------------#

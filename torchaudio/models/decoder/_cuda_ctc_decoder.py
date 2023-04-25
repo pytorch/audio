@@ -80,7 +80,7 @@ class CUCTCDecoder:
         self.space_id = 0
         self.nbest = nbest
         self.blank_skip_threshold = blank_skip_threshold
-        self.beam_size = beam_size
+        self.beam_size = beam_size  # beam size must be smaller than batch size
 
     def __del__(self):
         if cuctc is not None:

@@ -27,7 +27,7 @@
 #define __ctc_prefix_decoder_h_
 
 #include <cuda_runtime.h>
-
+#include <cstdint>
 #include <tuple>
 #include <vector>
 namespace cu_ctc {

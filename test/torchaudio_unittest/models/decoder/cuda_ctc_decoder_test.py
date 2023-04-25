@@ -8,7 +8,7 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
 )
 
-NUM_TOKENS = 8
+NUM_TOKENS = 7
 
 
 @skipIfNoCuda
@@ -22,6 +22,7 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
 
         return cuda_ctc_decoder(
             tokens=tokens,
+            beam_size=5,
             **kwargs,
         )
 
@@ -34,7 +35,7 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         return emissions
 
     @parameterized.expand(
-        [get_asset_path("decoder/tokens.txt"), ["-", "|", "f", "o", "b", "a", "r"]],
+        [(get_asset_path("decoder/tokens.txt"),), (["-", "|", "f", "o", "b", "a", "r"],)],
     )
     def test_construct_basic_decoder(self, tokens):
         self._get_decoder(tokens=tokens)

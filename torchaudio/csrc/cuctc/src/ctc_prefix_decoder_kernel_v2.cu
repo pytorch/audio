@@ -182,7 +182,6 @@ __global__ void prob_space_blank_kernel_v2(
     float pc = log_prob_struct.at(batch_id, select_seq, blid);
     float2 tmpprev = pprev[batch_id * ldbeam + beamid];
     int last_char = clast[batch_id * ldbeam + beamid];
-    int idin = last_char + (batch_id * beam + beamid) * ldc;
     int idout = blid + (batch_id * beam + beamid) * ldc;
     ptable[idout] = _logprob(pc, _logsumexp(tmpprev.x, tmpprev.y));
     if (last_char == blid)
@@ -403,7 +402,6 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
     return;
   const bool is_need_add_blank = log_prob_struct.need_add_blank(batch_id, step);
   const int tx = threadIdx.x;
-  constexpr int smem_size = MAX_SUPPORT_BEAM * (sizeof(float) + sizeof(int));
 
   using BlockRadixSortT =
       cub::BlockRadixSort<float, BLOCK_SIZE, ITEMS_PER_THREAD, int>;
@@ -411,6 +409,7 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
   __shared__ union {
     typename BlockRadixSortT::TempStorage temp_storage;
 #ifdef USE_PARALLEL_WRITE
+    constexpr int smem_size = MAX_SUPPORT_BEAM * (sizeof(float) + sizeof(int));
     uint8_t topk_key_value_smem[smem_size];
 #endif
     /* data */
@@ -610,13 +609,12 @@ int CTC_prob_first_step_V2(
   CHECK(beam <= 128, "ERROR: only support beam size <=128 ");
 
   constexpr int threads_per_block = 256;
-  constexpr int items_per_thread = 4;
   const int grid = bs;
 
   constexpr int Capacity = 16;
   using FunType =
       decltype(first_matrix__bitonic_topk_kernel<threads_per_block, Capacity>);
-  static const FunType* FirstMatrixFuns[5]{
+  static FunType* FirstMatrixFuns[5]{
       first_matrix__bitonic_topk_kernel<threads_per_block, 8>,
       first_matrix__bitonic_topk_kernel<threads_per_block, 16>,
       first_matrix__bitonic_topk_kernel<threads_per_block, 32>,
@@ -754,7 +752,7 @@ int CTC_prob_topK_V2(
 
   using FunType = decltype(
       bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, Capacity>);
-  static const FunType* BitonicTopkFuns[5]{
+  static FunType* BitonicTopkFuns[5]{
       bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, 8>,
       bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, 16>,
       bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, 32>,
@@ -977,7 +975,6 @@ int CTC_copy_list_len_for_differnet_parity(
   constexpr int BLOCK_SIZE = 256;
   const int beams_per_block = BLOCK_SIZE / SUB_WARP_SIZE;
   const int bxs = (beam + beams_per_block - 1) / beams_per_block;
-  const int bys = bs;
   dim3 blocks_this_grid;
   blocks_this_grid.x = bxs;
   blocks_this_grid.y = bs;
