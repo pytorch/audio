@@ -751,8 +751,9 @@ int CTC_prob_topK_V2(
 
   constexpr int Capacity = 32; // 8,16,32,64,128
 
-  using FunType = decltype(
-      bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, Capacity>);
+  using FunType = decltype(bitonic_topk_multi_block_per_batch_kernel<
+                           threads_per_block0,
+                           Capacity>);
   static FunType* BitonicTopkFuns[5]{
       bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, 8>,
       bitonic_topk_multi_block_per_batch_kernel<threads_per_block0, 16>,
