@@ -3,12 +3,13 @@ import logging
 import time
 import torch
 import torchaudio
-from torchaudio.models.decoder import ctc_decoder, cuda_ctc_decoder, download_pretrained_files
+from torchaudio.models.decoder import ctc_decoder, cuda_ctc_decoder
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 import sentencepiece as spm
 
 logger = logging.getLogger(__name__)
+
 
 def collate_wrapper(batch):
     speeches, labels = [], []
@@ -16,6 +17,7 @@ def collate_wrapper(batch):
         speeches.append(speech)
         labels.append(label.strip().lower().strip())
     return speeches, labels
+
 
 def run_inference(args):
     device = torch.device("cuda", 0)
@@ -41,13 +43,13 @@ def run_inference(args):
     else:
         assert vocabs[0] == "<blk>", "idx of blank token has to be zero"
         blank_frame_skip_threshold = float(torch.log(torch.tensor(args.blank_skip_threshold)))
-        cuda_decoder = cuda_ctc_decoder(vocabs, nbest=args.nbest, beam_size=args.beam_size, blank_skip_threshold=blank_frame_skip_threshold)
+        cuda_decoder = cuda_ctc_decoder(vocabs, nbest=args.nbest, beam_size=args.beam_size, blank_skip_threshold=blank_frame_skip_threshold)  # noqa: E501
 
     dataset = torchaudio.datasets.LIBRISPEECH(args.librispeech_path, url=args.split, download=True)
 
     total_edit_distance, oracle_edit_distance, total_length = 0, 0, 0
 
-    data_loader = DataLoader(dataset, batch_size=args.batch_size, num_workers=4, pin_memory=True, collate_fn=collate_wrapper)
+    data_loader = DataLoader(dataset, batch_size=args.batch_size, num_workers=4, pin_memory=True, collate_fn=collate_wrapper)  # noqa: E501
 
     decoding_duration = 0
     for idx, batch in enumerate(data_loader):
@@ -64,7 +66,7 @@ def run_inference(args):
             x_lens=feature_lengths,
         )
         nnet_output = model.ctc_output(encoder_out)
-        log_prob = torch.nn.functional.log_softmax(nnet_output,-1)
+        log_prob = torch.nn.functional.log_softmax(nnet_output, -1)
 
         decoding_start = time.perf_counter()
         preds = []
@@ -86,13 +88,14 @@ def run_inference(args):
 
         for transcript, nbest_pred in zip(transcripts, preds):
             total_edit_distance += torchaudio.functional.edit_distance(transcript.split(), nbest_pred[0])
-            oracle_edit_distance += min([torchaudio.functional.edit_distance(transcript.split(), nbest_pred[i]) for i in range(len(nbest_pred))])
+            oracle_edit_distance += min([torchaudio.functional.edit_distance(transcript.split(), nbest_pred[i]) for i in range(len(nbest_pred))])  # noqa: E501
             total_length += len(transcript.split())
-       
-        if idx % 10 == 0:
-            logger.info(f"Processed elem {idx}; WER: {total_edit_distance / total_length}, Oracle WER: {oracle_edit_distance / total_length}, decoding time for batch size {args.batch_size}: {duration}")
 
-    logger.info(f"Final WER: {total_edit_distance / total_length}, Oracle WER: {oracle_edit_distance / total_length}, time for decoding {decoding_duration} secs.")
+        if idx % 10 == 0:
+            logger.info(f"Processed elem {idx}; WER: {total_edit_distance / total_length}, Oracle WER: {oracle_edit_distance / total_length}, decoding time for batch size {args.batch_size}: {duration}")  # noqa: E501
+
+    logger.info(f"Final WER: {total_edit_distance / total_length}, Oracle WER: {oracle_edit_distance / total_length}, time for decoding {decoding_duration} secs.")  # noqa: E501
+
 
 def _parse_args():
     parser = argparse.ArgumentParser(
@@ -149,10 +152,12 @@ def _parse_args():
     )
     return parser.parse_args()
 
+
 def _init_logger(debug):
     fmt = "%(asctime)s %(message)s" if debug else "%(message)s"
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %H:%M:%S")
+
 
 def _main():
     args = _parse_args()

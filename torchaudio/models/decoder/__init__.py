@@ -30,7 +30,7 @@ def __getattr__(name: str):
             from . import _cuda_ctc_decoder
         except AttributeError as err:
             raise RuntimeError(
-                "CUCTC decoder requires the decoder extension. Please set BUILD_CUDA_CTC_DECODER=1 when building from source."
+                "To use CUCTC decoder, please set BUILD_CUDA_CTC_DECODER=1 when building from source."
             ) from err
 
         item = getattr(_cuda_ctc_decoder, name)

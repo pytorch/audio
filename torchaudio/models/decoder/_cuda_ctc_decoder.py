@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import itertools as it
 import math
 
-import warnings
-from abc import abstractmethod
-from collections import namedtuple
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import List, NamedTuple, Union
 
 import torch
 import torchaudio
-from torchaudio.utils import download_asset
 
 torchaudio._extension._load_lib("libctc_prefix_decoder")
 import torchaudio.lib.pybind11_prefixctc as cuctc
@@ -34,7 +29,7 @@ class CUCTCHypothesis(NamedTuple):
     """Predicted sequence of token IDs. Shape `(L, )`, where `L` is the length of the output sequence"""
 
     words: List[str]
-    """List of predicted tokens. Algin with modeling unit. 
+    """List of predicted tokens. Algin with modeling unit.
     """
 
     score: float

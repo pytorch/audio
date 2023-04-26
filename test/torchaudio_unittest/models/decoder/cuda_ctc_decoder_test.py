@@ -1,5 +1,4 @@
 import torch
-from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     skipIfNoCuCtcDecoder,
