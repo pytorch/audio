@@ -612,9 +612,8 @@ int CTC_prob_first_step_V2(
   const int grid = bs;
 
   constexpr int Capacity = 16;
-  using FunType = decltype(first_matrix__bitonic_topk_kernel<
-                           threads_per_block,
-                           Capacity>);
+  using FunType =
+      decltype(first_matrix__bitonic_topk_kernel<threads_per_block, Capacity>);
   static FunType* FirstMatrixFuns[5]{
       first_matrix__bitonic_topk_kernel<threads_per_block, 8>,
       first_matrix__bitonic_topk_kernel<threads_per_block, 16>,
