@@ -80,7 +80,7 @@ class CUCTCDecoder:
         self.space_id = 0
         self.nbest = nbest
         self.blank_skip_threshold = blank_skip_threshold
-        self.beam_size = beam_size  # beam size must be smaller than batch size
+        self.beam_size = min(beam_size, len(vocab_list))  # beam size must be smaller than vocab size
 
     def __del__(self):
         if cuctc is not None:
@@ -104,6 +104,8 @@ class CUCTCDecoder:
             raise AssertionError("log_prob must be torch.float32")
         if not (log_prob.is_cuda and encoder_out_lens.is_cuda):
             raise AssertionError("inputs must be cuda tensors")
+        if not (log_prob.is_contiguous() and encoder_out_lens.is_contiguous()):
+            raise AssertionError("input tensors must be contiguous")
         required_size, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
             self.internal_data,
             self.memory.data_ptr(),

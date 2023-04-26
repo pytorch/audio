@@ -37,10 +37,10 @@ _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX"
 _BUILD_KALDI = False if platform.system() == "Windows" else _get_build("BUILD_KALDI", True)
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
-_BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
+_BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", _USE_CUDA)
 _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
