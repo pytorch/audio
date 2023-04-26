@@ -37,7 +37,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     pybind11_prefixctc
     src/python_binding.cpp
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "libctc_prefix_decoder;${additional_libs}"
+    "libctc_prefix_decoder"
     ""
     )
 endif()
