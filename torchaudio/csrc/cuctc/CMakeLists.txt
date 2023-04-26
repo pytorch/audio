@@ -14,10 +14,6 @@ set(
   src/ctc_prefix_decoder_kernel_v2.cu
   )
 
-set(
-  additional_libs
-  )
-
 list(
   APPEND
   additional_libs
