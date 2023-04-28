@@ -134,7 +134,7 @@ def plot_waveform(waveform, title):
     sample_size = waveform.shape[1]
     time_axis = torch.arange(0, sample_size) / 16000
 
-    figure = plt.figure(figsize=(10,4))
+    figure, axes = plt.subplots(1, 1)
     axes = figure.gca()
     axes.plot(time_axis, wav_numpy[0], linewidth=1)
     axes.grid(True)
@@ -147,7 +147,7 @@ def plot_specgram(waveform, sample_rate, title):
 
     sample_size = waveform.shape[1]
 
-    figure = plt.figure(figsize=(10,4))
+    figure, axes = plt.subplots(1, 1)
     axes = figure.gca()
     axes.specgram(wav_numpy[0], Fs=sample_rate)
     figure.suptitle(title)
@@ -232,7 +232,7 @@ Audio(WAVEFORM_DISTORTED.numpy()[1], rate=16000)
 
 
 ######################################################################
-# 4. Visualize the waveforms
+# 5. Visualize the waveforms
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 
@@ -270,9 +270,16 @@ plot_specgram(WAVEFORM_DISTORTED[1:2], 16000, f"Distorted Speech with {snr_dbs[1
 
 
 ######################################################################
-# 5. Predict Objective Metrics
+# 6. Predict Objective Metrics
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
+
+
+######################################################################
+# Get the pre-trained ``SquimObjective``\ model.
+# 
+
+objective_model = SQUIM_OBJECTIVE.get_model()
 
 
 ######################################################################
@@ -280,7 +287,6 @@ plot_specgram(WAVEFORM_DISTORTED[1:2], 16000, f"Distorted Speech with {snr_dbs[1
 # SNR
 # 
 
-objective_model = SQUIM_OBJECTIVE.get_model()
 stoi_hyp, pesq_hyp, si_sdr_hyp = objective_model(WAVEFORM_DISTORTED[0:1,:])
 print(f"Estimated metrics for distorted speech at {snr_dbs[0]}dB are\n")
 print(f"STOI: {stoi_hyp[0]}")
@@ -301,7 +307,6 @@ print(f"SI-SDR: {si_sdr_ref}")
 # SNR
 # 
 
-objective_model = SQUIM_OBJECTIVE.get_model()
 stoi_hyp, pesq_hyp, si_sdr_hyp = objective_model(WAVEFORM_DISTORTED[1:2,:])
 print(f"Estimated metrics for distorted speech at {snr_dbs[1]}dB are\n")
 print(f"STOI: {stoi_hyp[0]}")
@@ -318,14 +323,20 @@ print(f"SI-SDR: {si_sdr_ref}")
 
 
 ######################################################################
-# 5. Predict Mean Opinion Scores (Subjective)
+# 7. Predict Mean Opinion Scores (Subjective)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 
 
 ######################################################################
+# Get the pre-trained ``SquimSubjective`` model.
+# 
+
+subjective_model = SQUIM_SUBJECTIVE.get_model()
+
+
+######################################################################
 # Load a non-matching reference (NMR)
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 
 NMR_SPEECH = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
@@ -333,8 +344,6 @@ NMR_SPEECH = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 WAVEFORM_NMR, SAMPLE_RATE_NMR = torchaudio.load(NMR_SPEECH)
 if SAMPLE_RATE_NMR != 16000:
     WAVEFORM_NMR = F.resample(WAVEFORM_NMR, SAMPLE_RATE_NMR, 16000)
-
-subjective_model = SQUIM_SUBJECTIVE.get_model()
 
 
 ######################################################################

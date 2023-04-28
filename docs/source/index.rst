@@ -305,7 +305,7 @@ Tutorials
 .. customcarditem::
    :header: Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio
    :card_description: Learn how to estimate subjective and objective metrics with pre-trained TorchAudio-SQUIM models (<code>torchaudio.pipelines.SQUIMObjective</code>).
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/speech_recognition_pipeline_tutorial.png
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/squim_tutorial.png
    :link: tutorials/squim_tutorial.html
    :tags: Pipelines,Speech Assessment,Speech Enhancement
 .. customcardend::
