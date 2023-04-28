@@ -4,7 +4,6 @@ It affects functionalities in :py:mod:`torchaudio.io` (and indirectly :py:func:`
 """
 from typing import Dict, List, Tuple
 
-import torch
 import torchaudio
 
 
