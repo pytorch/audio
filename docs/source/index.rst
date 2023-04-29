@@ -71,6 +71,7 @@ model implementations and application components.
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
    tutorials/hybrid_demucs_tutorial
+   tutorials/squim_tutorial
 
 .. toctree::
    :maxdepth: 1
@@ -301,6 +302,12 @@ Tutorials
    :link: tutorials/hybrid_demucs_tutorial.html
    :tags: Pipelines,Source-Separation
 
+.. customcarditem::
+   :header: Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio
+   :card_description: Learn how to estimate subjective and objective metrics with pre-trained TorchAudio-SQUIM models (<code>torchaudio.pipelines.SQUIMObjective</code>).
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/squim_tutorial.png
+   :link: tutorials/squim_tutorial.html
+   :tags: Pipelines,Speech Assessment,Speech Enhancement
 .. customcardend::
 
 
