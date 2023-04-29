@@ -116,6 +116,7 @@ def is_ffmpeg_available():
 
 
 _IS_CTC_DECODER_AVAILABLE = None
+_IS_CUDA_CTC_DECODER_AVAILABLE = None
 
 
 def is_ctc_decoder_available():
@@ -128,6 +129,18 @@ def is_ctc_decoder_available():
         except Exception:
             _IS_CTC_DECODER_AVAILABLE = False
     return _IS_CTC_DECODER_AVAILABLE
+
+
+def is_cuda_ctc_decoder_available():
+    global _IS_CUDA_CTC_DECODER_AVAILABLE
+    if _IS_CUDA_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.models.decoder import CUCTCDecoder  # noqa: F401
+
+            _IS_CUDA_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CUDA_CTC_DECODER_AVAILABLE = False
+    return _IS_CUDA_CTC_DECODER_AVAILABLE
 
 
 def _eval_env(var, default):
@@ -235,6 +248,11 @@ skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),
     reason="CTC decoder not available.",
     key="NO_CTC_DECODER",
+)
+skipIfNoCuCtcDecoder = _skipIf(
+    not is_cuda_ctc_decoder_available(),
+    reason="CUCTC decoder not available.",
+    key="NO_CUCTC_DECODER",
 )
 skipIfRocm = _skipIf(
     _eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
