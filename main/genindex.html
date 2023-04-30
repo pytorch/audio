@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230428) &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.1.0.dev20230430) &#x25BC</span></a>
     </div>
     
 
@@ -279,6 +279,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
 <ul>
@@ -437,6 +438,8 @@
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.__call__">__call__() (torchaudio.models.decoder.CTCDecoder method)</a>
 
       <ul>
+        <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCDecoder.__call__">(torchaudio.models.decoder.CUCTCDecoder method)</a>
+</li>
         <li><a href="generated/torchaudio.pipelines.RNNTBundle.FeatureExtractor.html#torchaudio.pipelines.RNNTBundle.FeatureExtractor.__call__">(torchaudio.pipelines.RNNTBundle.FeatureExtractor method)</a>
 </li>
         <li><a href="generated/torchaudio.pipelines.RNNTBundle.TokenProcessor.html#torchaudio.pipelines.RNNTBundle.TokenProcessor.__call__">(torchaudio.pipelines.RNNTBundle.TokenProcessor method)</a>
@@ -629,10 +632,10 @@
 </li>
       <li><a href="generated/torchaudio.prototype.models.conformer_rnnt_model.html#torchaudio.prototype.models.conformer_rnnt_model">conformer_rnnt_model() (in module torchaudio.prototype.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base">conformer_wav2vec2_base() (in module torchaudio.prototype.models)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/torchaudio.prototype.models.conformer_wav2vec2_model.html#torchaudio.prototype.models.conformer_wav2vec2_model">conformer_wav2vec2_model() (in module torchaudio.prototype.models)</a>
 </li>
       <li><a href="generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_base.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base">conformer_wav2vec2_pretrain_base() (in module torchaudio.prototype.models)</a>
@@ -668,6 +671,12 @@
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLMState">CTCDecoderLMState (class in torchaudio.models.decoder)</a>
 </li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCHypothesis">CTCHypothesis (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCDecoder">CUCTCDecoder (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis">CUCTCHypothesis (class in torchaudio.models.decoder)</a>
+</li>
+      <li><a href="generated/torchaudio.models.decoder.cuda_ctc_decoder.html#torchaudio.models.decoder.cuda_ctc_decoder">cuda_ctc_decoder() (in module torchaudio.models.decoder)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1443,7 +1452,11 @@
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCHypothesis.score">score (torchaudio.models.decoder.CTCHypothesis attribute)</a>
+
+      <ul>
+        <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis.score">(torchaudio.models.decoder.CUCTCHypothesis attribute)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLM.score">score() (torchaudio.models.decoder.CTCDecoderLM method)</a>
 </li>
       <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.seek">seek() (torchaudio.io.StreamReader method)</a>
@@ -1575,6 +1588,8 @@
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCHypothesis.tokens">tokens (torchaudio.models.decoder.CTCHypothesis attribute)</a>
 
       <ul>
+        <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis.tokens">(torchaudio.models.decoder.CUCTCHypothesis attribute)</a>
+</li>
         <li><a href="generated/torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens">(torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor property)</a>
 </li>
       </ul></li>
@@ -1942,10 +1957,10 @@
 </li>
       <li><a href="generated/torchaudio.pipelines.WAV2VEC2_XLSR_1B.html#torchaudio.pipelines.WAV2VEC2_XLSR_1B">WAV2VEC2_XLSR_1B (in module torchaudio.pipelines)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/torchaudio.models.wav2vec2_xlsr_1b.html#torchaudio.models.wav2vec2_xlsr_1b">wav2vec2_xlsr_1b() (in module torchaudio.models)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/torchaudio.pipelines.WAV2VEC2_XLSR_2B.html#torchaudio.pipelines.WAV2VEC2_XLSR_2B">WAV2VEC2_XLSR_2B (in module torchaudio.pipelines)</a>
 </li>
       <li><a href="generated/torchaudio.models.wav2vec2_xlsr_2b.html#torchaudio.models.wav2vec2_xlsr_2b">wav2vec2_xlsr_2b() (in module torchaudio.models)</a>
@@ -1981,7 +1996,11 @@
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCHypothesis.words">words (torchaudio.models.decoder.CTCHypothesis attribute)</a>
+
+      <ul>
+        <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis.words">(torchaudio.models.decoder.CUCTCHypothesis attribute)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_audio_chunk">write_audio_chunk() (torchaudio.io.StreamWriter method)</a>
 </li>
       <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_video_chunk">write_video_chunk() (torchaudio.io.StreamWriter method)</a>
