@@ -23,8 +23,8 @@ from jinja2 import select_autoescape
 
 PYTHON_VERSIONS = ["3.8", "3.9", "3.10", "3.11"]
 CU_VERSIONS_DICT = {
-    "linux": ["cpu", "cu117", "cu118", "rocm5.2", "rocm5.3"],
-    "windows": ["cpu", "cu117", "cu118"],
+    "linux": ["cpu", "cu117", "cu118", "cu121", "rocm5.2", "rocm5.3"],
+    "windows": ["cpu", "cu117", "cu118", "cu121"],
     "macos": ["cpu"],
 }
 
