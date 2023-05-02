@@ -13,11 +13,11 @@ apply various effects and codecs to waveform tensor.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <5).
+#    This tutorial requires FFmpeg libraries (>=5.0, <6).
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda 'ffmpeg<5'`` will install
+#    ``conda install -c conda-forge 'ffmpeg<6'`` will install
 #    the required libraries.
 #
 

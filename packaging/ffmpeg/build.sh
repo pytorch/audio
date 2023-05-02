@@ -32,7 +32,7 @@ cd "${build_dir}"
 # NOTE:
 # When changing the version of FFmpeg, update the README so that the link to the source points
 # the same version.
-curl -LsS -o ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.1.8.tar.gz
+curl -LsS -o ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.0.3.tar.gz
 tar -xf ffmpeg.tar.gz --strip-components 1
 ./configure \
     --prefix="${prefix}" \
@@ -72,11 +72,11 @@ ls ${prefix}/*
 # macOS: Fix rpath so that the libraries are searched dynamically in user environment.
 # In Linux, this is handled by `--enable-rpath` flag.
 if [[ "$(uname)" == Darwin ]]; then
-    avcodec=libavcodec.58
-    avdevice=libavdevice.58
-    avfilter=libavfilter.7
-    avformat=libavformat.58
-    avutil=libavutil.56
+    avcodec=libavcodec.59
+    avdevice=libavdevice.59
+    avfilter=libavfilter.8
+    avformat=libavformat.59
+    avutil=libavutil.57
 
     otool="/usr/bin/otool"
     # NOTE: miniconda has a version of otool and install_name_tool installed and we want
