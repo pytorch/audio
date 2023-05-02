@@ -792,6 +792,8 @@ jobs:
 
   build_docs:
     <<: *smoke_test_common
+    docker:
+      - image: "<< parameters.conda_docker_image >>"
     resource_class: 2xlarge+
     steps:
       - attach_workspace:
