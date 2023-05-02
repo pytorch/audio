@@ -1206,7 +1206,6 @@ class _AxisMasking(torch.nn.Module):
     __constants__ = ["mask_param", "axis", "iid_masks", "p"]
 
     def __init__(self, mask_param: int, axis: int, iid_masks: bool, p: float = 1.0) -> None:
-
         super(_AxisMasking, self).__init__()
         self.mask_param = mask_param
         self.axis = axis
@@ -1226,11 +1225,11 @@ class _AxisMasking(torch.nn.Module):
         # self.axis + specgram.dim() - 3 gives the time/frequency dimension (last two dimensions)
         # for input tensor for which the dimension is not 3.
         if self.iid_masks:
-            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value,
-                                         self.axis + specgram.dim() - 3, p=self.p)
+            return F.mask_along_axis_iid(
+                specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p
+            )
         else:
-            return F.mask_along_axis(specgram, self.mask_param, mask_value,
-                                     self.axis + specgram.dim() - 3, p=self.p)
+            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p)
 
 
 class FrequencyMasking(_AxisMasking):
