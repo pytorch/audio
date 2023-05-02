@@ -838,10 +838,10 @@ def mask_along_axis_iid(
     dim = specgrams.dim()
 
     if dim < 3:
-        raise ValueError("Spectrogram must have at least three dimensions")
+        raise ValueError(f"Spectrogram must have at least three dimensions ({dim} given).")
 
     if axis not in [dim - 2, dim - 1]:
-        raise ValueError("Only Frequency and Time masking are supported")
+        raise ValueError(f"Only Frequency (axis {dim-2}) and Time (axis {dim-1}) masking are supported ({axis} given).")
 
     if not 0.0 <= p <= 1.0:
         raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
@@ -903,10 +903,10 @@ def mask_along_axis(
     dim = specgram.dim()
 
     if dim < 2:
-        raise ValueError("Spectrogram must have at least two dimensions (time and frequency)")
+        raise ValueError(f"Spectrogram must have at least two dimensions (time and frequency) ({dim} given).")
 
     if axis not in [dim - 2, dim - 1]:
-        raise ValueError("Only Frequency and Time masking are supported")
+        raise ValueError(f"Only Frequency (axis {dim-2}) and Time (axis {dim-1}) masking are supported ({axis} given).")
 
     if not 0.0 <= p <= 1.0:
         raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
