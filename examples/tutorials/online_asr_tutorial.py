@@ -39,6 +39,7 @@ to perform online speech recognition.
 # --------------
 #
 
+import os
 import torch
 import torchaudio
 
@@ -222,9 +223,9 @@ def run_inference(num_iter=100):
         segment = cacher(chunk[:, 0])
         features, length = feature_extractor(segment)
         hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
-        hypothesis = hypos[0]
-        transcript = token_processor(hypothesis[0], lstrip=False)
-        print(transcript, end="", flush=True)
+        hypothesis = hypos
+        transcript = token_processor(hypos[0][0], lstrip=False)
+        print(transcript, end="\r", flush=True)
 
         chunks.append(chunk)
         feats.append(features)
