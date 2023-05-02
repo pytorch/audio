@@ -469,10 +469,11 @@ class InverseMelScale(torch.nn.Module):
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
         self.register_buffer("fb", fb)
 
-    def forward(self, melspec: Tensor) -> Tensor:
+    def forward(self, melspec: Tensor, driver: str = "gels") -> Tensor:
         r"""
         Args:
             melspec (Tensor): A Mel frequency spectrogram of dimension (..., ``n_mels``, time)
+            driver (str, optional): Name of the LAPACK/MAGMA method to be used for `torch.lstsq`. (Default: ``"gels``)
 
         Returns:
             Tensor: Linear scale spectrogram of size (..., freq, time)
@@ -486,7 +487,7 @@ class InverseMelScale(torch.nn.Module):
         if self.n_mels != n_mels:
             raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
 
-        specgram = torch.relu(torch.linalg.lstsq(self.fb.transpose(-1, -2)[None], melspec, driver="gels").solution)
+        specgram = torch.relu(torch.linalg.lstsq(self.fb.transpose(-1, -2)[None], melspec, driver=driver).solution)
 
         # unpack batch
         specgram = specgram.view(shape[:-2] + (freq, time))
