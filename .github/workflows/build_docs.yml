@@ -98,7 +98,7 @@ jobs:
         name: docs
     - name: Update nightly doc
       # TODO: add tag-based process (need to handle the main directory name)
-      if github.ref_name == 'nightly'
+      if: github.ref_name == 'nightly'
       run: |
         set -x
 
