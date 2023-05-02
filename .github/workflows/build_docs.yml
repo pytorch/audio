@@ -83,7 +83,7 @@ jobs:
     permissions:
       # Required for `git push`
       # Note:
-      #   This is not effective from folk.
+      #   This is not effective from fork.
       #   When you debug this, make sure to make a branch on pytorch and
       #   make PR from there.
       contents: write
