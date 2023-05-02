@@ -9,10 +9,11 @@ on:
       - release/*
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   commit:
-    permissions:
-      contents: write
 
     runs-on: ubuntu-latest
     steps:
@@ -23,10 +24,11 @@ jobs:
       run: |
         set -x
         # Let's pretend that this is equivalent of build step
-        echo "$date" > main/foo.html
+        mkdir -p test
+        echo "$date" > test/foo.html
 
         # Update the main doc
-        git add --all main || true
+        git add --all test || true
         git ls-files main
         git config user.name "pytorchbot"
         git config user.email "soumith+bot@pytorch.org"
