@@ -10,79 +10,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  upload:
+  commit:
     runs-on: ubuntu-latest
-    needs: build
     steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: docs
-    - name: Tweak the doc artifact
+    # Let's pretend that this is equivalent of build step
+    - name: Generate doc
       run: |
-        ls .
-
-    
-  build:
-    strategy:
-      matrix:
-        python_version: ["3.10"]
-        cuda_arch_version: ["11.7"]
-      fail-fast: false
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    with:
-      job-name: Build doc
-      runner: linux.g5.4xlarge.nvidia.gpu
-      repository: pytorch/audio
-      gpu-arch-type: cuda
-      gpu-arch-version: ${{ matrix.cuda_arch_version }}
-      timeout: 120
-      upload-artifact: docs
-
-      script: |
-        # Mark Build Directory Safe
-        git config --global --add safe.directory /__w/audio/audio
-
-        # Set up Environment Variables
-        export PYTHON_VERSION="${{ matrix.python_version }}"
-        export CU_VERSION="${{ matrix.cuda_arch_version }}"
-        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
-
-        # Set CHANNEL
-        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
-          export CHANNEL=test
-        else
-          export CHANNEL=nightly
-        fi
-
-        # Create Conda Env
-        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
-        conda activate ./ci_env
-
-        # Install PyTorch
-        set -ex
-        set +u  # don't know why
-        conda install \
-          --yes \
-          --quiet \
-          -c "pytorch-${CHANNEL}" \
-          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
-          "${CUDATOOLKIT}"
-
-        # Install torchaudio
-        # TODO: Enable NVDec/NVEnc
-        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
-        pip --quiet install cmake>=3.18.0 ninja
-        USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
-
-        # Install runtime dependencies
-        pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
-
-        # Install build tools
-        conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
-        pip install --quiet -r docs/requirements.txt -r docs/requirements-tutorials.txt
-
-        # Build docs
-        export BUILD_GALLERY=true
-        (cd docs && make html)
-
-        mv docs/build/html /artifacts/
+        mkdir -p docs/build/html
+        echo "$date" > docs/build/html/index.html
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+    - name: Prepare doc
+      run: |
+        rm -rf main
+        mv docs/build/html main
+        git remote -v
+        git add --all main || true
+        git config user.name "pytorchbot"
+        git config user.email "soumith+bot@pytorch.org"
+        git commit -m "auto-generating sphinx docs" || true
+        git push
