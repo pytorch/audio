@@ -13,19 +13,21 @@ jobs:
   commit:
     runs-on: ubuntu-latest
     steps:
-    # Let's pretend that this is equivalent of build step
-    - name: Generate doc
-      run: |
-        mkdir -p docs/build/html
-        echo "$date" > docs/build/html/index.html
     - uses: actions/checkout@v3
       with:
         ref: gh-pages
     - name: Prepare doc
       run: |
+        # Debug info
+        git remote -v
+
+        # Let's pretend that this is equivalent of build step
+        mkdir -p docs/build/html
+        echo "$date" > docs/build/html/index.html
+
+        # Update the main doc
         rm -rf main
         mv docs/build/html main
-        git remote -v
         git add --all main || true
         git config user.name "pytorchbot"
         git config user.email "soumith+bot@pytorch.org"
