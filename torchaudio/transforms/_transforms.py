@@ -431,6 +431,7 @@ class InverseMelScale(torch.nn.Module):
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+        driver (str, optional): Name of the LAPACK/MAGMA method to be used for `torch.lstsq`. (Default: ``"gels``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -456,12 +457,14 @@ class InverseMelScale(torch.nn.Module):
         f_max: Optional[float] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
+        driver: str = "gels",
     ) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max or float(sample_rate // 2)
         self.f_min = f_min
+        self.driver = driver
 
         if f_min > self.f_max:
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
@@ -469,11 +472,10 @@ class InverseMelScale(torch.nn.Module):
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
         self.register_buffer("fb", fb)
 
-    def forward(self, melspec: Tensor, driver: str = "gels") -> Tensor:
+    def forward(self, melspec: Tensor) -> Tensor:
         r"""
         Args:
             melspec (Tensor): A Mel frequency spectrogram of dimension (..., ``n_mels``, time)
-            driver (str, optional): Name of the LAPACK/MAGMA method to be used for `torch.lstsq`. (Default: ``"gels``)
 
         Returns:
             Tensor: Linear scale spectrogram of size (..., freq, time)
@@ -487,7 +489,7 @@ class InverseMelScale(torch.nn.Module):
         if self.n_mels != n_mels:
             raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
 
-        specgram = torch.relu(torch.linalg.lstsq(self.fb.transpose(-1, -2)[None], melspec, driver=driver).solution)
+        specgram = torch.relu(torch.linalg.lstsq(self.fb.transpose(-1, -2)[None], melspec, driver=self.driver).solution)
 
         # unpack batch
         specgram = specgram.view(shape[:-2] + (freq, time))
