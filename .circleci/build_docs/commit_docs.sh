@@ -21,12 +21,6 @@ mkdir -p ./"${target}"
 rm -rf ./"${target}"/*
 cp -r "${src}/docs/build/html/"* ./"$target"
 rm ./"$target"/artifact.tar.gz
-if [ "${target}" == "main" ]; then
-    mkdir -p ./_static
-    rm -rf ./_static/*
-    cp -r "${src}/docs/build/html/_static/"* ./_static
-    git add --all ./_static || true
-fi
 git add --all ./"${target}" || true
 git config user.email "soumith+bot@pytorch.org"
 git config user.name "pytorchbot"
