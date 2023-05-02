@@ -918,12 +918,14 @@ def mask_along_axis(
     # pack batch
     shape = specgram.size()
     specgram = specgram.reshape([-1] + list(shape[-2:]))
+    # After packing, specgram is a 3D tensor, and the axis corresponding to the to-be-masked dimension
+    # is now (axis - dim + 3), e.g. a tensor of shape (10, 2, 50, 10, 2) becomes a tensor of shape (1000, 10, 2).
     value = torch.rand(1) * mask_param
-    min_value = torch.rand(1) * (specgram.size(axis) - value)
+    min_value = torch.rand(1) * (specgram.size(axis - dim + 3) - value)
 
     mask_start = (min_value.long()).squeeze()
     mask_end = (min_value.long() + value.long()).squeeze()
-    mask = torch.arange(0, specgram.shape[axis], device=specgram.device, dtype=specgram.dtype)
+    mask = torch.arange(0, specgram.shape[axis - dim + 3], device=specgram.device, dtype=specgram.dtype)
     mask = (mask >= mask_start) & (mask < mask_end)
     # unsqueeze the mask if the axis is frequency
     if axis == dim - 2:
