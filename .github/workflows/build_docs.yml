@@ -11,6 +11,9 @@ on:
 
 jobs:
   commit:
+    permissions:
+      contents: write
+
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -20,13 +23,9 @@ jobs:
       run: |
         set -x
         # Let's pretend that this is equivalent of build step
-        mkdir -p docs/build/html
-        echo "$date" > docs/build/html/index.html
+        echo "$date" > main/foo.html
 
         # Update the main doc
-        rm -rf main
-        mv docs/build/html main
-        ls main
         git add --all main || true
         git ls-files main
         git config user.name "pytorchbot"
