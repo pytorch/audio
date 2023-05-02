@@ -31,7 +31,6 @@ jobs:
             pre-script: packaging/ffmpeg/build.bat
             wheel-build-params: "--plat-name win_amd64"
             post-script: ""
-            smoke-test-script: ""
             package-name: torchaudio
             conda-package-directory: packaging/torchaudio
             smoke-test-script: test/smoke_test/smoke_test.py
