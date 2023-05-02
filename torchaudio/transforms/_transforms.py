@@ -1223,12 +1223,14 @@ class _AxisMasking(torch.nn.Module):
             Tensor: Masked spectrogram of dimensions `(..., freq, time)`.
         """
         # if iid_masks flag marked and specgram has a batch dimension
-	# self.axis + specgram.dim() - 3 gives the time/frequency dimension (last two dimensions)
-	# for input tensor for which the dimension is not 3. 
+        # self.axis + specgram.dim() - 3 gives the time/frequency dimension (last two dimensions)
+        # for input tensor for which the dimension is not 3.
         if self.iid_masks:
-            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p)
+            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value,
+                                         self.axis + specgram.dim() - 3, p=self.p)
         else:
-            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p)
+            return F.mask_along_axis(specgram, self.mask_param, mask_value,
+                                     self.axis + specgram.dim() - 3, p=self.p)
 
 
 class FrequencyMasking(_AxisMasking):
