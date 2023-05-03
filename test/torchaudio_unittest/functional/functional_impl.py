@@ -397,19 +397,13 @@ class Functional(TestBaseMixin):
         close_to_limit = decibels < 6.0207
         assert close_to_limit.any(), f"No values were close to the limit. Did it over-clamp?\n{decibels}"
 
-
-
-    @parameterized.expand(
-        list(
-            itertools.product([(1, 201, 100), (10, 2, 201, 300)])
-        )
-    )
+    @parameterized.expand(list(itertools.product([(1, 201, 100), (10, 2, 201, 300)])))
     def test_mask_along_axis_input_axis_check(self, shape):
         specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
         message = "Only Frequency and Time masking are supported"
         with self.assertRaisesRegex(ValueError, message):
             F.mask_along_axis(specgram, 100, 0.0, 0, 1.0)
-    
+
     @parameterized.expand(
         list(
             itertools.product([(1025, 400), (1, 201, 100), (10, 2, 201, 300)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0])
