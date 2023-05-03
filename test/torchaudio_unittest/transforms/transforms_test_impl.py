@@ -384,14 +384,10 @@ class TransformsTestBase(TestBaseMixin):
         m0 = torch.mean(masked, 0)
         self.assertTrue(0 in m0)
         self.assertFalse(False in torch.eq(m0[m0 != 0], 1))
-        if dim > 2:
-            m1 = torch.mean(masked, 1)
-            self.assertTrue(0 in m1)
-            self.assertFalse(False in torch.eq(m1[m1 != 0], 1))
-        if dim > 3:
-            m2 = torch.mean(masked, 2)
-            self.assertTrue(0 in m2)
-            self.assertFalse(False in torch.eq(m2[m2 != 0], 1))
+        for axis in range(dim - 1):
+            unmasked_axis_mean = torch.mean(masked, axis)
+            self.assertTrue(0 in unmasked_axis_mean)
+            self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))
 
     @nested_params(
         [(100, 200), (5, 10, 20), (50, 50, 100, 200)],
