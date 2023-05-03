@@ -1,7 +1,5 @@
-import math
 import torch.nn as nn
-import pdb
-import torch
+
 
 class Swish(nn.Module):
     """Construct an Swish object."""
@@ -212,7 +210,7 @@ class ResNet1D(nn.Module):
         return x
 
 
-class Conv1dResNet(torch.nn.Module):
+class Conv1dResNet(nn.Module):
     """Conv1dResNet
     """
 

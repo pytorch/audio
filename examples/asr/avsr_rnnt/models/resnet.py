@@ -1,14 +1,4 @@
-import math
 import torch.nn as nn
-import pdb
-import torch
-
-class Swish(nn.Module):
-    """Construct an Swish object."""
-
-    def forward(self, x):
-        """Return Swich activation function."""
-        return x * torch.sigmoid(x)
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -77,8 +67,8 @@ class BasicBlock(nn.Module):
             self.relu1 = nn.PReLU(num_parameters=planes)
             self.relu2 = nn.PReLU(num_parameters=planes)
         elif relu_type == "swish":
-            self.relu1 = Swish()
-            self.relu2 = Swish()
+            self.relu1 = nn.SiLU(inplace=True)
+            self.relu2 = nn.SiLU(inplace=True)
         else:
             raise NotImplementedError
         # --------
@@ -185,7 +175,7 @@ def threeD_to_2D_tensor(x):
     return x.reshape(n_batch*s_time, n_channels, sx, sy)
 
 
-class Conv3dResNet(torch.nn.Module):
+class Conv3dResNet(nn.Module):
     """Conv3dResNet module
     """
 
@@ -211,7 +201,7 @@ class Conv3dResNet(torch.nn.Module):
         elif relu_type == 'prelu':
             frontend_relu = nn.PReLU( self.frontend_nout )
         elif relu_type == 'swish':
-            frontend_relu = Swish()
+            frontend_relu = nn.SiLU(inplace=True)
 
         self.frontend3D = nn.Sequential( 
             nn.Conv3d(
