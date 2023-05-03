@@ -36,7 +36,7 @@ class CUCTCHypothesis(NamedTuple):
     """Score corresponding to hypothesis"""
 
 
-_DEFAULT_SKIP_THREASHOLD = math.log(0.95)
+_DEFAULT_BLANK_SKIP_THREASHOLD = 0.95
 
 
 class CUCTCDecoder:
@@ -54,17 +54,17 @@ class CUCTCDecoder:
         blank_id: int = 0,
         beam_size: int = 10,
         nbest: int = 1,
-        blank_skip_threshold: float = _DEFAULT_SKIP_THREASHOLD,
+        blank_skip_threshold: float = _DEFAULT_BLANK_SKIP_THREASHOLD,
         cuda_stream: torch.cuda.streams.Stream = None,
     ):
         """
         Args:
-            blank_id (int): token id corresopnding to blank (Default: 0)
+            blank_id (int): token id corresopnding to blank, only support 0 for now. (Default: 0)
             vocab_list (List[str]): list of vocabulary tokens
             beam_size (int, optional): max number of hypos to hold after each decode step (Default: 10)
             nbest (int): number of best decodings to return
-            blank_skip_threshold (float): skip frames if log_prob(blank) > blank_skip_threshold, to speed up decoding.
-                (Default: log(0.95)).
+            blank_skip_threshold (float): skip frames if log_prob(blank) > log(blank_skip_threshold), to speed up decoding.
+                (Default: 0.95).
             cuda_stream (torch.cuda.streams.Stream): using assigned cuda stream (Default: using default stream)
 
         """
@@ -74,11 +74,15 @@ class CUCTCDecoder:
         cuda_stream_ = cuda_stream.cuda_stream if cuda_stream else torch.cuda.current_stream().cuda_stream
         self.internal_data = cuctc.prefixCTC_alloc(cuda_stream_)
         self.memory = torch.empty(0, dtype=torch.int8, device=torch.device("cuda"))
-        self.blank_id = 0  # blank id has to be zero
+        if blank_id != 0:
+            raise AssertionError("blank_id must be 0")
+        self.blank_id = blank_id
         self.vocab_list = vocab_list
         self.space_id = 0
         self.nbest = nbest
-        self.blank_skip_threshold = blank_skip_threshold
+        if not (blank_skip_threshold >= 0 and blank_skip_threshold <= 1):
+            raise AssertionError("blank_skip_threshold must be between 0 and 1")
+        self.blank_skip_threshold = math.log(blank_skip_threshold)
         self.beam_size = min(beam_size, len(vocab_list))  # beam size must be smaller than vocab size
 
     def __del__(self):
@@ -153,7 +157,7 @@ def cuda_ctc_decoder(
     tokens: Union[str, List[str]],
     nbest: int = 1,
     beam_size: int = 10,
-    blank_skip_threshold: float = _DEFAULT_SKIP_THREASHOLD,
+    blank_skip_threshold: float = _DEFAULT_BLANK_SKIP_THREASHOLD,
 ) -> CUCTCDecoder:
     """Builds an instance of :class:`CUCTCDecoder`.
 
@@ -163,8 +167,8 @@ def cuda_ctc_decoder(
         beam_size (int, optional): The maximum number of hypos to hold after each decode step (Default: 10)
         nbest (int): The number of best decodings to return
         blank_id (int): The token ID corresopnding to the blank symbol.
-        blank_skip_threshold (float): skip frames if log_prob(blank) > blank_skip_threshold, to speed up decoding
-            (Default: log(0.95)).
+        blank_skip_threshold (float): skip frames if log_prob(blank) > log(blank_skip_threshold), to speed up decoding
+            (Default: 0.95).
 
     Returns:
         CUCTCDecoder: decoder
@@ -172,7 +176,7 @@ def cuda_ctc_decoder(
     Example
         >>> decoder = cuda_ctc_decoder(
         >>>     vocab_file="tokens.txt",
-        >>>     blank_skip_threshold=math.log(0.95),
+        >>>     blank_skip_threshold=0.95,
         >>> )
         >>> results = decoder(log_probs, encoder_out_lens) # List of shape (B, nbest) of Hypotheses
     """
