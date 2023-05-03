@@ -397,14 +397,29 @@ class Functional(TestBaseMixin):
         close_to_limit = decibels < 6.0207
         assert close_to_limit.any(), f"No values were close to the limit. Did it over-clamp?\n{decibels}"
 
+
+
     @parameterized.expand(
-        list(itertools.product([(1025, 400), (1, 201, 100), (10, 2, 201, 300)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0]))
+        list(
+            itertools.product([(1, 201, 100), (10, 2, 201, 300)])
+        )
+    )
+    def test_mask_along_axis_input_axis_check(self, shape):
+        specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
+        message = "Only Frequency and Time masking are supported"
+        with self.assertRaisesRegex(ValueError, message):
+            F.mask_along_axis(specgram, 100, 0.0, 0, 1.0)
+    
+    @parameterized.expand(
+        list(
+            itertools.product([(1025, 400), (1, 201, 100), (10, 2, 201, 300)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0])
+        )
     )
     def test_mask_along_axis(self, shape, mask_param, mask_value, last_axis, p):
         specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
 
         # last_axis = 1 means the last axis; 2 means the second-to-last axis.
-        axis = len(shape) - last_axis 
+        axis = len(shape) - last_axis
         if p != 1.0:
             mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis, p=p)
         else:
@@ -414,14 +429,14 @@ class Functional(TestBaseMixin):
 
         masked_columns = (mask_specgram == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
-        
+
         if len(shape) == 2:
             den = 1
         elif len(shape) == 3:
             den = mask_specgram.size(0)
         else:
             den = mask_specgram.size(0) * mask_specgram.size(1)
-        
+
         num_masked_columns = torch.div(num_masked_columns, den, rounding_mode="floor")
 
         if p != 1.0:

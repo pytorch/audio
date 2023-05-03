@@ -841,7 +841,9 @@ def mask_along_axis_iid(
         raise ValueError(f"Spectrogram must have at least three dimensions ({dim} given).")
 
     if axis not in [dim - 2, dim - 1]:
-        raise ValueError(f"Only Frequency (axis {dim-2}) and Time (axis {dim-1}) masking are supported ({axis} given).")
+        raise ValueError(
+            f"Only Frequency and Time masking are supported (axis {dim-2} and axis {dim-1} supported; {axis} given)."
+        )
 
     if not 0.0 <= p <= 1.0:
         raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
@@ -906,7 +908,9 @@ def mask_along_axis(
         raise ValueError(f"Spectrogram must have at least two dimensions (time and frequency) ({dim} given).")
 
     if axis not in [dim - 2, dim - 1]:
-        raise ValueError(f"Only Frequency (axis {dim-2}) and Time (axis {dim-1}) masking are supported ({axis} given).")
+        raise ValueError(
+            f"Only Frequency and Time masking are supported (axis {dim-2} and axis {dim-1} supported; {axis} given)."
+        )
 
     if not 0.0 <= p <= 1.0:
         raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
@@ -1452,7 +1456,6 @@ def _get_sinc_resample_kernel(
     device: torch.device = torch.device("cpu"),
     dtype: Optional[torch.dtype] = None,
 ):
-
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
         raise Exception(
             "Frequencies must be of integer type to ensure quality resampling computation. "
