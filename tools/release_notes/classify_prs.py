@@ -28,7 +28,7 @@ secondary_labels_mapping = {
     "module: docs": "Documentation",
     "module: tests": "Tests",
     "tutorial": "Tutorials",
-    "recipe": "Recipes", 
+    "recipe": "Recipes",
     "example": "Examples",
     "build": "Build",
     "style": "Style",
