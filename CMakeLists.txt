@@ -136,6 +136,8 @@ if (MSVC)
 else()
   set(warning_flags -Wall)
 endif()
+message(STATUS CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS}")
+message(STATUS TORCH_CXX_FLAGS="${TORCH_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warning_flags} ${TORCH_CXX_FLAGS}")
 
 find_program(CCACHE_PROGRAM ccache)

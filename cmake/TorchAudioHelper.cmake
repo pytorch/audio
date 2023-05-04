@@ -1,5 +1,53 @@
 find_package(Torch REQUIRED)
 
+message(STATUS TORCH_LIBRARIES="${TORCH_LIBRARIES}")
+
+if(NOT CMAKE_PROPERTY_LIST)
+    execute_process(COMMAND cmake --help-property-list OUTPUT_VARIABLE CMAKE_PROPERTY_LIST)
+    
+    # Convert command output into a CMake list
+    string(REGEX REPLACE ";" "\\\\;" CMAKE_PROPERTY_LIST "${CMAKE_PROPERTY_LIST}")
+    string(REGEX REPLACE "\n" ";" CMAKE_PROPERTY_LIST "${CMAKE_PROPERTY_LIST}")
+endif()
+    
+function(print_properties)
+    message("CMAKE_PROPERTY_LIST = ${CMAKE_PROPERTY_LIST}")
+endfunction()
+    
+function(print_target_properties target)
+    if(NOT TARGET ${target})
+      message(STATUS "There is no target named '${target}'")
+      return()
+    endif()
+
+    foreach(property ${CMAKE_PROPERTY_LIST})
+        string(REPLACE "<CONFIG>" "${CMAKE_BUILD_TYPE}" property ${property})
+
+        # Fix https://stackoverflow.com/questions/32197663/how-can-i-remove-the-the-location-property-may-not-be-read-from-target-error-i
+        if(property STREQUAL "LOCATION" OR property MATCHES "^LOCATION_" OR property MATCHES "_LOCATION$")
+            continue()
+        endif()
+
+        get_property(was_set TARGET ${target} PROPERTY ${property} SET)
+        if(was_set)
+            get_target_property(value ${target} ${property})
+            message("${target} ${property} = ${value}")
+        endif()
+    endforeach()
+endfunction()
+
+print_target_properties(torch)
+print_target_properties(torch_cpu_library)
+print_target_properties(torch_cpu)
+print_target_properties(c10)
+print_target_properties(caffe2::mkl)
+get_target_property(dep torch_cpu INTERFACE_LINK_LIBRARIES)
+if ("caffe2::mkl" IN_LIST dep)
+  list(REMOVE_ITEM dep "caffe2::mkl")
+  set_target_properties(torch_cpu PROPERTIES INTERFACE_LINK_LIBRARIES "${dep}")
+endif()
+print_target_properties(torch_cpu)
+
 function (torchaudio_library name source include_dirs link_libraries compile_defs)
   add_library(${name} SHARED ${source})
   target_include_directories(${name} PRIVATE "${PROJECT_SOURCE_DIR};${include_dirs}")
