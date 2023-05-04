@@ -381,9 +381,6 @@ class TransformsTestBase(TestBaseMixin):
 
         # Across all other dimensions, the mean tensor should contain at least
         # one zero element, and all non-zero elements should be 1.
-        m0 = torch.mean(masked, 0)
-        self.assertTrue(0 in m0)
-        self.assertFalse(False in torch.eq(m0[m0 != 0], 1))
         for axis in range(dim - 1):
             unmasked_axis_mean = torch.mean(masked, axis)
             self.assertTrue(0 in unmasked_axis_mean)
@@ -408,19 +405,8 @@ class TransformsTestBase(TestBaseMixin):
 
         # Across all other dimensions, the mean tensor should contain at least
         # one zero element, and all non-zero elements should be 1.
-        if dim > 2:
-            m0 = torch.mean(masked, 0)
-            self.assertTrue(0 in m0)
-            self.assertFalse(False in torch.eq(m0[m0 != 0], 1))
-        if dim == 2 or dim == 4:
-            m1 = torch.mean(masked, 1)
-            self.assertTrue(0 in m1)
-            self.assertFalse(False in torch.eq(m1[m1 != 0], 1))
-        if dim == 3:
-            m2 = torch.mean(masked, 2)
-            self.assertTrue(0 in m2)
-            self.assertFalse(False in torch.eq(m2[m2 != 0], 1))
-        if dim == 4:
-            m3 = torch.mean(masked, 3)
-            self.assertTrue(0 in m3)
-            self.assertFalse(False in torch.eq(m3[m3 != 0], 1))
+        for axis in range(dim):
+            if axis != dim - 2:
+                unmasked_axis_mean = torch.mean(masked, axis)
+                self.assertTrue(0 in unmasked_axis_mean)
+                self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))

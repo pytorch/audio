@@ -424,12 +424,9 @@ class Functional(TestBaseMixin):
         masked_columns = (mask_specgram == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
 
-        if len(shape) == 2:
-            den = 1
-        elif len(shape) == 3:
-            den = mask_specgram.size(0)
-        else:
-            den = mask_specgram.size(0) * mask_specgram.size(1)
+        den = 1
+        for i in range(len(shape) - 2):
+            den *= mask_specgram.size(i)
 
         num_masked_columns = torch.div(num_masked_columns, den, rounding_mode="floor")
 
