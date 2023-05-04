@@ -361,3 +361,52 @@ class TransformsTestBase(TestBaseMixin):
         deemphasis = T.Deemphasis(coeff=coeff).to(dtype=self.dtype, device=self.device)
         deemphasized = deemphasis(preemphasized)
         self.assertEqual(deemphasized, waveform)
+
+    @nested_params(
+        [(100, 200), (5, 10, 20), (50, 50, 100, 200)],
+    )
+    def test_time_masking(self, input_shape):
+        transform = T.TimeMasking(time_mask_param=5)
+        # Genearte a specgram tensor containing 1's only, for the ease of testing.
+        specgram = torch.ones(*input_shape)
+        masked = transform(specgram)
+        dim = len(input_shape)
+        # Across the axis (dim-1) where we apply masking,
+        # the mean tensor should contain equal elements,
+        # and the value should be between 0 and 1.
+        m_masked = torch.mean(masked, dim - 1)
+        self.assertEqual(torch.var(m_masked), 0)
+        self.assertTrue(torch.mean(m_masked) > 0)
+        self.assertTrue(torch.mean(m_masked) < 1)
+
+        # Across all other dimensions, the mean tensor should contain at least
+        # one zero element, and all non-zero elements should be 1.
+        for axis in range(dim - 1):
+            unmasked_axis_mean = torch.mean(masked, axis)
+            self.assertTrue(0 in unmasked_axis_mean)
+            self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))
+
+    @nested_params(
+        [(100, 200), (5, 10, 20), (50, 50, 100, 200)],
+    )
+    def test_freq_masking(self, input_shape):
+        transform = T.FrequencyMasking(freq_mask_param=5)
+        # Genearte a specgram tensor containing 1's only, for the ease of testing.
+        specgram = torch.ones(*input_shape)
+        masked = transform(specgram)
+        dim = len(input_shape)
+        # Across the axis (dim-2) where we apply masking,
+        # the mean tensor should contain equal elements,
+        # and the value should be between 0 and 1.
+        m_masked = torch.mean(masked, dim - 2)
+        self.assertEqual(torch.var(m_masked), 0)
+        self.assertTrue(torch.mean(m_masked) > 0)
+        self.assertTrue(torch.mean(m_masked) < 1)
+
+        # Across all other dimensions, the mean tensor should contain at least
+        # one zero element, and all non-zero elements should be 1.
+        for axis in range(dim):
+            if axis != dim - 2:
+                unmasked_axis_mean = torch.mean(masked, axis)
+                self.assertTrue(0 in unmasked_axis_mean)
+                self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))

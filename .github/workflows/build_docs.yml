@@ -79,7 +79,7 @@ jobs:
         mv docs/build/html /artifacts/
 
   commit:
-    if: github.repository == 'pytorch/audio'
+    if: ${{ (github.repository == 'pytorch/audio') && ((github.event_name == 'push') && (github.ref_name == 'nightly')) }}
     permissions:
       # Required for `git push`
       # Note:
@@ -97,11 +97,10 @@ jobs:
       with:
         name: docs
     - name: Update nightly doc
-      # TODO: add tag-based process (need to handle the main directory name)
-      if: github.ref_name == 'nightly'
       run: |
         set -x
 
+        # TODO: add tag-based process (need to handle the main directory name)
         rm -rf main
         mv html main
 
