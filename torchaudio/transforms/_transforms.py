@@ -1196,15 +1196,16 @@ class _AxisMasking(torch.nn.Module):
 
     Args:
         mask_param (int): Maximum possible length of the mask.
-        axis (int): What dimension the mask is applied on.
+        axis (int): What dimension the mask is applied on (assuming the tensor is 3D).
+            For frequency masking, axis = 1.
+            For time masking, axis = 2.
         iid_masks (bool): Applies iid masks to each of the examples in the batch dimension.
-            This option is applicable only when the input tensor is 4D.
+            This option is applicable only when the dimension of the input tensor is >= 3.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
     """
     __constants__ = ["mask_param", "axis", "iid_masks", "p"]
 
     def __init__(self, mask_param: int, axis: int, iid_masks: bool, p: float = 1.0) -> None:
-
         super(_AxisMasking, self).__init__()
         self.mask_param = mask_param
         self.axis = axis
@@ -1221,10 +1222,14 @@ class _AxisMasking(torch.nn.Module):
             Tensor: Masked spectrogram of dimensions `(..., freq, time)`.
         """
         # if iid_masks flag marked and specgram has a batch dimension
-        if self.iid_masks and specgram.dim() == 4:
-            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1, p=self.p)
+        # self.axis + specgram.dim() - 3 gives the time/frequency dimension (last two dimensions)
+        # for input tensor for which the dimension is not 3.
+        if self.iid_masks:
+            return F.mask_along_axis_iid(
+                specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p
+            )
         else:
-            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis, p=self.p)
+            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p)
 
 
 class FrequencyMasking(_AxisMasking):
@@ -1241,7 +1246,7 @@ class FrequencyMasking(_AxisMasking):
             Indices uniformly sampled from [0, freq_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
-            This option is applicable only when the input tensor is 4D.
+            This option is applicable only when the input tensor >= 3D.
 
     Example
         >>> spectrogram = torchaudio.transforms.Spectrogram()
@@ -1275,7 +1280,7 @@ class TimeMasking(_AxisMasking):
             Indices uniformly sampled from [0, time_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
-            This option is applicable only when the input tensor is 4D.
+            This option is applicable only when the input tensor >= 3D.
         p (float, optional): maximum proportion of time steps that can be masked.
             Must be within range [0.0, 1.0]. (Default: 1.0)
 

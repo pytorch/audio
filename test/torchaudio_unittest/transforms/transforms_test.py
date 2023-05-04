@@ -25,7 +25,6 @@ class Tester(common_utils.TorchaudioTestCase):
         return waveform / factor
 
     def test_mu_law_companding(self):
-
         quantization_channels = 256
 
         waveform = self.waveform.clone()
