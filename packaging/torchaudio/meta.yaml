@@ -19,7 +19,7 @@ requirements:
     - ninja
     - numpy>=1.11 # [py <= 39]
     - numpy>=1.21.2 # [py >= 310]
-    - mkl<=2021.4.0 # [osx and x86_64]
+    - mkl<=2021.2.0 # [osx and x86_64]
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
@@ -30,7 +30,6 @@ requirements:
     - numpy>=1.11 # [py <= 39]
     - numpy>=1.21.2 # [py >= 310]
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
-    - mkl<=2021.4.0 # [osx and x86_64]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
 
