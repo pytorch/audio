@@ -900,7 +900,7 @@ def mask_along_axis(
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrograms with the same dimensions as input specgram Tensor`
+        Tensor: Masked spectrograms with the same dimensions as input specgram Tensor
     """
     dim = specgram.dim()
 
