@@ -924,6 +924,8 @@ EncodeProcess get_video_encode_process(
       AVFramePtr frame{alloc_avframe()};
       int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
       TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
+      frame->nb_samples = 1;
+      frame->pts = 0;
       return frame;
     }
     return get_video_frame(src_fmt, src_width, src_height);
