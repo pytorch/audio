@@ -63,6 +63,10 @@ jobs:
         # TODO: Enable NVDec/NVEnc
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
+        cd packaging
+        . ./pkg_helpers.bash
+        setup_build_version
+        cd ../
         USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
 
         # Install runtime dependencies
