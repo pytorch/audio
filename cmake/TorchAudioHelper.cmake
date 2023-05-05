@@ -1,5 +1,19 @@
 find_package(Torch REQUIRED)
 
+# Remove stray mkl dependency found in Intel mac.
+#
+# For Intel mac, torch_cpu has caffe2::mkl, which adds link flags like
+# -lmkl_intel_ilp64, -lmkl_core and -lmkl_intel_thread.
+# Even though TorchAudio does not call any of MKL functions directly,
+# Apple's linker does not drop them, instead it bakes these dependencies
+# Therefore, we remove it.
+# See https://github.com/pytorch/audio/pull/3307
+get_target_property(dep torch_cpu INTERFACE_LINK_LIBRARIES)
+if ("caffe2::mkl" IN_LIST dep)
+  list(REMOVE_ITEM dep "caffe2::mkl")
+  set_target_properties(torch_cpu PROPERTIES INTERFACE_LINK_LIBRARIES "${dep}")
+endif()
+
 function (torchaudio_library name source include_dirs link_libraries compile_defs)
   add_library(${name} SHARED ${source})
   target_include_directories(${name} PRIVATE "${PROJECT_SOURCE_DIR};${include_dirs}")
