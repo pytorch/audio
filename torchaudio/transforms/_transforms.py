@@ -1315,7 +1315,7 @@ class SpecAugment(torch.nn.Module):
             This option is applicable only when the input tensor is 4D. (Default: ``True``)
         p (float, optional): maximum proportion of time steps that can be masked.
             Must be within range [0.0, 1.0]. (Default: 1.0)
-        zero_masking (bool, optional): If ``True``, use 0 as the mask value with 0,
+        zero_masking (bool, optional): If ``True``, use 0 as the mask value,
             else use mean of the input tensor. (Default: ``False``)
     """
     __constants__ = [
