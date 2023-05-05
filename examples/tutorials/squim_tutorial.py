@@ -357,3 +357,44 @@ print(f"Estimated MOS for distorted speech at {snr_dbs[0]}dB is MOS: {mos[0]}")
 
 mos = subjective_model(WAVEFORM_DISTORTED[1:2, :], WAVEFORM_NMR)
 print(f"Estimated MOS for distorted speech at {snr_dbs[1]}dB is MOS: {mos[0]}")
+
+
+######################################################################
+# 8. Comparison with ground truths and baselines
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Visualizing the estimated metrics by the ``SquimObjective`` and
+# ``SquimSubjective`` models can help users better understand how the
+# models can be applicable in real scenario. The graph below shows scatter
+# plots of three different systems: MOSA-Net [1], AMSA [2], and the
+# ``SquimObjective`` model, where y axis represents the estimated STOI,
+# PESQ, and Si-SDR scores, and x axis represents the corresponding ground
+# truth.
+#
+# .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/objective_plot.png
+#    :width: 500px
+#    :align: center
+#
+# [1] Zezario, Ryandhimas E., Szu-Wei Fu, Fei Chen, Chiou-Shann Fuh,
+# Hsin-Min Wang, and Yu Tsao. “Deep learning-based non-intrusive
+# multi-objective speech assessment model with cross-domain features.”
+# IEEE/ACM Transactions on Audio, Speech, and Language Processing 31
+# (2022): 54-70.
+#
+# [2] Dong, Xuan, and Donald S. Williamson. “An attention enhanced
+# multi-task model for objective speech assessment in real-world
+# environments.” In ICASSP 2020-2020 IEEE International Conference on
+# Acoustics, Speech and Signal Processing (ICASSP), pp. 911-915. IEEE,
+# 2020.
+#
+
+
+######################################################################
+# The graph below shows scatter plot of the ``SquimSubjective`` model,
+# where y axis represents the estimated MOS metric score, and x axis
+# represents the corresponding ground truth.
+#
+# .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png
+#    :width: 500px
+#    :align: center
+#
