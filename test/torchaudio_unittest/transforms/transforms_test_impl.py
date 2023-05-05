@@ -410,3 +410,70 @@ class TransformsTestBase(TestBaseMixin):
                 unmasked_axis_mean = torch.mean(masked, axis)
                 self.assertTrue(0 in unmasked_axis_mean)
                 self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))
+
+    @parameterized.expand(
+        [
+            param(10, 20, 10, 20, False),
+            param(0, 20, 10, 20, False),
+            param(10, 20, 0, 20, False),
+            param(10, 20, 10, 20, True),
+            param(0, 20, 10, 20, True),
+            param(10, 20, 0, 20, True),
+        ]
+    )
+    def test_specaugment(self, n_time_masks, time_mask_param, n_freq_masks, freq_mask_param, iid_masks):
+        """Make sure SpecAug masking works as expected"""
+        spec = torch.ones(2, 200, 200)
+        transform = T.SpecAugment(
+            n_time_masks=n_time_masks,
+            time_mask_param=time_mask_param,
+            n_freq_masks=n_freq_masks,
+            freq_mask_param=freq_mask_param,
+            iid_masks=iid_masks,
+            zero_masking=True,
+        )
+        spec_masked = transform(spec)
+        f_axis_mean = torch.mean(spec_masked, 1)
+        t_axis_mean = torch.mean(spec_masked, 2)
+        if n_time_masks == 0 and n_freq_masks == 0:
+            self.assertEqual(spec, spec_masked)
+        elif n_time_masks > 0 and n_freq_masks > 0:
+            # Across both time and frequency dimensions, the mean tensor should contain
+            # at least one zero element, and all non-zero elements should be less than 1.
+            self.assertTrue(0 in t_axis_mean)
+            self.assertFalse(False in torch.lt(t_axis_mean[t_axis_mean != 0], 1))
+            self.assertTrue(0 in f_axis_mean)
+            self.assertFalse(False in torch.lt(f_axis_mean[f_axis_mean != 0], 1))
+        else:
+            if n_freq_masks > 0:
+                # Across the frequency axis where we apply masking,
+                # the mean tensor should contain equal elements,
+                # and the value should be between 0 and 1.
+                self.assertFalse(False in torch.eq(f_axis_mean[0], f_axis_mean[0][0]))
+                self.assertFalse(False in torch.eq(f_axis_mean[1], f_axis_mean[1][0]))
+                self.assertTrue(f_axis_mean[0][0] < 1)
+                self.assertTrue(f_axis_mean[1][0] > 0)
+
+                # Across the time axis where we don't mask, the mean tensor should contain at
+                # least one zero element, and all non-zero elements should be 1.
+                self.assertTrue(0 in t_axis_mean)
+                self.assertFalse(False in torch.eq(t_axis_mean[t_axis_mean != 0], 1))
+            else:
+                # Across the time axis where we apply masking,
+                # the mean tensor should contain equal elements,
+                # and the value should be between 0 and 1.
+                self.assertFalse(False in torch.eq(t_axis_mean[0], t_axis_mean[0][0]))
+                self.assertFalse(False in torch.eq(t_axis_mean[1], t_axis_mean[1][0]))
+                self.assertTrue(t_axis_mean[0][0] < 1)
+                self.assertTrue(t_axis_mean[1][0] > 0)
+
+                # Across the frequency axis where we don't mask, the mean tensor should contain at
+                # least one zero element, and all non-zero elements should be 1.
+                self.assertTrue(0 in f_axis_mean)
+                self.assertFalse(False in torch.eq(f_axis_mean[f_axis_mean != 0], 1))
+
+        # Test if iid_masks gives different masking results for different spectrograms across the 0th dimension.
+        if iid_masks is True:
+            assert torch.isclose(torch.norm(spec_masked[0] - spec_masked[1]), torch.zeros(1)) == False
+        else:
+            assert torch.isclose(torch.norm(spec_masked[0] - spec_masked[1]), torch.zeros(1)) == True
