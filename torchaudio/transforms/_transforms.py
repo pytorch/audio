@@ -1318,7 +1318,15 @@ class SpecAugment(torch.nn.Module):
         zero_masking (bool, optional): If True, use 0 as the mask value with 0,
             else use mean of the input tensor. (Default: ``False``)
     """
-    __constants__ = ["mask_param", "axis", "iid_masks", "p"]
+    __constants__ = [
+        "n_time_masks",
+        "time_mask_param",
+        "n_freq_masks",
+        "freq_mask_param",
+        "iid_masks",
+        "p",
+        "zero_masking",
+    ]
 
     def __init__(
         self,
@@ -1331,7 +1339,6 @@ class SpecAugment(torch.nn.Module):
         zero_masking: bool = False,
     ) -> None:
         super(SpecAugment, self).__init__()
-        self.zero_masking = zero_masking
         self.n_time_masks = n_time_masks
         self.time_mask_param = time_mask_param
         self.n_freq_masks = n_freq_masks
@@ -1343,9 +1350,9 @@ class SpecAugment(torch.nn.Module):
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
-            specgram (Tensor): Tensor of dimension `(..., freq, time)`.
+            specgram (Tensor): Tensor of shape `(..., freq, time)`.
         Returns:
-            Tensor: Masked spectrogram of dimensions `(..., freq, time)`.
+            Tensor: Masked spectrogram of shape `(..., freq, time)`.
         """
         if self.zero_masking:
             mask_value = 0.0
