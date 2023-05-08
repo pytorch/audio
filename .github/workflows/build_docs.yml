@@ -63,6 +63,10 @@ jobs:
         # TODO: Enable NVDec/NVEnc
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
+        cd packaging
+        . ./pkg_helpers.bash
+        setup_build_version
+        cd ../
         USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
 
         # Install runtime dependencies
@@ -79,7 +83,7 @@ jobs:
         mv docs/build/html /artifacts/
 
   commit:
-    if: github.repository == 'pytorch/audio'
+    if: ${{ (github.repository == 'pytorch/audio') && ((github.event_name == 'push') && (github.ref_name == 'nightly')) }}
     permissions:
       # Required for `git push`
       # Note:
@@ -97,11 +101,10 @@ jobs:
       with:
         name: docs
     - name: Update nightly doc
-      # TODO: add tag-based process (need to handle the main directory name)
-      if: github.ref_name == 'nightly'
       run: |
         set -x
 
+        # TODO: add tag-based process (need to handle the main directory name)
         rm -rf main
         mv html main
 
