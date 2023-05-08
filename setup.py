@@ -144,14 +144,14 @@ def _main():
     _make_version_file(version, sha)
     _fetch_third_party_libraries()
 
-    with open("README.rst") as f:
-        readme = f.read()
+    with open("README.md") as f:
+        long_description = f.read()
 
     setup(
         name="torchaudio",
         version=version,
         description="An audio package for PyTorch",
-        long_description=readme,
+        long_description=long_description,
         long_description_content_type="text/markdown",
         url="https://github.com/pytorch/audio",
         author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
