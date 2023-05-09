@@ -1,0 +1,85 @@
+name: Unit-tests on Macos CPU
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+env:
+  CHANNEL: "nightly"
+
+jobs:
+  tests:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      runner: macos-12
+      repository: pytorch/audio
+      timeout: 120
+      script: |
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+
+        # Set up Environment Variables
+        export PYTHON_VERSION="3.8"
+        export CU_VERSION=""
+        export CUDATOOLKIT=""
+        export MKL_CONSTRAINT="mkl==2021.2.0"
+
+        # Set CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export CHANNEL=test
+        else
+          export CHANNEL=nightly
+        fi
+
+        # Create Conda Env
+        conda create --quiet -y --name ci_env python="${PYTHON_VERSION}"
+        conda activate ci_env
+
+        # Install PyTorch
+        set -euxo pipefail
+        conda install \
+          --yes \
+          --quiet \
+          -c "pytorch-${CHANNEL}" \
+          "$MKL_CONSTRAINT" \
+          "pytorch-${CHANNEL}"::pytorch
+
+        # Install torchaudio
+        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
+        python3 -m pip --quiet install cmake>=3.18.0 ninja
+        USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
+
+        # Install test tools
+        conda install -y --quiet -c conda-forge -c numba/label/dev 'librosa==0.10.0' parameterized 'requests>=2.20'
+        python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag flashlight-text git+https://github.com/kpu/kenlm/
+        python3 -m pip install --quiet git+https://github.com/pytorch/fairseq.git@e47a4c8
+
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_HW_ACCEL=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE=true
+
+        declare -a args=(
+            '-v'
+            '--cov=torchaudio'
+            "--junitxml=${PWD}/test-results/junit.xml"
+            '--durations' '100'
+        )
+
+        cd test
+        python3 -m torch.utils.collect_env
+        env | grep TORCHAUDIO || true
+        pytest "${args[@]}" torchaudio_unittest
+        coverage html
