@@ -431,7 +431,10 @@ class InverseMelScale(torch.nn.Module):
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
-        driver (str, optional): Name of the LAPACK/MAGMA method to be used for `torch.lstsq`. (Default: ``"gels``)
+        driver (str, optional): Name of the LAPACK/MAGMA method to be used for `torch.lstsq`.
+            For CPU inputs the valid values are ``"gels"``, ``"gelsy"``, ``"gelsd"``, ``"gelss"``.
+            For CUDA input, the only valid driver is ``"gels"``, which assumes that A is full-rank.
+            (Default: ``"gels``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -468,6 +471,9 @@ class InverseMelScale(torch.nn.Module):
 
         if f_min > self.f_max:
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
+
+        if driver not in ["gels", "gelsy", "gelsd", "gelss"]:
+            raise ValueError(f'driver must be one of ["gels", "gelsy", "gelsd", "gelss"]. Found {driver}.')
 
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
         self.register_buffer("fb", fb)
