@@ -35,7 +35,7 @@ class BatchConsistencyTest(TorchaudioTestCase):
         n_barks = 32
         n_stft = 5
         bark_spec = torch.randn(3, 2, n_barks, 32) ** 2
-        transform = transforms.InverseMelScale(n_stft, n_barks)
+        transform = T.InverseBarkScale(n_stft, n_barks)
 
         # Because InverseBarkScale runs SGD on randomly initialized values so they do not yield
         # exactly same result. For this reason, tolerance is very relaxed here.
