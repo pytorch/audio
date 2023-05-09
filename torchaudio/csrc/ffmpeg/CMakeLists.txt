@@ -21,7 +21,6 @@ set(
   stream_writer/encoder.cpp
   stream_writer/packet_writer.cpp
   stream_writer/stream_writer.cpp
-  stream_writer/stream_writer_custom_io.cpp
   stream_writer/tensor_converter.cpp
   compat.cpp
   )

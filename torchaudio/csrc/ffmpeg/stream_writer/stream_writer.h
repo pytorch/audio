@@ -10,6 +10,10 @@
 namespace torchaudio {
 namespace io {
 
+////////////////////////////////////////////////////////////////////////////////
+// StreamWriter
+////////////////////////////////////////////////////////////////////////////////
+
 ///
 /// Encode and write audio/video streams chunk by chunk
 ///
@@ -285,6 +289,44 @@ class StreamWriter {
 
  private:
   int num_output_streams();
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// StreamWriterCustomIO
+////////////////////////////////////////////////////////////////////////////////
+
+/// @cond
+
+namespace detail {
+struct CustomOutput {
+  AVIOContextPtr io_ctx;
+  CustomOutput(
+      void* opaque,
+      int buffer_size,
+      int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
+      int64_t (*seek)(void* opaque, int64_t offset, int whence));
+};
+} // namespace detail
+
+/// @endcond
+
+/// Construct StreamWriter with custom write and seek functions.
+///
+/// @param opaque Custom data used by write_packet and seek functions.
+/// @param format Specify output format.
+/// @param buffer_size The size of the intermediate buffer, which FFmpeg uses to
+/// pass data to write_packet function.
+/// @param write_packet Custom write function that is called from FFmpeg to
+/// actually write data to the custom destination.
+/// @param seek Optional seek function that is used to seek the destination.
+struct StreamWriterCustomIO : private detail::CustomOutput,
+                              public StreamWriter {
+  StreamWriterCustomIO(
+      void* opaque,
+      const c10::optional<std::string>& format,
+      int buffer_size,
+      int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
+      int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr);
 };
 
 } // namespace io
