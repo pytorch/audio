@@ -31,9 +31,9 @@ jobs:
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
-          export CHANNEL=test
+          export UPLOAD_CHANNEL=test
         else
-          export CHANNEL=nightly
+          export UPLOAD_CHANNEL=nightly
         fi
 
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
