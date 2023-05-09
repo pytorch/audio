@@ -144,10 +144,15 @@ def _main():
     _make_version_file(version, sha)
     _fetch_third_party_libraries()
 
+    with open("README.md") as f:
+        long_description = f.read()
+
     setup(
         name="torchaudio",
         version=version,
         description="An audio package for PyTorch",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
         url="https://github.com/pytorch/audio",
         author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
         author_email="soumith@pytorch.org",
@@ -165,6 +170,7 @@ def _main():
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Multimedia :: Sound/Audio",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
