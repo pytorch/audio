@@ -1,6 +1,5 @@
 #include <torch/extension.h>
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
-#include <torchaudio/csrc/ffmpeg/pybind/fileobj.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
@@ -99,26 +98,93 @@ std::string get_build_config() {
   return avcodec_configuration();
 }
 
-// The reason we inherit FileObj instead of making it an attribute
-// is so that FileObj is instantiated first.
-// AVIOContext must be initialized before AVFormat, and outlive AVFormat.
-struct StreamReaderFileObj : private FileObj, public StreamReader {
+//////////////////////////////////////////////////////////////////////////////
+// StreamReader/Writer FileObj
+//////////////////////////////////////////////////////////////////////////////
+
+struct FileObj {
+  py::object fileobj;
+  int buffer_size;
+};
+
+namespace {
+
+static int read_func(void* opaque, uint8_t* buf, int buf_size) {
+  FileObj* fileobj = static_cast<FileObj*>(opaque);
+  buf_size = FFMIN(buf_size, fileobj->buffer_size);
+
+  int num_read = 0;
+  while (num_read < buf_size) {
+    int request = buf_size - num_read;
+    auto chunk = static_cast<std::string>(
+        static_cast<py::bytes>(fileobj->fileobj.attr("read")(request)));
+    auto chunk_len = chunk.length();
+    if (chunk_len == 0) {
+      break;
+    }
+    TORCH_CHECK(
+        chunk_len <= request,
+        "Requested up to ",
+        request,
+        " bytes but, received ",
+        chunk_len,
+        " bytes. The given object does not confirm to read protocol of file object.");
+    memcpy(buf, chunk.data(), chunk_len);
+    buf += chunk_len;
+    num_read += static_cast<int>(chunk_len);
+  }
+  return num_read == 0 ? AVERROR_EOF : num_read;
+}
+
+static int write_func(void* opaque, uint8_t* buf, int buf_size) {
+  FileObj* fileobj = static_cast<FileObj*>(opaque);
+  buf_size = FFMIN(buf_size, fileobj->buffer_size);
+
+  py::bytes b(reinterpret_cast<const char*>(buf), buf_size);
+  // TODO: check the return value
+  fileobj->fileobj.attr("write")(b);
+  return buf_size;
+}
+
+static int64_t seek_func(void* opaque, int64_t offset, int whence) {
+  // We do not know the file size.
+  if (whence == AVSEEK_SIZE) {
+    return AVERROR(EIO);
+  }
+  FileObj* fileobj = static_cast<FileObj*>(opaque);
+  return py::cast<int64_t>(fileobj->fileobj.attr("seek")(offset, whence));
+}
+
+} // namespace
+
+struct StreamReaderFileObj : private FileObj, public StreamReaderCustomIO {
   StreamReaderFileObj(
       py::object fileobj,
       const c10::optional<std::string>& format,
       const c10::optional<std::map<std::string, std::string>>& option,
-      int64_t buffer_size)
-      : FileObj(fileobj, static_cast<int>(buffer_size), false),
-        StreamReader(pAVIO, format, option) {}
+      int buffer_size)
+      : FileObj{fileobj, buffer_size},
+        StreamReaderCustomIO(
+            this,
+            format,
+            buffer_size,
+            read_func,
+            py::hasattr(fileobj, "seek") ? &seek_func : nullptr,
+            option) {}
 };
 
-struct StreamWriterFileObj : private FileObj, public StreamWriter {
+struct StreamWriterFileObj : private FileObj, public StreamWriterCustomIO {
   StreamWriterFileObj(
       py::object fileobj,
       const c10::optional<std::string>& format,
-      int64_t buffer_size)
-      : FileObj(fileobj, static_cast<int>(buffer_size), true),
-        StreamWriter(pAVIO, format) {}
+      int buffer_size)
+      : FileObj{fileobj, buffer_size},
+        StreamWriterCustomIO(
+            this,
+            format,
+            buffer_size,
+            write_func,
+            py::hasattr(fileobj, "seek") ? &seek_func : nullptr) {}
 };
 
 PYBIND11_MODULE(_torchaudio_ffmpeg, m) {

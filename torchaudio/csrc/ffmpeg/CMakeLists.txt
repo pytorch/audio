@@ -42,7 +42,6 @@ torchaudio_library(
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   set(
     ext_sources
-    pybind/fileobj.cpp
     pybind/pybind.cpp
     )
   torchaudio_extension(
