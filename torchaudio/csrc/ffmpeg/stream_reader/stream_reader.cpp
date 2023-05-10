@@ -565,5 +565,47 @@ std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
 std::vector<AVPacketPtr> StreamReader::pop_packets() {
   return packet_buffer->pop_packets();
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// StreamReaderCustomIO
+//////////////////////////////////////////////////////////////////////////////
+
+namespace detail {
+namespace {
+AVIOContext* get_io_context(
+    void* opaque,
+    int buffer_size,
+    int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
+    int64_t (*seek)(void* opaque, int64_t offset, int whence)) {
+  unsigned char* buffer = static_cast<unsigned char*>(av_malloc(buffer_size));
+  TORCH_CHECK(buffer, "Failed to allocate buffer.");
+  AVIOContext* io_ctx = avio_alloc_context(
+      buffer, buffer_size, 0, opaque, read_packet, nullptr, seek);
+  if (!io_ctx) {
+    av_freep(&buffer);
+    TORCH_CHECK(false, "Failed to allocate AVIOContext.");
+  }
+  return io_ctx;
+}
+} // namespace
+
+CustomInput::CustomInput(
+    void* opaque,
+    int buffer_size,
+    int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
+    int64_t (*seek)(void* opaque, int64_t offset, int whence))
+    : io_ctx(get_io_context(opaque, buffer_size, read_packet, seek)) {}
+} // namespace detail
+
+StreamReaderCustomIO::StreamReaderCustomIO(
+    void* opaque,
+    const c10::optional<std::string>& format,
+    int buffer_size,
+    int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
+    int64_t (*seek)(void* opaque, int64_t offset, int whence),
+    const c10::optional<OptionDict>& option)
+    : CustomInput(opaque, buffer_size, read_packet, seek),
+      StreamReader(io_ctx, format, option) {}
+
 } // namespace io
 } // namespace torchaudio

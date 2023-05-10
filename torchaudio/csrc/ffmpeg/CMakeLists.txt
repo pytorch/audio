@@ -21,7 +21,6 @@ set(
   stream_writer/encoder.cpp
   stream_writer/packet_writer.cpp
   stream_writer/stream_writer.cpp
-  stream_writer/stream_writer_custom_io.cpp
   stream_writer/tensor_converter.cpp
   compat.cpp
   )
@@ -43,7 +42,6 @@ torchaudio_library(
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   set(
     ext_sources
-    pybind/fileobj.cpp
     pybind/pybind.cpp
     )
   torchaudio_extension(
