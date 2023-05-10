@@ -81,6 +81,7 @@ jobs:
         (cd docs && make html)
 
         mv docs/build/html /artifacts/
+        mv docs/build/html/* "${RUNNER_DOCS_DIR}"
 
   commit:
     if: ${{ (github.repository == 'pytorch/audio') && ((github.event_name == 'push') && (github.ref_name == 'nightly')) }}
