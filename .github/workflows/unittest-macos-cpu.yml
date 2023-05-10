@@ -18,7 +18,7 @@ jobs:
     with:
       runner: macos-12
       repository: pytorch/audio
-      timeout: 120
+      timeout: 180
       script: |
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
