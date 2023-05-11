@@ -26,10 +26,19 @@ class StreamWriter {
   bool is_open = false;
   int current_key = 0;
 
- protected:
   /// @cond
 
+ private:
   explicit StreamWriter(AVFormatContext*);
+
+ protected:
+  /// Construct StreamWriter from custom IO
+  ///
+  /// @param io_ctx Custom IO.
+  /// @param format Specify output format.
+  explicit StreamWriter(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format = c10::nullopt);
 
   /// @endcond
 
@@ -42,19 +51,6 @@ class StreamWriter {
   explicit StreamWriter(
       const std::string& dst,
       const c10::optional<std::string>& format = c10::nullopt);
-
-  /// @cond
-
-  /// Construct StreamWriter from custom IO
-  ///
-  /// @param io_ctx Custom IO.
-  /// @param format Specify output format.
-  // TODO: Move this into wrapper class.
-  explicit StreamWriter(
-      AVIOContext* io_ctx,
-      const c10::optional<std::string>& format = c10::nullopt);
-
-  /// @endcond
 
   // Non-copyable
   StreamWriter(const StreamWriter&) = delete;
