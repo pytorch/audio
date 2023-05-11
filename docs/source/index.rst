@@ -46,6 +46,7 @@ model implementations and application components.
    tutorials/streamwriter_advanced
    hw_acceleration_tutorial
 
+   tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
@@ -183,6 +184,13 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
    :link: hw_acceleration_tutorial.html
    :tags: I/O,StreamReader,StreamWriter
+
+.. customcarditem::
+   :header: Apply effects and codecs to waveform
+   :card_description: Learn how to apply effects and codecs to waveform using <code>torchaudio.io.AudioEffector</code>.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/effector_tutorial.png
+   :link: tutorials/effector_tutorial.html
+   :tags: Preprocessing
 
 .. customcarditem::
    :header: Audio resampling with bandlimited sinc interpolation
