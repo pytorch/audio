@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  unittests-windows:
+  unittests-windows-cpu:
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
       repository: pytorch/audio

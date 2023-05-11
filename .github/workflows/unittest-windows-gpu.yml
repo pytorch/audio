@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  unittests-windows:
+  unittests-windows-gpu:
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
       repository: pytorch/audio
@@ -24,6 +24,7 @@ jobs:
 
         # Set up Environment Variables
         export PYTHON_VERSION="3.8"
+        export CUDA_VERSION="11.7"
         export USE_FFMPEG="1"
 
         # Set CHANNEL
