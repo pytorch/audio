@@ -806,11 +806,9 @@ workflows:
   lint:
     jobs:
       - lint_python_and_config
-  build:
-    jobs:
-      - circleci_consistency
   unittest:
     jobs:
+      - circleci_consistency
       - download_third_parties:
           name: download_third_parties
       - unittest_linux_cpu:

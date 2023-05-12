@@ -806,9 +806,7 @@ workflows:
   lint:
     jobs:
       - lint_python_and_config
-  build:
-    jobs:
-      - circleci_consistency
   unittest:
     jobs:
+      - circleci_consistency
       {{ unittest_workflows() }}
