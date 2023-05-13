@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -ex
 
 echo CU_VERSION is "${CU_VERSION}"
 echo CUDA_VERSION is "${CUDA_VERSION}"
