@@ -12,7 +12,7 @@ To build TorchAudio from source, refer to the [contributing guidelines](https://
 
 ### Install additional dependencies
 ```bash
-pip install pytorch-lightning sentencepiece
+pip install pytorch-lightning sentencepiece tensorboard
 ```
 
 ## Usage
