@@ -24,6 +24,7 @@ jobs:
 
         # Set up Environment Variables
         export PYTHON_VERSION="3.8"
+        export CU_VERSION="11.7"
         export CUDA_VERSION="11.7"
         export USE_FFMPEG="1"
 
