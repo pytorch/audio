@@ -27,7 +27,7 @@ pip install pytorch-lightning sentencepiece tensorboard
 
 Sample SLURM command:
 ```
-srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.py --exp_dir ./experiments --librispeech_path ./librispeech/ --global_stats_path ./global_stats.json --sp_model_path ./spm_unigram_1023.model --epochs 160
+srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.py --exp-dir ./experiments --librispeech-path ./librispeech/ --global-stats-path ./global_stats.json --sp-model-path ./spm_unigram_1023.model --epochs 160
 ```
 
 ### Evaluation
@@ -36,7 +36,7 @@ srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.
 
 Sample SLURM command:
 ```
-srun python eval.py --checkpoint_path ./experiments/checkpoints/epoch=159.ckpt --librispeech_path ./librispeech/ --sp_model_path ./spm_unigram_1023.model --use_cuda
+srun python eval.py --checkpoint-path ./experiments/checkpoints/epoch=159.ckpt --librispeech-path ./librispeech/ --sp-model-path ./spm-unigram-1023.model --use-cuda
 ```
 
 The table below contains WER results for various splits.
