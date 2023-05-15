@@ -22,23 +22,6 @@ from jinja2 import select_autoescape
 
 
 PYTHON_VERSIONS = ["3.8", "3.9", "3.10", "3.11"]
-CU_VERSIONS_DICT = {
-    "windows": ["cpu", "cu117", "cu118", "cu121"],
-}
-
-
-def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
-    w = []
-    w += build_download_job(filter_branch)
-    for os_type in ["windows"]:
-        w += build_ffmpeg_job(os_type, filter_branch)
-        for btype in ["wheel", "conda"]:
-            for python_version in PYTHON_VERSIONS:
-                for cu_version in CU_VERSIONS_DICT[os_type]:
-                    fb = filter_branch
-                    w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
-
-    return indent(indentation, w)
 
 
 def build_download_job(filter_branch):
@@ -221,7 +204,6 @@ if __name__ == "__main__":
     with open(os.path.join(d, "config.yml"), "w") as f:
         f.write(
             env.get_template("config.yml.in").render(
-                build_workflows=build_workflows,
                 unittest_workflows=unittest_workflows,
             )
         )
