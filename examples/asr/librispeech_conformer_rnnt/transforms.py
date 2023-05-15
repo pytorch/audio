@@ -74,8 +74,18 @@ class TrainTransform:
             FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
-            torchaudio.transforms.TimeMasking(100, p=0.2),
-            torchaudio.transforms.TimeMasking(100, p=0.2),
+            # torchaudio.transforms.TimeMasking(100, p=0.2),
+            # torchaudio.transforms.TimeMasking(100, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
+            torchaudio.transforms.TimeMasking(30, p=0.2),
             FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
         )
 
@@ -116,4 +126,6 @@ def get_data_module(librispeech_path, global_stats_path, sp_model_path):
         train_transform=train_transform,
         val_transform=val_transform,
         test_transform=test_transform,
+        batch_size=None,
+        max_tokens=1800,
     )
