@@ -36,7 +36,7 @@ srun --cpus-per-task=12 --gpus-per-node=8 -N 4 --ntasks-per-node=8 python train.
 
 Sample SLURM command:
 ```
-srun python eval.py --checkpoint-path ./experiments/checkpoints/epoch=159.ckpt --librispeech-path ./librispeech/ --sp-model-path ./spm-unigram-1023.model --use-cuda
+srun python eval.py --checkpoint-path ./experiments/checkpoints/epoch=159.ckpt --librispeech-path ./librispeech/ --sp-model-path ./spm_unigram_1023.model --use-cuda
 ```
 
 The table below contains WER results for various splits.
