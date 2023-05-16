@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-echo CU_VERSION is "${CU_VERSION}"
 echo CUDA_VERSION is "${CUDA_VERSION}"
 
-# Currenly, CU_VERSION and CUDA_VERSION are not consistent.
-# to understand this code, please checck out https://github.com/pytorch/vision/issues/4443
 version="cpu"
 if [[ ! -z "${CUDA_VERSION}" ]] ; then
     version="$CUDA_VERSION"
-else
-    if [[ ${#CU_VERSION} -eq 5 ]]; then
-        version="${CU_VERSION:2:2}.${CU_VERSION:4:1}"
-    fi
 fi
 
 # Don't use if [[ "$version" == "cpu" ]]; then exit 0 fi.
