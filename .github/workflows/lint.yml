@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  python-source-and-configs:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      repository: pytorch/audio
+      script: |
+        set -euo pipefail
+
+        echo '::group::Setup environment'
+        CONDA_PATH=$(which conda)
+        eval "$(${CONDA_PATH} shell.bash hook)"
+        conda create --name ci --quiet --yes python=3.8 pip
+        conda activate ci
+        echo '::endgroup::'
+        
+        echo '::group::Install lint tools'
+        pip install --user --progress-bar=off pre-commit
+        pre-commit install-hooks
+        echo '::endgroup::'
+        
+        set +e
+        pre-commit run --all-files
+        
+        if [ $? -ne 0 ]; then
+          git --no-pager diff
+          exit 1
+        fi
