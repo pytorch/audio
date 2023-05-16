@@ -270,6 +270,78 @@ torch::Tensor YUV420PConverter::convert(const AVFrame* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// YUV420P10LE
+////////////////////////////////////////////////////////////////////////////////
+YUV420P10LEConverter::YUV420P10LEConverter(int h, int w)
+    : ImageConverterBase(h, w, 3) {
+  TORCH_WARN_ONCE(
+      "The output format YUV420PLE is selected. "
+      "This will be implicitly converted to YUV444P (16-bit), "
+      "in which all the color components Y, U, V have the same dimension.");
+}
+
+void YUV420P10LEConverter::convert(const AVFrame* src, torch::Tensor& dst) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      (AVPixelFormat)(src->format) == AV_PIX_FMT_YUV420P10LE);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src->height == height);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src->width == width);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(1) == 3);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(2) == height);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(3) == width);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.dtype() == torch::kInt16);
+
+  // Write Y plane directly
+  {
+    int16_t* p_dst = dst.data_ptr<int16_t>();
+    uint8_t* p_src = src->data[0];
+    for (int h = 0; h < height; ++h) {
+      memcpy(p_dst, p_src, (size_t)width * 2);
+      p_dst += width;
+      p_src += src->linesize[0];
+    }
+  }
+  // Chroma (U and V planes) are subsamapled by 2 in both vertical and
+  // holizontal directions.
+  // https://en.wikipedia.org/wiki/Chroma_subsampling
+  // Since we are returning data in Tensor, which has the same size for all
+  // color planes, we need to upsample the UV planes. PyTorch has interpolate
+  // function but it does not work for int16 type. So we manually copy them.
+  //
+  //              block1  block2  block3  block4
+  // ab -> aabb = a  b   *  a  b *       *
+  // cd    aabb                   a  b      a  b
+  //       ccdd   c  d      c  d
+  //       ccdd                   c  d      c  d
+  //
+  auto block00 = dst.slice(2, 0, {}, 2).slice(3, 0, {}, 2);
+  auto block01 = dst.slice(2, 0, {}, 2).slice(3, 1, {}, 2);
+  auto block10 = dst.slice(2, 1, {}, 2).slice(3, 0, {}, 2);
+  auto block11 = dst.slice(2, 1, {}, 2).slice(3, 1, {}, 2);
+  for (int i = 1; i < 3; ++i) {
+    // borrow data
+    auto tmp = torch::from_blob(
+        src->data[i],
+        {height / 2, width / 2},
+        {src->linesize[i] / 2, 1},
+        [](void*) {},
+        torch::TensorOptions().dtype(torch::kInt16).layout(torch::kStrided));
+    // Copy to each block
+    block00.slice(1, i, i + 1).copy_(tmp);
+    block01.slice(1, i, i + 1).copy_(tmp);
+    block10.slice(1, i, i + 1).copy_(tmp);
+    block11.slice(1, i, i + 1).copy_(tmp);
+  }
+}
+
+torch::Tensor YUV420P10LEConverter::convert(const AVFrame* src) {
+  torch::Tensor buffer =
+      get_image_buffer({1, num_channels, height, width}, torch::kInt16);
+  convert(src, buffer);
+  return buffer;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // NV12
 ////////////////////////////////////////////////////////////////////////////////
 NV12Converter::NV12Converter(int h, int w)
