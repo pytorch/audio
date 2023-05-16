@@ -94,7 +94,7 @@ class NV12CudaConverter : ImageConverterBase {
 };
 
 class P010CudaConverter : ImageConverterBase {
-  torch::Tensor tmp_uv;
+  torch::Device device;
 
  public:
   P010CudaConverter(int height, int width, const torch::Device& device);

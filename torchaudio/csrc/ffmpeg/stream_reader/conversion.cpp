@@ -414,11 +414,7 @@ torch::Tensor NV12CudaConverter::convert(const AVFrame* src) {
 // P010 CUDA
 ////////////////////////////////////////////////////////////////////////////////
 P010CudaConverter::P010CudaConverter(int h, int w, const torch::Device& device)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer(
-          {1, height / 2, width / 2, 2},
-          device,
-          torch::kInt16)) {
+    : ImageConverterBase(h, w, 3), device(device) {
   TORCH_WARN_ONCE(
       "The output format P010 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -433,6 +429,7 @@ void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(2) == height);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(3) == width);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.dtype() == torch::kInt16);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.device() == device);
 
   auto fmt = (AVPixelFormat)(src->format);
   AVHWFramesContext* hwctx = (AVHWFramesContext*)src->hw_frames_ctx->data;
@@ -456,19 +453,20 @@ void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
       width * 2,
       height,
       cudaMemcpyDeviceToDevice);
-  TORCH_CHECK(cudaSuccess == status, "Failed to copy Y plane to CUDA tensor.");
+  TORCH_CHECK(cudaSuccess == status, "Failed to copy Y plane to CUDA tensor. Error code: ", status);
   // Prepare intermediate UV planes
-  status = cudaMemcpy2D(
-      tmp_uv.data_ptr(),
-      width * 2,
+  auto tmp_uv = torch::from_blob(
       src->data[1],
-      src->linesize[1],
-      width * 2,
-      height / 2,
-      cudaMemcpyDeviceToDevice);
-  TORCH_CHECK(cudaSuccess == status, "Failed to copy UV plane to CUDA tensor.");
+      {height / 2, width},
+      {src->linesize[1] / 2, 1},
+      [](void*) {},
+      torch::TensorOptions()
+          .dtype(torch::kInt16)
+          .layout(torch::kStrided)
+          .device(dst.device()));
+  torch::Tensor uv =
+      tmp_uv.view({1, height / 2, width / 2, 2}).permute({0, 3, 1, 2});
   // Write to the UV plane
-  torch::Tensor uv = tmp_uv.permute({0, 3, 1, 2});
   using namespace torch::indexing;
   // very simplistic upscale using indexing since interpolate doesn't support
   // shorts
@@ -481,12 +479,15 @@ void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   dst.index_put_(
       {Slice(), Slice(1, 3), Slice(1, None, 2), Slice(1, None, 2)}, uv);
   // correct for int16
+  // The original data is in range of [0, 2 ^ 16),
+  // which wraps and becomes discoutiguous in int16 type.
+  // Shift it by 2 ^ 15 so that the resulting values are linear in [-2^15, 2^15)
   dst += 32768;
 }
 
 torch::Tensor P010CudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer = get_image_buffer(
-      {1, num_channels, height, width}, tmp_uv.device(), torch::kInt16);
+  torch::Tensor buffer =
+      get_image_buffer({1, num_channels, height, width}, device, torch::kInt16);
   convert(src, buffer);
   return buffer;
 }
