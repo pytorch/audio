@@ -35,4 +35,4 @@ conda activate "${env_dir}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
-conda install --quiet -y 'ffmpeg>=4.1'
+conda install --quiet -y -c conda-forge 'ffmpeg==5.1'
