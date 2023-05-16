@@ -16,16 +16,3 @@ endif()
 if (BUILD_KALDI)
   add_subdirectory(kaldi)
 endif()
-
-################################################################################
-# Decoder
-################################################################################
-if (BUILD_CTC_DECODER)
-  add_subdirectory(zlib)
-  add_subdirectory(bzip2)
-  if (NOT MSVC)
-    add_subdirectory(lzma)
-  endif()
-  add_subdirectory(kenlm)
-  add_subdirectory(flashlight-text)
-endif()

@@ -76,7 +76,6 @@ Some environmnet variables that change the build behavior
 - `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
 - `BUILD_KALDI`: Determines whether build Kaldi extension. This is required for `kaldi_pitch` function. Default value is 1 on Linux/macOS and 0 on Windows.
 - `BUILD_RNNT`: Determines whether build RNN-T loss function. Default value is 1.
-- `BUILD_CTC_DECODER`: Determines whether build decoder features based on KenLM and FlashLight CTC decoder. Default value is 1.
 - `BUILD_CUDA_CTC_DECODER`: Determines whether build decoder features based on CUDA CTC decoder. Default value is 1. (`USE_CUDA` has to be 1.)
 
 Please check the [./tools/setup_helpers/extension.py](./tools/setup_helpers/extension.py) for the up-to-date detail.
