@@ -23,7 +23,7 @@ jobs:
         # Set up Environment Variables
         export PYTHON_VERSION="3.8"
         export USE_FFMPEG="1"
-        export CUDA_VERSION="cpu"
+        unset CUDA_VERSION
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
