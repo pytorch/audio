@@ -509,7 +509,7 @@ class MelSpectrogram(torch.nn.Module):
 
     .. properties:: Autograd TorchScript
 
-    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and
+    This is a composition of :py:func:`torchaudio.transforms.Spectrogram`
     and :py:func:`torchaudio.transforms.MelScale`.
 
     Sources
