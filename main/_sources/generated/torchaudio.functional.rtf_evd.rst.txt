@@ -1,0 +1,6 @@
+﻿torchaudio.functional.rtf\_evd
+==============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: rtf_evd

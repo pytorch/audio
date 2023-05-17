@@ -1,0 +1,1144 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.datasets &mdash; Torchaudio 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torchaudio.models" href="models.html" />
+    <link rel="prev" title="torchaudio.transforms" href="transforms.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href='https://pytorch.org/audio/versions.html'>0.8.0 &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>torchaudio.datasets</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/datasets.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="section" id="torchaudio-datasets">
+<h1>torchaudio.datasets<a class="headerlink" href="#torchaudio-datasets" title="Permalink to this headline">¶</a></h1>
+<p>All datasets are subclasses of <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a>
+and have <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> and <code class="docutils literal notranslate"><span class="pre">__len__</span></code> methods implemented.
+Hence, they can all be passed to a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></a>
+which can load multiple samples parallelly using <code class="docutils literal notranslate"><span class="pre">torch.multiprocessing</span></code> workers.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yesno_data</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">yesno_data</span><span class="p">,</span>
+                                          <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                          <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">num_workers</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">nThreads</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following datasets are available:</p>
+<div class="contents local topic" id="datasets">
+<p class="topic-title">Datasets</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#cmuarctic" id="id1">CMUARCTIC</a></p></li>
+<li><p><a class="reference internal" href="#commonvoice" id="id2">COMMONVOICE</a></p></li>
+<li><p><a class="reference internal" href="#gtzan" id="id3">GTZAN</a></p></li>
+<li><p><a class="reference internal" href="#librispeech" id="id4">LIBRISPEECH</a></p></li>
+<li><p><a class="reference internal" href="#libritts" id="id5">LIBRITTS</a></p></li>
+<li><p><a class="reference internal" href="#ljspeech" id="id6">LJSPEECH</a></p></li>
+<li><p><a class="reference internal" href="#speechcommands" id="id7">SPEECHCOMMANDS</a></p></li>
+<li><p><a class="reference internal" href="#tedlium" id="id8">TEDLIUM</a></p></li>
+<li><p><a class="reference internal" href="#vctk" id="id9">VCTK</a></p></li>
+<li><p><a class="reference internal" href="#vctk-092" id="id10">VCTK_092</a></p></li>
+<li><p><a class="reference internal" href="#yesno" id="id11">YESNO</a></p></li>
+</ul>
+</div>
+<p>All the datasets have almost similar API. They all have two common arguments:
+<code class="docutils literal notranslate"><span class="pre">transform</span></code> and  <code class="docutils literal notranslate"><span class="pre">target_transform</span></code> to transform the input and target respectively.</p>
+<div class="section" id="cmuarctic">
+<h2><a class="toc-backref" href="#id1">CMUARCTIC</a><a class="headerlink" href="#cmuarctic" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.CMUARCTIC">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">CMUARCTIC</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'aew', folder_in_archive: str = 'ARCTIC', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/cmuarctic.html#CMUARCTIC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.CMUARCTIC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for CMU_ARCTIC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from or the type of the dataset to dowload.
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;aew&quot;</span></code>)
+Allowed type values are <code class="docutils literal notranslate"><span class="pre">&quot;aew&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ahw&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;aup&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;awb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;axb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;bdl&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;clb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;eey&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fem&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;gka&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;jmk&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ksp&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ljm&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;lnh&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;rxr&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;slp&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;slt&quot;</span></code>.</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;ARCTIC&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.CMUARCTIC.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/cmuarctic.html#CMUARCTIC.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.CMUARCTIC.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">utterance,</span> <span class="pre">utterance_id)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="commonvoice">
+<h2><a class="toc-backref" href="#id2">COMMONVOICE</a><a class="headerlink" href="#commonvoice" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.COMMONVOICE">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">COMMONVOICE</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], tsv: str = 'train.tsv', url: Optional[str] = None, folder_in_archive: Optional[str] = None, version: Optional[str] = None, download: Optional[bool] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/commonvoice.html#COMMONVOICE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.COMMONVOICE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for CommonVoice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is located.
+(Where the <code class="docutils literal notranslate"><span class="pre">tsv</span></code> file is present.)</p></li>
+<li><p><strong>tsv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the tsv file used to construct the metadata, such as
+<code class="docutils literal notranslate"><span class="pre">&quot;train.tsv&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;test.tsv&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;dev.tsv&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;invalidated.tsv&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;validated.tsv&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;other.tsv&quot;</span></code>. (default: <code class="docutils literal notranslate"><span class="pre">&quot;train.tsv&quot;</span></code>)</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Deprecated, not used.</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Deprecated, not used.</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Deprecated, not used.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Deprecated, not used.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.COMMONVOICE.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, Dict[str, str]]<a class="reference internal" href="_modules/torchaudio/datasets/commonvoice.html#COMMONVOICE.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.COMMONVOICE.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">dictionary)</span></code>,  where dictionary is built
+from the TSV file with the following keys: <code class="docutils literal notranslate"><span class="pre">client_id</span></code>, <code class="docutils literal notranslate"><span class="pre">path</span></code>, <code class="docutils literal notranslate"><span class="pre">sentence</span></code>,
+<code class="docutils literal notranslate"><span class="pre">up_votes</span></code>, <code class="docutils literal notranslate"><span class="pre">down_votes</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>, <code class="docutils literal notranslate"><span class="pre">gender</span></code> and <code class="docutils literal notranslate"><span class="pre">accent</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="gtzan">
+<h2><a class="toc-backref" href="#id3">GTZAN</a><a class="headerlink" href="#gtzan" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.GTZAN">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">GTZAN</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://opihi.cs.uvic.ca/sound/genres.tar.gz', folder_in_archive: str = 'genres', download: bool = False, subset: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/gtzan.html#GTZAN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.GTZAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for GTZAN.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please see <a class="reference external" href="http://marsyas.info/downloads/datasets.html">http://marsyas.info/downloads/datasets.html</a> if you are planning to use
+this dataset to publish results.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from.
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;http://opihi.cs.uvic.ca/sound/genres.tar.gz&quot;</span></code>)</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>subset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Which subset of the dataset to use.
+One of <code class="docutils literal notranslate"><span class="pre">&quot;training&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;validation&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;testing&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the entire dataset is used. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.GTZAN.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str]<a class="reference internal" href="_modules/torchaudio/datasets/gtzan.html#GTZAN.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.GTZAN.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">label)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="librispeech">
+<h2><a class="toc-backref" href="#id4">LIBRISPEECH</a><a class="headerlink" href="#librispeech" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.LIBRISPEECH">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">LIBRISPEECH</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'train-clean-100', folder_in_archive: str = 'LibriSpeech', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/librispeech.html#LIBRISPEECH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRISPEECH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for LibriSpeech.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from,
+or the type of the dataset to dowload.
+Allowed type values are <code class="docutils literal notranslate"><span class="pre">&quot;dev-clean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;dev-other&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;test-clean&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;test-other&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;train-clean-100&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;train-clean-360&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;train-other-500&quot;</span></code>. (default: <code class="docutils literal notranslate"><span class="pre">&quot;train-clean-100&quot;</span></code>)</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;LibriSpeech&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.LIBRISPEECH.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, int, int, int]<a class="reference internal" href="_modules/torchaudio/datasets/librispeech.html#LIBRISPEECH.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRISPEECH.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">utterance,</span> <span class="pre">speaker_id,</span> <span class="pre">chapter_id,</span> <span class="pre">utterance_id)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="libritts">
+<h2><a class="toc-backref" href="#id5">LIBRITTS</a><a class="headerlink" href="#libritts" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.LIBRITTS">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">LIBRITTS</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'train-clean-100', folder_in_archive: str = 'LibriTTS', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/libritts.html#LIBRITTS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRITTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for LibriTTS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from,
+or the type of the dataset to dowload.
+Allowed type values are <code class="docutils literal notranslate"><span class="pre">&quot;dev-clean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;dev-other&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;test-clean&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;test-other&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;train-clean-100&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;train-clean-360&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;train-other-500&quot;</span></code>. (default: <code class="docutils literal notranslate"><span class="pre">&quot;train-clean-100&quot;</span></code>)</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;LibriTTS&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.LIBRITTS.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, int, int, str]<a class="reference internal" href="_modules/torchaudio/datasets/libritts.html#LIBRITTS.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LIBRITTS.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">original_text,</span> <span class="pre">normalized_text,</span> <span class="pre">speaker_id,</span>
+<span class="pre">chapter_id,</span> <span class="pre">utterance_id)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ljspeech">
+<h2><a class="toc-backref" href="#id6">LJSPEECH</a><a class="headerlink" href="#ljspeech" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.LJSPEECH">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">LJSPEECH</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2', folder_in_archive: str = 'wavs', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/ljspeech.html#LJSPEECH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LJSPEECH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for LJSpeech-1.1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from.
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2&quot;</span></code>)</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;wavs&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.LJSPEECH.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/ljspeech.html#LJSPEECH.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.LJSPEECH.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">transcript,</span> <span class="pre">normalized_transcript)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="speechcommands">
+<h2><a class="toc-backref" href="#id7">SPEECHCOMMANDS</a><a class="headerlink" href="#speechcommands" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.SPEECHCOMMANDS">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">SPEECHCOMMANDS</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'speech_commands_v0.02', folder_in_archive: str = 'SpeechCommands', download: bool = False, subset: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/speechcommands.html#SPEECHCOMMANDS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.SPEECHCOMMANDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for Speech Commands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from,
+or the type of the dataset to dowload.
+Allowed type values are <code class="docutils literal notranslate"><span class="pre">&quot;speech_commands_v0.01&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;speech_commands_v0.02&quot;</span></code>
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;speech_commands_v0.02&quot;</span></code>)</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;SpeechCommands&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>subset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – Select a subset of the dataset [None, “training”, “validation”, “testing”]. None means
+the whole dataset. “validation” and “testing” are defined in “validation_list.txt” and
+“testing_list.txt”, respectively, and “training” is the rest. Details for the files
+“validation_list.txt” and “testing_list.txt” are explained in the README of the dataset
+and in the introduction of Section 7 of the original paper and its reference 12. The
+original paper can be found <a class="reference external" href="https://arxiv.org/pdf/1804.03209.pdf">here</a>. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.SPEECHCOMMANDS.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, int]<a class="reference internal" href="_modules/torchaudio/datasets/speechcommands.html#SPEECHCOMMANDS.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.SPEECHCOMMANDS.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">label,</span> <span class="pre">speaker_id,</span> <span class="pre">utterance_number)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tedlium">
+<h2><a class="toc-backref" href="#id8">TEDLIUM</a><a class="headerlink" href="#tedlium" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.TEDLIUM">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">TEDLIUM</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], release: str = 'release1', subset: str = None, download: bool = False, audio_ext='.sph'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/tedlium.html#TEDLIUM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.TEDLIUM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for Tedlium. It supports releases 1,2 and 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>release</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Release version.
+Allowed values are <code class="docutils literal notranslate"><span class="pre">&quot;release1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;release2&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;release3&quot;</span></code>.
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;release1&quot;</span></code>).</p></li>
+<li><p><strong>subset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The subset of dataset to use. Valid options are <code class="docutils literal notranslate"><span class="pre">&quot;train&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;dev&quot;</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">&quot;test&quot;</span></code> for releases 1&amp;2, <code class="docutils literal notranslate"><span class="pre">None</span></code> for release3. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;train&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.TEDLIUM.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, int, int, int]<a class="reference internal" href="_modules/torchaudio/datasets/tedlium.html#TEDLIUM.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.TEDLIUM.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">transcript,</span> <span class="pre">talk_id,</span> <span class="pre">speaker_id,</span> <span class="pre">identifier)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="torchaudio.datasets.TEDLIUM.phoneme_dict">
+<em class="property">property </em><code class="sig-name descname">phoneme_dict</code><a class="headerlink" href="#torchaudio.datasets.TEDLIUM.phoneme_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Phonemes. Mapping from word to tuple of phonemes.
+Note that some words have empty phonemes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="vctk">
+<h2><a class="toc-backref" href="#id9">VCTK</a><a class="headerlink" href="#vctk" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.VCTK">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip', folder_in_archive: str = 'VCTK-Corpus', download: bool = False, downsample: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for VCTK.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p><strong>This dataset is no longer publicly available.</strong> Please use <a class="reference internal" href="#torchaudio.datasets.VCTK_092" title="torchaudio.datasets.VCTK_092"><code class="xref py py-class docutils literal notranslate"><span class="pre">VCTK_092</span></code></a></p></li>
+<li><p>Directory <code class="docutils literal notranslate"><span class="pre">p315</span></code> is ignored because there is no corresponding text files.
+For more information about the dataset visit: <a class="reference external" href="https://datashare.is.ed.ac.uk/handle/10283/3443">https://datashare.is.ed.ac.uk/handle/10283/3443</a></p></li>
+</ul>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used as the dataset is no longer publicly available.</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;VCTK-Corpus&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).
+Giving <code class="docutils literal notranslate"><span class="pre">download=True</span></code> will result in error as the dataset is no longer
+publicly available.</p></li>
+<li><p><strong>downsample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Not used.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.VCTK.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">utterance,</span> <span class="pre">speaker_id,</span> <span class="pre">utterance_id)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="vctk-092">
+<h2><a class="toc-backref" href="#id10">VCTK_092</a><a class="headerlink" href="#vctk-092" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.VCTK_092">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK_092</code><span class="sig-paren">(</span><em class="sig-param">root: str</em>, <em class="sig-param">mic_id: str = 'mic2'</em>, <em class="sig-param">download: bool = False</em>, <em class="sig-param">url: str = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip'</em>, <em class="sig-param">audio_ext='.flac'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK_092"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK_092" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create VCTK 0.92 Dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Root directory where the dataset’s top level directory is found.</p></li>
+<li><p><strong>mic_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Microphone ID. Either <code class="docutils literal notranslate"><span class="pre">&quot;mic1&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;mic2&quot;</span></code>. (default: <code class="docutils literal notranslate"><span class="pre">&quot;mic2&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from.
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip&quot;</span></code>)</p></li>
+<li><p><strong>audio_ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Custom audio extension if dataset is converted to non-default audio format.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>All the speeches from speaker <code class="docutils literal notranslate"><span class="pre">p315</span></code> will be skipped due to the lack of the corresponding text files.</p></li>
+<li><p>All the speeches from <code class="docutils literal notranslate"><span class="pre">p280</span></code> will be skipped for <code class="docutils literal notranslate"><span class="pre">mic_id=&quot;mic2&quot;</span></code> due to the lack of the audio files.</p></li>
+<li><p>Some of the speeches from speaker <code class="docutils literal notranslate"><span class="pre">p362</span></code> will be skipped due to the lack of  the audio files.</p></li>
+<li><p>See Also: <a class="reference external" href="https://datashare.is.ed.ac.uk/handle/10283/3443">https://datashare.is.ed.ac.uk/handle/10283/3443</a></p></li>
+</ul>
+</div>
+<dl class="method">
+<dt id="torchaudio.datasets.VCTK_092.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, str, str, str]<a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK_092.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK_092.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">utterance,</span> <span class="pre">speaker_id,</span> <span class="pre">utterance_id)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="yesno">
+<h2><a class="toc-backref" href="#id11">YESNO</a><a class="headerlink" href="#yesno" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.datasets.YESNO">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">YESNO</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://www.openslr.org/resources/1/waves_yesno.tar.gz', folder_in_archive: str = 'waves_yesno', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Dataset for YesNo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the directory where the dataset is found or downloaded.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The URL to download the dataset from.
+(default: <code class="docutils literal notranslate"><span class="pre">&quot;http://www.openslr.org/resources/1/waves_yesno.tar.gz&quot;</span></code>)</p></li>
+<li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;waves_yesno&quot;</span></code>)</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.datasets.YESNO.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int, List[int]]<a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the n-th sample from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The index of the sample to be loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(waveform,</span> <span class="pre">sample_rate,</span> <span class="pre">labels)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="models.html" class="btn btn-neutral float-right" title="torchaudio.models" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="transforms.html" class="btn btn-neutral" title="torchaudio.transforms" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torchaudio.datasets</a><ul>
+<li><a class="reference internal" href="#cmuarctic">CMUARCTIC</a></li>
+<li><a class="reference internal" href="#commonvoice">COMMONVOICE</a></li>
+<li><a class="reference internal" href="#gtzan">GTZAN</a></li>
+<li><a class="reference internal" href="#librispeech">LIBRISPEECH</a></li>
+<li><a class="reference internal" href="#libritts">LIBRITTS</a></li>
+<li><a class="reference internal" href="#ljspeech">LJSPEECH</a></li>
+<li><a class="reference internal" href="#speechcommands">SPEECHCOMMANDS</a></li>
+<li><a class="reference internal" href="#tedlium">TEDLIUM</a></li>
+<li><a class="reference internal" href="#vctk">VCTK</a></li>
+<li><a class="reference internal" href="#vctk-092">VCTK_092</a></li>
+<li><a class="reference internal" href="#yesno">YESNO</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Stay Connected</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

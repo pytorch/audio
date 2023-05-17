@@ -1,0 +1,1373 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.backend &mdash; Torchaudio 0.12.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torchaudio.functional" href="functional.html" />
+    <link rel="prev" title="torchaudio.io" href="io.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../versions.html">0.12.1 &#x25BC</a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api_tutorial.html">Media Stream API - Pt. 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streaming_api2_tutorial.html">Media Stream API - Pt. 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Usages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">Accelerated Video Decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>torchaudio.backend</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/backend.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="section" id="module-torchaudio.backend">
+<span id="torchaudio-backend"></span><span id="backend"></span><h1>torchaudio.backend<a class="headerlink" href="#module-torchaudio.backend" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#module-torchaudio.backend" title="torchaudio.backend"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code></a> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
+<p>There are currently four implementations available.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#sox-io-backend"><span class="std std-ref">“sox_io”</span></a> (default on Linux/macOS)</p></li>
+<li><p><a class="reference internal" href="#soundfile-backend"><span class="std std-ref">“soundfile”</span></a> (default on Windows)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Instead of calling functions in <code class="docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> directly, please use <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> with proper backend set with <a class="reference internal" href="torchaudio.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.set_audio_backend()</span></code></a>.</p>
+</div>
+<div class="section" id="availability">
+<h3>Availability<a class="headerlink" href="#availability" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend requires C++ extension module, which is included in Linux/macOS binary distributions. This backend is not available on Windows.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend requires <code class="docutils literal notranslate"><span class="pre">SoundFile</span></code>. Please refer to <a class="reference external" href="https://pysoundfile.readthedocs.io/en/latest/">the SoundFile documentation</a> for the installation.</p>
+</div>
+</div>
+<div class="section" id="common-data-structure">
+<h2>Common Data Structure<a class="headerlink" href="#common-data-structure" title="Permalink to this headline">¶</a></h2>
+<p>Structures used to report the metadata of audio files.</p>
+<div class="section" id="audiometadata">
+<h3>AudioMetaData<a class="headerlink" href="#audiometadata" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.backend.common.AudioMetaData">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">torchaudio.backend.common.</span></code><code class="sig-name descname"><span class="pre">AudioMetaData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_frames</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_sample</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#AudioMetaData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.common.AudioMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return type of <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> function.</p>
+<p>This class is used by <a class="reference internal" href="#sox-io-backend"><span class="std std-ref">“sox_io” backend</span></a> and
+<a class="reference internal" href="#soundfile-backend"><span class="std std-ref">“soundfile” backend with the new interface</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Sample rate</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The number of frames</p></li>
+<li><p><strong>num_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The number of channels</p></li>
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The number of bits per sample. This is 0 for lossy formats,
+or when it cannot be accurately inferred.</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <p>Audio encoding
+The values encoding can take are one of the following:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_S</span></code>: Signed integer linear PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_U</span></code>: Unsigned integer linear PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_F</span></code>: Floating point linear PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FLAC</span></code>: Flac, Free Lossless Audio Codec</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ULAW</span></code>: Mu-law</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ALAW</span></code>: A-law</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MP3</span></code> : MP3, MPEG-1 Audio Layer III</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VORBIS</span></code>: OGG Vorbis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AMR_WB</span></code>: Adaptive Multi-Rate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AMR_NB</span></code>: Adaptive Multi-Rate Wideband</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OPUS</span></code>: Opus</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTK</span></code>: Single channel 16-bit PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code> : None of above</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">AudioMetaData</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This tutorial shows how to use TorchAudio&#x27;s basic I/O API to load audio files into PyTorch&#x27;s Te..."><img alt="Audio I/O" src="_images/sphx_glr_audio_io_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Audio I/O</div>
+</div></div></div></dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="sox-io-backend">
+<span id="id1"></span><h2>Sox IO Backend<a class="headerlink" href="#sox-io-backend" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend is available and default on Linux/macOS and not available on Windows.</p>
+<p>I/O functions of this backend support <a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript</a>.</p>
+<p>You can switch from another backend to the <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend with the following;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;sox_io&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="info">
+<h3>info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.info">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.backend.sox_io_backend.</span></code><code class="sig-name descname"><span class="pre">info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.backend.common.AudioMetaData" title="torchaudio.backend.common.AudioMetaData"><span class="pre">torchaudio.backend.common.AudioMetaData</span></a><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get signal information of an audio file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. When the function is not compiled by TorchScript,
+(e.g. <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code>), the following types are accepted;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: file path</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
+which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
+</ul>
+</div></blockquote>
+<p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li><p>When the input type is file-like object, this function cannot
+get the correct length (<code class="docutils literal notranslate"><span class="pre">num_samples</span></code>) for certain formats,
+such as <code class="docutils literal notranslate"><span class="pre">mp3</span></code> and <code class="docutils literal notranslate"><span class="pre">vorbis</span></code>.
+In this case, the value of <code class="docutils literal notranslate"><span class="pre">num_samples</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p>This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
+TorchScript compiler compatibility.</p></li>
+</ul>
+</div>
+</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
+Providing the argument might help when libsox can not infer the format
+from header or extension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Metadata of the given audio.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.backend.common.AudioMetaData" title="torchaudio.backend.common.AudioMetaData">AudioMetaData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="load">
+<h3>load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.load">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.backend.sox_io_backend.</span></code><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_offset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_frames</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load audio data from file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function can handle all the codecs that underlying libsox can handle,
+however it is tested on the following formats;</p>
+<ul>
+<li><p>WAV, AMB</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>32-bit floating-point</p></li>
+<li><p>32-bit signed integer</p></li>
+<li><p>24-bit signed integer</p></li>
+<li><p>16-bit signed integer</p></li>
+<li><p>8-bit unsigned integer (WAV only)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>MP3</p></li>
+<li><p>FLAC</p></li>
+<li><p>OGG/VORBIS</p></li>
+<li><p>OPUS</p></li>
+<li><p>SPHERE</p></li>
+<li><p>AMR-NB</p></li>
+</ul>
+<p>To load <code class="docutils literal notranslate"><span class="pre">MP3</span></code>, <code class="docutils literal notranslate"><span class="pre">FLAC</span></code>, <code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>, <code class="docutils literal notranslate"><span class="pre">OPUS</span></code> and other codecs <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not
+handle natively, your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code>
+and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code> or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
+</div>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">normalize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>), this function returns Tensor with
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype, and the shape of <cite>[channel, time]</cite>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> argument does not perform volume normalization.
+It only converts the sample type to <cite>torch.float32</cite> from the native sample
+type.</p>
+<p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>,
+this function can return integer Tensor, where the samples are expressed within the whole range
+of the corresponding dtype, that is, <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensor for 32-bit signed PCM,
+<code class="docutils literal notranslate"><span class="pre">int16</span></code> for 16-bit signed PCM and <code class="docutils literal notranslate"><span class="pre">uint8</span></code> for 8-bit unsigned PCM. Since torch does not
+support <code class="docutils literal notranslate"><span class="pre">int24</span></code> dtype, 24-bit signed PCM are converted to <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensors.</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> argument has no effect on 32-bit floating-point WAV and other formats, such as
+<code class="docutils literal notranslate"><span class="pre">flac</span></code> and <code class="docutils literal notranslate"><span class="pre">mp3</span></code>.</p>
+<p>For these formats, this function always returns <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor with values.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. When the function is not compiled by TorchScript,
+(e.g. <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code>), the following types are accepted;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: file path</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
+which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
+</ul>
+</div></blockquote>
+<p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.</p>
+<p>Note: This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
+TorchScript compiler compatibility.</p>
+</p></li>
+<li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
+starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
+This function may return the less number of frames if there is not enough
+frames in the given file.</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function converts the native sample type to <code class="docutils literal notranslate"><span class="pre">float32</span></code>.
+Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
+integer type.
+This argument has no effect for formats other than integer WAV type.</p>
+</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <cite>[channel, time]</cite>.
+Otherwise, the returned Tensor’s dimension is <cite>[time, channel]</cite>.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
+Providing the argument might help when libsox can not infer the format
+from header or extension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Resulting Tensor and sample rate.</dt><dd><p>If the input file has integer wav format and <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>, then it has
+integer type, else <code class="docutils literal notranslate"><span class="pre">float32</span></code> type. If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has
+<cite>[channel, time]</cite> else <cite>[time, channel]</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="save">
+<h3>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.save">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.backend.sox_io_backend.</span></code><code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_sample</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save audio data to file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>pathlib.Path</em></a>) – Path to save file.
+This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated
+as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – sampling rate</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <cite>[channel, time]</cite>,
+otherwise <cite>[time, channel]</cite>.</p></li>
+<li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Used for formats other than WAV.
+This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code></dt><dd><p>Either bitrate (in <code class="docutils literal notranslate"><span class="pre">kbps</span></code>) with quality factor, such as <code class="docutils literal notranslate"><span class="pre">128.2</span></code>, or
+VBR encoding with quality factor such as <code class="docutils literal notranslate"><span class="pre">-4.2</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">-4.5</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code></dt><dd><p>Whole number from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">8</span></code>. <code class="docutils literal notranslate"><span class="pre">8</span></code> is default and highest compression.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code></dt><dd><p>Number from <code class="docutils literal notranslate"><span class="pre">-1</span></code> to <code class="docutils literal notranslate"><span class="pre">10</span></code>; <code class="docutils literal notranslate"><span class="pre">-1</span></code> is the highest compression
+and lowest quality. Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
+</dd>
+</dl>
+<p>See the detail at <a class="reference external" href="http://sox.sourceforge.net/soxformat.html">http://sox.sourceforge.net/soxformat.html</a>.</p>
+</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
+When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is path-like object, audio format is infered from
+file extension. If file extension is missing or different, you can specify the
+correct format with this argument.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is file-like object, this argument is required.</p>
+<p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;htk&quot;</span></code>.</p>
+</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for the supported formats.
+This argument is effective only for supported formats, such as <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;amb&quot;</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> (signed integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> (unsigned integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> (floating point PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> (mu-law)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code> (a-law)</p></li>
+</ul>
+</div></blockquote>
+<dl>
+<dt>Default values</dt><dd><p>If not provided, the default value is picked based on <code class="docutils literal notranslate"><span class="pre">format</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code>.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code></dt><dd><ul>
+<li><div class="line-block">
+<div class="line">If both <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code> are not provided, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the</div>
+<div class="line">Tensor is used to determine the default value.</div>
+</div>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code> or <code class="docutils literal notranslate"><span class="pre">int32</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">float32</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if <code class="docutils literal notranslate"><span class="pre">bits_per_sample=8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> otherwise</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code> format;</dt><dd><ul>
+<li><p>the default value is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Changes the bit depth for the supported formats.
+When <code class="docutils literal notranslate"><span class="pre">format</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, you can change the
+bit depth. Valid values are <code class="docutils literal notranslate"><span class="pre">8</span></code>, <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code> and <code class="docutils literal notranslate"><span class="pre">64</span></code>.</p>
+<dl>
+<dt>Default Value;</dt><dd><p>If not provided, the default values are picked based on <code class="docutils literal notranslate"><span class="pre">format</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;encoding&quot;</span></code>;</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>;</dt><dd><ul>
+<li><div class="line-block">
+<div class="line">If both <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code> are not provided, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the</div>
+<div class="line">Tensor is used.</div>
+</div>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> if dtype is  <code class="docutils literal notranslate"><span class="pre">int32</span></code> or <code class="docutils literal notranslate"><span class="pre">float32</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code></p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> format;</dt><dd><ul>
+<li><p>the default value is <code class="docutils literal notranslate"><span class="pre">24</span></code></p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code> format;</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> or not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code> format;</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> or not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported formats/encodings/bit depth/compression are;</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code></dt><dd><ul class="simple">
+<li><p>32-bit floating-point PCM</p></li>
+<li><p>32-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>8-bit unsigned integer PCM</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+</ul>
+<p>Note: Default encoding/bit depth is determined by the dtype of the input Tensor.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code></dt><dd><p>Fixed bit rate (such as 128kHz) and variable bit rate compression.
+Default: VBR with high quality.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit</p></li>
+<li><p>16-bit</p></li>
+<li><p>24-bit (default)</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code></dt><dd><ul class="simple">
+<li><p>Different quality level. Default: approx. 112kbps</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>32-bit signed integer PCM (default)</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+<li><p>16-bit a-law</p></li>
+<li><p>24-bit a-law</p></li>
+<li><p>32-bit a-law</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code></dt><dd><p>Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code></dt><dd><p>Lossy Speech Compression, CPU intensive.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;htk&quot;</span></code></dt><dd><p>Uses a default single-channel 16-bit PCM format.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To save into formats that <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not handle natively, (such as <code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>), your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has
+to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code> and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code>
+or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="soundfile-backend">
+<span id="id2"></span><h2>Soundfile Backend<a class="headerlink" href="#soundfile-backend" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend is available when <a class="reference external" href="https://pysoundfile.readthedocs.io/en/latest/">SoundFile</a> is installed. This backend is the default on Windows.</p>
+<p>You can switch from another backend to the <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend with the following;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id3">
+<h3>info<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.info">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.backend.soundfile_backend.</span></code><code class="sig-name descname"><span class="pre">info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.backend.common.AudioMetaData" title="torchaudio.backend.common.AudioMetaData"><span class="pre">torchaudio.backend.common.AudioMetaData</span></a><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get signal information of an audio file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only, even though it accepts
+<code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> object as well. This is for the consistency with <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend,
+which has a restriction on type annotation due to TorchScript compiler compatiblity.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – Source of audio data.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>meta data of the given audio.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.backend.common.AudioMetaData" title="torchaudio.backend.common.AudioMetaData">AudioMetaData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>load<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.load">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.backend.soundfile_backend.</span></code><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_offset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_frames</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load audio data from file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The formats this function can handle depend on the soundfile installation.
+This function is tested on the following formats;</p>
+<ul>
+<li><p>WAV</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>32-bit floating-point</p></li>
+<li><p>32-bit signed integer</p></li>
+<li><p>16-bit signed integer</p></li>
+<li><p>8-bit unsigned integer</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>FLAC</p></li>
+<li><p>OGG/VORBIS</p></li>
+<li><p>SPHERE</p></li>
+</ul>
+</div>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">normalize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>), this function returns Tensor with
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype, and the shape of <cite>[channel, time]</cite>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> argument does not perform volume normalization.
+It only converts the sample type to <cite>torch.float32</cite> from the native sample
+type.</p>
+<p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>,
+this function can return integer Tensor, where the samples are expressed within the whole range
+of the corresponding dtype, that is, <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensor for 32-bit signed PCM,
+<code class="docutils literal notranslate"><span class="pre">int16</span></code> for 16-bit signed PCM and <code class="docutils literal notranslate"><span class="pre">uint8</span></code> for 8-bit unsigned PCM. Since torch does not
+support <code class="docutils literal notranslate"><span class="pre">int24</span></code> dtype, 24-bit signed PCM are converted to <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensors.</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> argument has no effect on 32-bit floating-point WAV and other formats, such as
+<code class="docutils literal notranslate"><span class="pre">flac</span></code> and <code class="docutils literal notranslate"><span class="pre">mp3</span></code>.</p>
+<p>For these formats, this function always returns <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor with values.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only, even though it accepts
+<code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> object as well. This is for the consistency with <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend,
+which has a restriction on type annotation due to TorchScript compiler compatiblity.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – Source of audio data.</p></li>
+<li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames to skip before start reading data.</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
+starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
+This function may return the less number of frames if there is not enough
+frames in the given file.</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function converts the native sample type to <code class="docutils literal notranslate"><span class="pre">float32</span></code>.
+Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
+integer type.
+This argument has no effect for formats other than integer WAV type.</p>
+</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, the returned Tensor has dimension <cite>[channel, time]</cite>.
+Otherwise, the returned Tensor’s dimension is <cite>[time, channel]</cite>.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Resulting Tensor and sample rate.</dt><dd><p>If the input file has integer wav format and normalization is off, then it has
+integer type, else <code class="docutils literal notranslate"><span class="pre">float32</span></code> type. If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has
+<cite>[channel, time]</cite> else <cite>[time, channel]</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h3>save<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.save">
+<code class="sig-prename descclassname"><span class="pre">torchaudio.backend.soundfile_backend.</span></code><code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels_first</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_sample</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save audio data to file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The formats this function can handle depend on the soundfile installation.
+This function is tested on the following formats;</p>
+<ul>
+<li><p>WAV</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>32-bit floating-point</p></li>
+<li><p>32-bit signed integer</p></li>
+<li><p>16-bit signed integer</p></li>
+<li><p>8-bit unsigned integer</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>FLAC</p></li>
+<li><p>OGG/VORBIS</p></li>
+<li><p>SPHERE</p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only, even though it accepts
+<code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> object as well. This is for the consistency with <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend,
+which has a restriction on type annotation due to TorchScript compiler compatiblity.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>pathlib.Path</em></a>) – Path to audio file.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – sampling rate</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <cite>[channel, time]</cite>,
+otherwise <cite>[time, channel]</cite>.</p></li>
+<li><p><strong>compression</strong> (<em>float of None</em><em>, </em><em>optional</em>) – Not used.
+It is here only for interface compatibility reson with “sox_io” backend.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
+When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is path-like object, audio format is
+inferred from file extension. If the file extension is missing or
+different, you can specify the correct format with this argument.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is file-like object,
+this argument is required.</p>
+<p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>.</p>
+</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for supported formats.
+This argument is effective only for supported formats, sush as
+<code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> (signed integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> (unsigned integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> (floating point PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> (mu-law)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code> (a-law)</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the
+supported formats.
+When <code class="docutils literal notranslate"><span class="pre">format</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>,
+you can change the bit depth.
+Valid values are <code class="docutils literal notranslate"><span class="pre">8</span></code>, <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code> and <code class="docutils literal notranslate"><span class="pre">64</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported formats/encodings/bit depth/compression are:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code></dt><dd><ul class="simple">
+<li><p>32-bit floating-point PCM</p></li>
+<li><p>32-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>8-bit unsigned integer PCM</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+</ul>
+<dl class="simple">
+<dt>Note:</dt><dd><p>Default encoding/bit depth is determined by the dtype of
+the input Tensor.</p>
+</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit</p></li>
+<li><p>16-bit (default)</p></li>
+<li><p>24-bit</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code></dt><dd><ul class="simple">
+<li><p>Doesn’t accept changing configuration.</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>32-bit signed integer PCM (default)</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+<li><p>16-bit a-law</p></li>
+<li><p>24-bit a-law</p></li>
+<li><p>32-bit a-law</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="functional.html" class="btn btn-neutral float-right" title="torchaudio.functional" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="io.html" class="btn btn-neutral" title="torchaudio.io" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torchaudio.backend</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#availability">Availability</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-data-structure">Common Data Structure</a><ul>
+<li><a class="reference internal" href="#audiometadata">AudioMetaData</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sox-io-backend">Sox IO Backend</a><ul>
+<li><a class="reference internal" href="#info">info</a></li>
+<li><a class="reference internal" href="#load">load</a></li>
+<li><a class="reference internal" href="#save">save</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#soundfile-backend">Soundfile Backend</a><ul>
+<li><a class="reference internal" href="#id3">info</a></li>
+<li><a class="reference internal" href="#id4">load</a></li>
+<li><a class="reference internal" href="#id5">save</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = []
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+    </script>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Stay Connected</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>
