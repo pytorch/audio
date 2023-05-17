@@ -363,6 +363,11 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_video_process(
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter), C{h, w}, B{tb});
     }
+    case AV_PIX_FMT_YUV420P10LE: {
+      using C = YUV420P10LEConverter;
+      return std::make_unique<ProcessImpl<C, B>>(
+          std::move(filter), C{h, w}, B{tb});
+    }
     case AV_PIX_FMT_NV12: {
       using C = NV12Converter;
       return std::make_unique<ProcessImpl<C, B>>(
@@ -471,6 +476,11 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_video_process(
     }
     case AV_PIX_FMT_YUV420P: {
       using C = YUV420PConverter;
+      return std::make_unique<ProcessImpl<C, B>>(
+          std::move(filter), C{h, w}, B{tb, frames_per_chunk, num_chunks});
+    }
+    case AV_PIX_FMT_YUV420P10LE: {
+      using C = YUV420P10LEConverter;
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter), C{h, w}, B{tb, frames_per_chunk, num_chunks});
     }
