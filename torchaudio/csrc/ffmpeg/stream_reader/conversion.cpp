@@ -344,9 +344,7 @@ torch::Tensor YUV420P10LEConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 // NV12
 ////////////////////////////////////////////////////////////////////////////////
-NV12Converter::NV12Converter(int h, int w)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer({1, height / 2, width / 2, 2})) {
+NV12Converter::NV12Converter(int h, int w) : ImageConverterBase(h, w, 3) {
   TORCH_WARN_ONCE(
       "The output format NV12 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -375,26 +373,19 @@ void NV12Converter::convert(const AVFrame* src, torch::Tensor& dst) {
   }
   // Write intermediate UV plane
   {
-    uint8_t* p_dst = tmp_uv.data_ptr<uint8_t>();
-    uint8_t* p_src = src->data[1];
-    for (int h = 0; h < height / 2; ++h) {
-      memcpy(p_dst, p_src, width);
-      p_dst += width;
-      p_src += src->linesize[1];
-    }
+    auto tmp = torch::from_blob(
+        src->data[1],
+        {height / 2, width},
+        {src->linesize[1], 1},
+        [](void*) {},
+        torch::TensorOptions().dtype(torch::kUInt8).layout(torch::kStrided));
+    tmp = tmp.view({1, height / 2, width / 2, 2}).permute({0, 3, 1, 2});
+    auto dst_uv = dst.slice(1, 1, 3);
+    dst_uv.slice(2, 0, {}, 2).slice(3, 0, {}, 2).copy_(tmp);
+    dst_uv.slice(2, 0, {}, 2).slice(3, 1, {}, 2).copy_(tmp);
+    dst_uv.slice(2, 1, {}, 2).slice(3, 0, {}, 2).copy_(tmp);
+    dst_uv.slice(2, 1, {}, 2).slice(3, 1, {}, 2).copy_(tmp);
   }
-  // Upsample width and height
-  namespace F = torch::nn::functional;
-  torch::Tensor uv = F::interpolate(
-      tmp_uv.permute({0, 3, 1, 2}),
-      F::InterpolateFuncOptions()
-          .mode(torch::kNearest)
-          .size(std::vector<int64_t>({height, width})));
-
-  // Write to the UV plane
-  // dst[:, 1:] = uv
-  using namespace torch::indexing;
-  dst.index_put_({Slice(), Slice(1)}, uv);
 }
 
 torch::Tensor NV12Converter::convert(const AVFrame* src) {
