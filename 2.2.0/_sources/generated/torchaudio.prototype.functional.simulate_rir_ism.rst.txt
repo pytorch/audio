@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.simulate\_rir\_ism
+==================================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: simulate_rir_ism

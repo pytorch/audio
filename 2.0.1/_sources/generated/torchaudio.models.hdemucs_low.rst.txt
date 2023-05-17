@@ -1,0 +1,6 @@
+torchaudio.models.hdemucs\_low
+==============================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hdemucs_low

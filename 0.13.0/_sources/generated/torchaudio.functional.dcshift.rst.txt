@@ -1,0 +1,6 @@
+﻿torchaudio.functional.dcshift
+=============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: dcshift

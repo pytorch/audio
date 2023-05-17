@@ -1,0 +1,1397 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>StreamReader Basic Usages &mdash; Torchaudio 2.1.2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="StreamReader Advanced Usages" href="streamreader_advanced_tutorial.html" />
+    <link rel="prev" title="Audio I/O" href="audio_io_tutorial.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../versions.html"><span style="font-size:110%">2.1.2 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>StreamReader Basic Usages &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/streamreader_basic_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">tutorials/streamreader_basic_tutorial</div>
+
+      <div id="google-colab-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+        <div class="call-to-action-desktop-view">Run in Google Colab</div>
+        <div class="call-to-action-mobile-view">Colab</div>
+      </div>
+      <div id="download-notebook-link">
+        <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+        <div class="call-to-action-desktop-view">Download Notebook</div>
+        <div class="call-to-action-mobile-view">Notebook</div>
+      </div>
+      <div id="github-view-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+        <div class="call-to-action-desktop-view">View on GitHub</div>
+        <div class="call-to-action-mobile-view">GitHub</div>
+      </div>
+    </div>
+
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-streamreader-basic-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="streamreader-basic-usages">
+<span id="sphx-glr-tutorials-streamreader-basic-tutorial-py"></span><h1>StreamReader Basic Usages<a class="headerlink" href="#streamreader-basic-usages" title="Permalink to this heading">¶</a></h1>
+<p><strong>Author</strong>: <a class="reference external" href="mailto:moto&#37;&#52;&#48;meta&#46;com">Moto Hira</a></p>
+<p>This tutorial shows how to use <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.io.StreamReader</span></code></a> to
+fetch and decode audio/video data and apply preprocessings that
+libavfilter provides.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial requires FFmpeg libraries.
+Please refer to <a class="reference internal" href="../installation.html#ffmpeg-dependency"><span class="std std-ref">FFmpeg dependency</span></a> for
+the detail.</p>
+</div>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<p>Streaming API leverages the powerful I/O features of ffmpeg.</p>
+<dl class="simple">
+<dt>It can</dt><dd><ul class="simple">
+<li><p>Load audio/video in variety of formats</p></li>
+<li><p>Load audio/video from local/remote source</p></li>
+<li><p>Load audio/video from file-like object</p></li>
+<li><p>Load audio/video from microphone, camera and screen</p></li>
+<li><p>Generate synthetic audio/video signals.</p></li>
+<li><p>Load audio/video chunk by chunk</p></li>
+<li><p>Change the sample rate / frame rate, image size, on-the-fly</p></li>
+<li><p>Apply filters and preprocessings</p></li>
+</ul>
+</dd>
+</dl>
+<p>The streaming API works in three steps.</p>
+<ol class="arabic simple">
+<li><p>Open media source (file, device, synthetic pattern generator)</p></li>
+<li><p>Configure output stream</p></li>
+<li><p>Stream the media</p></li>
+</ol>
+<p>At this moment, the features that the ffmpeg integration provides
+are limited to the form of</p>
+<p><cite>&lt;some media source&gt; -&gt; &lt;optional processing&gt; -&gt; &lt;tensor&gt;</cite></p>
+<p>If you have other forms that can be useful to your usecases,
+(such as integration with <cite>torch.Tensor</cite> type)
+please file a feature request.</p>
+</section>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.1
+2.1.2
+</pre></div>
+</div>
+</section>
+<section id="opening-the-source">
+<h2>Opening the source<a class="headerlink" href="#opening-the-source" title="Permalink to this heading">¶</a></h2>
+<p>There are mainly three different sources that streaming API can
+handle. Whichever source is used, the remaining processes
+(configuring the output, applying preprocessing) are same.</p>
+<ol class="arabic simple">
+<li><p>Common media formats (resource indicator of string type or file-like object)</p></li>
+<li><p>Audio / Video devices</p></li>
+<li><p>Synthetic audio / video sources</p></li>
+</ol>
+<p>The following section covers how to open common media formats.
+For the other streams, please refer to the
+<a class="reference external" href="./streamreader_advanced_tutorial.html">StreamReader Advanced Usage</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The coverage of the supported media (such as containers, codecs and protocols)
+depend on the FFmpeg libraries found in the system.</p>
+<p>If <cite>StreamReader</cite> raises an error opening a source, please check
+that <cite>ffmpeg</cite> command can handle it.</p>
+</div>
+<section id="local-files">
+<h3>Local files<a class="headerlink" href="#local-files" title="Permalink to this heading">¶</a></h3>
+<p>To open a media file, you can simply pass the path of the file to
+the constructor of <cite>StreamReader</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.wav&quot;</span><span class="p">)</span>
+
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;audio.mp3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This works for image file, video file and video streams.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Still image</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;image.jpeg&quot;</span><span class="p">)</span>
+
+<span class="c1"># Video file</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;video.mpeg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="network-protocols">
+<h3>Network protocols<a class="headerlink" href="#network-protocols" title="Permalink to this heading">¶</a></h3>
+<p>You can directly pass a URL as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Video on remote server</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/video.mp4&quot;</span><span class="p">)</span>
+
+<span class="c1"># Playlist format</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;https://example.com/playlist.m3u&quot;</span><span class="p">)</span>
+
+<span class="c1"># RTMP</span>
+<span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;rtmp://example.com:1935/live/app&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="file-like-objects">
+<h3>File-like objects<a class="headerlink" href="#file-like-objects" title="Permalink to this heading">¶</a></h3>
+<p>You can also pass a file-like object. A file-like object must implement
+<code class="docutils literal notranslate"><span class="pre">read</span></code> method conforming to <a class="reference external" href="https://docs.python.org/3/library/io.html#io.RawIOBase.read" title="(in Python v3.12)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">io.RawIOBase.read</span></code></a>.</p>
+<p>If the given file-like object has <code class="docutils literal notranslate"><span class="pre">seek</span></code> method, StreamReader uses it
+as well. In this case the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method is expected to conform to
+<a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase.seek" title="(in Python v3.12)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">io.IOBase.seek</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open as fileobj with seek support</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.mp4&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">:</span>
+    <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case where third-party libraries implement <code class="docutils literal notranslate"><span class="pre">seek</span></code> so that it raises
+an error, you can write a wrapper class to mask the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UnseekableWrapper</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://example.com/video.mp4&quot;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">raw</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">boto3</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;s3&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="s2">&quot;my_bucket&quot;</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="s2">&quot;key&quot;</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using an unseekable file-like object, the source media has to be
+streamable.
+For example, a valid MP4-formatted object can have its metadata either
+at the beginning or at the end of the media data.
+Those with metadata at the beginning can be opened without method
+<cite>seek</cite>, but those with metadata at the end cannot be opened
+without <cite>seek</cite>.</p>
+</div>
+</section>
+<section id="headerless-media">
+<h3>Headerless media<a class="headerlink" href="#headerless-media" title="Permalink to this heading">¶</a></h3>
+<p>If attempting to load headerless raw data, you can use <code class="docutils literal notranslate"><span class="pre">format</span></code> and
+<code class="docutils literal notranslate"><span class="pre">option</span></code> to specify the format of the data.</p>
+<p>Say, you converted an audio file into faw format with <code class="docutils literal notranslate"><span class="pre">sox</span></code> command
+as follow;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Headerless, 16-bit signed integer PCM, resampled at 16k Hz.
+$ sox original.wav -r 16000 raw.s2
+</pre></div>
+</div>
+<p>Such audio can be opened like following.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="o">=</span><span class="s2">&quot;raw.s2&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;s16le&quot;</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;16000&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="checking-the-source-streams">
+<h2>Checking the source streams<a class="headerlink" href="#checking-the-source-streams" title="Permalink to this heading">¶</a></h2>
+<p>Once the media is opened, we can inspect the streams and configure
+the output streams.</p>
+<p>You can check the number of source streams with
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.num_src_streams" title="torchaudio.io.StreamReader.num_src_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_src_streams</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The number of streams is NOT the number of channels.
+Each audio stream can contain an arbitrary number of channels.</p>
+</div>
+<p>To check the metadata of source stream you can use
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info" title="torchaudio.io.StreamReader.get_src_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_src_stream_info()</span></code></a>
+method and provide the index of the source stream.</p>
+<p>This method returns
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SourceStream</span></code>. If a source
+stream is audio type, then the return type is
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SourceAudioStream</span></code>, which is
+a subclass of <cite>SourceStream</cite>, with additional audio-specific attributes.
+Similarly, if a source stream is video type, then the return type is
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SourceVideoStream</span></code>.</p>
+<p>For regular audio formats and still image formats, such as <cite>WAV</cite>
+and <cite>JPEG</cite>, the number of souorce streams is 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The number of source streams:&quot;</span><span class="p">,</span> <span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The number of source streams: 1
+SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;pcm_s16le&#39;, codec_long_name=&#39;PCM signed 16-bit little-endian&#39;, format=&#39;s16&#39;, bit_rate=256000, num_frames=0, bits_per_sample=0, metadata={}, sample_rate=16000.0, num_channels=1)
+</pre></div>
+</div>
+<p>Container formats and playlist formats may contain multiple streams
+of different media type.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a> <span class="o">=</span> <span class="s2">&quot;https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8&quot;</span>
+<span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The number of source streams:&quot;</span><span class="p">,</span> <span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The number of source streams: 27
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:39.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;2177116&#39;}, width=960, height=540, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:42.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;8001098&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:48.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;6312875&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750899, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:54.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;4943747&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513057, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:59.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;3216424&#39;}, width=1280, height=720, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:03.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;1268994&#39;}, width=768, height=432, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111939, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:06.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;902298&#39;}, width=640, height=360, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:07.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;541052&#39;}, width=480, height=270, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:39.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;2399619&#39;}, width=960, height=540, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:42.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;8223601&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:48.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;6535378&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750899, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:54.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;5166250&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513057, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:59.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;3438927&#39;}, width=1280, height=720, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:03.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;1491497&#39;}, width=768, height=432, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111939, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:06.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;1124801&#39;}, width=640, height=360, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:07.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;763555&#39;}, width=480, height=270, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:39.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;2207619&#39;}, width=960, height=540, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:42.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;8031601&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:48.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;6343378&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=750899, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:54.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;4974250&#39;}, width=1920, height=1080, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=513057, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:59.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;3246927&#39;}, width=1280, height=720, frame_rate=60.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=185749, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:03.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;1299497&#39;}, width=768, height=432, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=111939, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:06.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;932801&#39;}, width=640, height=360, frame_rate=30.0)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=59938, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:38:07.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;571555&#39;}, width=480, height=270, frame_rate=30.0)
+SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=60076, num_frames=0, bits_per_sample=0, metadata={&#39;comment&#39;: &#39;English&#39;, &#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T22:14:57.000000Z&#39;, &#39;language&#39;: &#39;en&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;}, sample_rate=48000.0, num_channels=2)
+SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;ac3&#39;, codec_long_name=&#39;ATSC A/52A (AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=384000, num_frames=0, bits_per_sample=0, metadata={&#39;comment&#39;: &#39;English&#39;, &#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T22:15:46.000000Z&#39;, &#39;language&#39;: &#39;en&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;}, sample_rate=48000.0, num_channels=6)
+SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;eac3&#39;, codec_long_name=&#39;ATSC A/52B (AC-3, E-AC-3)&#39;, format=&#39;fltp&#39;, bit_rate=192000, num_frames=0, bits_per_sample=0, metadata={&#39;comment&#39;: &#39;English&#39;, &#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T22:16:17.000000Z&#39;, &#39;language&#39;: &#39;en&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;}, sample_rate=48000.0, num_channels=6)
+</pre></div>
+</div>
+</section>
+<section id="configuring-output-streams">
+<h2>Configuring output streams<a class="headerlink" href="#configuring-output-streams" title="Permalink to this heading">¶</a></h2>
+<p>The stream API lets you stream data from an arbitrary combination of
+the input streams. If your application does not need audio or video,
+you can omit them. Or if you want to apply different preprocessing
+to the same source stream, you can duplicate the source stream.</p>
+<section id="default-streams">
+<h3>Default streams<a class="headerlink" href="#default-streams" title="Permalink to this heading">¶</a></h3>
+<p>When there are multiple streams in the source, it is not immediately
+clear which stream should be used.</p>
+<p>FFmpeg implements some heuristics to determine the default stream.
+The resulting stream index is exposed via</p>
+<p><a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.default_audio_stream" title="torchaudio.io.StreamReader.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> and
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.default_video_stream" title="torchaudio.io.StreamReader.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a>.</p>
+</section>
+<section id="id1">
+<h3>Configuring output streams<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<p>Once you know which source stream you want to use, then you can
+configure output streams with
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_audio_stream" title="torchaudio.io.StreamReader.add_basic_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_audio_stream()</span></code></a> and
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_video_stream" title="torchaudio.io.StreamReader.add_basic_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_video_stream()</span></code></a>.</p>
+<p>These methods provide a simple way to change the basic property of
+media to match the application’s requirements.</p>
+<p>The arguments common to both methods are;</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span></code>: How many frames at maximum should be
+returned at each iteration.
+For audio, the resulting tensor will be the shape of
+<cite>(frames_per_chunk, num_channels)</cite>.
+For video, it will be
+<cite>(frames_per_chunk, num_channels, height, width)</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">buffer_chunk_size</span></code>: The maximum number of chunks to be buffered internally.
+When the StreamReader buffered this number of chunks and is asked to pull
+more frames, StreamReader drops the old frames/chunks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stream_index</span></code>: The index of the source stream.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decoder</span></code>: If provided, override the decoder. Useful if it fails to detect
+the codec.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decoder_option</span></code>: The option for the decoder.</p></li>
+</ul>
+<p>For audio output stream, you can provide the following additional
+parameters to change the audio properties.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">format</span></code>: By default the StreamReader returns tensor of <cite>float32</cite> dtype,
+with sample values ranging <cite>[-1, 1]</cite>. By providing <code class="docutils literal notranslate"><span class="pre">format</span></code> argument
+the resulting dtype and value range is changed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_rate</span></code>: When provided, StreamReader resamples the audio on-the-fly.</p></li>
+</ul>
+<p>For video output stream, the following parameters are available.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">format</span></code>: Image frame format. By default StreamReader returns
+frames in 8-bit 3 channel, in RGB order.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frame_rate</span></code>: Change the frame rate by dropping or duplicating
+frames. No interpolation is performed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">width</span></code>, <code class="docutils literal notranslate"><span class="pre">height</span></code>: Change the image size.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Stream audio from default audio source stream</span>
+<span class="c1"># 256 frames at a time, keeping the original sampling rate.</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Stream audio from source stream `i`.</span>
+<span class="c1"># Resample audio to 8k Hz, stream 256 frames at each</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">stream_index</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stream video from default video source stream.</span>
+<span class="c1"># 10 frames at a time, at 30 FPS</span>
+<span class="c1"># RGB color channels.</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">frame_rate</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Stream video from source stream `j`,</span>
+<span class="c1"># 10 frames at a time, at 30 FPS</span>
+<span class="c1"># BGR color channels with rescaling to 128x128</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">stream_index</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">,</span>
+    <span class="n">frame_rate</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;bgr24&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can check the resulting output streams in a similar manner as
+checking the source streams.
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.num_out_streams" title="torchaudio.io.StreamReader.num_out_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_out_streams</span></code></a> reports
+the number of configured output streams, and
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info" title="torchaudio.io.StreamReader.get_out_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_out_stream_info()</span></code></a>
+fetches the information about the output streams.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<p>If you want to remove an output stream, you can do so with
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.remove_stream" title="torchaudio.io.StreamReader.remove_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_stream()</span></code></a> method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Removes the first output stream.</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="streaming">
+<h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this heading">¶</a></h2>
+<p>To stream media data, the streamer alternates the process of
+fetching and decoding the source data, and passing the resulting
+audio / video data to client code.</p>
+<p>There are low-level methods that performs these operations.
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.is_buffer_ready" title="torchaudio.io.StreamReader.is_buffer_ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_buffer_ready()</span></code></a>,
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.process_packet" title="torchaudio.io.StreamReader.process_packet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_packet()</span></code></a> and
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a>.</p>
+<p>In this tutorial, we will use the high-level API, iterator protocol.
+It is as simple as a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">chunks</span> <span class="ow">in</span> <span class="n">streamer</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+    <span class="n">audio_chunk</span><span class="p">,</span> <span class="n">video_chunk</span> <span class="o">=</span> <span class="n">chunks</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<p>Let’s take an example video to configure the output streams.
+We will use the following video.</p>
+<iframe width="560" height="315"
+ src="https://www.youtube.com/embed/6zNsc0e3Zns"
+ title="YouTube video player"
+ frameborder="0"
+ allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+ allowfullscreen></iframe><p>Source: <a class="reference external" href="https://svs.gsfc.nasa.gov/13013">https://svs.gsfc.nasa.gov/13013</a> (This video is in public domain)</p>
+<p>Credit: NASA’s Goddard Space Flight Center.</p>
+<p>NASA’s Media Usage Guidelines: <a class="reference external" href="https://www.nasa.gov/multimedia/guidelines/index.html">https://www.nasa.gov/multimedia/guidelines/index.html</a></p>
+<section id="opening-the-source-media">
+<h3>Opening the source media<a class="headerlink" href="#opening-the-source-media" title="Permalink to this heading">¶</a></h3>
+<p>Firstly, let’s list the available streams and its properties.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={&#39;creation_time&#39;: &#39;2018-07-24T17:40:48.000000Z&#39;, &#39;encoder&#39;: &#39;AVC Coding&#39;, &#39;handler_name&#39;: &#39;\x1fMainconcept Video Media Handler&#39;, &#39;language&#39;: &#39;eng&#39;, &#39;vendor_id&#39;: &#39;[0][0][0][0]&#39;}, width=1920, height=1080, frame_rate=29.97002997002997)
+SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=317375, num_frames=9658, bits_per_sample=0, metadata={&#39;creation_time&#39;: &#39;2018-07-24T17:40:48.000000Z&#39;, &#39;handler_name&#39;: &#39;#Mainconcept MP4 Sound Media Handler&#39;, &#39;language&#39;: &#39;eng&#39;, &#39;vendor_id&#39;: &#39;[0][0][0][0]&#39;}, sample_rate=48000.0, num_channels=2)
+</pre></div>
+</div>
+<p>Now we configure the output stream.</p>
+</section>
+<section id="configuring-ouptut-streams">
+<h3>Configuring ouptut streams<a class="headerlink" href="#configuring-ouptut-streams" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fmt: off</span>
+<span class="c1"># Audio stream with 8k Hz</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Audio stream with 16k Hz</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_audio_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Video stream with 960x540 at 1 FPS.</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">frame_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">960</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">540</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Video stream with 320x320 (stretched) at 3 FPS, grayscale</span>
+<span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">frame_rate</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">320</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">320</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># fmt: on</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When configuring multiple output streams, in order to keep all
+streams synced, set parameters so that the ratio between
+<code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span></code> and <code class="docutils literal notranslate"><span class="pre">sample_rate</span></code> or <code class="docutils literal notranslate"><span class="pre">frame_rate</span></code> is
+consistent across output streams.</p>
+</div>
+<p>Checking the output streams.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputAudioStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;, media_type=&#39;audio&#39;, format=&#39;fltp&#39;, sample_rate=8000.0, num_channels=2)
+OutputAudioStream(source_index=1, filter_description=&#39;aresample=16000,aformat=sample_fmts=fltp&#39;, media_type=&#39;audio&#39;, format=&#39;fltp&#39;, sample_rate=16000.0, num_channels=2)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=1,scale=width=960:height=540,format=pix_fmts=rgb24&#39;, media_type=&#39;video&#39;, format=&#39;rgb24&#39;, width=960, height=540, frame_rate=1.0)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;, media_type=&#39;video&#39;, format=&#39;gray&#39;, width=320, height=320, frame_rate=3.0)
+</pre></div>
+</div>
+<p>Remove the second audio stream.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OutputAudioStream(source_index=1, filter_description=&#39;aresample=8000,aformat=sample_fmts=fltp&#39;, media_type=&#39;audio&#39;, format=&#39;fltp&#39;, sample_rate=8000.0, num_channels=2)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=1,scale=width=960:height=540,format=pix_fmts=rgb24&#39;, media_type=&#39;video&#39;, format=&#39;rgb24&#39;, width=960, height=540, frame_rate=1.0)
+OutputVideoStream(source_index=0, filter_description=&#39;fps=3,scale=width=320:height=320,format=pix_fmts=gray&#39;, media_type=&#39;video&#39;, format=&#39;gray&#39;, width=320, height=320, frame_rate=3.0)
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>Streaming<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<p>Jump to the 10 second point.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, let’s finally iterate over the output streams.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_ite</span></a> <span class="o">=</span> <span class="mi">3</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids1</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids2</span></a> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">vid1</span><span class="p">,</span> <span class="n">vid2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">stream</span><span class="p">()):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids1</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vid1</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids2</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vid2</span><span class="p">)</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_ite</span></a><span class="p">:</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+<p>For audio stream, the chunk Tensor will be the shape of
+<cite>(frames_per_chunk, num_channels)</cite>, and for video stream,
+it is <cite>(frames_per_chunk, num_color_channels, height, width)</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids1</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids2</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([8000, 2])
+torch.Size([1, 3, 540, 960])
+torch.Size([3, 1, 320, 320])
+</pre></div>
+</div>
+<p>Let’s visualize what we received.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_gridspec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_ite</span></a><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">waveform</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="p">:</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Fs</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Stream 0&quot;</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">vid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids1</span></a><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="p">:</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1"># NCHW-&gt;HWC</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Stream 1&quot;</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">vid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vids2</span></a><span class="p">):</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="p">:</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">+</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vid</span><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Stream 2&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_streamreader_basic_tutorial_001.png" srcset="../_images/sphx_glr_streamreader_basic_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.202 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-basic-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/dc81b404e96c6cb650e0c5a8115bc1f1/streamreader_basic_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_basic_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/2b51f71e4505865cc313762deb71d572/streamreader_basic_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">streamreader_basic_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="streamreader_advanced_tutorial.html" class="btn btn-neutral float-right" title="StreamReader Advanced Usages" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="audio_io_tutorial.html" class="btn btn-neutral" title="Audio I/O" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2023, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">StreamReader Basic Usages</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#opening-the-source">Opening the source</a><ul>
+<li><a class="reference internal" href="#local-files">Local files</a></li>
+<li><a class="reference internal" href="#network-protocols">Network protocols</a></li>
+<li><a class="reference internal" href="#file-like-objects">File-like objects</a></li>
+<li><a class="reference internal" href="#headerless-media">Headerless media</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#checking-the-source-streams">Checking the source streams</a></li>
+<li><a class="reference internal" href="#configuring-output-streams">Configuring output streams</a><ul>
+<li><a class="reference internal" href="#default-streams">Default streams</a></li>
+<li><a class="reference internal" href="#id1">Configuring output streams</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#streaming">Streaming</a></li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#opening-the-source-media">Opening the source media</a></li>
+<li><a class="reference internal" href="#configuring-ouptut-streams">Configuring ouptut streams</a></li>
+<li><a class="reference internal" href="#id2">Streaming</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

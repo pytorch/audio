@@ -1,0 +1,1205 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.pipelines &mdash; Torchaudio 2.1.2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RNNTBundle" href="generated/torchaudio.pipelines.RNNTBundle.html" />
+    <link rel="prev" title="cuda_ctc_decoder" href="generated/torchaudio.models.decoder.cuda_ctc_decoder.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../versions.html"><span style="font-size:110%">2.1.2 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>torchaudio.pipelines &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/pipelines.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <span class="target" id="module-torchaudio.pipelines"></span><section id="torchaudio-pipelines">
+<h1>torchaudio.pipelines<a class="headerlink" href="#torchaudio-pipelines" title="Permalink to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code> module packages pre-trained models with support functions and meta-data into simple APIs tailored to perform specific tasks.</p>
+<p>When using pre-trained models to perform a task, in addition to instantiating the model with pre-trained weights, the client code also needs to build pipelines for feature extractions and post processing in the same way they were done during the training. This requires to carrying over information used during the training, such as the type of transforms and the their parameters (for example, sampling rate the number of FFT bins).</p>
+<p>To make this information tied to a pre-trained model and easily accessible, <code class="docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code> module uses the concept of a <cite>Bundle</cite> class, which defines a set of APIs to instantiate pipelines, and the interface of the pipelines.</p>
+<p>The following figure illustrates this.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-intro.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-intro.png" />
+<p>A pre-trained model and associated pipelines are expressed as an instance of <code class="docutils literal notranslate"><span class="pre">Bundle</span></code>. Different instances of same <code class="docutils literal notranslate"><span class="pre">Bundle</span></code> share the interface, but their implementations are not constrained to be of same types. For example, <a class="reference internal" href="generated/torchaudio.pipelines.SourceSeparationBundle.html#torchaudio.pipelines.SourceSeparationBundle" title="torchaudio.pipelines.SourceSeparationBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code></a> defines the interface for performing source separation, but its instance <a class="reference internal" href="generated/torchaudio.pipelines.CONVTASNET_BASE_LIBRI2MIX.html#torchaudio.pipelines.CONVTASNET_BASE_LIBRI2MIX" title="torchaudio.pipelines.CONVTASNET_BASE_LIBRI2MIX"><code class="xref py py-data docutils literal notranslate"><span class="pre">CONVTASNET_BASE_LIBRI2MIX</span></code></a> instantiates a model of <a class="reference internal" href="generated/torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.ConvTasNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConvTasNet</span></code></a> while <a class="reference internal" href="generated/torchaudio.pipelines.HDEMUCS_HIGH_MUSDB.html#torchaudio.pipelines.HDEMUCS_HIGH_MUSDB" title="torchaudio.pipelines.HDEMUCS_HIGH_MUSDB"><code class="xref py py-data docutils literal notranslate"><span class="pre">HDEMUCS_HIGH_MUSDB</span></code></a> instantiates a model of <a class="reference internal" href="generated/torchaudio.models.HDemucs.html#torchaudio.models.HDemucs" title="torchaudio.models.HDemucs"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDemucs</span></code></a>. Still, because they share the same interface, the usage is the same.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Under the hood, the implementations of <code class="docutils literal notranslate"><span class="pre">Bundle</span></code> use components from other <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> modules, such as <a class="reference internal" href="models.html#module-torchaudio.models" title="torchaudio.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.models</span></code></a> and <a class="reference internal" href="transforms.html#module-torchaudio.transforms" title="torchaudio.transforms"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.transforms</span></code></a>, or even third party libraries like <a class="reference external" href="https://github.com/google/sentencepiece">SentencPiece</a> and <a class="reference external" href="https://github.com/as-ideas/DeepPhonemizer">DeepPhonemizer</a>. But this implementation detail is abstracted away from library users.</p>
+</div>
+<section id="rnn-t-streaming-non-streaming-asr">
+<span id="rnnt"></span><h2>RNN-T Streaming/Non-Streaming ASR<a class="headerlink" href="#rnn-t-streaming-non-streaming-asr" title="Permalink to this heading">¶</a></h2>
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">RNNTBundle</span></code> defines ASR pipelines and consists of three steps: feature extraction, inference, and de-tokenization.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-rnntbundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-rnntbundle.png" />
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle" title="torchaudio.pipelines.RNNTBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNTBundle</span></code></a></p></td>
+<td><p>Dataclass that bundles components for performing automatic speech recognition (ASR, speech-to-text) inference with an RNN-T model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.RNNTBundle.FeatureExtractor.html#torchaudio.pipelines.RNNTBundle.FeatureExtractor" title="torchaudio.pipelines.RNNTBundle.FeatureExtractor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNTBundle.FeatureExtractor</span></code></a></p></td>
+<td><p>Interface of the feature extraction part of RNN-T pipeline</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.RNNTBundle.TokenProcessor.html#torchaudio.pipelines.RNNTBundle.TokenProcessor" title="torchaudio.pipelines.RNNTBundle.TokenProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNTBundle.TokenProcessor</span></code></a></p></td>
+<td><p>Interface of the token processor part of RNN-T pipeline</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Tutorials using <code class="docutils literal notranslate"><span class="pre">RNNTBundle</span></code></p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Jeff Hwang &lt;jeffhwang@meta.com&gt;`__, `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Online ASR with Emformer RNN-T" src="_images/sphx_glr_online_asr_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/online_asr_tutorial.html#sphx-glr-tutorials-online-asr-tutorial-py"><span class="std std-ref">Online ASR with Emformer RNN-T</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Online ASR with Emformer RNN-T</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__, `Jeff Hwang &lt;jeffhwang@meta.com&gt;`__."><img alt="Device ASR with Emformer RNN-T" src="_images/sphx_glr_device_asr_thumb.png" />
+<p><a class="reference internal" href="tutorials/device_asr.html#sphx-glr-tutorials-device-asr-py"><span class="std std-ref">Device ASR with Emformer RNN-T</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Device ASR with Emformer RNN-T</div>
+</div></div></section>
+<section id="pretrained-models">
+<h3>Pretrained Models<a class="headerlink" href="#pretrained-models" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH.html#torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH" title="torchaudio.pipelines.EMFORMER_RNNT_BASE_LIBRISPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EMFORMER_RNNT_BASE_LIBRISPEECH</span></code></a></p></td>
+<td><p>ASR pipeline based on Emformer-RNNT, pretrained on <em>LibriSpeech</em> dataset <span id="id1">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span>, capable of performing both streaming and non-streaming inference.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="wav2vec-2-0-hubert-wavlm-ssl">
+<h2>wav2vec 2.0 / HuBERT / WavLM - SSL<a class="headerlink" href="#wav2vec-2-0-hubert-wavlm-ssl" title="Permalink to this heading">¶</a></h2>
+<section id="id2">
+<h3>Interface<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Wav2Vec2Bundle</span></code> instantiates models that generate acoustic features that can be used for downstream inference and fine-tuning.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2bundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2bundle.png" />
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle" title="torchaudio.pipelines.Wav2Vec2Bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Vec2Bundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id3">
+<h3>Pretrained Models<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_BASE.html#torchaudio.pipelines.WAV2VEC2_BASE" title="torchaudio.pipelines.WAV2VEC2_BASE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_BASE</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id4">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), not fine-tuned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_LARGE.html#torchaudio.pipelines.WAV2VEC2_LARGE" title="torchaudio.pipelines.WAV2VEC2_LARGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_LARGE</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large&quot; architecture), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id5">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), not fine-tuned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_LARGE_LV60K.html#torchaudio.pipelines.WAV2VEC2_LARGE_LV60K" title="torchaudio.pipelines.WAV2VEC2_LARGE_LV60K"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_LARGE_LV60K</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id6">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, not fine-tuned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_XLSR53.html#torchaudio.pipelines.WAV2VEC2_XLSR53" title="torchaudio.pipelines.WAV2VEC2_XLSR53"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_XLSR53</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 56,000 hours of unlabeled audio from multiple datasets ( <em>Multilingual LibriSpeech</em> <span id="id7">[<a class="reference internal" href="references.html#id11" title="Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. Interspeech 2020, Oct 2020. URL: http://dx.doi.org/10.21437/Interspeech.2020-2826, doi:10.21437/interspeech.2020-2826.">Pratap <em>et al.</em>, 2020</a>]</span>, <em>CommonVoice</em> <span id="id8">[<a class="reference internal" href="references.html#id10" title="Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. arXiv:1912.06670.">Ardila <em>et al.</em>, 2020</a>]</span> and <em>BABEL</em> <span id="id9">[<a class="reference internal" href="references.html#id9" title="Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In SLTU. 2014.">Gales <em>et al.</em>, 2014</a>]</span>), not fine-tuned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_XLSR_300M.html#torchaudio.pipelines.WAV2VEC2_XLSR_300M" title="torchaudio.pipelines.WAV2VEC2_XLSR_300M"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_XLSR_300M</span></code></a></p></td>
+<td><p>XLS-R model with 300 million parameters, pre-trained on 436,000 hours of unlabeled audio from multiple datasets ( <em>Multilingual LibriSpeech</em> <span id="id10">[<a class="reference internal" href="references.html#id11" title="Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. Interspeech 2020, Oct 2020. URL: http://dx.doi.org/10.21437/Interspeech.2020-2826, doi:10.21437/interspeech.2020-2826.">Pratap <em>et al.</em>, 2020</a>]</span>, <em>CommonVoice</em> <span id="id11">[<a class="reference internal" href="references.html#id10" title="Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. arXiv:1912.06670.">Ardila <em>et al.</em>, 2020</a>]</span>, <em>VoxLingua107</em> <span id="id12">[<a class="reference internal" href="references.html#id61" title="Jörgen Valk and Tanel Alumäe. Voxlingua107: a dataset for spoken language recognition. In 2021 IEEE Spoken Language Technology Workshop (SLT), 652–658. IEEE, 2021.">Valk and Alumäe, 2021</a>]</span>, <em>BABEL</em> <span id="id13">[<a class="reference internal" href="references.html#id9" title="Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In SLTU. 2014.">Gales <em>et al.</em>, 2014</a>]</span>, and <em>VoxPopuli</em> <span id="id14">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span>) in 128 languages, not fine-tuned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_XLSR_1B.html#torchaudio.pipelines.WAV2VEC2_XLSR_1B" title="torchaudio.pipelines.WAV2VEC2_XLSR_1B"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_XLSR_1B</span></code></a></p></td>
+<td><p>XLS-R model with 1 billion parameters, pre-trained on 436,000 hours of unlabeled audio from multiple datasets ( <em>Multilingual LibriSpeech</em> <span id="id15">[<a class="reference internal" href="references.html#id11" title="Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. Interspeech 2020, Oct 2020. URL: http://dx.doi.org/10.21437/Interspeech.2020-2826, doi:10.21437/interspeech.2020-2826.">Pratap <em>et al.</em>, 2020</a>]</span>, <em>CommonVoice</em> <span id="id16">[<a class="reference internal" href="references.html#id10" title="Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. arXiv:1912.06670.">Ardila <em>et al.</em>, 2020</a>]</span>, <em>VoxLingua107</em> <span id="id17">[<a class="reference internal" href="references.html#id61" title="Jörgen Valk and Tanel Alumäe. Voxlingua107: a dataset for spoken language recognition. In 2021 IEEE Spoken Language Technology Workshop (SLT), 652–658. IEEE, 2021.">Valk and Alumäe, 2021</a>]</span>, <em>BABEL</em> <span id="id18">[<a class="reference internal" href="references.html#id9" title="Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In SLTU. 2014.">Gales <em>et al.</em>, 2014</a>]</span>, and <em>VoxPopuli</em> <span id="id19">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span>) in 128 languages, not fine-tuned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_XLSR_2B.html#torchaudio.pipelines.WAV2VEC2_XLSR_2B" title="torchaudio.pipelines.WAV2VEC2_XLSR_2B"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_XLSR_2B</span></code></a></p></td>
+<td><p>XLS-R model with 2 billion parameters, pre-trained on 436,000 hours of unlabeled audio from multiple datasets ( <em>Multilingual LibriSpeech</em> <span id="id20">[<a class="reference internal" href="references.html#id11" title="Vineel Pratap, Qiantong Xu, Anuroop Sriram, Gabriel Synnaeve, and Ronan Collobert. Mls: a large-scale multilingual dataset for speech research. Interspeech 2020, Oct 2020. URL: http://dx.doi.org/10.21437/Interspeech.2020-2826, doi:10.21437/interspeech.2020-2826.">Pratap <em>et al.</em>, 2020</a>]</span>, <em>CommonVoice</em> <span id="id21">[<a class="reference internal" href="references.html#id10" title="Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. arXiv:1912.06670.">Ardila <em>et al.</em>, 2020</a>]</span>, <em>VoxLingua107</em> <span id="id22">[<a class="reference internal" href="references.html#id61" title="Jörgen Valk and Tanel Alumäe. Voxlingua107: a dataset for spoken language recognition. In 2021 IEEE Spoken Language Technology Workshop (SLT), 652–658. IEEE, 2021.">Valk and Alumäe, 2021</a>]</span>, <em>BABEL</em> <span id="id23">[<a class="reference internal" href="references.html#id9" title="Mark John Francis Gales, Kate Knill, Anton Ragni, and Shakti Prasad Rath. Speech recognition and keyword spotting for low-resource languages: babel project research at cued. In SLTU. 2014.">Gales <em>et al.</em>, 2014</a>]</span>, and <em>VoxPopuli</em> <span id="id24">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span>) in 128 languages, not fine-tuned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HUBERT_BASE.html#torchaudio.pipelines.HUBERT_BASE" title="torchaudio.pipelines.HUBERT_BASE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HUBERT_BASE</span></code></a></p></td>
+<td><p>HuBERT model (&quot;base&quot; architecture), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id25">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), not fine-tuned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HUBERT_LARGE.html#torchaudio.pipelines.HUBERT_LARGE" title="torchaudio.pipelines.HUBERT_LARGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HUBERT_LARGE</span></code></a></p></td>
+<td><p>HuBERT model (&quot;large&quot; architecture), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id26">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, not fine-tuned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HUBERT_XLARGE.html#torchaudio.pipelines.HUBERT_XLARGE" title="torchaudio.pipelines.HUBERT_XLARGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HUBERT_XLARGE</span></code></a></p></td>
+<td><p>HuBERT model (&quot;extra large&quot; architecture), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id27">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, not fine-tuned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAVLM_BASE.html#torchaudio.pipelines.WAVLM_BASE" title="torchaudio.pipelines.WAVLM_BASE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAVLM_BASE</span></code></a></p></td>
+<td><p>WavLM Base model (&quot;base&quot; architecture), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id28">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span>, not fine-tuned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAVLM_BASE_PLUS.html#torchaudio.pipelines.WAVLM_BASE_PLUS" title="torchaudio.pipelines.WAVLM_BASE_PLUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAVLM_BASE_PLUS</span></code></a></p></td>
+<td><p>WavLM Base+ model (&quot;base&quot; architecture), pre-trained on 60,000 hours of Libri-Light dataset <span id="id29">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, 10,000 hours of GigaSpeech <span id="id30">[<a class="reference internal" href="references.html#id56" title="Guoguo Chen, Shuzhou Chai, Guanbo Wang, Jiayu Du, Wei-Qiang Zhang, Chao Weng, Dan Su, Daniel Povey, Jan Trmal, Junbo Zhang, Mingjie Jin, Sanjeev Khudanpur, Shinji Watanabe, Shuaijiang Zhao, Wei Zou, Xiangang Li, Xuchen Yao, Yongqing Wang, Yujun Wang, Zhao You, and Zhiyong Yan. Gigaspeech: an evolving, multi-domain asr corpus with 10,000 hours of transcribed audio. In Proc. Interspeech 2021. 2021.">Chen <em>et al.</em>, 2021</a>]</span>, and 24,000 hours of <em>VoxPopuli</em> <span id="id31">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span>, not fine-tuned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAVLM_LARGE.html#torchaudio.pipelines.WAVLM_LARGE" title="torchaudio.pipelines.WAVLM_LARGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAVLM_LARGE</span></code></a></p></td>
+<td><p>WavLM Large model (&quot;large&quot; architecture), pre-trained on 60,000 hours of Libri-Light dataset <span id="id32">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, 10,000 hours of GigaSpeech <span id="id33">[<a class="reference internal" href="references.html#id56" title="Guoguo Chen, Shuzhou Chai, Guanbo Wang, Jiayu Du, Wei-Qiang Zhang, Chao Weng, Dan Su, Daniel Povey, Jan Trmal, Junbo Zhang, Mingjie Jin, Sanjeev Khudanpur, Shinji Watanabe, Shuaijiang Zhao, Wei Zou, Xiangang Li, Xuchen Yao, Yongqing Wang, Yujun Wang, Zhao You, and Zhiyong Yan. Gigaspeech: an evolving, multi-domain asr corpus with 10,000 hours of transcribed audio. In Proc. Interspeech 2021. 2021.">Chen <em>et al.</em>, 2021</a>]</span>, and 24,000 hours of <em>VoxPopuli</em> <span id="id34">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span>, not fine-tuned.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="wav2vec-2-0-hubert-fine-tuned-asr">
+<h2>wav2vec 2.0 / HuBERT - Fine-tuned ASR<a class="headerlink" href="#wav2vec-2-0-hubert-fine-tuned-asr" title="Permalink to this heading">¶</a></h2>
+<section id="id35">
+<h3>Interface<a class="headerlink" href="#id35" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code> instantiates models that generate probability distribution over pre-defined labels, that can be used for ASR.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2asrbundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2asrbundle.png" />
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle" title="torchaudio.pipelines.Wav2Vec2ASRBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Tutorials using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ASRBundle</span></code></p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Speech Recognition with Wav2Vec2" src="_images/sphx_glr_speech_recognition_pipeline_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html#sphx-glr-tutorials-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">Speech Recognition with Wav2Vec2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speech Recognition with Wav2Vec2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Caroline Chen &lt;carolinechen@meta.com&gt;`__"><img alt="ASR Inference with CTC Decoder" src="_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CTC Decoder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">ASR Inference with CTC Decoder</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Forced Alignment with Wav2Vec2" src="_images/sphx_glr_forced_alignment_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Forced Alignment with Wav2Vec2</div>
+</div></div></section>
+<section id="id36">
+<h3>Pretrained Models<a class="headerlink" href="#id36" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M" title="torchaudio.pipelines.WAV2VEC2_ASR_BASE_10M"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_BASE_10M</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id37">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset <span id="id38">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> (&quot;train-10min&quot; subset).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H" title="torchaudio.pipelines.WAV2VEC2_ASR_BASE_100H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_BASE_100H</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id39">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and fine-tuned for ASR on 100 hours of transcribed audio from &quot;train-clean-100&quot; subset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H.html#torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H" title="torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_BASE_960H</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;base&quot; architecture with an extra linear module), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id40">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and fine-tuned for ASR on the same audio with the corresponding transcripts.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_LARGE_10M.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_10M" title="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_10M"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_LARGE_10M</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id41">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and fine-tuned for ASR on 10 minutes of transcribed audio from <em>Libri-Light</em> dataset <span id="id42">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> (&quot;train-10min&quot; subset).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_LARGE_100H.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_100H" title="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_100H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_LARGE_100H</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id43">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and fine-tuned for ASR on 100 hours of transcribed audio from the same dataset (&quot;train-clean-100&quot; subset).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_LARGE_960H.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_960H" title="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_960H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_LARGE_960H</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large&quot; architecture with an extra linear module), pre-trained on 960 hours of unlabeled audio from <em>LibriSpeech</em> dataset <span id="id44">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;), and fine-tuned for ASR on the same audio with the corresponding transcripts.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_10M.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_10M" title="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_10M"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_10M</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id45">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, and fine-tuned for ASR on 10 minutes of transcribed audio from the same dataset (&quot;train-10min&quot; subset).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_100H.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_100H" title="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_100H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_100H</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id46">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, and fine-tuned for ASR on 100 hours of transcribed audio from <em>LibriSpeech</em> dataset <span id="id47">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (&quot;train-clean-100&quot; subset).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_960H.html#torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_960H" title="torchaudio.pipelines.WAV2VEC2_ASR_LARGE_LV60K_960H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAV2VEC2_ASR_LARGE_LV60K_960H</span></code></a></p></td>
+<td><p>Wav2vec 2.0 model (&quot;large-lv60k&quot; architecture with an extra linear module), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> <span id="id48">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> dataset, and fine-tuned for ASR on 960 hours of transcribed audio from <em>LibriSpeech</em> dataset <span id="id49">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_DE.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_DE" title="torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_DE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOXPOPULI_ASR_BASE_10K_DE</span></code></a></p></td>
+<td><p>wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 10k hours of unlabeled audio from <em>VoxPopuli</em> dataset <span id="id50">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span> (&quot;10k&quot; subset, consisting of 23 languages), and fine-tuned for ASR on 282 hours of transcribed audio from &quot;de&quot; subset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_EN.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_EN" title="torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_EN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOXPOPULI_ASR_BASE_10K_EN</span></code></a></p></td>
+<td><p>wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 10k hours of unlabeled audio from <em>VoxPopuli</em> dataset <span id="id51">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span> (&quot;10k&quot; subset, consisting of 23 languages), and fine-tuned for ASR on 543 hours of transcribed audio from &quot;en&quot; subset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_ES.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_ES" title="torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_ES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOXPOPULI_ASR_BASE_10K_ES</span></code></a></p></td>
+<td><p>wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 10k hours of unlabeled audio from <em>VoxPopuli</em> dataset <span id="id52">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span> (&quot;10k&quot; subset, consisting of 23 languages), and fine-tuned for ASR on 166 hours of transcribed audio from &quot;es&quot; subset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_FR.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_FR" title="torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_FR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOXPOPULI_ASR_BASE_10K_FR</span></code></a></p></td>
+<td><p>wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 10k hours of unlabeled audio from <em>VoxPopuli</em> dataset <span id="id53">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span> (&quot;10k&quot; subset, consisting of 23 languages), and fine-tuned for ASR on 211 hours of transcribed audio from &quot;fr&quot; subset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_IT.html#torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_IT" title="torchaudio.pipelines.VOXPOPULI_ASR_BASE_10K_IT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOXPOPULI_ASR_BASE_10K_IT</span></code></a></p></td>
+<td><p>wav2vec 2.0 model (&quot;base&quot; architecture), pre-trained on 10k hours of unlabeled audio from <em>VoxPopuli</em> dataset <span id="id54">[<a class="reference internal" href="references.html#id5" title="Changhan Wang, Morgane Rivière, Ann Lee, Anne Wu, Chaitanya Talnikar, Daniel Haziza, Mary Williamson, Juan Miguel Pino, and Emmanuel Dupoux. Voxpopuli: A large-scale multilingual speech corpus for representation learning, semi-supervised learning and interpretation. CoRR, 2021. URL: https://arxiv.org/abs/2101.00390, arXiv:2101.00390.">Wang <em>et al.</em>, 2021</a>]</span> (&quot;10k&quot; subset, consisting of 23 languages), and fine-tuned for ASR on 91 hours of transcribed audio from &quot;it&quot; subset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HUBERT_ASR_LARGE.html#torchaudio.pipelines.HUBERT_ASR_LARGE" title="torchaudio.pipelines.HUBERT_ASR_LARGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HUBERT_ASR_LARGE</span></code></a></p></td>
+<td><p>HuBERT model (&quot;large&quot; architecture), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id55">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, and fine-tuned for ASR on 960 hours of transcribed audio from <em>LibriSpeech</em> dataset <span id="id56">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HUBERT_ASR_XLARGE.html#torchaudio.pipelines.HUBERT_ASR_XLARGE" title="torchaudio.pipelines.HUBERT_ASR_XLARGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HUBERT_ASR_XLARGE</span></code></a></p></td>
+<td><p>HuBERT model (&quot;extra large&quot; architecture), pre-trained on 60,000 hours of unlabeled audio from <em>Libri-Light</em> dataset <span id="id57">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span>, and fine-tuned for ASR on 960 hours of transcribed audio from <em>LibriSpeech</em> dataset <span id="id58">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> (the combination of &quot;train-clean-100&quot;, &quot;train-clean-360&quot;, and &quot;train-other-500&quot;).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="wav2vec-2-0-hubert-forced-alignment">
+<h2>wav2vec 2.0 / HuBERT - Forced Alignment<a class="headerlink" href="#wav2vec-2-0-hubert-forced-alignment" title="Permalink to this heading">¶</a></h2>
+<section id="id59">
+<h3>Interface<a class="headerlink" href="#id59" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Wav2Vec2FABundle</span></code> bundles pre-trained model and its associated dictionary. Additionally, it supports appending <code class="docutils literal notranslate"><span class="pre">star</span></code> token dimension.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2fabundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2fabundle.png" />
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle" title="torchaudio.pipelines.Wav2Vec2FABundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Vec2FABundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> for forced alignment.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Wav2Vec2FABundle.Tokenizer.html#torchaudio.pipelines.Wav2Vec2FABundle.Tokenizer" title="torchaudio.pipelines.Wav2Vec2FABundle.Tokenizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Vec2FABundle.Tokenizer</span></code></a></p></td>
+<td><p>Interface of the tokenizer</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Wav2Vec2FABundle.Aligner.html#torchaudio.pipelines.Wav2Vec2FABundle.Aligner" title="torchaudio.pipelines.Wav2Vec2FABundle.Aligner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wav2Vec2FABundle.Aligner</span></code></a></p></td>
+<td><p>Interface of the aligner</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Tutorials using <code class="docutils literal notranslate"><span class="pre">Wav2Vec2FABundle</span></code></p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Xiaohui Zhang &lt;xiaohuizhang@meta.com&gt;`__, `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="CTC forced alignment API tutorial" src="_images/sphx_glr_ctc_forced_alignment_api_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html#sphx-glr-tutorials-ctc-forced-alignment-api-tutorial-py"><span class="std std-ref">CTC forced alignment API tutorial</span></a></p>
+  <div class="sphx-glr-thumbnail-title">CTC forced alignment API tutorial</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Authors**: `Xiaohui Zhang &lt;xiaohuizhang@meta.com&gt;`__, `Moto Hira &lt;moto@meta.com&gt;`__."><img alt="Forced alignment for multilingual data" src="_images/sphx_glr_forced_alignment_for_multilingual_data_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html#sphx-glr-tutorials-forced-alignment-for-multilingual-data-tutorial-py"><span class="std std-ref">Forced alignment for multilingual data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Forced alignment for multilingual data</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Forced Alignment with Wav2Vec2" src="_images/sphx_glr_forced_alignment_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Forced Alignment with Wav2Vec2</div>
+</div></div></section>
+<section id="pertrained-models">
+<h3>Pertrained Models<a class="headerlink" href="#pertrained-models" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.MMS_FA.html#torchaudio.pipelines.MMS_FA" title="torchaudio.pipelines.MMS_FA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MMS_FA</span></code></a></p></td>
+<td><p>Trained on 31K hours of data in 1,130 languages from <em>Scaling Speech Technology to 1,000+ Languages</em> <span id="id60">[<a class="reference internal" href="references.html#id71" title="Vineel Pratap, Andros Tjandra, Bowen Shi, Paden Tomasello, Arun Babu, Sayani Kundu, Ali Elkahky, Zhaoheng Ni, Apoorv Vyas, Maryam Fazel-Zarandi, Alexei Baevski, Yossi Adi, Xiaohui Zhang, Wei-Ning Hsu, Alexis Conneau, and Michael Auli. Scaling speech technology to 1,000+ languages. 2023. arXiv:2305.13516.">Pratap <em>et al.</em>, 2023</a>]</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="tacotron2-text-to-speech">
+<span id="tacotron2"></span><h2>Tacotron2 Text-To-Speech<a class="headerlink" href="#tacotron2-text-to-speech" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code> defines text-to-speech pipelines and consists of three steps: tokenization, spectrogram generation and vocoder. The spectrogram generation is based on <a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> model.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-tacotron2bundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-tacotron2bundle.png" />
+<p><code class="docutils literal notranslate"><span class="pre">TextProcessor</span></code> can be rule-based tokenization in the case of characters, or it can be a neural-netowrk-based G2P model that generates sequence of phonemes from input text.</p>
+<p>Similarly <code class="docutils literal notranslate"><span class="pre">Vocoder</span></code> can be an algorithm without learning parameters, like <cite>Griffin-Lim</cite>, or a neural-network-based model like <cite>Waveglow</cite>.</p>
+<section id="id61">
+<h3>Interface<a class="headerlink" href="#id61" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained Tacotron2 and vocoder.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.html#torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor" title="torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tacotron2TTSBundle.TextProcessor</span></code></a></p></td>
+<td><p>Interface of the text processing part of Tacotron2TTS pipeline</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.html#torchaudio.pipelines.Tacotron2TTSBundle.Vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.Vocoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tacotron2TTSBundle.Vocoder</span></code></a></p></td>
+<td><p>Interface of the vocoder part of Tacotron2TTS pipeline</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Tutorials using <code class="docutils literal notranslate"><span class="pre">Tacotron2TTSBundle</span></code></p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Yao-Yuan Yang &lt;https://github.com/yangarbiter&gt;`__, `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Text-to-Speech with Tacotron2" src="_images/sphx_glr_tacotron2_pipeline_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html#sphx-glr-tutorials-tacotron2-pipeline-tutorial-py"><span class="std std-ref">Text-to-Speech with Tacotron2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Text-to-Speech with Tacotron2</div>
+</div></div></section>
+<section id="id62">
+<h3>Pretrained Models<a class="headerlink" href="#id62" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH.html#torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH" title="torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TACOTRON2_WAVERNN_PHONE_LJSPEECH</span></code></a></p></td>
+<td><p>Phoneme-based TTS pipeline with <a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> trained on <em>LJSpeech</em> <span id="id63">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs, and <a class="reference internal" href="generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaveRNN</span></code></a> vocoder trained on 8 bits depth waveform of <em>LJSpeech</em> <span id="id64">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 10,000 epochs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH.html#torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH" title="torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TACOTRON2_WAVERNN_CHAR_LJSPEECH</span></code></a></p></td>
+<td><p>Character-based TTS pipeline with <a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> trained on <em>LJSpeech</em> <span id="id65">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs and <a class="reference internal" href="generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaveRNN</span></code></a> vocoder trained on 8 bits depth waveform of <em>LJSpeech</em> <span id="id66">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 10,000 epochs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH.html#torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH" title="torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH</span></code></a></p></td>
+<td><p>Phoneme-based TTS pipeline with <a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> trained on <em>LJSpeech</em> <span id="id67">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs and <a class="reference internal" href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriffinLim</span></code></a> as vocoder.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.html#torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH" title="torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH</span></code></a></p></td>
+<td><p>Character-based TTS pipeline with <a class="reference internal" href="generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> trained on <em>LJSpeech</em> <span id="id68">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs, and <a class="reference internal" href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriffinLim</span></code></a> as vocoder.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="source-separation">
+<h2>Source Separation<a class="headerlink" href="#source-separation" title="Permalink to this heading">¶</a></h2>
+<section id="id69">
+<h3>Interface<a class="headerlink" href="#id69" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code> instantiates source separation models which take single channel audio and generates multi-channel audio.</p>
+<img alt="https://download.pytorch.org/torchaudio/doc-assets/pipelines-sourceseparationbundle.png" src="https://download.pytorch.org/torchaudio/doc-assets/pipelines-sourceseparationbundle.png" />
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.SourceSeparationBundle.html#torchaudio.pipelines.SourceSeparationBundle" title="torchaudio.pipelines.SourceSeparationBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code></a></p></td>
+<td><p>Dataclass that bundles components for performing source separation.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Tutorials using <code class="docutils literal notranslate"><span class="pre">SourceSeparationBundle</span></code></p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Sean Kim &lt;https://github.com/skim0514&gt;`__"><img alt="Music Source Separation with Hybrid Demucs" src="_images/sphx_glr_hybrid_demucs_tutorial_thumb.png" />
+<p><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html#sphx-glr-tutorials-hybrid-demucs-tutorial-py"><span class="std std-ref">Music Source Separation with Hybrid Demucs</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Music Source Separation with Hybrid Demucs</div>
+</div></div></section>
+<section id="id70">
+<h3>Pretrained Models<a class="headerlink" href="#id70" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.CONVTASNET_BASE_LIBRI2MIX.html#torchaudio.pipelines.CONVTASNET_BASE_LIBRI2MIX" title="torchaudio.pipelines.CONVTASNET_BASE_LIBRI2MIX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONVTASNET_BASE_LIBRI2MIX</span></code></a></p></td>
+<td><p>Pre-trained Source Separation pipeline with <em>ConvTasNet</em> <span id="id71">[<a class="reference internal" href="references.html#id22" title="Yi Luo and Nima Mesgarani. Conv-tasnet: surpassing ideal time–frequency magnitude masking for speech separation. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 27(8):1256–1266, Aug 2019. URL: http://dx.doi.org/10.1109/TASLP.2019.2915167, doi:10.1109/taslp.2019.2915167.">Luo and Mesgarani, 2019</a>]</span> trained on <em>Libri2Mix dataset</em> <span id="id72">[<a class="reference internal" href="references.html#id37" title="Joris Cosentino, Manuel Pariente, Samuele Cornell, Antoine Deleforge, and Emmanuel Vincent. Librimix: an open-source dataset for generalizable speech separation. 2020. arXiv:2005.11262.">Cosentino <em>et al.</em>, 2020</a>]</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS.html#torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS" title="torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDEMUCS_HIGH_MUSDB_PLUS</span></code></a></p></td>
+<td><p>Pre-trained music source separation pipeline with <em>Hybrid Demucs</em> <span id="id73">[<a class="reference internal" href="references.html#id50" title="Alexandre Défossez. Hybrid spectrogram and waveform source separation. In Proceedings of the ISMIR 2021 Workshop on Music Source Separation. 2021.">Défossez, 2021</a>]</span> trained on both training and test sets of MUSDB-HQ <span id="id74">[<a class="reference internal" href="references.html#id47" title="Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: https://doi.org/10.5281/zenodo.3338373, doi:10.5281/zenodo.3338373.">Rafii <em>et al.</em>, 2019</a>]</span> and an additional 150 extra songs from an internal database that was specifically produced for Meta.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.HDEMUCS_HIGH_MUSDB.html#torchaudio.pipelines.HDEMUCS_HIGH_MUSDB" title="torchaudio.pipelines.HDEMUCS_HIGH_MUSDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDEMUCS_HIGH_MUSDB</span></code></a></p></td>
+<td><p>Pre-trained music source separation pipeline with <em>Hybrid Demucs</em> <span id="id75">[<a class="reference internal" href="references.html#id50" title="Alexandre Défossez. Hybrid spectrogram and waveform source separation. In Proceedings of the ISMIR 2021 Workshop on Music Source Separation. 2021.">Défossez, 2021</a>]</span> trained on the training set of MUSDB-HQ <span id="id76">[<a class="reference internal" href="references.html#id47" title="Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: https://doi.org/10.5281/zenodo.3338373, doi:10.5281/zenodo.3338373.">Rafii <em>et al.</em>, 2019</a>]</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="squim-objective">
+<h2>Squim Objective<a class="headerlink" href="#squim-objective" title="Permalink to this heading">¶</a></h2>
+<section id="id77">
+<h3>Interface<a class="headerlink" href="#id77" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="generated/torchaudio.pipelines.SquimObjectiveBundle.html#torchaudio.pipelines.SquimObjectiveBundle" title="torchaudio.pipelines.SquimObjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimObjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>objecive</strong> metric scores given the input waveform.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.SquimObjectiveBundle.html#torchaudio.pipelines.SquimObjectiveBundle" title="torchaudio.pipelines.SquimObjectiveBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquimObjectiveBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.models.SquimObjective.html#torchaudio.models.SquimObjective" title="torchaudio.models.SquimObjective"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimObjective</span></code></a> model.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id78">
+<h3>Pretrained Models<a class="headerlink" href="#id78" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.SQUIM_OBJECTIVE.html#torchaudio.pipelines.SQUIM_OBJECTIVE" title="torchaudio.pipelines.SQUIM_OBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_OBJECTIVE</span></code></a></p></td>
+<td><p>SquimObjective pipeline trained using approach described in <span id="id79">[<a class="reference internal" href="references.html#id69" title="Anurag Kumar, Ke Tan, Zhaoheng Ni, Pranay Manocha, Xiaohui Zhang, Ethan Henderson, and Buye Xu. Torchaudio-squim: reference-less speech quality and intelligibility measures in torchaudio. arXiv preprint arXiv:2304.01448, 2023.">Kumar <em>et al.</em>, 2023</a>]</span> on the <em>DNS 2020 Dataset</em> <span id="id80">[<a class="reference internal" href="references.html#id65" title="Chandan KA Reddy, Vishak Gopal, Ross Cutler, Ebrahim Beyrami, Roger Cheng, Harishchandra Dubey, Sergiy Matusevych, Robert Aichner, Ashkan Aazami, Sebastian Braun, and others. The interspeech 2020 deep noise suppression challenge: datasets, subjective testing framework, and challenge results. arXiv preprint arXiv:2005.13981, 2020.">Reddy <em>et al.</em>, 2020</a>]</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="squim-subjective">
+<h2>Squim Subjective<a class="headerlink" href="#squim-subjective" title="Permalink to this heading">¶</a></h2>
+<section id="id81">
+<h3>Interface<a class="headerlink" href="#id81" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="generated/torchaudio.pipelines.SquimSubjectiveBundle.html#torchaudio.pipelines.SquimSubjectiveBundle" title="torchaudio.pipelines.SquimSubjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>subjective</strong> metric scores given the input waveform.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.SquimSubjectiveBundle.html#torchaudio.pipelines.SquimSubjectiveBundle" title="torchaudio.pipelines.SquimSubjectiveBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a></p></td>
+<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.models.SquimSubjective.html#torchaudio.models.SquimSubjective" title="torchaudio.models.SquimSubjective"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjective</span></code></a> model.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id82">
+<h3>Pretrained Models<a class="headerlink" href="#id82" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.pipelines.SQUIM_SUBJECTIVE.html#torchaudio.pipelines.SQUIM_SUBJECTIVE" title="torchaudio.pipelines.SQUIM_SUBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_SUBJECTIVE</span></code></a></p></td>
+<td><p>SquimSubjective pipeline trained as described in <span id="id83">[<a class="reference internal" href="references.html#id66" title="Pranay Manocha and Anurag Kumar. Speech quality assessment through mos using non-matching references. arXiv preprint arXiv:2206.12285, 2022.">Manocha and Kumar, 2022</a>]</span> and <span id="id84">[<a class="reference internal" href="references.html#id69" title="Anurag Kumar, Ke Tan, Zhaoheng Ni, Pranay Manocha, Xiaohui Zhang, Ethan Henderson, and Buye Xu. Torchaudio-squim: reference-less speech quality and intelligibility measures in torchaudio. arXiv preprint arXiv:2304.01448, 2023.">Kumar <em>et al.</em>, 2023</a>]</span> on the <em>BVCC</em> <span id="id85">[<a class="reference internal" href="references.html#id67" title="Erica Cooper and Junichi Yamagishi. How do voices from past speech synthesis challenges compare today? arXiv preprint arXiv:2105.02373, 2021.">Cooper and Yamagishi, 2021</a>]</span> and <em>DAPS</em> <span id="id86">[<a class="reference internal" href="references.html#id68" title="Gautham J Mysore. Can we automatically transform speech recorded on common consumer devices in real-world environments into professional production quality speech?—a dataset, insights, and challenges. IEEE Signal Processing Letters, 22(8):1006–1010, 2014.">Mysore, 2014</a>]</span> datasets.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/torchaudio.pipelines.RNNTBundle.html" class="btn btn-neutral float-right" title="RNNTBundle" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="generated/torchaudio.models.decoder.cuda_ctc_decoder.html" class="btn btn-neutral" title="cuda_ctc_decoder" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2023, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torchaudio.pipelines</a><ul>
+<li><a class="reference internal" href="#rnn-t-streaming-non-streaming-asr">RNN-T Streaming/Non-Streaming ASR</a><ul>
+<li><a class="reference internal" href="#interface">Interface</a></li>
+<li><a class="reference internal" href="#pretrained-models">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wav2vec-2-0-hubert-wavlm-ssl">wav2vec 2.0 / HuBERT / WavLM - SSL</a><ul>
+<li><a class="reference internal" href="#id2">Interface</a></li>
+<li><a class="reference internal" href="#id3">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wav2vec-2-0-hubert-fine-tuned-asr">wav2vec 2.0 / HuBERT - Fine-tuned ASR</a><ul>
+<li><a class="reference internal" href="#id35">Interface</a></li>
+<li><a class="reference internal" href="#id36">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wav2vec-2-0-hubert-forced-alignment">wav2vec 2.0 / HuBERT - Forced Alignment</a><ul>
+<li><a class="reference internal" href="#id59">Interface</a></li>
+<li><a class="reference internal" href="#pertrained-models">Pertrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tacotron2-text-to-speech">Tacotron2 Text-To-Speech</a><ul>
+<li><a class="reference internal" href="#id61">Interface</a></li>
+<li><a class="reference internal" href="#id62">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#source-separation">Source Separation</a><ul>
+<li><a class="reference internal" href="#id69">Interface</a></li>
+<li><a class="reference internal" href="#id70">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#squim-objective">Squim Objective</a><ul>
+<li><a class="reference internal" href="#id77">Interface</a></li>
+<li><a class="reference internal" href="#id78">Pretrained Models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#squim-subjective">Squim Subjective</a><ul>
+<li><a class="reference internal" href="#id81">Interface</a></li>
+<li><a class="reference internal" href="#id82">Pretrained Models</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

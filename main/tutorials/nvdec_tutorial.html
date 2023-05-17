@@ -1,0 +1,1658 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Accelerated video decoding with NVDEC &mdash; Torchaudio 2.2.0.dev20231214 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Accelerated video encoding with NVENC" href="nvenc_tutorial.html" />
+    <link rel="prev" title="StreamWriter Advanced Usage" href="streamwriter_advanced.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231214 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>Accelerated video decoding with NVDEC &gt;</li>
+      
+      <li>Nightly (unstable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/nvdec_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">tutorials/nvdec_tutorial</div>
+
+      <div id="google-colab-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+        <div class="call-to-action-desktop-view">Run in Google Colab</div>
+        <div class="call-to-action-mobile-view">Colab</div>
+      </div>
+      <div id="download-notebook-link">
+        <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+        <div class="call-to-action-desktop-view">Download Notebook</div>
+        <div class="call-to-action-mobile-view">Notebook</div>
+      </div>
+      <div id="github-view-link">
+        <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+        <div class="call-to-action-desktop-view">View on GitHub</div>
+        <div class="call-to-action-mobile-view">GitHub</div>
+      </div>
+    </div>
+
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-tutorials-nvdec-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="accelerated-video-decoding-with-nvdec">
+<span id="sphx-glr-tutorials-nvdec-tutorial-py"></span><h1>Accelerated video decoding with NVDEC<a class="headerlink" href="#accelerated-video-decoding-with-nvdec" title="Permalink to this heading">¶</a></h1>
+<p id="nvdec-tutorial"><strong>Author</strong>: <a class="reference external" href="mailto:moto&#37;&#52;&#48;meta&#46;com">Moto Hira</a></p>
+<p>This tutorial shows how to use NVIDIA’s hardware video decoder (NVDEC)
+with TorchAudio, and how it improves the performance of video decoding.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial requires FFmpeg libraries compiled with HW
+acceleration enabled.</p>
+<p>Please refer to
+<a class="reference internal" href="../build.ffmpeg.html#enabling-hw-decoder"><span class="std std-ref">Enabling GPU video decoder/encoder</span></a>
+for how to build FFmpeg with HW acceleration.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.2.0.dev20231213
+2.2.0.dev20231214
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
+</pre></div>
+</div>
+<section id="check-the-prerequisites">
+<h2>Check the prerequisites<a class="headerlink" href="#check-the-prerequisites" title="Permalink to this heading">¶</a></h2>
+<p>First, we check that TorchAudio correctly detects FFmpeg libraries
+that support HW decoder/encoder.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">ffmpeg_utils</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;FFmpeg Library versions:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ver</span></a> <span class="ow">in</span> <span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_versions</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="si">}</span><span class="s2">:</span><span class="se">\t</span><span class="si">{</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ver</span></a><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>FFmpeg Library versions:
+  libavcodec:   60.3.100
+  libavdevice:  60.1.100
+  libavfilter:  9.3.100
+  libavformat:  60.3.100
+  libavutil:    58.2.100
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available NVDEC Decoders:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a> <span class="ow">in</span> <span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_video_decoders</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">if</span> <span class="s2">&quot;cuvid&quot;</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Available NVDEC Decoders:
+ - av1_cuvid
+ - h264_cuvid
+ - hevc_cuvid
+ - mjpeg_cuvid
+ - mpeg1_cuvid
+ - mpeg2_cuvid
+ - mpeg4_cuvid
+ - vc1_cuvid
+ - vp8_cuvid
+ - vp9_cuvid
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Avaialbe GPU:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.cuda.get_device_properties.html#torch.cuda.get_device_properties" title="torch.cuda.get_device_properties" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span></a><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Avaialbe GPU:
+_CudaDeviceProperties(name=&#39;NVIDIA A10G&#39;, major=8, minor=6, total_memory=22515MB, multi_processor_count=80)
+</pre></div>
+</div>
+<p>We will use the following video which has the following properties;</p>
+<ul class="simple">
+<li><p>Codec: H.264</p></li>
+<li><p>Resolution: 960x540</p></li>
+<li><p>FPS: 29.97</p></li>
+<li><p>Pixel format: YUV420P</p></li>
+</ul>
+<video style="max-width: 100%" controls>
+  <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4" type="video/mp4">
+</video><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span>
+    <span class="s2">&quot;tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/31.8M [00:00&lt;?, ?B/s]
+ 52%|#####1    | 16.4M/31.8M [00:00&lt;00:00, 69.2MB/s]
+ 98%|#########8| 31.2M/31.8M [00:00&lt;00:00, 85.4MB/s]
+100%|##########| 31.8M/31.8M [00:00&lt;00:00, 83.1MB/s]
+</pre></div>
+</div>
+</section>
+<section id="decoding-videos-with-nvdec">
+<h2>Decoding videos with NVDEC<a class="headerlink" href="#decoding-videos-with-nvdec" title="Permalink to this heading">¶</a></h2>
+<p>To use HW video decoder, you need to specify the HW decoder when
+defining the output video stream by passing <code class="docutils literal notranslate"><span class="pre">decoder</span></code> option to
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_video_stream" title="torchaudio.io.StreamReader.add_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_video_stream()</span></code></a> method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
+<span class="p">(</span><span class="n">video</span><span class="p">,)</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The video frames are decoded and returned as tensor of NCHW format.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="torch.dtype" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">video</span><span class="o">.</span><span class="n">dtype</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([5, 3, 540, 960]) torch.uint8
+</pre></div>
+</div>
+<p>By default, the decoded frames are sent back to CPU memory, and
+CPU tensors are created.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">video</span><span class="o">.</span><span class="n">device</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>cpu
+</pre></div>
+</div>
+<p>By specifying <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option, you can convert the decoded frames
+to CUDA tensor.
+<code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option takes string values and pass it
+to <a class="reference external" href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="(in PyTorch v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option and
+<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_video_stream" title="torchaudio.io.StreamReader.add_basic_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_video_stream()</span></code></a>
+are not compatible. <code class="docutils literal notranslate"><span class="pre">add_basic_video_stream</span></code> adds post-decoding
+process, which is designed for frames in CPU memory.
+Please use <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_video_stream" title="torchaudio.io.StreamReader.add_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_video_stream()</span></code></a>.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span> <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
+<span class="p">(</span><span class="n">video</span><span class="p">,)</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="torch.dtype" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">video</span><span class="o">.</span><span class="n">dtype</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">video</span><span class="o">.</span><span class="n">device</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([5, 3, 540, 960]) torch.uint8 cuda:0
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When there are multiple of GPUs available, <code class="docutils literal notranslate"><span class="pre">StreamReader</span></code> by
+default uses the first GPU. You can change this by providing
+<code class="docutils literal notranslate"><span class="pre">&quot;gpu&quot;</span></code> option.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Video data is sent to CUDA device 0, decoded and</span>
+<span class="c1"># converted on the same device.</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>
+    <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>
+    <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;gpu&quot;</span></code> option and <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option can be specified
+independently. If they do not match, decoded frames are
+transfered to the device specified by <code class="docutils literal notranslate"><span class="pre">hw_accell</span></code>
+automatically.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Video data is sent to CUDA device 0, and decoded there.</span>
+<span class="c1"># Then it is transfered to CUDA device 1, and converted to</span>
+<span class="c1"># CUDA tensor.</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>
+    <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">},</span>
+    <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda:1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this heading">¶</a></h2>
+<p>Let’s look at the frames decoded by HW decoder and compare them
+against equivalent results from software decoders.</p>
+<p>The following function seeks into the given timestamp and decode one
+frame with the specificed decoder.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_decode</span><span class="p">(</span><span class="n">decoder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">seek</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">seek</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">video</span><span class="p">,)</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestamps</span></a> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cpu_frames</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">test_decode</span><span class="p">(</span><span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264&quot;</span><span class="p">,</span> <span class="n">seek</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span> <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestamps</span></a><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cuda_frames</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">test_decode</span><span class="p">(</span><span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span> <span class="n">seek</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span> <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestamps</span></a><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, HW decoder does not support colorspace conversion.
+Decoded frames are YUV format.
+The following function performs YUV to RGB covnersion
+(and axis shuffling for plotting).</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">yuv_to_rgb</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span><span class="o">.</span><span class="n">cpu</span></a><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="torch.dtype" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">float</span></a><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">u</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">v</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+    <span class="n">y</span> <span class="o">/=</span> <span class="mi">255</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">/</span> <span class="mi">255</span> <span class="o">-</span> <span class="mf">0.5</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="mi">255</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">1.14</span> <span class="o">*</span> <span class="n">v</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="o">-</span><span class="mf">0.396</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">0.581</span> <span class="o">*</span> <span class="n">v</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">2.029</span> <span class="o">*</span> <span class="n">u</span>
+
+    <span class="n">rgb</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.stack.html#torch.stack" title="torch.stack" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></a><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">rgb</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="torch.dtype" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span></a><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rgb</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now we visualize the resutls.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">():</span>
+    <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestamps</span></a><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">):</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cpu_frames</span></a><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cuda_frames</span></a><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Software decoder&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;HW decoder&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">yticks</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+
+<span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_nvdec_tutorial_001.png" srcset="../_images/sphx_glr_nvdec_tutorial_001.png" alt="Software decoder, HW decoder" class = "sphx-glr-single-img"/><p>They are indistinguishable to the eyes of the author.
+Feel free to let us know if you spot something. :)</p>
+</section>
+<section id="hw-resizing-and-cropping">
+<h2>HW resizing and cropping<a class="headerlink" href="#hw-resizing-and-cropping" title="Permalink to this heading">¶</a></h2>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">decoder_option</span></code> argument to provide decoder-specific
+options.</p>
+<p>The following options are often relevant in preprocessing.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">resize</span></code>: Resize the frame into <code class="docutils literal notranslate"><span class="pre">(width)x(height)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">crop</span></code>: Crop the frame <code class="docutils literal notranslate"><span class="pre">(top)x(bottom)x(left)x(right)</span></code>.
+Note that the specified values are the amount of rows/columns removed.
+The final image size is <code class="docutils literal notranslate"><span class="pre">(width</span> <span class="pre">-</span> <span class="pre">left</span> <span class="pre">-</span> <span class="pre">right)x(height</span> <span class="pre">-</span> <span class="pre">top</span> <span class="pre">-bottom)</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">crop</span></code> and <code class="docutils literal notranslate"><span class="pre">resize</span></code> options are used together,
+<code class="docutils literal notranslate"><span class="pre">crop</span></code> is performed first.</p></li>
+</ul>
+<p>For other available options, please run
+<code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">decoder=h264_cuvid</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_options</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">87</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span> <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="n">option</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">video</span><span class="p">,)</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Option: </span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s2">:</span><span class="se">\t</span><span class="si">{</span><span class="n">video</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">original</span></a> <span class="o">=</span> <span class="n">test_options</span><span class="p">(</span><span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">resized</span></a> <span class="o">=</span> <span class="n">test_options</span><span class="p">(</span><span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;480x270&quot;</span><span class="p">})</span>
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cropped</span></a> <span class="o">=</span> <span class="n">test_options</span><span class="p">(</span><span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;crop&quot;</span><span class="p">:</span> <span class="s2">&quot;135x135x240x240&quot;</span><span class="p">})</span>
+<a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cropped_and_resized</span></a> <span class="o">=</span> <span class="n">test_options</span><span class="p">(</span><span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;crop&quot;</span><span class="p">:</span> <span class="s2">&quot;135x135x240x240&quot;</span><span class="p">,</span> <span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;640x360&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Option: None:   torch.Size([1, 3, 540, 960])
+Option: {&#39;resize&#39;: &#39;480x270&#39;}:  torch.Size([1, 3, 270, 480])
+Option: {&#39;crop&#39;: &#39;135x135x240x240&#39;}:    torch.Size([1, 3, 270, 480])
+Option: {&#39;crop&#39;: &#39;135x135x240x240&#39;, &#39;resize&#39;: &#39;640x360&#39;}:       torch.Size([1, 3, 360, 640])
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">():</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">])</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">original</span></a><span class="p">))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">resized</span></a><span class="p">))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cropped</span></a><span class="p">))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cropped_and_resized</span></a><span class="p">))</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Resized&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Cropped&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Cropped and resized&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_nvdec_tutorial_002.png" srcset="../_images/sphx_glr_nvdec_tutorial_002.png" alt="Original, Resized, Cropped, Cropped and resized" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1280x960 with 4 Axes&gt;
+</pre></div>
+</div>
+</section>
+<section id="comparing-resizing-methods">
+<h2>Comparing resizing methods<a class="headerlink" href="#comparing-resizing-methods" title="Permalink to this heading">¶</a></h2>
+<p>Unlike software scaling, NVDEC does not provide an option to choose
+the scaling algorithm.
+In ML applicatoins, it is often necessary to construct a
+preprocessing pipeline with a similar numerical property.
+So here we compare the result of hardware resizing with software
+resizing of different algorithms.</p>
+<p>We will use the following video, which contains the test pattern
+generated using the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ffmpeg</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">f</span> <span class="n">lavfi</span> <span class="o">-</span><span class="n">t</span> <span class="mf">12.05</span> <span class="o">-</span><span class="n">i</span> <span class="n">mptestsrc</span> <span class="o">-</span><span class="n">movflags</span> <span class="o">+</span><span class="n">faststart</span> <span class="n">mptestsrc</span><span class="o">.</span><span class="n">mp4</span>
+</pre></div>
+</div>
+<video style="max-width: 100%" controls>
+  <source src="https://download.pytorch.org/torchaudio/tutorial-assets/mptestsrc.mp4" type="video/mp4">
+</video><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">test_src</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/mptestsrc.mp4&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/232k [00:00&lt;?, ?B/s]
+100%|##########| 232k/232k [00:00&lt;00:00, 44.1MB/s]
+</pre></div>
+</div>
+<p>The following function decodes video and
+apply the specified scaling algorithm.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decode_resize_ffmpeg</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">seek</span><span class="p">):</span>
+    <span class="n">filter_desc</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;scale=</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">:sws_flags=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">test_src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">filter_desc</span><span class="o">=</span><span class="n">filter_desc</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">seek</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">chunk</span>
+</pre></div>
+</div>
+<p>The following function uses HW decoder to decode video and resize.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decode_resize_cuvid</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">seek</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">test_src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span> <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">seek</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">chunk</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now we execute them and visualize the resulting frames.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">224</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">224</span><span class="p">,</span> <span class="s2">&quot;seek&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;neighbor&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;bilinear&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;bicubic&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_cuvid</span><span class="p">(</span><span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;spline&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;lanczos:param0=1&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;lanczos:param0=3&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+    <span class="n">decode_resize_ffmpeg</span><span class="p">(</span><span class="s2">&quot;lanczos:param0=5&quot;</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params</span></a><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">():</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">12.8</span><span class="p">,</span> <span class="mf">15.2</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frames</span></a><span class="p">):</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="n">h</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span> <span class="p">:</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">3</span><span class="p">][</span><span class="n">i</span> <span class="o">%</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">yuv_to_rgb</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;nearest neighbor&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;bilinear&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;bicubic&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;NVDEC&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;spline&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;lanczos(1)&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;lanczos(3)&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;lanczos(5)&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">yticks</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+
+<span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_nvdec_tutorial_003.png" srcset="../_images/sphx_glr_nvdec_tutorial_003.png" alt="Original, nearest neighbor, bilinear, bicubic, NVDEC, spline, lanczos(1), lanczos(3), lanczos(5)" class = "sphx-glr-single-img"/><p>None of them is exactly the same. To the eyes of authors, lanczos(1)
+appears to be most similar to NVDEC.
+The bicubic looks close as well.</p>
+</section>
+<section id="benchmark-nvdec-with-streamreader">
+<h2>Benchmark NVDEC with StreamReader<a class="headerlink" href="#benchmark-nvdec-with-streamreader" title="Permalink to this heading">¶</a></h2>
+<p>In this section, we compare the performace of software video
+decoding and HW video decoding.</p>
+</section>
+<section id="decode-as-cuda-frames">
+<h2>Decode as CUDA frames<a class="headerlink" href="#decode-as-cuda-frames" title="Permalink to this heading">¶</a></h2>
+<p>First, we compare the time it takes for software decoder and
+hardware encoder to decode the same video.
+To make the result comparable, when using software decoder, we move
+the resulting tensor to CUDA.</p>
+<p>The procedures to test look like the following</p>
+<ul class="simple">
+<li><p>Use hardware decoder and place data on CUDA directly</p></li>
+<li><p>Use software decoder, generate CPU Tensors and move them to CUDA.</p></li>
+</ul>
+<p>The following function implements the hardware decoder test case.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_decode_cuda</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frames_per_chunk</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span> <span class="n">hw_accel</span><span class="o">=</span><span class="n">hw_accel</span><span class="p">)</span>
+
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t0</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+        <span class="n">num_frames</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Shape: </span><span class="si">{</span><span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="n">num_frames</span> <span class="o">/</span> <span class="n">elapsed</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2"> frames in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds. (</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> fps)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fps</span>
+</pre></div>
+</div>
+<p>The following function implements the software decoder test case.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_decode_cpu</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">threads</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frames_per_chunk</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">threads</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">device</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">stream</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Shape: </span><span class="si">{</span><span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">num_frames</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="n">num_frames</span> <span class="o">/</span> <span class="n">elapsed</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2"> frames in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds. (</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> fps)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fps</span>
+</pre></div>
+</div>
+<p>For each resolution of video, we run multiple software decoder test
+cases with different number of threads.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_decode_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing: </span><span class="si">{</span><a href="https://docs.python.org/3/library/os.path.html#os.path.basename" title="os.path.basename" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">threads</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* Software decoding (num_threads=</span><span class="si">{</span><span class="n">threads</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">fps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_decode_cpu</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">threads</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Hardware decoding&quot;</span><span class="p">)</span>
+    <span class="n">fps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_decode_cuda</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fps</span>
+</pre></div>
+</div>
+<p>Now we run the tests with videos of different resolutions.</p>
+</section>
+<section id="qvga">
+<h2>QVGA<a class="headerlink" href="#qvga" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_qvga</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/testsrc2_qvga.h264.mp4&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_qvga</span></a> <span class="o">=</span> <span class="n">run_decode_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_qvga</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/1.06M [00:00&lt;?, ?B/s]
+100%|##########| 1.06M/1.06M [00:00&lt;00:00, 317MB/s]
+Testing: testsrc2_qvga.h264.mp4
+* Software decoding (num_threads=1)
+ - Shape: torch.Size([5, 3, 240, 320])
+ - Processed 900 frames in 0.50 seconds. (1783.75 fps)
+* Software decoding (num_threads=4)
+ - Shape: torch.Size([5, 3, 240, 320])
+ - Processed 900 frames in 0.35 seconds. (2541.45 fps)
+* Software decoding (num_threads=8)
+ - Shape: torch.Size([5, 3, 240, 320])
+ - Processed 900 frames in 0.33 seconds. (2700.28 fps)
+* Software decoding (num_threads=16)
+ - Shape: torch.Size([5, 3, 240, 320])
+ - Processed 895 frames in 0.33 seconds. (2738.28 fps)
+* Hardware decoding
+ - Shape: torch.Size([5, 3, 240, 320])
+ - Processed 900 frames in 2.02 seconds. (445.90 fps)
+</pre></div>
+</div>
+</section>
+<section id="vga">
+<h2>VGA<a class="headerlink" href="#vga" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_vga</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/testsrc2_vga.h264.mp4&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_vga</span></a> <span class="o">=</span> <span class="n">run_decode_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_vga</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/3.59M [00:00&lt;?, ?B/s]
+100%|##########| 3.59M/3.59M [00:00&lt;00:00, 335MB/s]
+Testing: testsrc2_vga.h264.mp4
+* Software decoding (num_threads=1)
+ - Shape: torch.Size([5, 3, 480, 640])
+ - Processed 900 frames in 1.20 seconds. (748.77 fps)
+* Software decoding (num_threads=4)
+ - Shape: torch.Size([5, 3, 480, 640])
+ - Processed 900 frames in 0.61 seconds. (1487.18 fps)
+* Software decoding (num_threads=8)
+ - Shape: torch.Size([5, 3, 480, 640])
+ - Processed 900 frames in 0.71 seconds. (1269.04 fps)
+* Software decoding (num_threads=16)
+ - Shape: torch.Size([5, 3, 480, 640])
+ - Processed 895 frames in 0.69 seconds. (1298.91 fps)
+* Hardware decoding
+ - Shape: torch.Size([5, 3, 480, 640])
+ - Processed 900 frames in 0.35 seconds. (2564.14 fps)
+</pre></div>
+</div>
+</section>
+<section id="xga">
+<h2>XGA<a class="headerlink" href="#xga" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_xga</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/testsrc2_xga.h264.mp4&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_xga</span></a> <span class="o">=</span> <span class="n">run_decode_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_xga</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/9.22M [00:00&lt;?, ?B/s]
+ 95%|#########5| 8.80M/9.22M [00:00&lt;00:00, 92.2MB/s]
+100%|##########| 9.22M/9.22M [00:00&lt;00:00, 87.6MB/s]
+Testing: testsrc2_xga.h264.mp4
+* Software decoding (num_threads=1)
+ - Shape: torch.Size([5, 3, 768, 1024])
+ - Processed 900 frames in 2.71 seconds. (332.28 fps)
+* Software decoding (num_threads=4)
+ - Shape: torch.Size([5, 3, 768, 1024])
+ - Processed 900 frames in 1.19 seconds. (757.65 fps)
+* Software decoding (num_threads=8)
+ - Shape: torch.Size([5, 3, 768, 1024])
+ - Processed 900 frames in 1.20 seconds. (747.50 fps)
+* Software decoding (num_threads=16)
+ - Shape: torch.Size([5, 3, 768, 1024])
+ - Processed 895 frames in 1.19 seconds. (754.88 fps)
+* Hardware decoding
+ - Shape: torch.Size([5, 3, 768, 1024])
+ - Processed 900 frames in 0.62 seconds. (1450.35 fps)
+</pre></div>
+</div>
+</section>
+<section id="result">
+<h2>Result<a class="headerlink" href="#result" title="Permalink to this heading">¶</a></h2>
+<p>Now we plot the result.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">():</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_qvga</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_vga</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_xga</span></a><span class="p">,</span> <span class="s2">&quot;ov^sx&quot;</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">items</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="n">items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;QVGA (320x240)&quot;</span><span class="p">,</span> <span class="s2">&quot;VGA (640x480)&quot;</span><span class="p">,</span> <span class="s2">&quot;XGA (1024x768)&quot;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;Software Decoding (threads=1)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Software Decoding (threads=4)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Software Decoding (threads=8)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Software Decoding (threads=16)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Hardware Decoding (CUDA Tensor)&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Speed of processing video frames&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frames per second&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+
+<span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_nvdec_tutorial_004.png" srcset="../_images/sphx_glr_nvdec_tutorial_004.png" alt="Speed of processing video frames" class = "sphx-glr-single-img"/><p>We observe couple of things</p>
+<ul class="simple">
+<li><p>Increasing the number of threads in software decoding makes the
+pipeline faster, but the performance saturates around 8 threads.</p></li>
+<li><p>The performance gain from using hardware decoder depends on the
+resolution of video.</p></li>
+<li><p>At lower resolutions like QVGA, hardware decoding is slower than
+software decoding</p></li>
+<li><p>At higher resolutions like XGA, hardware decoding is faster
+than software decoding.</p></li>
+</ul>
+<p>It is worth noting that the performance gain also depends on the
+type of GPU.
+We observed that when decoding VGA videos using V100 or A100 GPUs,
+hardware decoders are slower than software decoders. But using A10
+GPU hardware deocder is faster than software decodr.</p>
+</section>
+<section id="decode-and-resize">
+<h2>Decode and resize<a class="headerlink" href="#decode-and-resize" title="Permalink to this heading">¶</a></h2>
+<p>Next, we add resize operation to the pipeline.
+We will compare the following pipelines.</p>
+<ol class="arabic simple">
+<li><p>Decode video using software decoder and read the frames as
+PyTorch Tensor. Resize the tensor using
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="(in PyTorch v2.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate()</span></code></a>, then send
+the resulting tensor to CUDA device.</p></li>
+<li><p>Decode video using software decoder, resize the frame with
+FFmpeg’s filter graph, read the resized frames as PyTorch tensor,
+then send it to CUDA device.</p></li>
+<li><p>Decode and resize video simulaneously with HW decoder, read the
+resulting frames as CUDA tensor.</p></li>
+</ol>
+<p>The pipeline 1 represents common video loading implementations.</p>
+<p>The pipeline 2 uses FFmpeg’s filter graph, which allows to manipulate
+raw frames before converting them to Tensors.</p>
+<p>The pipeline 3 has the minimum amount of data transfer from CPU to
+CUDA, which significantly contribute to performant data loading.</p>
+<p>The following function implements the pipeline 1. It uses PyTorch’s
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="(in PyTorch v2.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate()</span></code></a>.
+We use <code class="docutils literal notranslate"><span class="pre">bincubic</span></code> mode, as we saw that the resulting frames are
+closest to NVDEC resizing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_decode_then_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;bicubic&quot;</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="n">frames_per_chunk</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">})</span>
+
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">device</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t0</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+        <span class="n">num_frames</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">chunk</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="torch.nn.functional.interpolate" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">interpolate</span></a><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="p">[</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="n">num_frames</span> <span class="o">/</span> <span class="n">elapsed</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Shape: </span><span class="si">{</span><span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2"> frames in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds. (</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> fps)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fps</span>
+</pre></div>
+</div>
+<p>The following function implements the pipeline 2. Frames are resized
+as part of decoding process, then sent to CUDA device.</p>
+<p>We use <code class="docutils literal notranslate"><span class="pre">bincubic</span></code> mode, to make the result comparable with
+PyTorch-based implementation above.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_decode_and_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;bicubic&quot;</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
+        <span class="n">frames_per_chunk</span><span class="p">,</span> <span class="n">filter_desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;scale=</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">:sws_flags=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">device</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t0</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+        <span class="n">num_frames</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="n">num_frames</span> <span class="o">/</span> <span class="n">elapsed</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Shape: </span><span class="si">{</span><span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2"> frames in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds. (</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> fps)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fps</span>
+</pre></div>
+</div>
+<p>The following function implements the pipeline 3. Resizing is
+performed by NVDEC and the resulting tensor is placed on CUDA memory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_hw_decode_and_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">decoder_option</span><span class="p">,</span> <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span> <span class="n">hw_accel</span><span class="o">=</span><span class="n">hw_accel</span><span class="p">)</span>
+
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t0</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">chunk</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+        <span class="n">num_frames</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/time.html#time.monotonic" title="time.monotonic" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span></a><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="n">num_frames</span> <span class="o">/</span> <span class="n">elapsed</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Shape: </span><span class="si">{</span><span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Processed </span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2"> frames in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds. (</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> fps)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fps</span>
+</pre></div>
+</div>
+<p>The following function run the benchmark functions on given sources.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_resize_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing: </span><span class="si">{</span><a href="https://docs.python.org/3/library/os.path.html#os.path.basename" title="os.path.basename" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Software decoding with PyTorch interpolate&quot;</span><span class="p">)</span>
+    <span class="n">cpu_resize1</span> <span class="o">=</span> <span class="n">test_decode_then_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Software decoding with FFmpeg scale&quot;</span><span class="p">)</span>
+    <span class="n">cpu_resize2</span> <span class="o">=</span> <span class="n">test_decode_and_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* Hardware decoding with resize&quot;</span><span class="p">)</span>
+    <span class="n">cuda_resize</span> <span class="o">=</span> <span class="n">test_hw_decode_and_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span> <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">cpu_resize1</span><span class="p">,</span> <span class="n">cpu_resize2</span><span class="p">,</span> <span class="n">cuda_resize</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now we run the tests.</p>
+</section>
+<section id="id1">
+<h2>QVGA<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_qvga</span></a> <span class="o">=</span> <span class="n">run_resize_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_qvga</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: testsrc2_qvga.h264.mp4
+* Software decoding with PyTorch interpolate
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.59 seconds. (1515.75 fps)
+* Software decoding with FFmpeg scale
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.39 seconds. (2293.45 fps)
+* Hardware decoding with resize
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.27 seconds. (3287.47 fps)
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>VGA<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_vga</span></a> <span class="o">=</span> <span class="n">run_resize_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_vga</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: testsrc2_vga.h264.mp4
+* Software decoding with PyTorch interpolate
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 1.40 seconds. (641.65 fps)
+* Software decoding with FFmpeg scale
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.66 seconds. (1367.38 fps)
+* Hardware decoding with resize
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.35 seconds. (2570.07 fps)
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>XGA<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_xga</span></a> <span class="o">=</span> <span class="n">run_resize_tests</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_xga</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: testsrc2_xga.h264.mp4
+* Software decoding with PyTorch interpolate
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 3.19 seconds. (281.71 fps)
+* Software decoding with FFmpeg scale
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.99 seconds. (912.29 fps)
+* Hardware decoding with resize
+ - Shape: torch.Size([5, 3, 224, 224])
+ - Processed 900 frames in 0.62 seconds. (1455.06 fps)
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2>Result<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
+<p>Now we plot the result.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">():</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_qvga</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_vga</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fps_xga</span></a><span class="p">,</span> <span class="s2">&quot;ov^sx&quot;</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">items</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="n">items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;QVGA (320x240)&quot;</span><span class="p">,</span> <span class="s2">&quot;VGA (640x480)&quot;</span><span class="p">,</span> <span class="s2">&quot;XGA (1024x768)&quot;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;Software decoding</span><span class="se">\n</span><span class="s2">with resize</span><span class="se">\n</span><span class="s2">(PyTorch interpolate)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Software decoding</span><span class="se">\n</span><span class="s2">with resize</span><span class="se">\n</span><span class="s2">(FFmpeg scale)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NVDEC</span><span class="se">\n</span><span class="s2">with resizing&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Speed of processing video frames&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Input video resolution&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frames per second&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+
+<span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_nvdec_tutorial_005.png" srcset="../_images/sphx_glr_nvdec_tutorial_005.png" alt="Speed of processing video frames" class = "sphx-glr-single-img"/><p>Hardware deocder shows a similar trend as previous experiment.
+In fact, the performance is almost the same. Hardware resizing has
+almost zero overhead for scaling down the frames.</p>
+<p>Software decoding also shows a similar trend. Performing resizing as
+part of decoding is faster. One possible explanation is that, video
+frames are internally stored as YUV420P, which has half the number
+of pixels compared to RGB24, or YUV444P. This means that if resizing
+before copying frame data to PyTorch tensor, the number of pixels
+manipulated and copied are smaller than the case where applying
+resizing after frames are converted to Tensor.</p>
+<p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.476 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-nvdec-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/2c0cb1d7d79d5a5622253c098a75dbf0/nvdec_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">nvdec_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/5e0b0b0d95c7f3b1cf924ca3dad58679/nvdec_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">nvdec_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="nvenc_tutorial.html" class="btn btn-neutral float-right" title="Accelerated video encoding with NVENC" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="streamwriter_advanced.html" class="btn btn-neutral" title="StreamWriter Advanced Usage" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2023, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Accelerated video decoding with NVDEC</a><ul>
+<li><a class="reference internal" href="#check-the-prerequisites">Check the prerequisites</a></li>
+<li><a class="reference internal" href="#decoding-videos-with-nvdec">Decoding videos with NVDEC</a></li>
+<li><a class="reference internal" href="#visualization">Visualization</a></li>
+<li><a class="reference internal" href="#hw-resizing-and-cropping">HW resizing and cropping</a></li>
+<li><a class="reference internal" href="#comparing-resizing-methods">Comparing resizing methods</a></li>
+<li><a class="reference internal" href="#benchmark-nvdec-with-streamreader">Benchmark NVDEC with StreamReader</a></li>
+<li><a class="reference internal" href="#decode-as-cuda-frames">Decode as CUDA frames</a></li>
+<li><a class="reference internal" href="#qvga">QVGA</a></li>
+<li><a class="reference internal" href="#vga">VGA</a></li>
+<li><a class="reference internal" href="#xga">XGA</a></li>
+<li><a class="reference internal" href="#result">Result</a></li>
+<li><a class="reference internal" href="#decode-and-resize">Decode and resize</a></li>
+<li><a class="reference internal" href="#id1">QVGA</a></li>
+<li><a class="reference internal" href="#id2">VGA</a></li>
+<li><a class="reference internal" href="#id3">XGA</a></li>
+<li><a class="reference internal" href="#id4">Result</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

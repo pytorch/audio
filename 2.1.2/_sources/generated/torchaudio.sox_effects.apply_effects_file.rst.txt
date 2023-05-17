@@ -1,0 +1,6 @@
+﻿torchaudio.sox\_effects.apply\_effects\_file
+============================================
+
+.. currentmodule:: torchaudio.sox_effects
+
+.. autofunction:: apply_effects_file

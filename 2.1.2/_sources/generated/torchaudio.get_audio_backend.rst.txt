@@ -1,0 +1,6 @@
+﻿torchaudio.get\_audio\_backend
+==============================
+
+.. currentmodule:: torchaudio
+
+.. autofunction:: get_audio_backend

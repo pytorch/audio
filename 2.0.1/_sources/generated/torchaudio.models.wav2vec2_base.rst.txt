@@ -1,0 +1,6 @@
+torchaudio.models.wav2vec2\_base
+================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: wav2vec2_base
