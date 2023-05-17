@@ -1054,6 +1054,7 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             rgb16 = ((rgb.to(torch.int32) - 128) << 8).to(torch.int16)
 
             yuv = rgb_to_yuv_ccir(rgb)
+            yuv16 = yuv.to(torch.int16) * 4
             bgr = rgb[:, [2, 1, 0], :, :]
             gray = rgb_to_gray(rgb)
             argb = torch.cat([alpha, rgb], dim=1)
@@ -1073,6 +1074,7 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             s.add_basic_video_stream(frames_per_chunk=-1, format="rgba")
             s.add_basic_video_stream(frames_per_chunk=-1, format="abgr")
             s.add_basic_video_stream(frames_per_chunk=-1, format="bgra")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv420p10le")
             s.process_all_packets()
             chunks = s.pop_chunks()
             self.assertEqual(chunks[0], yuv, atol=1, rtol=0)
@@ -1086,6 +1088,7 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             self.assertEqual(chunks[8], rgba, atol=0, rtol=0)
             self.assertEqual(chunks[9], abgr, atol=0, rtol=0)
             self.assertEqual(chunks[10], bgra, atol=0, rtol=0)
+            self.assertEqual(chunks[11], yuv16, atol=4, rtol=0)
 
 
 @skipIfNoHWAccel("h264_cuvid")

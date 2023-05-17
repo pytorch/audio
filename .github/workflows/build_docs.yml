@@ -61,7 +61,7 @@ jobs:
 
         # Install torchaudio
         # TODO: Enable NVDec/NVEnc
-        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
+        conda install --quiet -y -c conda-forge 'ffmpeg>=5.0,<6' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
         cd packaging
         . ./pkg_helpers.bash

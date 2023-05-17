@@ -13,14 +13,12 @@ encode and save audio/video data into various formats/destinations.
 #
 # .. note::
 #
-#    This tutorial requires torchaudio nightly build and FFmpeg libraries (>=4.1, <4.4).
-#
-#    To install torchaudio nightly build, please refer to
-#    https://pytorch.org/get-started/locally/ .
+#    This tutorial requires FFmpeg libraries (>=5.0, <6).
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install 'ffmpeg<4.4'`` will install the required FFmpeg libraries.
+#    ``conda install -c conda-forge 'ffmpeg<6'`` will install
+#    the required libraries.
 #
 
 ######################################################################

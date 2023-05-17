@@ -33,7 +33,6 @@ They can be enabled by passing ``1`` and disabled by ``0``.
 - ``BUILD_SOX``: Enable/disable I/O features based on libsox.
 - ``BUILD_KALDI``: Enable/disable feature extraction based on Kaldi.
 - ``BUILD_RNNT``: Enable/disable custom RNN-T loss function.
-- ``BUILD_CTC_DECODER``: Enable/disable CTC decoder based on `Flashlight Text <https://github.com/flashlight/text>`_.
 - ``USE_FFMPEG``: Enable/disable I/O features based on FFmpeg libraries.
 - ``USE_ROCM``: Enable/disable AMD ROCm support.
 - ``USE_CUDA``: Enable/disable CUDA support.

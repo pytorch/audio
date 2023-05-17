@@ -42,7 +42,7 @@
           <li><a href="{{ doc.link|e }}">{{ doc.title }}</a> &gt;</li>
         {% endfor %}
       <li>{{ title }} &gt;</li>
-      {% if 'Nightly' in version %}
+      {% if 'dev' in version %}
       <li>Nightly (unstable)</li>
       {% elif version_stable in version %}
       <li>Current (stable)</li>

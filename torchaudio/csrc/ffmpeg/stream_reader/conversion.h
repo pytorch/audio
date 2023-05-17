@@ -73,6 +73,13 @@ class YUV420PConverter : public ImageConverterBase {
   torch::Tensor convert(const AVFrame* src);
 };
 
+class YUV420P10LEConverter : public ImageConverterBase {
+ public:
+  YUV420P10LEConverter(int height, int width);
+  void convert(const AVFrame* src, torch::Tensor& dst);
+  torch::Tensor convert(const AVFrame* src);
+};
+
 class NV12Converter : public ImageConverterBase {
   torch::Tensor tmp_uv;
 
