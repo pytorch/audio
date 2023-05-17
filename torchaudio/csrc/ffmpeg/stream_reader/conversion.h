@@ -65,8 +65,6 @@ struct PlanarImageConverter : public ImageConverterBase {
 // Family of YUVs - NCHW
 ////////////////////////////////////////////////////////////////////////////////
 class YUV420PConverter : public ImageConverterBase {
-  torch::Tensor tmp_uv;
-
  public:
   YUV420PConverter(int height, int width);
   void convert(const AVFrame* src, torch::Tensor& dst);
