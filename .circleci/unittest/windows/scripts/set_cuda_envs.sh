@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-if [[ -z "${CUDA_VERSION}" ]] ; then
+if [ -z "${CUDA_VERSION:-}" ] ; then
     version="cpu"
 else
     version="$CUDA_VERSION"
