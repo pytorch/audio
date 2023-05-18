@@ -58,8 +58,8 @@ Subtractive synthesis creates timbre by applying filters.
 
  .. code-block:: none
 
-    2.1.0.dev20230517
-    2.1.0.dev20230517
+    2.1.0.dev20230901
+    2.2.0.dev20230902
 
 
 
@@ -71,23 +71,20 @@ Overview
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-55
+.. GENERATED FROM PYTHON SOURCE LINES 36-52
 
 .. code-block:: default
 
 
     try:
-        from torchaudio.prototype.functional import (
-            oscillator_bank,
-            extend_pitch,
-            adsr_envelope,
-        )
+        from torchaudio.prototype.functional import adsr_envelope, extend_pitch, oscillator_bank
     except ModuleNotFoundError:
         print(
             "Failed to import prototype DSP features. "
             "Please install torchaudio nightly builds. "
             "Please refer to https://pytorch.org/get-started/locally "
-            "for instructions to install a nightly build.")
+            "for instructions to install a nightly build."
+        )
         raise
 
     import matplotlib.pyplot as plt
@@ -101,7 +98,7 @@ Overview
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-71
+.. GENERATED FROM PYTHON SOURCE LINES 53-68
 
 Creating multiple frequency pitches
 -----------------------------------
@@ -119,12 +116,12 @@ In this tutorial, we use
 a timbre from base frequency.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 First, we define some constants and helper function that we use
 throughout the tutorial.
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-87
+.. GENERATED FROM PYTHON SOURCE LINES 73-84
 
 .. code-block:: default
 
@@ -133,7 +130,7 @@ throughout the tutorial.
     PI = torch.pi
     PI2 = 2 * torch.pi
 
-    F0 = 344.  # fundamental frequency
+    F0 = 344.0  # fundamental frequency
     DURATION = 1.1  # [seconds]
     SAMPLE_RATE = 16_000  # [Hz]
 
@@ -146,36 +143,29 @@ throughout the tutorial.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-124
+.. GENERATED FROM PYTHON SOURCE LINES 86-115
 
 .. code-block:: default
 
 
-    def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
+
+    def plot(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
         t = torch.arange(waveform.size(0)) / sample_rate
 
         fig, axes = plt.subplots(4, 1, sharex=True)
         axes[0].plot(t, freq)
-        axes[0].set(
-            title=f"Oscillator bank (bank size: {amp.size(-1)})",
-            ylabel="Frequency [Hz]",
-            ylim=[-0.03, None])
+        axes[0].set(title=f"Oscillator bank (bank size: {amp.size(-1)})", ylabel="Frequency [Hz]", ylim=[-0.03, None])
         axes[1].plot(t, amp)
-        axes[1].set(
-            ylabel="Amplitude",
-            ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
+        axes[1].set(ylabel="Amplitude", ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
         axes[2].plot(t, waveform)
         axes[2].set(ylabel="Waveform")
         axes[3].specgram(waveform, Fs=sample_rate)
-        axes[3].set(
-            ylabel="Spectrogram",
-            xlabel="Time [s]",
-            xlim=[-0.01, t[-1] + 0.01])
+        axes[3].set(ylabel="Spectrogram", xlabel="Time [s]", xlim=[-0.01, t[-1] + 0.01])
 
         for i in range(4):
             axes[i].grid(True)
         pos = axes[2].get_position()
-        plt.tight_layout()
+        fig.tight_layout()
 
         if zoom is not None:
             ax = fig.add_axes([pos.x0 + 0.02, pos.y0 + 0.03, pos.width / 2.5, pos.height / 2.0])
@@ -192,7 +182,8 @@ throughout the tutorial.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-138
+
+.. GENERATED FROM PYTHON SOURCE LINES 116-129
 
 Harmonic Overtones
 -------------------
@@ -208,7 +199,7 @@ synthesizers. That is,
  - Triangle wave
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-156
+.. GENERATED FROM PYTHON SOURCE LINES 131-147
 
 Sawtooth wave
 ~~~~~~~~~~~~~
@@ -227,21 +218,22 @@ it is commonly used in subtractive synthesis as well.
    \end{align*}
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-161
+.. GENERATED FROM PYTHON SOURCE LINES 149-152
 
 The following function takes fundamental frequencies and amplitudes,
 and adds extend pitch in accordance with the formula above.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-171
+.. GENERATED FROM PYTHON SOURCE LINES 152-163
 
 .. code-block:: default
+
 
 
     def sawtooth_wave(freq0, amp0, num_pitches, sample_rate):
         freq = extend_pitch(freq0, num_pitches)
 
-        mults = [-((-1) ** i) / (PI * i) for i in range(1, 1+num_pitches)]
+        mults = [-((-1) ** i) / (PI * i) for i in range(1, 1 + num_pitches)]
         amp = extend_pitch(amp0, mults)
         waveform = oscillator_bank(freq, amp, sample_rate=sample_rate)
         return freq, amp, waveform
@@ -254,12 +246,12 @@ and adds extend pitch in accordance with the formula above.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-174
+.. GENERATED FROM PYTHON SOURCE LINES 164-166
 
 Now synthesize a waveform
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-181
+.. GENERATED FROM PYTHON SOURCE LINES 167-173
 
 .. code-block:: default
 
@@ -267,7 +259,7 @@ Now synthesize a waveform
     freq0 = torch.full((NUM_FRAMES, 1), F0)
     amp0 = torch.ones((NUM_FRAMES, 1))
     freq, amp, waveform = sawtooth_wave(freq0, amp0, int(SAMPLE_RATE / F0), SAMPLE_RATE)
-    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+    plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 
@@ -282,7 +274,7 @@ Now synthesize a waveform
 
  .. code-block:: none
 
-    /work/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -299,13 +291,13 @@ Now synthesize a waveform
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-185
+.. GENERATED FROM PYTHON SOURCE LINES 174-177
 
 It is possible to oscillate the base frequency to create a
 time-varying tone based on sawtooth wave.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-196
+.. GENERATED FROM PYTHON SOURCE LINES 178-188
 
 .. code-block:: default
 
@@ -317,7 +309,7 @@ time-varying tone based on sawtooth wave.
     freq0 = F0 + f_dev * torch.sin(phase).unsqueeze(-1)
 
     freq, amp, waveform = sawtooth_wave(freq0, amp0, int(SAMPLE_RATE / F0), SAMPLE_RATE)
-    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+    plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 
@@ -332,7 +324,7 @@ time-varying tone based on sawtooth wave.
 
  .. code-block:: none
 
-    /work/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -349,7 +341,7 @@ time-varying tone based on sawtooth wave.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-212
+.. GENERATED FROM PYTHON SOURCE LINES 189-204
 
 Square wave
 ~~~~~~~~~~~
@@ -367,17 +359,17 @@ only odd-integer harmonics.
    n   &= 2k + 1
    \end{align*}
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-224
+.. GENERATED FROM PYTHON SOURCE LINES 204-217
 
 .. code-block:: default
 
 
 
     def square_wave(freq0, amp0, num_pitches, sample_rate):
-        mults = [2. * i + 1. for i in range(num_pitches)]
+        mults = [2.0 * i + 1.0 for i in range(num_pitches)]
         freq = extend_pitch(freq0, mults)
 
-        mults = [4 / (PI * (2. * i + 1.)) for i in range(num_pitches)]
+        mults = [4 / (PI * (2.0 * i + 1.0)) for i in range(num_pitches)]
         amp = extend_pitch(amp0, mults)
 
         waveform = oscillator_bank(freq, amp, sample_rate=sample_rate)
@@ -390,15 +382,16 @@ only odd-integer harmonics.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-232
+
+.. GENERATED FROM PYTHON SOURCE LINES 219-225
 
 .. code-block:: default
 
 
     freq0 = torch.full((NUM_FRAMES, 1), F0)
     amp0 = torch.ones((NUM_FRAMES, 1))
-    freq, amp, waveform = square_wave(freq0, amp0, int(SAMPLE_RATE/F0/2), SAMPLE_RATE)
-    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+    freq, amp, waveform = square_wave(freq0, amp0, int(SAMPLE_RATE / F0 / 2), SAMPLE_RATE)
+    plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 
@@ -413,7 +406,7 @@ only odd-integer harmonics.
 
  .. code-block:: none
 
-    /work/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -430,7 +423,7 @@ only odd-integer harmonics.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-248
+.. GENERATED FROM PYTHON SOURCE LINES 226-241
 
 Triangle wave
 ~~~~~~~~~~~~~
@@ -448,18 +441,18 @@ also only contains odd-integer harmonics.
    n   &= 2k + 1
    \end{align*}
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-262
+.. GENERATED FROM PYTHON SOURCE LINES 241-255
 
 .. code-block:: default
 
 
 
     def triangle_wave(freq0, amp0, num_pitches, sample_rate):
-        mults = [2. * i + 1. for i in range(num_pitches)]
+        mults = [2.0 * i + 1.0 for i in range(num_pitches)]
         freq = extend_pitch(freq0, mults)
 
-        c = 8 / (PI ** 2)
-        mults = [c * ((-1) ** i) / ((2. * i + 1.) ** 2) for i in range(num_pitches)]
+        c = 8 / (PI**2)
+        mults = [c * ((-1) ** i) / ((2.0 * i + 1.0) ** 2) for i in range(num_pitches)]
         amp = extend_pitch(amp0, mults)
 
         waveform = oscillator_bank(freq, amp, sample_rate=sample_rate)
@@ -473,13 +466,13 @@ also only contains odd-integer harmonics.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 264-268
+.. GENERATED FROM PYTHON SOURCE LINES 257-261
 
 .. code-block:: default
 
 
     freq, amp, waveform = triangle_wave(freq0, amp0, int(SAMPLE_RATE / F0 / 2), SAMPLE_RATE)
-    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+    plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 
@@ -494,7 +487,7 @@ also only contains odd-integer harmonics.
 
  .. code-block:: none
 
-    /work/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -511,7 +504,7 @@ also only contains odd-integer harmonics.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-278
+.. GENERATED FROM PYTHON SOURCE LINES 262-271
 
 Inharmonic Paritials
 --------------------
@@ -523,7 +516,7 @@ They are essential in re-creating realistic sound or
 making the result of synthesis more interesting.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 280-285
+.. GENERATED FROM PYTHON SOURCE LINES 273-278
 
 Bell sound
 ~~~~~~~~~~
@@ -531,7 +524,7 @@ Bell sound
 https://computermusicresource.com/Simple.bell.tutorial.html
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 285-308
+.. GENERATED FROM PYTHON SOURCE LINES 278-301
 
 .. code-block:: default
 
@@ -541,22 +534,22 @@ https://computermusicresource.com/Simple.bell.tutorial.html
     num_frames = int(SAMPLE_RATE * duration)
 
     freq0 = torch.full((num_frames, 1), F0)
-    mults = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3., 3.76, 4.07]
+    mults = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3.0, 3.76, 4.07]
     freq = extend_pitch(freq0, mults)
 
     amp = adsr_envelope(
         num_frames=num_frames,
         attack=0.002,
         decay=0.998,
-        sustain=0.,
-        release=0.,
+        sustain=0.0,
+        release=0.0,
         n_decay=2,
     )
-    amp = torch.stack([amp * (0.5 ** i) for i in range(num_tones)], dim=-1)
+    amp = torch.stack([amp * (0.5**i) for i in range(num_tones)], dim=-1)
 
     waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-    show(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
+    plot(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
 
 
 
@@ -581,14 +574,14 @@ https://computermusicresource.com/Simple.bell.tutorial.html
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 309-313
+.. GENERATED FROM PYTHON SOURCE LINES 302-306
 
 As a comparison, the following is the harmonic version of the above.
 Only frequency values are different.
 The number of overtones and its amplitudes are same.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 314-320
+.. GENERATED FROM PYTHON SOURCE LINES 307-313
 
 .. code-block:: default
 
@@ -596,7 +589,7 @@ The number of overtones and its amplitudes are same.
     freq = extend_pitch(freq0, num_tones)
     waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-    show(freq, amp, waveform, SAMPLE_RATE)
+    plot(freq, amp, waveform, SAMPLE_RATE)
 
 
 
@@ -621,7 +614,7 @@ The number of overtones and its amplitudes are same.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 321-327
+.. GENERATED FROM PYTHON SOURCE LINES 314-320
 
 References
 ----------
@@ -633,7 +626,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  13.914 seconds)
+   **Total running time of the script:** ( 2 minutes  31.611 seconds)
 
 
 .. _sphx_glr_download_tutorials_additive_synthesis_tutorial.py:

@@ -1,6 +1,0 @@
-torchaudio.prototype.models.squim\_subjective\_model
-====================================================
-
-.. currentmodule:: torchaudio.prototype.models
-
-.. autofunction:: squim_subjective_model

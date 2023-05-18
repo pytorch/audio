@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Torchaudio Documentation &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>Torchaudio Documentation &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -43,18 +43,13 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Supported Features" href="supported_features.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -131,12 +126,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -164,13 +163,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -212,7 +223,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -260,12 +271,14 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -276,9 +289,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -290,12 +306,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
@@ -402,6 +418,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -450,6 +470,34 @@ model implementations and application components.</p>
   <div class="row">
     <div id="tutorial-cards">
       <div class="list"></p>
+<p><div class="col-md-12 tutorials-card-container" data-tags=Pipelines,ASR,CTC-Decoder,CUDA-CTC-Decoder>
+  <div class="card tutorials-card">
+    <a href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">
+      <div class="card-body">
+        <div class="card-title-container">
+          <h4>AM inference with CUDA CTC Beam Seach Decoder</h4>
+        </div>
+        <p>Topics: <span class="tags">Pipelines,ASR,CTC-Decoder,CUDA-CTC-Decoder</span></p>
+        <p class="card-summary">Learn how to perform ASR beam search decoding with GPU, using <code>torchaudio.models.decoder.cuda_ctc_decoder</code>.</p>
+        <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/asr_inference_with_ctc_decoder_tutorial.png'></div>
+      </div>
+    </a>
+  </div>
+</div></p>
+<p><div class="col-md-12 tutorials-card-container" data-tags=I/O,Pipelines,RNNT>
+  <div class="card tutorials-card">
+    <a href="tutorials/device_avsr.html">
+      <div class="card-body">
+        <div class="card-title-container">
+          <h4>On device audio-visual automatic speech recognition</h4>
+        </div>
+        <p>Topics: <span class="tags">I/O,Pipelines,RNNT</span></p>
+        <p class="card-summary">Learn how to stream audio and video from laptop webcam and perform audio-visual automatic speech recognition using Emformer-RNNT model.</p>
+        <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/doc-assets/avsr/transformed.gif'></div>
+      </div>
+    </a>
+  </div>
+</div></p>
 <p><div class="col-md-12 tutorials-card-container" data-tags=I/O>
   <div class="card tutorials-card">
     <a href="tutorials/audio_io_tutorial.html">
@@ -460,6 +508,34 @@ model implementations and application components.</p>
         <p>Topics: <span class="tags">I/O</span></p>
         <p class="card-summary">Learn how to query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.</p>
         <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_io_tutorial.png'></div>
+      </div>
+    </a>
+  </div>
+</div></p>
+<p><div class="col-md-12 tutorials-card-container" data-tags=CTC,Forced-Alignment>
+  <div class="card tutorials-card">
+    <a href="tutorials/ctc_forced_alignment_api_tutorial.html">
+      <div class="card-body">
+        <div class="card-title-container">
+          <h4>CTC Forced Alignment API</h4>
+        </div>
+        <p>Topics: <span class="tags">CTC,Forced-Alignment</span></p>
+        <p class="card-summary">Learn how to use TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>).</p>
+        <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png'></div>
+      </div>
+    </a>
+  </div>
+</div></p>
+<p><div class="col-md-12 tutorials-card-container" data-tags=Forced-Alignment>
+  <div class="card tutorials-card">
+    <a href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">
+      <div class="card-body">
+        <div class="card-title-container">
+          <h4>Forced alignment for multilingual data</h4>
+        </div>
+        <p>Topics: <span class="tags">Forced-Alignment</span></p>
+        <p class="card-summary">Learn how to use align multiligual data using TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>) and a multiligual Wav2Vec2 model.</p>
+        <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/forced_alignment_for_multilingual_data_tutorial.png'></div>
       </div>
     </a>
   </div>
@@ -520,15 +596,29 @@ model implementations and application components.</p>
     </a>
   </div>
 </div></p>
-<p><div class="col-md-12 tutorials-card-container" data-tags=I/O,StreamReader,StreamWriter>
+<p><div class="col-md-12 tutorials-card-container" data-tags=I/O,StreamReader>
   <div class="card tutorials-card">
-    <a href="hw_acceleration_tutorial.html">
+    <a href="tutorials/nvdec_tutorial.html">
       <div class="card-body">
         <div class="card-title-container">
-          <h4>Hardware accelerated video I/O with NVDEC/NVENC</h4>
+          <h4>Hardware accelerated video decoding with NVDEC</h4>
         </div>
-        <p>Topics: <span class="tags">I/O,StreamReader,StreamWriter</span></p>
-        <p class="card-summary">Learn how to setup and use HW accelerated video I/O.</p>
+        <p>Topics: <span class="tags">I/O,StreamReader</span></p>
+        <p class="card-summary">Learn how to use HW video decoder.</p>
+        <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png'></div>
+      </div>
+    </a>
+  </div>
+</div></p>
+<p><div class="col-md-12 tutorials-card-container" data-tags=I/O,StreamWriter>
+  <div class="card tutorials-card">
+    <a href="tutorials/nvenc_tutorial.html">
+      <div class="card-body">
+        <div class="card-title-container">
+          <h4>Hardware accelerated video encoding with NVENC</h4>
+        </div>
+        <p>Topics: <span class="tags">I/O,StreamWriter</span></p>
+        <p class="card-summary">Learn how to use HW video encoder.</p>
         <div class="tutorials-image"><img src='https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png'></div>
       </div>
     </a>
@@ -1097,13 +1187,9 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1136,6 +1222,18 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1151,18 +1249,15 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1170,7 +1265,23 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

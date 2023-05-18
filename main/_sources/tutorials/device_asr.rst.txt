@@ -27,16 +27,13 @@ This tutorial shows how to use Emformer RNN-T and streaming API
 to perform speech recognition on a streaming device input, i.e. microphone
 on laptop.
 
+.. GENERATED FROM PYTHON SOURCE LINES 13-25
+
 .. note::
 
-   This tutorial requires FFmpeg libraries (>=5.0, <6) and SentencePiece.
-
-   There are multiple ways to install FFmpeg libraries.
-   If you are using Anaconda Python distribution,
-   ``conda install -c conda-forge 'ffmpeg<6'`` will install
-   the required FFmpeg libraries.
-
-   You can install SentencePiece by running ``pip install sentencepiece``.
+   This tutorial requires FFmpeg libraries.
+   Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+   the detail.
 
 .. note::
 
@@ -45,7 +42,7 @@ on laptop.
    This tutorial does NOT work on Google Colab because the server running
    this tutorial does not have a microphone that you can talk to.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-42
+.. GENERATED FROM PYTHON SOURCE LINES 28-39
 
 1. Overview
 -----------
@@ -59,7 +56,7 @@ please refer to
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-80
+.. GENERATED FROM PYTHON SOURCE LINES 41-77
 
 2. Checking the supported devices
 ---------------------------------
@@ -98,7 +95,7 @@ We will use the following values for Streaming API.
        format = "avfoundation",
    )
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-104
+.. GENERATED FROM PYTHON SOURCE LINES 79-101
 
 For Windows, ``dshow`` device should work.
 
@@ -123,7 +120,7 @@ In the above case, the following value can be used to stream from microphone.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-122
+.. GENERATED FROM PYTHON SOURCE LINES 104-119
 
 3. Data acquisition
 -------------------
@@ -141,7 +138,7 @@ This function initializes the streaming API, acquires data then
 puts it in a queue, which the main process is watching.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-151
+.. GENERATED FROM PYTHON SOURCE LINES 119-148
 
 .. code-block:: default
 
@@ -175,7 +172,7 @@ puts it in a queue, which the main process is watching.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-182
+.. GENERATED FROM PYTHON SOURCE LINES 149-179
 
 The notable difference from the non-device streaming is that,
 we provide ``timeout`` and ``backoff`` parameters to ``stream`` method.
@@ -208,7 +205,7 @@ to the documentation of
    this increases the CPU consumption.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-193
+.. GENERATED FROM PYTHON SOURCE LINES 182-190
 
 4. Building inference pipeline
 ------------------------------
@@ -219,7 +216,7 @@ This is the same process as
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-225
+.. GENERATED FROM PYTHON SOURCE LINES 190-222
 
 .. code-block:: default
 
@@ -256,7 +253,7 @@ This is the same process as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-251
+.. GENERATED FROM PYTHON SOURCE LINES 224-248
 
 .. code-block:: default
 
@@ -285,7 +282,7 @@ This is the same process as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-272
+.. GENERATED FROM PYTHON SOURCE LINES 249-269
 
 5. The main process
 -------------------
@@ -308,7 +305,7 @@ The execution flow of the main process is as follows:
    `__name__ == "__main__"` guard.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 272-316
+.. GENERATED FROM PYTHON SOURCE LINES 269-313
 
 .. code-block:: default
 
@@ -357,7 +354,7 @@ The execution flow of the main process is as follows:
         )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 317-330
+.. GENERATED FROM PYTHON SOURCE LINES 314-327
 
 .. code::
 
@@ -373,7 +370,7 @@ The execution flow of the main process is as follows:
    hello world
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 333-335
+.. GENERATED FROM PYTHON SOURCE LINES 330-332
 
 Tag: :obj:`torchaudio.io`
 

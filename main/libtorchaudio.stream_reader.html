@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio::io::StreamReader &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio::io::StreamReader &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -44,18 +44,13 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio::io::StreamWriter" href="libtorchaudio.stream_writer.html" />
     <link rel="prev" title="libtorchaudio" href="libtorchaudio.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
@@ -405,6 +421,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -418,15 +438,20 @@ API/ABI backward compatibility is not guaranteed.</p>
 </div>
 <section id="torchaudio-io-streamreader">
 <h1>torchaudio::io::StreamReader<a class="headerlink" href="#torchaudio-io-streamreader" title="Permalink to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">StreamReader</span></code> is the implementation used by Python equivalent and provides similar interface.
+When working with custom I/O, such as in-memory data, <code class="docutils literal notranslate"><span class="pre">StreamReaderCustomIO</span></code> class can be used.</p>
+<p>Both classes have the same methods defined, so their usages are the same.</p>
+<section id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this heading">¶</a></h2>
+<section id="streamreader">
+<h3>StreamReader<a class="headerlink" href="#streamreader" title="Permalink to this heading">¶</a></h3>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io12StreamReaderE">
 <span class="target" id="classtorchaudio_1_1io_1_1StreamReader"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamReader</span></span></span><a class="headerlink" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Fetch and decode audio/video streams chunk by chunk. </p>
-<p>Subclassed by torchaudio::io::StreamReaderCustomIO</p>
+<p>Subclassed by <a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamReaderCustomIO"><span class="std std-ref">torchaudio::io::StreamReaderCustomIO</span></a></p>
 </dd></dl>
 
-<section id="constructors">
-<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this heading">¶</a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io12StreamReader12StreamReaderERKNSt6stringERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEE">
 <span class="target" id="classtorchaudio_1_1io_1_1StreamReader_1a4e92d793f4de0b326fc0e5dafc9b2289"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="torchaudio::io::StreamReader"><span class="n"><span class="pre">StreamReader</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StreamReader</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10torchaudio2io12StreamReader12StreamReaderERKNSt6stringERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEE" title="Permalink to this definition">¶</a><br /></dt>
@@ -442,6 +467,34 @@ API/ABI backward compatibility is not guaranteed.</p>
 </dl>
 </dd></dl>
 
+</section>
+<section id="streamreadercustomio">
+<h3>StreamReaderCustomIO<a class="headerlink" href="#streamreadercustomio" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io20StreamReaderCustomIOE">
+<span class="target" id="classtorchaudio_1_1io_1_1StreamReaderCustomIO"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamReaderCustomIO</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CustomInput</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io12StreamReaderE" title="torchaudio::io::StreamReader"><span class="n"><span class="pre">StreamReader</span></span></a><a class="headerlink" href="#_CPPv4N10torchaudio2io20StreamReaderCustomIOE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A subclass of <a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamReader"><span class="std std-ref">StreamReader</span></a> which works with custom read function. Can be used for decoding media from memory or custom object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10torchaudio2io20StreamReaderCustomIO20StreamReaderCustomIOEPvRKN3c108optionalINSt6stringEEEiPFiPvP7uint8_tiEPF7int64_tPv7int64_tiERKN3c108optionalI10OptionDictEE">
+<span class="target" id="classtorchaudio_1_1io_1_1StreamReaderCustomIO_1a37d7a0f7d5f7cece1d000377a72ef514"></span><span class="sig-prename descclassname"><span class="n"><span class="pre">torchaudio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N10torchaudio2io20StreamReaderCustomIOE" title="torchaudio::io::StreamReaderCustomIO"><span class="n"><span class="pre">StreamReaderCustomIO</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StreamReaderCustomIO</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">opaque</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">buffer_size</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">read_packet</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opaque</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buf</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">buf_size</span></span><span class="p"><span class="pre">)</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">seek</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opaque</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">whence</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10torchaudio2io20StreamReaderCustomIO20StreamReaderCustomIOEPvRKN3c108optionalINSt6stringEEEiPFiPvP7uint8_tiEPF7int64_tPv7int64_tiERKN3c108optionalI10OptionDictEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct <a class="reference internal" href="#classtorchaudio_1_1io_1_1StreamReader"><span class="std std-ref">StreamReader</span></a> with custom read and seek functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opaque</strong> – Custom data used by <code class="docutils literal notranslate"><span class="pre">read_packet</span></code> and <code class="docutils literal notranslate"><span class="pre">seek</span></code> functions. </p></li>
+<li><p><strong>format</strong> – Specify input format. </p></li>
+<li><p><strong>buffer_size</strong> – The size of the intermediate buffer, which FFmpeg uses to pass data to function read_packet. </p></li>
+<li><p><strong>read_packet</strong> – Custom read function that is called from FFmpeg to read data from the destination. </p></li>
+<li><p><strong>seek</strong> – Optional seek function that is used to seek the destination. </p></li>
+<li><p><strong>option</strong> – Custom option passed when initializing format context. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 <section id="query-methods">
 <h2>Query Methods<a class="headerlink" href="#query-methods" title="Permalink to this heading">¶</a></h2>
@@ -996,7 +1049,11 @@ API/ABI backward compatibility is not guaranteed.</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio::io::StreamReader</a><ul>
-<li><a class="reference internal" href="#constructors">Constructors</a></li>
+<li><a class="reference internal" href="#constructors">Constructors</a><ul>
+<li><a class="reference internal" href="#streamreader">StreamReader</a></li>
+<li><a class="reference internal" href="#streamreadercustomio">StreamReaderCustomIO</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#query-methods">Query Methods</a><ul>
 <li><a class="reference internal" href="#find-best-audio-stream">find_best_audio_stream</a></li>
 <li><a class="reference internal" href="#find-best-video-stream">find_best_video_stream</a></li>
@@ -1267,13 +1324,9 @@ API/ABI backward compatibility is not guaranteed.</p>
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1306,6 +1359,18 @@ API/ABI backward compatibility is not guaranteed.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1321,18 +1386,15 @@ API/ABI backward compatibility is not guaranteed.</p>
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1340,7 +1402,23 @@ API/ABI backward compatibility is not guaranteed.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

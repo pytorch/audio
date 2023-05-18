@@ -7,25 +7,22 @@ Device ASR with Emformer RNN-T
 This tutorial shows how to use Emformer RNN-T and streaming API
 to perform speech recognition on a streaming device input, i.e. microphone
 on laptop.
-
-.. note::
-
-   This tutorial requires FFmpeg libraries (>=5.0, <6) and SentencePiece.
-
-   There are multiple ways to install FFmpeg libraries.
-   If you are using Anaconda Python distribution,
-   ``conda install -c conda-forge 'ffmpeg<6'`` will install
-   the required FFmpeg libraries.
-
-   You can install SentencePiece by running ``pip install sentencepiece``.
-
-.. note::
-
-   This tutorial was tested on MacBook Pro and Dynabook with Windows 10.
-
-   This tutorial does NOT work on Google Colab because the server running
-   this tutorial does not have a microphone that you can talk to.
 """
+
+######################################################################
+#
+# .. note::
+#
+#    This tutorial requires FFmpeg libraries.
+#    Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+#    the detail.
+#
+# .. note::
+#
+#    This tutorial was tested on MacBook Pro and Dynabook with Windows 10.
+#
+#    This tutorial does NOT work on Google Colab because the server running
+#    this tutorial does not have a microphone that you can talk to.
 
 ######################################################################
 # 1. Overview

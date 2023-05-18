@@ -46,7 +46,7 @@ Steps:
    relative transfer function (RTF) matrix of the reference microphone.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-40
+.. GENERATED FROM PYTHON SOURCE LINES 31-44
 
 .. code-block:: default
 
@@ -59,6 +59,10 @@ Steps:
     print(torchaudio.__version__)
 
 
+    import matplotlib.pyplot as plt
+    import mir_eval
+    from IPython.display import Audio
+
 
 
 
@@ -67,19 +71,19 @@ Steps:
 
  .. code-block:: none
 
-    2.1.0.dev20230517
-    2.1.0.dev20230517
+    2.1.0.dev20230901
+    2.2.0.dev20230902
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-44
+.. GENERATED FROM PYTHON SOURCE LINES 45-48
 
 2. Preparation
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-54
+.. GENERATED FROM PYTHON SOURCE LINES 50-58
 
 2.1. Import the packages
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,7 +94,7 @@ First, we install and import the necessary packages.
 evaluating the speech enhancement performance.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-68
+.. GENERATED FROM PYTHON SOURCE LINES 58-68
 
 .. code-block:: default
 
@@ -102,10 +106,6 @@ evaluating the speech enhancement performance.
 
     from pesq import pesq
     from pystoi import stoi
-    import mir_eval
-
-    import matplotlib.pyplot as plt
-    from IPython.display import Audio
     from torchaudio.utils import download_asset
 
 
@@ -156,8 +156,8 @@ which was generated with:
 
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 205MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 288MB/s]
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 244MB/s]
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 344MB/s]
 
 
 
@@ -168,29 +168,27 @@ which was generated with:
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-164
+.. GENERATED FROM PYTHON SOURCE LINES 99-162
 
 .. code-block:: default
 
 
 
-    def plot_spectrogram(stft, title="Spectrogram", xlim=None):
+    def plot_spectrogram(stft, title="Spectrogram"):
         magnitude = stft.abs()
         spectrogram = 20 * torch.log10(magnitude + 1e-8).numpy()
         figure, axis = plt.subplots(1, 1)
         img = axis.imshow(spectrogram, cmap="viridis", vmin=-100, vmax=0, origin="lower", aspect="auto")
-        figure.suptitle(title)
+        axis.set_title(title)
         plt.colorbar(img, ax=axis)
-        plt.show()
 
 
-    def plot_mask(mask, title="Mask", xlim=None):
+    def plot_mask(mask, title="Mask"):
         mask = mask.numpy()
         figure, axis = plt.subplots(1, 1)
         img = axis.imshow(mask, cmap="viridis", origin="lower", aspect="auto")
-        figure.suptitle(title)
+        axis.set_title(title)
         plt.colorbar(img, ax=axis)
-        plt.show()
 
 
     def si_snr(estimate, reference, epsilon=1e-8):
@@ -244,19 +242,19 @@ which was generated with:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-168
+.. GENERATED FROM PYTHON SOURCE LINES 163-166
 
 3. Generate Ideal Ratio Masks (IRMs)
 ------------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-174
+.. GENERATED FROM PYTHON SOURCE LINES 169-172
 
 3.1. Load audio data
 ~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-183
+.. GENERATED FROM PYTHON SOURCE LINES 172-181
 
 .. code-block:: default
 
@@ -276,13 +274,13 @@ which was generated with:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-187
+.. GENERATED FROM PYTHON SOURCE LINES 182-185
 
 Note: To improve computational robustness, it is recommended to represent
 the waveforms as double-precision floating point (``torch.float64`` or ``torch.double``) values.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-193
+.. GENERATED FROM PYTHON SOURCE LINES 185-191
 
 .. code-block:: default
 
@@ -299,13 +297,13 @@ the waveforms as double-precision floating point (``torch.float64`` or ``torch.d
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-197
+.. GENERATED FROM PYTHON SOURCE LINES 192-195
 
 3.2. Compute STFT coefficients
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-212
+.. GENERATED FROM PYTHON SOURCE LINES 195-210
 
 .. code-block:: default
 
@@ -331,7 +329,7 @@ the waveforms as double-precision floating point (``torch.float64`` or ``torch.d
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-225
+.. GENERATED FROM PYTHON SOURCE LINES 211-223
 
 3.2.1. Visualize mixture speech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -346,7 +344,7 @@ using the following three metrics:
 We also evaluate the intelligibility of the speech with the Short-Time Objective Intelligibility
 (STOI) metric.
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-231
+.. GENERATED FROM PYTHON SOURCE LINES 223-229
 
 .. code-block:: default
 
@@ -388,13 +386,13 @@ We also evaluate the intelligibility of the speech with the Short-Time Objective
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-235
+.. GENERATED FROM PYTHON SOURCE LINES 230-233
 
 3.2.2. Visualize clean speech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 235-240
+.. GENERATED FROM PYTHON SOURCE LINES 233-238
 
 .. code-block:: default
 
@@ -426,13 +424,13 @@ We also evaluate the intelligibility of the speech with the Short-Time Objective
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-244
+.. GENERATED FROM PYTHON SOURCE LINES 239-242
 
 3.2.3. Visualize noise
 ^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-249
+.. GENERATED FROM PYTHON SOURCE LINES 242-247
 
 .. code-block:: default
 
@@ -464,7 +462,7 @@ We also evaluate the intelligibility of the speech with the Short-Time Objective
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-258
+.. GENERATED FROM PYTHON SOURCE LINES 248-256
 
 3.3. Define the reference microphone
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -475,7 +473,7 @@ The selection of the reference channel may depend on the design of the microphon
 You can also apply an end-to-end neural network which estimates both the reference channel and
 the PSD matrices, then obtains the enhanced STFT coefficients by the MVDR module.
 
-.. GENERATED FROM PYTHON SOURCE LINES 258-262
+.. GENERATED FROM PYTHON SOURCE LINES 256-260
 
 .. code-block:: default
 
@@ -490,13 +488,13 @@ the PSD matrices, then obtains the enhanced STFT coefficients by the MVDR module
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 263-266
+.. GENERATED FROM PYTHON SOURCE LINES 261-264
 
 3.4. Compute IRMs
 ~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-279
+.. GENERATED FROM PYTHON SOURCE LINES 264-277
 
 .. code-block:: default
 
@@ -520,13 +518,13 @@ the PSD matrices, then obtains the enhanced STFT coefficients by the MVDR module
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 280-283
+.. GENERATED FROM PYTHON SOURCE LINES 278-281
 
 3.4.1. Visualize IRM of target speech
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-287
+.. GENERATED FROM PYTHON SOURCE LINES 281-285
 
 .. code-block:: default
 
@@ -546,13 +544,13 @@ the PSD matrices, then obtains the enhanced STFT coefficients by the MVDR module
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 288-291
+.. GENERATED FROM PYTHON SOURCE LINES 286-289
 
 3.4.2. Visualize IRM of noise
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-294
+.. GENERATED FROM PYTHON SOURCE LINES 289-292
 
 .. code-block:: default
 
@@ -571,7 +569,7 @@ the PSD matrices, then obtains the enhanced STFT coefficients by the MVDR module
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 295-303
+.. GENERATED FROM PYTHON SOURCE LINES 293-301
 
 4. Compute PSD matrices
 -----------------------
@@ -582,7 +580,7 @@ and the time-frequency mask.
 
 The shape of the PSD matrix is `(..., freq, channel, channel)`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-310
+.. GENERATED FROM PYTHON SOURCE LINES 301-308
 
 .. code-block:: default
 
@@ -600,13 +598,13 @@ The shape of the PSD matrix is `(..., freq, channel, channel)`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 311-314
+.. GENERATED FROM PYTHON SOURCE LINES 309-312
 
 5. Beamforming using SoudenMVDR
 -------------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 317-327
+.. GENERATED FROM PYTHON SOURCE LINES 315-325
 
 5.1. Apply beamforming
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -619,7 +617,7 @@ The output is a single-channel complex-valued STFT coefficients of the enhanced 
 We can then obtain the enhanced waveform by passing this output to the
 :py:func:`torchaudio.transforms.InverseSpectrogram` module.
 
-.. GENERATED FROM PYTHON SOURCE LINES 327-333
+.. GENERATED FROM PYTHON SOURCE LINES 325-331
 
 .. code-block:: default
 
@@ -636,13 +634,13 @@ We can then obtain the enhanced waveform by passing this output to the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 334-337
+.. GENERATED FROM PYTHON SOURCE LINES 332-335
 
 5.2. Result for SoudenMVDR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 337-344
+.. GENERATED FROM PYTHON SOURCE LINES 335-342
 
 .. code-block:: default
 
@@ -685,13 +683,13 @@ We can then obtain the enhanced waveform by passing this output to the
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 345-348
+.. GENERATED FROM PYTHON SOURCE LINES 343-346
 
 6. Beamforming using RTFMVDR
 ----------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 351-363
+.. GENERATED FROM PYTHON SOURCE LINES 349-361
 
 6.1. Compute RTF
 ~~~~~~~~~~~~~~~~
@@ -706,7 +704,7 @@ target speech:
    method. You can specify the number of iterations with argument ``n_iter``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 363-368
+.. GENERATED FROM PYTHON SOURCE LINES 361-366
 
 .. code-block:: default
 
@@ -722,7 +720,7 @@ target speech:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 369-379
+.. GENERATED FROM PYTHON SOURCE LINES 367-377
 
 6.2. Apply beamforming
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -735,7 +733,7 @@ The output is a single-channel complex-valued STFT coefficients of the enhanced 
 We can then obtain the enhanced waveform by passing this output to the
 :py:func:`torchaudio.transforms.InverseSpectrogram` module.
 
-.. GENERATED FROM PYTHON SOURCE LINES 379-391
+.. GENERATED FROM PYTHON SOURCE LINES 377-389
 
 .. code-block:: default
 
@@ -758,13 +756,13 @@ We can then obtain the enhanced waveform by passing this output to the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 392-395
+.. GENERATED FROM PYTHON SOURCE LINES 390-393
 
 6.3. Result for RTFMVDR with `rtf_evd`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 395-402
+.. GENERATED FROM PYTHON SOURCE LINES 393-400
 
 .. code-block:: default
 
@@ -807,13 +805,13 @@ We can then obtain the enhanced waveform by passing this output to the
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 403-406
+.. GENERATED FROM PYTHON SOURCE LINES 401-404
 
 6.4. Result for RTFMVDR with `rtf_power`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 406-411
+.. GENERATED FROM PYTHON SOURCE LINES 404-409
 
 .. code-block:: default
 
@@ -857,7 +855,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.866 seconds)
+   **Total running time of the script:** ( 0 minutes  2.008 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

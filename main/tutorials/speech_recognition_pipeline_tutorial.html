@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Speech Recognition with Wav2Vec2 &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>Speech Recognition with Wav2Vec2 &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -44,18 +44,13 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="ASR Inference with CTC Decoder" href="asr_inference_with_ctc_decoder_tutorial.html" />
     <link rel="prev" title="Audio Datasets" href="audio_datasets_tutorial.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
@@ -425,6 +441,10 @@
 
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -469,8 +489,8 @@ labels. They are bundled together and available under
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230517
-2.1.0.dev20230517
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230901
+2.2.0.dev20230902
 cuda
 </pre></div>
 </div>
@@ -479,10 +499,6 @@ cuda
 <span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SPEECH_FILE</span></a> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/106k [00:00&lt;?, ?B/s]
-100%|##########| 106k/106k [00:00&lt;00:00, 88.5MB/s]
 </pre></div>
 </div>
 </section>
@@ -525,15 +541,16 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 11%|#         | 39.3M/360M [00:00&lt;00:00, 412MB/s]
- 22%|##1       | 78.5M/360M [00:00&lt;00:00, 411MB/s]
- 33%|###3      | 120M/360M [00:00&lt;00:00, 421MB/s]
- 45%|####4     | 160M/360M [00:00&lt;00:00, 423MB/s]
- 56%|#####5    | 201M/360M [00:00&lt;00:00, 424MB/s]
- 67%|######7   | 241M/360M [00:00&lt;00:00, 421MB/s]
- 78%|#######8  | 282M/360M [00:00&lt;00:00, 421MB/s]
- 90%|########9 | 323M/360M [00:00&lt;00:00, 424MB/s]
-100%|##########| 360M/360M [00:00&lt;00:00, 422MB/s]
+ 10%|#         | 37.4M/360M [00:00&lt;00:00, 392MB/s]
+ 21%|##        | 74.8M/360M [00:00&lt;00:00, 344MB/s]
+ 30%|###       | 110M/360M [00:00&lt;00:00, 354MB/s]
+ 41%|####1     | 148M/360M [00:00&lt;00:00, 371MB/s]
+ 53%|#####2    | 189M/360M [00:00&lt;00:00, 394MB/s]
+ 63%|######3   | 227M/360M [00:00&lt;00:00, 389MB/s]
+ 73%|#######3  | 265M/360M [00:00&lt;00:00, 372MB/s]
+ 83%|########3 | 300M/360M [00:00&lt;00:00, 348MB/s]
+ 93%|#########2| 334M/360M [00:00&lt;00:00, 338MB/s]
+100%|##########| 360M/360M [00:01&lt;00:00, 357MB/s]
 &lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
@@ -555,7 +572,7 @@ Creative Commos BY 4.0.</p>
 
 </div>
 <br />
-<br /><p>To load data, we use <a class="reference internal" href="../torchaudio.html#torchaudio.load" title="torchaudio.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code></a>.</p>
+<br /><p>To load data, we use <a class="reference internal" href="../generated/torchaudio.load.html#torchaudio.load" title="torchaudio.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code></a>.</p>
 <p>If the sampling rate is different from what the pipeline expects, then
 we can use <a class="reference internal" href="../generated/torchaudio.functional.resample.html#torchaudio.functional.resample" title="torchaudio.functional.resample"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.resample()</span></code></a> for resampling.</p>
 <div class="admonition note">
@@ -595,8 +612,7 @@ a transformer layer.</p>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feature from transformer layer </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Feature dimension&quot;</span><span class="p">)</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frame (time-axis)&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_speech_recognition_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_speech_recognition_pipeline_tutorial_001.png" alt="Feature from transformer layer 1, Feature from transformer layer 2, Feature from transformer layer 3, Feature from transformer layer 4, Feature from transformer layer 5, Feature from transformer layer 6, Feature from transformer layer 7, Feature from transformer layer 8, Feature from transformer layer 9, Feature from transformer layer 10, Feature from transformer layer 11, Feature from transformer layer 12" class = "sphx-glr-single-img"/></section>
@@ -617,7 +633,7 @@ probability.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Classification result&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Frame (time-axis)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Class&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Class labels:&quot;</span><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_labels</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -705,7 +721,7 @@ a model and getting the emission is as short as two lines.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.890 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.925 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a0b5016bbf34fce4ac5549f4075dd10f/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
@@ -988,13 +1004,9 @@ a model and getting the emission is as short as two lines.</p>
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1027,6 +1039,18 @@ a model and getting the emission is as short as two lines.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1042,18 +1066,15 @@ a model and getting the emission is as short as two lines.</p>
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1061,7 +1082,23 @@ a model and getting the emission is as short as two lines.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

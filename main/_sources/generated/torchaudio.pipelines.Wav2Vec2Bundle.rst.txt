@@ -6,21 +6,21 @@ Wav2Vec2Bundle
 
 .. autoclass:: torchaudio.pipelines.Wav2Vec2Bundle()
 
-..
-   ATTRIBUTES
+Properties
+----------
 
 sample_rate
------------
+~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. autoproperty:: torchaudio.pipelines.Wav2Vec2Bundle.sample_rate
 
-..
-   METHODS
+Methods
+-------
 
 get_model
----------
+~~~~~~~~~
 
 .. container:: py attribute
 

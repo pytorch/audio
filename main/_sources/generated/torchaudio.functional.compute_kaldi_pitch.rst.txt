@@ -1,6 +1,0 @@
-﻿torchaudio.functional.compute\_kaldi\_pitch
-===========================================
-
-.. currentmodule:: torchaudio.functional
-
-.. autofunction:: compute_kaldi_pitch

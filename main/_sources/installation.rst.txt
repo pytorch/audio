@@ -16,7 +16,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
    each of which requires a corresponding PyTorch distribution.
 
 .. note::
-   This software was compiled against an unmodified copy of FFmpeg (licensed under `the LGPLv2.1 <https://github.com/FFmpeg/FFmpeg/blob/0e15444aceca0e78f99f3d67758eb79d11b86599/COPYING.LGPLv2.1>`_), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded `here <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`_.
+   This software was compiled against an unmodified copies of FFmpeg, with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded from the following locations: `n4.1.8 <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.4.4>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n4.4.4/COPYING.LGPLv2.1>`__), `n5.0.3 <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n5.0.3/COPYING.LGPLv2.1>`__) and `n6.0 <https://github.com/FFmpeg/FFmpeg/releases/tag/n6.0>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n6.0/COPYING.LGPLv2.1>`__).
 
 Dependencies
 ------------
@@ -25,24 +25,89 @@ Dependencies
 
   Please refer to the compatibility matrix bellow for supported PyTorch versions.
 
+.. _optional_dependencies:
+
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-* `FFmpeg <https://ffmpeg.org>`_.
+.. _ffmpeg:
 
-  Required to use :py:mod:`torchaudio.io` module.
-  TorchAudio official binary distributions are compatible with FFmpeg 5.
-  If you need to use FFmpeg 6, please build TorchAudio from source.
+* `FFmpeg <https://ffmpeg.org>`__
 
-* `sentencepiece <https://pypi.org/project/sentencepiece/>`_
+  Required to use :py:mod:`torchaudio.io` module. and ``backend="ffmpeg"`` in
+  `I/O functions <./torchaudio.html#i-o>`__.
+
+  Starting version 2.1, TorchAudio official binary distributions are compatible with
+  FFmpeg version 6, 5 and 4. (>=4.4, <7). At runtime, TorchAudio first looks for FFmpeg 6,
+  if not found, then it continues to looks for 5 and move on to 4.
+
+  There are multiple ways to install FFmpeg libraries.
+  Please refer to the official documentation for how to install FFmpeg.
+  If you are using Anaconda Python distribution,
+  ``conda install -c conda-forge 'ffmpeg<7'`` will install
+  compatible FFmpeg libraries.
+
+  If you need to specify the version of FFmpeg TorchAudio searches and links, you can
+  specify it via the environment variable ``TORCHAUDIO_USE_FFMPEG_VERSION``. For example,
+  by setting ``TORCHAUDIO_USE_FFMPEG_VERSION=5``, TorchAudio will only look for FFmpeg
+  5.
+
+  If for some reason, this search mechanism is causing an issue, you can disable
+  the FFmpeg integration entirely by setting the environment variable
+  ``TORCHAUDIO_USE_FFMPEG=0``.
+
+  There are multiple ways to install FFmpeg libraries.
+  If you are using Anaconda Python distribution,
+  ``conda install -c conda-forge 'ffmpeg<7'`` will install
+  compatible FFmpeg libraries.
+
+  .. note::
+
+     When searching for FFmpeg installation, TorchAudio looks for library files
+     which have names with version numbers.
+     That is, ``libavutil.so.<VERSION>`` for Linux, ``libavutil.<VERSION>.dylib``
+     for macOS, and ``avutil-<VERSION>.dll`` for Windows.
+     Many public pre-built binaries follow this naming scheme, but some distributions
+     have un-versioned file names.
+     If you are having difficulties detecting FFmpeg, double check that the library
+     files you installed follow this naming scheme, (and then make sure
+     that they are in one of the directories listed in library search path.)
+
+* `SoX <https://sox.sourceforge.net/>`__
+
+  Required to use ``backend="sox"`` in `I/O functions <./torchaudio.html#i-o>`__.
+
+  Starting version 2.1, TorchAudio requires separately installed libsox.
+
+  If dynamic linking is causing an issue, you can set the environment variable
+  ``TORCHAUDIO_USE_SOX=0``, and TorchAudio won't use SoX.
+
+  .. note::
+
+     TorchAudio looks for a library file with unversioned name, that is ``libsox.so``
+     for Linux, and ``libsox.dylib`` for macOS. Some package managers install the library
+     file with different name. For example, aptitude on Ubuntu installs ``libsox.so.3``.
+     To have TorchAudio link against it, you can create a symbolic link to it with name
+     ``libsox.so`` (and put the symlink in a library search path).
+
+  .. note::
+     TorchAudio is tested on libsox 14.4.2. (And it is unlikely that other
+     versions would work.)
+
+* `SoundFile <https://pysoundfile.readthedocs.io/>`__
+
+  Required to use ``backend="soundfile"`` in `I/O functions <./torchaudio.html#i-o>`__.
+
+* `sentencepiece <https://pypi.org/project/sentencepiece/>`__
 
   Required for performing automatic speech recognition with :ref:`Emformer RNN-T<RNNT>`.
+  You can install it by running ``pip install sentencepiece``.
 
-* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`_
+* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`__
 
   Required for performing text-to-speech with :ref:`Tacotron2`.
 
-* `kaldi_io <https://pypi.org/project/kaldi-io/>`_
+* `kaldi_io <https://pypi.org/project/kaldi-io/>`__
 
   Required to use :py:mod:`torchaudio.kaldi_io` module.
 

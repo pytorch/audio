@@ -13,12 +13,9 @@ apply various effects and codecs to waveform tensor.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=5.0, <6).
-#
-#    There are multiple ways to install FFmpeg libraries.
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c conda-forge 'ffmpeg<6'`` will install
-#    the required libraries.
+#    This tutorial requires FFmpeg libraries.
+#    Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+#    the detail.
 #
 
 ######################################################################
@@ -42,28 +39,15 @@ print(torchaudio.__version__)
 
 ######################################################################
 #
-try:
-    from torchaudio.io import AudioEffector, CodecConfig
-except ImportError as err:
-    raise RuntimeError(
-        "This tutorial requires nightly build of TorchAudio. "
-        "Please install the nightly versions of PyTorch and torchaudio. "
-        "https://pytorch.org/get-started/locally/"
-    ) from err
+from torchaudio.io import AudioEffector, CodecConfig
 
 import matplotlib.pyplot as plt
 from IPython.display import Audio
 
 ######################################################################
 #
-try:
-    for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
-        print(k, v)
-except Exception:
-    raise RuntimeError(
-        "This tutorial requires FFmpeg libraries 4.2>,<5. "
-        "Please install FFmpeg."
-    )
+for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
+    print(k, v)
 
 ######################################################################
 # Usage
@@ -107,11 +91,11 @@ waveform, sr = torchaudio.load(src, channels_first=False)
 #
 
 
-def show(effect=None, format=None, *, stereo=False):
+def show(effect, *, stereo=False):
     wf = torch.cat([waveform] * 2, dim=1) if stereo else waveform
     figsize = (6.4, 2.1 if stereo else 1.2)
 
-    effector = AudioEffector(effect=effect, format=format, pad_end=False)
+    effector = AudioEffector(effect=effect, pad_end=False)
     result = effector.apply(wf, int(sr))
 
     num_channels = result.size(1)
@@ -128,7 +112,7 @@ def show(effect=None, format=None, *, stereo=False):
 # --------
 #
 
-show(effect=None, format=None)
+show(effect=None)
 
 ######################################################################
 # Effects
@@ -139,131 +123,138 @@ show(effect=None, format=None)
 # tempo
 # ~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#atempo
-show(effect="atempo=0.7")
+show("atempo=0.7")
 
 ######################################################################
 #
-show(effect="atempo=1.8")
+show("atempo=1.8")
 
 ######################################################################
 # highpass
 # ~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#highpass
-show(effect="highpass=frequency=1500")
+show("highpass=frequency=1500")
 
 ######################################################################
 # lowpass
 # ~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#lowpass
-show(effect="lowpass=frequency=1000")
+show("lowpass=frequency=1000")
 
 ######################################################################
 # allpass
 # ~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#allpass
-show(effect="allpass")
+show("allpass")
 
 ######################################################################
 # bandpass
 # ~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#bandpass
-show(effect="bandpass=frequency=3000")
+show("bandpass=frequency=3000")
 
 ######################################################################
 # bandreject
 # ~~~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#bandreject
-show(effect="bandreject=frequency=3000")
+show("bandreject=frequency=3000")
 
 ######################################################################
 # echo
 # ~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#aecho
-show(effect="aecho=in_gain=0.8:out_gain=0.88:delays=6:decays=0.4")
+show("aecho=in_gain=0.8:out_gain=0.88:delays=6:decays=0.4")
 
 ######################################################################
 #
-show(effect="aecho=in_gain=0.8:out_gain=0.88:delays=60:decays=0.4")
+show("aecho=in_gain=0.8:out_gain=0.88:delays=60:decays=0.4")
 
 ######################################################################
 #
-show(effect="aecho=in_gain=0.8:out_gain=0.9:delays=1000:decays=0.3")
+show("aecho=in_gain=0.8:out_gain=0.9:delays=1000:decays=0.3")
 
 ######################################################################
 # chorus
 # ~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#chorus
-show(effect=("chorus=0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3"))
+show("chorus=0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3")
 
 ######################################################################
 # fft filter
 # ~~~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#afftfilt
-show(effect=(
+
+# fmt: off
+show(
     "afftfilt="
     "real='re * (1-clip(b * (b/nb), 0, 1))':"
-    "imag='im * (1-clip(b * (b/nb), 0, 1))'"))
+    "imag='im * (1-clip(b * (b/nb), 0, 1))'"
+)
 
 ######################################################################
 #
-show(effect=(
+
+show(
     "afftfilt="
     "real='hypot(re,im) * sin(0)':"
     "imag='hypot(re,im) * cos(0)':"
     "win_size=512:"
-    "overlap=0.75"))
-
+    "overlap=0.75"
+)
 
 ######################################################################
 #
-show(effect=(
+
+show(
     "afftfilt="
     "real='hypot(re,im) * cos(2 * 3.14 * (random(0) * 2-1))':"
     "imag='hypot(re,im) * sin(2 * 3.14 * (random(1) * 2-1))':"
     "win_size=128:"
-    "overlap=0.8"))
+    "overlap=0.8"
+)
+# fmt: on
 
 ######################################################################
 # vibrato
 # ~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#vibrato
-show(effect=("vibrato=f=10:d=0.8"))
+show("vibrato=f=10:d=0.8")
 
 ######################################################################
 # tremolo
 # ~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#tremolo
-show(effect=("tremolo=f=8:d=0.8"))
+show("tremolo=f=8:d=0.8")
 
 ######################################################################
 # crystalizer
 # ~~~~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#crystalizer
-show(effect=("crystalizer"))
+show("crystalizer")
 
 ######################################################################
 # flanger
 # ~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#flanger
-show(effect=("flanger"))
+show("flanger")
 
 ######################################################################
 # phaser
 # ~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#aphaser
-show(effect=("aphaser"))
+show("aphaser")
 
 ######################################################################
 # pulsator
 # ~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#apulsator
-show(effect=("apulsator"), stereo=True)
+show("apulsator", stereo=True)
 
 ######################################################################
 # haas
 # ~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#haas
-show(effect=("haas"))
+show("haas")
 
 ######################################################################
 # Codecs
@@ -292,11 +283,13 @@ def show_multi(configs):
 # ~~~
 #
 
-results = show_multi([
-    {"format": "ogg"},
-    {"format": "ogg", "encoder": "vorbis"},
-    {"format": "ogg", "encoder": "opus"},
-])
+results = show_multi(
+    [
+        {"format": "ogg"},
+        {"format": "ogg", "encoder": "vorbis"},
+        {"format": "ogg", "encoder": "opus"},
+    ]
+)
 
 ######################################################################
 # ogg - default encoder (flac)
@@ -321,15 +314,17 @@ results[2]
 # ~~~
 # https://trac.ffmpeg.org/wiki/Encode/MP3
 
-results = show_multi([
-    {"format": "mp3"},
-    {"format": "mp3", "codec_config": CodecConfig(compression_level=1)},
-    {"format": "mp3", "codec_config": CodecConfig(compression_level=9)},
-    {"format": "mp3", "codec_config": CodecConfig(bit_rate=192_000)},
-    {"format": "mp3", "codec_config": CodecConfig(bit_rate=8_000)},
-    {"format": "mp3", "codec_config": CodecConfig(qscale=9)},
-    {"format": "mp3", "codec_config": CodecConfig(qscale=1)},
-])
+results = show_multi(
+    [
+        {"format": "mp3"},
+        {"format": "mp3", "codec_config": CodecConfig(compression_level=1)},
+        {"format": "mp3", "codec_config": CodecConfig(compression_level=9)},
+        {"format": "mp3", "codec_config": CodecConfig(bit_rate=192_000)},
+        {"format": "mp3", "codec_config": CodecConfig(bit_rate=8_000)},
+        {"format": "mp3", "codec_config": CodecConfig(qscale=9)},
+        {"format": "mp3", "codec_config": CodecConfig(qscale=1)},
+    ]
+)
 
 ######################################################################
 # default

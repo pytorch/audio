@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.sox_effects.sox_effects &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.sox_effects.sox_effects &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -41,18 +41,13 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -129,12 +124,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -162,13 +161,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -210,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -258,12 +269,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -274,9 +287,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -288,12 +304,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
@@ -398,6 +414,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -406,7 +426,6 @@
               
   <h1>Source code for torchaudio.sox_effects.sox_effects</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -563,14 +582,6 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span></div>
 
 
-<span class="n">_deprecation_message</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;File-like object support in sox_io backend is deprecated, &quot;</span>
-    <span class="s2">&quot;and will be removed in v2.1. &quot;</span>
-    <span class="s2">&quot;See https://github.com/pytorch/audio/issues/2950 for the detail.&quot;</span>
-    <span class="s2">&quot;Please migrate to the new dispatcher, or use soundfile backend.&quot;</span>
-<span class="p">)</span>
-
-
 <div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
 <span class="k">def</span> <span class="nf">apply_effects_file</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -594,18 +605,8 @@
 <span class="sd">        rate and leave samples untouched.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        path (path-like object or file-like object):</span>
-<span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
-<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted:</span>
-
-<span class="sd">                  * ``path-like``: file path</span>
-<span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
-<span class="sd">                    which returns byte string of at most ``size`` length.</span>
-
-<span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
-
-<span class="sd">            Note: This argument is intentionally annotated as ``str`` only for</span>
-<span class="sd">            TorchScript compiler compatibility.</span>
+<span class="sd">        path (path-like object):</span>
+<span class="sd">            Source of audio data.</span>
 <span class="sd">        effects (List[List[str]]): List of effects.</span>
 <span class="sd">        normalize (bool, optional):</span>
 <span class="sd">            When ``True``, this function converts the native sample type to ``float32``.</span>
@@ -690,16 +691,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_deprecation_message</span><span class="p">)</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">apply_effects_fileobj</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">ret</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;apply_effects_file function does not support file-like object. &quot;</span>
+                <span class="s2">&quot;Please use torchaudio.io.AudioEffector.&quot;</span>
+            <span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ret</span>
-    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
 </pre></div>
 
              </article>
@@ -949,13 +946,9 @@
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -988,6 +981,18 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1003,18 +1008,15 @@
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1022,7 +1024,23 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

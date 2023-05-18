@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.transforms._transforms &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.prototype.transforms._transforms &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -41,18 +41,13 @@
   <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -129,12 +124,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -162,13 +161,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -210,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -258,12 +269,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -274,9 +287,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -288,12 +304,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">torchaudio.datasets</a></li>
@@ -398,6 +414,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -408,7 +428,7 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchaudio.prototype.functional</span> <span class="kn">import</span> <span class="n">barkscale_fbanks</span>
+<span class="kn">from</span> <span class="nn">torchaudio.prototype.functional</span> <span class="kn">import</span> <span class="n">barkscale_fbanks</span><span class="p">,</span> <span class="n">chroma_filterbank</span>
 <span class="kn">from</span> <span class="nn">torchaudio.transforms</span> <span class="kn">import</span> <span class="n">Spectrogram</span>
 
 
@@ -702,6 +722,165 @@
         <span class="n">specgram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
         <span class="n">bark_specgram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bark_scale</span><span class="p">(</span><span class="n">specgram</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">bark_specgram</span></div></div>
+
+
+<div class="viewcode-block" id="ChromaScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale">[docs]</a><span class="k">class</span> <span class="nc">ChromaScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Converts spectrogram to chromagram.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample_rate (int): Sample rate of audio signal.</span>
+<span class="sd">        n_freqs (int): Number of frequency bins in STFT. See ``n_fft`` in :class:`Spectrogram`.</span>
+<span class="sd">        n_chroma (int, optional): Number of chroma. (Default: ``12``)</span>
+<span class="sd">        tuning (float, optional): Tuning deviation from A440 in fractions of a chroma bin. (Default: 0.0)</span>
+<span class="sd">        ctroct (float, optional): Center of Gaussian dominance window to weight filters by, in octaves. (Default: 5.0)</span>
+<span class="sd">        octwidth (float or None, optional): Width of Gaussian dominance window to weight filters by, in octaves.</span>
+<span class="sd">            If ``None``, then disable weighting altogether. (Default: 2.0)</span>
+<span class="sd">        norm (int, optional): order of norm to normalize filter bank by. (Default: 2)</span>
+<span class="sd">        base_c (bool, optional): If True, then start filter bank at C. Otherwise, start at A. (Default: True)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram_transform = transforms.Spectrogram(n_fft=1024)</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = spectrogram_transform(waveform)</span>
+<span class="sd">        &gt;&gt;&gt; chroma_transform = transforms.ChromaScale(sample_rate=sample_rate, n_freqs=1024 // 2 + 1)</span>
+<span class="sd">        &gt;&gt;&gt; chroma_spectrogram = chroma_transform(spectrogram)</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        :py:func:`torchaudio.prototype.functional.chroma_filterbank` — function used to</span>
+<span class="sd">        generate the filter bank.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">n_chroma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">tuning</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">ctroct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">octwidth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">base_c</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">fb</span> <span class="o">=</span> <span class="n">chroma_filterbank</span><span class="p">(</span>
+            <span class="n">sample_rate</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">,</span> <span class="n">n_chroma</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="n">tuning</span><span class="p">,</span> <span class="n">ctroct</span><span class="o">=</span><span class="n">ctroct</span><span class="p">,</span> <span class="n">octwidth</span><span class="o">=</span><span class="n">octwidth</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">base_c</span><span class="o">=</span><span class="n">base_c</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChromaScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            specgram (torch.Tensor): Spectrogram of dimension (..., ``n_freqs``, time).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Chroma spectrogram of size (..., ``n_chroma``, time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ChromaSpectrogram"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">ChromaSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates chromagram for audio signal.</span>
+
+<span class="sd">    .. devices:: CPU CUDA</span>
+
+<span class="sd">    .. properties:: Autograd</span>
+
+<span class="sd">    Composes :py:func:`torchaudio.transforms.Spectrogram` and</span>
+<span class="sd">    and :py:func:`torchaudio.prototype.transforms.ChromaScale`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample_rate (int): Sample rate of audio signal.</span>
+<span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins.</span>
+<span class="sd">        win_length (int or None, optional): Window size. (Default: ``n_fft``)</span>
+<span class="sd">        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)</span>
+<span class="sd">        pad (int, optional): Two sided padding of signal. (Default: ``0``)</span>
+<span class="sd">        window_fn (Callable[..., torch.Tensor], optional): A function to create a window tensor</span>
+<span class="sd">            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)</span>
+<span class="sd">        power (float, optional): Exponent for the magnitude spectrogram,</span>
+<span class="sd">            (must be &gt; 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)</span>
+<span class="sd">        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)</span>
+<span class="sd">        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)</span>
+<span class="sd">        center (bool, optional): whether to pad :attr:`waveform` on both sides so</span>
+<span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.</span>
+<span class="sd">            (Default: ``True``)</span>
+<span class="sd">        pad_mode (string, optional): controls the padding method used when</span>
+<span class="sd">            :attr:`center` is ``True``. (Default: ``&quot;reflect&quot;``)</span>
+<span class="sd">        n_chroma (int, optional): Number of chroma. (Default: ``12``)</span>
+<span class="sd">        tuning (float, optional): Tuning deviation from A440 in fractions of a chroma bin. (Default: 0.0)</span>
+<span class="sd">        ctroct (float, optional): Center of Gaussian dominance window to weight filters by, in octaves. (Default: 5.0)</span>
+<span class="sd">        octwidth (float or None, optional): Width of Gaussian dominance window to weight filters by, in octaves.</span>
+<span class="sd">            If ``None``, then disable weighting altogether. (Default: 2.0)</span>
+<span class="sd">        norm (int, optional): order of norm to normalize filter bank by. (Default: 2)</span>
+<span class="sd">        base_c (bool, optional): If True, then start filter bank at C. Otherwise, start at A. (Default: True)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = torchaudio.load(&quot;test.wav&quot;, normalize=True)</span>
+<span class="sd">        &gt;&gt;&gt; transform = transforms.ChromaSpectrogram(sample_rate=sample_rate, n_fft=400)</span>
+<span class="sd">        &gt;&gt;&gt; chromagram = transform(waveform)  # (channel, n_chroma, time)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hop_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">window_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">,</span>
+        <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">wkwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+        <span class="n">n_chroma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">tuning</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">ctroct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">octwidth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">base_c</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">Spectrogram</span><span class="p">(</span>
+            <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+            <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+            <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+            <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">,</span>
+            <span class="n">window_fn</span><span class="o">=</span><span class="n">window_fn</span><span class="p">,</span>
+            <span class="n">power</span><span class="o">=</span><span class="n">power</span><span class="p">,</span>
+            <span class="n">normalized</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span>
+            <span class="n">wkwargs</span><span class="o">=</span><span class="n">wkwargs</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span>
+            <span class="n">pad_mode</span><span class="o">=</span><span class="n">pad_mode</span><span class="p">,</span>
+            <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroma_scale</span> <span class="o">=</span> <span class="n">ChromaScale</span><span class="p">(</span>
+            <span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">n_chroma</span><span class="o">=</span><span class="n">n_chroma</span><span class="p">,</span>
+            <span class="n">tuning</span><span class="o">=</span><span class="n">tuning</span><span class="p">,</span>
+            <span class="n">base_c</span><span class="o">=</span><span class="n">base_c</span><span class="p">,</span>
+            <span class="n">ctroct</span><span class="o">=</span><span class="n">ctroct</span><span class="p">,</span>
+            <span class="n">octwidth</span><span class="o">=</span><span class="n">octwidth</span><span class="p">,</span>
+            <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ChromaSpectrogram.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Chromagram of size (..., ``n_chroma``, time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spectrogram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+        <span class="n">chroma_spectrogram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroma_scale</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chroma_spectrogram</span></div></div>
 </pre></div>
 
              </article>
@@ -951,13 +1130,9 @@
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -990,6 +1165,18 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1005,18 +1192,15 @@
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1024,7 +1208,23 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

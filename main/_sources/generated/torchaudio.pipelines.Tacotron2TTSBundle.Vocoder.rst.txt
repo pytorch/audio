@@ -6,22 +6,21 @@ Tacotron2TTSBundle.Vocoder
 
 .. autoclass:: torchaudio.pipelines.Tacotron2TTSBundle.Vocoder()
 
-
-..
-   ATTRIBUTES
+Properties
+----------
 
 sample_rate
------------
+~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. autoproperty:: torchaudio.pipelines.Tacotron2TTSBundle.Vocoder.sample_rate
 
-..
-   METHODS
+Methods
+-------
 
 __call__
---------
+~~~~~~~~
 
 .. container:: py attribute
 

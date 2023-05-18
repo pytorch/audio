@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.datasets &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -44,18 +44,13 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CMUARCTIC" href="generated/torchaudio.datasets.CMUARCTIC.html" />
     <link rel="prev" title="SoudenMVDR" href="generated/torchaudio.transforms.SoudenMVDR.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.datasets</a></li>
@@ -403,6 +419,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -427,67 +447,67 @@ For example:</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.CMUARCTIC.html#torchaudio.datasets.CMUARCTIC" title="torchaudio.datasets.CMUARCTIC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CMUARCTIC</span></code></a></p></td>
-<td><p><em>CMU ARCTIC</em> <span id="id1">[<a class="reference internal" href="references.html#id35" title="John Kominek, Alan W Black, and Ver Ver. Cmu arctic databases for speech synthesis. Technical Report, 2003.">Kominek <em>et al.</em>, 2003</a>]</span> dataset.</p></td>
+<td><p><em>CMU ARCTIC</em> <span id="id1">[<a class="reference internal" href="references.html#id36" title="John Kominek, Alan W Black, and Ver Ver. Cmu arctic databases for speech synthesis. Technical Report, 2003.">Kominek <em>et al.</em>, 2003</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.CMUDict.html#torchaudio.datasets.CMUDict" title="torchaudio.datasets.CMUDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CMUDict</span></code></a></p></td>
-<td><p><em>CMU Pronouncing Dictionary</em> <span id="id2">[<a class="reference internal" href="references.html#id44" title="R.L. Weide. The carnegie mellon pronuncing dictionary. 1998. URL: http://www.speech.cs.cmu.edu/cgi-bin/cmudict.">Weide, 1998</a>]</span> (CMUDict) dataset.</p></td>
+<td><p><em>CMU Pronouncing Dictionary</em> <span id="id2">[<a class="reference internal" href="references.html#id45" title="R.L. Weide. The carnegie mellon pronuncing dictionary. 1998. URL: http://www.speech.cs.cmu.edu/cgi-bin/cmudict.">Weide, 1998</a>]</span> (CMUDict) dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.COMMONVOICE.html#torchaudio.datasets.COMMONVOICE" title="torchaudio.datasets.COMMONVOICE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMMONVOICE</span></code></a></p></td>
-<td><p><em>CommonVoice</em> <span id="id3">[<a class="reference internal" href="references.html#id9" title="Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. arXiv:1912.06670.">Ardila <em>et al.</em>, 2020</a>]</span> dataset.</p></td>
+<td><p><em>CommonVoice</em> <span id="id3">[<a class="reference internal" href="references.html#id10" title="Rosana Ardila, Megan Branson, Kelly Davis, Michael Henretty, Michael Kohler, Josh Meyer, Reuben Morais, Lindsay Saunders, Francis M. Tyers, and Gregor Weber. Common voice: a massively-multilingual speech corpus. 2020. arXiv:1912.06670.">Ardila <em>et al.</em>, 2020</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.DR_VCTK.html#torchaudio.datasets.DR_VCTK" title="torchaudio.datasets.DR_VCTK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DR_VCTK</span></code></a></p></td>
-<td><p><em>Device Recorded VCTK (Small subset version)</em> <span id="id4">[<a class="reference internal" href="references.html#id41" title="Seyyed Saeed Sarfjoo and Junichi Yamagishi. Device recorded vctk (small subset version). 2018.">Sarfjoo and Yamagishi, 2018</a>]</span> dataset.</p></td>
+<td><p><em>Device Recorded VCTK (Small subset version)</em> <span id="id4">[<a class="reference internal" href="references.html#id42" title="Seyyed Saeed Sarfjoo and Junichi Yamagishi. Device recorded vctk (small subset version). 2018.">Sarfjoo and Yamagishi, 2018</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.FluentSpeechCommands.html#torchaudio.datasets.FluentSpeechCommands" title="torchaudio.datasets.FluentSpeechCommands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FluentSpeechCommands</span></code></a></p></td>
-<td><p><em>Fluent Speech Commands</em> <span id="id5">[<a class="reference internal" href="references.html#id47" title="Loren Lugosch, Mirco Ravanelli, Patrick Ignoto, Vikrant Singh Tomar, and Yoshua Bengio. Speech model pre-training for end-to-end spoken language understanding. In Gernot Kubin and Zdravko Kacic, editors, Proc. of Interspeech, 814–818. 2019.">Lugosch <em>et al.</em>, 2019</a>]</span> dataset</p></td>
+<td><p><em>Fluent Speech Commands</em> <span id="id5">[<a class="reference internal" href="references.html#id48" title="Loren Lugosch, Mirco Ravanelli, Patrick Ignoto, Vikrant Singh Tomar, and Yoshua Bengio. Speech model pre-training for end-to-end spoken language understanding. In Gernot Kubin and Zdravko Kacic, editors, Proc. of Interspeech, 814–818. 2019.">Lugosch <em>et al.</em>, 2019</a>]</span> dataset</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.GTZAN.html#torchaudio.datasets.GTZAN" title="torchaudio.datasets.GTZAN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GTZAN</span></code></a></p></td>
-<td><p><em>GTZAN</em> <span id="id6">[<a class="reference internal" href="references.html#id42" title="George Tzanetakis, Georg Essl, and Perry Cook. Automatic musical genre classification of audio signals. 2001. URL: http://ismir2001.ismir.net/pdf/tzanetakis.pdf.">Tzanetakis <em>et al.</em>, 2001</a>]</span> dataset.</p></td>
+<td><p><em>GTZAN</em> <span id="id6">[<a class="reference internal" href="references.html#id43" title="George Tzanetakis, Georg Essl, and Perry Cook. Automatic musical genre classification of audio signals. 2001. URL: http://ismir2001.ismir.net/pdf/tzanetakis.pdf.">Tzanetakis <em>et al.</em>, 2001</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.IEMOCAP.html#torchaudio.datasets.IEMOCAP" title="torchaudio.datasets.IEMOCAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IEMOCAP</span></code></a></p></td>
-<td><p><em>IEMOCAP</em> <span id="id7">[<a class="reference internal" href="references.html#id51" title="Carlos Busso, Murtaza Bulut, Chi-Chun Lee, Abe Kazemzadeh, Emily Mower Provost, Samuel Kim, Jeannette Chang, Sungbok Lee, and Shrikanth Narayanan. Iemocap: interactive emotional dyadic motion capture database. Language Resources and Evaluation, 42:335-359, 12 2008. doi:10.1007/s10579-008-9076-6.">Busso <em>et al.</em>, 2008</a>]</span> dataset.</p></td>
+<td><p><em>IEMOCAP</em> <span id="id7">[<a class="reference internal" href="references.html#id52" title="Carlos Busso, Murtaza Bulut, Chi-Chun Lee, Abe Kazemzadeh, Emily Mower Provost, Samuel Kim, Jeannette Chang, Sungbok Lee, and Shrikanth Narayanan. Iemocap: interactive emotional dyadic motion capture database. Language Resources and Evaluation, 42:335-359, 12 2008. doi:10.1007/s10579-008-9076-6.">Busso <em>et al.</em>, 2008</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LibriMix.html#torchaudio.datasets.LibriMix" title="torchaudio.datasets.LibriMix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LibriMix</span></code></a></p></td>
-<td><p><em>LibriMix</em> <span id="id8">[<a class="reference internal" href="references.html#id36" title="Joris Cosentino, Manuel Pariente, Samuele Cornell, Antoine Deleforge, and Emmanuel Vincent. Librimix: an open-source dataset for generalizable speech separation. 2020. arXiv:2005.11262.">Cosentino <em>et al.</em>, 2020</a>]</span> dataset.</p></td>
+<td><p><em>LibriMix</em> <span id="id8">[<a class="reference internal" href="references.html#id37" title="Joris Cosentino, Manuel Pariente, Samuele Cornell, Antoine Deleforge, and Emmanuel Vincent. Librimix: an open-source dataset for generalizable speech separation. 2020. arXiv:2005.11262.">Cosentino <em>et al.</em>, 2020</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LIBRISPEECH.html#torchaudio.datasets.LIBRISPEECH" title="torchaudio.datasets.LIBRISPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LIBRISPEECH</span></code></a></p></td>
-<td><p><em>LibriSpeech</em> <span id="id9">[<a class="reference internal" href="references.html#id12" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> dataset.</p></td>
+<td><p><em>LibriSpeech</em> <span id="id9">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LibriLightLimited.html#torchaudio.datasets.LibriLightLimited" title="torchaudio.datasets.LibriLightLimited"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LibriLightLimited</span></code></a></p></td>
-<td><p>Subset of Libri-light <span id="id10">[<a class="reference internal" href="references.html#id11" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> dataset, which was used in HuBERT <span id="id11">[<a class="reference internal" href="references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for supervised fine-tuning.</p></td>
+<td><p>Subset of Libri-light <span id="id10">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> dataset, which was used in HuBERT <span id="id11">[<a class="reference internal" href="references.html#id16" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for supervised fine-tuning.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LIBRITTS.html#torchaudio.datasets.LIBRITTS" title="torchaudio.datasets.LIBRITTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LIBRITTS</span></code></a></p></td>
-<td><p><em>LibriTTS</em> <span id="id12">[<a class="reference internal" href="references.html#id37" title="Heiga Zen, Viet-Trung Dang, Robert A. J. Clark, Yu Zhang, Ron J. Weiss, Ye Jia, Z. Chen, and Yonghui Wu. Libritts: a corpus derived from librispeech for text-to-speech. ArXiv, 2019.">Zen <em>et al.</em>, 2019</a>]</span> dataset.</p></td>
+<td><p><em>LibriTTS</em> <span id="id12">[<a class="reference internal" href="references.html#id38" title="Heiga Zen, Viet-Trung Dang, Robert A. J. Clark, Yu Zhang, Ron J. Weiss, Ye Jia, Z. Chen, and Yonghui Wu. Libritts: a corpus derived from librispeech for text-to-speech. ArXiv, 2019.">Zen <em>et al.</em>, 2019</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LJSPEECH.html#torchaudio.datasets.LJSPEECH" title="torchaudio.datasets.LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LJSPEECH</span></code></a></p></td>
-<td><p><em>LJSpeech-1.1</em> <span id="id13">[<a class="reference internal" href="references.html#id6" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> dataset.</p></td>
+<td><p><em>LJSpeech-1.1</em> <span id="id13">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.MUSDB_HQ.html#torchaudio.datasets.MUSDB_HQ" title="torchaudio.datasets.MUSDB_HQ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MUSDB_HQ</span></code></a></p></td>
-<td><p><em>MUSDB_HQ</em> <span id="id14">[<a class="reference internal" href="references.html#id46" title="Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: https://doi.org/10.5281/zenodo.3338373, doi:10.5281/zenodo.3338373.">Rafii <em>et al.</em>, 2019</a>]</span> dataset.</p></td>
+<td><p><em>MUSDB_HQ</em> <span id="id14">[<a class="reference internal" href="references.html#id47" title="Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: https://doi.org/10.5281/zenodo.3338373, doi:10.5281/zenodo.3338373.">Rafii <em>et al.</em>, 2019</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.QUESST14.html#torchaudio.datasets.QUESST14" title="torchaudio.datasets.QUESST14"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QUESST14</span></code></a></p></td>
-<td><p><em>QUESST14</em> <span id="id15">[<a class="reference internal" href="references.html#id43" title="Xavier Anguera Miro, Luis Javier Rodriguez-Fuentes, Andi Buzo, Florian Metze, Igor Szoke, and Mikel Peñagarikano. Quesst2014: evaluating query-by-example speech search in a zero-resource setting with real-life queries. 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), pages 5833-5837, 2015.">Miro <em>et al.</em>, 2015</a>]</span> dataset.</p></td>
+<td><p><em>QUESST14</em> <span id="id15">[<a class="reference internal" href="references.html#id44" title="Xavier Anguera Miro, Luis Javier Rodriguez-Fuentes, Andi Buzo, Florian Metze, Igor Szoke, and Mikel Peñagarikano. Quesst2014: evaluating query-by-example speech search in a zero-resource setting with real-life queries. 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), pages 5833-5837, 2015.">Miro <em>et al.</em>, 2015</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.Snips.html#torchaudio.datasets.Snips" title="torchaudio.datasets.Snips"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Snips</span></code></a></p></td>
-<td><p><em>Snips</em> <span id="id16">[<a class="reference internal" href="references.html#id52" title="Alice Coucke, Alaa Saade, Adrien Ball, Théodore Bluche, Alexandre Caulier, David Leroy, Clément Doumouro, Thibault Gisselbrecht, Francesco Caltagirone, Thibaut Lavril, and others. Snips voice platform: an embedded spoken language understanding system for private-by-design voice interfaces. arXiv preprint arXiv:1805.10190, 2018.">Coucke <em>et al.</em>, 2018</a>]</span> dataset.</p></td>
+<td><p><em>Snips</em> <span id="id16">[<a class="reference internal" href="references.html#id53" title="Alice Coucke, Alaa Saade, Adrien Ball, Théodore Bluche, Alexandre Caulier, David Leroy, Clément Doumouro, Thibault Gisselbrecht, Francesco Caltagirone, Thibaut Lavril, and others. Snips voice platform: an embedded spoken language understanding system for private-by-design voice interfaces. arXiv preprint arXiv:1805.10190, 2018.">Coucke <em>et al.</em>, 2018</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.SPEECHCOMMANDS.html#torchaudio.datasets.SPEECHCOMMANDS" title="torchaudio.datasets.SPEECHCOMMANDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPEECHCOMMANDS</span></code></a></p></td>
-<td><p><em>Speech Commands</em> <span id="id17">[<a class="reference internal" href="references.html#id38" title="P. Warden. Speech Commands: A Dataset for Limited-Vocabulary Speech Recognition. ArXiv e-prints, April 2018. URL: https://arxiv.org/abs/1804.03209, arXiv:1804.03209.">Warden, 2018</a>]</span> dataset.</p></td>
+<td><p><em>Speech Commands</em> <span id="id17">[<a class="reference internal" href="references.html#id39" title="P. Warden. Speech Commands: A Dataset for Limited-Vocabulary Speech Recognition. ArXiv e-prints, April 2018. URL: https://arxiv.org/abs/1804.03209, arXiv:1804.03209.">Warden, 2018</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.TEDLIUM.html#torchaudio.datasets.TEDLIUM" title="torchaudio.datasets.TEDLIUM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEDLIUM</span></code></a></p></td>
-<td><p><em>Tedlium</em> <span id="id18">[<a class="reference internal" href="references.html#id39" title="Anthony Rousseau, Paul Deléglise, and Yannick Estève. Ted-lium: an automatic speech recognition dedicated corpus. In Conference on Language Resources and Evaluation (LREC), 125–129. 2012.">Rousseau <em>et al.</em>, 2012</a>]</span> dataset (releases 1,2 and 3).</p></td>
+<td><p><em>Tedlium</em> <span id="id18">[<a class="reference internal" href="references.html#id40" title="Anthony Rousseau, Paul Deléglise, and Yannick Estève. Ted-lium: an automatic speech recognition dedicated corpus. In Conference on Language Resources and Evaluation (LREC), 125–129. 2012.">Rousseau <em>et al.</em>, 2012</a>]</span> dataset (releases 1,2 and 3).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.VCTK_092.html#torchaudio.datasets.VCTK_092" title="torchaudio.datasets.VCTK_092"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VCTK_092</span></code></a></p></td>
-<td><p><em>VCTK 0.92</em> <span id="id19">[<a class="reference internal" href="references.html#id40" title="Junichi Yamagishi, Christophe Veaux, and Kirsten MacDonald. CSTR VCTK Corpus: english multi-speaker corpus for CSTR voice cloning toolkit (version 0.92). 2019. doi:10.7488/ds/2645.">Yamagishi <em>et al.</em>, 2019</a>]</span> dataset</p></td>
+<td><p><em>VCTK 0.92</em> <span id="id19">[<a class="reference internal" href="references.html#id41" title="Junichi Yamagishi, Christophe Veaux, and Kirsten MacDonald. CSTR VCTK Corpus: english multi-speaker corpus for CSTR voice cloning toolkit (version 0.92). 2019. doi:10.7488/ds/2645.">Yamagishi <em>et al.</em>, 2019</a>]</span> dataset</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.VoxCeleb1Identification.html#torchaudio.datasets.VoxCeleb1Identification" title="torchaudio.datasets.VoxCeleb1Identification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoxCeleb1Identification</span></code></a></p></td>
-<td><p><em>VoxCeleb1</em> <span id="id20">[<a class="reference internal" href="references.html#id48" title="Arsha Nagrani, Joon Son Chung, and Andrew Zisserman. Voxceleb: a large-scale speaker identification dataset. arXiv preprint arXiv:1706.08612, 2017.">Nagrani <em>et al.</em>, 2017</a>]</span> dataset for speaker identification task.</p></td>
+<td><p><em>VoxCeleb1</em> <span id="id20">[<a class="reference internal" href="references.html#id49" title="Arsha Nagrani, Joon Son Chung, and Andrew Zisserman. Voxceleb: a large-scale speaker identification dataset. arXiv preprint arXiv:1706.08612, 2017.">Nagrani <em>et al.</em>, 2017</a>]</span> dataset for speaker identification task.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.VoxCeleb1Verification.html#torchaudio.datasets.VoxCeleb1Verification" title="torchaudio.datasets.VoxCeleb1Verification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VoxCeleb1Verification</span></code></a></p></td>
-<td><p><em>VoxCeleb1</em> <span id="id21">[<a class="reference internal" href="references.html#id48" title="Arsha Nagrani, Joon Son Chung, and Andrew Zisserman. Voxceleb: a large-scale speaker identification dataset. arXiv preprint arXiv:1706.08612, 2017.">Nagrani <em>et al.</em>, 2017</a>]</span> dataset for speaker verification task.</p></td>
+<td><p><em>VoxCeleb1</em> <span id="id21">[<a class="reference internal" href="references.html#id49" title="Arsha Nagrani, Joon Son Chung, and Andrew Zisserman. Voxceleb: a large-scale speaker identification dataset. arXiv preprint arXiv:1706.08612, 2017.">Nagrani <em>et al.</em>, 2017</a>]</span> dataset for speaker verification task.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.YESNO.html#torchaudio.datasets.YESNO" title="torchaudio.datasets.YESNO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YESNO</span></code></a></p></td>
-<td><p><em>YesNo</em> <span id="id22">[<a class="reference internal" href="references.html#id45" title="Yesno. URL: http://www.openslr.org/1/."><em>YesNo</em>, n.d.</a>]</span> dataset.</p></td>
+<td><p><em>YesNo</em> <span id="id22">[<a class="reference internal" href="references.html#id46" title="Yesno. URL: http://www.openslr.org/1/."><em>YesNo</em>, n.d.</a>]</span> dataset.</p></td>
 </tr>
 </tbody>
 </table>
@@ -753,13 +773,9 @@ For example:</p>
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -792,6 +808,18 @@ For example:</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -807,18 +835,15 @@ For example:</p>
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -826,7 +851,23 @@ For example:</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

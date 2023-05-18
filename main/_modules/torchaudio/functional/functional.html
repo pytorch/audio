@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.functional &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.functional.functional &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -41,18 +41,13 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -129,12 +124,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -162,13 +161,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -210,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -258,12 +269,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -274,9 +287,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -288,12 +304,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
@@ -398,6 +414,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -407,8 +427,8 @@
   <h1>Source code for torchaudio.functional.functional</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
@@ -416,6 +436,7 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal.module_utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="kn">from</span> <span class="nn">.filtering</span> <span class="kn">import</span> <span class="n">highpass_biquad</span><span class="p">,</span> <span class="n">treble_biquad</span>
 
@@ -426,7 +447,6 @@
     <span class="s2">&quot;amplitude_to_DB&quot;</span><span class="p">,</span>
     <span class="s2">&quot;DB_to_amplitude&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compute_deltas&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;compute_kaldi_pitch&quot;</span><span class="p">,</span>
     <span class="s2">&quot;melscale_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;linear_fbanks&quot;</span><span class="p">,</span>
     <span class="s2">&quot;create_dct&quot;</span><span class="p">,</span>
@@ -777,9 +797,17 @@
 
 <span class="sd">    Args:</span>
 
-<span class="sd">        x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take</span>
-<span class="sd">          the form `(..., freq, time)`. Batched inputs should include a channel dimension and</span>
-<span class="sd">          have the form `(batch, channel, freq, time)`.</span>
+<span class="sd">        x (Tensor): Input spectrogram(s) before being converted to decibel scale.</span>
+<span class="sd">            The expected shapes are ``(freq, time)``, ``(channel, freq, time)`` or</span>
+<span class="sd">            ``(..., batch, channel, freq, time)``.</span>
+
+<span class="sd">            .. note::</span>
+
+<span class="sd">               When ``top_db`` is specified, cut-off values are computed for each audio</span>
+<span class="sd">               in the batch. Therefore if the input shape is 4D (or larger), different</span>
+<span class="sd">               cut-off values are used for audio data in the batch.</span>
+<span class="sd">               If the input shape is 2D or 3D, a single cutoff value is used.</span>
+
 <span class="sd">        multiplier (float): Use 10. for power and 20. for amplitude</span>
 <span class="sd">        amin (float): Number to clamp ``x``</span>
 <span class="sd">        db_multiplier (float): Log10(max(reference value and amin))</span>
@@ -954,7 +982,7 @@
 <span class="sd">        meaning number of frequencies to highlight/apply to x the number of filterbanks.</span>
 <span class="sd">        Each column is a filterbank so that assuming there is a matrix A of</span>
 <span class="sd">        size (..., ``n_freqs``), the applied result would be</span>
-<span class="sd">        ``A * melscale_fbanks(A.size(-1), ...)``.</span>
+<span class="sd">        ``A @ melscale_fbanks(A.size(-1), ...)``.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1443,8 +1471,8 @@
 
         <span class="n">output_frames</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">s1</span> <span class="o">*</span> <span class="n">s2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="o">/</span> <span class="p">(</span><span class="n">EPSILON</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-            <span class="o">/</span> <span class="p">(</span><span class="n">EPSILON</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">EPSILON</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">EPSILON</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="p">)</span>
 
         <span class="n">output_lag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_frames</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
@@ -1695,6 +1723,7 @@
 
 
 <div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Please migrate to :py:class:`torchaudio.io.AudioEffector`.&quot;</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">apply_codec</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1727,129 +1756,17 @@
 <span class="sd">        Tensor: Resulting Tensor.</span>
 <span class="sd">        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">bytes</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-        <span class="nb">bytes</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span>
-    <span class="p">)</span>
-    <span class="nb">bytes</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">augmented</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span>
+        <span class="p">)</span>
+        <span class="n">augmented</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sr</span> <span class="o">!=</span> <span class="n">sample_rate</span><span class="p">:</span>
         <span class="n">augmented</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">augmented</span></div>
 
 
-<div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../generated/torchaudio.functional.compute_kaldi_pitch.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_kaldi</span>
-<span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
-    <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
-    <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
-    <span class="n">min_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
-    <span class="n">max_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
-    <span class="n">soft_min_f0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
-    <span class="n">penalty_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-    <span class="n">resample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">4000</span><span class="p">,</span>
-    <span class="n">delta_pitch</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.005</span><span class="p">,</span>
-    <span class="n">nccf_ballast</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">7000</span><span class="p">,</span>
-    <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">upsample_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="n">max_frames_latency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">simulate_first_pass_online</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">recompute_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-    <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract pitch based on method described in *A pitch extraction algorithm tuned</span>
-<span class="sd">    for automatic speech recognition* :cite:`6854049`.</span>
-
-<span class="sd">    .. devices:: CPU</span>
-
-<span class="sd">    .. properties:: TorchScript</span>
-
-<span class="sd">    This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        waveform (Tensor):</span>
-<span class="sd">            The input waveform of shape `(..., time)`.</span>
-<span class="sd">        sample_rate (float):</span>
-<span class="sd">            Sample rate of `waveform`.</span>
-<span class="sd">        frame_length (float, optional):</span>
-<span class="sd">            Frame length in milliseconds. (default: 25.0)</span>
-<span class="sd">        frame_shift (float, optional):</span>
-<span class="sd">            Frame shift in milliseconds. (default: 10.0)</span>
-<span class="sd">        min_f0 (float, optional):</span>
-<span class="sd">            Minimum F0 to search for (Hz)  (default: 50.0)</span>
-<span class="sd">        max_f0 (float, optional):</span>
-<span class="sd">            Maximum F0 to search for (Hz)  (default: 400.0)</span>
-<span class="sd">        soft_min_f0 (float, optional):</span>
-<span class="sd">            Minimum f0, applied in soft way, must not exceed min-f0  (default: 10.0)</span>
-<span class="sd">        penalty_factor (float, optional):</span>
-<span class="sd">            Cost factor for FO change.  (default: 0.1)</span>
-<span class="sd">        lowpass_cutoff (float, optional):</span>
-<span class="sd">            Cutoff frequency for LowPass filter (Hz) (default: 1000)</span>
-<span class="sd">        resample_frequency (float, optional):</span>
-<span class="sd">            Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.</span>
-<span class="sd">            (default: 4000)</span>
-<span class="sd">        delta_pitch( float, optional):</span>
-<span class="sd">            Smallest relative change in pitch that our algorithm measures. (default: 0.005)</span>
-<span class="sd">        nccf_ballast (float, optional):</span>
-<span class="sd">            Increasing this factor reduces NCCF for quiet frames (default: 7000)</span>
-<span class="sd">        lowpass_filter_width (int, optional):</span>
-<span class="sd">            Integer that determines filter width of lowpass filter, more gives sharper filter.</span>
-<span class="sd">            (default: 1)</span>
-<span class="sd">        upsample_filter_width (int, optional):</span>
-<span class="sd">            Integer that determines filter width when upsampling NCCF. (default: 5)</span>
-<span class="sd">        max_frames_latency (int, optional):</span>
-<span class="sd">            Maximum number of frames of latency that we allow pitch tracking to introduce into</span>
-<span class="sd">            the feature processing (affects output only if ``frames_per_chunk &gt; 0`` and</span>
-<span class="sd">            ``simulate_first_pass_online=True``) (default: 0)</span>
-<span class="sd">        frames_per_chunk (int, optional):</span>
-<span class="sd">            The number of frames used for energy normalization. (default: 0)</span>
-<span class="sd">        simulate_first_pass_online (bool, optional):</span>
-<span class="sd">            If true, the function will output features that correspond to what an online decoder</span>
-<span class="sd">            would see in the first pass of decoding -- not the final version of the features,</span>
-<span class="sd">            which is the default. (default: False)</span>
-<span class="sd">            Relevant if ``frames_per_chunk &gt; 0``.</span>
-<span class="sd">        recompute_frame (int, optional):</span>
-<span class="sd">            Only relevant for compatibility with online pitch extraction.</span>
-<span class="sd">            A non-critical parameter; the frame at which we recompute some of the forward pointers,</span>
-<span class="sd">            after revising our estimate of the signal energy.</span>
-<span class="sd">            Relevant if ``frames_per_chunk &gt; 0``. (default: 500)</span>
-<span class="sd">        snip_edges (bool, optional):</span>
-<span class="sd">            If this is set to false, the incomplete frames near the ending edge won&#39;t be snipped,</span>
-<span class="sd">            so that the number of frames is the file size divided by the frame-shift.</span>
-<span class="sd">            This makes different types of features give the same number of frames. (default: True)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension</span>
-<span class="sd">       corresponds to pitch and NCCF.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_ComputeKaldiPitch</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">,</span>
-        <span class="n">frame_length</span><span class="p">,</span>
-        <span class="n">frame_shift</span><span class="p">,</span>
-        <span class="n">min_f0</span><span class="p">,</span>
-        <span class="n">max_f0</span><span class="p">,</span>
-        <span class="n">soft_min_f0</span><span class="p">,</span>
-        <span class="n">penalty_factor</span><span class="p">,</span>
-        <span class="n">lowpass_cutoff</span><span class="p">,</span>
-        <span class="n">resample_frequency</span><span class="p">,</span>
-        <span class="n">delta_pitch</span><span class="p">,</span>
-        <span class="n">nccf_ballast</span><span class="p">,</span>
-        <span class="n">lowpass_filter_width</span><span class="p">,</span>
-        <span class="n">upsample_filter_width</span><span class="p">,</span>
-        <span class="n">max_frames_latency</span><span class="p">,</span>
-        <span class="n">frames_per_chunk</span><span class="p">,</span>
-        <span class="n">simulate_first_pass_online</span><span class="p">,</span>
-        <span class="n">recompute_frame</span><span class="p">,</span>
-        <span class="n">snip_edges</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
-    <span class="k">return</span> <span class="n">result</span></div>
+<span class="n">_CPU</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span>
@@ -1860,7 +1777,7 @@
     <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
     <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">_CPU</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_freq</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">):</span>
@@ -1973,7 +1890,7 @@
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">))</span>
     <span class="n">resampled</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">waveform</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">orig_freq</span><span class="p">)</span>
     <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_wavs</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">target_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">new_freq</span> <span class="o">*</span> <span class="n">length</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">))</span>
+    <span class="n">target_length</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">new_freq</span> <span class="o">*</span> <span class="n">length</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">))</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
     <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">target_length</span><span class="p">]</span>
 
     <span class="c1"># unpack batch</span>
@@ -3003,6 +2920,44 @@
     <span class="n">a_coeffs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="n">coeff</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="n">b_coeffs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="o">=</span><span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="o">=</span><span class="n">b_coeffs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="frechet_distance"><a class="viewcode-back" href="../../../generated/torchaudio.functional.frechet_distance.html#torchaudio.functional.frechet_distance">[docs]</a><span class="k">def</span> <span class="nf">frechet_distance</span><span class="p">(</span><span class="n">mu_x</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">mu_y</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the Fréchet distance between two multivariate normal distributions :cite:`dowson1982frechet`.</span>
+
+<span class="sd">    Concretely, for multivariate Gaussians :math:`X(\mu_X, \Sigma_X)`</span>
+<span class="sd">    and :math:`Y(\mu_Y, \Sigma_Y)`, the function computes and returns :math:`F` as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        F(X, Y) = || \mu_X - \mu_Y ||_2^2</span>
+<span class="sd">        + \text{Tr}\left( \Sigma_X + \Sigma_Y - 2 \sqrt{\Sigma_X \Sigma_Y} \right)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mu_x (torch.Tensor): mean :math:`\mu_X` of multivariate Gaussian :math:`X`, with shape `(N,)`.</span>
+<span class="sd">        sigma_x (torch.Tensor): covariance matrix :math:`\Sigma_X` of :math:`X`, with shape `(N, N)`.</span>
+<span class="sd">        mu_y (torch.Tensor): mean :math:`\mu_Y` of multivariate Gaussian :math:`Y`, with shape `(N,)`.</span>
+<span class="sd">        sigma_y (torch.Tensor): covariance matrix :math:`\Sigma_Y` of :math:`Y`, with shape `(N, N)`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: the Fréchet distance between :math:`X` and :math:`Y`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mu_x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input mu_x must be one-dimensional; got dimension </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mu_x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigma_x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input sigma_x must be two-dimensional; got dimension </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sigma_x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sigma_x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="n">sigma_x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">mu_x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Each of sigma_x&#39;s dimensions must match mu_x&#39;s size.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mu_x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">!=</span> <span class="n">mu_y</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inputs mu_x and mu_y must have the same shape; got </span><span class="si">{</span><span class="n">mu_x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">mu_y</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sigma_x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">!=</span> <span class="n">sigma_y</span><span class="o">.</span><span class="n">size</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Inputs sigma_x and sigma_y must have the same shape; got </span><span class="si">{</span><span class="n">sigma_x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">sigma_y</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu_x</span> <span class="o">-</span> <span class="n">mu_y</span><span class="p">)</span><span class="o">.</span><span class="n">square</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">sigma_x</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">+</span> <span class="n">sigma_y</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">sigma_x</span> <span class="o">@</span> <span class="n">sigma_y</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">c</span></div>
 </pre></div>
 
              </article>
@@ -3252,13 +3207,9 @@
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -3291,6 +3242,18 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -3306,18 +3269,15 @@
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -3325,7 +3285,23 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

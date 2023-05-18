@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Enabling GPU video decoder/encoder &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>Enabling GPU video decoder/encoder &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -44,18 +44,13 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Audio I/O" href="tutorials/audio_io_tutorial.html" />
     <link rel="prev" title="Building on Jetson" href="build.jetson.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
@@ -403,6 +419,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -410,11 +430,11 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <section id="enabling-gpu-video-decoder-encoder">
-<h1>Enabling GPU video decoder/encoder<a class="headerlink" href="#enabling-gpu-video-decoder-encoder" title="Permalink to this heading">¶</a></h1>
+<span id="enabling-hw-decoder"></span><h1>Enabling GPU video decoder/encoder<a class="headerlink" href="#enabling-gpu-video-decoder-encoder" title="Permalink to this heading">¶</a></h1>
 <p>TorchAudio can make use of hardware-based video decoding and encoding supported by underlying FFmpeg libraries that are linked at runtime.</p>
 <p>Using NVIDIA’s GPU decoder and encoder, it is also possible to pass around CUDA Tensor directly, that is decode video into CUDA tensor or encode video from CUDA tensor, without moving data from/to CPU.</p>
 <p>This improves the video throughput significantly. However, please note that not all the video formats are supported by hardware acceleration.</p>
-<p>This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see <a class="reference external" href="./hw_acceleration_tutorial.html">Hardware-Accelerated Video Decoding and Encoding</a></p>
+<p>This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see <a class="reference internal" href="tutorials/nvdec_tutorial.html#nvdec-tutorial"><span class="std std-ref">NVDEC tutoial</span></a> and <a class="reference internal" href="tutorials/nvenc_tutorial.html#nvenc-tutorial"><span class="std std-ref">NVENC tutorial</span></a>.</p>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>Using them in TorchAduio requires additional FFmpeg configuration.</p>
@@ -425,13 +445,13 @@ To use NVENC/NVDEC with TorchAudio, the following items are required.</p>
 <li><p>FFmpeg libraries compiled with NVDEC/NVENC support. †</p></li>
 <li><p>PyTorch / TorchAudio with CUDA support.</p></li>
 </ol>
-<p>TorchAudio’s official binary distributions are compiled to work with FFmpeg 4 libraries, and they contain the logic required for hardware-based decoding/encoding.</p>
-<p>In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. If you would like to use FFmpeg 5, then you need to build TorchAudio with it.</p>
+<p>TorchAudio’s official binary distributions are compiled to work with FFmpeg libraries, and they contain the logic to use hardware decoding/encoding.</p>
+<p>In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. You can also use FFmpeg 5 or 6.</p>
 <p>The following procedure was tested on Ubuntu.</p>
 <p>† For details on NVDEC/NVENC and FFmpeg, please refer to the following articles.</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/">https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/</a></p></li>
-<li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg">https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg</a></p></li>
+<li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/">https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/</a></p></li>
+<li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg">https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg</a></p></li>
 <li><p><a class="reference external" href="https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/">https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/</a></p></li>
 </ul>
 </section>
@@ -541,7 +561,7 @@ Processing triggers for libc-bin (2.27-3ubuntu1.6) ...
 </section>
 <section id="build-ffmpeg-with-nvdec-nvenc-support">
 <h2>Build FFmpeg with NVDEC/NVENC support<a class="headerlink" href="#build-ffmpeg-with-nvdec-nvenc-support" title="Permalink to this heading">¶</a></h2>
-<p>Next we download the source code of FFmpeg 4. We use 4.4.2 here. Any version later than 4.1 should work with TorchAudio binary distributions. If you want to use FFmpeg 5, then you need to build TorchAudio after building FFmpeg.</p>
+<p>Next we download the source code of FFmpeg 4. We use 4.4.2 here.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>-q<span class="w"> </span>https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.4.2.tar.gz
 tar<span class="w"> </span>-xf<span class="w"> </span>n4.4.2.tar.gz
 <span class="nb">cd</span><span class="w"> </span>FFmpeg-n4.4.2
@@ -827,31 +847,10 @@ Encoders:
 </pre></div>
 </div>
 </section>
-<section id="using-the-hardware-decoder">
-<h3>Using the hardware decoder<a class="headerlink" href="#using-the-hardware-decoder" title="Permalink to this heading">¶</a></h3>
+<section id="using-the-hardware-decoder-and-encoder">
+<h3>Using the hardware decoder and encoder<a class="headerlink" href="#using-the-hardware-decoder-and-encoder" title="Permalink to this heading">¶</a></h3>
 <p>Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.</p>
-<p>For the detail on the performance of GPU decoder and encoder please see <a class="reference external" href="./hw_acceleration_tutorial.html">Hardware-Accelerated Video Decoding and Encoding</a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
-
-<span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
-
-<span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-<span class="n">s</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
-    <span class="mi">5</span><span class="p">,</span>
-    <span class="n">decoder</span><span class="o">=</span><span class="s2">&quot;h264_cuvid&quot;</span><span class="p">,</span>
-    <span class="n">hw_accel</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>
-    <span class="n">decoder_option</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;resize&quot;</span><span class="p">:</span> <span class="s2">&quot;360x240&quot;</span><span class="p">,</span>
-    <span class="p">},</span>
-<span class="p">)</span>
-<span class="n">s</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">()</span>
-<span class="n">chunk</span><span class="p">,</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; - Chunk:&#39;</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>- Chunk: torch.Size([5, 3, 240, 360]) cuda:0 torch.uint8
-</pre></div>
-</div>
+<p>For the detail on the performance of GPU decoder and encoder please see <a class="reference internal" href="tutorials/nvdec_tutorial.html#nvdec-tutorial"><span class="std std-ref">NVDEC tutoial</span></a> and <a class="reference internal" href="tutorials/nvenc_tutorial.html#nvenc-tutorial"><span class="std std-ref">NVENC tutorial</span></a>.</p>
 </section>
 </section>
 </section>
@@ -911,7 +910,7 @@ Encoders:
 <li><a class="reference internal" href="#checking-the-intallation">Checking the intallation</a></li>
 <li><a class="reference internal" href="#using-the-gpu-decoder-encoder-from-torchaudio">Using the GPU decoder/encoder from TorchAudio</a><ul>
 <li><a class="reference internal" href="#checking-the-installation">Checking the installation</a></li>
-<li><a class="reference internal" href="#using-the-hardware-decoder">Using the hardware decoder</a></li>
+<li><a class="reference internal" href="#using-the-hardware-decoder-and-encoder">Using the hardware decoder and encoder</a></li>
 </ul>
 </li>
 </ul>
@@ -1130,13 +1129,9 @@ Encoders:
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1169,6 +1164,18 @@ Encoders:
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1184,18 +1191,15 @@ Encoders:
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1203,7 +1207,23 @@ Encoders:
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

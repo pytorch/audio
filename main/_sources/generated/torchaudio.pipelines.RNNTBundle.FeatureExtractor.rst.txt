@@ -6,14 +6,11 @@ RNNTBundle.FeatureExtractor
 
 .. autoclass:: torchaudio.pipelines.RNNTBundle.FeatureExtractor()
 
-..
-   ATTRIBUTES
-
-..
-   METHODS
+Methods
+-------
 
 __call__
---------
+~~~~~~~~
 
 .. container:: py attribute
 

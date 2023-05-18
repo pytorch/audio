@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.pipelines &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.prototype.pipelines &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -43,19 +43,14 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="EMFORMER_RNNT_BASE_MUSTC" href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC.html" />
-    <link rel="prev" title="torchaudio.prototype.models.squim_subjective_base" href="generated/torchaudio.prototype.models.squim_subjective_base.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+    <link rel="prev" title="torchaudio.prototype.models.hifigan_vocoder_v3" href="generated/torchaudio.prototype.models.hifigan_vocoder_v3.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
@@ -405,6 +421,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -448,55 +468,36 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html#torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH" title="torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HIFIGAN_VOCODER_V3_LJSPEECH</span></code></a></p></td>
-<td><p>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em> <span id="id2">[<a class="reference internal" href="references.html#id6" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p></td>
+<td><p>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em> <span id="id2">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 </section>
-<section id="squim-objective">
-<h2>Squim Objective<a class="headerlink" href="#squim-objective" title="Permalink to this heading">¶</a></h2>
+<section id="vggish">
+<h2>VGGish<a class="headerlink" href="#vggish" title="Permalink to this heading">¶</a></h2>
 <section id="id3">
 <h3>Interface<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
-<p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimObjectiveBundle.html#torchaudio.prototype.pipelines.SquimObjectiveBundle" title="torchaudio.prototype.pipelines.SquimObjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimObjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>objecive</strong> metric scores given the input waveform.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimObjectiveBundle.html#torchaudio.prototype.pipelines.SquimObjectiveBundle" title="torchaudio.prototype.pipelines.SquimObjectiveBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquimObjectiveBundle</span></code></a></p></td>
-<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.prototype.models.SquimObjective.html#torchaudio.prototype.models.SquimObjective" title="torchaudio.prototype.models.SquimObjective"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimObjective</span></code></a> model.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle" title="torchaudio.prototype.pipelines.VGGishBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGishBundle</span></code></a></p></td>
+<td><p>VGGish <span id="id4">[<a class="reference internal" href="references.html#id70" title="Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore, Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics, Speech and Signal Processing (ICASSP). 2017. URL: https://arxiv.org/abs/1609.09430.">Hershey <em>et al.</em>, 2017</a>]</span> inference pipeline ported from <a class="reference external" href="https://github.com/harritaylor/torchvggish">torchvggish</a> and <a class="reference external" href="https://github.com/tensorflow/models/tree/master/research/audioset">tensorflow-models</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.VGGish.html#torchaudio.prototype.pipelines.VGGishBundle.VGGish" title="torchaudio.prototype.pipelines.VGGishBundle.VGGish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGishBundle.VGGish</span></code></a></p></td>
+<td><p>Implementation of VGGish model <span id="id5">[<a class="reference internal" href="references.html#id70" title="Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore, Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics, Speech and Signal Processing (ICASSP). 2017. URL: https://arxiv.org/abs/1609.09430.">Hershey <em>et al.</em>, 2017</a>]</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.VGGishInputProcessor.html#torchaudio.prototype.pipelines.VGGishBundle.VGGishInputProcessor" title="torchaudio.prototype.pipelines.VGGishBundle.VGGishInputProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGishBundle.VGGishInputProcessor</span></code></a></p></td>
+<td><p>Converts raw waveforms to batches of examples to use as inputs to VGGish.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="id4">
-<h3>Pretrained Models<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<section id="id6">
+<h3>Pretrained Models<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SQUIM_OBJECTIVE.html#torchaudio.prototype.pipelines.SQUIM_OBJECTIVE" title="torchaudio.prototype.pipelines.SQUIM_OBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_OBJECTIVE</span></code></a></p></td>
-<td><p>SquimObjective pipeline trained using approach described in <span id="id5">[<a class="reference internal" href="references.html#id68" title="Anurag Kumar, Ke Tan, Zhaoheng Ni, Pranay Manocha, Xiaohui Zhang, Ethan Henderson, and Buye Xu. Torchaudio-squim: reference-less speech quality and intelligibility measures in torchaudio. arXiv preprint arXiv:2304.01448, 2023.">Kumar <em>et al.</em>, 2023</a>]</span> on the <em>DNS 2020 Dataset</em> <span id="id6">[<a class="reference internal" href="references.html#id64" title="Chandan KA Reddy, Vishak Gopal, Ross Cutler, Ebrahim Beyrami, Roger Cheng, Harishchandra Dubey, Sergiy Matusevych, Robert Aichner, Ashkan Aazami, Sebastian Braun, and others. The interspeech 2020 deep noise suppression challenge: datasets, subjective testing framework, and challenge results. arXiv preprint arXiv:2005.13981, 2020.">Reddy <em>et al.</em>, 2020</a>]</span>.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="squim-subjective">
-<h2>Squim Subjective<a class="headerlink" href="#squim-subjective" title="Permalink to this heading">¶</a></h2>
-<section id="id7">
-<h3>Interface<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
-<p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle" title="torchaudio.prototype.pipelines.SquimSubjectiveBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a> defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict <strong>subjective</strong> metric scores given the input waveform.</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SquimSubjectiveBundle.html#torchaudio.prototype.pipelines.SquimSubjectiveBundle" title="torchaudio.prototype.pipelines.SquimSubjectiveBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquimSubjectiveBundle</span></code></a></p></td>
-<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.prototype.models.SquimSubjective.html#torchaudio.prototype.models.SquimSubjective" title="torchaudio.prototype.models.SquimSubjective"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquimSubjective</span></code></a> model.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="id8">
-<h3>Pretrained Models<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE.html#torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE" title="torchaudio.prototype.pipelines.SQUIM_SUBJECTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQUIM_SUBJECTIVE</span></code></a></p></td>
-<td><p>SquimSubjective pipeline trained as described in <span id="id9">[<a class="reference internal" href="references.html#id65" title="Pranay Manocha and Anurag Kumar. Speech quality assessment through mos using non-matching references. arXiv preprint arXiv:2206.12285, 2022.">Manocha and Kumar, 2022</a>]</span> and <span id="id10">[<a class="reference internal" href="references.html#id68" title="Anurag Kumar, Ke Tan, Zhaoheng Ni, Pranay Manocha, Xiaohui Zhang, Ethan Henderson, and Buye Xu. Torchaudio-squim: reference-less speech quality and intelligibility measures in torchaudio. arXiv preprint arXiv:2304.01448, 2023.">Kumar <em>et al.</em>, 2023</a>]</span> on the <em>BVCC</em> <span id="id11">[<a class="reference internal" href="references.html#id66" title="Erica Cooper and Junichi Yamagishi. How do voices from past speech synthesis challenges compare today? arXiv preprint arXiv:2105.02373, 2021.">Cooper and Yamagishi, 2021</a>]</span> and <em>DAPS</em> <span id="id12">[<a class="reference internal" href="references.html#id67" title="Gautham J Mysore. Can we automatically transform speech recorded on common consumer devices in real-world environments into professional production quality speech?—a dataset, insights, and challenges. IEEE Signal Processing Letters, 22(8):1006–1010, 2014.">Mysore, 2014</a>]</span> datasets.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGISH.html#torchaudio.prototype.pipelines.VGGISH" title="torchaudio.prototype.pipelines.VGGISH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGISH</span></code></a></p></td>
+<td><p>Pre-trained VGGish <span id="id7">[<a class="reference internal" href="references.html#id70" title="Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore, Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics, Speech and Signal Processing (ICASSP). 2017. URL: https://arxiv.org/abs/1609.09430.">Hershey <em>et al.</em>, 2017</a>]</span> inference pipeline ported from <a class="reference external" href="https://github.com/harritaylor/torchvggish">torchvggish</a> and <a class="reference external" href="https://github.com/tensorflow/models/tree/master/research/audioset">tensorflow-models</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -515,7 +516,7 @@
         <a href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC.html" class="btn btn-neutral float-right" title="EMFORMER_RNNT_BASE_MUSTC" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="generated/torchaudio.prototype.models.squim_subjective_base.html" class="btn btn-neutral" title="torchaudio.prototype.models.squim_subjective_base" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="generated/torchaudio.prototype.models.hifigan_vocoder_v3.html" class="btn btn-neutral" title="torchaudio.prototype.models.hifigan_vocoder_v3" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -559,14 +560,9 @@
 <li><a class="reference internal" href="#id1">Pretrained Models</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#squim-objective">Squim Objective</a><ul>
+<li><a class="reference internal" href="#vggish">VGGish</a><ul>
 <li><a class="reference internal" href="#id3">Interface</a></li>
-<li><a class="reference internal" href="#id4">Pretrained Models</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#squim-subjective">Squim Subjective</a><ul>
-<li><a class="reference internal" href="#id7">Interface</a></li>
-<li><a class="reference internal" href="#id8">Pretrained Models</a></li>
+<li><a class="reference internal" href="#id6">Pretrained Models</a></li>
 </ul>
 </li>
 </ul>
@@ -785,13 +781,9 @@
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -824,6 +816,18 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -839,18 +843,15 @@
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -858,7 +859,23 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

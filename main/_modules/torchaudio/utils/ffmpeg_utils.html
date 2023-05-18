@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.utils.ffmpeg_utils &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.utils.ffmpeg_utils &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -41,18 +41,13 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -129,12 +124,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -162,13 +161,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -210,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -258,12 +269,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -274,9 +287,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -288,12 +304,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
@@ -398,6 +414,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -422,7 +442,7 @@
 <span class="sd">        dict: mapping from library names to version string,</span>
 <span class="sd">            i.e. `&quot;libavutil&quot;: (56, 22, 100)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_versions</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_versions</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_log_level"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_log_level">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -431,7 +451,7 @@
 
 <span class="sd">    See :py:func:`set_log_level` for the detailo.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_log_level</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_log_level</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="set_log_level"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.set_log_level">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -468,7 +488,7 @@
 <span class="sd">                  Extremely verbose debugging, useful for libav* development.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
+    <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_demuxers"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_demuxers">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -486,7 +506,7 @@
 <span class="sd">        ... aax: CRI AAX</span>
 <span class="sd">        ... ac3: raw AC-3</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_demuxers</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_demuxers</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_muxers"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_muxers">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -505,7 +525,7 @@
 <span class="sd">        ... adx: CRI ADX</span>
 <span class="sd">        ... aiff: Audio IFF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_muxers</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_muxers</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_audio_decoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -524,7 +544,7 @@
 <span class="sd">        ... adx: CRI ADX</span>
 <span class="sd">        ... aiff: Audio IFF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_audio_decoders</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_audio_decoders</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_audio_encoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_encoders">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -544,7 +564,7 @@
 <span class="sd">        ... ac3_fixed: ATSC A/52A (AC-3)</span>
 <span class="sd">        ... alac: ALAC (Apple Lossless Audio Codec)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_audio_encoders</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_audio_encoders</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_video_decoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -564,7 +584,7 @@
 <span class="sd">        ... amv: AMV Video</span>
 <span class="sd">        ... anm: Deluxe Paint Animation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_video_decoders</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_video_decoders</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_video_encoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_encoders">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -585,7 +605,7 @@
 <span class="sd">        ... asv1: ASUS V1</span>
 <span class="sd">        ... asv2: ASUS V2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_video_encoders</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_video_encoders</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_input_devices"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_devices">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -601,7 +621,7 @@
 <span class="sd">        ... avfoundation: AVFoundation input device</span>
 <span class="sd">        ... lavfi: Libavfilter virtual input device</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_input_devices</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_input_devices</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_output_devices"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_devices">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -616,7 +636,7 @@
 <span class="sd">        &gt;&gt;&gt;     print(f&quot;{k}: {v}&quot;)</span>
 <span class="sd">        ... audiotoolbox: AudioToolbox output device</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_output_devices</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_output_devices</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_input_protocols"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_protocols">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -630,7 +650,7 @@
 <span class="sd">        &gt;&gt;&gt; print(get_input_protocols())</span>
 <span class="sd">        ... [&#39;file&#39;, &#39;ftp&#39;, &#39;hls&#39;, &#39;http&#39;,&#39;https&#39;, &#39;pipe&#39;, &#39;rtmp&#39;, &#39;tcp&#39;, &#39;tls&#39;, &#39;udp&#39;, &#39;unix&#39;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_input_protocols</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_input_protocols</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_output_protocols"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_protocols">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -644,7 +664,7 @@
 <span class="sd">        &gt;&gt;&gt; print(get_output_protocols())</span>
 <span class="sd">        ... [&#39;file&#39;, &#39;ftp&#39;, &#39;http&#39;, &#39;https&#39;, &#39;md5&#39;, &#39;pipe&#39;, &#39;prompeg&#39;, &#39;rtmp&#39;, &#39;tee&#39;, &#39;tcp&#39;, &#39;tls&#39;, &#39;udp&#39;, &#39;unix&#39;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_output_protocols</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_output_protocols</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="get_build_config"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_build_config">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
@@ -658,13 +678,13 @@
 <span class="sd">        &gt;&gt;&gt; print(get_build_config())</span>
 <span class="sd">        --prefix=/Users/runner/miniforge3 --cc=arm64-apple-darwin20.0.0-clang --enable-gpl --enable-hardcoded-tables --enable-libfreetype --enable-libopenh264 --enable-neon --enable-libx264 --enable-libx265 --enable-libaom --enable-libsvtav1 --enable-libxml2 --enable-libvpx --enable-pic --enable-pthreads --enable-shared --disable-static --enable-version3 --enable-zlib --enable-libmp3lame --pkg-config=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/pkg-config --enable-cross-compile --arch=arm64 --target-os=darwin --cross-prefix=arm64-apple-darwin20.0.0- --host-cc=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/x86_64-apple-darwin13.4.0-clang  # noqa</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">get_build_config</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">get_build_config</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="clear_cuda_context_cache"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.clear_cuda_context_cache">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
 <span class="k">def</span> <span class="nf">clear_cuda_context_cache</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear the CUDA context used by CUDA Hardware accelerated video decoding&quot;&quot;&quot;</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_ffmpeg</span><span class="o">.</span><span class="n">clear_cuda_context_cache</span><span class="p">()</span></div>
+    <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_EXT</span><span class="o">.</span><span class="n">clear_cuda_context_cache</span><span class="p">()</span></div>
 </pre></div>
 
              </article>
@@ -914,13 +934,9 @@
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -953,6 +969,18 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -968,18 +996,15 @@
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -987,7 +1012,23 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

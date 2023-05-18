@@ -6,28 +6,28 @@ HiFiGANVocoderBundle
 
 .. autoclass:: torchaudio.prototype.pipelines.HiFiGANVocoderBundle()
 
-..
-   ATTRIBUTES
+Properties
+----------
 
 sample_rate
------------
+~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. autoproperty:: torchaudio.prototype.pipelines.HiFiGANVocoderBundle.sample_rate
 
-..
-   METHODS
+Methods
+-------
 
 get_mel_transform
------------------
+~~~~~~~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. automethod:: torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform
 
 get_vocoder
------------
+~~~~~~~~~~~
 
 .. container:: py attribute
 

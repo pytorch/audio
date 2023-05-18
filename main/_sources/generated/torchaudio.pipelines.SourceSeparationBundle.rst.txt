@@ -6,21 +6,21 @@ SourceSeparationBundle
 
 .. autoclass:: torchaudio.pipelines.SourceSeparationBundle()
 
-..
-   ATTRIBUTES
+Properties
+----------
 
 sample_rate
------------
+~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. autoproperty:: torchaudio.pipelines.SourceSeparationBundle.sample_rate
 
-..
-   METHODS
+Methods
+-------
 
 get_model
----------
+~~~~~~~~~
 
 .. container:: py attribute
 

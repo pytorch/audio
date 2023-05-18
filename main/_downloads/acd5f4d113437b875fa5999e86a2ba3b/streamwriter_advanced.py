@@ -23,14 +23,9 @@ play audio and video.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=5.0, <6).
-#
-#    There are multiple ways to install FFmpeg libraries.
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c conda-forge 'ffmpeg<6'`` will install
-#    the required libraries.
-#    This distribution, however, does not have SDL plugin, so
-#    it cannot play video.
+#    This tutorial requires FFmpeg libraries.
+#    Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+#    the detail.
 #
 
 ######################################################################
@@ -71,7 +66,9 @@ from torchaudio.io import StreamWriter
 from torchaudio.utils import download_asset
 
 AUDIO_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-VIDEO_PATH = download_asset("tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4")
+VIDEO_PATH = download_asset(
+    "tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
+)
 
 ######################################################################
 #
@@ -137,7 +134,7 @@ s.add_audio_stream(sample_rate, num_channels, format="s16")
 # Write audio to the device
 with s.open():
     for i in range(0, num_frames, 256):
-        s.write_audio_chunk(0, waveform[i:i+256])
+        s.write_audio_chunk(0, waveform[i : i + 256])
 
 ######################################################################
 #
@@ -183,8 +180,12 @@ width, height = 640, 360
 # a background thread and give chunks
 
 running = True
+
+
 def video_streamer(path, frames_per_chunk):
-    import queue, threading
+    import queue
+    import threading
+
     from torchaudio.io import StreamReader
 
     q = queue.Queue()
@@ -193,9 +194,9 @@ def video_streamer(path, frames_per_chunk):
     def _streamer():
         streamer = StreamReader(path)
         streamer.add_basic_video_stream(
-            frames_per_chunk, format="rgb24",
-            frame_rate=frame_rate, width=width, height=height)
-        for (chunk_, ) in streamer.stream():
+            frames_per_chunk, format="rgb24", frame_rate=frame_rate, width=width, height=height
+        )
+        for (chunk_,) in streamer.stream():
             q.put(chunk_)
             if not running:
                 break

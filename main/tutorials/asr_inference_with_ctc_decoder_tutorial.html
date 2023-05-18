@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ASR Inference with CTC Decoder &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>ASR Inference with CTC Decoder &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -42,20 +42,15 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Online ASR with Emformer RNN-T" href="online_asr_tutorial.html" />
+    <link rel="next" title="ASR Inference with CUDA CTC Decoder" href="asr_inference_with_cuda_ctc_decoder_tutorial.html" />
     <link rel="prev" title="Speech Recognition with Wav2Vec2" href="speech_recognition_pipeline_tutorial.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
@@ -425,6 +441,10 @@
 
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -478,8 +498,8 @@ working with</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230517
-2.1.0.dev20230517
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230901
+2.2.0.dev20230902
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -505,17 +525,20 @@ tutorial</a>.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ll10m.pth&quot; to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ll10m.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 11%|#1        | 39.8M/360M [00:00&lt;00:00, 418MB/s]
- 22%|##2       | 79.7M/360M [00:00&lt;00:00, 398MB/s]
- 33%|###2      | 118M/360M [00:00&lt;00:00, 344MB/s]
- 43%|####2     | 155M/360M [00:00&lt;00:00, 358MB/s]
- 53%|#####2    | 189M/360M [00:00&lt;00:00, 333MB/s]
- 63%|######3   | 228M/360M [00:00&lt;00:00, 356MB/s]
- 73%|#######2  | 263M/360M [00:00&lt;00:00, 317MB/s]
- 82%|########1 | 294M/360M [00:00&lt;00:00, 293MB/s]
- 90%|########9 | 323M/360M [00:01&lt;00:00, 249MB/s]
- 97%|#########6| 348M/360M [00:01&lt;00:00, 231MB/s]
-100%|##########| 360M/360M [00:01&lt;00:00, 291MB/s]
+  3%|2         | 10.7M/360M [00:00&lt;00:03, 112MB/s]
+  6%|5         | 21.4M/360M [00:00&lt;00:03, 93.5MB/s]
+ 12%|#1        | 42.1M/360M [00:00&lt;00:02, 144MB/s]
+ 18%|#8        | 66.6M/360M [00:00&lt;00:01, 186MB/s]
+ 27%|##7       | 98.0M/360M [00:00&lt;00:01, 236MB/s]
+ 38%|###7      | 136M/360M [00:00&lt;00:00, 288MB/s]
+ 48%|####7     | 171M/360M [00:00&lt;00:00, 316MB/s]
+ 58%|#####7    | 208M/360M [00:00&lt;00:00, 337MB/s]
+ 68%|######7   | 243M/360M [00:00&lt;00:00, 347MB/s]
+ 77%|#######6  | 277M/360M [00:01&lt;00:00, 323MB/s]
+ 85%|########5 | 308M/360M [00:01&lt;00:00, 261MB/s]
+ 93%|#########2| 335M/360M [00:01&lt;00:00, 233MB/s]
+100%|#########9| 359M/360M [00:01&lt;00:00, 205MB/s]
+100%|##########| 360M/360M [00:01&lt;00:00, 240MB/s]
 </pre></div>
 </div>
 <p>We will load a sample from the LibriSpeech test-other dataset.</p>
@@ -620,6 +643,7 @@ it be a statistical or neural network language model, using
 
 <span class="k">class</span> <span class="nc">CustomLM</span><span class="p">(</span><span class="n">CTCDecoderLM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a Python wrapper around `language_model` to feed to the decoder.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language_model</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
         <span class="n">CTCDecoderLM</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language_model</span> <span class="o">=</span> <span class="n">language_model</span>
@@ -664,93 +688,114 @@ model can be large</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/4.97M [00:00&lt;?, ?B/s]
-100%|##########| 4.97M/4.97M [00:00&lt;00:00, 123MB/s]
+100%|##########| 4.97M/4.97M [00:00&lt;00:00, 318MB/s]
 
   0%|          | 0.00/57.0 [00:00&lt;?, ?B/s]
-100%|##########| 57.0/57.0 [00:00&lt;00:00, 57.7kB/s]
+100%|##########| 57.0/57.0 [00:00&lt;00:00, 44.6kB/s]
 
   0%|          | 0.00/2.91G [00:00&lt;?, ?B/s]
-  1%|1         | 35.8M/2.91G [00:00&lt;00:08, 375MB/s]
-  2%|2         | 73.6M/2.91G [00:00&lt;00:07, 387MB/s]
-  4%|3         | 111M/2.91G [00:00&lt;00:07, 390MB/s]
-  5%|5         | 150M/2.91G [00:00&lt;00:07, 396MB/s]
-  6%|6         | 188M/2.91G [00:00&lt;00:07, 386MB/s]
-  8%|7         | 224M/2.91G [00:00&lt;00:07, 386MB/s]
-  9%|8         | 261M/2.91G [00:00&lt;00:07, 384MB/s]
- 10%|#         | 298M/2.91G [00:00&lt;00:07, 385MB/s]
- 11%|#1        | 335M/2.91G [00:00&lt;00:07, 379MB/s]
- 12%|#2        | 371M/2.91G [00:01&lt;00:07, 379MB/s]
- 14%|#3        | 408M/2.91G [00:01&lt;00:07, 381MB/s]
- 15%|#4        | 445M/2.91G [00:01&lt;00:07, 380MB/s]
- 16%|#6        | 481M/2.91G [00:01&lt;00:06, 377MB/s]
- 17%|#7        | 517M/2.91G [00:01&lt;00:06, 371MB/s]
- 19%|#8        | 553M/2.91G [00:01&lt;00:06, 373MB/s]
- 20%|#9        | 589M/2.91G [00:01&lt;00:06, 374MB/s]
- 21%|##1       | 626M/2.91G [00:01&lt;00:06, 380MB/s]
- 22%|##2       | 663M/2.91G [00:01&lt;00:06, 374MB/s]
- 23%|##3       | 700M/2.91G [00:01&lt;00:06, 379MB/s]
- 25%|##4       | 739M/2.91G [00:02&lt;00:06, 387MB/s]
- 26%|##6       | 776M/2.91G [00:02&lt;00:05, 388MB/s]
- 27%|##7       | 814M/2.91G [00:02&lt;00:05, 391MB/s]
- 29%|##8       | 851M/2.91G [00:02&lt;00:05, 383MB/s]
- 30%|##9       | 889M/2.91G [00:02&lt;00:05, 388MB/s]
- 31%|###1      | 926M/2.91G [00:02&lt;00:05, 384MB/s]
- 32%|###2      | 963M/2.91G [00:02&lt;00:05, 385MB/s]
- 34%|###3      | 0.98G/2.91G [00:02&lt;00:05, 390MB/s]
- 35%|###4      | 1.02G/2.91G [00:02&lt;00:05, 392MB/s]
- 36%|###6      | 1.05G/2.91G [00:02&lt;00:05, 386MB/s]
- 37%|###7      | 1.09G/2.91G [00:03&lt;00:05, 385MB/s]
- 39%|###8      | 1.12G/2.91G [00:03&lt;00:04, 384MB/s]
- 40%|###9      | 1.16G/2.91G [00:03&lt;00:04, 386MB/s]
- 41%|####1     | 1.20G/2.91G [00:03&lt;00:04, 379MB/s]
- 42%|####2     | 1.23G/2.91G [00:03&lt;00:05, 357MB/s]
- 43%|####3     | 1.26G/2.91G [00:03&lt;00:04, 357MB/s]
- 45%|####4     | 1.30G/2.91G [00:03&lt;00:04, 363MB/s]
- 46%|####5     | 1.33G/2.91G [00:03&lt;00:04, 366MB/s]
- 47%|####7     | 1.37G/2.91G [00:03&lt;00:04, 372MB/s]
- 48%|####8     | 1.41G/2.91G [00:03&lt;00:04, 374MB/s]
- 50%|####9     | 1.44G/2.91G [00:04&lt;00:04, 376MB/s]
- 51%|#####     | 1.48G/2.91G [00:04&lt;00:04, 378MB/s]
- 52%|#####2    | 1.51G/2.91G [00:04&lt;00:03, 382MB/s]
- 53%|#####3    | 1.55G/2.91G [00:04&lt;00:03, 399MB/s]
- 55%|#####4    | 1.60G/2.91G [00:04&lt;00:03, 414MB/s]
- 56%|#####6    | 1.63G/2.91G [00:04&lt;00:03, 400MB/s]
- 57%|#####7    | 1.67G/2.91G [00:04&lt;00:03, 395MB/s]
- 59%|#####8    | 1.71G/2.91G [00:04&lt;00:03, 380MB/s]
- 60%|#####9    | 1.74G/2.91G [00:04&lt;00:03, 367MB/s]
- 61%|######1   | 1.78G/2.91G [00:05&lt;00:03, 339MB/s]
- 62%|######2   | 1.81G/2.91G [00:05&lt;00:03, 327MB/s]
- 63%|######3   | 1.84G/2.91G [00:05&lt;00:03, 316MB/s]
- 64%|######4   | 1.87G/2.91G [00:05&lt;00:03, 324MB/s]
- 66%|######5   | 1.91G/2.91G [00:05&lt;00:03, 343MB/s]
- 67%|######6   | 1.95G/2.91G [00:05&lt;00:02, 358MB/s]
- 68%|######8   | 1.98G/2.91G [00:05&lt;00:02, 365MB/s]
- 69%|######9   | 2.02G/2.91G [00:05&lt;00:02, 376MB/s]
- 71%|#######   | 2.06G/2.91G [00:05&lt;00:02, 382MB/s]
- 72%|#######1  | 2.09G/2.91G [00:05&lt;00:02, 388MB/s]
- 73%|#######3  | 2.13G/2.91G [00:06&lt;00:02, 393MB/s]
- 75%|#######4  | 2.17G/2.91G [00:06&lt;00:01, 397MB/s]
- 76%|#######5  | 2.21G/2.91G [00:06&lt;00:01, 400MB/s]
- 77%|#######7  | 2.25G/2.91G [00:06&lt;00:01, 402MB/s]
- 78%|#######8  | 2.28G/2.91G [00:06&lt;00:01, 397MB/s]
- 80%|#######9  | 2.32G/2.91G [00:06&lt;00:01, 393MB/s]
- 81%|########1 | 2.36G/2.91G [00:06&lt;00:01, 385MB/s]
- 82%|########2 | 2.39G/2.91G [00:06&lt;00:01, 383MB/s]
- 83%|########3 | 2.43G/2.91G [00:06&lt;00:01, 378MB/s]
- 85%|########4 | 2.46G/2.91G [00:06&lt;00:01, 379MB/s]
- 86%|########5 | 2.50G/2.91G [00:07&lt;00:01, 379MB/s]
- 87%|########7 | 2.54G/2.91G [00:07&lt;00:01, 381MB/s]
- 88%|########8 | 2.57G/2.91G [00:07&lt;00:00, 387MB/s]
- 90%|########9 | 2.61G/2.91G [00:07&lt;00:00, 384MB/s]
- 91%|######### | 2.64G/2.91G [00:07&lt;00:00, 379MB/s]
- 92%|#########2| 2.68G/2.91G [00:07&lt;00:00, 380MB/s]
- 93%|#########3| 2.72G/2.91G [00:07&lt;00:00, 383MB/s]
- 95%|#########4| 2.75G/2.91G [00:07&lt;00:00, 385MB/s]
- 96%|#########5| 2.79G/2.91G [00:07&lt;00:00, 384MB/s]
- 97%|#########7| 2.83G/2.91G [00:08&lt;00:00, 388MB/s]
- 98%|#########8| 2.86G/2.91G [00:08&lt;00:00, 381MB/s]
-100%|#########9| 2.90G/2.91G [00:08&lt;00:00, 371MB/s]
-100%|##########| 2.91G/2.91G [00:08&lt;00:00, 378MB/s]
+  1%|1         | 31.7M/2.91G [00:00&lt;00:09, 333MB/s]
+  2%|2         | 63.5M/2.91G [00:00&lt;00:11, 271MB/s]
+  3%|3         | 96.3M/2.91G [00:00&lt;00:10, 300MB/s]
+  4%|4         | 126M/2.91G [00:00&lt;00:10, 295MB/s]
+  5%|5         | 154M/2.91G [00:00&lt;00:10, 286MB/s]
+  6%|6         | 182M/2.91G [00:00&lt;00:10, 284MB/s]
+  7%|7         | 211M/2.91G [00:00&lt;00:09, 292MB/s]
+  8%|8         | 239M/2.91G [00:00&lt;00:10, 272MB/s]
+  9%|8         | 266M/2.91G [00:00&lt;00:10, 267MB/s]
+ 10%|9         | 291M/2.91G [00:01&lt;00:10, 261MB/s]
+ 11%|#         | 320M/2.91G [00:01&lt;00:10, 273MB/s]
+ 12%|#1        | 347M/2.91G [00:01&lt;00:10, 252MB/s]
+ 13%|#2        | 374M/2.91G [00:01&lt;00:10, 263MB/s]
+ 13%|#3        | 400M/2.91G [00:01&lt;00:12, 222MB/s]
+ 14%|#4        | 422M/2.91G [00:01&lt;00:12, 222MB/s]
+ 15%|#4        | 444M/2.91G [00:01&lt;00:14, 182MB/s]
+ 16%|#5        | 467M/2.91G [00:01&lt;00:13, 194MB/s]
+ 16%|#6        | 487M/2.91G [00:02&lt;00:13, 195MB/s]
+ 17%|#6        | 506M/2.91G [00:02&lt;00:15, 164MB/s]
+ 18%|#7        | 523M/2.91G [00:02&lt;00:15, 168MB/s]
+ 18%|#8        | 543M/2.91G [00:02&lt;00:14, 178MB/s]
+ 19%|#9        | 567M/2.91G [00:02&lt;00:12, 196MB/s]
+ 20%|#9        | 596M/2.91G [00:02&lt;00:11, 226MB/s]
+ 21%|##        | 618M/2.91G [00:02&lt;00:10, 228MB/s]
+ 22%|##1       | 641M/2.91G [00:02&lt;00:10, 230MB/s]
+ 22%|##2       | 670M/2.91G [00:02&lt;00:09, 254MB/s]
+ 23%|##3       | 695M/2.91G [00:03&lt;00:09, 249MB/s]
+ 24%|##4       | 722M/2.91G [00:03&lt;00:09, 260MB/s]
+ 25%|##5       | 757M/2.91G [00:03&lt;00:08, 291MB/s]
+ 26%|##6       | 785M/2.91G [00:03&lt;00:07, 289MB/s]
+ 27%|##7       | 813M/2.91G [00:03&lt;00:08, 276MB/s]
+ 28%|##8       | 846M/2.91G [00:03&lt;00:07, 296MB/s]
+ 29%|##9       | 874M/2.91G [00:03&lt;00:08, 249MB/s]
+ 30%|###       | 900M/2.91G [00:03&lt;00:09, 237MB/s]
+ 31%|###1      | 930M/2.91G [00:04&lt;00:08, 258MB/s]
+ 32%|###2      | 967M/2.91G [00:04&lt;00:07, 292MB/s]
+ 33%|###3      | 996M/2.91G [00:04&lt;00:07, 268MB/s]
+ 34%|###4      | 1.00G/2.91G [00:04&lt;00:07, 281MB/s]
+ 36%|###5      | 1.03G/2.91G [00:04&lt;00:06, 296MB/s]
+ 37%|###6      | 1.06G/2.91G [00:04&lt;00:06, 301MB/s]
+ 37%|###7      | 1.09G/2.91G [00:04&lt;00:08, 234MB/s]
+ 39%|###8      | 1.12G/2.91G [00:04&lt;00:07, 261MB/s]
+ 40%|###9      | 1.15G/2.91G [00:04&lt;00:06, 280MB/s]
+ 41%|####      | 1.18G/2.91G [00:05&lt;00:06, 281MB/s]
+ 42%|####1     | 1.21G/2.91G [00:05&lt;00:06, 281MB/s]
+ 43%|####2     | 1.24G/2.91G [00:05&lt;00:06, 283MB/s]
+ 43%|####3     | 1.26G/2.91G [00:05&lt;00:06, 262MB/s]
+ 44%|####4     | 1.29G/2.91G [00:05&lt;00:06, 274MB/s]
+ 45%|####5     | 1.32G/2.91G [00:05&lt;00:05, 287MB/s]
+ 47%|####6     | 1.36G/2.91G [00:05&lt;00:05, 304MB/s]
+ 48%|####7     | 1.38G/2.91G [00:05&lt;00:05, 307MB/s]
+ 49%|####8     | 1.42G/2.91G [00:05&lt;00:05, 320MB/s]
+ 50%|####9     | 1.45G/2.91G [00:05&lt;00:05, 312MB/s]
+ 51%|#####     | 1.48G/2.91G [00:06&lt;00:05, 304MB/s]
+ 52%|#####1    | 1.51G/2.91G [00:06&lt;00:05, 261MB/s]
+ 53%|#####2    | 1.53G/2.91G [00:06&lt;00:05, 264MB/s]
+ 54%|#####3    | 1.57G/2.91G [00:06&lt;00:04, 295MB/s]
+ 55%|#####4    | 1.59G/2.91G [00:06&lt;00:04, 299MB/s]
+ 56%|#####5    | 1.62G/2.91G [00:06&lt;00:04, 301MB/s]
+ 57%|#####6    | 1.65G/2.91G [00:06&lt;00:05, 259MB/s]
+ 58%|#####7    | 1.68G/2.91G [00:06&lt;00:05, 254MB/s]
+ 58%|#####8    | 1.70G/2.91G [00:07&lt;00:05, 239MB/s]
+ 59%|#####9    | 1.72G/2.91G [00:07&lt;00:05, 227MB/s]
+ 60%|#####9    | 1.75G/2.91G [00:07&lt;00:05, 227MB/s]
+ 61%|######    | 1.77G/2.91G [00:07&lt;00:05, 238MB/s]
+ 62%|######1   | 1.80G/2.91G [00:07&lt;00:04, 245MB/s]
+ 63%|######2   | 1.83G/2.91G [00:07&lt;00:04, 282MB/s]
+ 64%|######4   | 1.87G/2.91G [00:07&lt;00:03, 314MB/s]
+ 65%|######5   | 1.90G/2.91G [00:07&lt;00:03, 296MB/s]
+ 66%|######6   | 1.93G/2.91G [00:07&lt;00:03, 316MB/s]
+ 67%|######7   | 1.96G/2.91G [00:08&lt;00:03, 328MB/s]
+ 69%|######8   | 1.99G/2.91G [00:08&lt;00:03, 322MB/s]
+ 70%|######9   | 2.02G/2.91G [00:08&lt;00:03, 286MB/s]
+ 71%|#######   | 2.06G/2.91G [00:08&lt;00:03, 300MB/s]
+ 72%|#######1  | 2.09G/2.91G [00:08&lt;00:02, 329MB/s]
+ 73%|#######3  | 2.13G/2.91G [00:08&lt;00:02, 353MB/s]
+ 74%|#######4  | 2.17G/2.91G [00:08&lt;00:02, 345MB/s]
+ 76%|#######5  | 2.20G/2.91G [00:08&lt;00:03, 253MB/s]
+ 77%|#######6  | 2.23G/2.91G [00:08&lt;00:02, 272MB/s]
+ 78%|#######7  | 2.27G/2.91G [00:09&lt;00:02, 303MB/s]
+ 79%|#######8  | 2.30G/2.91G [00:09&lt;00:02, 303MB/s]
+ 80%|#######9  | 2.33G/2.91G [00:09&lt;00:02, 293MB/s]
+ 81%|########  | 2.36G/2.91G [00:09&lt;00:02, 284MB/s]
+ 82%|########1 | 2.38G/2.91G [00:09&lt;00:01, 290MB/s]
+ 83%|########3 | 2.42G/2.91G [00:09&lt;00:01, 306MB/s]
+ 84%|########4 | 2.45G/2.91G [00:09&lt;00:01, 304MB/s]
+ 85%|########5 | 2.48G/2.91G [00:09&lt;00:01, 315MB/s]
+ 86%|########6 | 2.52G/2.91G [00:09&lt;00:01, 343MB/s]
+ 88%|########7 | 2.55G/2.91G [00:10&lt;00:01, 357MB/s]
+ 89%|########8 | 2.59G/2.91G [00:10&lt;00:01, 316MB/s]
+ 90%|########9 | 2.62G/2.91G [00:10&lt;00:00, 316MB/s]
+ 91%|######### | 2.65G/2.91G [00:10&lt;00:01, 217MB/s]
+ 92%|#########1| 2.67G/2.91G [00:10&lt;00:01, 233MB/s]
+ 93%|#########2| 2.70G/2.91G [00:10&lt;00:00, 247MB/s]
+ 94%|#########3| 2.73G/2.91G [00:10&lt;00:00, 270MB/s]
+ 95%|#########4| 2.76G/2.91G [00:10&lt;00:00, 275MB/s]
+ 96%|#########5| 2.79G/2.91G [00:11&lt;00:00, 271MB/s]
+ 97%|#########6| 2.82G/2.91G [00:11&lt;00:00, 282MB/s]
+ 98%|#########7| 2.84G/2.91G [00:11&lt;00:00, 278MB/s]
+ 99%|#########8| 2.87G/2.91G [00:11&lt;00:00, 289MB/s]
+100%|#########9| 2.90G/2.91G [00:11&lt;00:00, 289MB/s]
+100%|##########| 2.91G/2.91G [00:11&lt;00:00, 271MB/s]
 PretrainedFiles(lexicon=&#39;/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lexicon.txt&#39;, tokens=&#39;/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/tokens.txt&#39;, lm=&#39;/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lm.bin&#39;)
 </pre></div>
 </div>
@@ -897,30 +942,45 @@ tensor([  0,  31,  33,  36,  39,  41,  42,  44,  46,  48,  49,  52,  54,  58,
 </pre></div>
 </div>
 <p>Below, we visualize the token timestep alignments relative to the original waveform.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_alignments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">):</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_alignments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">):</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange" title="torch.arange" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a>
+    <span class="n">ratio</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a>
 
-    <span class="n">ratio</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">word_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">chars</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">word_start</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">token</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a> <span class="o">*</span> <span class="n">ratio</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">token</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">word_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">word_start</span><span class="p">,</span> <span class="n">timestep</span><span class="p">))</span>
+            <span class="n">word_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chars</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">token</span><span class="p">,</span> <span class="n">timestep</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">word_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">word_start</span> <span class="o">=</span> <span class="n">timestep</span>
 
-    <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">)):</span>
-        <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
-            <span class="n">word_start</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span>
-        <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tokens</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.02</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-        <span class="k">elif</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">word_end</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">word_start</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">word_end</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="n">xticks</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">xticks</span> <span class="o">/</span> <span class="n">bundle</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (sec)&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlim</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">)</span>
+        <span class="k">for</span> <span class="n">token</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">chars</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">word_start</span><span class="p">,</span> <span class="n">word_end</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">word_start</span><span class="p">,</span> <span class="n">word_end</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+
+    <span class="n">_plot</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+    <span class="n">_plot</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.7</span><span class="p">))</span>
+    <span class="n">_plot</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">(</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">6.9</span><span class="p">))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (sec)&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 
 
-<span class="n">plot_alignments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">predicted_tokens</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">)</span>
+<span class="n">plot_alignments</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">predicted_tokens</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timesteps</span></a><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sample_rate</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_001.png" srcset="../_images/sphx_glr_asr_inference_with_ctc_decoder_tutorial_001.png" alt="asr inference with ctc decoder tutorial" class = "sphx-glr-single-img"/></section>
@@ -955,9 +1015,9 @@ decoder earlier, we can now access the hypotheses with the top 3 scores.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transcript</span></a><span class="si">}</span><span class="s2"> (score: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">score</span></a><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.824877529141)
-i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: 3697.859134184119)
-i reply was very much afraid of showing him how much shocked i was at some part of what he said (score: 3695.016531050202)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.8247656512226)
+i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: 3697.8590263593164)
+i reply was very much afraid of showing him how much shocked i was at some part of what he said (score: 3695.0164135098426)
 </pre></div>
 </div>
 </section>
@@ -987,10 +1047,10 @@ computation time.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;beam size&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_size</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0476 secs)
-beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0522 secs)
-beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.1708 secs)
-beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.5597 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0452 secs)
+beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0514 secs)
+beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.1643 secs)
+beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.5416 secs)
 </pre></div>
 </div>
 </section>
@@ -1016,10 +1076,10 @@ hypotheses at the cost of computation.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;beam size token&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_size_token</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.1792 secs)
-beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.1853 secs)
-beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.2086 secs)
-beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2366 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.1583 secs)
+beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.1786 secs)
+beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.1979 secs)
+beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2291 secs)
 </pre></div>
 </div>
 </section>
@@ -1046,10 +1106,10 @@ threshold such that plausible hypotheses are not pruned.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;beam threshold&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_threshold</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0323 secs)
-beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0488 secs)
-beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2353 secs)
-beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2455 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0277 secs)
+beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0540 secs)
+beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2112 secs)
+beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2325 secs)
 </pre></div>
 </div>
 </section>
@@ -1074,9 +1134,9 @@ give more weight to the acoustic model score instead.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">emission</span></a><span class="p">,</span> <span class="s2">&quot;lm weight&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lm_weight</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.06; 0.2682 secs)
-lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2722 secs)
-lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2493 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.06; 0.2550 secs)
+lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2616 secs)
+lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2410 secs)
 </pre></div>
 </div>
 </section>
@@ -1089,7 +1149,7 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2
 <li><p><code class="docutils literal notranslate"><span class="pre">sil_score</span></code>: silence appearance score to add</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">log_add</span></code>: whether to use log add for lexicon Trie smearing</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  52.183 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  1.171 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-asr-inference-with-ctc-decoder-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/da151acc525ba1fb468e2a4904659af1/asr_inference_with_ctc_decoder_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">asr_inference_with_ctc_decoder_tutorial.py</span></code></a></p>
@@ -1111,7 +1171,7 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="online_asr_tutorial.html" class="btn btn-neutral float-right" title="Online ASR with Emformer RNN-T" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="asr_inference_with_cuda_ctc_decoder_tutorial.html" class="btn btn-neutral float-right" title="ASR Inference with CUDA CTC Decoder" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="speech_recognition_pipeline_tutorial.html" class="btn btn-neutral" title="Speech Recognition with Wav2Vec2" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -1396,13 +1456,9 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1435,6 +1491,18 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1450,18 +1518,15 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1469,7 +1534,23 @@ lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

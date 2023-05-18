@@ -6,28 +6,25 @@ Tacotron2TTSBundle
 
 .. autoclass:: torchaudio.pipelines.Tacotron2TTSBundle()
 
-..
-   ATTRIBUTES
-
-..
-   METHODS
+Methods
+-------
 
 get_tacotron2
--------------
+~~~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. automethod:: torchaudio.pipelines.Tacotron2TTSBundle.get_tacotron2
 
 get_text_processor
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. container:: py attribute
 
    .. automethod:: torchaudio.pipelines.Tacotron2TTSBundle.get_text_processor
 
 get_vocoder
------------
+~~~~~~~~~~~
 
 .. container:: py attribute
 

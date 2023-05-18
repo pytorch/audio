@@ -1,0 +1,6 @@
+﻿torchaudio.functional.forced\_align
+===================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: forced_align

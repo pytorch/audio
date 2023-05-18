@@ -61,6 +61,7 @@ def _hide_seek(obj):
 
         def read(self, n):
             return self.obj.read(n)
+
     return _wrapper(obj)
 
 
@@ -180,7 +181,6 @@ def plot_waveform(waveform, sample_rate):
         if num_channels > 1:
             axes[c].set_ylabel(f"Channel {c+1}")
     figure.suptitle("waveform")
-    plt.show(block=False)
 
 
 ######################################################################
@@ -203,7 +203,6 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram"):
         if num_channels > 1:
             axes[c].set_ylabel(f"Channel {c+1}")
     figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################
@@ -294,7 +293,8 @@ with requests.get(url, stream=True) as response:
 print("Fetching until the requested frames are available...")
 with requests.get(url, stream=True) as response:
     waveform2, sample_rate2 = torchaudio.load(
-        _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames)
+        _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames
+    )
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Checking the resulting waveform ... ", end="")
@@ -333,6 +333,7 @@ waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
 ######################################################################
 #
 
+
 def inspect_file(path):
     print("-" * 10)
     print("Source:", path)
@@ -340,6 +341,7 @@ def inspect_file(path):
     print(f" - File size: {os.path.getsize(path)} bytes")
     print(f" - {torchaudio.info(path)}")
     print()
+
 
 ######################################################################
 #

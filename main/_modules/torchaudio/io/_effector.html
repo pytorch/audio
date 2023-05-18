@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.io._effector &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>torchaudio.io._effector &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -41,18 +41,13 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -129,12 +124,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -162,13 +161,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -210,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -258,12 +269,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -274,9 +287,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -288,12 +304,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
@@ -398,6 +414,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -553,9 +573,7 @@
 <span class="sd">        pad_end (bool, optional): When enabled, and if the waveform becomes shorter after applying</span>
 <span class="sd">            effects/codec, then pad the end with silence.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        * Basic usage</span>
-
+<span class="sd">    Example - Basic usage</span>
 <span class="sd">        To use ``AudioEffector``, first instantiate it with a set of</span>
 <span class="sd">        ``effect`` and ``format``.</span>
 
@@ -572,8 +590,7 @@
 <span class="sd">        &gt;&gt;&gt; for chunk in effector.stream(waveform, sample_rate):</span>
 <span class="sd">        &gt;&gt;&gt;    ...</span>
 
-<span class="sd">        * Applying effects</span>
-
+<span class="sd">    Example - Applying effects</span>
 <span class="sd">        Please refer to</span>
 <span class="sd">        https://ffmpeg.org/ffmpeg-filters.html#Filtergraph-description</span>
 <span class="sd">        for the overview of filter description, and</span>
@@ -604,8 +621,7 @@
 
 <span class="sd">        &gt;&gt;&gt; AudioEffector(effect=&quot;&quot;)</span>
 
-<span class="sd">        * Applying codec</span>
-
+<span class="sd">    Example - Applying codec</span>
 <span class="sd">        One can apply codec using ``format`` argument. ``format`` can be</span>
 <span class="sd">        audio format or container format. If the container format supports</span>
 <span class="sd">        multiple encoders, you can specify it with ``encoder`` argument.</span>
@@ -632,8 +648,7 @@
 
 <span class="sd">        &gt;&gt;&gt; AudioEffector(format=&quot;webm&quot;, encoder=&quot;opus&quot;)</span>
 
-<span class="sd">        * Applying codec with configuration</span>
-
+<span class="sd">    Example - Applying codec with configuration</span>
 <span class="sd">        Reference: https://trac.ffmpeg.org/wiki/Encode/MP3</span>
 
 <span class="sd">        MP3 with default config</span>
@@ -667,13 +682,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">codec_config</span> <span class="o">=</span> <span class="n">codec_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_end</span> <span class="o">=</span> <span class="n">pad_end</span>
 
-    <span class="k">def</span> <span class="nf">_get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">num_frames</span><span class="p">,</span> <span class="n">num_channels</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">muxer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span>
             <span class="n">encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span>
             <span class="n">option</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># Some formats are headerless, so need to provide these infomation.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="s2">&quot;mulaw&quot;</span><span class="p">:</span>
+                <span class="n">option</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_channels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># PCM</span>
             <span class="n">muxer</span> <span class="o">=</span> <span class="n">_get_muxer</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
             <span class="n">encoder</span> <span class="o">=</span> <span class="kc">None</span>
@@ -686,7 +705,8 @@
                 <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="n">muxer</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">codec_config</span><span class="p">,</span> <span class="n">frames_per_chunk</span>
             <span class="p">)</span>
 
-        <span class="n">filter_desc</span> <span class="o">=</span> <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">_get_sample_fmt</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">num_channels</span><span class="p">)</span>
+        <span class="n">output_sr</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="k">if</span> <span class="n">output_sample_rate</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_sample_rate</span>
+        <span class="n">filter_desc</span> <span class="o">=</span> <span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">output_sr</span><span class="p">,</span> <span class="n">_get_sample_fmt</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">num_channels</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_end</span><span class="p">:</span>
             <span class="n">filter_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filter_desc</span><span class="si">}</span><span class="s2">,apad=whole_len=</span><span class="si">{</span><span class="n">num_frames</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -694,12 +714,17 @@
         <span class="n">reader</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">frames_per_chunk</span> <span class="ow">or</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">filter_desc</span><span class="o">=</span><span class="n">filter_desc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">reader</span>
 
-<div class="viewcode-block" id="AudioEffector.apply"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="AudioEffector.apply"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the effect and/or codecs to the whole tensor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (Tensor): The input waveform. Shape: ``(time, channel)``</span>
-<span class="sd">            sample_rate (int): Sample rate of the waveform.</span>
+<span class="sd">            sample_rate (int): Sample rate of the input waveform.</span>
+<span class="sd">            output_sample_rate (int or None, optional): Output sample rate.</span>
+<span class="sd">                If provided, override the output sample rate.</span>
+<span class="sd">                Otherwise, the resulting tensor is resampled to have</span>
+<span class="sd">                the same sample rate as the input.</span>
+<span class="sd">                Default: ``None``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor:</span>
@@ -712,18 +737,25 @@
         <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">waveform</span>
 
-        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reader</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reader</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">)</span>
         <span class="n">reader</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span>
         <span class="p">(</span><span class="n">applied</span><span class="p">,)</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">applied</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AudioEffector.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<div class="viewcode-block" id="AudioEffector.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the effect and/or codecs to the given tensor chunk by chunk.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (Tensor): The input waveform. Shape: ``(time, channel)``</span>
 <span class="sd">            sample_rate (int): Sample rate of the waveform.</span>
 <span class="sd">            frames_per_chunk (int): The number of frames to return at a time.</span>
+<span class="sd">            output_sample_rate (int or None, optional): Output sample rate.</span>
+<span class="sd">                If provided, override the output sample rate.</span>
+<span class="sd">                Otherwise, the resulting tensor is resampled to have</span>
+<span class="sd">                the same sample rate as the input.</span>
+<span class="sd">                Default: ``None``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Iterator[Tensor]:</span>
@@ -737,7 +769,7 @@
         <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">waveform</span>
 
-        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reader</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reader</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">applied</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">applied</span><span class="p">)</span></div></div>
 </pre></div>
@@ -989,13 +1021,9 @@
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1028,6 +1056,18 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1043,18 +1083,15 @@
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1062,7 +1099,23 @@
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

@@ -47,37 +47,44 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    2.1.0.dev20230517
-    2.1.0.dev20230517
+    2.1.0.dev20230901
+    2.2.0.dev20230902
 
 
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-25
 
-Preparing data and utility functions (skip this section)
---------------------------------------------------------
+Preparation
+-----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-90
+.. GENERATED FROM PYTHON SOURCE LINES 25-30
 
 .. code-block:: default
 
 
-    # @title Prepare data and utility functions. {display-mode: "form"}
-    # @markdown
-    # @markdown You do not need to look into this cell.
-    # @markdown Just execute once and you are good to go.
-    # @markdown
-    # @markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/),
-    # @markdown which is licensed under Creative Commos BY 4.0.
-
-    # -------------------------------------------------------------------------------
-    # Preparation of data and helper functions.
-    # -------------------------------------------------------------------------------
     import librosa
     import matplotlib.pyplot as plt
     from torchaudio.utils import download_asset
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 31-34
+
+In this tutorial, we will use a speech data from
+`VOiCES dataset <https://iqtlabs.github.io/voices/>`__,
+which is licensed under Creative Commos BY 4.0.
+
+.. GENERATED FROM PYTHON SOURCE LINES 34-77
+
+.. code-block:: default
+
 
     SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
@@ -116,26 +123,25 @@ Preparing data and utility functions (skip this section)
         return spectrogram(waveform)
 
 
-    def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
-        fig, axs = plt.subplots(1, 1)
-        axs.set_title(title or "Spectrogram (db)")
-        axs.set_ylabel(ylabel)
-        axs.set_xlabel("frame")
-        im = axs.imshow(librosa.power_to_db(spec), origin="lower", aspect=aspect)
-        if xmax:
-            axs.set_xlim((0, xmax))
-        fig.colorbar(im, ax=axs)
-        plt.show(block=False)
+    def plot_spec(ax, spec, title, ylabel="freq_bin"):
+        ax.set_title(title)
+        ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
 
 
 
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 80.7MB/s]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-101
+
+.. GENERATED FROM PYTHON SOURCE LINES 78-88
 
 SpecAugment
 -----------
@@ -148,13 +154,13 @@ is a popular spectrogram augmentation technique.
 :py:func:`torchaudio.transforms.FrequencyMasking`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-106
+.. GENERATED FROM PYTHON SOURCE LINES 90-93
 
 TimeStretch
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-121
+.. GENERATED FROM PYTHON SOURCE LINES 93-101
 
 .. code-block:: default
 
@@ -163,132 +169,93 @@ TimeStretch
     spec = get_spectrogram(power=None)
     stretch = T.TimeStretch()
 
-    rate = 1.2
-    spec_ = stretch(spec, rate)
-    plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
-
-    plot_spectrogram(torch.abs(spec[0]), title="Original", aspect="equal", xmax=304)
-
-    rate = 0.9
-    spec_ = stretch(spec, rate)
-    plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
-
-
-
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_001.png
-         :alt: Stretched x1.2
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_001.png
-         :class: sphx-glr-multi-img
-
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_002.png
-         :alt: Original
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_002.png
-         :class: sphx-glr-multi-img
-
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_003.png
-         :alt: Stretched x0.9
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_003.png
-         :class: sphx-glr-multi-img
+    spec_12 = stretch(spec, overriding_rate=1.2)
+    spec_09 = stretch(spec, overriding_rate=0.9)
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-125
-
-TimeMasking
------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-136
+
+.. GENERATED FROM PYTHON SOURCE LINES 103-115
+
+.. code-block:: default
+
+
+
+    def plot():
+        fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
+        plot_spec(axes[0], torch.abs(spec_12[0]), title="Stretched x1.2")
+        plot_spec(axes[1], torch.abs(spec[0]), title="Original")
+        plot_spec(axes[2], torch.abs(spec_09[0]), title="Stretched x0.9")
+        fig.tight_layout()
+
+
+    plot()
+
+
+
+
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_001.png
+   :alt: Stretched x1.2, Original, Stretched x0.9
+   :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 116-119
+
+Time and Frequency Masking
+--------------------------
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 119-129
 
 .. code-block:: default
 
 
     torch.random.manual_seed(4)
 
+    time_masking = T.TimeMasking(time_mask_param=80)
+    freq_masking = T.FrequencyMasking(freq_mask_param=80)
+
     spec = get_spectrogram()
-    plot_spectrogram(spec[0], title="Original")
-
-    masking = T.TimeMasking(time_mask_param=80)
-    spec = masking(spec)
-
-    plot_spectrogram(spec[0], title="Masked along time axis")
-
-
-
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_004.png
-         :alt: Original
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_004.png
-         :class: sphx-glr-multi-img
-
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_005.png
-         :alt: Masked along time axis
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_005.png
-         :class: sphx-glr-multi-img
+    time_masked = time_masking(spec)
+    freq_masked = freq_masking(spec)
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-140
-
-FrequencyMasking
-----------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-151
+
+.. GENERATED FROM PYTHON SOURCE LINES 131-142
 
 .. code-block:: default
 
 
 
-    torch.random.manual_seed(4)
-
-    spec = get_spectrogram()
-    plot_spectrogram(spec[0], title="Original")
-
-    masking = T.FrequencyMasking(freq_mask_param=80)
-    spec = masking(spec)
-
-    plot_spectrogram(spec[0], title="Masked along frequency axis")
+    def plot():
+        fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
+        plot_spec(axes[0], spec[0], title="Original")
+        plot_spec(axes[1], time_masked[0], title="Masked along time axis")
+        plot_spec(axes[2], freq_masked[0], title="Masked along frequency axis")
+        fig.tight_layout()
 
 
+    plot()
 
-.. rst-class:: sphx-glr-horizontal
 
 
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_006.png
-         :alt: Original
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_006.png
-         :class: sphx-glr-multi-img
-
-    *
-
-      .. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_007.png
-         :alt: Masked along frequency axis
-         :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_007.png
-         :class: sphx-glr-multi-img
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_002.png
+   :alt: Original, Masked along time axis, Masked along frequency axis
+   :srcset: /tutorials/images/sphx_glr_audio_feature_augmentation_tutorial_002.png
+   :class: sphx-glr-single-img
 
 
 
@@ -297,7 +264,7 @@ FrequencyMasking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.860 seconds)
+   **Total running time of the script:** ( 0 minutes  2.667 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

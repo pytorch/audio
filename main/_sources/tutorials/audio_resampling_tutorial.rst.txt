@@ -46,8 +46,8 @@ This tutorial shows how to use torchaudio's resampling API.
 
  .. code-block:: none
 
-    2.1.0.dev20230517
-    2.1.0.dev20230517
+    2.1.0.dev20230901
+    2.2.0.dev20230902
 
 
 
@@ -60,7 +60,7 @@ Preparation
 First, we import the modules and define the helper functions.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-111
+.. GENERATED FROM PYTHON SOURCE LINES 25-110
 
 .. code-block:: default
 
@@ -69,14 +69,14 @@ First, we import the modules and define the helper functions.
     import timeit
 
     import librosa
-    import resampy
-    import matplotlib.pyplot as plt
     import matplotlib.colors as mcolors
+    import matplotlib.pyplot as plt
     import pandas as pd
-    from IPython.display import Audio, display
+    import resampy
+    from IPython.display import Audio
 
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.max_columns", None)
 
     DEFAULT_OFFSET = 201
 
@@ -147,7 +147,6 @@ First, we import the modules and define the helper functions.
         axis.yaxis.grid(True, alpha=0.67)
         figure.suptitle(f"{title} (sample rate: {sample_rate} Hz)")
         plt.colorbar(cax)
-        plt.show(block=True)
 
 
 
@@ -157,7 +156,7 @@ First, we import the modules and define the helper functions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-148
+.. GENERATED FROM PYTHON SOURCE LINES 111-147
 
 Resampling Overview
 -------------------
@@ -196,7 +195,7 @@ waveform (in log scale), y-axis the frequency of the
 plotted waveform, and color intensity the amplitude.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-155
+.. GENERATED FROM PYTHON SOURCE LINES 147-154
 
 .. code-block:: default
 
@@ -230,7 +229,7 @@ plotted waveform, and color intensity the amplitude.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-163
+.. GENERATED FROM PYTHON SOURCE LINES 155-162
 
 Now we resample (downsample) it.
 
@@ -240,7 +239,7 @@ This effect is called aliasing.
 `This page <https://music.arts.uci.edu/dobrian/digitalaudio.htm>`__ has
 an explanation of how it happens, and why it looks like a reflection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-172
+.. GENERATED FROM PYTHON SOURCE LINES 163-171
 
 .. code-block:: default
 
@@ -275,7 +274,7 @@ an explanation of how it happens, and why it looks like a reflection.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-187
+.. GENERATED FROM PYTHON SOURCE LINES 172-186
 
 Controling resampling quality with parameters
 ---------------------------------------------
@@ -292,7 +291,7 @@ provides a sharper, more precise filter, but is more computationally
 expensive.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-194
+.. GENERATED FROM PYTHON SOURCE LINES 186-193
 
 .. code-block:: default
 
@@ -315,7 +314,7 @@ expensive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-200
+.. GENERATED FROM PYTHON SOURCE LINES 195-199
 
 .. code-block:: default
 
@@ -335,7 +334,7 @@ expensive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-212
+.. GENERATED FROM PYTHON SOURCE LINES 200-211
 
 Rolloff
 ~~~~~~~
@@ -349,7 +348,7 @@ will therefore reduce the amount of aliasing, but it will also reduce
 some of the higher frequencies.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-220
+.. GENERATED FROM PYTHON SOURCE LINES 211-219
 
 .. code-block:: default
 
@@ -373,7 +372,7 @@ some of the higher frequencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-227
+.. GENERATED FROM PYTHON SOURCE LINES 221-226
 
 .. code-block:: default
 
@@ -394,7 +393,7 @@ some of the higher frequencies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-238
+.. GENERATED FROM PYTHON SOURCE LINES 227-237
 
 Window function
 ~~~~~~~~~~~~~~~
@@ -407,7 +406,7 @@ filter and width of impulse. This can be controlled using the
 ``resampling_method`` parameter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-246
+.. GENERATED FROM PYTHON SOURCE LINES 237-245
 
 .. code-block:: default
 
@@ -431,7 +430,7 @@ filter and width of impulse. This can be controlled using the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-253
+.. GENERATED FROM PYTHON SOURCE LINES 247-252
 
 .. code-block:: default
 
@@ -452,7 +451,7 @@ filter and width of impulse. This can be controlled using the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 254-260
+.. GENERATED FROM PYTHON SOURCE LINES 253-259
 
 Comparison against librosa
 --------------------------
@@ -461,7 +460,7 @@ Comparison against librosa
 that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-264
+.. GENERATED FROM PYTHON SOURCE LINES 259-263
 
 .. code-block:: default
 
@@ -476,13 +475,13 @@ that of librosa (resampy)’s kaiser window resampling, with some noise
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-268
+.. GENERATED FROM PYTHON SOURCE LINES 264-267
 
 kaiser_best
 ~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 268-279
+.. GENERATED FROM PYTHON SOURCE LINES 267-278
 
 .. code-block:: default
 
@@ -509,7 +508,7 @@ kaiser_best
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 281-287
+.. GENERATED FROM PYTHON SOURCE LINES 280-286
 
 .. code-block:: default
 
@@ -531,7 +530,7 @@ kaiser_best
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 289-293
+.. GENERATED FROM PYTHON SOURCE LINES 288-292
 
 .. code-block:: default
 
@@ -552,13 +551,13 @@ kaiser_best
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-297
+.. GENERATED FROM PYTHON SOURCE LINES 293-296
 
 kaiser_fast
 ~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-308
+.. GENERATED FROM PYTHON SOURCE LINES 296-307
 
 .. code-block:: default
 
@@ -585,7 +584,7 @@ kaiser_fast
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 310-316
+.. GENERATED FROM PYTHON SOURCE LINES 309-315
 
 .. code-block:: default
 
@@ -607,7 +606,7 @@ kaiser_fast
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 318-322
+.. GENERATED FROM PYTHON SOURCE LINES 317-321
 
 .. code-block:: default
 
@@ -628,7 +627,7 @@ kaiser_fast
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 323-333
+.. GENERATED FROM PYTHON SOURCE LINES 322-332
 
 Performance Benchmarking
 ------------------------
@@ -641,7 +640,7 @@ have. Additionally, we provide a comparison against ``librosa``\ ’s
 in ``torchaudio``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 333-338
+.. GENERATED FROM PYTHON SOURCE LINES 332-337
 
 .. code-block:: default
 
@@ -658,16 +657,17 @@ in ``torchaudio``.
 
  .. code-block:: none
 
-    torchaudio: 2.1.0.dev20230517
+    torchaudio: 2.2.0.dev20230902
     librosa: 0.10.0
     resampy: 0.2.2
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 340-369
+.. GENERATED FROM PYTHON SOURCE LINES 339-373
 
 .. code-block:: default
+
 
 
     def benchmark_resample_functional(
@@ -680,8 +680,9 @@ in ``torchaudio``.
         beta=None,
         iters=5,
     ):
-        return timeit.timeit(
-            stmt='''
+        return (
+            timeit.timeit(
+                stmt="""
     torchaudio.functional.resample(
         waveform,
         sample_rate,
@@ -691,11 +692,14 @@ in ``torchaudio``.
         resampling_method=resampling_method,
         beta=beta,
     )
-            ''',
-            setup='import torchaudio',
-            number=iters,
-            globals=locals(),
-        ) * 1000 / iters
+            """,
+                setup="import torchaudio",
+                number=iters,
+                globals=locals(),
+            )
+            * 1000
+            / iters
+        )
 
 
 
@@ -705,9 +709,10 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 371-403
+.. GENERATED FROM PYTHON SOURCE LINES 375-412
 
 .. code-block:: default
+
 
 
     def benchmark_resample_transforms(
@@ -720,9 +725,10 @@ in ``torchaudio``.
         beta=None,
         iters=5,
     ):
-        return timeit.timeit(
-            stmt='resampler(waveform)',
-            setup='''
+        return (
+            timeit.timeit(
+                stmt="resampler(waveform)",
+                setup="""
     import torchaudio
 
     resampler = torchaudio.transforms.Resample(
@@ -735,10 +741,13 @@ in ``torchaudio``.
         beta=beta,
     )
     resampler.to(waveform.device)
-            ''',
-            number=iters,
-            globals=locals(),
-        ) * 1000 / iters
+            """,
+                number=iters,
+                globals=locals(),
+            )
+            * 1000
+            / iters
+        )
 
 
 
@@ -748,9 +757,10 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 405-429
+.. GENERATED FROM PYTHON SOURCE LINES 414-443
 
 .. code-block:: default
+
 
 
     def benchmark_resample_librosa(
@@ -761,19 +771,23 @@ in ``torchaudio``.
         iters=5,
     ):
         waveform_np = waveform.squeeze().numpy()
-        return timeit.timeit(
-            stmt='''
+        return (
+            timeit.timeit(
+                stmt="""
     librosa.resample(
         waveform_np,
         orig_sr=sample_rate,
         target_sr=resample_rate,
         res_type=res_type,
     )
-            ''',
-            setup='import librosa',
-            number=iters,
-            globals=locals(),
-        ) * 1000 / iters
+            """,
+                setup="import librosa",
+                number=iters,
+                globals=locals(),
+            )
+            * 1000
+            / iters
+        )
 
 
 
@@ -783,9 +797,10 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 431-480
+.. GENERATED FROM PYTHON SOURCE LINES 445-495
 
 .. code-block:: default
+
 
 
     def benchmark(sample_rate, resample_rate):
@@ -843,7 +858,7 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 482-492
+.. GENERATED FROM PYTHON SOURCE LINES 497-507
 
 .. code-block:: default
 
@@ -851,7 +866,7 @@ in ``torchaudio``.
         print(df.round(2))
         ax = df.plot(kind="bar")
         plt.ylabel("Time Elapsed [ms]")
-        plt.xticks(rotation = 0, fontsize=10)
+        plt.xticks(rotation=0, fontsize=10)
         for cont, col, color in zip(ax.containers, df.columns, mcolors.TABLEAU_COLORS):
             label = ["N/A" if v != v else str(v) for v in df[col].round(2)]
             ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")
@@ -864,12 +879,12 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 493-495
+.. GENERATED FROM PYTHON SOURCE LINES 508-510
 
 Downsample (48 -> 44.1 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 496-500
+.. GENERATED FROM PYTHON SOURCE LINES 511-515
 
 .. code-block:: default
 
@@ -891,20 +906,20 @@ Downsample (48 -> 44.1 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        1.07        0.49
-    sinc (width 16)      NaN        0.82        0.41
-    kaiser_best        80.99        1.58        0.50
-    kaiser_fast         8.12        1.17        0.43
+    sinc (width 64)      NaN        0.87        0.37
+    sinc (width 16)      NaN        0.74        0.34
+    kaiser_best        80.91        1.24        0.37
+    kaiser_fast         8.11        0.99        0.33
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 501-503
+.. GENERATED FROM PYTHON SOURCE LINES 516-518
 
 Downsample (16 -> 8 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 504-508
+.. GENERATED FROM PYTHON SOURCE LINES 519-523
 
 .. code-block:: default
 
@@ -926,20 +941,20 @@ Downsample (16 -> 8 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        1.94        1.71
-    sinc (width 16)      NaN        0.64        0.51
-    kaiser_best        11.67        2.11        1.80
-    kaiser_fast         3.41        0.80        0.58
+    sinc (width 64)      NaN        1.27        1.10
+    sinc (width 16)      NaN        0.52        0.37
+    kaiser_best        11.54        1.36        1.18
+    kaiser_fast         3.41        0.59        0.40
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 509-511
+.. GENERATED FROM PYTHON SOURCE LINES 524-526
 
 Upsample (44.1 -> 48 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 512-516
+.. GENERATED FROM PYTHON SOURCE LINES 527-531
 
 .. code-block:: default
 
@@ -961,20 +976,20 @@ Upsample (44.1 -> 48 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.98        0.38
-    sinc (width 16)      NaN        0.75        0.33
-    kaiser_best        32.82        1.27        0.36
-    kaiser_fast         8.13        1.15        0.35
+    sinc (width 64)      NaN        0.86        0.35
+    sinc (width 16)      NaN        0.72        0.32
+    kaiser_best        32.86        1.12        0.36
+    kaiser_fast         8.09        0.98        0.34
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 517-519
+.. GENERATED FROM PYTHON SOURCE LINES 532-534
 
 Upsample (8 -> 16 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 520-524
+.. GENERATED FROM PYTHON SOURCE LINES 535-539
 
 .. code-block:: default
 
@@ -996,15 +1011,15 @@ Upsample (8 -> 16 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.66        0.46
-    sinc (width 16)      NaN        0.34        0.19
-    kaiser_best        11.56        0.70        0.47
-    kaiser_fast         3.23        0.39        0.21
+    sinc (width 64)      NaN        0.67        0.45
+    sinc (width 16)      NaN        0.36        0.21
+    kaiser_best        11.49        0.67        0.46
+    kaiser_fast         3.72        0.40        0.22
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 525-539
+.. GENERATED FROM PYTHON SOURCE LINES 540-554
 
 Summary
 ~~~~~~~
@@ -1024,7 +1039,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.401 seconds)
+   **Total running time of the script:** ( 0 minutes  3.268 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:

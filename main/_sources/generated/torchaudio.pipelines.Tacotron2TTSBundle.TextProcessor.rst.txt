@@ -6,21 +6,21 @@ Tacotron2TTSBundle.TextProcessor
 
 .. autoclass:: torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor()
 
-..
-   ATTRIBUTES
+Properties
+----------
 
 tokens
-------
+~~~~~~
 
 .. container:: py attribute
 
    .. autoproperty:: torchaudio.pipelines.Tacotron2TTSBundle.TextProcessor.tokens
 
-..
-   METHODS
+Methods
+-------
 
 __call__
---------
+~~~~~~~~
 
 .. container:: py attribute
 

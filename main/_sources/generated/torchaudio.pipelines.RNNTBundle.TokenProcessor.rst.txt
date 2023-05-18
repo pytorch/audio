@@ -6,14 +6,11 @@ RNNTBundle.TokenProcessor
 
 .. autoclass:: torchaudio.pipelines.RNNTBundle.TokenProcessor()
 
-..
-   ATTRIBUTES
-
-..
-   METHODS
+Methods
+-------
 
 __call__
---------
+~~~~~~~~
 
 .. container:: py attribute
 

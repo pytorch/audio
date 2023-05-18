@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Wav2Vec2Model &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>Wav2Vec2Model &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -44,18 +44,13 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="torchaudio.models.wav2vec2_model" href="torchaudio.models.wav2vec2_model.html" />
     <link rel="prev" title="Wav2Letter" href="torchaudio.models.Wav2Letter.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
@@ -405,6 +421,10 @@
         
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -416,7 +436,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.models.Wav2Vec2Model">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></span><span class="sig-name descname"><span class="pre">Wav2Vec2Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_extractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.0)"><span class="pre">Module</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.0)"><span class="pre">Module</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.0)"><span class="pre">Module</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.Wav2Vec2Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Acoustic model used in <em>wav2vec 2.0</em> <span id="id1">[<a class="reference internal" href="../references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span>.</p>
+<dd><p>Acoustic model used in <em>wav2vec 2.0</em> <span id="id1">[<a class="reference internal" href="../references.html#id15" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To build the model, please use one of the factory functions.</p>
@@ -552,40 +572,40 @@ It indicates the valid length in time axis of each feature Tensor.</p>
 <td><p>Builds custom <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.models.wav2vec2_base.html#torchaudio.models.wav2vec2_base" title="torchaudio.models.wav2vec2_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id2">[<a class="reference internal" href="../references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
+<td><p>Builds &quot;base&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id2">[<a class="reference internal" href="../references.html#id15" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.models.wav2vec2_large.html#torchaudio.models.wav2vec2_large" title="torchaudio.models.wav2vec2_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id3">[<a class="reference internal" href="../references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
+<td><p>Builds &quot;large&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id3">[<a class="reference internal" href="../references.html#id15" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.models.wav2vec2_large_lv60k.html#torchaudio.models.wav2vec2_large_lv60k" title="torchaudio.models.wav2vec2_large_lv60k"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_large_lv60k</span></code></a></p></td>
-<td><p>Builds &quot;large lv-60k&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id4">[<a class="reference internal" href="../references.html#id14" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
+<td><p>Builds &quot;large lv-60k&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wav2Vec2Model</span></code></a> from <em>wav2vec 2.0</em> <span id="id4">[<a class="reference internal" href="../references.html#id15" title="Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli. Wav2vec 2.0: a framework for self-supervised learning of speech representations. 2020. arXiv:2006.11477.">Baevski <em>et al.</em>, 2020</a>]</span></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.models.wav2vec2_xlsr_300m.html#torchaudio.models.wav2vec2_xlsr_300m" title="torchaudio.models.wav2vec2_xlsr_300m"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_xlsr_300m</span></code></a></p></td>
-<td><p>Builds XLS-R model <span id="id5">[<a class="reference internal" href="../references.html#id59" title="Arun Babu, Changhan Wang, Andros Tjandra, Kushal Lakhotia, Qiantong Xu, Naman Goyal, Kritika Singh, Patrick von Platen, Yatharth Saraf, Juan Pino, and others. Xls-r: self-supervised cross-lingual speech representation learning at scale. arXiv preprint arXiv:2111.09296, 2021.">Babu <em>et al.</em>, 2021</a>]</span> with 300 millions of parameters.</p></td>
+<td><p>Builds XLS-R model <span id="id5">[<a class="reference internal" href="../references.html#id60" title="Arun Babu, Changhan Wang, Andros Tjandra, Kushal Lakhotia, Qiantong Xu, Naman Goyal, Kritika Singh, Patrick von Platen, Yatharth Saraf, Juan Pino, and others. Xls-r: self-supervised cross-lingual speech representation learning at scale. arXiv preprint arXiv:2111.09296, 2021.">Babu <em>et al.</em>, 2021</a>]</span> with 300 millions of parameters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.models.wav2vec2_xlsr_1b.html#torchaudio.models.wav2vec2_xlsr_1b" title="torchaudio.models.wav2vec2_xlsr_1b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_xlsr_1b</span></code></a></p></td>
-<td><p>Builds XLS-R model <span id="id6">[<a class="reference internal" href="../references.html#id59" title="Arun Babu, Changhan Wang, Andros Tjandra, Kushal Lakhotia, Qiantong Xu, Naman Goyal, Kritika Singh, Patrick von Platen, Yatharth Saraf, Juan Pino, and others. Xls-r: self-supervised cross-lingual speech representation learning at scale. arXiv preprint arXiv:2111.09296, 2021.">Babu <em>et al.</em>, 2021</a>]</span> with 1 billion of parameters.</p></td>
+<td><p>Builds XLS-R model <span id="id6">[<a class="reference internal" href="../references.html#id60" title="Arun Babu, Changhan Wang, Andros Tjandra, Kushal Lakhotia, Qiantong Xu, Naman Goyal, Kritika Singh, Patrick von Platen, Yatharth Saraf, Juan Pino, and others. Xls-r: self-supervised cross-lingual speech representation learning at scale. arXiv preprint arXiv:2111.09296, 2021.">Babu <em>et al.</em>, 2021</a>]</span> with 1 billion of parameters.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.models.wav2vec2_xlsr_2b.html#torchaudio.models.wav2vec2_xlsr_2b" title="torchaudio.models.wav2vec2_xlsr_2b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wav2vec2_xlsr_2b</span></code></a></p></td>
-<td><p>Builds XLS-R model <span id="id7">[<a class="reference internal" href="../references.html#id59" title="Arun Babu, Changhan Wang, Andros Tjandra, Kushal Lakhotia, Qiantong Xu, Naman Goyal, Kritika Singh, Patrick von Platen, Yatharth Saraf, Juan Pino, and others. Xls-r: self-supervised cross-lingual speech representation learning at scale. arXiv preprint arXiv:2111.09296, 2021.">Babu <em>et al.</em>, 2021</a>]</span> with 2 billions of parameters.</p></td>
+<td><p>Builds XLS-R model <span id="id7">[<a class="reference internal" href="../references.html#id60" title="Arun Babu, Changhan Wang, Andros Tjandra, Kushal Lakhotia, Qiantong Xu, Naman Goyal, Kritika Singh, Patrick von Platen, Yatharth Saraf, Juan Pino, and others. Xls-r: self-supervised cross-lingual speech representation learning at scale. arXiv preprint arXiv:2111.09296, 2021.">Babu <em>et al.</em>, 2021</a>]</span> with 2 billions of parameters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.models.hubert_base.html#torchaudio.models.hubert_base" title="torchaudio.models.hubert_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id8">[<a class="reference internal" href="../references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
+<td><p>Builds &quot;base&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id8">[<a class="reference internal" href="../references.html#id16" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.models.hubert_large.html#torchaudio.models.hubert_large" title="torchaudio.models.hubert_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id9">[<a class="reference internal" href="../references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
+<td><p>Builds &quot;large&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id9">[<a class="reference internal" href="../references.html#id16" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.models.hubert_xlarge.html#torchaudio.models.hubert_xlarge" title="torchaudio.models.hubert_xlarge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hubert_xlarge</span></code></a></p></td>
-<td><p>Builds &quot;extra large&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id10">[<a class="reference internal" href="../references.html#id15" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
+<td><p>Builds &quot;extra large&quot; <a class="reference internal" href="#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.Wav2Vec2Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">HuBERT</span></code></a> from <em>HuBERT</em> <span id="id10">[<a class="reference internal" href="../references.html#id16" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.models.wavlm_model.html#torchaudio.models.wavlm_model" title="torchaudio.models.wavlm_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavlm_model</span></code></a></p></td>
-<td><p>Builds custom WaveLM model <span id="id11">[<a class="reference internal" href="../references.html#id54" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
+<td><p>Builds custom WaveLM model <span id="id11">[<a class="reference internal" href="../references.html#id55" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.models.wavlm_base.html#torchaudio.models.wavlm_base" title="torchaudio.models.wavlm_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavlm_base</span></code></a></p></td>
-<td><p>Builds &quot;base&quot; WaveLM model <span id="id12">[<a class="reference internal" href="../references.html#id54" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
+<td><p>Builds &quot;base&quot; WaveLM model <span id="id12">[<a class="reference internal" href="../references.html#id55" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.models.wavlm_large.html#torchaudio.models.wavlm_large" title="torchaudio.models.wavlm_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavlm_large</span></code></a></p></td>
-<td><p>Builds &quot;large&quot; WaveLM model <span id="id13">[<a class="reference internal" href="../references.html#id54" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
+<td><p>Builds &quot;large&quot; WaveLM model <span id="id13">[<a class="reference internal" href="../references.html#id55" title="Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, and others. Wavlm: large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518, 2022.">Chen <em>et al.</em>, 2022</a>]</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -604,7 +624,7 @@ It indicates the valid length in time axis of each feature Tensor.</p>
 <td><p>Build a custom Conformer Wav2Vec2Model</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base" title="torchaudio.prototype.models.conformer_wav2vec2_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conformer_wav2vec2_base</span></code></a></p></td>
-<td><p>Build Conformer Wav2Vec2 Model with &quot;small&quot; architecture from <em>Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks</em> <span id="id14">[<a class="reference internal" href="../references.html#id53" title="Sangeeta Srivastava, Yun Wang, Andros Tjandra, Anurag Kumar, Chunxi Liu, Kritika Singh, and Yatharth Saraf. Conformer-based self-supervised learning for non-speech audio tasks. In ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 8862-8866. 2022. doi:10.1109/ICASSP43922.2022.9746490.">Srivastava <em>et al.</em>, 2022</a>]</span></p></td>
+<td><p>Build Conformer Wav2Vec2 Model with &quot;small&quot; architecture from <em>Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks</em> <span id="id14">[<a class="reference internal" href="../references.html#id54" title="Sangeeta Srivastava, Yun Wang, Andros Tjandra, Anurag Kumar, Chunxi Liu, Kritika Singh, and Yatharth Saraf. Conformer-based self-supervised learning for non-speech audio tasks. In ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 8862-8866. 2022. doi:10.1109/ICASSP43922.2022.9746490.">Srivastava <em>et al.</em>, 2022</a>]</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -891,13 +911,9 @@ It indicates the valid length in time axis of each feature Tensor.</p>
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -930,6 +946,18 @@ It indicates the valid length in time axis of each feature Tensor.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -945,18 +973,15 @@ It indicates the valid length in time axis of each feature Tensor.</p>
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -964,7 +989,23 @@ It indicates the valid length in time axis of each feature Tensor.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

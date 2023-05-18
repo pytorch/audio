@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio &mdash; Torchaudio 2.1.0.dev20230517 documentation</title>
+  <title>Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
   
 
   
@@ -44,18 +44,13 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="torchaudio" href="../torchaudio.html" />
     <link rel="prev" title="Music Source Separation with Hybrid Demucs" href="hybrid_demucs_tutorial.html" />
-  <!-- Google Analytics -->
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-117752657-2');
-    </script>
-  
-  <!-- End Google Analytics -->
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
   
 
   
@@ -132,12 +127,16 @@
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
-                  <span class="dropdown-title">TorchRec</span>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
                   <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
                   <p></p>
                 </a>
                 <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
@@ -165,13 +164,25 @@
                   <span class="dropdown-title">About</span>
                   <p>Learn about PyTorch’s features and capabilities</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
                   <span class="dropdown-title">Community</span>
                   <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
                 </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
                 <a class="nav-dropdown-item" href="https://pytorch.org/resources">
                   <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
                 </a>
                 <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
                   <span class="dropdown-title">Forums</span>
@@ -213,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230517 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
     </div>
     
 
@@ -261,12 +272,14 @@
 <li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -277,9 +290,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
@@ -291,12 +307,12 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
@@ -425,6 +441,10 @@
 
     
     
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
           
           <div class="rst-content">
           
@@ -480,8 +500,8 @@ through MOS using non-matching references.” Interspeech, 2022.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230517
-2.1.0.dev20230517
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0.dev20230901
+2.2.0.dev20230902
 </pre></div>
 </div>
 </section>
@@ -491,30 +511,35 @@ through MOS using non-matching references.” Interspeech, 2022.</p>
 <p>We will need torch, torchaudio to use Torchaudio-squim, Matplotlib to
 plot data, pystoi, pesq for computing reference metrics.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">torchaudio.prototype.pipelines</span> <span class="kn">import</span> <span class="n">SQUIM_OBJECTIVE</span>
-    <span class="kn">from</span> <span class="nn">torchaudio.prototype.pipelines</span> <span class="kn">import</span> <span class="n">SQUIM_SUBJECTIVE</span>
     <span class="kn">from</span> <span class="nn">pesq</span> <span class="kn">import</span> <span class="n">pesq</span>
     <span class="kn">from</span> <span class="nn">pystoi</span> <span class="kn">import</span> <span class="n">stoi</span>
+    <span class="kn">from</span> <span class="nn">torchaudio.pipelines</span> <span class="kn">import</span> <span class="n">SQUIM_OBJECTIVE</span><span class="p">,</span> <span class="n">SQUIM_SUBJECTIVE</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">google.colab</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">google.colab</span>  <span class="c1"># noqa: F401</span>
 
-    <span class="nb">print</span><span class="p">(</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        To enable running this notebook in Google Colab, install nightly</span>
-<span class="sd">        torch and torchaudio builds by adding the following code block to the top</span>
-<span class="sd">        of the notebook before running it:</span>
-<span class="sd">        !pip3 uninstall -y torch torchvision torchaudio</span>
-<span class="sd">        !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu</span>
-<span class="sd">        !pip3 install pesq</span>
-<span class="sd">        !pip3 install pystoi</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-    <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            To enable running this notebook in Google Colab, install nightly</span>
+<span class="sd">            torch and torchaudio builds by adding the following code block to the top</span>
+<span class="sd">            of the notebook before running it:</span>
+<span class="sd">            !pip3 uninstall -y torch torchvision torchaudio</span>
+<span class="sd">            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu</span>
+<span class="sd">            !pip3 install pesq</span>
+<span class="sd">            !pip3 install pystoi</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">raise</span>
+
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchaudio.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Audio</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 
 
 <span class="k">def</span> <span class="nf">si_snr</span><span class="p">(</span><span class="n">estimate</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
@@ -537,27 +562,17 @@ plot data, pystoi, pesq for computing reference metrics.</p>
     <span class="k">return</span> <span class="n">si_snr</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">):</span>
     <span class="n">wav_numpy</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
     <span class="n">sample_size</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">time_axis</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange" title="torch.arange" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16000</span>
+    <span class="n">time_axis</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange" title="torch.arange" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_rate</span>
 
-    <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">axes</span> <span class="o">=</span> <span class="n">figure</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-    <span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">wav_numpy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">axes</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">wav_numpy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">specgram</span><span class="p">(</span><span class="n">wav_numpy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Fs</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">plot_specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
-    <span class="n">wav_numpy</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">axes</span> <span class="o">=</span> <span class="n">figure</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-    <span class="n">axes</span><span class="o">.</span><span class="n">specgram</span><span class="p">(</span><span class="n">wav_numpy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Fs</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-    <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -568,7 +583,7 @@ plot data, pystoi, pesq for computing reference metrics.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/156k [00:00&lt;?, ?B/s]
-100%|##########| 156k/156k [00:00&lt;00:00, 71.2MB/s]
+100%|##########| 156k/156k [00:00&lt;00:00, 126MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_SPEECH</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_SPEECH</span></a><span class="p">)</span>
@@ -655,42 +670,22 @@ Resample the waveforms if necessary.</p>
 <section id="visualize-the-waveforms">
 <h2>5. Visualize the waveforms<a class="headerlink" href="#visualize-the-waveforms" title="Permalink to this heading">¶</a></h2>
 <p>Visualize speech sample</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <span class="s2">&quot;Clean Speech&quot;</span><span class="p">)</span>
-<span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <span class="mi">16000</span><span class="p">,</span> <span class="s2">&quot;Clean Speech Spectrogram&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <span class="s2">&quot;Clean Speech&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_squim_tutorial_001.png" srcset="../_images/sphx_glr_squim_tutorial_001.png" alt="Clean Speech" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_squim_tutorial_002.png" srcset="../_images/sphx_glr_squim_tutorial_002.png" alt="Clean Speech Spectrogram" class = "sphx-glr-multi-img"/></li>
-</ul>
-<p>Visualize noise sample</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_NOISE</span></a><span class="p">,</span> <span class="s2">&quot;Noise&quot;</span><span class="p">)</span>
-<span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_NOISE</span></a><span class="p">,</span> <span class="mi">16000</span><span class="p">,</span> <span class="s2">&quot;Noise Spectrogram&quot;</span><span class="p">)</span>
+<img src="../_images/sphx_glr_squim_tutorial_001.png" srcset="../_images/sphx_glr_squim_tutorial_001.png" alt="Clean Speech" class = "sphx-glr-single-img"/><p>Visualize noise sample</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_NOISE</span></a><span class="p">,</span> <span class="s2">&quot;Noise&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_squim_tutorial_003.png" srcset="../_images/sphx_glr_squim_tutorial_003.png" alt="Noise" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_squim_tutorial_004.png" srcset="../_images/sphx_glr_squim_tutorial_004.png" alt="Noise Spectrogram" class = "sphx-glr-multi-img"/></li>
-</ul>
-<p>Visualize distorted speech with 20dB SNR</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_DISTORTED</span></a><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Distorted Speech with </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">dB SNR&quot;</span><span class="p">)</span>
-<span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_DISTORTED</span></a><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16000</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Distorted Speech with </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">dB SNR&quot;</span><span class="p">)</span>
+<img src="../_images/sphx_glr_squim_tutorial_002.png" srcset="../_images/sphx_glr_squim_tutorial_002.png" alt="Noise" class = "sphx-glr-single-img"/><p>Visualize distorted speech with 20dB SNR</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_DISTORTED</span></a><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Distorted Speech with </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">dB SNR&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_squim_tutorial_005.png" srcset="../_images/sphx_glr_squim_tutorial_005.png" alt="Distorted Speech with 20dB SNR" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_squim_tutorial_006.png" srcset="../_images/sphx_glr_squim_tutorial_006.png" alt="Distorted Speech with 20dB SNR" class = "sphx-glr-multi-img"/></li>
-</ul>
-<p>Visualize distorted speech with -5dB SNR</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_DISTORTED</span></a><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Distorted Speech with </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">dB SNR&quot;</span><span class="p">)</span>
-<span class="n">plot_specgram</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_DISTORTED</span></a><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">16000</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Distorted Speech with </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">dB SNR&quot;</span><span class="p">)</span>
+<img src="../_images/sphx_glr_squim_tutorial_003.png" srcset="../_images/sphx_glr_squim_tutorial_003.png" alt="Distorted Speech with 20dB SNR" class = "sphx-glr-single-img"/><p>Visualize distorted speech with -5dB SNR</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_DISTORTED</span></a><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Distorted Speech with </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">dB SNR&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_squim_tutorial_007.png" srcset="../_images/sphx_glr_squim_tutorial_007.png" alt="Distorted Speech with -5dB SNR" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_squim_tutorial_008.png" srcset="../_images/sphx_glr_squim_tutorial_008.png" alt="Distorted Speech with -5dB SNR" class = "sphx-glr-multi-img"/></li>
-</ul>
-</section>
+<img src="../_images/sphx_glr_squim_tutorial_004.png" srcset="../_images/sphx_glr_squim_tutorial_004.png" alt="Distorted Speech with -5dB SNR" class = "sphx-glr-single-img"/></section>
 <section id="predict-objective-metrics">
 <h2>6. Predict Objective Metrics<a class="headerlink" href="#predict-objective-metrics" title="Permalink to this heading">¶</a></h2>
 <p>Get the pre-trained <code class="docutils literal notranslate"><span class="pre">SquimObjective</span></code>model.</p>
@@ -700,7 +695,7 @@ Resample the waveforms if necessary.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/squim_objective_dns2020.pth&quot; to /root/.cache/torch/hub/checkpoints/squim_objective_dns2020.pth
 
   0%|          | 0.00/28.2M [00:00&lt;?, ?B/s]
-100%|##########| 28.2M/28.2M [00:00&lt;00:00, 399MB/s]
+100%|##########| 28.2M/28.2M [00:00&lt;00:00, 427MB/s]
 </pre></div>
 </div>
 <p>Compare model outputs with ground truths for distorted speech with 20dB
@@ -723,7 +718,7 @@ SNR</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Estimated metrics for distorted speech at 20dB are
 
 STOI: 0.9610356092453003
-PESQ: 2.7801527976989746
+PESQ: 2.7801530361175537
 SI-SDR: 20.692630767822266
 
 Reference metrics for distorted speech at 20dB are
@@ -754,7 +749,7 @@ SNR</p>
 
 STOI: 0.5743248462677002
 PESQ: 1.1112866401672363
-SI-SDR: -6.248741626739502
+SI-SDR: -6.248741149902344
 
 Reference metrics for distorted speech at -5dB are
 
@@ -773,16 +768,17 @@ SI-SDR: -5.016279220581055
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/squim_subjective_bvcc_daps.pth&quot; to /root/.cache/torch/hub/checkpoints/squim_subjective_bvcc_daps.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 11%|#         | 38.7M/360M [00:00&lt;00:00, 406MB/s]
- 22%|##1       | 78.3M/360M [00:00&lt;00:00, 411MB/s]
- 33%|###2      | 118M/360M [00:00&lt;00:00, 416MB/s]
- 44%|####4     | 159M/360M [00:00&lt;00:00, 419MB/s]
- 55%|#####5    | 199M/360M [00:00&lt;00:00, 420MB/s]
- 66%|######6   | 239M/360M [00:00&lt;00:00, 420MB/s]
- 78%|#######7  | 279M/360M [00:00&lt;00:00, 420MB/s]
- 89%|########8 | 320M/360M [00:00&lt;00:00, 421MB/s]
-100%|##########| 360M/360M [00:00&lt;00:00, 421MB/s]
-100%|##########| 360M/360M [00:00&lt;00:00, 419MB/s]
+  3%|2         | 10.7M/360M [00:00&lt;00:03, 112MB/s]
+  7%|6         | 24.4M/360M [00:00&lt;00:02, 131MB/s]
+ 18%|#7        | 64.0M/360M [00:00&lt;00:01, 261MB/s]
+ 28%|##8       | 102M/360M [00:00&lt;00:00, 314MB/s]
+ 38%|###8      | 137M/360M [00:00&lt;00:00, 334MB/s]
+ 48%|####8     | 174M/360M [00:00&lt;00:00, 352MB/s]
+ 59%|#####9    | 213M/360M [00:00&lt;00:00, 373MB/s]
+ 71%|#######   | 254M/360M [00:00&lt;00:00, 391MB/s]
+ 82%|########2 | 295M/360M [00:00&lt;00:00, 403MB/s]
+ 93%|#########3| 336M/360M [00:01&lt;00:00, 411MB/s]
+100%|##########| 360M/360M [00:01&lt;00:00, 357MB/s]
 </pre></div>
 </div>
 <p>Load a non-matching reference (NMR)</p>
@@ -791,10 +787,6 @@ SI-SDR: -5.016279220581055
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_NMR</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_NMR</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">NMR_SPEECH</span></a><span class="p">)</span>
 <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_NMR</span></a> <span class="o">!=</span> <span class="mi">16000</span><span class="p">:</span>
     <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_NMR</span></a> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_NMR</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_NMR</span></a><span class="p">,</span> <span class="mi">16000</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/441k [00:00&lt;?, ?B/s]
-100%|##########| 441k/441k [00:00&lt;00:00, 135MB/s]
 </pre></div>
 </div>
 <p>Compute MOS metric for distorted speech with 20dB SNR</p>
@@ -810,7 +802,7 @@ SI-SDR: -5.016279220581055
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated MOS for distorted speech at </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr_dbs</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">dB is MOS: </span><span class="si">{</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mos</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Estimated MOS for distorted speech at -5dB is MOS: 3.2918035984039307
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Estimated MOS for distorted speech at -5dB is MOS: 3.2918038368225098
 </pre></div>
 </div>
 </section>
@@ -838,7 +830,7 @@ Acoustics, Speech and Signal Processing (ICASSP), pp. 911-915. IEEE,
 where y axis represents the estimated MOS metric score, and x axis
 represents the corresponding ground truth.</p>
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png"><img alt="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" class="align-center" src="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" style="width: 500px;" /></a>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.948 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.400 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-squim-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c943e35bc7cad6e8d9b1df2a7034a8fc/squim_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">squim_tutorial.py</span></code></a></p>
@@ -1121,13 +1113,9 @@ represents the corresponding ground truth.</p>
           <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
-
+            
           <li>
             <a href="https://pytorch.org/mobile">Mobile</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1160,6 +1148,18 @@ represents the corresponding ground truth.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
               <a href="https://pytorch.org/serve/">TorchServe</a>
             </li>
 
@@ -1175,18 +1175,15 @@ represents the corresponding ground truth.</p>
           <li class="resources-mobile-menu-title">
             Resources
           </li>
-
-          <ul class="resources-mobile-menu-items">
-            <li>
-              <a href="https://pytorch.org/resources">Developer Resources</a>
-            </li>
+            
+           <ul class="resources-mobile-menu-items">
 
             <li>
               <a href="https://pytorch.org/features">About</a>
             </li>
 
             <li>
-              <a href="https://pytorch.org/hub">Models (Beta)</a>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
             </li>
 
             <li>
@@ -1194,7 +1191,23 @@ represents the corresponding ground truth.</p>
             </li>
 
             <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
               <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
             </li>
           </ul>
 

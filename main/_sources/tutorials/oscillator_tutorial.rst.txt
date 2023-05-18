@@ -53,31 +53,30 @@ This tutorial shows how to synthesize various waveforms using
 
  .. code-block:: none
 
-    2.1.0.dev20230517
-    2.1.0.dev20230517
+    2.1.0.dev20230901
+    2.2.0.dev20230902
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-50
+.. GENERATED FROM PYTHON SOURCE LINES 29-49
 
 .. code-block:: default
 
 
     try:
-        from torchaudio.prototype.functional import (
-            oscillator_bank,
-            adsr_envelope,
-        )
+        from torchaudio.prototype.functional import adsr_envelope, oscillator_bank
     except ModuleNotFoundError:
         print(
             "Failed to import prototype DSP features. "
             "Please install torchaudio nightly builds. "
             "Please refer to https://pytorch.org/get-started/locally "
-            "for instructions to install a nightly build.")
+            "for instructions to install a nightly build."
+        )
         raise
 
     import math
+
     import matplotlib.pyplot as plt
     from IPython.display import Audio
 
@@ -91,7 +90,7 @@ This tutorial shows how to synthesize various waveforms using
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-79
+.. GENERATED FROM PYTHON SOURCE LINES 50-78
 
 Oscillator Bank
 ---------------
@@ -122,7 +121,7 @@ frequency :math:`f_t`.
 sinsuoidal waveforms from amplitude envelopes and instantaneous frequencies.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-89
+.. GENERATED FROM PYTHON SOURCE LINES 80-88
 
 Simple Sine Wave
 ~~~~~~~~~~~~~~~~
@@ -133,18 +132,18 @@ First, we generate sinusoidal wave that has constant frequency and
 amplitude everywhere, that is, a regular sine wave.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-94
+.. GENERATED FROM PYTHON SOURCE LINES 90-93
 
 We define some constants and helper function that we use for
 the rest of the tutorial.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-102
+.. GENERATED FROM PYTHON SOURCE LINES 94-101
 
 .. code-block:: default
 
 
-    F0 = 344.  # fundamental frequency
+    F0 = 344.0  # fundamental frequency
     DURATION = 1.1  # [seconds]
     SAMPLE_RATE = 16_000  # [Hz]
 
@@ -157,9 +156,10 @@ the rest of the tutorial.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-140
+.. GENERATED FROM PYTHON SOURCE LINES 103-132
 
 .. code-block:: default
+
 
 
     def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.3):
@@ -167,21 +167,13 @@ the rest of the tutorial.
 
         fig, axes = plt.subplots(4, 1, sharex=True)
         axes[0].plot(t, freq)
-        axes[0].set(
-            title=f"Oscillator bank (bank size: {amp.size(-1)})",
-            ylabel="Frequency [Hz]",
-            ylim=[-0.03, None])
+        axes[0].set(title=f"Oscillator bank (bank size: {amp.size(-1)})", ylabel="Frequency [Hz]", ylim=[-0.03, None])
         axes[1].plot(t, amp)
-        axes[1].set(
-            ylabel="Amplitude",
-            ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
+        axes[1].set(ylabel="Amplitude", ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
         axes[2].plot(t, waveform)
         axes[2].set(ylabel="Waveform")
         axes[3].specgram(waveform, Fs=sample_rate)
-        axes[3].set(
-            ylabel="Spectrogram",
-            xlabel="Time [s]",
-            xlim=[-0.01, t[-1] + 0.01])
+        axes[3].set(ylabel="Spectrogram", xlabel="Time [s]", xlim=[-0.01, t[-1] + 0.01])
 
         for i in range(4):
             axes[i].grid(True)
@@ -204,12 +196,12 @@ the rest of the tutorial.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-143
+.. GENERATED FROM PYTHON SOURCE LINES 133-135
 
 Now we synthesize the audio with constant frequency and amplitude
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-152
+.. GENERATED FROM PYTHON SOURCE LINES 136-144
 
 .. code-block:: default
 
@@ -219,7 +211,7 @@ Now we synthesize the audio with constant frequency and amplitude
 
     waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 
@@ -244,7 +236,7 @@ Now we synthesize the audio with constant frequency and amplitude
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-159
+.. GENERATED FROM PYTHON SOURCE LINES 145-151
 
 Combining multiple sine waves
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -253,7 +245,7 @@ Combining multiple sine waves
 combine an arbitrary number of sinusoids to generate a waveform.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-172
+.. GENERATED FROM PYTHON SOURCE LINES 151-164
 
 .. code-block:: default
 
@@ -267,7 +259,7 @@ combine an arbitrary number of sinusoids to generate a waveform.
 
     waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+    show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 
@@ -293,7 +285,7 @@ combine an arbitrary number of sinusoids to generate a waveform.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-180
+.. GENERATED FROM PYTHON SOURCE LINES 165-172
 
 Changing Frequencies across time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -303,7 +295,7 @@ from zero to the Nyquist frequency (half of the sample rate) in
 log-scale so that it is easy to see the change in waveform.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-189
+.. GENERATED FROM PYTHON SOURCE LINES 172-181
 
 .. code-block:: default
 
@@ -339,12 +331,12 @@ log-scale so that it is easy to see the change in waveform.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-192
+.. GENERATED FROM PYTHON SOURCE LINES 182-184
 
 We can also oscillate frequency.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-206
+.. GENERATED FROM PYTHON SOURCE LINES 185-198
 
 .. code-block:: default
 
@@ -384,13 +376,13 @@ We can also oscillate frequency.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-210
+.. GENERATED FROM PYTHON SOURCE LINES 199-202
 
 ADSR Envelope
 -------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-231
+.. GENERATED FROM PYTHON SOURCE LINES 204-223
 
 Next, we change the amplitude over time. A common technique to model
 amplitude is ADSR Envelope.
@@ -412,7 +404,7 @@ the following properties
 hold and polynomial decay.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-256
+.. GENERATED FROM PYTHON SOURCE LINES 224-248
 
 .. code-block:: default
 
@@ -463,7 +455,7 @@ hold and polynomial decay.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 257-263
+.. GENERATED FROM PYTHON SOURCE LINES 249-255
 
 Now let's look into some examples of how ADSR envelope can be used
 to create different sounds.
@@ -472,13 +464,13 @@ The following examples are inspired by
 `this article <https://www.edmprod.com/adsr-envelopes/>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-269
+.. GENERATED FROM PYTHON SOURCE LINES 258-261
 
 Drum Beats
 ~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-289
+.. GENERATED FROM PYTHON SOURCE LINES 261-282
 
 .. code-block:: default
 
@@ -495,7 +487,8 @@ Drum Beats
             adsr_envelope(unit, attack=0.01, hold=0.125, decay=0.12, sustain=0.05, release=0),
             adsr_envelope(unit, attack=0.01, hold=0.25, decay=0.08, sustain=0, release=0),
         ),
-        dim=-1)
+        dim=-1,
+    )
     amp = amp.repeat(repeat, 1) / 2
 
     bass = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
@@ -525,13 +518,13 @@ Drum Beats
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 290-293
+.. GENERATED FROM PYTHON SOURCE LINES 283-286
 
 Pluck
 ~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-314
+.. GENERATED FROM PYTHON SOURCE LINES 286-307
 
 .. code-block:: default
 
@@ -579,18 +572,18 @@ Pluck
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 315-318
+.. GENERATED FROM PYTHON SOURCE LINES 308-311
 
 Riser
 ~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 318-337
+.. GENERATED FROM PYTHON SOURCE LINES 311-330
 
 .. code-block:: default
 
 
-    env = adsr_envelope(NUM_FRAMES * 6, attack=0.98, decay=0., sustain=1, release=0.02)
+    env = adsr_envelope(NUM_FRAMES * 6, attack=0.98, decay=0.0, sustain=1, release=0.02)
 
     tones = [
         484.90,  # B4
@@ -631,7 +624,7 @@ Riser
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 338-344
+.. GENERATED FROM PYTHON SOURCE LINES 331-337
 
 References
 ----------
@@ -643,7 +636,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  54.780 seconds)
+   **Total running time of the script:** ( 1 minutes  3.662 seconds)
 
 
 .. _sphx_glr_download_tutorials_oscillator_tutorial.py:
