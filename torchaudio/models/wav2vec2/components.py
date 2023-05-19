@@ -458,9 +458,10 @@ class Transformer(Module):
                 raise ValueError(f"`num_layers` must be between [1, {len(self.layers)}]")
 
         ret: List[Tensor] = []
+        position_bias = None
         x = self._preprocess(x)
         for layer in self.layers:
-            x, _ = layer(x, attention_mask)  # Ignore position_bias
+            x, position_bias = layer(x, attention_mask, position_bias=position_bias)
             ret.append(x)
             if num_layers is not None and len(ret) >= num_layers:
                 return ret
