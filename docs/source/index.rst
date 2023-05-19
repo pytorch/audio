@@ -44,6 +44,7 @@ model implementations and application components.
    tutorials/streamreader_advanced_tutorial
    tutorials/streamwriter_basic_tutorial
    tutorials/streamwriter_advanced
+   hw_acceleration_tutorial
 
    tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
