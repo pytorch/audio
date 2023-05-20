@@ -39,6 +39,7 @@ _IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
 # Kaldi or RIR features are found there.
 _IS_RIR_AVAILABLE = False
 _IS_KALDI_AVAILABLE = False
+_IS_ALIGN_AVAILABLE = False
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _load_lib("libtorchaudio")
 
@@ -47,6 +48,7 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _check_cuda_version()
     _IS_RIR_AVAILABLE = torchaudio.lib._torchaudio.is_rir_available()
     _IS_KALDI_AVAILABLE = torchaudio.lib._torchaudio.is_kaldi_available()
+    _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
 
 
 # Similar to libtorchaudio, sox-related features should be importable when present.
@@ -97,5 +99,14 @@ fail_if_no_rir = (
     if _IS_RIR_AVAILABLE
     else fail_with_message(
         "requires RIR extension, but TorchAudio is not compiled with it. Please build TorchAudio with RIR support."
+    )
+)
+
+fail_if_no_align = (
+    no_op
+    if _IS_ALIGN_AVAILABLE
+    else fail_with_message(
+        "Requires alignment extension, but TorchAudio is not compiled with it. \
+        Please build TorchAudio with alignment support."
     )
 )

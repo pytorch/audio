@@ -9,6 +9,7 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
+from torchaudio._extension import fail_if_no_align
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -51,6 +52,7 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
+    "forced_align",
 ]
 
 
@@ -2596,3 +2598,43 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
     return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+
+
+@fail_if_no_align
+def forced_align(
+    log_probs: torch.Tensor,
+    targets: torch.Tensor,
+    input_lengths: torch.Tensor,
+    target_lengths: torch.Tensor,
+    blank: int = 0,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Computes forced alignment given the emissions from a CTC-trained model and a target label.
+
+    Args:
+        log_probs (torch.Tensor): log probability of CTC emission output.
+            Tensor with dimensions `(T, C)`. where `T` is the input length,
+            vocabulary is the number of characters in alphabet including blank.
+        targets (torch.Tensor): Target sequence. Tensor with dimension `(L,)`,
+            where `L` is the target length.
+        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). Tensor with dimension `()`.
+        target_lengths (torch.Tensor): Lengths of the targets. Tensor with dimension `()`.
+        blank_id (int, optional): The index of blank symbol in CTC emission. (Default: 0)
+
+    Returns:
+        Tuple(torch.Tensor, torch.Tensor):
+            torch.Tensor: Label for each time step in the alignemnt path computed using forced alignment.
+            torch.Tensor: Log probability scores of the labels for each time step.
+
+    Note:
+        The sequence length of `log_probs` must satisfy:
+        .. math::
+            L_{\\text{log_probs}} \\ge L_{\\text{label}} + N_{\\text{repeat}}
+        where :math:`N_{\\text{repeat}}` is the number of consecutively repeated tokens.
+        For example, in str `"aabbc"`, the number of repeats are `2`.
+    """
+    if blank in targets:
+        raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")
+    if torch.max(targets) >= log_probs.shape[-1]:
+        raise ValueError("targets values must be less than the CTC dimension")
+    paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+    return paths, scores
