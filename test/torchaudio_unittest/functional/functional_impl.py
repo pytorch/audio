@@ -1114,6 +1114,105 @@ class Functional(TestBaseMixin):
         deemphasized = F.deemphasis(preemphasized, coeff=coeff)
         self.assertEqual(deemphasized, waveform)
 
+    @parameterized.expand(
+        [
+            ([0, 1, 1, 0], [0, 1, 5, 1, 0], torch.int32),
+            ([0, 1, 2, 3, 4], [0, 1, 2, 3, 4], torch.int32),
+            ([3, 3, 3], [3, 5, 3, 5, 3], torch.int64),
+            ([0, 1, 2], [0, 1, 1, 1, 2], torch.int64),
+        ]
+    )
+    def test_forced_align(self, targets, ref_path, targets_dtype):
+        emission = torch.tensor(
+            [
+                [0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
+                [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
+                [0.0357786, 0.633813, 0.321418, 0.00249248, 0.00272882, 0.0037688],
+                [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
+                [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107],
+            ],
+            dtype=self.dtype,
+            device=self.device,
+        )
+        blank = 5
+        ref_path = torch.tensor(ref_path, dtype=targets_dtype, device=self.device)
+        ref_scores = torch.tensor(
+            [torch.log(emission[i, ref_path[i]]).item() for i in range(emission.shape[0])],
+            dtype=emission.dtype,
+            device=self.device,
+        )
+        log_probs = torch.log(emission)
+        targets = torch.tensor(targets, dtype=targets_dtype, device=self.device)
+        input_lengths = torch.tensor((log_probs.shape[0]))
+        target_lengths = torch.tensor((targets.shape[0]))
+        hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+        self.assertEqual(hyp_path, ref_path)
+        self.assertEqual(hyp_scores, ref_scores)
+
+    @parameterized.expand([(torch.int32,), (torch.int64,)])
+    def test_forced_align_fail(self, targets_dtype):
+        log_probs = torch.rand(5, 6, dtype=self.dtype, device=self.device)
+        targets = torch.tensor([0, 1, 2, 3, 4, 4], dtype=targets_dtype, device=self.device)
+        blank = 5
+        input_lengths = torch.tensor((log_probs.shape[0]), device=self.device)
+        target_lengths = torch.tensor((targets.shape[0]), device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"targets length is too long for CTC"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([5, 3, 3], dtype=targets_dtype, device=self.device)
+        with self.assertRaisesRegex(ValueError, r"targets Tensor shouldn't contain blank index"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        log_probs = log_probs.int()
+        targets = torch.tensor([0, 1, 2, 3], dtype=targets_dtype, device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"log_probs must be float64, float32 or float16"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        log_probs = log_probs.float()
+        targets = targets.float()
+        with self.assertRaisesRegex(RuntimeError, r"targets must be int32 or int64 type"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        log_probs = torch.rand(3, 4, 6, dtype=self.dtype, device=self.device)
+        targets = targets.int()
+        with self.assertRaisesRegex(RuntimeError, r"3-D tensor is not yet supported for log_probs"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.randint(0, 4, (3, 4), device=self.device)
+        log_probs = torch.rand(3, 6, dtype=self.dtype, device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"2-D tensor is not yet supported for targets"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([0, 1, 2, 3], dtype=targets_dtype, device=self.device)
+        input_lengths = torch.randint(1, 5, (3,), device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"input_lengths must be 0-D"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        input_lengths = torch.tensor((log_probs.shape[0]), device=self.device)
+        target_lengths = torch.randint(1, 5, (3,), device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"target_lengths must be 0-D"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        input_lengths = torch.tensor((10000), device=self.device)
+        target_lengths = torch.tensor((targets.shape[0]), device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"input length mismatch"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        input_lengths = torch.tensor((log_probs.shape[0]))
+        target_lengths = torch.tensor((10000))
+        with self.assertRaisesRegex(RuntimeError, r"target length mismatch"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([7, 8, 9, 10], dtype=targets_dtype, device=self.device)
+        log_probs = torch.rand(10, 5, dtype=self.dtype, device=self.device)
+        with self.assertRaisesRegex(ValueError, r"targets values must be less than the CTC dimension"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([1, 3, 3], dtype=targets_dtype, device=self.device)
+        blank = 10000
+        with self.assertRaisesRegex(RuntimeError, r"blank must be within \[0, num classes\)"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):
@@ -1133,3 +1232,24 @@ class FunctionalCPUOnly(TestBaseMixin):
             warnings.simplefilter("always")
             F.melscale_fbanks(201, 0, 8000, 128, 16000)
         assert len(w) == 1
+
+
+class FunctionalCUDAOnly(Functional):
+    @nested_params(
+        [torch.half, torch.float, torch.double], [torch.int32, torch.int64], [(5, 6), (10, 6)], [(1,), (4,), (5,)]
+    )
+    def test_forced_align_same_result(self, log_probs_dtype, targets_dtype, log_probs_shape, targets_shape):
+        log_probs = torch.rand(log_probs_shape, dtype=log_probs_dtype, device=self.device)
+        targets = torch.randint(1, 6, targets_shape, dtype=targets_dtype, device=self.device)
+        input_lengths = torch.tensor((log_probs.shape[0]), device=self.device)
+        target_lengths = torch.tensor((targets.shape[0]), device=self.device)
+        log_probs_cuda = log_probs.cuda()
+        targets_cuda = targets.cuda()
+        input_lengths_cuda = input_lengths.cuda()
+        target_lengths_cuda = target_lengths.cuda()
+        hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths)
+        hyp_path_cuda, hyp_scores_cuda = F.forced_align(
+            log_probs_cuda, targets_cuda, input_lengths_cuda, target_lengths_cuda
+        )
+        self.assertEqual(hyp_path, hyp_path_cuda.cpu())
+        self.assertEqual(hyp_scores, hyp_scores_cuda.cpu())

@@ -23,6 +23,14 @@ bool is_rir_available() {
 #endif
 }
 
+bool is_align_available() {
+#ifdef INCLUDE_ALIGN
+  return true;
+#else
+  return false;
+#endif
+}
+
 c10::optional<int64_t> cuda_version() {
 #ifdef USE_CUDA
   return CUDA_VERSION;
