@@ -47,7 +47,7 @@ void forced_align_impl(
       ", and number of repeats: ",
       R);
   auto start = T - (L + R) > 0 ? 0 : 1;
-  auto end = S == 1 ? 1 : 2;
+  auto end = (S == 1) ? 1 : 2;
   for (auto i = start; i < end; i++) {
     auto labelIdx = (i % 2 == 0) ? blank : targets_a[i / 2];
     alphas_a[0][i] = logProbs_a[0][labelIdx];
@@ -76,7 +76,7 @@ void forced_align_impl(
     if (start == 0) {
       alphas_a[curIdxOffset][0] =
           alphas_a[prevIdxOffset][0] + logProbs_a[t][blank];
-      backPtr_a[t][S] = 0;
+      backPtr_a[t][0] = 0;
       startloop += 1;
     }
 
