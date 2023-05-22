@@ -1236,11 +1236,14 @@ class FunctionalCPUOnly(TestBaseMixin):
 
 class FunctionalCUDAOnly(Functional):
     @nested_params(
-        [torch.half, torch.float, torch.double], [torch.int32, torch.int64], [(5, 6), (10, 6)], [(1,), (4,), (5,)]
+        [torch.half, torch.float, torch.double],
+        [torch.int32, torch.int64],
+        [(50, 100), (100, 100)],
+        [(10,), (40,), (45,)],
     )
     def test_forced_align_same_result(self, log_probs_dtype, targets_dtype, log_probs_shape, targets_shape):
         log_probs = torch.rand(log_probs_shape, dtype=log_probs_dtype, device=self.device)
-        targets = torch.randint(1, 6, targets_shape, dtype=targets_dtype, device=self.device)
+        targets = torch.randint(1, 100, targets_shape, dtype=targets_dtype, device=self.device)
         input_lengths = torch.tensor((log_probs.shape[0]), device=self.device)
         target_lengths = torch.tensor((targets.shape[0]), device=self.device)
         log_probs_cuda = log_probs.cuda()
