@@ -33,6 +33,22 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 
+try:
+    from torchaudio.functional import forced_align
+except ModuleNotFoundError:
+    print(
+        "Failed to import the forced alignment API. "
+        "Please install torchaudio nightly builds. "
+        "Please refer to https://pytorch.org/get-started/locally "
+        "for instructions to install a nightly build.")
+    raise
+
+import matplotlib
+import matplotlib.pyplot as plt
+from IPython.display import Audio
+
+
+
 ######################################################################
 # I. Basic usages
 # ---------------
@@ -57,10 +73,7 @@ print(device)
 
 # %matplotlib inline
 from dataclasses import dataclass
-
 import IPython
-import matplotlib
-import matplotlib.pyplot as plt
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -72,7 +85,7 @@ sample_rate = 16000
 
 ######################################################################
 # Generate frame-wise class posteriors from a CTC acoustic model
-# ------------------------------------------------------------------------------
+# --------------------------------------------------------------
 #
 # The first step is to generate the class probabilities (i.e. posteriors)
 # of each audio frame.
@@ -293,8 +306,8 @@ def compute_alignments(transcript, dictionary, emission):
     # print(list(zip(transcript.replace(" ", ""), tokens)))
 
     targets = torch.tensor(tokens, dtype=torch.int32)
-    input_lengths = torch.tensor([emission.shape[0]])
-    target_lengths = torch.tensor([targets.shape[0]])
+    input_lengths = torch.tensor(emission.shape[0])
+    target_lengths = torch.tensor(targets.shape[0])
 
     # This is key step, where we call the forced alignment API functional.forced_align to compute alignments.
     frame_alignment, frame_scores = F.forced_align(emission, targets, input_lengths, target_lengths, 0)
@@ -313,12 +326,12 @@ def compute_alignments(transcript, dictionary, emission):
             token_index += 1
         frames.append(Frame(token_index, i, frame_scores[i].exp().item()))
         prev_hyp = frame_alignment[i].item()
-    return frames, frame_alignment
+    return frames, frame_alignment, frame_scores
 
 
 transcript = "i had that curiosity beside me at this moment"
 
-frames, frame_alignment = compute_alignments(transcript, dictionary, emission)
+frames, frame_alignment, frame_scores = compute_alignments(transcript, dictionary, emission)
 
 
 ######################################################################
@@ -355,7 +368,7 @@ class Segment:
         return self.end - self.start
 
 
-def merge_repeats(frames):
+def merge_repeats(frames, transcript, frame_alignment, frame_scores):
     transcript_nospace = transcript.replace(" ", "")
     i1, i2 = 0, 0
     segments = []
@@ -363,6 +376,11 @@ def merge_repeats(frames):
         while i2 < len(frames) and frames[i1].token_index == frames[i2].token_index:
             i2 += 1
         score = sum(frames[k].score for k in range(i1, i2)) / (i2 - i1)
+        tokens = [dictionary[c] if c in dictionary else dictionary['@'] for c in transcript.replace(" ", "")]
+        targets = torch.tensor(tokens, dtype=torch.int32)
+        if frames[i1].token_index >= len(transcript_nospace):
+            raise ValueError(i1, i2, frames[i1].token_index, len(transcript_nospace), transcript, len(transcript), frames, len(frames), frame_alignment, len(frame_alignment), frame_scores, len(frame_scores))
+
         segments.append(
             Segment(
                 transcript_nospace[frames[i1].token_index],
@@ -375,7 +393,7 @@ def merge_repeats(frames):
     return segments
 
 
-segments = merge_repeats(frames)
+segments = merge_repeats(frames, transcript, frame_alignment, frame_scores)
 for seg in segments:
     print(seg)
 
@@ -580,8 +598,8 @@ import os
 
 
 def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
-    frames, frame_alignment = compute_alignments(transcript, dictionary, emission)
-    segments = merge_repeats(frames)
+    frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
+    segments = merge_repeats(frames, transcript)
     word_segments = merge_words(transcript, segments)
     plot_alignments(
         segments,
