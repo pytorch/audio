@@ -32,6 +32,7 @@ Utility
    preemphasis
    deemphasis
    speed
+   forced_align
 
 
 Filtering
