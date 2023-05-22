@@ -43,6 +43,9 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
 fi
 
 # 2. Install torchaudio
+printf "* Installing fsspec\n"
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
+
 printf "* Installing torchaudio\n"
 "$root_dir/packaging/vc_env_helper.bat" python setup.py install
 
