@@ -2610,6 +2610,10 @@ def forced_align(
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Computes forced alignment given the emissions from a CTC-trained model and a target label.
 
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
     Args:
         log_probs (torch.Tensor): log probability of CTC emission output.
             Tensor with dimensions `(T, C)`. where `T` is the input length,
@@ -2622,13 +2626,16 @@ def forced_align(
 
     Returns:
         Tuple(torch.Tensor, torch.Tensor):
-            torch.Tensor: Label for each time step in the alignemnt path computed using forced alignment.
+            torch.Tensor: Label for each time step in the alignment path computed using forced alignment.
+
             torch.Tensor: Log probability scores of the labels for each time step.
 
     Note:
         The sequence length of `log_probs` must satisfy:
+        
         .. math::
-            L_{\\text{log_probs}} \\ge L_{\\text{label}} + N_{\\text{repeat}}
+            L_{\\text{log\_probs}} \ge L_{\\text{label}} + N_{\\text{repeat}}
+
         where :math:`N_{\\text{repeat}}` is the number of consecutively repeated tokens.
         For example, in str `"aabbc"`, the number of repeats are `2`.
     """
