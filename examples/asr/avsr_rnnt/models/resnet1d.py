@@ -1,14 +1,6 @@
 import torch.nn as nn
 
 
-class Swish(nn.Module):
-    """Construct an Swish object."""
-
-    def forward(self, x):
-        """Return Swich activation function."""
-        return x * torch.sigmoid(x)
-
-
 def conv3x3(in_planes, out_planes, stride=1):
     """conv3x3.
     :param in_planes: int, number of channels in the input sequence.
@@ -76,8 +68,8 @@ class BasicBlock1D(nn.Module):
             self.relu1 = nn.PReLU(num_parameters=planes)
             self.relu2 = nn.PReLU(num_parameters=planes)
         elif relu_type == "swish":
-            self.relu1 = Swish()
-            self.relu2 = Swish()
+            self.relu1 = nn.SiLU(inplace=True)
+            self.relu2 = nn.SiLU(inplace=True)
         else:
             raise NotImplementedError
         # --------
@@ -144,7 +136,7 @@ class ResNet1D(nn.Module):
         elif relu_type == "prelu":
             self.relu = nn.PReLU(num_parameters=self.inplanes)
         elif relu_type == "swish":
-            self.relu = Swish()
+            self.relu = nn.SiLU(inplace=True)
 
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
