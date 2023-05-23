@@ -67,6 +67,7 @@ model implementations and application components.
    tutorials/asr_inference_with_ctc_decoder_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
+   tutorials/ctc_forced_alignment_api_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
@@ -147,6 +148,13 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_io_tutorial.png
    :link: tutorials/audio_io_tutorial.html
    :tags: I/O
+
+.. customcarditem::
+   :header: CTC Forced Alignment API
+   :card_description: Learn how to use TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>).
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
+   :link: tutorials/ctc_forced_alignment_api_tutorial.html
+   :tags: CTC,Forced-Alignment
 
 .. customcarditem::
    :header: Streaming media decoding with StreamReader
