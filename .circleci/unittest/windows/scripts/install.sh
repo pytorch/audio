@@ -88,8 +88,7 @@ esac
         demucs \
         tinytag \
         pyroomacoustics \
-        flashlight-text \
-        git+https://github.com/kpu/kenlm/
+        flashlight-text
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

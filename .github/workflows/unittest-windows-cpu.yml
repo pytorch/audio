@@ -47,6 +47,13 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE="1"
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS="1"
 
+        # kenlm wheels builds have been broken on Windows for quite some time.
+        # Thus we will not run any tests that depend on kenlm in the Windows
+        # unittest job. The below 2 environment variables safely skip these
+        # tests.
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER="1"
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUCTC_DECODER="1"
+
         ./.circleci/unittest/windows/scripts/setup_env.sh
         ./.circleci/unittest/windows/scripts/install.sh
         ./.circleci/unittest/windows/scripts/run_test.sh
