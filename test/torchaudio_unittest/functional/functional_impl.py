@@ -1234,7 +1234,7 @@ class FunctionalCPUOnly(TestBaseMixin):
         assert len(w) == 1
 
 
-class FunctionalCUDAOnly(Functional):
+class FunctionalCUDAOnly(TestBaseMixin):
     @nested_params(
         [torch.half, torch.float, torch.double],
         [torch.int32, torch.int64],
