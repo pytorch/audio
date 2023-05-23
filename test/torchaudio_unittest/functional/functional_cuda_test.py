@@ -28,6 +28,8 @@ class TestFunctionalCUDAOnlyFloat32(FunctionalCUDAOnly, PytorchTestCase):
     device = torch.device("cuda")
 
     @unittest.expectedFailure
+    # TODO: This is the issue associated with the failure.
+    # Follow up required: https://github.com/pytorch/audio/issues/3361
     def test_lfilter_9th_order_filter_stability(self):
         super().test_lfilter_9th_order_filter_stability()
 
