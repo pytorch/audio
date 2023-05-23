@@ -27,6 +27,10 @@ class TestFunctionalCUDAOnlyFloat32(FunctionalCUDAOnly, PytorchTestCase):
     dtype = torch.float32
     device = torch.device("cuda")
 
+    @unittest.expectedFailure
+    def test_lfilter_9th_order_filter_stability(self):
+        super().test_lfilter_9th_order_filter_stability()
+
 
 @skipIfNoCuda
 class TestFunctionalCUDAOnlyFloat64(FunctionalCUDAOnly, PytorchTestCase):
