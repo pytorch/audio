@@ -5,12 +5,27 @@
 torchaudio::io::StreamReader
 ============================
 
-.. doxygenclass:: torchaudio::io::StreamReader
+``StreamReader`` is the implementation used by Python equivalent and provides similar interface.
+When working with custom I/O, such as in-memory data, ``StreamReaderCustomIO`` class can be used.
+
+Both classes have the same methods defined, so their usages are the same.
 
 Constructors
 ------------
 
+StreamReader
+^^^^^^^^^^^^
+
+.. doxygenclass:: torchaudio::io::StreamReader
+
 .. doxygenfunction:: torchaudio::io::StreamReader::StreamReader(const std::string &src, const c10::optional<std::string> &format = {}, const c10::optional<OptionDict> &option = {})
+
+StreamReaderCustomIO
+^^^^^^^^^^^^^^^^^^^^
+
+.. doxygenclass:: torchaudio::io::StreamReaderCustomIO
+
+.. doxygenfunction:: torchaudio::io::StreamReaderCustomIO::StreamReaderCustomIO
 
 Query Methods
 -------------

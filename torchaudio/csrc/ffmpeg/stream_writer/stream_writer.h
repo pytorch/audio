@@ -306,17 +306,21 @@ struct CustomOutput {
 
 /// @endcond
 
-/// Construct StreamWriter with custom write and seek functions.
 ///
-/// @param opaque Custom data used by write_packet and seek functions.
-/// @param format Specify output format.
-/// @param buffer_size The size of the intermediate buffer, which FFmpeg uses to
-/// pass data to write_packet function.
-/// @param write_packet Custom write function that is called from FFmpeg to
-/// actually write data to the custom destination.
-/// @param seek Optional seek function that is used to seek the destination.
-struct StreamWriterCustomIO : private detail::CustomOutput,
-                              public StreamWriter {
+/// A subclass of StreamReader which works with custom read function.
+/// Can be used for encoding media into memory or custom object.
+///
+class StreamWriterCustomIO : private detail::CustomOutput, public StreamWriter {
+ public:
+  /// Construct StreamWriterCustomIO with custom write and seek functions.
+  ///
+  /// @param opaque Custom data used by ``write_packet`` and ``seek`` functions.
+  /// @param format Specify output format.
+  /// @param buffer_size The size of the intermediate buffer, which FFmpeg uses
+  /// to pass data to write_packet function.
+  /// @param write_packet Custom write function that is called from FFmpeg to
+  /// actually write data to the custom destination.
+  /// @param seek Optional seek function that is used to seek the destination.
   StreamWriterCustomIO(
       void* opaque,
       const c10::optional<std::string>& format,
