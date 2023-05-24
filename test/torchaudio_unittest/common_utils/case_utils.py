@@ -234,11 +234,6 @@ skipIfNoSox = _skipIf(
     reason="Sox features are not available.",
     key="NO_SOX",
 )
-skipIfNoKaldi = _skipIf(
-    not torchaudio._extension._IS_KALDI_AVAILABLE,
-    reason="Kaldi features are not available.",
-    key="NO_KALDI",
-)
 skipIfNoRIR = _skipIf(
     not torchaudio._extension._IS_RIR_AVAILABLE,
     reason="RIR features are not available.",
