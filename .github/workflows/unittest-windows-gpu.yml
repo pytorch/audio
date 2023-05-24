@@ -53,9 +53,10 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUCTC_DECODER=true
 
-        ./.circleci/unittest/windows/scripts/setup_env.sh
+
+        source ./.circleci/unittest/windows/scripts/setup_env.sh
         ./packaging/windows/internal/cuda_install.bat
         ./packaging/windows/internal/driver_update.bat
 
         ./.circleci/unittest/windows/scripts/install.sh
-        ./.circleci/unittest/windows/scripts/run_test.sh
+        source ./.circleci/unittest/windows/scripts/run_test.sh
