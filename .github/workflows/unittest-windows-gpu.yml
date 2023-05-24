@@ -15,7 +15,7 @@ jobs:
     with:
       repository: pytorch/audio
       runner: windows.8xlarge.nvidia.gpu
-      timeout: 180
+      timeout: 360
       script: |
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
@@ -32,27 +32,26 @@ jobs:
           export UPLOAD_CHANNEL=nightly
         fi
 
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY="1"
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
 
 
-        # kenlm wheels builds have been broken on Windows for quite some time.
-        # Thus we will not run any tests that depend on kenlm in the Windows
-        # unittest job. The below 2 environment variables safely skip these
-        # tests.
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER="1"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUCTC_DECODER="1"
+        # Strangely kenlm stopped compiling on windows for a line of code that
+        # has not changed in 10 years:
+        # https://github.com/kpu/kenlm/blame/4e6ac85c8d01ac91cb61dfbdc76cd652158c5969/util/read_compressed.cc#L228
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUCTC_DECODER=true
 
         ./.circleci/unittest/windows/scripts/setup_env.sh
         ./packaging/windows/internal/cuda_install.bat
