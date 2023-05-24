@@ -2608,7 +2608,7 @@ def forced_align(
     target_lengths: torch.Tensor,
     blank: int = 0,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
-    """Computes forced alignment given the emissions from a CTC-trained model and a target label.
+    r"""Computes forced alignment given the emissions from a CTC-trained model and a target label.
 
     .. devices:: CPU CUDA
 
@@ -2635,9 +2635,9 @@ def forced_align(
 
 
         .. math::
-            L_{\\text{log\_probs}} \ge L_{\\text{label}} + N_{\\text{repeat}}
+            L_{\text{log\_probs}} \ge L_{\text{label}} + N_{\text{repeat}}
 
-        where :math:`N_{\\text{repeat}}` is the number of consecutively repeated tokens.
+        where :math:`N_{\text{repeat}}` is the number of consecutively repeated tokens.
         For example, in str `"aabbc"`, the number of repeats are `2`.
     """
     if blank in targets:
