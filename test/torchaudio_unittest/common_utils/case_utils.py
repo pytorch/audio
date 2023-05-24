@@ -67,7 +67,7 @@ class HttpServerMixin(TempDirMixin):
     """
 
     _proc = None
-    _port = 8000
+    _port = 12345
 
     @classmethod
     def setUpClass(cls):

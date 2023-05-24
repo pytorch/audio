@@ -313,7 +313,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
       TORCH_CHECK(
           bps == BitDepth::NOT_PROVIDED,
           "vorbis does not support `bits_per_sample` option.");
-      return std::make_tuple<>(SOX_ENCODING_VORBIS, 16);
+      return std::make_tuple<>(SOX_ENCODING_VORBIS, 0);
     case Format::AMR_NB:
       TORCH_CHECK(
           enc == Encoding::NOT_PROVIDED,
