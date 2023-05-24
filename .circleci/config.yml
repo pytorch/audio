@@ -460,7 +460,7 @@ workflows:
           requires:
           - download_third_parties
       - unittest_windows_gpu:
-          cuda_version: cu117
+          cuda_version: cu118
           name: unittest_windows_gpu_py3.8
           python_version: '3.8'
           requires:
