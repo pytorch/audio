@@ -106,6 +106,8 @@ jobs:
           "${CUDATOOLKIT}"
 
         # Install torchaudio
+        # TODO: Enable NVDec/NVEnc
+        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
         cd packaging
         . ./pkg_helpers.bash
