@@ -58,5 +58,5 @@ jobs:
         ./packaging/windows/internal/cuda_install.bat
         ./packaging/windows/internal/driver_update.bat
 
-        ./.circleci/unittest/windows/scripts/install.sh
+        source ./.circleci/unittest/windows/scripts/install.sh
         source ./.circleci/unittest/windows/scripts/run_test.sh
