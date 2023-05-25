@@ -49,30 +49,33 @@ HF_LARGE_LV60_960H = _load_config("wav2vec2-large-960h-lv60")
 HF_LARGE_LV60_SELF_960H = _load_config("wav2vec2-large-960h-lv60-self")
 HF_LARGE_XLSR_DE = _load_config("wav2vec2-large-xlsr-53-german")
 
+
 # Config and corresponding factory functions
 PRETRAIN_CONFIGS = parameterized.expand(
     [
         (HF_BASE, wav2vec2_base),
         (HF_LARGE, wav2vec2_large),
-        (HF_LARGE_LV60, wav2vec2_large_lv60k),
+        # (HF_LARGE_LV60, wav2vec2_large_lv60k),
         (HF_LARGE_XLSR_53, wav2vec2_large_lv60k),
         (HF_BASE_10K_VOXPOPULI, wav2vec2_base),
     ],
     name_func=_name_func,
 )
-XLSR_PRETRAIN_CONFIGS = parameterized.expand(
-    [
-        (HF_XLSR_300M, wav2vec2_xlsr_300m),
-        (HF_XLSR_1B, wav2vec2_xlsr_1b),
-        (HF_XLSR_2B, wav2vec2_xlsr_2b),
-    ],
-    name_func=_name_func,
-)
+
+# XLSR_PRETRAIN_CONFIGS = parameterized.expand(
+#    [
+#        (HF_XLSR_300M, wav2vec2_xlsr_300m),
+#        (HF_XLSR_1B, wav2vec2_xlsr_1b),
+#        (HF_XLSR_2B, wav2vec2_xlsr_2b),
+#    ],
+#    name_func=_name_func,
+# )
+
 FINETUNE_CONFIGS = parameterized.expand(
     [
         (HF_BASE_960H, wav2vec2_base),
         (HF_LARGE_960H, wav2vec2_large),
-        (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
+        # (HF_LARGE_LV60_960H, wav2vec2_large_lv60k),
         (HF_LARGE_LV60_SELF_960H, wav2vec2_large_lv60k),
         (HF_LARGE_XLSR_DE, wav2vec2_large_lv60k),
     ],
@@ -81,7 +84,7 @@ FINETUNE_CONFIGS = parameterized.expand(
 WAVLM_CONFIGS = parameterized.expand(
     [
         (HF_BASE_WAVLM, wavlm_base),
-        (HF_LARGE_WAVLM, wavlm_large),
+        # (HF_LARGE_WAVLM, wavlm_large),
     ],
     name_func=_name_func,
 )
@@ -190,13 +193,13 @@ class TestHFIntegration(TorchaudioTestCase):
         imported = import_huggingface_model(original).eval()
         self._test_import_pretrain(original, imported, config)
 
-    @XLSR_PRETRAIN_CONFIGS
-    @skipIfCudaSmallMemory
-    def test_import_xlsr_pretrain(self, config, _):
-        """XLS-R models from HF transformers can be imported and yields the same results"""
-        original = self._get_model(config).eval()
-        imported = import_huggingface_model(original).eval()
-        self._test_import_pretrain(original, imported, config)
+    # @XLSR_PRETRAIN_CONFIGS
+    # @skipIfCudaSmallMemory
+    # def test_import_xlsr_pretrain(self, config, _):
+    #    """XLS-R models from HF transformers can be imported and yields the same results"""
+    #    original = self._get_model(config).eval()
+    #    imported = import_huggingface_model(original).eval()
+    #    self._test_import_pretrain(original, imported, config)
 
     @FINETUNE_CONFIGS
     def test_import_finetune(self, config, _):

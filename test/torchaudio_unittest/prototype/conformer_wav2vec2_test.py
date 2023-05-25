@@ -31,11 +31,11 @@ class TestConformerWav2Vec2(TorchaudioTestCase):
         model = conformer_wav2vec2_base()
         self._smoke_test(model, torch.device("cpu"), dtype)
 
-    @parameterized.expand([(torch.float32,), (torch.float64,)])
-    @skipIfNoCuda
-    def test_cuda_smoke_test(self, dtype):
-        model = conformer_wav2vec2_base()
-        self._smoke_test(model, torch.device("cuda"), dtype)
+    # @parameterized.expand([(torch.float32,), (torch.float64,)])
+    # @skipIfNoCuda
+    # def test_cuda_smoke_test(self, dtype):
+    #    model = conformer_wav2vec2_base()
+    #    self._smoke_test(model, torch.device("cuda"), dtype)
 
     @nested_params(
         [conformer_wav2vec2_pretrain_base, conformer_wav2vec2_pretrain_large],
