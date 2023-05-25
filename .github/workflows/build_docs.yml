@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.10"]
-        cuda_arch_version: ["11.7"]
+        cuda_arch_version: ["11.8"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
@@ -91,8 +91,8 @@ jobs:
             make -j > /dev/null 2>&1
             make install
             # test
-            src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
-            ffmpeg -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i "${src}" -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
+            # src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
+            # ffmpeg -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i "${src}" -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
         )
 
         # Install PyTorch
@@ -142,6 +142,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         ref: gh-pages
+        fetch-depth: 5
     - uses: actions/download-artifact@v3
       with:
         name: docs
@@ -149,13 +150,20 @@ jobs:
       run: |
         set -x
 
-        # TODO: add tag-based process (need to handle the main directory name)
-        rm -rf main
-        mv html main
-
-        # Update the main doc
-        git add --all main || true
         git config user.name "pytorchbot"
         git config user.email "soumith+bot@pytorch.org"
-        git commit -m "auto-generating sphinx docs" || true
-        git push
+        # When `git clone`, `gh-pages` branch is fetched by default.
+        # The size of gh-pages grows significantly, so we use ammend and force push
+        # We add a new commit once a week
+        if [ "date +%u" = "1" ]; then
+           git commit --allow-empty -m "placeholder"
+        fi
+
+        # TODO: add tag-based process (need to handle the main directory name)
+        # Update the main doc
+        rm -rf main
+        mv html main
+        git add --all main || true
+
+        git commit --amend -m "auto-generating sphinx docs" || true
+        git push -f
