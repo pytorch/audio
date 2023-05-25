@@ -9,6 +9,8 @@ import torchaudio
 from data_module import LibriSpeechDataModule
 from lightning import Batch
 
+import torchaudio.transforms as T
+
 
 _decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
 _gain = pow(10, 0.05 * _decibel)
@@ -68,24 +70,36 @@ def _extract_features(data_pipeline, samples: List):
 class TrainTransform:
     def __init__(self, global_stats_path: str, sp_model_path: str):
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
+
+        spec_aug_transform = T.SpecAugment(
+            n_time_masks=10,
+            time_mask_param=30,
+            p=0.2,
+            n_freq_masks=2,
+            freq_mask_param=27,
+            iid_masks=True,
+            zero_masking=True,
+        )
+
         self.train_data_pipeline = torch.nn.Sequential(
             FunctionalModule(_piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
             FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
-            torchaudio.transforms.FrequencyMasking(27),
-            torchaudio.transforms.FrequencyMasking(27),
+            # torchaudio.transforms.FrequencyMasking(27),
+            # torchaudio.transforms.FrequencyMasking(27),
             # torchaudio.transforms.TimeMasking(100, p=0.2),
             # torchaudio.transforms.TimeMasking(100, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
-            torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            # torchaudio.transforms.TimeMasking(30, p=0.2),
+            spec_aug_transform,
             FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
         )
 
