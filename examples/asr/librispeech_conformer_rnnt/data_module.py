@@ -149,6 +149,7 @@ class LibriSpeechDataModule(LightningDataModule):
                     self.max_tokens,
                     self.train_num_buckets,
                     batch_size=self.batch_size,
+                    shuffle=True,
                 )
                 for dataset, lengths in zip(datasets, self.train_dataset_lengths)
             ]
