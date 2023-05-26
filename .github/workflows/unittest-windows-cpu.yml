@@ -47,16 +47,6 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS=true
 
-        # kenlm wheels builds have been broken on Windows for quite some time.
-        # Strangely kenlm stopped compiling on windows for a line of code that
-        # has not changed in 10 years: 
-        # https://github.com/kpu/kenlm/blame/4e6ac85c8d01ac91cb61dfbdc76cd652158c5969/util/read_compressed.cc#L228
-        # Thus we will not run any tests that depend on kenlm in the Windows
-        # unittest job. The below 2 environment variables safely skip these
-        # tests.
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUCTC_DECODER=true
-
         ./.circleci/unittest/windows/scripts/setup_env.sh
         ./.circleci/unittest/windows/scripts/install.sh
         ./.circleci/unittest/windows/scripts/run_test.sh
