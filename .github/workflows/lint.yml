@@ -26,9 +26,6 @@ jobs:
         
         echo '::group::Install lint tools'
         pip install --user --progress-bar=off pre-commit
-        pre-commit install-hooks
-        echo '::endgroup::'
-        
         set +e
         pre-commit run --all-files
         
@@ -36,3 +33,4 @@ jobs:
           git --no-pager diff
           exit 1
         fi
+        echo '::endgroup::'
