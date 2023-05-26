@@ -319,7 +319,7 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "11.7"
+      CUDA_VERSION: "11.8"
     steps:
       - checkout
       - designate_upload_channel
