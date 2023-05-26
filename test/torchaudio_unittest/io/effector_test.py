@@ -83,3 +83,20 @@ class EffectorTest(TorchaudioTestCase):
 
         output = effector.apply(original, sample_rate)
         self.assertEqual(original.shape, output.shape)
+
+    def test_resample(self):
+        """Resample option allows to change the sampling rate"""
+        sample_rate = 8000
+        output_sample_rate = 16000
+        num_channels = 3
+
+        effector = AudioEffector(effect="lowpass")
+        original = get_sinusoid(n_channels=num_channels, sample_rate=sample_rate, channels_first=False)
+
+        output = effector.apply(original, sample_rate, output_sample_rate)
+        self.assertEqual(output.shape, [output_sample_rate, num_channels])
+
+        for chunk in effector.stream(
+            original, sample_rate, output_sample_rate=output_sample_rate, frames_per_chunk=output_sample_rate
+        ):
+            self.assertEqual(chunk.shape, [output_sample_rate, num_channels])
