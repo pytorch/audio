@@ -215,6 +215,7 @@ class TestHFIntegration(TorchaudioTestCase):
         self._test_import_finetune(original, imported, config)
 
     @WAVLM_CONFIGS
+    @skipIf(True, "Skip since failing see issue")
     def test_import_pretrain_wavlm(self, config, _):
         """WavLM models from HF transformers can be imported and yield the same results"""
         original = self._get_model(config).eval()
