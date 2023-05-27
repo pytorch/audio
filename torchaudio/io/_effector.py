@@ -267,6 +267,10 @@ class AudioEffector:
             muxer = self.format
             encoder = self.encoder
             option = {}
+            # Some formats are headerless, so need to provide these infomation.
+            if self.format == "mulaw":
+                option = {"sample_rate": f"{sample_rate}", "channels": f"{num_channels}"}
+
         else:  # PCM
             muxer = _get_muxer(waveform.dtype)
             encoder = None
