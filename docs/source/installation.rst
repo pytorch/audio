@@ -16,7 +16,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
    each of which requires a corresponding PyTorch distribution.
 
 .. note::
-   This software was compiled against an unmodified copy of FFmpeg (licensed under `the LGPLv2.1 <https://github.com/FFmpeg/FFmpeg/blob/0e15444aceca0e78f99f3d67758eb79d11b86599/COPYING.LGPLv2.1>`_), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded `here <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`_.
+   This software was compiled against an unmodified copy of FFmpeg (licensed under `the LGPLv2.1 <https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1>`_), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded `here <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`_.
 
 Dependencies
 ------------
@@ -31,8 +31,8 @@ Optional Dependencies
 * `FFmpeg <https://ffmpeg.org>`_.
 
   Required to use :py:mod:`torchaudio.io` module.
-  TorchAudio official binary distributions are compatible with FFmpeg 5.
-  If you need to use FFmpeg 6, please build TorchAudio from source.
+  TorchAudio official binary distributions are compatible with FFmpeg 4.1 to 4.4.
+  If you need to use FFmpeg 5, please build TorchAudio from source.
 
 * `sentencepiece <https://pypi.org/project/sentencepiece/>`_
 

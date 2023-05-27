@@ -109,13 +109,9 @@ class RNNTBeamSearch(torch.nn.Module):
 
         self.step_max_tokens = step_max_tokens
 
-    def _init_b_hypos(self, hypo: Optional[Hypothesis], device: torch.device) -> List[Hypothesis]:
-        if hypo is not None:
-            token = _get_hypo_tokens(hypo)[-1]
-            state = _get_hypo_state(hypo)
-        else:
-            token = self.blank
-            state = None
+    def _init_b_hypos(self, device: torch.device) -> List[Hypothesis]:
+        token = self.blank
+        state = None
 
         one_tensor = torch.tensor([1], device=device)
         pred_out, _, pred_state = self.model.predict(torch.tensor([[token]], device=device), one_tensor, state)
@@ -230,14 +226,14 @@ class RNNTBeamSearch(torch.nn.Module):
     def _search(
         self,
         enc_out: torch.Tensor,
-        hypo: Optional[Hypothesis],
+        hypo: Optional[List[Hypothesis]],
         beam_width: int,
     ) -> List[Hypothesis]:
         n_time_steps = enc_out.shape[1]
         device = enc_out.device
 
         a_hypos: List[Hypothesis] = []
-        b_hypos = self._init_b_hypos(hypo, device)
+        b_hypos = self._init_b_hypos(device) if hypo is None else hypo
         for t in range(n_time_steps):
             a_hypos = b_hypos
             b_hypos = torch.jit.annotate(List[Hypothesis], [])
@@ -263,7 +259,7 @@ class RNNTBeamSearch(torch.nn.Module):
                 if a_hypos:
                     symbols_current_t += 1
 
-            _, sorted_idx = torch.tensor([self.hypo_sort_key(hypo) for hypo in b_hypos]).topk(beam_width)
+            _, sorted_idx = torch.tensor([self.hypo_sort_key(hyp) for hyp in b_hypos]).topk(beam_width)
             b_hypos = [b_hypos[idx] for idx in sorted_idx]
 
         return b_hypos
@@ -290,8 +286,8 @@ class RNNTBeamSearch(torch.nn.Module):
 
         if length.shape != () and length.shape != (1,):
             raise ValueError("length must be of shape () or (1,)")
-        if input.dim() == 0:
-            input = input.unsqueeze(0)
+        if length.dim() == 0:
+            length = length.unsqueeze(0)
 
         enc_out, _ = self.model.transcribe(input, length)
         return self._search(enc_out, None, beam_width)
@@ -303,7 +299,7 @@ class RNNTBeamSearch(torch.nn.Module):
         length: torch.Tensor,
         beam_width: int,
         state: Optional[List[List[torch.Tensor]]] = None,
-        hypothesis: Optional[Hypothesis] = None,
+        hypothesis: Optional[List[Hypothesis]] = None,
     ) -> Tuple[List[Hypothesis], List[List[torch.Tensor]]]:
         r"""Performs beam search for the given input sequence in streaming mode.
 

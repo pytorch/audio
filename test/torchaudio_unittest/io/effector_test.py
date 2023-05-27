@@ -30,14 +30,17 @@ class EffectorTest(TorchaudioTestCase):
             ("ogg", "flac"),  # flac only supports s16 and s32
             ("ogg", "opus"),  # opus only supports 48k Hz
             ("ogg", "vorbis"),  # vorbis only supports stereo
+            # ("ogg", "vorbis", 44100),
+            # this fails with small descrepancy; 441024 vs 441000
+            # TODO: investigate
             ("wav", None),
             ("wav", "pcm_u8"),
             ("mp3", None),
+            ("mulaw", None, 44100),  # mulaw is encoded without header
         ]
     )
-    def test_formats(self, format, encoder):
+    def test_formats(self, format, encoder, sample_rate=8000):
         """Formats (some with restrictions) just work without an issue in effector"""
-        sample_rate = 8000
 
         effector = AudioEffector(format=format, encoder=encoder)
         original = get_sinusoid(n_channels=3, sample_rate=sample_rate, channels_first=False)

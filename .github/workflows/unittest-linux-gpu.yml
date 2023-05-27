@@ -55,7 +55,7 @@ jobs:
           "${CUDATOOLKIT}"
 
         # Install torchaudio
-        conda install --quiet -y -c conda-forge 'ffmpeg==5.1' pkg-config
+        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         python3 -m pip --quiet install cmake>=3.18.0 ninja
         USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
 

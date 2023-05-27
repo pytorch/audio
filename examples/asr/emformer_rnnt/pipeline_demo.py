@@ -65,9 +65,9 @@ def run_eval_streaming(args):
             with torch.no_grad():
                 features, length = streaming_feature_extractor(segment)
                 hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
-            hypothesis = hypos[0]
-            transcript = token_processor(hypothesis[0], lstrip=False)
-            print(transcript, end="", flush=True)
+            hypothesis = hypos
+            transcript = token_processor(hypos[0][0], lstrip=True)
+            print(transcript, end="\r", flush=True)
         print()
 
         # Non-streaming decode.
