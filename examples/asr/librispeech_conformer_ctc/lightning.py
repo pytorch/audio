@@ -77,6 +77,27 @@ def post_process_hypos(
     return nbest_batch
 
 
+class GreedyCTCDecoder(torch.nn.Module):
+    def __init__(self, labels, blank=0):
+        super().__init__()
+        self.labels = labels
+        self.blank = blank
+
+    def forward(self, emission: torch.Tensor) -> List[str]:
+        """Given a sequence emission over labels, get the best path
+        Args:
+          emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.
+
+        Returns:
+          List[str]: The resulting transcript
+        """
+        indices = torch.argmax(emission, dim=-1)  # [num_seq,]
+        indices = torch.unique_consecutive(indices, dim=-1)
+        indices = [i for i in indices if i != self.blank]
+        joined = "".join([self.labels[i.item()] for i in indices])
+        return joined.replace("|", " ").strip().split()
+
+
 class ConformerCTCModule(LightningModule):
     def __init__(self, sp_model, inference_args=None):
         super().__init__()
@@ -98,22 +119,29 @@ class ConformerCTCModule(LightningModule):
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
         if inference_args:
-            files = download_pretrained_files("librispeech-4-gram")
-            self.files = files
-            self.decoder = ctc_decoder(
-                lexicon=files.lexicon,
-                tokens=files.tokens,
-                lm=files.lm,
-                nbest=inference_args["nbest"],
-                beam_size=inference_args["beam_size"],
-                beam_size_token=inference_args["beam_size_token"],
-                beam_threshold=inference_args["beam_threshold"],
-                lm_weight=inference_args["lm_weight"],
-                word_score=inference_args["word_score"],
-                unk_score=inference_args["unk_score"],
-                sil_score=inference_args["sil_score"],
-                log_add=False,
+            # files = download_pretrained_files("librispeech-4-gram")
+            # self.files = files
+            # self.decoder = ctc_decoder(
+            #     lexicon=files.lexicon,
+            #     tokens=files.tokens,
+            #     lm=files.lm,
+            #     nbest=inference_args["nbest"],
+            #     beam_size=inference_args["beam_size"],
+            #     beam_size_token=inference_args["beam_size_token"],
+            #     beam_threshold=inference_args["beam_threshold"],
+            #     lm_weight=inference_args["lm_weight"],
+            #     word_score=inference_args["word_score"],
+            #     unk_score=inference_args["unk_score"],
+            #     sil_score=inference_args["sil_score"],
+            #     log_add=False,
+            # )
+
+            tokens = {i: sp_model.id_to_piece(i) for i in range(sp_model.vocab_size())}
+            greedy_decoder = GreedyCTCDecoder(
+                labels=tokens,
+                blank=self.blank_idx,
             )
+            self.decoder = greedy_decoder
     
     def _step(self, batch, _, step_type):
         if batch is None:
@@ -137,12 +165,13 @@ class ConformerCTCModule(LightningModule):
     def forward(self, batch: Batch):
         with torch.inference_mode():
             output, src_lengths = self.model(
-                batch.features,
-                batch.feature_lengths,
+                batch.features.to(self.device),
+                batch.feature_lengths.to(self.device),
             )
-        emission = output
+        emission = output.cpu()
         beam_search_result = self.decoder(emission)
-        beam_search_transcript = " ".join(beam_search_result[0][0].words).strip()  # assuming batch_size=1
+        # beam_search_transcript = " ".join(beam_search_result[0][0].words).strip()  # assuming batch_size=1
+        beam_search_transcript = " ".join(beam_search_result).strip()
         return beam_search_transcript
 
     def training_step(self, batch: Batch, batch_idx):
