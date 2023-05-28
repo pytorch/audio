@@ -1,6 +1,7 @@
 #include <sox.h>
 #include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/effects_chain.h>
+#include <torchaudio/csrc/sox/libsox.h>
 #include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio::sox {
@@ -18,7 +19,7 @@ void initialize_sox_effects() {
   switch (SOX_RESOURCE_STATE) {
     case NotInitialized:
       TORCH_CHECK(
-          sox_init() == SOX_SUCCESS, "Failed to initialize sox effects.");
+          lsx().sox_init() == SOX_SUCCESS, "Failed to initialize sox effects.");
       SOX_RESOURCE_STATE = Initialized;
       break;
     case Initialized:
@@ -37,7 +38,7 @@ void shutdown_sox_effects() {
       TORCH_CHECK(false, "SoX Effects is not initialized. Cannot shutdown.");
     case Initialized:
       TORCH_CHECK(
-          sox_quit() == SOX_SUCCESS, "Failed to initialize sox effects.");
+          lsx().sox_quit() == SOX_SUCCESS, "Failed to initialize sox effects.");
       SOX_RESOURCE_STATE = ShutDown;
       break;
     case ShutDown:
@@ -91,7 +92,7 @@ auto apply_effects_file(
     const c10::optional<std::string>& format)
     -> c10::optional<std::tuple<torch::Tensor, int64_t>> {
   // Open input file
-  SoxFormat sf(sox_open_read(
+  SoxFormat sf(lsx().sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
       /*encoding=*/nullptr,
@@ -129,7 +130,6 @@ auto apply_effects_file(
       dtype,
       normalize.value_or(true),
       channels_first_);
-
   return std::tuple<torch::Tensor, int64_t>(
       tensor, chain.getOutputSampleRate());
 }
@@ -144,6 +144,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::sox_effects_apply_effects_tensor", &apply_effects_tensor);
   m.def("torchaudio::sox_effects_apply_effects_file", &apply_effects_file);
 }
-
 } // namespace
 } // namespace torchaudio::sox

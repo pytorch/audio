@@ -1,33 +1,34 @@
 #include <c10/core/ScalarType.h>
 #include <sox.h>
+#include <torchaudio/csrc/sox/libsox.h>
 #include <torchaudio/csrc/sox/types.h>
 #include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio::sox {
 
 void set_seed(const int64_t seed) {
-  sox_get_globals()->ranqd1 = static_cast<sox_int32_t>(seed);
+  lsx().sox_get_globals()->ranqd1 = static_cast<sox_int32_t>(seed);
 }
 
 void set_verbosity(const int64_t verbosity) {
-  sox_get_globals()->verbosity = static_cast<unsigned>(verbosity);
+  lsx().sox_get_globals()->verbosity = static_cast<unsigned>(verbosity);
 }
 
 void set_use_threads(const bool use_threads) {
-  sox_get_globals()->use_threads = static_cast<sox_bool>(use_threads);
+  lsx().sox_get_globals()->use_threads = static_cast<sox_bool>(use_threads);
 }
 
 void set_buffer_size(const int64_t buffer_size) {
-  sox_get_globals()->bufsiz = static_cast<size_t>(buffer_size);
+  lsx().sox_get_globals()->bufsiz = static_cast<size_t>(buffer_size);
 }
 
 int64_t get_buffer_size() {
-  return sox_get_globals()->bufsiz;
+  return lsx().sox_get_globals()->bufsiz;
 }
 
 std::vector<std::vector<std::string>> list_effects() {
   std::vector<std::vector<std::string>> effects;
-  for (const sox_effect_fn_t* fns = sox_get_effect_fns(); *fns; ++fns) {
+  for (const sox_effect_fn_t* fns = lsx().sox_get_effect_fns(); *fns; ++fns) {
     const sox_effect_handler_t* handler = (*fns)();
     if (handler && handler->name) {
       if (UNSUPPORTED_EFFECTS.find(handler->name) ==
@@ -43,7 +44,8 @@ std::vector<std::vector<std::string>> list_effects() {
 
 std::vector<std::string> list_write_formats() {
   std::vector<std::string> formats;
-  for (const sox_format_tab_t* fns = sox_get_format_fns(); fns->fn; ++fns) {
+  for (const sox_format_tab_t* fns = lsx().sox_get_format_fns(); fns->fn;
+       ++fns) {
     const sox_format_handler_t* handler = fns->fn();
     for (const char* const* names = handler->names; *names; ++names) {
       if (!strchr(*names, '/') && handler->write)
@@ -55,7 +57,8 @@ std::vector<std::string> list_write_formats() {
 
 std::vector<std::string> list_read_formats() {
   std::vector<std::string> formats;
-  for (const sox_format_tab_t* fns = sox_get_format_fns(); fns->fn; ++fns) {
+  for (const sox_format_tab_t* fns = lsx().sox_get_format_fns(); fns->fn;
+       ++fns) {
     const sox_format_handler_t* handler = fns->fn();
     for (const char* const* names = handler->names; *names; ++names) {
       if (!strchr(*names, '/') && handler->read)
@@ -79,7 +82,7 @@ SoxFormat::operator sox_format_t*() const noexcept {
 
 void SoxFormat::close() {
   if (fd_ != nullptr) {
-    sox_close(fd_);
+    lsx().sox_close(fd_);
     fd_ = nullptr;
   }
 }
@@ -490,5 +493,4 @@ sox_encodinginfo_t get_encodinginfo_for_save(
       /*reverse_bits=*/sox_option_default,
       /*opposite_endian=*/sox_false};
 }
-
 } // namespace torchaudio::sox

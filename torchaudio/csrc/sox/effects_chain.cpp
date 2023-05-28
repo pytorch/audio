@@ -1,11 +1,11 @@
 #include <torchaudio/csrc/sox/effects_chain.h>
+#include <torchaudio/csrc/sox/libsox.h>
 #include <torchaudio/csrc/sox/utils.h>
 #include "c10/util/Exception.h"
 
 using namespace torch::indexing;
 
 namespace torchaudio::sox {
-
 namespace {
 
 /// helper classes for passing the location of input tensor and output buffer
@@ -112,12 +112,12 @@ int file_output_flow(
   *osamp = 0;
   if (*isamp) {
     auto sf = static_cast<FileOutputPriv*>(effp->priv)->sf;
-    if (sox_write(sf, ibuf, *isamp) != *isamp) {
+    if (lsx().sox_write(sf, ibuf, *isamp) != *isamp) {
       TORCH_CHECK(
           !sf->sox_errno,
           sf->sox_errstr,
           " ",
-          sox_strerror(sf->sox_errno),
+          lsx().sox_strerror(sf->sox_errno),
           " ",
           sf->filename);
       return SOX_EOF;
@@ -197,18 +197,18 @@ SoxEffectsChain::SoxEffectsChain(
       in_sig_(),
       interm_sig_(),
       out_sig_(),
-      sec_(sox_create_effects_chain(&in_enc_, &out_enc_)) {
+      sec_(lsx().sox_create_effects_chain(&in_enc_, &out_enc_)) {
   TORCH_CHECK(sec_, "Failed to create effect chain.");
 }
 
 SoxEffectsChain::~SoxEffectsChain() {
   if (sec_ != nullptr) {
-    sox_delete_effects_chain(sec_);
+    lsx().sox_delete_effects_chain(sec_);
   }
 }
 
 void SoxEffectsChain::run() {
-  sox_flow_effects(sec_, NULL, NULL);
+  lsx().sox_flow_effects(sec_, NULL, NULL);
 }
 
 void SoxEffectsChain::addInputTensor(
@@ -217,44 +217,44 @@ void SoxEffectsChain::addInputTensor(
     bool channels_first) {
   in_sig_ = get_signalinfo(waveform, sample_rate, "wav", channels_first);
   interm_sig_ = in_sig_;
-  SoxEffect e(sox_create_effect(get_tensor_input_handler()));
+  SoxEffect e(lsx().sox_create_effect(get_tensor_input_handler()));
   auto priv = static_cast<TensorInputPriv*>(e->priv);
   priv->index = 0;
   priv->waveform = waveform;
   priv->sample_rate = sample_rate;
   priv->channels_first = channels_first;
   TORCH_CHECK(
-      sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
+      lsx().sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
       "Internal Error: Failed to add effect: input_tensor");
 }
 
 void SoxEffectsChain::addOutputBuffer(
     std::vector<sox_sample_t>* output_buffer) {
-  SoxEffect e(sox_create_effect(get_tensor_output_handler()));
+  SoxEffect e(lsx().sox_create_effect(get_tensor_output_handler()));
   static_cast<TensorOutputPriv*>(e->priv)->buffer = output_buffer;
   TORCH_CHECK(
-      sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
+      lsx().sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
       "Internal Error: Failed to add effect: output_tensor");
 }
 
 void SoxEffectsChain::addInputFile(sox_format_t* sf) {
   in_sig_ = sf->signal;
   interm_sig_ = in_sig_;
-  SoxEffect e(sox_create_effect(sox_find_effect("input")));
+  SoxEffect e(lsx().sox_create_effect(lsx().sox_find_effect("input")));
   char* opts[] = {(char*)sf};
-  sox_effect_options(e, 1, opts);
+  lsx().sox_effect_options(e, 1, opts);
   TORCH_CHECK(
-      sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
+      lsx().sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
       "Internal Error: Failed to add effect: input ",
       sf->filename);
 }
 
 void SoxEffectsChain::addOutputFile(sox_format_t* sf) {
   out_sig_ = sf->signal;
-  SoxEffect e(sox_create_effect(get_file_output_handler()));
+  SoxEffect e(lsx().sox_create_effect(get_file_output_handler()));
   static_cast<FileOutputPriv*>(e->priv)->sf = sf;
   TORCH_CHECK(
-      sox_add_effect(sec_, e, &interm_sig_, &out_sig_) == SOX_SUCCESS,
+      lsx().sox_add_effect(sec_, e, &interm_sig_, &out_sig_) == SOX_SUCCESS,
       "Internal Error: Failed to add effect: output ",
       sf->filename);
 }
@@ -266,12 +266,12 @@ void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
   TORCH_CHECK(
       UNSUPPORTED_EFFECTS.find(name) == UNSUPPORTED_EFFECTS.end(),
       "Unsupported effect: ",
-      name)
+      name);
 
-  auto returned_effect = sox_find_effect(name.c_str());
+  auto returned_effect = lsx().sox_find_effect(name.c_str());
   TORCH_CHECK(returned_effect, "Unsupported effect: ", name)
 
-  SoxEffect e(sox_create_effect(returned_effect));
+  SoxEffect e(lsx().sox_create_effect(returned_effect));
   const auto num_options = num_args - 1;
 
   std::vector<char*> opts;
@@ -279,12 +279,12 @@ void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
     opts.push_back((char*)effect[i].c_str());
   }
   TORCH_CHECK(
-      sox_effect_options(e, num_options, num_options ? opts.data() : nullptr) ==
-          SOX_SUCCESS,
+      lsx().sox_effect_options(
+          e, num_options, num_options ? opts.data() : nullptr) == SOX_SUCCESS,
       "Invalid effect option: ",
       c10::Join(" ", effect))
   TORCH_CHECK(
-      sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
+      lsx().sox_add_effect(sec_, e, &interm_sig_, &in_sig_) == SOX_SUCCESS,
       "Internal Error: Failed to add effect: \"",
       c10::Join(" ", effect),
       "\"");
