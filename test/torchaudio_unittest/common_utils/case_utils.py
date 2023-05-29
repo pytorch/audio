@@ -293,6 +293,7 @@ disabledInCI = _skipIf(
     key="TEMPORARY_DISABLED",
 )
 
+
 def skipIfNoHWAccel(name):
     key = "NO_HW_ACCEL"
     if not is_ffmpeg_available():
