@@ -24,6 +24,7 @@ from .case_utils import (
     TestBaseMixin,
     TorchaudioTestCase,
     zip_equal,
+    disabledInCI,
 )
 from .data_utils import get_asset_path, get_sinusoid, get_spectrogram, get_whitenoise
 from .func_utils import torch_script
@@ -60,6 +61,7 @@ __all__ = [
     "skipIfNoFFmpeg",
     "skipIfNoHWAccel",
     "skipIfPy310",
+    "disabledInCI",
     "get_wav_data",
     "normalize_wav",
     "load_wav",
