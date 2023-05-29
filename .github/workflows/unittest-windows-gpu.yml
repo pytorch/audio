@@ -47,16 +47,9 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
 
 
-        # Strangely kenlm stopped compiling on windows for a line of code that
-        # has not changed in 10 years:
-        # https://github.com/kpu/kenlm/blame/4e6ac85c8d01ac91cb61dfbdc76cd652158c5969/util/read_compressed.cc#L228
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUCTC_DECODER=true
-
-
-        source ./.circleci/unittest/windows/scripts/setup_env.sh
+        ./.circleci/unittest/windows/scripts/setup_env.sh
         ./packaging/windows/internal/cuda_install.bat
         ./packaging/windows/internal/driver_update.bat
 
-        source ./.circleci/unittest/windows/scripts/install.sh
-        source ./.circleci/unittest/windows/scripts/run_test.sh
+        ./.circleci/unittest/windows/scripts/install.sh
+        ./.circleci/unittest/windows/scripts/run_test.sh
