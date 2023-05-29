@@ -126,6 +126,7 @@ class FFmpegBackend(Backend):
             src,
             sample_rate,
             channels_first,
+            -1,
             format,
             encoding,
             bits_per_sample,
