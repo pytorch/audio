@@ -2,6 +2,7 @@ import io
 
 import torch
 import torchaudio
+from unittest import skipIf
 from parameterized import parameterized, parameterized_class
 from torchaudio_unittest.common_utils import (
     get_asset_path,
@@ -1171,6 +1172,7 @@ class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
 
 
 @skipIfNoHWAccel("h264_cuvid")
+@skipIf(True, "Skip since failing see issue: https://github.com/pytorch/audio/issues/3376")
 class FilterGraphWithCudaAccel(TorchaudioTestCase):
     def test_sclae_cuda_change_size(self):
         """scale_cuda filter can be used when HW accel is on"""
