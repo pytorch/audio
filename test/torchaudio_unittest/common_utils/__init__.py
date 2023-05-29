@@ -1,6 +1,7 @@
 from .autograd_utils import use_deterministic_algorithms
 from .backend_utils import set_audio_backend
 from .case_utils import (
+    disabledInCI,
     HttpServerMixin,
     is_ffmpeg_available,
     PytorchTestCase,
@@ -24,7 +25,6 @@ from .case_utils import (
     TestBaseMixin,
     TorchaudioTestCase,
     zip_equal,
-    disabledInCI,
 )
 from .data_utils import get_asset_path, get_sinusoid, get_spectrogram, get_whitenoise
 from .func_utils import torch_script
