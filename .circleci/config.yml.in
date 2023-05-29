@@ -355,6 +355,8 @@ jobs:
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE: true
               TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS: true
+              TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED: true
+
       - store_test_results:
           path: test-results
       - store_artifacts:

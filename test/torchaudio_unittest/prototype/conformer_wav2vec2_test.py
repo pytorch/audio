@@ -52,6 +52,8 @@ class TestConformerWav2Vec2(TorchaudioTestCase):
         [torch.float32, torch.float64],
     )
     @skipIfNoCuda
+    # Disabled in CI: https://github.com/pytorch/audio/issues/3376
+    @disabledInCI
     def test_pretrain_cuda_smoke_test(self, model, dtype):
         model = model()
         self._smoke_test(model, torch.device("cuda"), dtype)
