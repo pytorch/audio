@@ -5,8 +5,8 @@ from torchaudio.prototype.models import (
     conformer_wav2vec2_pretrain_base,
     conformer_wav2vec2_pretrain_large,
 )
-from torchaudio_unittest.common_utils import nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
-from unittest import skipIf
+from torchaudio_unittest.common_utils import disabledInCI, nested_params, skipIfNoCuda, torch_script, TorchaudioTestCase
+
 
 class TestConformerWav2Vec2(TorchaudioTestCase):
     def _smoke_test(self, model, device, dtype):
@@ -33,7 +33,8 @@ class TestConformerWav2Vec2(TorchaudioTestCase):
 
     @parameterized.expand([(torch.float32,), (torch.float64,)])
     @skipIfNoCuda
-    @skipIf(True, "Skip since failing see issue: https://github.com/pytorch/audio/issues/3376")
+    # Disabled in CI: https://github.com/pytorch/audio/issues/3376
+    @disabledInCI
     def test_cuda_smoke_test(self, dtype):
         model = conformer_wav2vec2_base()
         self._smoke_test(model, torch.device("cuda"), dtype)

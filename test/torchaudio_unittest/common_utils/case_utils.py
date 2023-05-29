@@ -287,7 +287,11 @@ skipIfNoMacOS = _skipIf(
     reason="This feature is only available for MacOS.",
     key="NO_MACOS",
 )
-
+disabledInCI = _skipIf(
+    "CI" in os.environ,
+    reason="Tests are failing on CI consistently. Disabled while investigating.",
+    key="TEMPORARY_DISABLED",
+)
 
 def skipIfNoHWAccel(name):
     key = "NO_HW_ACCEL"
