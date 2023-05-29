@@ -178,6 +178,8 @@ def _get_encoder(dtype: torch.dtype, format: str, encoding: str, bits_per_sample
         if encoding or bits_per_sample:
             raise ValueError("ogg/vorbis does not support encoding/bits_per_sample.")
         return "vorbis"
+    if format == "mp3":
+        return "libmp3lame"
     return format
 
 
