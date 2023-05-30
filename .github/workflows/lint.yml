@@ -25,8 +25,12 @@ jobs:
         echo '::endgroup::'
         
         echo '::group::Install lint tools'
+        pip install --upgrade pip
         pip install --user --progress-bar=off pre-commit
         set +e
+        # export PATH=${PATH}:/root/.local/bin
+        echo $PATH
+        echo $PYTHONPATH
         pre-commit run --all-files
         
         if [ $? -ne 0 ]; then
