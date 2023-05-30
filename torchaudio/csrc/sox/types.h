@@ -4,8 +4,7 @@
 #include <sox.h>
 #include <torch/script.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox {
 
 enum class Format {
   WAV,
@@ -54,7 +53,6 @@ BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth);
 
 std::string get_encoding(sox_encoding_t encoding);
 
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace torchaudio::sox
 
 #endif

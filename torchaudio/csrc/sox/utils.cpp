@@ -3,8 +3,7 @@
 #include <torchaudio/csrc/sox/types.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox {
 
 void set_seed(const int64_t seed) {
   sox_get_globals()->ranqd1 = static_cast<sox_int32_t>(seed);
@@ -492,30 +491,18 @@ sox_encodinginfo_t get_encodinginfo_for_save(
       /*opposite_endian=*/sox_false};
 }
 
+namespace {
+
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::sox_utils_set_seed", &torchaudio::sox_utils::set_seed);
-  m.def(
-      "torchaudio::sox_utils_set_verbosity",
-      &torchaudio::sox_utils::set_verbosity);
-  m.def(
-      "torchaudio::sox_utils_set_use_threads",
-      &torchaudio::sox_utils::set_use_threads);
-  m.def(
-      "torchaudio::sox_utils_set_buffer_size",
-      &torchaudio::sox_utils::set_buffer_size);
-  m.def(
-      "torchaudio::sox_utils_list_effects",
-      &torchaudio::sox_utils::list_effects);
-  m.def(
-      "torchaudio::sox_utils_list_read_formats",
-      &torchaudio::sox_utils::list_read_formats);
-  m.def(
-      "torchaudio::sox_utils_list_write_formats",
-      &torchaudio::sox_utils::list_write_formats);
-  m.def(
-      "torchaudio::sox_utils_get_buffer_size",
-      &torchaudio::sox_utils::get_buffer_size);
+  m.def("torchaudio::sox_utils_set_seed", &set_seed);
+  m.def("torchaudio::sox_utils_set_verbosity", &set_verbosity);
+  m.def("torchaudio::sox_utils_set_use_threads", &set_use_threads);
+  m.def("torchaudio::sox_utils_set_buffer_size", &set_buffer_size);
+  m.def("torchaudio::sox_utils_list_effects", &list_effects);
+  m.def("torchaudio::sox_utils_list_read_formats", &list_read_formats);
+  m.def("torchaudio::sox_utils_list_write_formats", &list_write_formats);
+  m.def("torchaudio::sox_utils_get_buffer_size", &get_buffer_size);
 }
 
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace
+} // namespace torchaudio::sox

@@ -4,8 +4,7 @@
 #include <sox.h>
 #include <torch/script.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox {
 
 ////////////////////////////////////////////////////////////////////////////////
 // APIs for Python interaction
@@ -106,6 +105,5 @@ sox_encodinginfo_t get_encodinginfo_for_save(
     const c10::optional<std::string> encoding,
     const c10::optional<int64_t> bits_per_sample);
 
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace torchaudio::sox
 #endif
