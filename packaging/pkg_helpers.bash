@@ -46,13 +46,21 @@ setup_cuda() {
 
   # Now work out the CUDA settings
   case "$CU_VERSION" in
+    cu121)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1"
+      else
+        export CUDA_HOME=/usr/local/cuda-12.1/
+      fi
+      export TORCH_CUDA_ARCH_LIST="5.0+PTX;6.0;7.0;7.5;8.0;8.6;9.0"
+      ;;
     cu118)
       if [[ "$OSTYPE" == "msys" ]]; then
         export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8"
       else
         export CUDA_HOME=/usr/local/cuda-11.8/
       fi
-      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6;9.0"
       ;;
     cu117)
       if [[ "$OSTYPE" == "msys" ]]; then
@@ -232,10 +240,6 @@ setup_conda_pytorch_constraint() {
   # TODO: Remove me later, see https://github.com/pytorch/pytorch/issues/62424 for more details
   if [[ "$(uname)" == Darwin ]]; then
     arch_name="$(uname -m)"
-    if [[ "${arch_name}" != "arm64" && "${PYTHON_VERSION}" != "3.11" ]]; then
-      # Use less than equal to avoid version conflict in python=3.6 environment
-      export CONDA_EXTRA_BUILD_CONSTRAINT="- mkl<=2021.2.0"
-    fi
   fi
 }
 
@@ -246,6 +250,9 @@ setup_conda_cudatoolkit_constraint() {
     export CONDA_BUILD_VARIANT="cpu"
   else
     case "$CU_VERSION" in
+      cu121)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=12.1 # [not osx]"
+        ;;
       cu118)
         export CONDA_CUDATOOLKIT_CONSTRAINT="- pytorch-cuda=11.8 # [not osx]"
         ;;

@@ -23,53 +23,20 @@ from jinja2 import select_autoescape
 
 PYTHON_VERSIONS = ["3.8", "3.9", "3.10", "3.11"]
 CU_VERSIONS_DICT = {
-    "linux": ["cpu", "cu117", "cu118", "rocm5.2", "rocm5.3"],
-    "windows": ["cpu", "cu117", "cu118"],
-    "macos": ["cpu"],
+    "windows": ["cpu", "cu117", "cu118", "cu121"],
 }
-
-
-DOC_VERSION = ("linux", "3.8")
 
 
 def build_workflows(prefix="", upload=False, filter_branch=None, indentation=6):
     w = []
     w += build_download_job(filter_branch)
-    for os_type in ["linux", "macos", "windows"]:
+    for os_type in ["windows"]:
         w += build_ffmpeg_job(os_type, filter_branch)
-    for btype in ["wheel", "conda"]:
-        for os_type in ["linux", "macos", "windows"]:
+        for btype in ["wheel", "conda"]:
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
                     fb = filter_branch
-                    if (
-                        (cu_version.startswith("rocm") and btype == "conda")
-                        or (os_type == "linux" and btype == "wheel")
-                        or (
-                            os_type == "linux"
-                            and btype == "conda"
-                            and (python_version != "3.8" or cu_version != "cu117")
-                        )
-                        or os_type == "macos"
-                    ):
-                        continue
-
-                    if not fb and (
-                        os_type == "linux" and btype == "wheel" and python_version == "3.8" and cu_version == "cpu"
-                    ):
-                        # the fields must match the build_docs "requires" dependency
-                        fb = "/.*/"
-
-                    if os_type == "linux" and btype == "conda" and python_version == "3.8" and cu_version == "cu117":
-                        w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, False)
-                        continue
-
                     w += build_workflow_pair(btype, os_type, python_version, cu_version, fb, prefix, upload)
-
-    if not filter_branch:
-        # Build on every pull request, but upload only on nightly and tags
-        w += build_doc_job("/.*/")
-        w += upload_doc_job("nightly")
 
     return indent(indentation, w)
 
@@ -114,36 +81,6 @@ def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branc
         )
 
     return w
-
-
-def build_doc_job(filter_branch):
-    job = {
-        "name": "build_docs",
-        "python_version": "3.8",
-        "cuda_version": "cu117",
-        "requires": [
-            "binary_linux_conda_py3.8_cu117",
-        ],
-    }
-
-    if filter_branch:
-        job["filters"] = gen_filter_branch_tree(filter_branch)
-    return [{"build_docs": job}]
-
-
-def upload_doc_job(filter_branch):
-    job = {
-        "name": "upload_docs",
-        "context": "org-member",
-        "python_version": "3.8",
-        "requires": [
-            "build_docs",
-        ],
-    }
-
-    if filter_branch:
-        job["filters"] = gen_filter_branch_tree(filter_branch)
-    return [{"upload_docs": job}]
 
 
 def docstring_parameters_sync_job(filter_branch):

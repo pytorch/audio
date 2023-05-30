@@ -40,6 +40,7 @@ _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
+_BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", _USE_CUDA)
 _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
@@ -54,6 +55,13 @@ def get_ext_modules():
             [
                 Extension(name="torchaudio.lib.libtorchaudio_sox", sources=[]),
                 Extension(name="torchaudio.lib._torchaudio_sox", sources=[]),
+            ]
+        )
+    if _BUILD_CUDA_CTC_DECODER:
+        modules.extend(
+            [
+                Extension(name="torchaudio.lib.libctc_prefix_decoder", sources=[]),
+                Extension(name="torchaudio.lib.pybind11_prefixctc", sources=[]),
             ]
         )
     if _USE_FFMPEG:
@@ -110,6 +118,7 @@ class CMakeBuild(build_ext):
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_RIR:BOOL={'ON' if _BUILD_RIR else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
+            f"-DBUILD_CUDA_CTC_DECODER:BOOL={'ON' if _BUILD_CUDA_CTC_DECODER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
