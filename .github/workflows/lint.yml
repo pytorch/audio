@@ -22,18 +22,20 @@ jobs:
         eval "$(${CONDA_PATH} shell.bash hook)"
         conda create --name ci --quiet --yes python=3.8 pip
         conda activate ci
-        CONDA_RUN="conda run -n ci"
+        # CONDA_RUN="conda run -n ci"
         echo '::endgroup::'
         
         echo '::group::Install lint tools'
-        ${CONDA_RUN} export PY_PKGS_DIR=${PATH%%:*}
-        ${CONDA_RUN} pip install --upgrade pip
-        ${CONDA_RUN} pip install --progress-bar=off pre-commit -t "${PY_PKGS_DIR}"
-        ${CONDA_RUN} ls "${PY_PKGS_DIR}"
+        export PY_PKGS_DIR=${PATH%%:*}
+        pip install --upgrade pip
+        # pip install --progress-bar=off pre-commit -t "${PY_PKGS_DIR}"
+        pip install --progress-bar=off pre-commit
+        # ls "${PY_PKGS_DIR}"
         set +e
         # export PATH=${PATH}:/root/.local/bin
-        ${CONDA_RUN} echo $PATH
-        ${CONDA_RUN} "${PY_PKGS_DIR}"/pre-commit run --all-files
+        echo $PATH
+        # "${PY_PKGS_DIR}"/pre-commit run --all-files
+        pre-commit run --all-files
         
         if [ $? -ne 0 ]; then
           git --no-pager diff
