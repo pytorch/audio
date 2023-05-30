@@ -26,7 +26,7 @@ jobs:
         echo '::endgroup::'
         
         echo '::group::Install lint tools'
-        ${CONDA_RUN} PY_PKGS_DIR=${PATH%%:*}
+        ${CONDA_RUN} export PY_PKGS_DIR=${PATH%%:*}
         ${CONDA_RUN} pip install --upgrade pip
         ${CONDA_RUN} pip install --progress-bar=off pre-commit -t "${PY_PKGS_DIR}"
         ${CONDA_RUN} ls "${PY_PKGS_DIR}"
