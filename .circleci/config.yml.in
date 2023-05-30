@@ -241,22 +241,6 @@ jobs:
           paths:
             - ffmpeg
 
-  stylecheck:
-    <<: *binary_common
-    docker:
-      - image: "pytorch/torchaudio_unittest_base:manylinux"
-    resource_class: medium
-    steps:
-      - checkout
-      - designate_upload_channel
-      - load_conda_channel_flags
-      - run:
-          name: Setup
-          command: .circleci/unittest/linux/scripts/setup_env.sh
-      - run:
-          name: Run style check
-          command: .circleci/unittest/linux/scripts/run_style_checks.sh
-
 workflows:
   lint:
     jobs:
