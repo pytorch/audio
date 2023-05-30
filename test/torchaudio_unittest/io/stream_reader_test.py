@@ -4,6 +4,7 @@ import torch
 import torchaudio
 from parameterized import parameterized, parameterized_class
 from torchaudio_unittest.common_utils import (
+    disabledInCI,
     get_asset_path,
     get_image,
     get_sinusoid,
@@ -1171,6 +1172,8 @@ class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
 
 
 @skipIfNoHWAccel("h264_cuvid")
+# Disabled in CI: https://github.com/pytorch/audio/issues/3376
+@disabledInCI
 class FilterGraphWithCudaAccel(TorchaudioTestCase):
     def test_sclae_cuda_change_size(self):
         """scale_cuda filter can be used when HW accel is on"""

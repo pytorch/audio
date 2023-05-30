@@ -1,6 +1,7 @@
 from .autograd_utils import use_deterministic_algorithms
 from .backend_utils import set_audio_backend
 from .case_utils import (
+    disabledInCI,
     HttpServerMixin,
     is_ffmpeg_available,
     PytorchTestCase,
@@ -60,6 +61,7 @@ __all__ = [
     "skipIfNoFFmpeg",
     "skipIfNoHWAccel",
     "skipIfPy310",
+    "disabledInCI",
     "get_wav_data",
     "normalize_wav",
     "load_wav",
