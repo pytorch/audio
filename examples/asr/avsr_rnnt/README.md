@@ -18,7 +18,7 @@ pip install pytorch-lightning sentencepiece
 
 3. Preprocess LRS3 to a cropped-face dataset from the [data_prep](./data_prep) folder.
 
-4. Download models below to initialise ASR/VSR front-end.
+4. For better performance, you can choose to download [models](https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks#model-zoo) from Table 1 to initialise ASR/VSR front-end.
 
 ### Training A/V-ASR model
 
