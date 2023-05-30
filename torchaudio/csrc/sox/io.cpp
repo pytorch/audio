@@ -5,10 +5,8 @@
 #include <torchaudio/csrc/sox/utils.h>
 
 using namespace torch::indexing;
-using namespace torchaudio::sox_utils;
 
-namespace torchaudio {
-namespace sox_io {
+namespace torchaudio::sox {
 
 c10::optional<MetaDataTuple> get_info_file(
     const std::string& path,
@@ -68,8 +66,7 @@ c10::optional<std::tuple<torch::Tensor, int64_t>> load_audio_file(
     c10::optional<bool> channels_first,
     const c10::optional<std::string>& format) {
   auto effects = get_effects(frame_offset, num_frames);
-  return torchaudio::sox_effects::apply_effects_file(
-      path, effects, normalize, channels_first, format);
+  return apply_effects_file(path, effects, normalize, channels_first, format);
 }
 
 void save_audio_file(
@@ -123,7 +120,7 @@ void save_audio_file(
       "Error saving audio file: failed to open file ",
       path);
 
-  torchaudio::sox_effects_chain::SoxEffectsChain chain(
+  SoxEffectsChain chain(
       /*input_encoding=*/get_tensor_encodinginfo(tensor.dtype()),
       /*output_encoding=*/sf->encoding);
   chain.addInputTensor(&tensor, sample_rate, channels_first);
@@ -132,14 +129,9 @@ void save_audio_file(
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info_file);
-  m.def(
-      "torchaudio::sox_io_load_audio_file",
-      &torchaudio::sox_io::load_audio_file);
-  m.def(
-      "torchaudio::sox_io_save_audio_file",
-      &torchaudio::sox_io::save_audio_file);
+  m.def("torchaudio::sox_io_get_info", &get_info_file);
+  m.def("torchaudio::sox_io_load_audio_file", &load_audio_file);
+  m.def("torchaudio::sox_io_save_audio_file", &save_audio_file);
 }
 
-} // namespace sox_io
-} // namespace torchaudio
+} // namespace torchaudio::sox

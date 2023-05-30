@@ -1,7 +1,6 @@
 #include <torchaudio/csrc/sox/types.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox {
 
 Format get_format_from_string(const std::string& format) {
   if (format == "wav")
@@ -129,5 +128,4 @@ std::string get_encoding(sox_encoding_t encoding) {
   }
 }
 
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace torchaudio::sox
