@@ -32,7 +32,7 @@ jobs:
         set +e
         # export PATH=${PATH}:/root/.local/bin
         echo $PATH
-        pre-commit run --all-files
+        "${PY_PKGS_DIR}"/pre-commit run --all-files
         
         if [ $? -ne 0 ]; then
           git --no-pager diff
