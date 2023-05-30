@@ -93,7 +93,7 @@ void validate_input_file(const SoxFormat& sf, const std::string& path) {
       "Error loading audio file: unknown encoding.");
 }
 
-void validate_input_tensor(const torch::Tensor tensor) {
+void validate_input_tensor(const torch::Tensor& tensor) {
   TORCH_CHECK(tensor.device().is_cpu(), "Input tensor has to be on CPU.");
 
   TORCH_CHECK(tensor.ndimension() == 2, "Input tensor has to be 2D.");
@@ -184,7 +184,7 @@ torch::Tensor convert_to_tensor(
   return t.contiguous();
 }
 
-const std::string get_filetype(const std::string path) {
+const std::string get_filetype(const std::string& path) {
   std::string ext = path.substr(path.find_last_of(".") + 1);
   std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
   return ext;
@@ -278,9 +278,9 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
 
 std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const std::string& format,
-    const caffe2::TypeMeta dtype,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample) {
+    const caffe2::TypeMeta& dtype,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
   const Format fmt = get_format_from_string(format);
   const Encoding enc = get_encoding_from_option(encoding);
   const BitDepth bps = get_bit_depth_from_option(bits_per_sample);
@@ -385,7 +385,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
   }
 }
 
-unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
+unsigned get_precision(const std::string& filetype, caffe2::TypeMeta dtype) {
   if (filetype == "mp3")
     return SOX_UNSPEC;
   if (filetype == "flac")
@@ -425,7 +425,7 @@ unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
 sox_signalinfo_t get_signalinfo(
     const torch::Tensor* waveform,
     const int64_t sample_rate,
-    const std::string filetype,
+    const std::string& filetype,
     const bool channels_first) {
   return sox_signalinfo_t{
       /*rate=*/static_cast<sox_rate_t>(sample_rate),
@@ -476,10 +476,10 @@ sox_encodinginfo_t get_tensor_encodinginfo(caffe2::TypeMeta dtype) {
 
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
-    const caffe2::TypeMeta dtype,
-    const c10::optional<double> compression,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample) {
+    const caffe2::TypeMeta& dtype,
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
   auto enc = get_save_encoding(format, dtype, encoding, bits_per_sample);
   return sox_encodinginfo_t{
       /*encoding=*/std::get<0>(enc),

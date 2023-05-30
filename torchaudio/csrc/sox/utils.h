@@ -53,7 +53,7 @@ struct SoxFormat {
 
 ///
 /// Verify that input Tensor is 2D, CPU and either uin8, int16, int32 or float32
-void validate_input_tensor(const torch::Tensor);
+void validate_input_tensor(const torch::Tensor&);
 
 ///
 /// Get target dtype for the given encoding and precision.
@@ -85,13 +85,13 @@ torch::Tensor convert_to_tensor(
     const bool channels_first);
 
 /// Extract extension from file path
-const std::string get_filetype(const std::string path);
+const std::string get_filetype(const std::string& path);
 
 /// Get sox_signalinfo_t for passing a torch::Tensor object.
 sox_signalinfo_t get_signalinfo(
     const torch::Tensor* waveform,
     const int64_t sample_rate,
-    const std::string filetype,
+    const std::string& filetype,
     const bool channels_first);
 
 /// Get sox_encodinginfo_t for Tensor I/O
@@ -100,10 +100,10 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
 /// Get sox_encodinginfo_t for saving to file/file object
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
-    const caffe2::TypeMeta dtype,
-    const c10::optional<double> compression,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample);
+    const caffe2::TypeMeta& dtype,
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample);
 
 } // namespace torchaudio::sox
 #endif
