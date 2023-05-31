@@ -2,10 +2,7 @@
 #include <torchaudio/csrc/sox/pybind/effects_chain.h>
 #include <torchaudio/csrc/sox/pybind/utils.h>
 
-using namespace torchaudio::sox_utils;
-
-namespace torchaudio {
-namespace sox_effects {
+namespace torchaudio::sox {
 
 // Streaming decoding over file-like object is tricky because libsox operates on
 // FILE pointer. The folloing is what `sox` and `play` commands do
@@ -95,7 +92,7 @@ auto apply_effects_fileobj(
 
   // Create and run SoxEffectsChain
   const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
-  torchaudio::sox_effects_chain::SoxEffectsChainPyBind chain(
+  SoxEffectsChainPyBind chain(
       /*input_encoding=*/sf->encoding,
       /*output_encoding=*/get_tensor_encodinginfo(dtype));
   chain.addInputFileObj(sf, in_buf, in_buffer_size, &fileobj);
@@ -119,5 +116,4 @@ auto apply_effects_fileobj(
       tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 
-} // namespace sox_effects
-} // namespace torchaudio
+} // namespace torchaudio::sox

@@ -314,7 +314,7 @@ class RNNTBeamSearch(torch.nn.Module):
             state (List[List[torch.Tensor]] or None, optional): list of lists of tensors
                 representing transcription network internal state generated in preceding
                 invocation. (Default: ``None``)
-            hypothesis (Hypothesis or None): hypothesis from preceding invocation to seed
+            hypothesis (List[Hypothesis] or None): hypotheses from preceding invocation to seed
                 search with. (Default: ``None``)
 
         Returns:
