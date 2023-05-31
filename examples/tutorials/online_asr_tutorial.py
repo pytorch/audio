@@ -39,7 +39,6 @@ to perform online speech recognition.
 # --------------
 #
 
-import os
 import torch
 import torchaudio
 
