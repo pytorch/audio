@@ -13,7 +13,7 @@ export PATH="${PWD}/third_party/install/bin/:${PATH}"
 declare -a args=(
     '-v'
     '--cov=torchaudio'
-    "--junitxml=${PWD}/test-results/junit.xml"
+    "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
     '--durations' '20'
 )
 
