@@ -80,7 +80,5 @@ if __name__ == "__main__":
     )
 
     with open(os.path.join(d, "config.yml"), "w") as f:
-        f.write(
-            env.get_template("config.yml.in").render()
-        )
+        f.write(env.get_template("config.yml.in").render())
         f.write("\n")
