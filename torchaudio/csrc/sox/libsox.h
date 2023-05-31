@@ -1,23 +1,22 @@
 #pragma once
-#include <ATen/DynamicLibrary.h>
-#include <memory.h>
 #include <sox.h>
 
 namespace torchaudio::sox {
 
+// Interface to provide handle to libsox library.
 struct LSX {
   int (*sox_add_effect)(
       sox_effects_chain_t* chain,
       sox_effect_t* effp,
       sox_signalinfo_t* in,
-      sox_signalinfo_t const* out) = nullptr;
-  int (*sox_close)(sox_format_t* ft) = nullptr;
+      sox_signalinfo_t const* out);
+  int (*sox_close)(sox_format_t* ft);
 
-  sox_effect_t* (*sox_create_effect)(sox_effect_handler_t const* eh) = nullptr;
+  sox_effect_t* (*sox_create_effect)(sox_effect_handler_t const* eh);
 
   sox_effects_chain_t* (*sox_create_effects_chain)(
       sox_encodinginfo_t const* in_enc,
-      sox_encodinginfo_t const* out_enc) = nullptr;
+      sox_encodinginfo_t const* out_enc);
 
   void (*sox_delete_effect)(sox_effect_t* effp);
   void (*sox_delete_effects_chain)(sox_effects_chain_t* ecp);
@@ -37,8 +36,6 @@ struct LSX {
 
   sox_globals_t* (*sox_get_globals)(void);
 
-  int (*sox_init)(void);
-
   sox_format_t* (*sox_open_read)(
       char const* path,
       sox_signalinfo_t const* signal,
@@ -52,7 +49,6 @@ struct LSX {
       char const* filetype,
       sox_oob_t const* oob,
       sox_bool (*overwrite_permitted)(char const* filename));
-  int (*sox_quit)(void);
 
   const char* (*sox_strerror)(int sox_errno);
 
