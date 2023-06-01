@@ -1330,12 +1330,11 @@ def apply_codec(
         Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
-    with tempfile.TemporaryFile() as f:
+    with tempfile.NamedTemporaryFile() as f:
         torchaudio.backend.sox_io_backend.save(
-            f, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+            f.name, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
         )
-        f.seek(0)
-        augmented, sr = torchaudio.backend.sox_io_backend.load(f, channels_first=channels_first, format=format)
+        augmented, sr = torchaudio.backend.sox_io_backend.load(f.name, channels_first=channels_first, format=format)
     if sr != sample_rate:
         augmented = resample(augmented, sr, sample_rate)
     return augmented
