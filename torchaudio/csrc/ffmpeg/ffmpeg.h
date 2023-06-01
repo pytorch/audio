@@ -6,6 +6,9 @@
 #include <memory>
 #include <string>
 
+#include <torchaudio/csrc/ffmpeg/libav.h>
+#include <torchaudio/csrc/ffmpeg/macro.h>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavdevice/avdevice.h>
@@ -29,21 +32,13 @@ namespace io {
 
 using OptionDict = std::map<std::string, std::string>;
 
-// https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
-// Starting from libavformat 59 (ffmpeg 5),
-// AVInputFormat is const and related functions expect constant.
-#if LIBAVFORMAT_VERSION_MAJOR >= 59
-#define AVFORMAT_CONST const
-#else
-#define AVFORMAT_CONST
-#endif
-
 // Replacement of av_err2str, which causes
 // `error: taking address of temporary array`
 // https://github.com/joncampbell123/composite-video-simulator/issues/5
 av_always_inline std::string av_err2string(int errnum) {
   char str[AV_ERROR_MAX_STRING_SIZE];
-  return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, errnum);
+  detail::libav().av_strerror(errnum, str, AV_ERROR_MAX_STRING_SIZE);
+  return str;
 }
 
 // Base structure that handles memory management.
