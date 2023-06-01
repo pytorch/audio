@@ -1,4 +1,5 @@
 #include <torch/torch.h>
+#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/conversion.h>
 
 #ifdef USE_CUDA
@@ -6,6 +7,8 @@
 #endif
 
 namespace torchaudio::io {
+
+using detail::libav;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Audio
@@ -429,11 +432,11 @@ void NV12CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT(
       AV_PIX_FMT_CUDA == fmt,
       "Expected CUDA frame. Found: ",
-      av_get_pix_fmt_name(fmt));
+      libav().av_get_pix_fmt_name(fmt));
   TORCH_INTERNAL_ASSERT(
       AV_PIX_FMT_NV12 == sw_fmt,
       "Expected NV12 format. Found: ",
-      av_get_pix_fmt_name(sw_fmt));
+      libav().av_get_pix_fmt_name(sw_fmt));
 
   // Write Y plane directly
   auto status = cudaMemcpy2D(
@@ -506,11 +509,11 @@ void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT(
       AV_PIX_FMT_CUDA == fmt,
       "Expected CUDA frame. Found: ",
-      av_get_pix_fmt_name(fmt));
+      libav().av_get_pix_fmt_name(fmt));
   TORCH_INTERNAL_ASSERT(
       AV_PIX_FMT_P010 == sw_fmt,
       "Expected P010 format. Found: ",
-      av_get_pix_fmt_name(sw_fmt));
+      libav().av_get_pix_fmt_name(sw_fmt));
 
   // Write Y plane directly
   auto status = cudaMemcpy2D(
@@ -581,11 +584,11 @@ void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT(
       AV_PIX_FMT_CUDA == fmt,
       "Expected CUDA frame. Found: ",
-      av_get_pix_fmt_name(fmt));
+      libav().av_get_pix_fmt_name(fmt));
   TORCH_INTERNAL_ASSERT(
       AV_PIX_FMT_YUV444P == sw_fmt,
       "Expected YUV444P format. Found: ",
-      av_get_pix_fmt_name(sw_fmt));
+      libav().av_get_pix_fmt_name(sw_fmt));
 
   // Write Y plane directly
   for (int i = 0; i < num_channels; ++i) {
