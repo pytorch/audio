@@ -1,10 +1,8 @@
 import os
-import warnings
 from typing import Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio.utils.sox_utils import get_buffer_size
 
 from .common import AudioMetaData
 
@@ -12,10 +10,6 @@ from .common import AudioMetaData
 # Note: need to comply TorchScript syntax -- need annotation and no f-string
 def _fail_info(filepath: str, format: Optional[str]) -> AudioMetaData:
     raise RuntimeError("Failed to fetch metadata from {}".format(filepath))
-
-
-def _fail_info_fileobj(fileobj, format: Optional[str], buffer_size: int) -> AudioMetaData:
-    raise RuntimeError("Failed to fetch metadata from {}".format(fileobj))
 
 
 # Note: need to comply TorchScript syntax -- need annotation and no f-string
@@ -30,30 +24,14 @@ def _fail_load(
     raise RuntimeError("Failed to load audio from {}".format(filepath))
 
 
-def _fail_load_fileobj(fileobj, *args, **kwargs):
-    raise RuntimeError(f"Failed to load audio from {fileobj}")
-
-
 if torchaudio._extension._FFMPEG_INITIALIZED:
     import torchaudio.io._compat as _compat
 
     _fallback_info = _compat.info_audio
-    _fallback_info_fileobj = _compat.info_audio_fileobj
     _fallback_load = _compat.load_audio
-    _fallback_load_fileobj = _compat.load_audio_fileobj
 else:
     _fallback_info = _fail_info
-    _fallback_info_fileobj = _fail_info_fileobj
     _fallback_load = _fail_load
-    _fallback_load_fileobj = _fail_load_fileobj
-
-
-_deprecation_message = (
-    "File-like object support in sox_io backend is deprecated, "
-    "and will be removed in v2.1. "
-    "See https://github.com/pytorch/audio/issues/2950 for the detail."
-    "Please migrate to the new dispatcher, or use soundfile backend."
-)
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -64,24 +42,8 @@ def info(
     """Get signal information of an audio file.
 
     Args:
-        filepath (path-like object or file-like object):
-            Source of audio data. When the function is not compiled by TorchScript,
-            (e.g. ``torch.jit.script``), the following types are accepted;
-
-                  * ``path-like``: file path
-                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
-                    which returns byte string of at most ``size`` length.
-
-            When the function is compiled by TorchScript, only ``str`` type is allowed.
-
-            Note:
-
-                  * When the input type is file-like object, this function cannot
-                    get the correct length (``num_samples``) for certain formats,
-                    such as ``vorbis``.
-                    In this case, the value of ``num_samples`` is ``0``.
-                  * This argument is intentionally annotated as ``str`` only due to
-                    TorchScript compiler compatibility.
+        filepath (str):
+            Source of audio data.
 
         format (str or None, optional):
             Override the format detection with the given format.
@@ -93,21 +55,7 @@ def info(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
-            # Special case for Backward compatibility
-            # v0.11 -> v0.12, mp3 handling is moved to FFmpeg.
-            # file-like objects are not necessarily fallback-able
-            # when they are not seekable.
-            # The previous libsox-based implementation required `format="mp3"`
-            # because internally libsox does not auto-detect the format.
-            # For the special BC for mp3, we handle mp3 differently.
-            buffer_size = get_buffer_size()
-            if format == "mp3":
-                return _fallback_info_fileobj(filepath, format, buffer_size)
-            warnings.warn(_deprecation_message)
-            sinfo = torchaudio.lib._torchaudio_sox.get_info_fileobj(filepath, format)
-            if sinfo is not None:
-                return AudioMetaData(*sinfo)
-            return _fallback_info_fileobj(filepath, format, buffer_size)
+            raise RuntimeError("sox_io backend does not support file-like object.")
         filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
     if sinfo is not None:
@@ -171,18 +119,7 @@ def load(
        For these formats, this function always returns ``float32`` Tensor with values.
 
     Args:
-        filepath (path-like object or file-like object):
-            Source of audio data. When the function is not compiled by TorchScript,
-            (e.g. ``torch.jit.script``), the following types are accepted;
-
-                  * ``path-like``: file path
-                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
-                    which returns byte string of at most ``size`` length.
-
-            When the function is compiled by TorchScript, only ``str`` type is allowed.
-
-            Note: This argument is intentionally annotated as ``str`` only due to
-            TorchScript compiler compatibility.
+        filepath (path-like object): Source of audio data.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int, optional):
@@ -214,39 +151,7 @@ def load(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "read"):
-            # Special case for Backward compatibility
-            # v0.11 -> v0.12, mp3 handling is moved to FFmpeg.
-            # file-like objects are not necessarily fallback-able
-            # when they are not seekable.
-            # The previous libsox-based implementation required `format="mp3"`
-            # because internally libsox does not auto-detect the format.
-            # For the special BC for mp3, we handle mp3 differently.
-            buffer_size = get_buffer_size()
-            if format == "mp3":
-                return _fallback_load_fileobj(
-                    filepath,
-                    frame_offset,
-                    num_frames,
-                    normalize,
-                    channels_first,
-                    format,
-                    buffer_size,
-                )
-            warnings.warn(_deprecation_message)
-            ret = torchaudio.lib._torchaudio_sox.load_audio_fileobj(
-                filepath, frame_offset, num_frames, normalize, channels_first, format
-            )
-            if ret is not None:
-                return ret
-            return _fallback_load_fileobj(
-                filepath,
-                frame_offset,
-                num_frames,
-                normalize,
-                channels_first,
-                format,
-                buffer_size,
-            )
+            raise RuntimeError("sox_io backend does not support file-like object.")
         filepath = os.fspath(filepath)
     ret = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format
@@ -270,9 +175,7 @@ def save(
     """Save audio data to file.
 
     Args:
-        filepath (str or pathlib.Path): Path to save file.
-            This function also handles ``pathlib.Path`` objects, but is annotated
-            as ``str`` for TorchScript compiler compatibility.
+        filepath (path-like object): Path to save file.
         src (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
         channels_first (bool, optional): If ``True``, the given tensor is interpreted as `[channel, time]`,
@@ -413,18 +316,7 @@ def save(
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, "write"):
-            warnings.warn(_deprecation_message)
-            torchaudio.lib._torchaudio_sox.save_audio_fileobj(
-                filepath,
-                src,
-                sample_rate,
-                channels_first,
-                compression,
-                format,
-                encoding,
-                bits_per_sample,
-            )
-            return
+            raise RuntimeError("sox_io backend does not handle file-like object.")
         filepath = os.fspath(filepath)
     torch.ops.torchaudio.sox_io_save_audio_file(
         filepath,

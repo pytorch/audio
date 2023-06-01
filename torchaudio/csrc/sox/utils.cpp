@@ -491,18 +491,4 @@ sox_encodinginfo_t get_encodinginfo_for_save(
       /*opposite_endian=*/sox_false};
 }
 
-namespace {
-
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::sox_utils_set_seed", &set_seed);
-  m.def("torchaudio::sox_utils_set_verbosity", &set_verbosity);
-  m.def("torchaudio::sox_utils_set_use_threads", &set_use_threads);
-  m.def("torchaudio::sox_utils_set_buffer_size", &set_buffer_size);
-  m.def("torchaudio::sox_utils_list_effects", &list_effects);
-  m.def("torchaudio::sox_utils_list_read_formats", &list_read_formats);
-  m.def("torchaudio::sox_utils_list_write_formats", &list_write_formats);
-  m.def("torchaudio::sox_utils_get_buffer_size", &get_buffer_size);
-}
-
-} // namespace
 } // namespace torchaudio::sox

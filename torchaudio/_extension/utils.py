@@ -67,7 +67,7 @@ def _init_sox():
     _load_lib("libtorchaudio_sox")
     import torchaudio.lib._torchaudio_sox  # noqa
 
-    torch.ops.torchaudio.sox_utils_set_verbosity(0)
+    torchaudio.lib._torchaudio_sox.set_verbosity(0)
 
     import atexit
 
