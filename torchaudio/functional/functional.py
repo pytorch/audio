@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import io
 import math
+import tempfile
 import warnings
 from collections.abc import Sequence
 from typing import List, Optional, Tuple, Union
@@ -10,6 +10,7 @@ import torch
 import torchaudio
 from torch import Tensor
 from torchaudio._extension import fail_if_no_align
+from torchaudio._internal.module_utils import deprecated
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -1290,6 +1291,7 @@ def spectral_centroid(
 
 
 @torchaudio._extension.fail_if_no_sox
+@deprecated("Please migrate to torchaudio.io.AudioEffector.", remove=False)
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1303,6 +1305,12 @@ def apply_codec(
     Apply codecs as a form of augmentation.
 
     .. devices:: CPU
+
+    .. warnings::
+
+       This function has been deprecated.
+       Please migrate to :py:class:`torchaudio.io.AudioEffector`, which works on all platforms,
+       and supports streaming processing.
 
     Args:
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
@@ -1322,12 +1330,12 @@ def apply_codec(
         Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
-    bytes = io.BytesIO()
-    torchaudio.backend.sox_io_backend.save(
-        bytes, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
-    )
-    bytes.seek(0)
-    augmented, sr = torchaudio.backend.sox_io_backend.load(bytes, channels_first=channels_first, format=format)
+    with tempfile.TemporaryFile() as f:
+        torchaudio.backend.sox_io_backend.save(
+            f, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+        )
+        f.seek(0)
+        augmented, sr = torchaudio.backend.sox_io_backend.load(f, channels_first=channels_first, format=format)
     if sr != sample_rate:
         augmented = resample(augmented, sr, sample_rate)
     return augmented

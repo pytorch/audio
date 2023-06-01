@@ -40,7 +40,7 @@ def requires_module(*modules: str):
     return decorator
 
 
-def deprecated(direction: str, version: Optional[str] = None):
+def deprecated(direction: str, version: Optional[str] = None, remove: bool = False):
     """Decorator to add deprecation message
 
     Args:
@@ -51,11 +51,9 @@ def deprecated(direction: str, version: Optional[str] = None):
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
-            message = (
-                f"{func.__module__}.{func.__name__} has been deprecated "
-                f'and will be removed from {"future" if version is None else version} release. '
-                f"{direction}"
-            )
+            message = f"{func.__module__}.{func.__name__} has been deprecated. {direction}"
+            if remove:
+                message += f' It will be removed from {"future" if version is None else version} release. '
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
 
