@@ -71,35 +71,6 @@ def unittest_python_versions(os):
     }.get(os)
 
 
-def unittest_workflows(indentation=6):
-    jobs = []
-    jobs += build_download_job(None)
-    for os_type in ["linux", "macos"]:
-        for device_type in ["cpu"]:
-
-            for i, python_version in enumerate(unittest_python_versions(os_type)):
-                job = {
-                    "name": f"unittest_{os_type}_{device_type}_py{python_version}",
-                    "python_version": python_version,
-                    "cuda_version": "cpu" if device_type == "cpu" else "cu118",
-                    "requires": ["download_third_parties"],
-                }
-
-                jobs.append({f"unittest_{os_type}_{device_type}": job})
-
-                if i == 0 and os_type == "linux" and device_type == "cpu":
-                    jobs.append(
-                        {
-                            "stylecheck": {
-                                "name": f"stylecheck_py{python_version}",
-                                "python_version": python_version,
-                                "cuda_version": "cpu",
-                            }
-                        }
-                    )
-    return indent(indentation, jobs)
-
-
 if __name__ == "__main__":
     d = os.path.dirname(__file__)
     env = jinja2.Environment(
@@ -109,9 +80,5 @@ if __name__ == "__main__":
     )
 
     with open(os.path.join(d, "config.yml"), "w") as f:
-        f.write(
-            env.get_template("config.yml.in").render(
-                unittest_workflows=unittest_workflows,
-            )
-        )
+        f.write(env.get_template("config.yml.in").render())
         f.write("\n")
