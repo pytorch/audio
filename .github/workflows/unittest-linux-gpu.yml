@@ -60,7 +60,7 @@ jobs:
         USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
 
         # Install test tools
-        conda install -y --quiet -c conda-forge -c numba/label/dev 'librosa==0.10.0' parameterized 'requests>=2.20'
+        conda install -y --quiet -c conda-forge -c numba/label/dev sox libvorbis 'librosa==0.10.0' parameterized 'requests>=2.20'
         python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag flashlight-text git+https://github.com/kpu/kenlm/
         python3 -m pip install --quiet git+https://github.com/pytorch/fairseq.git@e47a4c8
 
