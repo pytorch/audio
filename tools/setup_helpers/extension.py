@@ -33,7 +33,7 @@ def _get_build(var, default=False):
     return False
 
 
-_BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
+_BUILD_SOX = _get_build("BUILD_SOX", True)
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", True)
