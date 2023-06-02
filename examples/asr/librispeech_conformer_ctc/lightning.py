@@ -11,6 +11,8 @@ from torchaudio.models import Hypothesis, RNNTBeamSearch
 from torchaudio.models.decoder import ctc_decoder, download_pretrained_files
 # from torchaudio.models import Conformer
 from ctc_model import conformer_ctc_model, conformer_ctc_model_base
+from loss import MaximumLikelihoodLoss
+from bpe_graph_compiler import BpeCtcTrainingGraphCompiler
 
 
 logger = logging.getLogger()
@@ -152,7 +154,18 @@ class ConformerCTCModule(LightningModule):
         # For greater customizability, please refer to ``conformer_rnnt_model``.
         # self.model = conformer_ctc_model_base()
         self.model = conformer_ctc_customized()
-        self.loss = torch.nn.CTCLoss(blank=self.blank_idx, reduction="sum")
+        
+        # Option 1:
+        # self.loss = torch.nn.CTCLoss(blank=self.blank_idx, reduction="sum")
+
+        # Option 2:
+        graph_compiler = BpeCtcTrainingGraphCompiler(
+            bpe_model_path="./spm_unigram_1023.model",
+            device=torch.device("cuda", self.global_rank),
+            topo_type="hmm",
+        )
+        self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=4)
+        
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
