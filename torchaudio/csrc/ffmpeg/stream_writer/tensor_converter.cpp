@@ -1,4 +1,3 @@
-#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/tensor_converter.h>
 
 #ifdef USE_CUDA
@@ -6,8 +5,6 @@
 #endif
 
 namespace torchaudio::io {
-
-using detail::libav;
 
 namespace {
 
@@ -44,8 +41,8 @@ void convert_func_(const torch::Tensor& chunk, AVFrame* buffer) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(chunk.size(1) == buffer->channels);
 
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
-  if (!libav().av_frame_is_writable(buffer)) {
-    int ret = libav().av_frame_make_writable(buffer);
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
     TORCH_INTERNAL_ASSERT(
         ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
   }
@@ -148,8 +145,8 @@ void write_interlaced_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3) == num_channels);
 
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  if (!libav().av_frame_is_writable(buffer)) {
-    int ret = libav().av_frame_make_writable(buffer);
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
     TORCH_INTERNAL_ASSERT(
         ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
   }
@@ -190,7 +187,7 @@ void write_planar_video(
     AVFrame* buffer,
     int num_planes) {
   const auto num_colors =
-      libav().av_pix_fmt_desc_get((AVPixelFormat)buffer->format)->nb_components;
+      av_pix_fmt_desc_get((AVPixelFormat)buffer->format)->nb_components;
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.dim() == 4);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(0) == 1);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(1) == num_colors);
@@ -198,8 +195,8 @@ void write_planar_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3), buffer->width);
 
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  if (!libav().av_frame_is_writable(buffer)) {
-    int ret = libav().av_frame_make_writable(buffer);
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
     TORCH_INTERNAL_ASSERT(
         ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
   }
@@ -311,7 +308,7 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
         TORCH_CHECK(
             false,
             "Unexpected pixel format for CUDA: ",
-            libav().av_get_pix_fmt_name(sw_pix_fmt));
+            av_get_pix_fmt_name(sw_pix_fmt));
     }
   }
 
@@ -320,7 +317,7 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24: {
-      int channels = libav().av_pix_fmt_desc_get(pix_fmt)->nb_components;
+      int channels = av_pix_fmt_desc_get(pix_fmt)->nb_components;
       InitFunc init_func = [=](const torch::Tensor& t, AVFrame* f) {
         validate_video_input(t, f, channels);
         return init_interlaced(t);
@@ -342,9 +339,7 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
     }
     default:
       TORCH_CHECK(
-          false,
-          "Unexpected pixel format: ",
-          libav().av_get_pix_fmt_name(pix_fmt));
+          false, "Unexpected pixel format: ", av_get_pix_fmt_name(pix_fmt));
   }
 }
 
@@ -388,9 +383,7 @@ TensorConverter::TensorConverter(AVMediaType type, AVFrame* buf, int buf_size)
       break;
     default:
       TORCH_INTERNAL_ASSERT(
-          false,
-          "Unsupported media type: ",
-          libav().av_get_media_type_string(type));
+          false, "Unsupported media type: ", av_get_media_type_string(type));
   }
 }
 

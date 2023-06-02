@@ -1,4 +1,3 @@
-#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/conversion.h>
@@ -6,9 +5,6 @@
 
 namespace torchaudio::io {
 namespace detail {
-
-using detail::libav;
-
 namespace {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +48,7 @@ FilterGraphFactory get_video_factory(
     f.add_video_sink();
     f.add_process(filter_desc);
     if (hw_frames_ctx) {
-      f.create_filter(libav().av_buffer_ref(hw_frames_ctx));
+      f.create_filter(av_buffer_ref(hw_frames_ctx));
     } else {
       f.create_filter();
     }
@@ -143,7 +139,7 @@ struct ProcessImpl : public IPostDecodeProcess {
       if (ret >= 0) {
         buffer.push_frame(converter.convert(frame), frame->pts);
       }
-      libav().av_frame_unref(frame);
+      av_frame_unref(frame);
     }
     return ret;
   }
@@ -163,7 +159,7 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_audio_process(
   TORCH_INTERNAL_ASSERT(
       i.type == AVMEDIA_TYPE_AUDIO,
       "Unsupported media type found: ",
-      libav().av_get_media_type_string(i.type));
+      av_get_media_type_string(i.type));
 
   using B = UnchunkedBuffer;
 
@@ -230,7 +226,7 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_audio_process(
     }
     default:
       TORCH_INTERNAL_ASSERT(
-          false, "Unexpected audio type:", libav().av_get_sample_fmt_name(fmt));
+          false, "Unexpected audio type:", av_get_sample_fmt_name(fmt));
   }
 }
 
@@ -243,7 +239,7 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_audio_process(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       i.type == AVMEDIA_TYPE_AUDIO,
       "Unsupported media type found: ",
-      libav().av_get_media_type_string(i.type));
+      av_get_media_type_string(i.type));
 
   using B = ChunkedBuffer;
   B buffer{i.time_base, frames_per_chunk, num_chunks};
@@ -311,7 +307,7 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_audio_process(
     }
     default:
       TORCH_INTERNAL_ASSERT(
-          false, "Unexpected audio type:", libav().av_get_sample_fmt_name(fmt));
+          false, "Unexpected audio type:", av_get_sample_fmt_name(fmt));
   }
 }
 
@@ -325,7 +321,7 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_video_process(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       i.type == AVMEDIA_TYPE_VIDEO,
       "Unsupported media type found: ",
-      libav().av_get_media_type_string(i.type));
+      av_get_media_type_string(i.type));
 
   auto h = i.height;
   auto w = i.width;
@@ -379,9 +375,7 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_video_process(
     }
     default: {
       TORCH_INTERNAL_ASSERT(
-          false,
-          "Unexpected video format found: ",
-          libav().av_get_pix_fmt_name(fmt));
+          false, "Unexpected video format found: ", av_get_pix_fmt_name(fmt));
     }
   }
 }
@@ -399,7 +393,7 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_cuda_video_process(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       i.type == AVMEDIA_TYPE_VIDEO,
       "Unsupported media type found: ",
-      libav().av_get_media_type_string(i.type));
+      av_get_media_type_string(i.type));
 
   using B = UnchunkedBuffer;
   switch (auto fmt = (AVPixelFormat)i.format; fmt) {
@@ -422,13 +416,13 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_cuda_video_process(
       TORCH_CHECK(
           false,
           "Unsupported video format found in CUDA HW: ",
-          libav().av_get_pix_fmt_name(fmt));
+          av_get_pix_fmt_name(fmt));
     }
     default: {
       TORCH_CHECK(
           false,
           "Unexpected video format found in CUDA HW: ",
-          libav().av_get_pix_fmt_name(fmt));
+          av_get_pix_fmt_name(fmt));
     }
   }
 #endif
@@ -443,7 +437,7 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_video_process(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       i.type == AVMEDIA_TYPE_VIDEO,
       "Unsupported media type found: ",
-      libav().av_get_media_type_string(i.type));
+      av_get_media_type_string(i.type));
 
   auto h = i.height;
   auto w = i.width;
@@ -497,9 +491,7 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_video_process(
     }
     default: {
       TORCH_INTERNAL_ASSERT(
-          false,
-          "Unexpected video format found: ",
-          libav().av_get_pix_fmt_name(fmt));
+          false, "Unexpected video format found: ", av_get_pix_fmt_name(fmt));
     }
   }
 }
@@ -519,7 +511,7 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_cuda_video_process(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       i.type == AVMEDIA_TYPE_VIDEO,
       "Unsupported media type found: ",
-      libav().av_get_media_type_string(i.type));
+      av_get_media_type_string(i.type));
 
   using B = ChunkedBuffer;
   switch (auto fmt = (AVPixelFormat)i.format; fmt) {
@@ -548,13 +540,13 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_cuda_video_process(
       TORCH_CHECK(
           false,
           "Unsupported video format found in CUDA HW: ",
-          libav().av_get_pix_fmt_name(fmt));
+          av_get_pix_fmt_name(fmt));
     }
     default: {
       TORCH_CHECK(
           false,
           "Unexpected video format found in CUDA HW: ",
-          libav().av_get_pix_fmt_name(fmt));
+          av_get_pix_fmt_name(fmt));
     }
   }
 #endif

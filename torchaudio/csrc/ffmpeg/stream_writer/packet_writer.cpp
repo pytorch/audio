@@ -1,17 +1,13 @@
-#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/packet_writer.h>
 
 namespace torchaudio::io {
-
-using detail::libav;
-
 namespace {
 AVStream* add_stream(
     AVFormatContext* format_ctx,
     const StreamParams& stream_params) {
-  AVStream* stream = libav().avformat_new_stream(format_ctx, nullptr);
-  int ret = libav().avcodec_parameters_copy(
-      stream->codecpar, stream_params.codec_params);
+  AVStream* stream = avformat_new_stream(format_ctx, nullptr);
+  int ret =
+      avcodec_parameters_copy(stream->codecpar, stream_params.codec_params);
   TORCH_CHECK(
       ret >= 0,
       "Failed to copy the stream's codec parameters. (",
@@ -30,12 +26,11 @@ PacketWriter::PacketWriter(
 
 void PacketWriter::write_packet(const AVPacketPtr& packet) {
   AVPacket dst_packet;
-  int ret = libav().av_packet_ref(&dst_packet, packet);
+  int ret = av_packet_ref(&dst_packet, packet);
   TORCH_CHECK(ret >= 0, "Failed to copy packet.");
-  libav().av_packet_rescale_ts(
-      &dst_packet, original_time_base, stream->time_base);
+  av_packet_rescale_ts(&dst_packet, original_time_base, stream->time_base);
   dst_packet.stream_index = stream->index;
-  ret = libav().av_interleaved_write_frame(format_ctx, &dst_packet);
+  ret = av_interleaved_write_frame(format_ctx, &dst_packet);
   TORCH_CHECK(ret >= 0, "Failed to write packet to destination.");
 }
 } // namespace torchaudio::io

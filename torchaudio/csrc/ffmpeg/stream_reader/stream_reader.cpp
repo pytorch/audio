@@ -1,19 +1,13 @@
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <chrono>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
 
-extern "C" {
-#include <libavutil/rational.h>
-}
-
 namespace torchaudio {
 namespace io {
 
-using detail::libav;
 using KeyType = StreamProcessor::KeyType;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -25,7 +19,7 @@ AVFormatContext* get_input_format_context(
     const c10::optional<std::string>& format,
     const c10::optional<OptionDict>& option,
     AVIOContext* io_ctx) {
-  AVFormatContext* p = libav().avformat_alloc_context();
+  AVFormatContext* p = avformat_alloc_context();
   TORCH_CHECK(p, "Failed to allocate AVFormatContext.");
   if (io_ctx) {
     p->pb = io_ctx;
@@ -35,7 +29,7 @@ AVFormatContext* get_input_format_context(
     if (format.has_value()) {
       std::string format_str = format.value();
       AVFORMAT_CONST AVInputFormat* pInput =
-          libav().av_find_input_format(format_str.c_str());
+          av_find_input_format(format_str.c_str());
       TORCH_CHECK(pInput, "Unsupported device/format: \"", format_str, "\"");
       return pInput;
     }
@@ -43,7 +37,7 @@ AVFormatContext* get_input_format_context(
   }();
 
   AVDictionary* opt = get_option_dict(option);
-  int ret = libav().avformat_open_input(&p, src.c_str(), pInputFormat, &opt);
+  int ret = avformat_open_input(&p, src.c_str(), pInputFormat, &opt);
   clean_up_dict(opt);
 
   TORCH_CHECK(
@@ -59,7 +53,7 @@ AVFormatContext* get_input_format_context(
 
 StreamReader::StreamReader(AVFormatContext* p) : format_ctx(p) {
   C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReader");
-  int ret = libav().avformat_find_stream_info(format_ctx, nullptr);
+  int ret = avformat_find_stream_info(format_ctx, nullptr);
   TORCH_CHECK(
       ret >= 0, "Failed to find stream information: ", av_err2string(ret));
 
@@ -116,7 +110,7 @@ void validate_src_stream_type(
       "Stream ",
       i,
       " is not ",
-      libav().av_get_media_type_string(type),
+      av_get_media_type_string(type),
       " stream.");
 }
 
@@ -131,8 +125,7 @@ namespace {
 OptionDict parse_metadata(const AVDictionary* metadata) {
   AVDictionaryEntry* tag = nullptr;
   OptionDict ret;
-  while (
-      (tag = libav().av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+  while ((tag = av_dict_get(metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
     ret.emplace(std::string(tag->key), std::string(tag->value));
   }
   return ret;
@@ -155,8 +148,7 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
   ret.num_frames = stream->nb_frames;
   ret.bits_per_sample = codecpar->bits_per_raw_sample;
   ret.metadata = parse_metadata(stream->metadata);
-  const AVCodecDescriptor* desc =
-      libav().avcodec_descriptor_get(codecpar->codec_id);
+  const AVCodecDescriptor* desc = avcodec_descriptor_get(codecpar->codec_id);
   if (desc) {
     ret.codec_name = desc->name;
     ret.codec_long_name = desc->long_name;
@@ -166,7 +158,7 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
     case AVMEDIA_TYPE_AUDIO: {
       AVSampleFormat smp_fmt = static_cast<AVSampleFormat>(codecpar->format);
       if (smp_fmt != AV_SAMPLE_FMT_NONE) {
-        ret.fmt_name = libav().av_get_sample_fmt_name(smp_fmt);
+        ret.fmt_name = av_get_sample_fmt_name(smp_fmt);
       }
       ret.sample_rate = static_cast<double>(codecpar->sample_rate);
       ret.num_channels = codecpar->channels;
@@ -175,7 +167,7 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
     case AVMEDIA_TYPE_VIDEO: {
       AVPixelFormat pix_fmt = static_cast<AVPixelFormat>(codecpar->format);
       if (pix_fmt != AV_PIX_FMT_NONE) {
-        ret.fmt_name = libav().av_get_pix_fmt_name(pix_fmt);
+        ret.fmt_name = av_get_pix_fmt_name(pix_fmt);
       }
       ret.width = codecpar->width;
       ret.height = codecpar->height;
@@ -189,7 +181,7 @@ SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
 
 namespace {
 AVCodecParameters* get_codecpar() {
-  AVCodecParameters* ptr = libav().avcodec_parameters_alloc();
+  AVCodecParameters* ptr = avcodec_parameters_alloc();
   TORCH_CHECK(ptr, "Failed to allocate resource.");
   return ptr;
 }
@@ -200,7 +192,7 @@ StreamParams StreamReader::get_src_stream_params(int i) {
   AVStream* stream = format_ctx->streams[i];
 
   AVCodecParametersPtr codec_params(get_codecpar());
-  int ret = libav().avcodec_parameters_copy(codec_params, stream->codecpar);
+  int ret = avcodec_parameters_copy(codec_params, stream->codecpar);
   TORCH_CHECK(
       ret >= 0,
       "Failed to copy the stream's codec parameters. (",
@@ -242,12 +234,12 @@ OutputStreamInfo StreamReader::get_out_stream_info(int i) const {
 }
 
 int64_t StreamReader::find_best_audio_stream() const {
-  return libav().av_find_best_stream(
+  return av_find_best_stream(
       format_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
 }
 
 int64_t StreamReader::find_best_video_stream() const {
-  return libav().av_find_best_stream(
+  return av_find_best_stream(
       format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
 }
 
@@ -297,7 +289,7 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
       TORCH_CHECK(false, "Invalid mode value: ", mode);
   }
 
-  int ret = libav().av_seek_frame(format_ctx, -1, timestamp_av_tb, flag);
+  int ret = av_seek_frame(format_ctx, -1, timestamp_av_tb, flag);
 
   if (ret < 0) {
     seek_timestamp = 0;
@@ -410,12 +402,12 @@ void StreamReader::add_stream(
       case AVMEDIA_TYPE_AUDIO:
         return AVRational{0, 1};
       case AVMEDIA_TYPE_VIDEO:
-        return libav().av_guess_frame_rate(format_ctx, stream, nullptr);
+        return av_guess_frame_rate(format_ctx, stream, nullptr);
       default:
         TORCH_INTERNAL_ASSERT(
             false,
             "Unexpected media type is given: ",
-            libav().av_get_media_type_string(media_type));
+            av_get_media_type_string(media_type));
     }
   }();
   int key = processors[i]->add_stream(
@@ -454,7 +446,7 @@ void StreamReader::remove_stream(int64_t i) {
 // 1: It's done, caller should stop calling
 // <0: Some error happened
 int StreamReader::process_packet() {
-  int ret = libav().av_read_frame(format_ctx, packet);
+  int ret = av_read_frame(format_ctx, packet);
   if (ret == AVERROR_EOF) {
     ret = drain();
     return (ret < 0) ? ret : 1;
@@ -585,13 +577,12 @@ AVIOContext* get_io_context(
     int buffer_size,
     int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
     int64_t (*seek)(void* opaque, int64_t offset, int whence)) {
-  unsigned char* buffer =
-      static_cast<unsigned char*>(libav().av_malloc(buffer_size));
+  unsigned char* buffer = static_cast<unsigned char*>(av_malloc(buffer_size));
   TORCH_CHECK(buffer, "Failed to allocate buffer.");
-  AVIOContext* io_ctx = libav().avio_alloc_context(
+  AVIOContext* io_ctx = avio_alloc_context(
       buffer, buffer_size, 0, opaque, read_packet, nullptr, seek);
   if (!io_ctx) {
-    libav().av_freep(&buffer);
+    av_freep(&buffer);
     TORCH_CHECK(false, "Failed to allocate AVIOContext.");
   }
   return io_ctx;

@@ -1,6 +1,5 @@
 #include <c10/util/Exception.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -9,8 +8,6 @@
 namespace torchaudio {
 namespace io {
 
-using torchaudio::io::detail::libav;
-
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +15,7 @@ AVDictionary* get_option_dict(const c10::optional<OptionDict>& option) {
   AVDictionary* opt = nullptr;
   if (option) {
     for (auto const& [key, value] : option.value()) {
-      libav().av_dict_set(&opt, key.c_str(), value.c_str(), 0);
+      av_dict_set(&opt, key.c_str(), value.c_str(), 0);
     }
   }
   return opt;
@@ -29,10 +26,10 @@ void clean_up_dict(AVDictionary* p) {
     std::vector<std::string> unused_keys;
     // Check and copy unused keys, clean up the original dictionary
     AVDictionaryEntry* t = nullptr;
-    while ((t = libav().av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX))) {
+    while ((t = av_dict_get(p, "", t, AV_DICT_IGNORE_SUFFIX))) {
       unused_keys.emplace_back(t->key);
     }
-    libav().av_dict_free(&p);
+    av_dict_free(&p);
     TORCH_CHECK(
         unused_keys.empty(),
         "Unexpected options: ",
@@ -44,14 +41,14 @@ void clean_up_dict(AVDictionary* p) {
 // AVFormatContext
 ////////////////////////////////////////////////////////////////////////////////
 void AVFormatInputContextDeleter::operator()(AVFormatContext* p) {
-  libav().avformat_close_input(&p);
+  avformat_close_input(&p);
 };
 
 AVFormatInputContextPtr::AVFormatInputContextPtr(AVFormatContext* p)
     : Wrapper<AVFormatContext, AVFormatInputContextDeleter>(p) {}
 
 void AVFormatOutputContextDeleter::operator()(AVFormatContext* p) {
-  libav().avformat_free_context(p);
+  avformat_free_context(p);
 };
 
 AVFormatOutputContextPtr::AVFormatOutputContextPtr(AVFormatContext* p)
@@ -61,9 +58,9 @@ AVFormatOutputContextPtr::AVFormatOutputContextPtr(AVFormatContext* p)
 // AVIO
 ////////////////////////////////////////////////////////////////////////////////
 void AVIOContextDeleter::operator()(AVIOContext* p) {
-  libav().avio_flush(p);
-  libav().av_freep(&p->buffer);
-  libav().av_freep(&p);
+  avio_flush(p);
+  av_freep(&p->buffer);
+  av_freep(&p);
 };
 
 AVIOContextPtr::AVIOContextPtr(AVIOContext* p)
@@ -73,13 +70,13 @@ AVIOContextPtr::AVIOContextPtr(AVIOContext* p)
 // AVPacket
 ////////////////////////////////////////////////////////////////////////////////
 void AVPacketDeleter::operator()(AVPacket* p) {
-  libav().av_packet_free(&p);
+  av_packet_free(&p);
 };
 
 AVPacketPtr::AVPacketPtr(AVPacket* p) : Wrapper<AVPacket, AVPacketDeleter>(p) {}
 
 AVPacketPtr alloc_avpacket() {
-  AVPacket* p = libav().av_packet_alloc();
+  AVPacket* p = av_packet_alloc();
   TORCH_CHECK(p, "Failed to allocate AVPacket object.");
   return AVPacketPtr{p};
 }
@@ -89,7 +86,7 @@ AVPacketPtr alloc_avpacket() {
 ////////////////////////////////////////////////////////////////////////////////
 AutoPacketUnref::AutoPacketUnref(AVPacketPtr& p) : p_(p){};
 AutoPacketUnref::~AutoPacketUnref() {
-  libav().av_packet_unref(p_);
+  av_packet_unref(p_);
 }
 AutoPacketUnref::operator AVPacket*() const {
   return p_;
@@ -99,13 +96,13 @@ AutoPacketUnref::operator AVPacket*() const {
 // AVFrame
 ////////////////////////////////////////////////////////////////////////////////
 void AVFrameDeleter::operator()(AVFrame* p) {
-  libav().av_frame_free(&p);
+  av_frame_free(&p);
 };
 
 AVFramePtr::AVFramePtr(AVFrame* p) : Wrapper<AVFrame, AVFrameDeleter>(p) {}
 
 AVFramePtr alloc_avframe() {
-  AVFrame* p = libav().av_frame_alloc();
+  AVFrame* p = av_frame_alloc();
   TORCH_CHECK(p, "Failed to allocate AVFrame object.");
   return AVFramePtr{p};
 };
@@ -114,7 +111,7 @@ AVFramePtr alloc_avframe() {
 // AVCodecContext
 ////////////////////////////////////////////////////////////////////////////////
 void AVCodecContextDeleter::operator()(AVCodecContext* p) {
-  libav().avcodec_free_context(&p);
+  avcodec_free_context(&p);
 };
 
 AVCodecContextPtr::AVCodecContextPtr(AVCodecContext* p)
@@ -124,7 +121,7 @@ AVCodecContextPtr::AVCodecContextPtr(AVCodecContext* p)
 // AVBufferRefPtr
 ////////////////////////////////////////////////////////////////////////////////
 void AutoBufferUnref::operator()(AVBufferRef* p) {
-  libav().av_buffer_unref(&p);
+  av_buffer_unref(&p);
 }
 
 AVBufferRefPtr::AVBufferRefPtr(AVBufferRef* p)
@@ -134,7 +131,7 @@ AVBufferRefPtr::AVBufferRefPtr(AVBufferRef* p)
 // AVFilterGraph
 ////////////////////////////////////////////////////////////////////////////////
 void AVFilterGraphDeleter::operator()(AVFilterGraph* p) {
-  libav().avfilter_graph_free(&p);
+  avfilter_graph_free(&p);
 };
 
 AVFilterGraphPtr::AVFilterGraphPtr(AVFilterGraph* p)
@@ -144,7 +141,7 @@ AVFilterGraphPtr::AVFilterGraphPtr(AVFilterGraph* p)
 // AVCodecParameters
 ////////////////////////////////////////////////////////////////////////////////
 void AVCodecParametersDeleter::operator()(AVCodecParameters* codecpar) {
-  libav().avcodec_parameters_free(&codecpar);
+  avcodec_parameters_free(&codecpar);
 }
 
 AVCodecParametersPtr::AVCodecParametersPtr(AVCodecParameters* p)
