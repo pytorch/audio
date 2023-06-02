@@ -1,10 +1,11 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/packet_buffer.h>
+#include <torchaudio/csrc/ffmpeg/stub.h>
 
-namespace torchaudio {
-namespace io {
+namespace torchaudio::io {
+
 void PacketBuffer::push_packet(AVPacket* packet) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(packet, "Packet is null.");
-  AVPacket* p = av_packet_clone(packet);
+  AVPacket* p = FFMPEG av_packet_clone(packet);
   TORCH_INTERNAL_ASSERT(p, "Failed to clone packet.");
   packets.emplace_back(p);
 }
@@ -18,5 +19,4 @@ std::vector<AVPacketPtr> PacketBuffer::pop_packets() {
 bool PacketBuffer::has_packets() {
   return packets.size() > 0;
 }
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io
