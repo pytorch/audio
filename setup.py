@@ -124,7 +124,8 @@ def _fetch_archives(src):
 
 
 def _fetch_third_party_libraries():
-    _init_submodule()
+    # Revert this when a submodule is added again
+    # _init_submodule()
     if os.name != "nt":
         _fetch_archives(_parse_sources())
 
