@@ -15,6 +15,7 @@ from torchaudio_unittest.common_utils import (
     skipIfNoExec,
     skipIfNoModule,
     skipIfNoSox,
+    skipIfNoSoxDecoder,
     sox_utils,
     TempDirMixin,
 )
@@ -178,6 +179,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == bits_per_sample
         assert info.encoding == get_encoding("amb", dtype)
 
+    @skipIfNoSoxDecoder("amr_nb")
     def test_amr_nb(self):
         """`self._info` can check amr-nb file correctly"""
         duration = 1
@@ -256,7 +258,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.encoding == "PCM_S"
 
 
-@skipIfNoSox
+@skipIfNoSoxDecoder("opus")
 class TestInfoOpus(PytorchTestCase):
     _info = partial(get_info_func(), backend="sox")
 
