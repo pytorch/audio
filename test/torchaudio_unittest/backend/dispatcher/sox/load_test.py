@@ -14,6 +14,7 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     skipIfNoExec,
     skipIfNoSox,
+    skipIfNoSoxDecoder,
     sox_utils,
     TempDirMixin,
 )
@@ -238,6 +239,7 @@ class TestLoad(LoadTestBase):
         ),
         name_func=name_func,
     )
+    @skipIfNoSoxDecoder("opus")
     def test_opus(self, bitrate, num_channels, compression_level):
         """`sox_io_backend.load` can load opus file correctly."""
         ops_path = get_asset_path("io", f"{bitrate}_{compression_level}_{num_channels}ch.opus")
@@ -282,6 +284,7 @@ class TestLoad(LoadTestBase):
             "amb", sample_rate, num_channels, bit_depth=bit_depth, duration=1, encoding=encoding, normalize=normalize
         )
 
+    @skipIfNoSoxDecoder("amr_nb")
     def test_amr_nb(self):
         """`sox_io_backend.load` can load amr_nb format correctly."""
         self.assert_format("amr-nb", sample_rate=8000, num_channels=1, bit_depth=32, duration=1)

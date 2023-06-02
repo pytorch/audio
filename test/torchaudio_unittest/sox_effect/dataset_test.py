@@ -94,7 +94,7 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=32,
-            num_workers=16,
+            num_workers=4,
             worker_init_fn=init_random_seed,
         )
         for batch in loader:
@@ -115,7 +115,7 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=32,
-            num_workers=16,
+            num_workers=4,
             worker_init_fn=init_random_seed,
         )
         for batch in loader:

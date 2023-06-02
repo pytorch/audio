@@ -19,6 +19,8 @@ from .case_utils import (
     skipIfNoQengine,
     skipIfNoRIR,
     skipIfNoSox,
+    skipIfNoSoxDecoder,
+    skipIfNoSoxEncoder,
     skipIfPy310,
     skipIfRocm,
     TempDirMixin,

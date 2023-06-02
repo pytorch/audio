@@ -67,12 +67,8 @@ def _init_sox():
     _load_lib("libtorchaudio_sox")
     import torchaudio.lib._torchaudio_sox  # noqa
 
-    torchaudio.lib._torchaudio_sox.set_verbosity(0)
-
-    import atexit
-
-    torch.ops.torchaudio.sox_effects_initialize_sox_effects()
-    atexit.register(torch.ops.torchaudio.sox_effects_shutdown_sox_effects)
+    # Dry-run
+    torchaudio.lib._torchaudio_sox.list_effects()
 
 
 def _init_ffmpeg():
@@ -122,6 +118,25 @@ def _check_cuda_version():
                 "Please install the TorchAudio version that matches your PyTorch version."
             )
     return version
+
+
+def _fail_since_no_sox(func):
+    @wraps(func)
+    def wrapped(*_args, **_kwargs):
+        try:
+            # Note:
+            # We run _init_sox again just to show users the stacktrace.
+            # _init_ffmpeg would not succeed here.
+            _init_sox()
+        except Exception as err:
+            raise RuntimeError(
+                f"{func.__name__} requires libsox extension which is not available. "
+                "Please refer to the stacktrace above for how to resolve this."
+            ) from err
+        # This should not happen in normal execution, but just in case.
+        return func(*_args, **_kwargs)
+
+    return wrapped
 
 
 def _fail_since_no_ffmpeg(func):

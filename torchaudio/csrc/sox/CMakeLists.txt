@@ -1,5 +1,6 @@
 set(
   sources
+  libsox.cpp
   io.cpp
   utils.cpp
   effects.cpp

@@ -104,29 +104,11 @@ def _parse_url(path):
                 yield url
 
 
-def _parse_sources():
-    third_party_dir = ROOT_DIR / "third_party"
-    libs = ["sox"]
-    archive_dir = third_party_dir / "archives"
-    archive_dir.mkdir(exist_ok=True)
-    for lib in libs:
-        cmake_file = third_party_dir / lib / "CMakeLists.txt"
-        for url in _parse_url(cmake_file):
-            path = archive_dir / os.path.basename(url)
-            yield path, url
-
-
 def _fetch_archives(src):
     for dest, url in src:
         if not dest.exists():
             print(f" --- Fetching {os.path.basename(dest)}")
             torch.hub.download_url_to_file(url, dest, progress=False)
-
-
-def _fetch_third_party_libraries():
-    _init_submodule()
-    if os.name != "nt":
-        _fetch_archives(_parse_sources())
 
 
 def _main():
@@ -142,7 +124,7 @@ def _main():
     print("-- Building version", version)
 
     _make_version_file(version, sha)
-    _fetch_third_party_libraries()
+    _init_submodule()
 
     with open("README.md") as f:
         long_description = f.read()
