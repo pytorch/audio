@@ -2,7 +2,6 @@ import os
 
 import torch
 import torchaudio.prototype.transforms as T
-import torchaudio.transforms as transforms
 from torchaudio_unittest.common_utils import TorchaudioTestCase
 
 

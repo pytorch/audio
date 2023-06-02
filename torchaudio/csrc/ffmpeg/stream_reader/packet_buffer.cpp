@@ -1,10 +1,14 @@
+#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/packet_buffer.h>
 
 namespace torchaudio {
 namespace io {
+
+using detail::libav;
+
 void PacketBuffer::push_packet(AVPacket* packet) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(packet, "Packet is null.");
-  AVPacket* p = av_packet_clone(packet);
+  AVPacket* p = libav().av_packet_clone(packet);
   TORCH_INTERNAL_ASSERT(p, "Failed to clone packet.");
   packets.emplace_back(p);
 }

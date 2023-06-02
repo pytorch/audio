@@ -46,6 +46,7 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
     Args:
         direction (str): Migration steps to be given to users.
         version (str or int): The version when the object will be removed
+        remove (bool): If enabled, append future removal message.
     """
 
     def decorator(func):
