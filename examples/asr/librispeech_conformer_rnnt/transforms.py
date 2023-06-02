@@ -141,6 +141,6 @@ def get_data_module(librispeech_path, global_stats_path, sp_model_path):
         val_transform=val_transform,
         test_transform=test_transform,
         batch_size=None,
-        max_tokens=600,
-        train_num_buckets=1,
+        max_tokens=1500,
+        train_num_buckets=50,
     )
