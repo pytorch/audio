@@ -126,7 +126,7 @@ def conformer_ctc_customized():
     return conformer_ctc_model(
         input_dim=80,
         encoding_dim=512,
-        time_reduction_stride=1,
+        time_reduction_stride=4,
         conformer_input_dim=512,
         conformer_ffn_dim=2048,
         conformer_num_layers=12,
@@ -159,12 +159,13 @@ class ConformerCTCModule(LightningModule):
         # self.loss = torch.nn.CTCLoss(blank=self.blank_idx, reduction="sum")
 
         # Option 2:
-        graph_compiler = BpeCtcTrainingGraphCompiler(
-            bpe_model_path="./spm_unigram_1023.model",
-            device=torch.device("cuda", self.global_rank),
-            topo_type="hmm",
-        )
-        self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=4)
+        # graph_compiler = BpeCtcTrainingGraphCompiler(
+        #     bpe_model_path="./spm_unigram_1023.model",
+        #     device=self.device,  # torch.device("cuda", self.global_rank),
+        #     topo_type="ctc",
+        # )
+        # self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=4)
+        self.loss = None
         
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
@@ -194,6 +195,14 @@ class ConformerCTCModule(LightningModule):
             )
             self.decoder = greedy_decoder
     
+    def initialize_loss_func(self, topo_type="ctc", subsampling_factor=4):
+        graph_compiler = BpeCtcTrainingGraphCompiler(
+            bpe_model_path="./spm_unigram_1023.model",
+            device=self.device,  # torch.device("cuda", self.global_rank),
+            topo_type=topo_type,
+        )
+        self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=subsampling_factor)
+
     def _step(self, batch, _, step_type):
         if batch is None:
             return None

@@ -55,7 +55,7 @@ class BpeCtcTrainingGraphCompiler(object):
 
         self.start_tokens = {token_id for token_id in range(sp.vocab_size()) if sp.id_to_piece(token_id).startswith("▁")}
         self.remove_intra_word_blk_flag = True
-        print(f"self.remove_intra_word_blk_flag={self.remove_intra_word_blk_flag}")
+        # print(f"self.remove_intra_word_blk_flag={self.remove_intra_word_blk_flag}")
 
         if topo_type == "hmm":
             self.max_token_id = sp.vocab_size() + 1  # hard-coded for torch audio

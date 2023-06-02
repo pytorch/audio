@@ -5,9 +5,14 @@ import sentencepiece as spm
 
 from lightning import ConformerCTCModule
 from pytorch_lightning import seed_everything, Trainer
-from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint, Callback
 from pytorch_lightning.strategies import DDPStrategy
 from transforms import get_data_module
+
+
+class MyFitStartCallback(Callback):
+    def on_fit_start(self, trainer, pl_module):
+        pl_module.initialize_loss_func(topo_type="hmm", subsampling_factor=4)
 
 
 def run_train(args):
@@ -34,6 +39,7 @@ def run_train(args):
         checkpoint,
         train_checkpoint,
         lr_monitor,
+        MyFitStartCallback(),
     ]
     trainer = Trainer(
         default_root_dir=args.exp_dir,
