@@ -1,14 +1,11 @@
-#include <torchaudio/csrc/ffmpeg/libav.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
+#include <torchaudio/csrc/ffmpeg/stub.h>
 
 #ifdef USE_CUDA
 #include <c10/cuda/CUDAStream.h>
 #endif
 
 namespace torchaudio::io {
-
-using detail::libav;
-
 namespace {
 
 AVFormatContext* get_output_format_context(
@@ -22,7 +19,7 @@ AVFormatContext* get_output_format_context(
   }
 
   AVFormatContext* p = nullptr;
-  int ret = libav().avformat_alloc_output_context2(
+  int ret = FFMPEG avformat_alloc_output_context2(
       &p, nullptr, format ? format.value().c_str() : nullptr, dst.c_str());
   TORCH_CHECK(
       ret >= 0,
@@ -211,14 +208,14 @@ void StreamWriter::add_video_frame_stream(
 }
 
 void StreamWriter::set_metadata(const OptionDict& metadata) {
-  libav().av_dict_free(&format_ctx->metadata);
+  FFMPEG av_dict_free(&format_ctx->metadata);
   for (auto const& [key, value] : metadata) {
-    libav().av_dict_set(&format_ctx->metadata, key.c_str(), value.c_str(), 0);
+    FFMPEG av_dict_set(&format_ctx->metadata, key.c_str(), value.c_str(), 0);
   }
 }
 
 void StreamWriter::dump_format(int64_t i) {
-  libav().av_dump_format(format_ctx, (int)i, format_ctx->url, 1);
+  FFMPEG av_dump_format(format_ctx, (int)i, format_ctx->url, 1);
 }
 
 void StreamWriter::open(const c10::optional<OptionDict>& option) {
@@ -234,10 +231,10 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
   AVDictionary* opt = get_option_dict(option);
   if (!(fmt->flags & AVFMT_NOFILE) &&
       !(format_ctx->flags & AVFMT_FLAG_CUSTOM_IO)) {
-    ret = libav().avio_open2(
+    ret = FFMPEG avio_open2(
         &format_ctx->pb, format_ctx->url, AVIO_FLAG_WRITE, nullptr, &opt);
     if (ret < 0) {
-      libav().av_dict_free(&opt);
+      FFMPEG av_dict_free(&opt);
       TORCH_CHECK(
           false,
           "Failed to open dst: ",
@@ -248,7 +245,7 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
     }
   }
 
-  ret = libav().avformat_write_header(format_ctx, &opt);
+  ret = FFMPEG avformat_write_header(format_ctx, &opt);
   clean_up_dict(opt);
   TORCH_CHECK(
       ret >= 0,
@@ -261,7 +258,7 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
 }
 
 void StreamWriter::close() {
-  int ret = libav().av_write_trailer(format_ctx);
+  int ret = FFMPEG av_write_trailer(format_ctx);
   if (ret < 0) {
     LOG(WARNING) << "Failed to write trailer. (" << av_err2string(ret) << ").";
   }
@@ -272,7 +269,7 @@ void StreamWriter::close() {
   if (!(fmt->flags & AVFMT_NOFILE) &&
       !(format_ctx->flags & AVFMT_FLAG_CUSTOM_IO)) {
     // avio_closep can be only applied to AVIOContext opened by avio_open
-    libav().avio_closep(&(format_ctx->pb));
+    FFMPEG avio_closep(&(format_ctx->pb));
   }
   is_open = false;
 }
@@ -359,12 +356,12 @@ AVIOContext* get_io_context(
     int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
     int64_t (*seek)(void* opaque, int64_t offset, int whence)) {
   unsigned char* buffer =
-      static_cast<unsigned char*>(libav().av_malloc(buffer_size));
+      static_cast<unsigned char*>(FFMPEG av_malloc(buffer_size));
   TORCH_CHECK(buffer, "Failed to allocate buffer.");
-  AVIOContext* io_ctx = libav().avio_alloc_context(
+  AVIOContext* io_ctx = FFMPEG avio_alloc_context(
       buffer, buffer_size, 1, opaque, nullptr, write_packet, seek);
   if (!io_ctx) {
-    libav().av_freep(&buffer);
+    FFMPEG av_freep(&buffer);
     TORCH_CHECK(false, "Failed to allocate AVIOContext.");
   }
   return io_ctx;

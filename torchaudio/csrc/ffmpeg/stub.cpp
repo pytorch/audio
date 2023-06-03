@@ -1,6 +1,8 @@
+#ifdef DLOPEN_FFMPEG
+
 #include <ATen/DynamicLibrary.h>
 #include <c10/util/CallOnce.h>
-#include <torchaudio/csrc/ffmpeg/libav.h>
+#include <torchaudio/csrc/ffmpeg/stub.h>
 
 extern "C" {
 #include <libavcodec/version.h>
@@ -12,7 +14,7 @@ extern "C" {
 
 namespace torchaudio::io::detail {
 namespace {
-class LibAVImpl {
+class StubImpl {
   at::DynamicLibrary libavutil;
   at::DynamicLibrary libavcodec;
   at::DynamicLibrary libavformat;
@@ -21,9 +23,9 @@ class LibAVImpl {
 
  public:
   // The struct that holds all the function pointers to be used.
-  LibAV libav{};
+  FFmpegStub stub{};
 
-  LibAVImpl(
+  StubImpl(
       const char* util,
       const char* codec,
       const char* format,
@@ -34,7 +36,7 @@ class LibAVImpl {
         libavformat(format),
         libavdevice(device),
         libavfilter(filter) {
-#define set(X) this->libav.X = (decltype(LibAV::X))libavutil.sym(#X)
+#define set(X) stub.X = (decltype(FFmpegStub::X))libavutil.sym(#X)
     set(av_buffer_ref);
     set(av_buffer_unref);
     set(av_d2q);
@@ -72,7 +74,7 @@ class LibAVImpl {
     set(avutil_version);
 #undef set
 
-#define set(X) this->libav.X = (decltype(LibAV::X))libavcodec.sym(#X)
+#define set(X) stub.X = (decltype(FFmpegStub::X))libavcodec.sym(#X)
     set(av_codec_is_decoder);
     set(av_codec_is_encoder);
     set(av_codec_iterate);
@@ -106,7 +108,7 @@ class LibAVImpl {
     set(avcodec_version);
 #undef set
 
-#define set(X) this->libav.X = (decltype(LibAV::X))libavformat.sym(#X)
+#define set(X) stub.X = (decltype(FFmpegStub::X))libavformat.sym(#X)
     set(av_demuxer_iterate);
     set(av_dump_format);
     set(av_find_best_stream);
@@ -133,12 +135,12 @@ class LibAVImpl {
     set(avformat_write_header);
 #undef set
 
-#define set(X) this->libav.X = (decltype(LibAV::X))libavdevice.sym(#X)
+#define set(X) stub.X = (decltype(FFmpegStub::X))libavdevice.sym(#X)
     set(avdevice_register_all);
     set(avdevice_version);
 #undef set
 
-#define set(X) this->libav.X = (decltype(LibAV::X))libavfilter.sym(#X)
+#define set(X) stub.X = (decltype(FFmpegStub::X))libavfilter.sym(#X)
     set(av_buffersink_get_frame);
     set(av_buffersrc_add_frame_flags);
     set(avfilter_get_by_name);
@@ -154,25 +156,25 @@ class LibAVImpl {
   }
 };
 
-static std::unique_ptr<LibAVImpl> _libav;
+static std::unique_ptr<StubImpl> _stub;
 
-void _load_libav() {
+void _init_stub() {
 #if defined(_WIN32)
-  _libav = std::make_unique<LibAVImpl>(
+  _stub = std::make_unique<StubImpl>(
       "avutil-" AV_STRINGIFY(LIBAVUTIL_VERSION_MAJOR) ".dll",
       "avcodec-" AV_STRINGIFY(LIBAVCODEC_VERSION_MAJOR) ".dll",
       "avformat-" AV_STRINGIFY(LIBAVFORMAT_VERSION_MAJOR) ".dll",
       "avdevice-" AV_STRINGIFY(LIBAVDEVICE_VERSION_MAJOR) ".dll",
       "avfilter-" AV_STRINGIFY(LIBAVFILTER_VERSION_MAJOR) ".dll");
 #elif defined(__APPLE__)
-  _libav = std::make_unique<LibAVImpl>(
+  _stub = std::make_unique<StubImpl>(
       "libavutil." AV_STRINGIFY(LIBAVUTIL_VERSION_MAJOR) ".dylib",
       "libavcodec." AV_STRINGIFY(LIBAVCODEC_VERSION_MAJOR) ".dylib",
       "libavformat." AV_STRINGIFY(LIBAVFORMAT_VERSION_MAJOR) ".dylib",
       "libavdevice." AV_STRINGIFY(LIBAVDEVICE_VERSION_MAJOR) ".dylib",
       "libavfilter." AV_STRINGIFY(LIBAVFILTER_VERSION_MAJOR) ".dylib");
 #else
-  _libav = std::make_unique<LibAVImpl>(
+  _stub = std::make_unique<StubImpl>(
       "libavutil.so." AV_STRINGIFY(LIBAVUTIL_VERSION_MAJOR),
       "libavcodec.so." AV_STRINGIFY(LIBAVCODEC_VERSION_MAJOR),
       "libavformat.so." AV_STRINGIFY(LIBAVFORMAT_VERSION_MAJOR),
@@ -183,10 +185,12 @@ void _load_libav() {
 
 } // namespace
 
-LibAV& libav() {
+FFmpegStub& ffmpeg_stub() {
   static c10::once_flag init_flag;
-  c10::call_once(init_flag, _load_libav);
-  return _libav->libav;
+  c10::call_once(init_flag, _init_stub);
+  return _stub->stub;
 }
 
 } // namespace torchaudio::io::detail
+
+#endif

@@ -9,10 +9,3 @@ file(MAKE_DIRECTORY install/lib)
 if (BUILD_SOX)
   add_subdirectory(sox)
 endif()
-
-################################################################################
-# kaldi
-################################################################################
-if (BUILD_KALDI)
-  add_subdirectory(kaldi)
-endif()

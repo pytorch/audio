@@ -28,7 +28,6 @@ from .functional import (
     apply_beamforming,
     apply_codec,
     compute_deltas,
-    compute_kaldi_pitch,
     convolve,
     create_dct,
     DB_to_amplitude,
@@ -65,7 +64,6 @@ from .functional import (
 __all__ = [
     "amplitude_to_DB",
     "compute_deltas",
-    "compute_kaldi_pitch",
     "create_dct",
     "melscale_fbanks",
     "linear_fbanks",

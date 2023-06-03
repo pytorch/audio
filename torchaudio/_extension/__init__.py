@@ -14,12 +14,10 @@ _LG = logging.getLogger(__name__)
 # Builder uses it for debugging purpose, so we export it.
 # https://github.com/pytorch/builder/blob/e2e4542b8eb0bdf491214451a1a4128bd606cce2/test/smoke_test/smoke_test.py#L80
 __all__ = [
-    "fail_if_no_kaldi",
     "fail_if_no_sox",
     "fail_if_no_ffmpeg",
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
-    "_IS_KALDI_AVAILABLE",
     "_IS_RIR_AVAILABLE",
     "_SOX_INITIALIZED",
     "_FFMPEG_INITIALIZED",
@@ -34,11 +32,10 @@ if os.name == "nt" and (3, 8) <= sys.version_info < (3, 9):
 # In case of an error, we do not catch the failure as it suggests there is something
 # wrong with the installation.
 _IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
-# Kaldi and RIR features are implemented in _torchaudio extension, but they can be individually
+# RIR features are implemented in _torchaudio extension, but they can be individually
 # turned on/off at build time. Available means that _torchaudio is loaded properly, and
-# Kaldi or RIR features are found there.
+# RIR features are found there.
 _IS_RIR_AVAILABLE = False
-_IS_KALDI_AVAILABLE = False
 _IS_ALIGN_AVAILABLE = False
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _load_lib("libtorchaudio")
@@ -47,7 +44,6 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
 
     _check_cuda_version()
     _IS_RIR_AVAILABLE = torchaudio.lib._torchaudio.is_rir_available()
-    _IS_KALDI_AVAILABLE = torchaudio.lib._torchaudio.is_kaldi_available()
     _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
 
 
@@ -77,13 +73,6 @@ if is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
         _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
 
 
-fail_if_no_kaldi = (
-    no_op
-    if _IS_KALDI_AVAILABLE
-    else fail_with_message(
-        "requires kaldi extension, but TorchAudio is not compiled with it. Please build TorchAudio with kaldi support."
-    )
-)
 fail_if_no_sox = (
     no_op
     if _SOX_INITIALIZED

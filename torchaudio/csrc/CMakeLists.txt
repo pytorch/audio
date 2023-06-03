@@ -76,12 +76,6 @@ if(USE_CUDA)
     )
 endif()
 
-if(BUILD_KALDI)
-  list(APPEND additional_libs kaldi)
-  list(APPEND sources kaldi.cpp)
-  list(APPEND compile_definitions INCLUDE_KALDI)
-endif()
-
 if(OpenMP_CXX_FOUND)
   list(
     APPEND

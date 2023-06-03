@@ -1,18 +1,36 @@
 #pragma once
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavfilter/avfilter.h>
-#include <libavformat/avformat.h>
-#include <libavutil/avutil.h>
-#include <libavutil/pixdesc.h>
-}
+// Abstraction of the access to FFmpeg libraries.
+//
+// Do not include this in header files.
+// Include this header in implementation files and prepend
+// all the calls to libav functions with FFMPEG macro.
+//
+// If DLOPEN_FFMPEG is not defined, FFMPEG macro is empty.
+// In this case, FFmpeg libraries are linked at the time torchaudio is built.
+//
+// If DLOPEN_FFMPEG is defined, FFMPEG macro becomes a function call to
+// fetch a stub instance of FFmpeg libraries.
+// This function also initializes the function pointers by automatically
+// dlopens all the required libraries.
+//
 
-#include <torchaudio/csrc/ffmpeg/macro.h>
+#ifndef DLOPEN_FFMPEG
+#define FFMPEG
+#else
+#define FFMPEG detail::ffmpeg_stub().
+
+#include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 
 namespace torchaudio::io::detail {
 
-struct LibAV {
+struct FFmpegStub;
+
+// dlopen FFmpeg libraries and populate the methods of stub instance,
+// then return the reference to the stub instance
+FFmpegStub& ffmpeg_stub();
+
+struct FFmpegStub {
   /////////////////////////////////////////////////////////////////////////////
   // libavutil
   /////////////////////////////////////////////////////////////////////////////
@@ -290,7 +308,6 @@ struct LibAV {
   unsigned (*avfilter_version)();
 };
 
-// Fetch handler for dlopen-ed FFmpeg libraries.
-LibAV& libav();
-
 } // namespace torchaudio::io::detail
+
+#endif
