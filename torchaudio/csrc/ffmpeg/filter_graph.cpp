@@ -1,12 +1,12 @@
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
+#include <torchaudio/csrc/ffmpeg/stub.h>
 #include <stdexcept>
 
-namespace torchaudio {
-namespace io {
+namespace torchaudio::io {
 
 namespace {
 AVFilterGraph* get_filter_graph() {
-  AVFilterGraph* ptr = avfilter_graph_alloc();
+  AVFilterGraph* ptr = FFMPEG avfilter_graph_alloc();
   TORCH_CHECK(ptr, "Failed to allocate resouce.");
   ptr->nb_threads = 1;
   return ptr;
@@ -32,7 +32,7 @@ std::string get_audio_src_args(
       time_base.num,
       time_base.den,
       sample_rate,
-      av_get_sample_fmt_name(format),
+      FFMPEG av_get_sample_fmt_name(format),
       channel_layout);
   return std::string(args);
 }
@@ -51,7 +51,7 @@ std::string get_video_src_args(
       "video_size=%dx%d:pix_fmt=%s:time_base=%d/%d:frame_rate=%d/%d:pixel_aspect=%d/%d",
       width,
       height,
-      av_get_pix_fmt_name(format),
+      FFMPEG av_get_pix_fmt_name(format),
       time_base.num,
       time_base.den,
       frame_rate.num,
@@ -69,7 +69,7 @@ void FilterGraph::add_audio_src(
     int sample_rate,
     uint64_t channel_layout) {
   add_src(
-      avfilter_get_by_name("abuffer"),
+      FFMPEG avfilter_get_by_name("abuffer"),
       get_audio_src_args(format, time_base, sample_rate, channel_layout));
 }
 
@@ -81,13 +81,13 @@ void FilterGraph::add_video_src(
     int height,
     AVRational sample_aspect_ratio) {
   add_src(
-      avfilter_get_by_name("buffer"),
+      FFMPEG avfilter_get_by_name("buffer"),
       get_video_src_args(
           format, time_base, frame_rate, width, height, sample_aspect_ratio));
 }
 
 void FilterGraph::add_src(const AVFilter* buffersrc, const std::string& args) {
-  int ret = avfilter_graph_create_filter(
+  int ret = FFMPEG avfilter_graph_create_filter(
       &buffersrc_ctx, buffersrc, "in", args.c_str(), nullptr, graph);
   TORCH_CHECK(
       ret >= 0,
@@ -96,11 +96,11 @@ void FilterGraph::add_src(const AVFilter* buffersrc, const std::string& args) {
 }
 
 void FilterGraph::add_audio_sink() {
-  add_sink(avfilter_get_by_name("abuffersink"));
+  add_sink(FFMPEG avfilter_get_by_name("abuffersink"));
 }
 
 void FilterGraph::add_video_sink() {
-  add_sink(avfilter_get_by_name("buffersink"));
+  add_sink(FFMPEG avfilter_get_by_name("buffersink"));
 }
 
 void FilterGraph::add_sink(const AVFilter* buffersink) {
@@ -114,7 +114,7 @@ void FilterGraph::add_sink(const AVFilter* buffersink) {
   // According to the other example
   // https://ffmpeg.org/doxygen/4.1/filter_audio_8c-example.html
   // `abuffersink` should not take options, and this resolved issue.
-  int ret = avfilter_graph_create_filter(
+  int ret = FFMPEG avfilter_graph_create_filter(
       &buffersink_ctx, buffersink, "out", nullptr, nullptr, graph);
   TORCH_CHECK(ret >= 0, "Failed to create output filter.");
 }
@@ -131,15 +131,15 @@ class InOuts {
 
  public:
   InOuts(const char* name, AVFilterContext* pCtx) {
-    p = avfilter_inout_alloc();
+    p = FFMPEG avfilter_inout_alloc();
     TORCH_CHECK(p, "Failed to allocate AVFilterInOut.");
-    p->name = av_strdup(name);
+    p->name = FFMPEG av_strdup(name);
     p->filter_ctx = pCtx;
     p->pad_idx = 0;
     p->next = nullptr;
   }
   ~InOuts() {
-    avfilter_inout_free(&p);
+    FFMPEG avfilter_inout_free(&p);
   }
   operator AVFilterInOut**() {
     return &p;
@@ -156,7 +156,7 @@ void FilterGraph::add_process(const std::string& filter_description) {
   // If you are debugging this part of the code, you might get confused.
   InOuts in{"in", buffersrc_ctx}, out{"out", buffersink_ctx};
 
-  int ret = avfilter_graph_parse_ptr(
+  int ret = FFMPEG avfilter_graph_parse_ptr(
       graph, filter_description.c_str(), out, in, nullptr);
 
   TORCH_CHECK(
@@ -167,11 +167,11 @@ void FilterGraph::add_process(const std::string& filter_description) {
 
 void FilterGraph::create_filter(AVBufferRef* hw_frames_ctx) {
   buffersrc_ctx->outputs[0]->hw_frames_ctx = hw_frames_ctx;
-  int ret = avfilter_graph_config(graph, nullptr);
+  int ret = FFMPEG avfilter_graph_config(graph, nullptr);
   TORCH_CHECK(ret >= 0, "Failed to configure the graph: " + av_err2string(ret));
-  // char* desc = avfilter_graph_dump(graph, NULL);
+  // char* desc = FFMPEG avfilter_graph_dump(graph, NULL);
   // std::cerr << "Filter created:\n" << desc << std::endl;
-  // av_free(static_cast<void*>(desc));
+  // FFMPEG av_free(static_cast<void*>(desc));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,8 @@ FilterGraphOutputInfo FilterGraph::get_output_info() const {
       ret.num_channels = l->ch_layout.nb_channels;
 #else
       // Before FFmpeg 5.1
-      ret.num_channels = av_get_channel_layout_nb_channels(l->channel_layout);
+      ret.num_channels =
+          FFMPEG av_get_channel_layout_nb_channels(l->channel_layout);
 #endif
       break;
     }
@@ -214,13 +215,12 @@ FilterGraphOutputInfo FilterGraph::get_output_info() const {
 // Streaming process
 //////////////////////////////////////////////////////////////////////////////
 int FilterGraph::add_frame(AVFrame* pInputFrame) {
-  return av_buffersrc_add_frame_flags(
+  return FFMPEG av_buffersrc_add_frame_flags(
       buffersrc_ctx, pInputFrame, AV_BUFFERSRC_FLAG_KEEP_REF);
 }
 
 int FilterGraph::get_frame(AVFrame* pOutputFrame) {
-  return av_buffersink_get_frame(buffersink_ctx, pOutputFrame);
+  return FFMPEG av_buffersink_get_frame(buffersink_ctx, pOutputFrame);
 }
 
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io

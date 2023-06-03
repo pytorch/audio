@@ -1,4 +1,5 @@
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
+#include <torchaudio/csrc/ffmpeg/stub.h>
 
 namespace torchaudio::io {
 namespace {
@@ -15,7 +16,7 @@ AVBufferRef* get_cuda_context(int index) {
   }
   if (CUDA_CONTEXT_CACHE.count(index) == 0) {
     AVBufferRef* p = nullptr;
-    int ret = av_hwdevice_ctx_create(
+    int ret = FFMPEG av_hwdevice_ctx_create(
         &p, AV_HWDEVICE_TYPE_CUDA, std::to_string(index).c_str(), nullptr, 0);
     TORCH_CHECK(
         ret >= 0,
