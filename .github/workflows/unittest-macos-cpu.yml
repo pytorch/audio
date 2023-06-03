@@ -53,14 +53,10 @@ jobs:
 
         set -euxo pipefail
 
-        echo '::group::Setup Conda Environment'
-        ./.circleci/unittest/linux/scripts/setup_env.sh
-        echo '::endgroup::'
-
         echo '::group::Install PyTorch and Torchaudio'
-        ./.circleci/unittest/linux/scripts/install.sh
+        ./.github/scripts/unittest-linux/install.sh
         echo '::endgroup::'
 
         echo '::group::Run Tests'
-        ./.circleci/unittest/linux/scripts/run_test.sh
+        ./.github/scripts/unittest-linux/run_test.sh
         echo '::endgroup::'
