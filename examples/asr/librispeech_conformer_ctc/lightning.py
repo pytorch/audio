@@ -126,7 +126,7 @@ def conformer_ctc_customized():
     return conformer_ctc_model(
         input_dim=80,
         encoding_dim=512,
-        time_reduction_stride=4,
+        time_reduction_stride=1,
         conformer_input_dim=512,
         conformer_ffn_dim=2048,
         conformer_num_layers=12,
@@ -254,7 +254,16 @@ class ConformerCTCModule(LightningModule):
         Doing so allows us to account for the variability in batch sizes that
         variable-length sequential data yield.
         """
-        loss = self._step(batch, batch_idx, "train")
+        try:
+            loss = self._step(batch, batch_idx, "train")
+        except:
+            loss = 0
+            for model_param_name, model_param_value in self.model.named_parameters():  # encoder_output_layer.
+                    # if model_param_name.endswith('weight'):
+                    #     loss += model_param_value.abs().sum()
+                    loss += model_param_value.abs().sum()
+            loss = loss * 1e-5
+            logger.info(f"[{self.global_rank}] batch {batch_idx} is bad")
         batch_size = batch.features.size(0)
         batch_sizes = self.all_gather(batch_size)
         self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True)

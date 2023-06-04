@@ -12,7 +12,7 @@ from transforms import get_data_module
 
 class MyFitStartCallback(Callback):
     def on_fit_start(self, trainer, pl_module):
-        pl_module.initialize_loss_func(topo_type="hmm", subsampling_factor=4)
+        pl_module.initialize_loss_func(topo_type="hmm", subsampling_factor=1)
 
 
 def run_train(args):
@@ -51,6 +51,7 @@ def run_train(args):
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
         gradient_clip_val=10.0,
+        accumulate_grad_batches=3,
     )
 
     sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
