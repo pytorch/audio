@@ -21,13 +21,16 @@ Please run the following script to pre-process the LRS3 dataset:
 ```Shell
 python main.py \
     --data-dir=[data_dir] \
-    --dst-dir=[dst_dir] \
+    --dataset=[dataset] \
+    --root=[root] \
     --folder=[folder] \
     --groups=[num_groups] \
     --job-index=[job_index]
 ```
 
 - `[data_dir]` and `[landmarks_dir]` are the directories for original dataset and corresponding landmarks.
+
+- `[root]` is the directory for saved cropped-face dataset.
 
 - `[folder]` can be set to  `train` or `test`.
 
@@ -38,7 +41,8 @@ After completing Step 2, run the following script to merge all labels.
 
 ```Shell
 python merge.py \
-    --dst-dir=[dst_dir] \
+    --dataset=[dataset] \
+    --root=[root] \
     --folder=[folder] \
     --groups=[num_groups] \
 ```

@@ -18,20 +18,18 @@ pip install pytorch-lightning sentencepiece
 
 3. Preprocess LRS3 to a cropped-face dataset from the [data_prep](./data_prep) folder.
 
-4. For better performance, you can choose to download [models](https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks#model-zoo) from Table 1 to initialise ASR/VSR front-end.
+4. `[sp_model_path]` is a sentencepiece model to encode targets, which can be generated using `train_spm.py`.
 
-### Training A/V-ASR model
+### Training ASR or VSR model
 
-- `[dataset_path]` is the directory for original dataset.
-- `[label_path]` is the labels directory.
+- `[root_dir]` is the root directory for the LRS3 cropped-face dataset.
 - `[modality]` is the input modality type, including `v`, `a`, and `av`.
 - `[mode]` is the model type, including `online` and `offline`.
 
+
 ```Shell
 
-python train.py --dataset-path [dataset_path] \
-                --label-path [label-path]
-                --pretrained-model-path [pretrained_model_path] \
+python train.py --root-dir [root_dir] \
                 --sp-model-path ./spm_unigram_1023.model
                 --exp-dir ./exp \
                 --num-nodes 8 \
@@ -43,10 +41,7 @@ python train.py --dataset-path [dataset_path] \
 ### Training AV-ASR model
 
 ```Shell
-python train.py --dataset-path [dataset_path] \
-                --label-path [label-path] 
-                --pretrained-vid-model-path [pretrained_vid_model_path] \
-                --pretrained-aud-model-path [pretrained_aud_model_path] \
+python train.py --root-dir [root-dir] \
                 --sp-model-path ./spm_unigram_1023.model
                 --exp-dir ./exp \
                 --num-nodes 8 \
@@ -59,19 +54,17 @@ python train.py --dataset-path [dataset_path] \
 
 ```Shell
 python eval.py --dataset-path [dataset_path] \
-               --label-path [label-path]
-               --pretrained-model-path [pretrained_model_path] \
                --sp-model-path ./spm_unigram_1023.model
                --md [modality] \
                --mode [mode] \
                --checkpoint-path [checkpoint_path]
 ```
 
-The table below contains WER for AV-ASR models.
+The table below contains WER for AV-ASR models [offline evaluation].
 
 |    Model    |    WER [%]   |   Params (M)   |
 |:-----------:|:------------:|:--------------:|
 | Non-streaming models       |                |
-|    AV-ASR   |      4.2     |       50       |
+|    AV-ASR   |      4.0     |       50       |
 | Streaming models           |                |
-|    AV-ASR   |      4.9     |       40       |
+|    AV-ASR   |      4.3     |       40       |

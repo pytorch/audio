@@ -3,6 +3,7 @@ import math
 import glob
 import ffmpeg
 import shutil
+from tqdm import tqdm
 from data.data_module import AVSRDataLoader
 from utils import split_file, save_vid_aud_txt
 
@@ -20,9 +21,14 @@ def load_args(default_config=None):
         help="The directory for sequence.",
     )
     parser.add_argument(
-        "--dst-dir",
+        '--dataset',
         type=str,
-        help="The directory of saved mouth patches or embeddings.",
+        help='Specify the dataset name used in the experiment',
+    )
+    parser.add_argument(
+        "--root-dir",
+        type=str,
+        help="The root directory of cropped-face dataset.",
     )
     parser.add_argument(
         '--job-index',
@@ -47,8 +53,8 @@ def load_args(default_config=None):
 args = load_args()
 
 seg_duration = 16
-dataset_name = "LRS3"
 detector = "retinaface"
+dataset = args.dataset
 
 args.data_dir = os.path.normpath(args.data_dir)
 vid_dataloader = AVSRDataLoader(modality="video", detector=detector, resize=(96, 96))
@@ -58,18 +64,18 @@ seg_vid_len = seg_duration * 25
 seg_aud_len = seg_duration * 16000
 
 label_filename = os.path.join(
-    args.dst_dir,
-    dataset_name,
-    f"{args.folder}_transcript_lengths_seg{seg_duration}s.csv" if args.groups <= 1 else \
-    f"{args.folder}_transcript_lengths_seg{seg_duration}s.{args.groups}.{args.job_index}.csv"
+    args.root_dir,
+    "labels",
+    f"{dataset}_{args.folder}_transcript_lengths_seg{seg_duration}s.csv" if args.groups <= 1 else \
+    f"{dataset}_{args.folder}_transcript_lengths_seg{seg_duration}s.{args.groups}.{args.job_index}.csv"
 )
 os.makedirs(os.path.dirname(label_filename), exist_ok=True)
 print(f"Directory {os.path.dirname(label_filename)} created")
 
 f = open(label_filename, "w")
 # Step 2, extract mouth patches from segments.
-dst_vid_dir = os.path.join(args.dst_dir, dataset_name, dataset_name+f"_video_seg{seg_duration}s")
-dst_txt_dir = os.path.join(args.dst_dir, dataset_name, dataset_name+f"_text_seg{seg_duration}s")
+dst_vid_dir = os.path.join(args.root_dir, dataset, dataset+f"_video_seg{seg_duration}s")
+dst_txt_dir = os.path.join(args.root_dir, dataset, dataset+f"_text_seg{seg_duration}s")
 if args.folder == "test":
     filenames = glob.glob(os.path.join(args.data_dir, args.folder, "**", "*.mp4"), recursive=True)
 elif args.folder == "train":
@@ -82,7 +88,7 @@ else:
 unit = math.ceil(len(filenames) * 1. / args.groups)
 filenames = filenames[args.job_index * unit : (args.job_index+1) * unit]
 
-for data_filename in filenames:
+for data_filename in tqdm(filenames):
     try:
         video_data = vid_dataloader.load_data(data_filename)
         audio_data = aud_dataloader.load_data(data_filename)
@@ -117,8 +123,8 @@ for data_filename in filenames:
         os.remove(dst_vid_filename)
         shutil.move(dst_vid_filename[:-4]+'.m.mp4', dst_vid_filename)
 
-        basename = dst_vid_filename.replace(dst_vid_dir+"/", "")
-        f.write("{}\n".format(f"{dataset_name.lower()},{basename},{trim_vid_data.shape[0]},{len(content)}"))
+        basename = os.path.relpath(dst_vid_filename, start=os.path.join(args.root_dir, dataset))
+        f.write("{}\n".format(f"{dataset},{basename},{trim_vid_data.shape[0]},{len(content)}"))
         continue
 
     splitted = split_file(data_filename[:-4]+".txt", max_frames=seg_vid_len)
@@ -156,6 +162,6 @@ for data_filename in filenames:
         os.remove(dst_vid_filename)
         shutil.move(dst_vid_filename[:-4]+'.m.mp4', dst_vid_filename)
 
-        basename = dst_vid_filename.replace(dst_vid_dir+"/", "")
-        f.write("{}\n".format(f"{dataset_name.lower()},{basename},{trim_vid_data.shape[0]},{len(content)}"))
+        basename = os.path.relpath(dst_vid_filename, start=os.path.join(args.root_dir, dataset))
+        f.write("{}\n".format(f"{dataset},{basename},{trim_vid_data.shape[0]},{len(content)}"))
 f.close()

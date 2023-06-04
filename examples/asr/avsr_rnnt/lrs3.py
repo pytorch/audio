@@ -12,10 +12,10 @@ def _load_list(args, *filenames):
     output = []
     length = []
     for filename in filenames:
-        filepath = os.path.join(os.path.dirname(args.dataset_path), filename)
+        filepath = os.path.join(args.root_dir, "labels", filename)
         for line in open(filepath).read().splitlines():
-            dataset_name, rel_path, input_length = line.split(",")[0], line.split(",")[1], line.split(",")[2]
-            path = os.path.normpath(os.path.join(args.dataset_path, rel_path[:-4]+".mp4"))
+            dataset, rel_path, input_length = line.split(",")[0], line.split(",")[1], line.split(",")[2]
+            path = os.path.normpath(os.path.join(args.root_dir, dataset, rel_path[:-4]+".mp4"))
             length.append(int(input_length))
             output.append(path)
     return output, length
@@ -61,11 +61,11 @@ class LRS3(Dataset):
         self.args = args
 
         if subset == "train":
-            self._filelist, self._lengthlist = _load_list(self.args, "train_transcript_lengths_seg16s.csv")
+            self._filelist, self._lengthlist = _load_list(self.args, "lrs3_train_transcript_lengths_seg16s.csv")
         if subset == "val":
-            self._filelist, self._lengthlist = _load_list(self.args, "test_transcript_lengths_seg16s.csv")
+            self._filelist, self._lengthlist = _load_list(self.args, "lrs3_test_transcript_lengths_seg16s.csv")
         if subset == "test":
-            self._filelist, self._lengthlist = _load_list(self.args, "test_transcript_lengths_seg16s.csv")
+            self._filelist, self._lengthlist = _load_list(self.args, "lrs3_test_transcript_lengths_seg16s.csv")
 
 
     def __getitem__(self, n):

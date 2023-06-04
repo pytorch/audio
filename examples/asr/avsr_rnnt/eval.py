@@ -58,9 +58,9 @@ def parse_args():
         required=True,
     )
     parser.add_argument(
-        "--dataset-path",
+        "--root-dir",
         type=str,
-        help="Path to LRW audio-visual datasets.",
+        help="Root directory to LRS3 audio-visual datasets.",
         required=True,
     )
     parser.add_argument(

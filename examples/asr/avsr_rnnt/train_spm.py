@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Trains a SentencePiece model on transcripts across LRS3 pretrain and trainval.
 
+- `[lrs3_path]` is the directory path for the LRS3 cropped face dataset.
+
 Example:
-python train_spm.py --lrs3-path <LRS3-DIRECTORY>
+python train_spm.py --lrs3-path [lrs3_path]
 """
 
 import io
@@ -62,7 +64,7 @@ def parse_args():
 def run_cli():
     args = parse_args()
 
-    root = args.lrs3_path / "LRS3_text_seg24s"
+    root = args.lrs3_path / "LRS3_text_seg16s"
     splits = ["pretrain", "trainval"]
     merged_transcripts = []
     for split in splits:
