@@ -18,9 +18,9 @@ namespace alignment {
 namespace gpu {
 template <typename scalar_t, typename target_t>
 __global__ void falign_cuda_step_kernel(
-    const torch::PackedTensorAccessor32<scalar_t, 2, torch::RestrictPtrTraits>
+    const torch::PackedTensorAccessor32<scalar_t, 3, torch::RestrictPtrTraits>
         logProbs_a,
-    const torch::PackedTensorAccessor32<target_t, 1, torch::RestrictPtrTraits>
+    const torch::PackedTensorAccessor32<target_t, 2, torch::RestrictPtrTraits>
         targets_a,
     const int T,
     const int L,
@@ -36,6 +36,8 @@ __global__ void falign_cuda_step_kernel(
     torch::PackedTensorAccessor32<int8_t, 2, torch::RestrictPtrTraits>
         backPtrBuffer_a) {
   scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
+  const int batchIndex =
+      0; // TODO: support batch version and use the real batch index
   int S = 2 * L + 1;
   int curIdxOffset = (t % 2); // current time step frame for alpha
   int prevIdxOffset = ((t - 1) % 2); // previous time step frame for alpha
@@ -49,8 +51,8 @@ __global__ void falign_cuda_step_kernel(
   __syncthreads();
   if (t == 0) {
     for (unsigned int i = start + threadIdx.x; i < end; i += blockDim.x) {
-      int labelIdx = (i % 2 == 0) ? blank : targets_a[i / 2];
-      alphas_a[curIdxOffset][i] = logProbs_a[0][labelIdx];
+      int labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
+      alphas_a[curIdxOffset][i] = logProbs_a[batchIndex][0][labelIdx];
     }
     return;
   }
@@ -62,7 +64,7 @@ __global__ void falign_cuda_step_kernel(
   threadMax = kNegInfinity;
   if (start == 0 && threadIdx.x == 0) {
     alphas_a[curIdxOffset][0] =
-        alphas_a[prevIdxOffset][0] + logProbs_a[t][blank];
+        alphas_a[prevIdxOffset][0] + logProbs_a[batchIndex][t][blank];
     threadMax = max(threadMax, alphas_a[curIdxOffset][0]);
     backPtrBuffer_a[backPtrBufferLen][0] = 0;
   }
@@ -73,8 +75,9 @@ __global__ void falign_cuda_step_kernel(
     scalar_t x0 = alphas_a[prevIdxOffset][i];
     scalar_t x1 = alphas_a[prevIdxOffset][i - 1];
     scalar_t x2 = kNegInfinity;
-    int labelIdx = (i % 2 == 0) ? blank : targets_a[i / 2];
-    if (i % 2 != 0 && i != 1 && targets_a[i / 2] != targets_a[i / 2 - 1]) {
+    int labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
+    if (i % 2 != 0 && i != 1 &&
+        targets_a[batchIndex][i / 2] != targets_a[batchIndex][i / 2 - 1]) {
       x2 = alphas_a[prevIdxOffset][i - 2];
     }
     scalar_t result = 0.0;
@@ -88,7 +91,7 @@ __global__ void falign_cuda_step_kernel(
       result = x0;
       backPtrBuffer_a[backPtrBufferLen][i] = 0;
     }
-    alphas_a[curIdxOffset][i] = result + logProbs_a[t][labelIdx];
+    alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     threadMax = max(threadMax, alphas_a[curIdxOffset][i]);
   }
   scalar_t maxResult = BlockReduce(tempStorage).Reduce(threadMax, cub::Max());
@@ -113,10 +116,12 @@ void forced_align_impl(
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   using target_t = typename std::
       conditional<target_scalar_type == torch::kInt, int, int64_t>::type;
-  auto paths_a = paths.accessor<target_t, 1>();
-  const int T = logProbs.size(0); // num frames
-  const int N = logProbs.size(1); // alphabet size
-  const int L = targets.size(0); // label length
+  auto paths_a = paths.accessor<target_t, 2>();
+  const int batchIndex =
+      0; // TODO: support batch version and use the real batch index
+  const int T = logProbs.size(1); // num frames
+  const int N = logProbs.size(2); // alphabet size
+  const int L = targets.size(1); // label length
   const int S = 2 * L + 1;
   auto targetsCpu = targets.to(torch::kCPU);
   // backPtrBuffer stores the index offset fthe best path at current position
@@ -144,12 +149,12 @@ void forced_align_impl(
                                  .device(logProbs.device()))
                              .fill_(kNegInfinity);
   // CPU accessors
-  auto targetsCpu_a = targetsCpu.accessor<target_t, 1>();
+  auto targetsCpu_a = targetsCpu.accessor<target_t, 2>();
   auto backPtrCpu_a = backPtrCpu.accessor<int8_t, 2>();
   // count the number of repeats in label
   int R = 0;
   for (int i = 1; i < L; ++i) {
-    if (targetsCpu_a[i] == targetsCpu_a[i - 1]) {
+    if (targetsCpu_a[batchIndex][i] == targetsCpu_a[batchIndex][i - 1]) {
       ++R;
     }
   }
@@ -169,14 +174,16 @@ void forced_align_impl(
     if (t > 0) {
       if (T - t <= L + R) {
         if ((start % 2 == 1) &&
-            (targetsCpu_a[start / 2] != targetsCpu_a[start / 2 + 1])) {
+            (targetsCpu_a[batchIndex][start / 2] !=
+             targetsCpu_a[batchIndex][start / 2 + 1])) {
           start = start + 1;
         }
         start = start + 1;
       }
       if (t <= L + R) {
         if ((end % 2 == 0) && (end < 2 * L) &&
-            (targetsCpu_a[end / 2 - 1] != targetsCpu_a[end / 2])) {
+            (targetsCpu_a[batchIndex][end / 2 - 1] !=
+             targetsCpu_a[batchIndex][end / 2])) {
           end = end + 1;
         }
         end = end + 1;
@@ -184,8 +191,8 @@ void forced_align_impl(
     }
     falign_cuda_step_kernel<scalar_t, target_t>
         <<<1, kNumThreads, 0, defaultStream>>>(
-            logProbs.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>(),
-            targets.packed_accessor32<target_t, 1, torch::RestrictPtrTraits>(),
+            logProbs.packed_accessor32<scalar_t, 3, torch::RestrictPtrTraits>(),
+            targets.packed_accessor32<target_t, 2, torch::RestrictPtrTraits>(),
             T,
             L,
             N,
@@ -229,8 +236,9 @@ void forced_align_impl(
       : S - 2;
   int indexScores = 0;
   for (int t = T - 1; t >= 0; --t) {
-    auto lbl_idx = ltrIdx % 2 == 0 ? blank : targetsCpu_a[ltrIdx / 2];
-    paths_a[t] = lbl_idx;
+    auto lbl_idx =
+        ltrIdx % 2 == 0 ? blank : targetsCpu_a[batchIndex][ltrIdx / 2];
+    paths_a[batchIndex][t] = lbl_idx;
     ++indexScores;
     ltrIdx -= backPtrCpu_a[t][ltrIdx];
   }
@@ -258,30 +266,36 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
   TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
   TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
   TORCH_CHECK(
-      logProbs.dim() != 3,
-      "3-D tensor is not yet supported for log_probs, please provide 2-D tensor.")
+      logProbs.dim() == 3,
+      "log_probs must be 3-D (batch_size, input length, num classes)");
   TORCH_CHECK(
-      targets.dim() != 2,
-      "2-D tensor is not yet supported for targets, please provide 1-D tensor.")
+      targets.dim() == 2, "targets must be 2-D (batch_size, target length,)");
   TORCH_CHECK(
-      logProbs.dim() == 2, "log_probs must be 2-D (input length, num classes)");
-  TORCH_CHECK(targets.dim() == 1, "targets must be 1-D (target length,)");
-  TORCH_CHECK(inputLengths.dim() == 0, "input_lengths must be 0-D");
-  TORCH_CHECK(targetLengths.dim() == 0, "target_lengths must be 0-D");
+      inputLengths.dim() == 1, "input_lengths must be 1-D (batch_size,)");
+  TORCH_CHECK(
+      targetLengths.dim() == 1, "target_lengths must be 1-D (batch_size,)");
+  TORCH_CHECK(
+      logProbs.size(0) == 1,
+      "The batch dimension for log_probs must be 1 at the current version.")
+  TORCH_CHECK(
+      targets.size(0) == 1,
+      "The batch dimension for targets must be 1 at the current version.")
   TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
 
   TORCH_CHECK(
-      logProbs.size(0) == at::max(inputLengths).item().toInt(),
+      logProbs.size(1) == at::max(inputLengths).item().toInt(),
       "input length mismatch");
   TORCH_CHECK(
-      targets.size(0) == at::max(targetLengths).item().toInt(),
+      targets.size(1) == at::max(targetLengths).item().toInt(),
       "target length mismatch");
 
-  auto T = logProbs.size(0); // num frames
+  auto B = logProbs.size(0);
+  auto T = logProbs.size(1); // num frames
   auto paths = torch::zeros(
-      {T}, torch::TensorOptions().device(torch::kCPU).dtype(targets.dtype()));
+      {B, T},
+      torch::TensorOptions().device(torch::kCPU).dtype(targets.dtype()));
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       logProbs.scalar_type(), "forced_align_impl", [&] {
         if (targets.scalar_type() == torch::kInt64) {
@@ -295,9 +309,10 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
   return std::make_tuple(
       paths.to(logProbs.device()),
       logProbs.index(
-          {torch::linspace(
+          {torch::indexing::Slice(),
+           torch::linspace(
                0, T - 1, T, torch::TensorOptions().dtype(paths.dtype())),
-           paths}));
+           paths.index({0})}));
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
