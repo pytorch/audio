@@ -7,14 +7,6 @@
 
 namespace torchaudio {
 
-bool is_kaldi_available() {
-#ifdef INCLUDE_KALDI
-  return true;
-#else
-  return false;
-#endif
-}
-
 bool is_rir_available() {
 #ifdef INCLUDE_RIR
   return true;
