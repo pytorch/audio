@@ -47,6 +47,6 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS=true
 
-        ./.circleci/unittest/windows/scripts/setup_env.sh
-        ./.circleci/unittest/windows/scripts/install.sh
-        ./.circleci/unittest/windows/scripts/run_test.sh
+        .github/scripts/unittest-windows/setup_env.sh
+        .github/scripts/unittest-windows/install.sh
+        .github/scripts/unittest-windows/run_test.sh
