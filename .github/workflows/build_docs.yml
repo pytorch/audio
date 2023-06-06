@@ -110,7 +110,7 @@ jobs:
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
         BUILD_VERSION=$( cut -f 1 -d a version.txt )
-        BUILD_VERSION="$BUILD_VERSION.dev$(date "+%Y%m%d")
+        BUILD_VERSION=$BUILD_VERSION.dev$(date "+%Y%m%d")
         export BUILD_VERSION
 
 
