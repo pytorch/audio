@@ -1,11 +1,7 @@
 import os
-from pathlib import Path
-from typing import Tuple, Union
 
-import torch
 import torchaudio
 import torchvision
-from torch import Tensor
 from torch.utils.data import Dataset
 
 
@@ -15,7 +11,7 @@ def _load_list(args, *filenames):
     for filename in filenames:
         filepath = os.path.join(os.path.dirname(args.dataset_path), filename)
         for line in open(filepath).read().splitlines():
-            dataset_name, rel_path, input_length = line.split(",")[0], line.split(",")[1], line.split(",")[2]
+            rel_path, input_length = line.split(",")[1:3]
             path = os.path.normpath(os.path.join(args.dataset_path, rel_path[:-4] + ".mp4"))
             length.append(int(input_length))
             output.append(path)
