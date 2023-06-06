@@ -17,8 +17,10 @@ void forced_align_impl(
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   using target_t = typename std::
       conditional<target_scalar_type == torch::kInt, int, int64_t>::type;
-  const auto T = logProbs.size(0);
-  const auto L = targets.size(0);
+  const auto batchIndex =
+      0; // TODO: support batch version and use the real batch index
+  const auto T = logProbs.size(1);
+  const auto L = targets.size(1);
   const auto S = 2 * L + 1;
   torch::Tensor alphas = torch::empty(
                              {2, S},
@@ -27,14 +29,14 @@ void forced_align_impl(
                                  .dtype(logProbs.dtype()))
                              .fill_(kNegInfinity);
   torch::Tensor backPtr = torch::empty({T, S}, torch::kInt8).fill_(-1);
-  auto logProbs_a = logProbs.accessor<scalar_t, 2>();
-  auto targets_a = targets.accessor<target_t, 1>();
-  auto paths_a = paths.accessor<target_t, 1>();
+  auto logProbs_a = logProbs.accessor<scalar_t, 3>();
+  auto targets_a = targets.accessor<target_t, 2>();
+  auto paths_a = paths.accessor<target_t, 2>();
   auto alphas_a = alphas.accessor<scalar_t, 2>();
   auto backPtr_a = backPtr.accessor<int8_t, 2>();
   auto R = 0;
   for (auto i = 1; i < L; i++) {
-    if (targets_a[i] == targets_a[i - 1]) {
+    if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
       ++R;
     }
   }
@@ -49,20 +51,22 @@ void forced_align_impl(
   auto start = T - (L + R) > 0 ? 0 : 1;
   auto end = (S == 1) ? 1 : 2;
   for (auto i = start; i < end; i++) {
-    auto labelIdx = (i % 2 == 0) ? blank : targets_a[i / 2];
-    alphas_a[0][i] = logProbs_a[0][labelIdx];
+    auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
+    alphas_a[0][i] = logProbs_a[batchIndex][0][labelIdx];
   }
   for (auto t = 1; t < T; t++) {
     if (T - t <= L + R) {
       if ((start % 2 == 1) &&
-          targets_a[start / 2] != targets_a[start / 2 + 1]) {
+          targets_a[batchIndex][start / 2] !=
+              targets_a[batchIndex][start / 2 + 1]) {
         start = start + 1;
       }
       start = start + 1;
     }
     if (t <= L + R) {
       if (end % 2 == 0 && end < 2 * L &&
-          targets_a[end / 2 - 1] != targets_a[end / 2]) {
+          targets_a[batchIndex][end / 2 - 1] !=
+              targets_a[batchIndex][end / 2]) {
         end = end + 1;
       }
       end = end + 1;
@@ -75,7 +79,7 @@ void forced_align_impl(
     }
     if (start == 0) {
       alphas_a[curIdxOffset][0] =
-          alphas_a[prevIdxOffset][0] + logProbs_a[t][blank];
+          alphas_a[prevIdxOffset][0] + logProbs_a[batchIndex][t][blank];
       backPtr_a[t][0] = 0;
       startloop += 1;
     }
@@ -85,13 +89,14 @@ void forced_align_impl(
       auto x1 = alphas_a[prevIdxOffset][i - 1];
       auto x2 = -std::numeric_limits<scalar_t>::infinity();
 
-      auto labelIdx = (i % 2 == 0) ? blank : targets_a[i / 2];
+      auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
 
       // In CTC, the optimal path may optionally chose to skip a blank label.
       // x2 represents skipping a letter, and can only happen if we're not
       // currently on a blank_label, and we're not on a repeat letter
       // (i != 1) just ensures we don't access targets[i - 2] if its i < 2
-      if (i % 2 != 0 && i != 1 && targets_a[i / 2] != targets_a[i / 2 - 1]) {
+      if (i % 2 != 0 && i != 1 &&
+          targets_a[batchIndex][i / 2] != targets_a[batchIndex][i / 2 - 1]) {
         x2 = alphas_a[prevIdxOffset][i - 2];
       }
       scalar_t result = 0.0;
@@ -105,7 +110,7 @@ void forced_align_impl(
         result = x0;
         backPtr_a[t][i] = 0;
       }
-      alphas_a[curIdxOffset][i] = result + logProbs_a[t][labelIdx];
+      alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     }
   }
   auto idx1 = (T - 1) % 2;
@@ -113,8 +118,8 @@ void forced_align_impl(
   // path stores the token index for each time step after force alignment.
   auto indexScores = 0;
   for (auto t = T - 1; t > -1; t--) {
-    auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[ltrIdx / 2];
-    paths_a[t] = lbl_idx;
+    auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
+    paths_a[batchIndex][t] = lbl_idx;
     ++indexScores;
     ltrIdx -= backPtr_a[t][ltrIdx];
   }
@@ -142,30 +147,35 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
   TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
   TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
   TORCH_CHECK(
-      logProbs.dim() != 3,
-      "3-D tensor is not yet supported for log_probs, please provide 2-D tensor.")
+      logProbs.dim() == 3,
+      "log_probs must be 3-D (batch_size, input length, num classes)");
   TORCH_CHECK(
-      targets.dim() != 2,
-      "2-D tensor is not yet supported for targets, please provide 1-D tensor.")
+      targets.dim() == 2, "targets must be 2-D (batch_size, target length,)");
   TORCH_CHECK(
-      logProbs.dim() == 2, "log_probs must be 2-D (input length, num classes)");
-  TORCH_CHECK(targets.dim() == 1, "targets must be 1-D (target length,)");
-  TORCH_CHECK(inputLengths.dim() == 0, "input_lengths must be 0-D");
-  TORCH_CHECK(targetLengths.dim() == 0, "target_lengths must be 0-D");
+      inputLengths.dim() == 1, "input_lengths must be 1-D (batch_size,)");
+  TORCH_CHECK(
+      targetLengths.dim() == 1, "target_lengths must be 1-D (batch_size,)");
+  TORCH_CHECK(
+      logProbs.size(0) == 1,
+      "The batch dimension for log_probs must be 1 at the current version.")
+  TORCH_CHECK(
+      targets.size(0) == 1,
+      "The batch dimension for targets must be 1 at the current version.")
   TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
 
   TORCH_CHECK(
-      logProbs.size(0) == at::max(inputLengths).item().toInt(),
+      logProbs.size(1) == at::max(inputLengths).item().toInt(),
       "input length mismatch");
   TORCH_CHECK(
-      targets.size(0) == at::max(targetLengths).item().toInt(),
+      targets.size(1) == at::max(targetLengths).item().toInt(),
       "target length mismatch");
 
-  const auto T = logProbs.size(0);
+  const auto B = logProbs.size(0);
+  const auto T = logProbs.size(1);
   auto paths = torch::zeros(
-      {T},
+      {B, T},
       torch::TensorOptions().device(targets.device()).dtype(targets.dtype()));
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       logProbs.scalar_type(), "forced_align_impl", [&] {
@@ -180,9 +190,10 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
   return std::make_tuple(
       paths,
       logProbs.index(
-          {torch::linspace(
+          {torch::indexing::Slice(),
+           torch::linspace(
                0, T - 1, T, torch::TensorOptions().dtype(paths.dtype())),
-           paths}));
+           paths.index({0})}));
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
