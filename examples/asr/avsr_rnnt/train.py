@@ -1,6 +1,5 @@
 import logging
 import os
-import pathlib
 from argparse import ArgumentParser
 
 import sentencepiece as spm
@@ -19,7 +18,7 @@ def get_trainer(args):
         monitor="monitoring_step",
         mode="max",
         save_last=True,
-        filename=f"{{epoch}}",
+        filename="{{epoch}}",
         save_top_k=10,
     )
     lr_monitor = LearningRateMonitor(logging_interval="step")

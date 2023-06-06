@@ -1,5 +1,6 @@
 from torchaudio.models.rnnt import emformer_rnnt_model
 
+
 # https://pytorch.org/audio/master/_modules/torchaudio/models/rnnt.html#emformer_rnnt_base
 def emformer_rnnt():
     return emformer_rnnt_model(
