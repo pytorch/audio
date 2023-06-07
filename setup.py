@@ -155,7 +155,10 @@ def _main():
         long_description=long_description,
         long_description_content_type="text/markdown",
         url="https://github.com/pytorch/audio",
-        author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
+        author=(
+            "Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, "
+            "Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang"
+        ),
         author_email="soumith@pytorch.org",
         maintainer="Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
         maintainer_email="moto@meta.com",

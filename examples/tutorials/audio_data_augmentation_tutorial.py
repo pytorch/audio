@@ -20,6 +20,8 @@ import torchaudio.functional as F
 print(torch.__version__)
 print(torchaudio.__version__)
 
+import matplotlib.pyplot as plt
+
 ######################################################################
 # Preparation
 # -----------
@@ -28,7 +30,6 @@ print(torchaudio.__version__)
 #
 
 from IPython.display import Audio
-import matplotlib.pyplot as plt
 
 from torchaudio.utils import download_asset
 
@@ -101,6 +102,7 @@ def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None):
     figure.suptitle(title)
     plt.show(block=False)
 
+
 ######################################################################
 #
 
@@ -121,6 +123,7 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
     plt.show(block=False)
+
 
 ######################################################################
 # Original
@@ -353,10 +356,12 @@ bg_added = F.add_noise(rir_applied, noise, snr_db)
 plot_specgram(bg_added, sample_rate, title="BG noise added")
 
 # Apply filtering and change sample rate
-effect = ",".join([
-    "lowpass=frequency=4000:poles=1",
-    "compand=attacks=0.02:decays=0.05:points=-60/-60|-30/-10|-20/-8|-5/-8|-2/-8:gain=-8:volume=-7:delay=0.05",
-])
+effect = ",".join(
+    [
+        "lowpass=frequency=4000:poles=1",
+        "compand=attacks=0.02:decays=0.05:points=-60/-60|-30/-10|-20/-8|-5/-8|-2/-8:gain=-8:volume=-7:delay=0.05",
+    ]
+)
 
 filtered = apply_effect(bg_added.T, sample_rate, effect)
 sample_rate2 = 8000
