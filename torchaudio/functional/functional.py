@@ -1339,6 +1339,9 @@ def apply_codec(
     return augmented
 
 
+_CPU = torch.device("cpu")
+
+
 def _get_sinc_resample_kernel(
     orig_freq: int,
     new_freq: int,
@@ -1347,7 +1350,7 @@ def _get_sinc_resample_kernel(
     rolloff: float = 0.99,
     resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
-    device: torch.device = torch.device("cpu"),
+    device: torch.device = _CPU,
     dtype: Optional[torch.dtype] = None,
 ):
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):

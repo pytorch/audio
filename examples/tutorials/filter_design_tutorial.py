@@ -27,14 +27,11 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
+import matplotlib.pyplot as plt
+
 ######################################################################
 #
-from torchaudio.prototype.functional import (
-    sinc_impulse_response,
-    frequency_impulse_response,
-)
-
-import matplotlib.pyplot as plt
+from torchaudio.prototype.functional import frequency_impulse_response, sinc_impulse_response
 
 ######################################################################
 #
@@ -75,7 +72,7 @@ import matplotlib.pyplot as plt
 # :py:func:`~torchaudio.prototype.functional.sinc_impulse_response`.
 #
 
-cutoff = torch.linspace(0., 1., 9)
+cutoff = torch.linspace(0.0, 1.0, 9)
 irs = sinc_impulse_response(cutoff, window_size=513)
 
 print("Cutoff shape:", cutoff.shape)
@@ -86,6 +83,7 @@ print("Impulse response shape:", irs.shape)
 #
 # Let's visualize the resulting impulse responses.
 #
+
 
 def plot_sinc_ir(irs, cutoff):
     num_filts, window_size = irs.shape
@@ -99,7 +97,8 @@ def plot_sinc_ir(irs, cutoff):
         ax.grid(True)
     fig.suptitle(
         "Impulse response of sinc low-pass filter for different cut-off frequencies\n"
-        "(Frequencies are relative to Nyquist frequency)")
+        "(Frequencies are relative to Nyquist frequency)"
+    )
     axes[-1].set_xticks([i * half // 4 for i in range(-4, 5)])
     plt.tight_layout()
 
@@ -126,12 +125,12 @@ frs = torch.fft.rfft(irs, n=2048, dim=1).abs()
 # Let's visualize the resulting frequency responses.
 #
 
+
 def plot_sinc_fr(frs, cutoff, band=False):
     num_filts, num_fft = frs.shape
     num_ticks = num_filts + 1 if band else num_filts
 
-    fig, axes = plt.subplots(
-        num_filts, 1, sharex=True, sharey=True, figsize=(6.4, 4.8 * 1.5))
+    fig, axes = plt.subplots(num_filts, 1, sharex=True, sharey=True, figsize=(6.4, 4.8 * 1.5))
     for ax, fr, coff, color in zip(axes, frs, cutoff, plt.cm.tab10.colors):
         ax.grid(True)
         ax.semilogy(fr, color=color, zorder=4, label=f"Cutoff: {coff}")
@@ -141,11 +140,12 @@ def plot_sinc_fr(frs, cutoff, band=False):
         yticks=[1e-9, 1e-6, 1e-3, 1],
         xticks=torch.linspace(0, num_fft, num_ticks),
         xticklabels=[f"{i/(num_ticks - 1)}" for i in range(num_ticks)],
-        xlabel="Frequency"
+        xlabel="Frequency",
     )
     fig.suptitle(
         "Frequency response of sinc low-pass filter for different cut-off frequencies\n"
-        "(Frequencies are relative to Nyquist frequency)")
+        "(Frequencies are relative to Nyquist frequency)"
+    )
     plt.tight_layout()
 
 
@@ -193,13 +193,11 @@ plot_sinc_fr(frs, cutoff)
 # Band-pass filter can be obtained by subtracting low-pass filter for
 # upper band from that of lower band.
 
-cutoff = torch.linspace(0., 1, 11)
+cutoff = torch.linspace(0.0, 1, 11)
 c_low = cutoff[:-1]
 c_high = cutoff[1:]
 
-irs = (
-    sinc_impulse_response(c_low, window_size=513)
-    - sinc_impulse_response(c_high, window_size=513))
+irs = sinc_impulse_response(c_low, window_size=513) - sinc_impulse_response(c_high, window_size=513)
 frs = torch.fft.rfft(irs, n=2048, dim=1).abs()
 
 ######################################################################
@@ -256,6 +254,7 @@ print("Impulse Response:", ir.shape)
 ######################################################################
 #
 
+
 def plot_ir(magnitudes, ir, num_fft=2048):
     fr = torch.fft.rfft(ir, n=num_fft, dim=0).abs()
     ir_size = ir.size(-1)
@@ -268,16 +267,17 @@ def plot_ir(magnitudes, ir, num_fft=2048):
     axes[0].set(title="Impulse Response")
     axes[0].set_xticks([i * half // 4 for i in range(-4, 5)])
     t = torch.linspace(0, 1, fr.numel())
-    axes[1].plot(t, fr, label='Actual')
-    axes[2].semilogy(t, fr, label='Actual')
+    axes[1].plot(t, fr, label="Actual")
+    axes[2].semilogy(t, fr, label="Actual")
     t = torch.linspace(0, 1, magnitudes.numel())
     for i in range(1, 3):
-        axes[i].plot(t, magnitudes, label='Desired (input)', linewidth=1.1, linestyle='--')
+        axes[i].plot(t, magnitudes, label="Desired (input)", linewidth=1.1, linestyle="--")
         axes[i].grid(True)
     axes[1].set(title="Frequency Response")
     axes[2].set(title="Frequency Response (log-scale)", xlabel="Frequency")
     axes[2].legend(loc="lower right")
     fig.tight_layout()
+
 
 ######################################################################
 #
@@ -305,7 +305,7 @@ plot_ir(magnitudes, ir)
 #
 #
 
-magnitudes = torch.linspace(0, 1, 64)**4.0
+magnitudes = torch.linspace(0, 1, 64) ** 4.0
 ir = frequency_impulse_response(magnitudes)
 
 
@@ -316,7 +316,7 @@ plot_ir(magnitudes, ir)
 
 ######################################################################
 #
-magnitudes = torch.sin(torch.linspace(0, 10, 64))**4.0
+magnitudes = torch.sin(torch.linspace(0, 10, 64)) ** 4.0
 ir = frequency_impulse_response(magnitudes)
 
 

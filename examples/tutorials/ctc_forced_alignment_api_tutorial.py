@@ -10,7 +10,7 @@ This tutorial shows how to align transcripts to speech with
 `“Scaling Speech Technology to 1,000+
 Languages” <https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__,
 and two advanced usages, i.e. dealing with non-English data and
-transcription errors. 
+transcription errors.
 
 Though there’s some overlap in visualization
 diagrams, the scope here is different from the `“Forced Alignment with
@@ -39,13 +39,9 @@ except ModuleNotFoundError:
         "Failed to import the forced alignment API. "
         "Please install torchaudio nightly builds. "
         "Please refer to https://pytorch.org/get-started/locally "
-        "for instructions to install a nightly build.")
+        "for instructions to install a nightly build."
+    )
     raise
-
-import matplotlib
-import matplotlib.pyplot as plt
-from IPython.display import Audio
-
 
 ######################################################################
 # I. Basic usages
@@ -71,7 +67,10 @@ from IPython.display import Audio
 
 # %matplotlib inline
 from dataclasses import dataclass
+
 import IPython
+import matplotlib
+import matplotlib.pyplot as plt
 
 matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -193,8 +192,6 @@ plt.show()
 # token-level and word-level alignments easily.
 #
 
-import torchaudio.functional as F
-
 
 @dataclass
 class Frame:
@@ -214,7 +211,7 @@ def compute_alignments(transcript, dictionary, emission):
     target_lengths = torch.tensor(targets.shape[0])
 
     # This is the key step, where we call the forced alignment API functional.forced_align to compute alignments.
-    frame_alignment, frame_scores = F.forced_align(emission, targets, input_lengths, target_lengths, 0)
+    frame_alignment, frame_scores = forced_align(emission, targets, input_lengths, target_lengths, 0)
 
     assert len(frame_alignment) == input_lengths.item()
     assert len(targets) == target_lengths.item()
@@ -279,8 +276,6 @@ def merge_repeats(frames, transcript):
         while i2 < len(frames) and frames[i1].token_index == frames[i2].token_index:
             i2 += 1
         score = sum(frames[k].score for k in range(i1, i2)) / (i2 - i1)
-        tokens = [dictionary[c] if c in dictionary else dictionary['@'] for c in transcript.replace(" ", "")]
-
         segments.append(
             Segment(
                 transcript_nospace[frames[i1].token_index],
@@ -370,7 +365,7 @@ def merge_words(transcript, segments, separator=" "):
                     s = len(words)
                 else:
                     s = 0
-                segs = segments[i1 + s:i2 + s]
+                segs = segments[i1 + s : i2 + s]
                 word = "".join([seg.label for seg in segs])
                 score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
                 words.append(Segment(word, segments[i1 + s].start, segments[i2 + s - 1].end, score))
@@ -380,6 +375,7 @@ def merge_words(transcript, segments, separator=" "):
         i3 += 1
     return words
 
+
 word_segments = merge_words(transcript, segments, "|")
 
 
@@ -388,9 +384,10 @@ word_segments = merge_words(transcript, segments, "|")
 # ^^^^^^^^^^^^^
 #
 
+
 def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
     fig, ax2 = plt.subplots(figsize=(64, 12))
-    plt.rcParams.update({'font.size': 30})
+    plt.rcParams.update({"font.size": 30})
 
     # The original waveform
     ratio = waveform.size(0) / input_lengths
@@ -412,6 +409,7 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
     plt.xticks(xticks, xticks / sample_rate, fontsize=50)
     ax2.set_xlabel("time [second]", fontsize=40)
     ax2.set_yticks([])
+
 
 plot_alignments(
     segments,
@@ -436,6 +434,7 @@ def display_segment(i, waveform, word_segments, frame_alignment):
     print(f"{word.label} ({word.score:.2f}): {x0 / sample_rate:.3f} - {x1 / sample_rate:.3f} sec")
     segment = waveform[:, x0:x1]
     return IPython.display.Audio(segment.numpy(), rate=sample_rate)
+
 
 # Generate the audio for each segment
 print(transcript)
@@ -532,7 +531,9 @@ model = wav2vec2_model(
     aux_num_out=31,
 )
 
-torch.hub.download_url_to_file("https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt")
+torch.hub.download_url_to_file(
+    "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt"
+)
 checkpoint = torch.load("model.pt", map_location="cpu")
 
 model.load_state_dict(checkpoint)
@@ -555,6 +556,7 @@ def get_emission(waveform):
     emissions = torch.cat((emissions, extra_dim), 2)
     emission = emissions[0].cpu().detach()
     return emission, waveform
+
 
 emission, waveform = get_emission(waveform)
 
@@ -602,14 +604,10 @@ def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
     frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
     segments = merge_repeats(frames, transcript)
     word_segments = merge_words(transcript, segments)
-    plot_alignments(
-        segments,
-        word_segments,
-        waveform[0],
-        emission.shape[0]
-    )
+    plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
     plt.show()
     return word_segments, frame_alignment
+
 
 # One can follow the following steps to download the uroman romanizer and use it to obtain normalized transcripts.
 # def normalize_uroman(text):
@@ -622,14 +620,16 @@ def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
 # echo 'aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid' > test.txt"
 # git clone https://github.com/isi-nlp/uroman
 # uroman/bin/uroman.pl < test.txt > test_romanized.txt
-# 
+#
 # file = "test_romanized.txt"
 # f = open(file, "r")
 # lines = f.readlines()
 # text_normalized = normalize_uroman(lines[0].strip())
 
 
-text_normalized = "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
+text_normalized = (
+    "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
+)
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/10349_8674_000087.flac")
 waveform, _ = torchaudio.load(SPEECH_FILE)
 

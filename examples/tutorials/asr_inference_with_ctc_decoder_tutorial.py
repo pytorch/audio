@@ -207,6 +207,7 @@ from torchaudio.models.decoder import CTCDecoderLM, CTCDecoderLMState
 
 class CustomLM(CTCDecoderLM):
     """Create a Python wrapper around `language_model` to feed to the decoder."""
+
     def __init__(self, language_model: torch.nn.Module):
         CTCDecoderLM.__init__(self)
         self.language_model = language_model
