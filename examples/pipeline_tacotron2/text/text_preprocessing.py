@@ -70,8 +70,8 @@ symbols = [_pad] + list(_special) + list(_punctuation) + list(_letters)
 _phonemizer = None
 
 
-available_symbol_set = set(["english_characters", "english_phonemes"])
-available_phonemizers = set(["DeepPhonemizer"])
+available_symbol_set = {"english_characters", "english_phonemes"}
+available_phonemizers = {"DeepPhonemizer"}
 
 
 def get_symbol_list(symbol_list: str = "english_characters", cmudict_root: Optional[str] = "./") -> List[str]:

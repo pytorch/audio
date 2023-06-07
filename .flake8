@@ -1,4 +1,12 @@
 [flake8]
+# Note: it's recommended to use `pre-commit run -a flake8`
+
 max-line-length = 120
-ignore = E203,E305,E402,E721,E741,F405,W503,W504,F999
-exclude = build,docs/source,_ext,third_party,examples/tutorials
+ignore = E203,E402,E741,W503
+
+# Note: exclude is not honnored when flake8 is executed from pre-commit.
+# pre-commit has a separate config
+exclude = build,docs/src,third_party
+
+per-file-ignores =
+  examples/tutorials/*.py: E501

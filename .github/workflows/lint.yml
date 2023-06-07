@@ -18,20 +18,20 @@ jobs:
         set -euo pipefail
 
         echo '::group::Setup environment'
-        CONDA_PATH=$(which conda)
-        eval "$(${CONDA_PATH} shell.bash hook)"
-        conda create --name ci --quiet --yes python=3.8 pip
-        conda activate ci
-        echo '::endgroup::'
-        
-        echo '::group::Install lint tools'
-        pip install --upgrade pip
+        eval "$("$(which conda)" shell.bash hook)"
         pip install --progress-bar=off pre-commit
+        echo '::endgroup::'
+
         set +e
-        pre-commit run --all-files
-        
-        if [ $? -ne 0 ]; then
-          git --no-pager diff
-          exit 1
+        pre-commit run --all-files --show-diff-on-failure
+        status=$?
+
+        echo '::group::Add Summry'
+        if [ $status -ne 0 ]; then
+          echo '### Lint failure'  >> $GITHUB_STEP_SUMMARY
+          echo '```diff'           >> $GITHUB_STEP_SUMMARY
+          git --no-pager diff      >> $GITHUB_STEP_SUMMARY
+          echo '```'               >> $GITHUB_STEP_SUMMARY
         fi
         echo '::endgroup::'
+        exit $status

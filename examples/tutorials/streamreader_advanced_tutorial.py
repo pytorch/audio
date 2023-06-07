@@ -27,7 +27,7 @@ try:
     from torchaudio.io import StreamReader
 except ModuleNotFoundError:
     try:
-        import google.colab
+        import google.colab  # noqa
 
         print(
             """
@@ -117,8 +117,12 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #    ... )
 #    >>> for i in range(streamer.num_src_streams):
 #    ...     print(streamer.get_src_stream_info(i))
-#    SourceVideoStream(media_type='video', codec='rawvideo', codec_long_name='raw video', format='bgr0', bit_rate=0, width=640, height=480, frame_rate=30.0)
-#    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=3072000, sample_rate=48000.0, num_channels=2)
+#    SourceVideoStream(media_type='video', codec='rawvideo', \
+#    codec_long_name='raw video', format='bgr0', bit_rate=0, \
+#    width=640, height=480, frame_rate=30.0)
+#    SourceAudioStream(media_type='audio', codec='pcm_f32le', \
+#    codec_long_name='PCM 32-bit floating point little-endian', \
+#    format='flt', bit_rate=3072000, sample_rate=48000.0, num_channels=2)
 #
 
 ######################################################################

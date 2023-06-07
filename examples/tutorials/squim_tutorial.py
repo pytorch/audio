@@ -82,7 +82,7 @@ try:
     from pystoi import stoi
     from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 except ImportError:
-    import google.colab
+    import google.colab  # noqa: F401
 
     print(
         """
