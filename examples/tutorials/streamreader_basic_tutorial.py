@@ -72,7 +72,7 @@ try:
     from torchaudio.io import StreamReader
 except ModuleNotFoundError:
     try:
-        import google.colab
+        import google.colab  # noqa
 
         print(
             """

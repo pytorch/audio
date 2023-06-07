@@ -60,10 +60,7 @@ try:
     for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
         print(k, v)
 except Exception:
-    raise RuntimeError(
-        "This tutorial requires FFmpeg libraries 4.2>,<5. "
-        "Please install FFmpeg."
-    )
+    raise RuntimeError("This tutorial requires FFmpeg libraries 4.2>,<5. " "Please install FFmpeg.")
 
 ######################################################################
 # Usage
@@ -199,29 +196,26 @@ show(effect=("chorus=0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3"))
 # fft filter
 # ~~~~~~~~~~
 # https://ffmpeg.org/ffmpeg-filters.html#afftfilt
-show(effect=(
-    "afftfilt="
-    "real='re * (1-clip(b * (b/nb), 0, 1))':"
-    "imag='im * (1-clip(b * (b/nb), 0, 1))'"))
+show(effect=("afftfilt=" "real='re * (1-clip(b * (b/nb), 0, 1))':" "imag='im * (1-clip(b * (b/nb), 0, 1))'"))
 
 ######################################################################
 #
-show(effect=(
-    "afftfilt="
-    "real='hypot(re,im) * sin(0)':"
-    "imag='hypot(re,im) * cos(0)':"
-    "win_size=512:"
-    "overlap=0.75"))
+show(
+    effect=("afftfilt=" "real='hypot(re,im) * sin(0)':" "imag='hypot(re,im) * cos(0)':" "win_size=512:" "overlap=0.75")
+)
 
 
 ######################################################################
 #
-show(effect=(
-    "afftfilt="
-    "real='hypot(re,im) * cos(2 * 3.14 * (random(0) * 2-1))':"
-    "imag='hypot(re,im) * sin(2 * 3.14 * (random(1) * 2-1))':"
-    "win_size=128:"
-    "overlap=0.8"))
+show(
+    effect=(
+        "afftfilt="
+        "real='hypot(re,im) * cos(2 * 3.14 * (random(0) * 2-1))':"
+        "imag='hypot(re,im) * sin(2 * 3.14 * (random(1) * 2-1))':"
+        "win_size=128:"
+        "overlap=0.8"
+    )
+)
 
 ######################################################################
 # vibrato
@@ -292,11 +286,13 @@ def show_multi(configs):
 # ~~~
 #
 
-results = show_multi([
-    {"format": "ogg"},
-    {"format": "ogg", "encoder": "vorbis"},
-    {"format": "ogg", "encoder": "opus"},
-])
+results = show_multi(
+    [
+        {"format": "ogg"},
+        {"format": "ogg", "encoder": "vorbis"},
+        {"format": "ogg", "encoder": "opus"},
+    ]
+)
 
 ######################################################################
 # ogg - default encoder (flac)
@@ -321,15 +317,17 @@ results[2]
 # ~~~
 # https://trac.ffmpeg.org/wiki/Encode/MP3
 
-results = show_multi([
-    {"format": "mp3"},
-    {"format": "mp3", "codec_config": CodecConfig(compression_level=1)},
-    {"format": "mp3", "codec_config": CodecConfig(compression_level=9)},
-    {"format": "mp3", "codec_config": CodecConfig(bit_rate=192_000)},
-    {"format": "mp3", "codec_config": CodecConfig(bit_rate=8_000)},
-    {"format": "mp3", "codec_config": CodecConfig(qscale=9)},
-    {"format": "mp3", "codec_config": CodecConfig(qscale=1)},
-])
+results = show_multi(
+    [
+        {"format": "mp3"},
+        {"format": "mp3", "codec_config": CodecConfig(compression_level=1)},
+        {"format": "mp3", "codec_config": CodecConfig(compression_level=9)},
+        {"format": "mp3", "codec_config": CodecConfig(bit_rate=192_000)},
+        {"format": "mp3", "codec_config": CodecConfig(bit_rate=8_000)},
+        {"format": "mp3", "codec_config": CodecConfig(qscale=9)},
+        {"format": "mp3", "codec_config": CodecConfig(qscale=1)},
+    ]
+)
 
 ######################################################################
 # default

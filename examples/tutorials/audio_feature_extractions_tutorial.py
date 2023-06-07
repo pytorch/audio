@@ -25,6 +25,9 @@ import torchaudio.transforms as T
 print(torch.__version__)
 print(torchaudio.__version__)
 
+import librosa
+import matplotlib.pyplot as plt
+
 ######################################################################
 # Preparation
 # -----------
@@ -38,8 +41,6 @@ print(torchaudio.__version__)
 #       !pip install librosa
 #
 from IPython.display import Audio
-import librosa
-import matplotlib.pyplot as plt
 from torchaudio.utils import download_asset
 
 torch.random.manual_seed(0)
@@ -387,6 +388,7 @@ pitch = F.detect_pitch_frequency(SPEECH_WAVEFORM, SAMPLE_RATE)
 
 ######################################################################
 #
+
 
 def plot_pitch(waveform, sr, pitch):
     figure, axis = plt.subplots(1, 1)
