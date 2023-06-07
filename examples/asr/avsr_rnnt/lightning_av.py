@@ -1,5 +1,4 @@
 import itertools
-import logging
 import math
 
 from collections import namedtuple

@@ -1,32 +1,22 @@
-import io
 import itertools
-import tarfile
 
 import torch
-import torchaudio
 from parameterized import parameterized
-from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import sox_io_backend
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     get_wav_data,
-    HttpServerMixin,
     load_wav,
     nested_params,
     PytorchTestCase,
     save_wav,
     skipIfNoExec,
-    skipIfNoModule,
     skipIfNoSox,
     sox_utils,
     TempDirMixin,
 )
 
 from .common import name_func
-
-
-if _mod_utils.is_module_available("requests"):
-    import requests
 
 
 class LoadTestBase(TempDirMixin, PytorchTestCase):

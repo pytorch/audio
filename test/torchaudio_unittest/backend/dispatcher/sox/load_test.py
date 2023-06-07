@@ -2,7 +2,6 @@ import itertools
 from functools import partial
 
 import torch
-import torchaudio
 from parameterized import parameterized
 from torchaudio._backend.utils import get_load_func
 from torchaudio_unittest.common_utils import (
