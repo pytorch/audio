@@ -30,9 +30,11 @@ jobs:
           - repository: pytorch/audio
             pre-script: packaging/ffmpeg/build.bat
             env-script: packaging/vc_env_helper.bat
+            cache-path: /third_party/ffmpeg
+            cache-key: windows-ffmpeg
             wheel-build-params: "--plat-name win_amd64"
             post-script: ""
-            smoke-test-script: "test/smoke_test/smoke_test.py"
+            smoke-test-script: test/smoke_test/smoke_test.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
     uses: pytorch/test-infra/.github/workflows/build_wheels_windows.yml@main
