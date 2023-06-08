@@ -1110,65 +1110,100 @@ class CuvidHWAccelInterfaceTest(TorchaudioTestCase):
 
 @_media_source
 class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
-    @skipIfNoHWAccel("h264_cuvid")
-    def test_h264_cuvid(self):
-        """GPU decoder works for H264"""
-        src = self.get_src(get_asset_path("nasa_13013.mp4"))
+    def _test_decode(
+        self,
+        decoder: str,
+        src_path: str,
+        height: int,
+        width: int,
+        ref_num_frames: int,
+        hw_accel=None,
+        decoder_option=None,
+        dtype: torch.dtype = torch.uint8,
+    ):
+        src = self.get_src(get_asset_path(src_path))
         r = StreamReader(src)
-        r.add_video_stream(10, decoder="h264_cuvid")
+        r.add_video_stream(10, decoder=decoder, decoder_option=decoder_option, hw_accel=hw_accel)
 
         num_frames = 0
         for (chunk,) in r.stream():
-            self.assertEqual(chunk.device, torch.device("cpu"))
-            self.assertEqual(chunk.dtype, torch.uint8)
-            self.assertEqual(chunk.shape, torch.Size([10, 3, 270, 480]))
+            self.assertEqual(chunk.device, torch.device(hw_accel or "cpu"))
+            self.assertEqual(chunk.dtype, dtype)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, height, width]))
             num_frames += chunk.size(0)
-        assert num_frames == 390
+        assert num_frames == ref_num_frames
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid(self):
+        """GPU decoder works for H264"""
+        self._test_decode("h264_cuvid", "nasa_13013.mp4", 270, 480, 390)
 
     @skipIfNoHWAccel("h264_cuvid")
     def test_h264_cuvid_hw_accel(self):
         """GPU decoder works for H264 with HW acceleration, and put the frames on CUDA tensor"""
-        src = self.get_src(get_asset_path("nasa_13013.mp4"))
-        r = StreamReader(src)
-        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda")
+        self._test_decode("h264_cuvid", "nasa_13013.mp4", 270, 480, 390, hw_accel="cuda:0")
 
-        num_frames = 0
-        for (chunk,) in r.stream():
-            self.assertEqual(chunk.device, torch.device("cuda:0"))
-            self.assertEqual(chunk.dtype, torch.uint8)
-            self.assertEqual(chunk.shape, torch.Size([10, 3, 270, 480]))
-            num_frames += chunk.size(0)
-        assert num_frames == 390
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid_hw_accel_resize(self):
+        """GPU decoder works for H264 with HW acceleration and resize option"""
+        w, h = 240, 136
+        self._test_decode(
+            "h264_cuvid", "nasa_13013.mp4", h, w, 390, hw_accel="cuda:0", decoder_option={"resize": f"{w}x{h}"}
+        )
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid_hw_accel_crop(self):
+        """GPU decoder works for H264 with HW acceleration and crop option"""
+        top, bottom, left, right = 3, 5, 7, 9
+        self._test_decode(
+            "h264_cuvid",
+            "nasa_13013.mp4",
+            262,
+            464,
+            390,
+            hw_accel="cuda:0",
+            decoder_option={"crop": f"{top}x{bottom}x{left}x{right}"},
+        )
 
     @skipIfNoHWAccel("hevc_cuvid")
     def test_hevc_cuvid(self):
         """GPU decoder works for H265/HEVC"""
-        src = self.get_src(get_asset_path("testsrc.hevc"))
-        r = StreamReader(src)
-        r.add_video_stream(10, decoder="hevc_cuvid")
-
-        num_frames = 0
-        for (chunk,) in r.stream():
-            self.assertEqual(chunk.device, torch.device("cpu"))
-            self.assertEqual(chunk.dtype, torch.uint8)
-            self.assertEqual(chunk.shape, torch.Size([10, 3, 144, 256]))
-            num_frames += chunk.size(0)
-        assert num_frames == 300
+        self._test_decode("hevc_cuvid", "testsrc.hevc", 144, 256, 300)
 
     @skipIfNoHWAccel("hevc_cuvid")
     def test_hevc_cuvid_hw_accel(self):
         """GPU decoder works for H265/HEVC with HW acceleration, and put the frames on CUDA tensor"""
-        src = self.get_src(get_asset_path("testsrc.hevc"))
-        r = StreamReader(src)
-        r.add_video_stream(10, decoder="hevc_cuvid", hw_accel="cuda")
+        self._test_decode("hevc_cuvid", "testsrc.hevc", 144, 256, 300, hw_accel="cuda:0", dtype=torch.int16)
 
-        num_frames = 0
-        for (chunk,) in r.stream():
-            self.assertEqual(chunk.device, torch.device("cuda:0"))
-            self.assertEqual(chunk.dtype, torch.int16)
-            self.assertEqual(chunk.shape, torch.Size([10, 3, 144, 256]))
-            num_frames += chunk.size(0)
-        assert num_frames == 300
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid_hw_accel_resize(self):
+        """GPU decoder works for H265/HEVC with HW acceleration and resize option"""
+        w, h = 128, 64
+        self._test_decode(
+            "hevc_cuvid",
+            "testsrc.hevc",
+            h,
+            w,
+            300,
+            hw_accel="cuda:0",
+            dtype=torch.int16,
+            decoder_option={"resize": f"{w}x{h}"},
+        )
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid_hw_accel_crop(self):
+        """GPU decoder works for H265/HEVC with HW acceleration and crop option"""
+        top, bottom, left, right = 3, 5, 7, 9
+        self._test_decode(
+            "hevc_cuvid",
+            "testsrc.hevc",
+            136,
+            240,
+            300,
+            hw_accel="cuda:0",
+            dtype=torch.int16,
+            decoder_option={"crop": f"{top}x{bottom}x{left}x{right}"},
+        )
 
 
 @skipIfNoHWAccel("h264_cuvid")

@@ -399,15 +399,14 @@ torch::Tensor NV12Converter::convert(const AVFrame* src) {
 
 #ifdef USE_CUDA
 
+CudaImageConverterBase::CudaImageConverterBase(const torch::Device& device)
+    : device(device) {}
+
 ////////////////////////////////////////////////////////////////////////////////
 // NV12 CUDA
 ////////////////////////////////////////////////////////////////////////////////
-NV12CudaConverter::NV12CudaConverter(int h, int w, const torch::Device& device)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer(
-          {1, height / 2, width / 2, 2},
-          device,
-          torch::kUInt8)) {
+NV12CudaConverter::NV12CudaConverter(const torch::Device& device)
+    : CudaImageConverterBase(device) {
   TORCH_WARN_ONCE(
       "The output format NV12 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -470,8 +469,16 @@ void NV12CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
 }
 
 torch::Tensor NV12CudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer =
-      get_image_buffer({1, num_channels, height, width}, tmp_uv.device());
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  if (!init) {
+    height = src->height;
+    width = src->width;
+    tmp_uv =
+        get_image_buffer({1, height / 2, width / 2, 2}, device, torch::kUInt8);
+    init = true;
+  }
+
+  torch::Tensor buffer = get_image_buffer({1, 3, height, width}, device);
   convert(src, buffer);
   return buffer;
 }
@@ -479,12 +486,8 @@ torch::Tensor NV12CudaConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 // P010 CUDA
 ////////////////////////////////////////////////////////////////////////////////
-P010CudaConverter::P010CudaConverter(int h, int w, const torch::Device& device)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer(
-          {1, height / 2, width / 2, 2},
-          device,
-          torch::kInt16)) {
+P010CudaConverter::P010CudaConverter(const torch::Device& device)
+    : CudaImageConverterBase{device} {
   TORCH_WARN_ONCE(
       "The output format P010 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -551,8 +554,17 @@ void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
 }
 
 torch::Tensor P010CudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer = get_image_buffer(
-      {1, num_channels, height, width}, tmp_uv.device(), torch::kInt16);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  if (!init) {
+    height = src->height;
+    width = src->width;
+    tmp_uv =
+        get_image_buffer({1, height / 2, width / 2, 2}, device, torch::kInt16);
+    init = true;
+  }
+
+  torch::Tensor buffer =
+      get_image_buffer({1, 3, height, width}, device, torch::kInt16);
   convert(src, buffer);
   return buffer;
 }
@@ -560,11 +572,8 @@ torch::Tensor P010CudaConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 // YUV444P CUDA
 ////////////////////////////////////////////////////////////////////////////////
-YUV444PCudaConverter::YUV444PCudaConverter(
-    int h,
-    int w,
-    const torch::Device& device)
-    : ImageConverterBase(h, w, 3), device(device) {}
+YUV444PCudaConverter::YUV444PCudaConverter(const torch::Device& device)
+    : CudaImageConverterBase(device) {}
 
 void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
@@ -589,7 +598,7 @@ void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
       FFMPEG av_get_pix_fmt_name(sw_fmt));
 
   // Write Y plane directly
-  for (int i = 0; i < num_channels; ++i) {
+  for (int i = 0; i < 3; ++i) {
     auto status = cudaMemcpy2D(
         dst.index({0, i}).data_ptr(),
         width,
@@ -604,8 +613,13 @@ void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
 }
 
 torch::Tensor YUV444PCudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer =
-      get_image_buffer({1, num_channels, height, width}, device);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  if (!init) {
+    height = src->height;
+    width = src->width;
+    init = true;
+  }
+  torch::Tensor buffer = get_image_buffer({1, 3, height, width}, device);
   convert(src, buffer);
   return buffer;
 }
