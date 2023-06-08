@@ -32,9 +32,12 @@ jobs:
       matrix:
         include:
           - repository: pytorch/audio
+            cache-path: /third_party/ffmpeg
+            cache-key: linux-ffmpeg
             pre-script: packaging/pre_build_script.sh
             post-script: packaging/post_build_script.sh
             smoke-test-script: test/smoke_test/smoke_test.py
+            conda-package-directory: packaging/torchaudio
             package-name: torchaudio
     name: ${{ matrix.repository }}
     uses: pytorch/test-infra/.github/workflows/build_conda_linux.yml@main

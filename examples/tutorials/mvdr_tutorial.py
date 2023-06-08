@@ -37,6 +37,10 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 
+import matplotlib.pyplot as plt
+import mir_eval
+from IPython.display import Audio
+
 ######################################################################
 # 2. Preparation
 # --------------
@@ -59,10 +63,6 @@ print(torchaudio.__version__)
 
 from pesq import pesq
 from pystoi import stoi
-import mir_eval
-
-import matplotlib.pyplot as plt
-from IPython.display import Audio
 from torchaudio.utils import download_asset
 
 ######################################################################

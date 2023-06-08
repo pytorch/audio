@@ -76,8 +76,9 @@ def _main():
         conf = cfg["model"]
         del conf["w2v_path"]
         keep = ["_name", "task", "model"]
-        for key in list(k for k in conf["w2v_args"] if k not in keep):
-            del conf["w2v_args"][key]
+        for key in conf["w2v_args"]:
+            if key not in keep:
+                del conf["w2v_args"][key]
         conf["data"] = "/foo/bar/"
         conf["w2v_args"]["task"]["data"] = "/foo/bar"
         conf["w2v_args"]["task"]["labels"] = []
