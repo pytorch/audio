@@ -4,10 +4,15 @@ torchaudio.prototype.functional
 .. py:module:: torchaudio.prototype.functional
 .. currentmodule:: torchaudio.prototype.functional
 
-barkscale_fbanks
-~~~~~~~~~~~~~~~~
+Utility
+~~~~~~~
 
-.. autofunction:: barkscale_fbanks
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   barkscale_fbanks
+   chroma_filterbank
 
 DSP
 ~~~
