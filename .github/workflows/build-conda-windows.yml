@@ -28,12 +28,13 @@ jobs:
       matrix:
         include:
           - repository: pytorch/audio
+            cache-path: /third_party/ffmpeg
+            cache-key: windows-ffmpeg
             pre-script: packaging/ffmpeg/build.bat
-            wheel-build-params: "--plat-name win_amd64"
             post-script: ""
-            package-name: torchaudio
-            conda-package-directory: packaging/torchaudio
             smoke-test-script: test/smoke_test/smoke_test.py
+            conda-package-directory: packaging/torchaudio
+            package-name: torchaudio
     name: ${{ matrix.repository }}
     uses: pytorch/test-infra/.github/workflows/build_conda_windows.yml@main
     with:

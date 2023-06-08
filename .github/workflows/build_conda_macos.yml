@@ -32,8 +32,11 @@ jobs:
       matrix:
         include:
           - repository: pytorch/audio
+            cache-path: /third_party/ffmpeg
+            cache-key: macos-ffmpeg
             pre-script: packaging/pre_build_script.sh
             post-script: packaging/post_build_script.sh
+            conda-package-directory: packaging/torchaudio
             smoke-test-script: test/smoke_test/smoke_test.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
