@@ -53,5 +53,7 @@ jobs:
       package-name: ${{ matrix.package-name }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
       trigger-event: ${{ github.event_name }}
+      cache-path: ${{ matrix.cache-path }}
+      cache-key: ${{ matrix.cache-key }}
     secrets:
       CONDA_PYTORCHBOT_TOKEN: ${{ secrets.CONDA_PYTORCHBOT_TOKEN }}
