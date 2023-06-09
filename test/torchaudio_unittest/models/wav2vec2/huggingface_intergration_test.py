@@ -1,4 +1,5 @@
 import json
+import unittest
 
 import torch
 from parameterized import parameterized
@@ -87,6 +88,7 @@ WAVLM_CONFIGS = parameterized.expand(
 )
 
 
+@unittest.skip("transformers v4.30 seems to break the weight format. See https://github.com/pytorch/audio/issues/3430")
 @skipIfNoModule("transformers")
 class TestHFIntegration(TorchaudioTestCase):
     """Test the process of importing the models from Hugging Face Transformers
