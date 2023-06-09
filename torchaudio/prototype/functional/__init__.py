@@ -8,13 +8,14 @@ from ._dsp import (
     sinc_impulse_response,
 )
 from ._rir import simulate_rir_ism
-from .functional import barkscale_fbanks
+from .functional import barkscale_fbanks, chroma_filterbank
 
 
 __all__ = [
     "adsr_envelope",
     "exp_sigmoid",
     "barkscale_fbanks",
+    "chroma_filterbank",
     "extend_pitch",
     "filter_waveform",
     "frequency_impulse_response",

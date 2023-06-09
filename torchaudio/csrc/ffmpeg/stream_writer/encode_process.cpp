@@ -682,7 +682,12 @@ FilterGraph get_video_filter_graph(
 
   FilterGraph f;
   f.add_video_src(
-      src_fmt, av_inv_q(src_rate), src_rate, src_width, src_height, {1, 1});
+      is_cuda ? AV_PIX_FMT_CUDA : src_fmt,
+      av_inv_q(src_rate),
+      src_rate,
+      src_width,
+      src_height,
+      {1, 1});
   f.add_video_sink();
   f.add_process(desc);
   f.create_filter();
