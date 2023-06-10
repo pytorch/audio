@@ -1,5 +1,5 @@
 #pragma once
-#include <torch/torch.h>
+#include <torch/types.h>
 
 namespace torchaudio {
 bool is_rir_available();

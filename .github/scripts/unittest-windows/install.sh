@@ -82,7 +82,6 @@ esac
         pytest-cov \
         pytorch-lightning \
         'scipy==1.7.3' \
-        transformers \
         unidecode \
         'protobuf<4.21.0' \
         demucs \
