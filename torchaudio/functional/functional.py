@@ -1305,7 +1305,7 @@ def apply_codec(
 
     .. devices:: CPU
 
-    .. warnings::
+    .. warning::
 
        This function has been deprecated.
        Please migrate to :py:class:`torchaudio.io.AudioEffector`, which works on all platforms,
