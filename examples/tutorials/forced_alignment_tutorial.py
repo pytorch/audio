@@ -9,6 +9,17 @@ This tutorial shows how to align transcript to speech with
 `CTC-Segmentation of Large Corpora for German End-to-end Speech
 Recognition <https://arxiv.org/abs/2007.09127>`__.
 
+.. note::
+
+   The implementation in this tutorial is simplified for
+   educational purpose.
+
+   If you are looking to align your corpus, we recommend to use
+   :py:func:`torchaudio.functional.forced_align`, which is more
+   accurate and faster.
+
+   Please refer to `this tutorial <./ctc_forced_alignment_api_tutorial.html>`__
+   for the detail of :py:func:`~torchaudio.functional.forced_align`.
 """
 
 import torch
@@ -261,7 +272,7 @@ def plot_trellis_with_path(trellis, path):
     # To plot trellis with path, we take advantage of 'nan' value
     trellis_with_path = trellis.clone()
     for _, p in enumerate(path):
-        trellis_with_path[p.time_index, p.token_index] = float("nan")
+        trellis_with_path[p.time_index + 1, p.token_index + 1] = float("nan")
     plt.imshow(trellis_with_path[1:, 1:].T, origin="lower")
 
 
@@ -330,13 +341,13 @@ def plot_trellis_with_segments(trellis, segments, transcript):
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
     ax1.set_title("Path, label and probability for each label")
-    ax1.imshow(trellis_with_path.T, origin="lower")
+    ax1.imshow(trellis_with_path[1:, 1:].T, origin="lower")
     ax1.set_xticks([])
 
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            ax1.annotate(seg.label, (seg.start + 0.7, i + 0.3), weight="bold")
-            ax1.annotate(f"{seg.score:.2f}", (seg.start - 0.3, i + 4.3))
+            ax1.annotate(seg.label, (seg.start - 0.3, i - 0.7), weight="bold")
+            ax1.annotate(f"{seg.score:.2f}", (seg.start - 1.3, i + 3.3))
 
     ax2.set_title("Label probability with and without repetation")
     xs, hs, ws = [], [], []
@@ -452,6 +463,8 @@ plt.show()
 
 
 ################################################################################
+# Audio Samples
+# -------------
 #
 
 # A trick to embed the resulting audio to the generated file.
