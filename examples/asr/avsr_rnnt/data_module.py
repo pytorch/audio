@@ -1,8 +1,6 @@
-import os
 import random
 
 import torch
-import torchaudio
 
 from lrs3 import LRS3
 from pytorch_lightning import LightningDataModule

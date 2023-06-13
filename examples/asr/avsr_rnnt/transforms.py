@@ -1,12 +1,8 @@
-import json
-import math
 import random
-from functools import partial
 from typing import List
 
 import sentencepiece as spm
 import torch
-import torchaudio
 import torchvision
 from data_module import LRS3DataModule
 from lightning import Batch

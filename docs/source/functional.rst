@@ -80,7 +80,6 @@ Feature Extractions
    compute_deltas
    detect_pitch_frequency
    sliding_window_cmn
-   compute_kaldi_pitch
    spectral_centroid
 
 Multi-channel

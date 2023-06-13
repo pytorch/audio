@@ -1,26 +1,23 @@
 #!/usr/bin/env bash
 
+# NOTE
+# Currently Linux GPU code has separate run script hardcoded in GHA YAML file.
+# Therefore the CUDA-related things in this script is not used, and it's broken.
+# TODO: Migrate GHA Linux GPU test job to this script.
+
 unset PYTORCH_VERSION
-# For unittest, nightly PyTorch is used as the following section,
-# so no need to set PYTORCH_VERSION.
+# No need to set PYTORCH_VERSION for unit test, as we use nightly PyTorch.
 # In fact, keeping PYTORCH_VERSION forces us to hardcode PyTorch version in config.
 
 set -e
 
-root_dir="$(git rev-parse --show-toplevel)"
-conda_dir="${root_dir}/conda"
-env_dir="${root_dir}/env"
-
-cd "${root_dir}"
-
 case "$(uname -s)" in
-    Darwin*) os=MacOSX;;
-    *) os=Linux
+    Darwin*)
+        os=MacOSX;;
+    *)
+        os=Linux
+        eval "$("/opt/conda/bin/conda" shell.bash hook)"
 esac
-
-# 0. Activate conda env
-eval "$("${conda_dir}/bin/conda" shell.bash hook)"
-conda activate "${env_dir}"
 
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
@@ -57,6 +54,8 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 )
 
 # 2. Install torchaudio
+conda install --quiet -y 'ffmpeg>=4.1' ninja cmake
+
 printf "* Installing torchaudio\n"
 python setup.py install
 
@@ -72,7 +71,7 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
+    pip install kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

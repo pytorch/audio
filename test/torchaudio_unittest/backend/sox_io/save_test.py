@@ -1,4 +1,3 @@
-import io
 import os
 
 import torch
@@ -43,7 +42,6 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         num_channels: int = 2,
         num_frames: float = 3 * 8000,
         src_dtype: str = "int32",
-        test_mode: str = "path",
     ):
         """`save` function produces file that is comparable with `sox` command
 
@@ -97,37 +95,9 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
 
         # 2.1. Convert the original wav to target format with torchaudio
         data = load_wav(src_path, normalize=False)[0]
-        if test_mode == "path":
-            sox_io_backend.save(
-                tgt_path, data, sample_rate, compression=compression, encoding=encoding, bits_per_sample=bits_per_sample
-            )
-        elif test_mode == "fileobj":
-            with open(tgt_path, "bw") as file_:
-                sox_io_backend.save(
-                    file_,
-                    data,
-                    sample_rate,
-                    format=format,
-                    compression=compression,
-                    encoding=encoding,
-                    bits_per_sample=bits_per_sample,
-                )
-        elif test_mode == "bytesio":
-            file_ = io.BytesIO()
-            sox_io_backend.save(
-                file_,
-                data,
-                sample_rate,
-                format=format,
-                compression=compression,
-                encoding=encoding,
-                bits_per_sample=bits_per_sample,
-            )
-            file_.seek(0)
-            with open(tgt_path, "bw") as f:
-                f.write(file_.read())
-        else:
-            raise ValueError(f"Unexpected test mode: {test_mode}")
+        sox_io_backend.save(
+            tgt_path, data, sample_rate, compression=compression, encoding=encoding, bits_per_sample=bits_per_sample
+        )
         # 2.2. Convert the target format to wav with sox
         sox_utils.convert_audio_file(tgt_path, tst_path, encoding=cmp_encoding, bit_depth=cmp_bit_depth)
         # 2.3. Load with SciPy
@@ -150,7 +120,6 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
 @skipIfNoSox
 class SaveTest(SaveTestBase):
     @nested_params(
-        ["path", "fileobj", "bytesio"],
         [
             ("PCM_U", 8),
             ("PCM_S", 16),
@@ -161,12 +130,11 @@ class SaveTest(SaveTestBase):
             ("ALAW", 8),
         ],
     )
-    def test_save_wav(self, test_mode, enc_params):
+    def test_save_wav(self, enc_params):
         encoding, bits_per_sample = enc_params
-        self.assert_save_consistency("wav", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
+        self.assert_save_consistency("wav", encoding=encoding, bits_per_sample=bits_per_sample)
 
     @nested_params(
-        ["path", "fileobj", "bytesio"],
         [
             ("float32",),
             ("int32",),
@@ -174,12 +142,11 @@ class SaveTest(SaveTestBase):
             ("uint8",),
         ],
     )
-    def test_save_wav_dtype(self, test_mode, params):
+    def test_save_wav_dtype(self, params):
         (dtype,) = params
-        self.assert_save_consistency("wav", src_dtype=dtype, test_mode=test_mode)
+        self.assert_save_consistency("wav", src_dtype=dtype)
 
     @nested_params(
-        ["path", "fileobj", "bytesio"],
         [8, 16, 24],
         [
             None,
@@ -194,19 +161,13 @@ class SaveTest(SaveTestBase):
             8,
         ],
     )
-    def test_save_flac(self, test_mode, bits_per_sample, compression_level):
-        self.assert_save_consistency(
-            "flac", compression=compression_level, bits_per_sample=bits_per_sample, test_mode=test_mode
-        )
+    def test_save_flac(self, bits_per_sample, compression_level):
+        self.assert_save_consistency("flac", compression=compression_level, bits_per_sample=bits_per_sample)
+
+    def test_save_htk(self):
+        self.assert_save_consistency("htk", num_channels=1)
 
     @nested_params(
-        ["path", "fileobj", "bytesio"],
-    )
-    def test_save_htk(self, test_mode):
-        self.assert_save_consistency("htk", test_mode=test_mode, num_channels=1)
-
-    @nested_params(
-        ["path", "fileobj", "bytesio"],
         [
             None,
             -1,
@@ -219,11 +180,10 @@ class SaveTest(SaveTestBase):
             10,
         ],
     )
-    def test_save_vorbis(self, test_mode, quality_level):
-        self.assert_save_consistency("vorbis", compression=quality_level, test_mode=test_mode)
+    def test_save_vorbis(self, quality_level):
+        self.assert_save_consistency("vorbis", compression=quality_level)
 
     @nested_params(
-        ["path", "fileobj", "bytesio"],
         [
             (
                 "PCM_S",
@@ -248,12 +208,11 @@ class SaveTest(SaveTestBase):
             ("ALAW", 32),
         ],
     )
-    def test_save_sphere(self, test_mode, enc_params):
+    def test_save_sphere(self, enc_params):
         encoding, bits_per_sample = enc_params
-        self.assert_save_consistency("sph", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
+        self.assert_save_consistency("sph", encoding=encoding, bits_per_sample=bits_per_sample)
 
     @nested_params(
-        ["path", "fileobj", "bytesio"],
         [
             (
                 "PCM_U",
@@ -289,12 +248,11 @@ class SaveTest(SaveTestBase):
             ),
         ],
     )
-    def test_save_amb(self, test_mode, enc_params):
+    def test_save_amb(self, enc_params):
         encoding, bits_per_sample = enc_params
-        self.assert_save_consistency("amb", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
+        self.assert_save_consistency("amb", encoding=encoding, bits_per_sample=bits_per_sample)
 
     @nested_params(
-        ["path", "fileobj", "bytesio"],
         [
             None,
             0,
@@ -307,18 +265,15 @@ class SaveTest(SaveTestBase):
             7,
         ],
     )
-    def test_save_amr_nb(self, test_mode, bit_rate):
-        self.assert_save_consistency("amr-nb", compression=bit_rate, num_channels=1, test_mode=test_mode)
+    def test_save_amr_nb(self, bit_rate):
+        self.assert_save_consistency("amr-nb", compression=bit_rate, num_channels=1)
 
-    @nested_params(
-        ["path", "fileobj", "bytesio"],
-    )
-    def test_save_gsm(self, test_mode):
-        self.assert_save_consistency("gsm", num_channels=1, test_mode=test_mode)
+    def test_save_gsm(self):
+        self.assert_save_consistency("gsm", num_channels=1)
         with self.assertRaises(RuntimeError, msg="gsm format only supports single channel audio."):
-            self.assert_save_consistency("gsm", num_channels=2, test_mode=test_mode)
+            self.assert_save_consistency("gsm", num_channels=2)
         with self.assertRaises(RuntimeError, msg="gsm format only supports a sampling rate of 8kHz."):
-            self.assert_save_consistency("gsm", sample_rate=16000, test_mode=test_mode)
+            self.assert_save_consistency("gsm", sample_rate=16000)
 
     @parameterized.expand(
         [

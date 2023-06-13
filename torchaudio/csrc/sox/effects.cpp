@@ -3,11 +3,7 @@
 #include <torchaudio/csrc/sox/effects_chain.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-using namespace torchaudio::sox_utils;
-
-namespace torchaudio {
-namespace sox_effects {
-
+namespace torchaudio::sox {
 namespace {
 
 enum SoxEffectsResourceState { NotInitialized, Initialized, ShutDown };
@@ -58,7 +54,7 @@ auto apply_effects_tensor(
 
   // Create SoxEffectsChain
   const auto dtype = waveform.dtype();
-  torchaudio::sox_effects_chain::SoxEffectsChain chain(
+  SoxEffectsChain chain(
       /*input_encoding=*/get_tensor_encodinginfo(dtype),
       /*output_encoding=*/get_tensor_encodinginfo(dtype));
 
@@ -113,7 +109,7 @@ auto apply_effects_file(
   out_buffer.reserve(sf->signal.length);
 
   // Create and run SoxEffectsChain
-  torchaudio::sox_effects_chain::SoxEffectsChain chain(
+  SoxEffectsChain chain(
       /*input_encoding=*/sf->encoding,
       /*output_encoding=*/get_tensor_encodinginfo(dtype));
 
@@ -138,20 +134,16 @@ auto apply_effects_file(
       tensor, chain.getOutputSampleRate());
 }
 
+namespace {
+
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
       "torchaudio::sox_effects_initialize_sox_effects",
-      &torchaudio::sox_effects::initialize_sox_effects);
-  m.def(
-      "torchaudio::sox_effects_shutdown_sox_effects",
-      &torchaudio::sox_effects::shutdown_sox_effects);
-  m.def(
-      "torchaudio::sox_effects_apply_effects_tensor",
-      &torchaudio::sox_effects::apply_effects_tensor);
-  m.def(
-      "torchaudio::sox_effects_apply_effects_file",
-      &torchaudio::sox_effects::apply_effects_file);
+      &initialize_sox_effects);
+  m.def("torchaudio::sox_effects_shutdown_sox_effects", &shutdown_sox_effects);
+  m.def("torchaudio::sox_effects_apply_effects_tensor", &apply_effects_tensor);
+  m.def("torchaudio::sox_effects_apply_effects_file", &apply_effects_file);
 }
 
-} // namespace sox_effects
-} // namespace torchaudio
+} // namespace
+} // namespace torchaudio::sox

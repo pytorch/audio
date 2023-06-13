@@ -14,8 +14,8 @@ from dataset import (
     DistributedBatchSampler,
     HuBERTDataSet,
 )
+from lightning.pytorch import LightningModule
 from loss import hubert_loss
-from pytorch_lightning import LightningModule
 from torch import Tensor
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader

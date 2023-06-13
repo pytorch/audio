@@ -1,7 +1,7 @@
 from collections import namedtuple
 from typing import Callable, Optional
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torch
 import torch.nn as nn
 from torch.optim.optimizer import Optimizer

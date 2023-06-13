@@ -78,12 +78,11 @@ print(torchaudio.__version__)
 #
 
 try:
-    from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE
-    from torchaudio.prototype.pipelines import SQUIM_SUBJECTIVE
     from pesq import pesq
     from pystoi import stoi
+    from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 except ImportError:
-    import google.colab
+    import google.colab  # noqa: F401
 
     print(
         """
@@ -98,14 +97,15 @@ except ImportError:
     )
 
 
+import matplotlib.pyplot as plt
+
 ######################################################################
 #
 #
 
 import torchaudio.functional as F
-from torchaudio.utils import download_asset
 from IPython.display import Audio
-import matplotlib.pyplot as plt
+from torchaudio.utils import download_asset
 
 
 def si_snr(estimate, reference, epsilon=1e-8):

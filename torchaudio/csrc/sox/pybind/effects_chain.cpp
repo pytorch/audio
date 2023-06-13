@@ -2,11 +2,7 @@
 #include <torchaudio/csrc/sox/pybind/effects_chain.h>
 #include <torchaudio/csrc/sox/pybind/utils.h>
 
-using namespace torchaudio::sox_utils;
-
-namespace torchaudio {
-namespace sox_effects_chain {
-
+namespace torchaudio::sox {
 namespace {
 
 /// helper classes for passing file-like object to SoxEffectChain
@@ -233,5 +229,4 @@ void SoxEffectsChainPyBind::addOutputFileObj(
   }
 }
 
-} // namespace sox_effects_chain
-} // namespace torchaudio
+} // namespace torchaudio::sox

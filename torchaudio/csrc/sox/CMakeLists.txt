@@ -15,17 +15,9 @@ torchaudio_library(
   )
 
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-  set(
-    ext_sources
-    pybind/pybind.cpp
-    pybind/effects.cpp
-    pybind/effects_chain.cpp
-    pybind/io.cpp
-    pybind/utils.cpp
-    )
   torchaudio_extension(
     _torchaudio_sox
-    "${ext_sources}"
+    "pybind/pybind.cpp;"
     ""
     "libtorchaudio_sox"
     ""

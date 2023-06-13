@@ -1,4 +1,5 @@
 #include <c10/cuda/CUDAException.h>
+#include <c10/cuda/CUDAGuard.h>
 #include <torch/torch.h>
 
 template <typename scalar_t>
@@ -57,6 +58,8 @@ void cuda_lfilter_core_loop(
   TORCH_CHECK(C == padded_out.size(1));
 
   TORCH_CHECK(in.size(2) + a_flipped.size(1) - 1 == padded_out.size(2));
+
+  const at::cuda::OptionalCUDAGuard device_guard(device_of(in));
 
   const dim3 threads(256);
   const dim3 blocks((N * C + threads.x - 1) / threads.x);

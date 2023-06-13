@@ -1,5 +1,4 @@
 import os
-import warnings
 from typing import List, Optional, Tuple
 
 import torch
@@ -156,14 +155,6 @@ def apply_effects_tensor(
     return torch.ops.torchaudio.sox_effects_apply_effects_tensor(tensor, sample_rate, effects, channels_first)
 
 
-_deprecation_message = (
-    "File-like object support in sox_io backend is deprecated, "
-    "and will be removed in v2.1. "
-    "See https://github.com/pytorch/audio/issues/2950 for the detail."
-    "Please migrate to the new dispatcher, or use soundfile backend."
-)
-
-
 @torchaudio._extension.fail_if_no_sox
 def apply_effects_file(
     path: str,
@@ -187,18 +178,8 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (path-like object or file-like object):
-            Source of audio data. When the function is not compiled by TorchScript,
-            (e.g. ``torch.jit.script``), the following types are accepted:
-
-                  * ``path-like``: file path
-                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
-                    which returns byte string of at most ``size`` length.
-
-            When the function is compiled by TorchScript, only ``str`` type is allowed.
-
-            Note: This argument is intentionally annotated as ``str`` only for
-            TorchScript compiler compatibility.
+        path (path-like object):
+            Source of audio data.
         effects (List[List[str]]): List of effects.
         normalize (bool, optional):
             When ``True``, this function converts the native sample type to ``float32``.
@@ -283,11 +264,10 @@ def apply_effects_file(
     """
     if not torch.jit.is_scripting():
         if hasattr(path, "read"):
-            warnings.warn(_deprecation_message)
-            ret = torchaudio.lib._torchaudio_sox.apply_effects_fileobj(path, effects, normalize, channels_first, format)
-            if ret is None:
-                raise RuntimeError("Failed to load audio from {}".format(path))
-            return ret
+            raise RuntimeError(
+                "apply_effects_file function does not support file-like object. "
+                "Please use torchaudio.io.AudioEffector."
+            )
         path = os.fspath(path)
     ret = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
     if ret is not None:

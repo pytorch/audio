@@ -2,7 +2,6 @@ import itertools
 from functools import partial
 
 import torch
-import torchaudio
 from parameterized import parameterized
 from torchaudio._backend.utils import get_load_func
 from torchaudio_unittest.common_utils import (
@@ -315,13 +314,6 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         """The combination of properly changes the output tensor"""
 
         self._test(torch.ops.torchaudio.sox_io_load_audio_file, frame_offset, num_frames, channels_first, normalize)
-
-        # test file-like obj
-        def func(path, *args):
-            with open(path, "rb") as fileobj:
-                return torchaudio.lib._torchaudio_sox.load_audio_fileobj(fileobj, *args)
-
-        self._test(func, frame_offset, num_frames, channels_first, normalize)
 
     @nested_params(
         [0, 1, 10, 100, 1000],

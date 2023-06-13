@@ -7,10 +7,7 @@
 
 #include <utility>
 
-using namespace torchaudio::sox_utils;
-
-namespace torchaudio {
-namespace sox_io {
+namespace torchaudio::sox {
 
 auto get_info_fileobj(py::object fileobj, c10::optional<std::string> format)
     -> c10::optional<MetaDataTuple> {
@@ -83,7 +80,7 @@ auto load_audio_fileobj(
     c10::optional<std::string> format)
     -> c10::optional<std::tuple<torch::Tensor, int64_t>> {
   auto effects = get_effects(frame_offset, num_frames);
-  return torchaudio::sox_effects::apply_effects_fileobj(
+  return apply_effects_fileobj(
       std::move(fileobj),
       effects,
       normalize,
@@ -177,7 +174,7 @@ void save_audio_fileobj(
         "Error saving audio file: failed to open memory stream.");
   }
 
-  torchaudio::sox_effects_chain::SoxEffectsChainPyBind chain(
+  SoxEffectsChainPyBind chain(
       /*input_encoding=*/get_tensor_encodinginfo(tensor.dtype()),
       /*output_encoding=*/sf->encoding);
   chain.addInputTensor(&tensor, sample_rate, channels_first);
@@ -191,5 +188,4 @@ void save_audio_fileobj(
   fileobj.attr("write")(py::bytes(buffer.ptr, buffer.size));
 }
 
-} // namespace sox_io
-} // namespace torchaudio
+} // namespace torchaudio::sox

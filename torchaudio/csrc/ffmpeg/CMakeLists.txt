@@ -2,11 +2,13 @@ message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
 find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
 add_library(ffmpeg INTERFACE)
 target_include_directories(ffmpeg INTERFACE "${FFMPEG_INCLUDE_DIRS}")
+if (NOT DLOPEN_FFMPEG)
 target_link_libraries(ffmpeg INTERFACE "${FFMPEG_LIBRARIES}")
-
+endif()
 
 set(
   sources
+  stub.cpp
   ffmpeg.cpp
   filter_graph.cpp
   hw_context.cpp
@@ -31,24 +33,24 @@ if (USE_CUDA)
     cuda_deps)
 endif()
 
+if (DLOPEN_FFMPEG)
+  set(compile_definitions DLOPEN_FFMPEG)
+endif()
+
 torchaudio_library(
   libtorchaudio_ffmpeg
   "${sources}"
   ""
   "torch;ffmpeg;${additional_lib}"
-  ""
+  "${compile_definitions}"
   )
 
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-  set(
-    ext_sources
-    pybind/pybind.cpp
-    )
   torchaudio_extension(
     _torchaudio_ffmpeg
-    "${ext_sources}"
+    pybind/pybind.cpp
     ""
     "libtorchaudio_ffmpeg"
-    ""
+    "${compile_definitions}"
     )
 endif ()

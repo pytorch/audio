@@ -28,19 +28,18 @@ print(torchaudio.__version__)
 #
 
 try:
-    from torchaudio.prototype.functional import (
-        oscillator_bank,
-        adsr_envelope,
-    )
+    from torchaudio.prototype.functional import adsr_envelope, oscillator_bank
 except ModuleNotFoundError:
     print(
         "Failed to import prototype DSP features. "
         "Please install torchaudio nightly builds. "
         "Please refer to https://pytorch.org/get-started/locally "
-        "for instructions to install a nightly build.")
+        "for instructions to install a nightly build."
+    )
     raise
 
 import math
+
 import matplotlib.pyplot as plt
 from IPython.display import Audio
 
@@ -93,7 +92,7 @@ PI2 = 2 * torch.pi
 # the rest of the tutorial.
 #
 
-F0 = 344.  # fundamental frequency
+F0 = 344.0  # fundamental frequency
 DURATION = 1.1  # [seconds]
 SAMPLE_RATE = 16_000  # [Hz]
 
@@ -102,26 +101,19 @@ NUM_FRAMES = int(DURATION * SAMPLE_RATE)
 ######################################################################
 #
 
+
 def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.3):
     t = torch.arange(waveform.size(0)) / sample_rate
 
     fig, axes = plt.subplots(4, 1, sharex=True)
     axes[0].plot(t, freq)
-    axes[0].set(
-        title=f"Oscillator bank (bank size: {amp.size(-1)})",
-        ylabel="Frequency [Hz]",
-        ylim=[-0.03, None])
+    axes[0].set(title=f"Oscillator bank (bank size: {amp.size(-1)})", ylabel="Frequency [Hz]", ylim=[-0.03, None])
     axes[1].plot(t, amp)
-    axes[1].set(
-        ylabel="Amplitude",
-        ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
+    axes[1].set(ylabel="Amplitude", ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
     axes[2].plot(t, waveform)
     axes[2].set(ylabel="Waveform")
     axes[3].specgram(waveform, Fs=sample_rate)
-    axes[3].set(
-        ylabel="Spectrogram",
-        xlabel="Time [s]",
-        xlim=[-0.01, t[-1] + 0.01])
+    axes[3].set(ylabel="Spectrogram", xlabel="Time [s]", xlim=[-0.01, t[-1] + 0.01])
 
     for i in range(4):
         axes[i].grid(True)
@@ -147,7 +139,7 @@ amp = torch.ones((NUM_FRAMES, 1))
 
 waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Combining multiple sine waves
@@ -166,7 +158,7 @@ amp = torch.ones((NUM_FRAMES, 3)) / 3
 
 waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 
 ######################################################################
@@ -279,7 +271,8 @@ amp = torch.stack(
         adsr_envelope(unit, attack=0.01, hold=0.125, decay=0.12, sustain=0.05, release=0),
         adsr_envelope(unit, attack=0.01, hold=0.25, decay=0.08, sustain=0, release=0),
     ),
-    dim=-1)
+    dim=-1,
+)
 amp = amp.repeat(repeat, 1) / 2
 
 bass = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
@@ -316,7 +309,7 @@ show(freq, amp, doremi, SAMPLE_RATE)
 # ~~~~~
 #
 
-env = adsr_envelope(NUM_FRAMES * 6, attack=0.98, decay=0., sustain=1, release=0.02)
+env = adsr_envelope(NUM_FRAMES * 6, attack=0.98, decay=0.0, sustain=1, release=0.02)
 
 tones = [
     484.90,  # B4

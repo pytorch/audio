@@ -1,4 +1,0 @@
-[submodule "kaldi"]
-	path = third_party/kaldi/submodule
-	url = https://github.com/kaldi-asr/kaldi
-	ignore = dirty
