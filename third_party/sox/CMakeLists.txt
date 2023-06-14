@@ -75,7 +75,7 @@ ExternalProject_Add(flac
   URL https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
   URL_HASH SHA256=91cfc3ed61dc40f47f050a109b08610667d73477af6ef36dcad31c31a4a8d53f
   PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/flac/
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/flac/configure ${COMMON_ARGS} --with-ogg --disable-cpplibs
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/flac/configure ${COMMON_ARGS} --with-ogg --disable-cpplibs --disable-xmms-plugin
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
