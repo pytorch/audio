@@ -12,11 +12,10 @@ import pathlib
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from typing import Tuple
 
-from lightning import HuBERTFineTuneModule
+from lightning.pytorch import seed_everything, Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint
 
-from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.utilities.seed import seed_everything
+from lightning_modules import HuBERTFineTuneModule
 
 
 logger = logging.getLogger(__name__)
@@ -56,10 +55,10 @@ def run_train(args):
         default_root_dir=args.exp_dir,
         max_steps=args.max_updates,
         num_nodes=args.num_nodes,
-        gpus=args.gpus,
+        devices=args.gpus,
         accelerator="gpu",
-        strategy="ddp",
-        replace_sampler_ddp=False,
+        strategy="ddp_find_unused_parameters_true",
+        use_distributed_sampler=False,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
         val_check_interval=500,

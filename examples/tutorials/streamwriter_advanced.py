@@ -74,7 +74,9 @@ from torchaudio.io import StreamWriter
 from torchaudio.utils import download_asset
 
 AUDIO_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-VIDEO_PATH = download_asset("tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4")
+VIDEO_PATH = download_asset(
+    "tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
+)
 
 ######################################################################
 #
@@ -140,7 +142,7 @@ s.add_audio_stream(sample_rate, num_channels, format="s16")
 # Write audio to the device
 with s.open():
     for i in range(0, num_frames, 256):
-        s.write_audio_chunk(0, waveform[i:i+256])
+        s.write_audio_chunk(0, waveform[i : i + 256])
 
 ######################################################################
 #
@@ -186,8 +188,12 @@ width, height = 640, 360
 # a background thread and give chunks
 
 running = True
+
+
 def video_streamer(path, frames_per_chunk):
-    import queue, threading
+    import queue
+    import threading
+
     from torchaudio.io import StreamReader
 
     q = queue.Queue()
@@ -196,9 +202,9 @@ def video_streamer(path, frames_per_chunk):
     def _streamer():
         streamer = StreamReader(path)
         streamer.add_basic_video_stream(
-            frames_per_chunk, format="rgb24",
-            frame_rate=frame_rate, width=width, height=height)
-        for (chunk_, ) in streamer.stream():
+            frames_per_chunk, format="rgb24", frame_rate=frame_rate, width=width, height=height
+        )
+        for (chunk_,) in streamer.stream():
             q.put(chunk_)
             if not running:
                 break
@@ -246,7 +252,7 @@ with s.open():
 #        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-sdl-demo.mp4">
 #    </video>
 #
-# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`_]
+# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`__]
 #
 
 ######################################################################
@@ -292,7 +298,7 @@ with s.open():
 #        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-rtmp-demo.mp4">
 #    </video>
 #
-# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`_]
+# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`__]
 #
 
 
@@ -324,7 +330,7 @@ with s.open():
 #        <source src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio-udp-demo.mp4">
 #    </video>
 #
-# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`_]
+# [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`__]
 #
 
 ######################################################################

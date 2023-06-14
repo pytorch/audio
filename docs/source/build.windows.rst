@@ -164,7 +164,7 @@ Also, in case torchaudio developer needs to update and customize the CI for FFmp
 1. Install MSYS2
 ~~~~~~~~~~~~~~~~
 
-To build FFmpeg in a way it is usable from the TorchAudio development environment, we need to build binaries native to ``MINGW64``. To do so, we need tools required by FFmpeg's build process, such as ``gcc`` and ``make``,  that work in ``MINGW64`` environment. For this purpose, we use MSYS2.
+To build FFmpeg in a way it is usable from the TorchAudio development environment, we need to build binaries native to ``MINGW64``. To do so, we need tools required by FFmpeg's build process, such as ``pkg-config`` and ``make``,  that work in ``MINGW64`` environment. For this purpose, we use MSYS2.
 
 FFmpeg's official documentation touches this https://trac.ffmpeg.org/wiki/CompilationGuide/MinGW
 
@@ -187,7 +187,6 @@ Use the shortcut to launch MSYS2 (MINGW64).
 
 .. code-block::
 
-   $ pacman -S mingw-w64-x86_64-gcc
    $ pacman -S mingw-w64-x86_64-make
    $ pacman -S mingw-w64-x86_64-yasm
 
@@ -199,18 +198,8 @@ After the installation, you should have packages similar to the following;
    base 2020.12-1
    base-devel 2022.01-2
    filesystem 2023.01-2
-   git 2.36.0-1
-   mingw-w64-x86_64-gcc-ada 11.3.0-1
-   mingw-w64-x86_64-gcc-fortran 11.3.0-1
-   mingw-w64-x86_64-gcc-libgfortran 11.3.0-1
-   mingw-w64-x86_64-gcc-objc 11.3.0-1
-   mingw-w64-x86_64-gdb 11.2-2
-   mingw-w64-x86_64-gdb-multiarch 11.2-2
-   mingw-w64-x86_64-libmangle-git 10.0.0.r14.ga08c638f8-1
    mingw-w64-x86_64-make 4.3-1
    mingw-w64-x86_64-pkgconf 1.8.0-2
-   mingw-w64-x86_64-tools-git 10.0.0.r14.ga08c638f8-1
-   mingw-w64-x86_64-winstorecompat-git 10.0.0.r14.ga08c638f8-1
    mingw-w64-x86_64-yasm 1.3.0-4
    msys2-runtime 3.4.3-5
 
@@ -229,7 +218,7 @@ Build
 
 .. code-block::
 
-   ./configure
+   ./configure --toolchain=msvc
    make -j
 
 If the build succeeds, ``ffmpeg.exe`` should be found in the same directory. Make sure that you can run it.

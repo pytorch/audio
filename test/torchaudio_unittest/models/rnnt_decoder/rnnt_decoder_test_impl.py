@@ -99,7 +99,7 @@ class RNNTBeamSearchTestImpl(TestBaseMixin):
             self.assertEqual(res, scripted_res)
 
             state = res[1]
-            hypo = res[0][0]
+            hypo = res[0]
 
             scripted_state = scripted_res[1]
-            scripted_hypo = scripted_res[0][0]
+            scripted_hypo = scripted_res[0]

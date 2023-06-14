@@ -1,5 +1,6 @@
 import io
 import os
+import pathlib
 import subprocess
 import sys
 from functools import partial
@@ -7,7 +8,7 @@ from functools import partial
 import torch
 from parameterized import parameterized
 from torchaudio._backend.utils import get_save_func
-from torchaudio.io._compat import _get_encoder, _get_encoder_format
+from torchaudio.io._compat import _parse_save_args
 
 from torchaudio_unittest.backend.dispatcher.sox.common import get_enc_params, name_func
 from torchaudio_unittest.common_utils import (
@@ -23,12 +24,14 @@ from torchaudio_unittest.common_utils import (
 )
 
 
-def _convert_audio_file(src_path, dst_path, format=None, acodec=None):
-    command = ["ffmpeg", "-i", src_path, "-strict", "-2"]
-    if format:
-        command += ["-sample_fmt", format]
-    if acodec:
-        command += ["-acodec", acodec]
+def _convert_audio_file(src_path, dst_path, muxer=None, encoder=None, sample_fmt=None):
+    command = ["ffmpeg", "-hide_banner", "-y", "-i", src_path, "-strict", "-2"]
+    if muxer:
+        command += ["-f", muxer]
+    if encoder:
+        command += ["-acodec", encoder]
+    if sample_fmt:
+        command += ["-sample_fmt", sample_fmt]
     command += [dst_path]
     print(" ".join(command), file=sys.stderr)
     subprocess.run(command, check=True)
@@ -99,8 +102,10 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         # 2.1. Convert the original wav to target format with torchaudio
         data = load_wav(src_path, normalize=False)[0]
         if test_mode == "path":
-            self._save(tgt_path, data, sample_rate, encoding=encoding, bits_per_sample=bits_per_sample)
+            ext = format
+            self._save(tgt_path, data, sample_rate, format=format, encoding=encoding, bits_per_sample=bits_per_sample)
         elif test_mode == "fileobj":
+            ext = None
             with open(tgt_path, "bw") as file_:
                 self._save(
                     file_,
@@ -112,6 +117,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
                 )
         elif test_mode == "bytesio":
             file_ = io.BytesIO()
+            ext = None
             self._save(
                 file_,
                 data,
@@ -126,25 +132,36 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         else:
             raise ValueError(f"Unexpected test mode: {test_mode}")
         # 2.2. Convert the target format to wav with ffmpeg
-        _convert_audio_file(tgt_path, tst_path, acodec="pcm_f32le")
+        _convert_audio_file(tgt_path, tst_path, encoder="pcm_f32le")
         # 2.3. Load with SciPy
         found = load_wav(tst_path, normalize=False)[0]
 
         # 3.1. Convert the original wav to target format with ffmpeg
-        acodec = _get_encoder(data.dtype, format, encoding, bits_per_sample)
-        sample_fmt = _get_encoder_format(format, bits_per_sample)
-        _convert_audio_file(src_path, sox_path, acodec=acodec, format=sample_fmt)
+        muxer, encoder, sample_fmt = _parse_save_args(ext, format, encoding, bits_per_sample)
+        _convert_audio_file(src_path, sox_path, muxer=muxer, encoder=encoder, sample_fmt=sample_fmt)
         # 3.2. Convert the target format to wav with ffmpeg
-        _convert_audio_file(sox_path, ref_path, acodec="pcm_f32le")
+        _convert_audio_file(sox_path, ref_path, encoder="pcm_f32le")
         # 3.3. Load with SciPy
         expected = load_wav(ref_path, normalize=False)[0]
 
         self.assertEqual(found, expected)
 
 
+@skipIfNoExec("sox")
 @skipIfNoExec("ffmpeg")
 @skipIfNoFFmpeg
 class SaveTest(SaveTestBase):
+    def test_pathlike(self):
+        """FFmpeg dispatcher can save audio data to pathlike object"""
+        sample_rate = 16000
+        dtype = "float32"
+        num_channels = 2
+        duration = 1
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        self._save(pathlib.Path(path), data, sample_rate)
+
     @nested_params(
         ["path", "fileobj", "bytesio"],
         [
@@ -332,6 +349,7 @@ class SaveTest(SaveTestBase):
         self.assert_save_consistency("wav", encoding="PCM_S", bits_per_sample=16, num_channels=num_channels)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `self._save`"""
@@ -378,6 +396,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         self.assertEqual(data, expected)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestSaveNonExistingDirectory(PytorchTestCase):
     _save = partial(get_save_func(), backend="ffmpeg")

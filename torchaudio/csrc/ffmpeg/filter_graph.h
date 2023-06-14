@@ -4,10 +4,25 @@
 namespace torchaudio {
 namespace io {
 
-class FilterGraph {
-  AVMediaType media_type;
+/// Used to report the output formats of filter graph.
+struct FilterGraphOutputInfo {
+  AVMediaType type = AVMEDIA_TYPE_UNKNOWN;
+  int format = -1;
 
-  AVFilterGraphPtr pFilterGraph;
+  AVRational time_base = {1, 1};
+
+  // Audio
+  int sample_rate = -1;
+  int num_channels = -1;
+
+  // Video
+  AVRational frame_rate = {0, 1};
+  int height = -1;
+  int width = -1;
+};
+
+class FilterGraph {
+  AVFilterGraphPtr graph;
 
   // AVFilterContext is freed as a part of AVFilterGraph
   // so we do not manage the resource.
@@ -15,7 +30,7 @@ class FilterGraph {
   AVFilterContext* buffersink_ctx = nullptr;
 
  public:
-  explicit FilterGraph(AVMediaType media_type);
+  explicit FilterGraph();
   // Custom destructor to release AVFilterGraph*
   ~FilterGraph() = default;
   // Non-copyable
@@ -37,24 +52,29 @@ class FilterGraph {
   void add_video_src(
       AVPixelFormat format,
       AVRational time_base,
+      AVRational frame_rate,
       int width,
       int height,
       AVRational sample_aspect_ratio);
 
-  void add_src(const std::string& arg);
+  void add_audio_sink();
 
-  void add_sink();
+  void add_video_sink();
 
   void add_process(const std::string& filter_description);
 
-  void create_filter();
+  void create_filter(AVBufferRef* hw_frames_ctx = nullptr);
+
+ private:
+  void add_src(const AVFilter* buffersrc, const std::string& arg);
+
+  void add_sink(const AVFilter* buffersrc);
 
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
-  [[nodiscard]] AVRational get_output_timebase() const;
-  [[nodiscard]] int get_output_sample_rate() const;
-  [[nodiscard]] int get_output_channels() const;
+ public:
+  [[nodiscard]] FilterGraphOutputInfo get_output_info() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Streaming process

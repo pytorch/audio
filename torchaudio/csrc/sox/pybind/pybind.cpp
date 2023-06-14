@@ -1,23 +1,27 @@
 #include <torch/extension.h>
+#include <torchaudio/csrc/sox/utils.h>
 
-#include <torchaudio/csrc/sox/pybind/effects.h>
-#include <torchaudio/csrc/sox/pybind/io.h>
+namespace torchaudio {
+namespace sox {
+namespace {
 
 PYBIND11_MODULE(_torchaudio_sox, m) {
+  m.def("set_seed", &set_seed, "Set random seed.");
+  m.def("set_verbosity", &set_verbosity, "Set verbosity.");
+  m.def("set_use_threads", &set_use_threads, "Set threading.");
+  m.def("set_buffer_size", &set_buffer_size, "Set buffer size.");
+  m.def("get_buffer_size", &get_buffer_size, "Get buffer size.");
+  m.def("list_effects", &list_effects, "List available effects.");
   m.def(
-      "get_info_fileobj",
-      &torchaudio::sox_io::get_info_fileobj,
-      "Get metadata of audio in file object.");
+      "list_read_formats",
+      &list_read_formats,
+      "List supported formats for decoding.");
   m.def(
-      "load_audio_fileobj",
-      &torchaudio::sox_io::load_audio_fileobj,
-      "Load audio from file object.");
-  m.def(
-      "save_audio_fileobj",
-      &torchaudio::sox_io::save_audio_fileobj,
-      "Save audio to file obj.");
-  m.def(
-      "apply_effects_fileobj",
-      &torchaudio::sox_effects::apply_effects_fileobj,
-      "Decode audio data from file-like obj and apply effects.");
+      "list_write_formats",
+      &list_write_formats,
+      "List supported formats for encoding.");
 }
+
+} // namespace
+} // namespace sox
+} // namespace torchaudio

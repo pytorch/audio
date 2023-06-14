@@ -38,7 +38,11 @@ Methods
 -------
 
 {%- for item in members %}
-{%- if not item.startswith('_') and item not in inherited_members and item not in attributes %}
+{%- if
+   not item.startswith('_')
+   and item not in inherited_members
+   and item not in attributes
+   %}
 
 {{ item | underline("~") }}
 
@@ -50,17 +54,21 @@ Methods
 {%- endfor %}
 {%- endif %}
 
-{%- if name == "StreamReader" %}
+
+{%- if name in ["StreamReader", "StreamWriter"] %}
 
 Support Structures
 ------------------
 
+{%- if name == "StreamReader" %}
 {%- for item in [
     "ChunkTensor",
     "SourceStream",
     "SourceAudioStream",
     "SourceVideoStream",
     "OutputStream",
+    "OutputAudioStream",
+    "OutputVideoStream",
 ] %}
 
 {{ item | underline("~") }}
@@ -69,4 +77,14 @@ Support Structures
    :members:
 
 {%- endfor %}
+
+{%- elif name == "StreamWriter" %}
+
+CodecConfig
+~~~~~~~~~~~
+
+.. autoclass:: torchaudio.io::CodecConfig
+   :members:
+
+{%- endif %}
 {%- endif %}

@@ -4,8 +4,7 @@
 #include <sox.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_effects_chain {
+namespace torchaudio::sox {
 
 // Helper struct to safely close sox_effect_t* pointer returned by
 // sox_create_effect
@@ -57,7 +56,6 @@ class SoxEffectsChain {
   int64_t getOutputSampleRate();
 };
 
-} // namespace sox_effects_chain
-} // namespace torchaudio
+} // namespace torchaudio::sox
 
 #endif

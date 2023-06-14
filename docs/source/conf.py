@@ -25,6 +25,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.abspath("."))
 
+
 import pytorch_sphinx_theme
 
 # -- General configuration ------------------------------------------------
@@ -175,6 +176,15 @@ else:
 
     version = f"Nightly Build ({torchaudio.__version__})"
     release = "nightly"
+
+
+#
+# Specify the version of the current stable release.
+# Used in `docs/source/_templates/breadcrumbs.html`
+#
+# https://stackoverflow.com/a/33845358/1106930
+#
+html_context = {"version_stable": "2.0.1"}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

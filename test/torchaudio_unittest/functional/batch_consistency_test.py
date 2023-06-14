@@ -65,7 +65,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "rand_init": False,
         }
         func = partial(F.griffinlim, **kwargs)
-        self.assert_batch_consistency(func, inputs=(batch,), atol=5e-5)
+        self.assert_batch_consistency(func, inputs=(batch,), atol=1e-4)
 
     @parameterized.expand(
         list(
@@ -256,18 +256,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             rtol=1e-4,
             atol=1e-7,
         )
-
-    @common_utils.skipIfNoKaldi
-    def test_compute_kaldi_pitch(self):
-        sample_rate = 44100
-        n_channels = 2
-        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, n_channels=self.batch_size * n_channels)
-        batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
-        kwargs = {
-            "sample_rate": sample_rate,
-        }
-        func = partial(F.compute_kaldi_pitch, **kwargs)
-        self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_lfilter(self):
         signal_length = 2048

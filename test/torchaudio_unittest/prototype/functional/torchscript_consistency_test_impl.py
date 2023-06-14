@@ -42,7 +42,7 @@ class TorchScriptConsistencyTestImpl(TestBaseMixin):
         freq = torch.rand((num_frames, num_pitches), dtype=self.dtype, device=self.device)
         amps = torch.ones_like(freq)
 
-        self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum"))
+        self._assert_consistency(F.oscillator_bank, (freq, amps, sample_rate, "sum", torch.float64))
 
     def test_extend_pitch(self):
         num_frames = 5

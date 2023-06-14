@@ -1,5 +1,5 @@
 #include <c10/cuda/CUDAStream.h>
-#include <torch/script.h>
+#include <torch/types.h>
 #ifdef __HIP_PLATFORM_AMD__
 #include <torchaudio/csrc/rnnt/hip/gpu_transducer_hip.h>
 #else

@@ -1,7 +1,6 @@
 #include <torchaudio/csrc/sox/types.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox {
 
 Format get_format_from_string(const std::string& format) {
   if (format == "wav")
@@ -58,7 +57,7 @@ std::string to_string(Encoding v) {
   }
 }
 
-Encoding get_encoding_from_option(const c10::optional<std::string> encoding) {
+Encoding get_encoding_from_option(const c10::optional<std::string>& encoding) {
   if (!encoding.has_value())
     return Encoding::NOT_PROVIDED;
   std::string v = encoding.value();
@@ -75,7 +74,7 @@ Encoding get_encoding_from_option(const c10::optional<std::string> encoding) {
   TORCH_CHECK(false, "Internal Error: unexpected encoding value: ", v);
 }
 
-BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth) {
+BitDepth get_bit_depth_from_option(const c10::optional<int64_t>& bit_depth) {
   if (!bit_depth.has_value())
     return BitDepth::NOT_PROVIDED;
   int64_t v = bit_depth.value();
@@ -129,5 +128,4 @@ std::string get_encoding(sox_encoding_t encoding) {
   }
 }
 
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace torchaudio::sox

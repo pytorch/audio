@@ -4,8 +4,10 @@ import torch
 import torchaudio
 from parameterized import parameterized, parameterized_class
 from torchaudio_unittest.common_utils import (
+    disabledInCI,
     get_asset_path,
     get_image,
+    get_sinusoid,
     get_wav_data,
     is_ffmpeg_available,
     nested_params,
@@ -14,13 +16,22 @@ from torchaudio_unittest.common_utils import (
     save_image,
     save_wav,
     skipIfNoFFmpeg,
+    skipIfNoHWAccel,
     TempDirMixin,
     TorchaudioTestCase,
 )
 
+
 if is_ffmpeg_available():
     from torchaudio.io import StreamReader, StreamWriter
-    from torchaudio.io._stream_reader import ChunkTensor, SourceAudioStream, SourceStream, SourceVideoStream
+    from torchaudio.io._stream_reader import (
+        ChunkTensor,
+        OutputAudioStream,
+        OutputVideoStream,
+        SourceAudioStream,
+        SourceStream,
+        SourceVideoStream,
+    )
 
 
 @skipIfNoFFmpeg
@@ -59,13 +70,14 @@ class ChunkTensorTest(TorchaudioTestCase):
         w.add_audio_stream(8000, 2)
         with w.open():
             w.write_audio_chunk(0, c)
+            w.write_audio_chunk(0, c, c.pts)
 
 
 ################################################################################
 # Helper decorator and Mixin to duplicate the tests for fileobj
 _media_source = parameterized_class(
     ("test_type",),
-    [("str",), ("fileobj",), ("tensor",)],
+    [("str",), ("fileobj",)],
     class_name_func=lambda cls, _, params: f'{cls.__name__}_{params["test_type"]}',
 )
 
@@ -83,10 +95,6 @@ class _MediaSourceMixin:
             self.src = path
         elif self.test_type == "fileobj":
             self.src = open(path, "rb")
-        elif self.test_type == "tensor":
-            with open(path, "rb") as fileobj:
-                data = fileobj.read()
-            self.src = torch.frombuffer(data, dtype=torch.uint8)
         return self.src
 
     def tearDown(self):
@@ -239,6 +247,81 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             ),
         ]
         output = [s.get_src_stream_info(i) for i in range(6)]
+        assert expected == output
+
+    def test_output_info(self):
+        s = StreamReader(self.get_src())
+
+        s.add_audio_stream(-1)
+        s.add_audio_stream(-1, filter_desc="aresample=8000")
+        s.add_audio_stream(-1, filter_desc="aformat=sample_fmts=s16p")
+        s.add_video_stream(-1)
+        s.add_video_stream(-1, filter_desc="fps=10")
+        s.add_video_stream(-1, filter_desc="format=rgb24")
+        s.add_video_stream(-1, filter_desc="scale=w=160:h=90")
+        expected = [
+            OutputAudioStream(
+                source_index=4,
+                filter_description="anull",
+                media_type="audio",
+                format="fltp",
+                sample_rate=16000.0,
+                num_channels=2,
+            ),
+            OutputAudioStream(
+                source_index=4,
+                filter_description="aresample=8000",
+                media_type="audio",
+                format="fltp",
+                sample_rate=8000.0,
+                num_channels=2,
+            ),
+            OutputAudioStream(
+                source_index=4,
+                filter_description="aformat=sample_fmts=s16p",
+                media_type="audio",
+                format="s16p",
+                sample_rate=16000.0,
+                num_channels=2,
+            ),
+            OutputVideoStream(
+                source_index=3,
+                filter_description="null",
+                media_type="video",
+                format="yuv420p",
+                width=480,
+                height=270,
+                frame_rate=30000 / 1001,
+            ),
+            OutputVideoStream(
+                source_index=3,
+                filter_description="fps=10",
+                media_type="video",
+                format="yuv420p",
+                width=480,
+                height=270,
+                frame_rate=10,
+            ),
+            OutputVideoStream(
+                source_index=3,
+                filter_description="format=rgb24",
+                media_type="video",
+                format="rgb24",
+                width=480,
+                height=270,
+                frame_rate=30000 / 1001,
+            ),
+            OutputVideoStream(
+                source_index=3,
+                filter_description="scale=w=160:h=90",
+                media_type="video",
+                format="yuv420p",
+                width=160,
+                height=90,
+                frame_rate=30000 / 1001,
+            ),
+        ]
+        output = [s.get_out_stream_info(i) for i in range(s.num_out_streams)]
         assert expected == output
 
     def test_id3tag(self):
@@ -753,11 +836,84 @@ class StreamReaderAudioTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         if self.test_type == "fileobj":
             src.seek(0)
         self._test_wav(src, original, fmt=None)
-        # convert to float32
-        expected = _to_fltp(original)
-        if self.test_type == "fileobj":
-            src.seek(0)
-        self._test_wav(src, expected, fmt="fltp")
+
+    def test_audio_stream_format(self):
+        "`format` argument properly changes the sample format of decoded audio"
+        num_channels = 2
+        src, s32 = self.get_src(8000, dtype="int32", num_channels=num_channels)
+        args = {
+            "num_channels": num_channels,
+            "normalize": False,
+            "channels_first": False,
+            "num_frames": 1 << 16,
+        }
+        u8 = get_wav_data("uint8", **args)
+        s16 = get_wav_data("int16", **args)
+        s64 = s32.to(torch.int64) * (1 << 32)
+        f32 = get_wav_data("float32", **args)
+        f64 = get_wav_data("float64", **args)
+
+        s = StreamReader(src)
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="u8")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="u8p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s16")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s16p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s32")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s32p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s64")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="s64p")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="flt")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="fltp")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="dbl")
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="dblp")
+        s.process_all_packets()
+        chunks = s.pop_chunks()
+        self.assertEqual(chunks[0], u8, atol=1, rtol=0)
+        self.assertEqual(chunks[1], u8, atol=1, rtol=0)
+        self.assertEqual(chunks[2], s16)
+        self.assertEqual(chunks[3], s16)
+        self.assertEqual(chunks[4], s32)
+        self.assertEqual(chunks[5], s32)
+        self.assertEqual(chunks[6], s64)
+        self.assertEqual(chunks[7], s64)
+        self.assertEqual(chunks[8], f32)
+        self.assertEqual(chunks[9], f32)
+        self.assertEqual(chunks[10], f64)
+        self.assertEqual(chunks[11], f64)
+
+    @nested_params([4000, 16000])
+    def test_basic_audio_stream_sample_rate(self, sr):
+        """`sample_rate` argument changes the sample_rate of decoded audio"""
+        src_num_channels, src_sr = 2, 8000
+        data = get_sinusoid(sample_rate=src_sr, n_channels=src_num_channels, channels_first=False)
+        path = self.get_temp_path("ref.wav")
+        save_wav(path, data, src_sr, channels_first=False)
+
+        s = StreamReader(path)
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="flt", sample_rate=sr)
+        self.assertEqual(s.get_src_stream_info(0).sample_rate, src_sr)
+        self.assertEqual(s.get_out_stream_info(0).sample_rate, sr)
+
+        s.process_all_packets()
+        (chunks,) = s.pop_chunks()
+        self.assertEqual(chunks.shape, [sr, src_num_channels])
+
+    @nested_params([1, 2, 3, 8, 16])
+    def test_basic_audio_stream_num_channels(self, num_channels):
+        """`sample_rate` argument changes the number of channels of decoded audio"""
+        src_num_channels, sr = 2, 8000
+        data = get_sinusoid(sample_rate=sr, n_channels=src_num_channels, channels_first=False)
+        path = self.get_temp_path("ref.wav")
+        save_wav(path, data, sr, channels_first=False)
+
+        s = StreamReader(path)
+        s.add_basic_audio_stream(frames_per_chunk=-1, format="flt", num_channels=num_channels)
+        self.assertEqual(s.get_src_stream_info(0).num_channels, src_num_channels)
+        self.assertEqual(s.get_out_stream_info(0).num_channels, num_channels)
+
+        s.process_all_packets()
+        (chunks,) = s.pop_chunks()
+        self.assertEqual(chunks.shape, [sr, num_channels])
 
     @nested_params(
         ["int16", "uint8", "int32"],  # "float", "double", "int64"]
@@ -890,6 +1046,7 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
         rgb = torch.empty(1, 3, 256, 256, dtype=torch.uint8)
         rgb[0, 0] = torch.arange(256, dtype=torch.uint8).reshape([1, -1])
         rgb[0, 1] = torch.arange(256, dtype=torch.uint8).reshape([-1, 1])
+        alpha = torch.full((1, 1, 256, 256), 255, dtype=torch.uint8)
         for i in range(256):
             rgb[0, 2] = i
             path = self.get_temp_path(f"ref_{i}.png")
@@ -898,8 +1055,13 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             rgb16 = ((rgb.to(torch.int32) - 128) << 8).to(torch.int16)
 
             yuv = rgb_to_yuv_ccir(rgb)
+            yuv16 = yuv.to(torch.int16) * 4
             bgr = rgb[:, [2, 1, 0], :, :]
             gray = rgb_to_gray(rgb)
+            argb = torch.cat([alpha, rgb], dim=1)
+            rgba = torch.cat([rgb, alpha], dim=1)
+            abgr = torch.cat([alpha, bgr], dim=1)
+            bgra = torch.cat([bgr, alpha], dim=1)
 
             s = StreamReader(path)
             s.add_basic_video_stream(frames_per_chunk=-1, format="yuv444p")
@@ -909,12 +1071,167 @@ class StreamReaderImageTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase)
             s.add_basic_video_stream(frames_per_chunk=-1, format="bgr24")
             s.add_basic_video_stream(frames_per_chunk=-1, format="gray8")
             s.add_basic_video_stream(frames_per_chunk=-1, format="rgb48le")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="argb")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="rgba")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="abgr")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="bgra")
+            s.add_basic_video_stream(frames_per_chunk=-1, format="yuv420p10le")
             s.process_all_packets()
-            yuv444, yuv420, nv12, rgb24, bgr24, gray8, rgb48le = s.pop_chunks()
-            self.assertEqual(yuv, yuv444, atol=1, rtol=0)
-            self.assertEqual(yuv, yuv420, atol=1, rtol=0)
-            self.assertEqual(yuv, nv12, atol=1, rtol=0)
-            self.assertEqual(rgb, rgb24, atol=0, rtol=0)
-            self.assertEqual(bgr, bgr24, atol=0, rtol=0)
-            self.assertEqual(gray, gray8, atol=1, rtol=0)
-            self.assertEqual(rgb16, rgb48le, atol=256, rtol=0)
+            chunks = s.pop_chunks()
+            self.assertEqual(chunks[0], yuv, atol=1, rtol=0)
+            self.assertEqual(chunks[1], yuv, atol=1, rtol=0)
+            self.assertEqual(chunks[2], yuv, atol=1, rtol=0)
+            self.assertEqual(chunks[3], rgb, atol=0, rtol=0)
+            self.assertEqual(chunks[4], bgr, atol=0, rtol=0)
+            self.assertEqual(chunks[5], gray, atol=1, rtol=0)
+            self.assertEqual(chunks[6], rgb16, atol=256, rtol=0)
+            self.assertEqual(chunks[7], argb, atol=0, rtol=0)
+            self.assertEqual(chunks[8], rgba, atol=0, rtol=0)
+            self.assertEqual(chunks[9], abgr, atol=0, rtol=0)
+            self.assertEqual(chunks[10], bgra, atol=0, rtol=0)
+            self.assertEqual(chunks[11], yuv16, atol=4, rtol=0)
+
+
+@skipIfNoHWAccel("h264_cuvid")
+class CuvidHWAccelInterfaceTest(TorchaudioTestCase):
+    def test_dup_hw_acel(self):
+        """Specifying the same source stream with and without HW accel should fail (instead of segfault later)"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        r.add_video_stream(-1, decoder="h264_cuvid")
+        with self.assertRaises(RuntimeError):
+            r.add_video_stream(-1, decoder="h264_cuvid", hw_accel="cuda")
+
+        r = StreamReader(src)
+        r.add_video_stream(-1, decoder="h264_cuvid", hw_accel="cuda")
+        with self.assertRaises(RuntimeError):
+            r.add_video_stream(-1, decoder="h264_cuvid")
+
+
+@_media_source
+class CudaDecoderTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestCase):
+    def _test_decode(
+        self,
+        decoder: str,
+        src_path: str,
+        height: int,
+        width: int,
+        ref_num_frames: int,
+        hw_accel=None,
+        decoder_option=None,
+        dtype: torch.dtype = torch.uint8,
+    ):
+        src = self.get_src(get_asset_path(src_path))
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder=decoder, decoder_option=decoder_option, hw_accel=hw_accel)
+
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device(hw_accel or "cpu"))
+            self.assertEqual(chunk.dtype, dtype)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, height, width]))
+            num_frames += chunk.size(0)
+        assert num_frames == ref_num_frames
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid(self):
+        """GPU decoder works for H264"""
+        self._test_decode("h264_cuvid", "nasa_13013.mp4", 270, 480, 390)
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid_hw_accel(self):
+        """GPU decoder works for H264 with HW acceleration, and put the frames on CUDA tensor"""
+        self._test_decode("h264_cuvid", "nasa_13013.mp4", 270, 480, 390, hw_accel="cuda:0")
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid_hw_accel_resize(self):
+        """GPU decoder works for H264 with HW acceleration and resize option"""
+        w, h = 240, 136
+        self._test_decode(
+            "h264_cuvid", "nasa_13013.mp4", h, w, 390, hw_accel="cuda:0", decoder_option={"resize": f"{w}x{h}"}
+        )
+
+    @skipIfNoHWAccel("h264_cuvid")
+    def test_h264_cuvid_hw_accel_crop(self):
+        """GPU decoder works for H264 with HW acceleration and crop option"""
+        top, bottom, left, right = 3, 5, 7, 9
+        self._test_decode(
+            "h264_cuvid",
+            "nasa_13013.mp4",
+            262,
+            464,
+            390,
+            hw_accel="cuda:0",
+            decoder_option={"crop": f"{top}x{bottom}x{left}x{right}"},
+        )
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid(self):
+        """GPU decoder works for H265/HEVC"""
+        self._test_decode("hevc_cuvid", "testsrc.hevc", 144, 256, 300)
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid_hw_accel(self):
+        """GPU decoder works for H265/HEVC with HW acceleration, and put the frames on CUDA tensor"""
+        self._test_decode("hevc_cuvid", "testsrc.hevc", 144, 256, 300, hw_accel="cuda:0", dtype=torch.int16)
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid_hw_accel_resize(self):
+        """GPU decoder works for H265/HEVC with HW acceleration and resize option"""
+        w, h = 128, 64
+        self._test_decode(
+            "hevc_cuvid",
+            "testsrc.hevc",
+            h,
+            w,
+            300,
+            hw_accel="cuda:0",
+            dtype=torch.int16,
+            decoder_option={"resize": f"{w}x{h}"},
+        )
+
+    @skipIfNoHWAccel("hevc_cuvid")
+    def test_hevc_cuvid_hw_accel_crop(self):
+        """GPU decoder works for H265/HEVC with HW acceleration and crop option"""
+        top, bottom, left, right = 3, 5, 7, 9
+        self._test_decode(
+            "hevc_cuvid",
+            "testsrc.hevc",
+            136,
+            240,
+            300,
+            hw_accel="cuda:0",
+            dtype=torch.int16,
+            decoder_option={"crop": f"{top}x{bottom}x{left}x{right}"},
+        )
+
+
+@skipIfNoHWAccel("h264_cuvid")
+# Disabled in CI: https://github.com/pytorch/audio/issues/3376
+@disabledInCI
+class FilterGraphWithCudaAccel(TorchaudioTestCase):
+    def test_sclae_cuda_change_size(self):
+        """scale_cuda filter can be used when HW accel is on"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=iw/2:ih/2")
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cuda:0"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 135, 240]))
+            num_frames += chunk.size(0)
+        assert num_frames == 390
+
+    def test_scale_cuda_format(self):
+        """yuv444p format conversion should work"""
+        src = get_asset_path("nasa_13013.mp4")
+        r = StreamReader(src)
+        r.add_video_stream(10, decoder="h264_cuvid", hw_accel="cuda", filter_desc="scale_cuda=format=yuv444p")
+        num_frames = 0
+        for (chunk,) in r.stream():
+            self.assertEqual(chunk.device, torch.device("cuda:0"))
+            self.assertEqual(chunk.dtype, torch.uint8)
+            self.assertEqual(chunk.shape, torch.Size([10, 3, 270, 480]))
+            num_frames += chunk.size(0)
+        assert num_frames == 390

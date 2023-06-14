@@ -1,44 +1,44 @@
 #pragma once
 
-#include <torch/torch.h>
+#include <torch/types.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/packet_writer.h>
+#include <torchaudio/csrc/ffmpeg/stream_writer/types.h>
 
 namespace torchaudio {
 namespace io {
 
-/// @cond
-
-struct OutputStream {
-  AVStream* stream;
-  AVCodecContextPtr codec_ctx;
-  std::unique_ptr<FilterGraph> filter;
-  AVFramePtr src_frame;
-  AVFramePtr dst_frame;
-  // The number of samples written so far
-  int64_t num_frames;
-  // Audio-only: The maximum frames that frame can hold
-  int64_t frame_capacity;
-  // Video-only: HW acceleration
-  AVBufferRefPtr hw_device_ctx;
-  AVBufferRefPtr hw_frame_ctx;
-};
-
-/// @endcond
+////////////////////////////////////////////////////////////////////////////////
+// StreamWriter
+////////////////////////////////////////////////////////////////////////////////
 
 ///
 /// Encode and write audio/video streams chunk by chunk
 ///
 class StreamWriter {
-  AVFormatOutputContextPtr pFormatContext;
-  AVBufferRefPtr pHWBufferRef;
-  std::vector<OutputStream> streams;
-  AVPacketPtr pkt;
+  AVFormatOutputContextPtr format_ctx;
+  std::map<int, EncodeProcess> processes;
+  std::map<int, PacketWriter> packet_writers;
 
- protected:
+  AVPacketPtr pkt{alloc_avpacket()};
+  bool is_open = false;
+  int current_key = 0;
+
   /// @cond
 
+ private:
   explicit StreamWriter(AVFormatContext*);
+
+ protected:
+  /// Construct StreamWriter from custom IO
+  ///
+  /// @param io_ctx Custom IO.
+  /// @param format Specify output format.
+  explicit StreamWriter(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format = c10::nullopt);
 
   /// @endcond
 
@@ -50,20 +50,7 @@ class StreamWriter {
   /// ``dst``.
   explicit StreamWriter(
       const std::string& dst,
-      const c10::optional<std::string>& format = {});
-
-  /// @cond
-
-  /// Construct StreamWriter from custom IO
-  ///
-  /// @param io_ctx Custom IO.
-  /// @param format Specify output format.
-  // TODO: Move this into wrapper class.
-  explicit StreamWriter(
-      AVIOContext* io_ctx,
-      const c10::optional<std::string>& format);
-
-  /// @endcond
+      const c10::optional<std::string>& format = c10::nullopt);
 
   // Non-copyable
   StreamWriter(const StreamWriter&) = delete;
@@ -115,13 +102,25 @@ class StreamWriter {
   /// override the format used for encoding.
   ///  To list supported formats for the encoder, you can use
   /// ``ffmpeg -h encoder=<ENCODER>`` command.
+  /// @param encoder_sample_rate If provided, perform resampling
+  /// before encoding.
+  /// @param encoder_num_channels If provided, change channel configuration
+  /// before encoding.
+  /// @param codec_config Codec configuration.
+  /// @param filter_desc Additional processing to apply before
+  /// encoding the input data
   void add_audio_stream(
-      int64_t sample_rate,
-      int64_t num_channels,
+      int sample_rate,
+      int num_channels,
       const std::string& format,
-      const c10::optional<std::string>& encoder,
-      const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format);
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<int>& encoder_sample_rate = c10::nullopt,
+      const c10::optional<int>& encoder_num_channels = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+
   /// Add an output video stream.
   ///
   /// @param frame_rate Frame rate
@@ -142,7 +141,11 @@ class StreamWriter {
   /// @param encoder See ``add_audio_stream()``.
   /// @param encoder_option See ``add_audio_stream()``.
   /// @param encoder_format See ``add_audio_stream()``.
+  /// @param encoder_frame_rate If provided, change frame rate before encoding.
+  /// @param encoder_width If provided, resize image before encoding.
+  /// @param encoder_height If provided, resize image before encoding.
   /// @param hw_accel Enable hardware acceleration.
+  /// @param codec_config Codec configuration.
   /// @parblock
   /// When video is encoded on CUDA hardware, for example
   /// `encoder="h264_nvenc"`, passing CUDA device indicator to `hw_accel`
@@ -151,21 +154,70 @@ class StreamWriter {
   ///
   /// If `None`, the video chunk Tensor has to be a CPU Tensor.
   /// @endparblock
+  /// @param filter_desc Additional processing to apply before
+  /// encoding the input data
   void add_video_stream(
       double frame_rate,
-      int64_t width,
-      int64_t height,
+      int width,
+      int height,
       const std::string& format,
-      const c10::optional<std::string>& encoder,
-      const c10::optional<OptionDict>& encoder_option,
-      const c10::optional<std::string>& encoder_format,
-      const c10::optional<std::string>& hw_accel);
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<double>& encoder_frame_rate = c10::nullopt,
+      const c10::optional<int>& encoder_width = c10::nullopt,
+      const c10::optional<int>& encoder_height = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+  /// @cond
+  /// Add output audio frame stream.
+  /// Allows for writing frames rather than tensors via `write_frame`.
+  ///
+  /// See `add_audio_stream` for more detail on input parameters.
+  void add_audio_frame_stream(
+      int sample_rate,
+      int num_channels,
+      const std::string& format,
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<int>& encoder_sample_rate = c10::nullopt,
+      const c10::optional<int>& encoder_num_channels = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+
+  /// Add output video frame stream.
+  /// Allows for writing frames rather than tensors via `write_frame`.
+  ///
+  /// See `add_video_stream` for more detail on input parameters.
+  void add_video_frame_stream(
+      double frame_rate,
+      int width,
+      int height,
+      const std::string& format,
+      const c10::optional<std::string>& encoder = c10::nullopt,
+      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
+      const c10::optional<std::string>& encoder_format = c10::nullopt,
+      const c10::optional<double>& encoder_frame_rate = c10::nullopt,
+      const c10::optional<int>& encoder_width = c10::nullopt,
+      const c10::optional<int>& encoder_height = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt,
+      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
+      const c10::optional<std::string>& filter_desc = c10::nullopt);
+
+  /// Add packet stream. Intended to be used in conjunction with
+  /// ``StreamReader`` to perform packet passthrough.
+  /// @param stream_params Stream parameters returned by
+  /// ``StreamReader::get_src_stream_params()`` for the packet stream to pass
+  /// through.
+  void add_packet_stream(const StreamParams& stream_params);
+
+  /// @endcond
+
   /// Set file-level metadata
   /// @param metadata metadata.
   void set_metadata(const OptionDict& metadata);
-
- private:
-  AVStream* add_stream(AVCodecContextPtr& ctx);
 
   //////////////////////////////////////////////////////////////////////////////
   // Write methods
@@ -174,43 +226,107 @@ class StreamWriter {
   /// Open the output file / device and write the header.
   ///
   /// @param opt Private options for protocol, device and muxer.
-  void open(const c10::optional<OptionDict>& opt);
+  void open(const c10::optional<OptionDict>& opt = c10::nullopt);
   /// Close the output file / device and finalize metadata.
   void close();
 
   /// Write audio data
   /// @param i Stream index.
-  /// @param chunk Waveform tensor. Shape: ``(frame, channel)``.
+  /// @param frames Waveform tensor. Shape: ``(frame, channel)``.
   /// The ``dtype`` must match what was passed to ``add_audio_stream()`` method.
-  void write_audio_chunk(int i, const torch::Tensor& chunk);
+  /// @param pts
+  /// @parblock
+  /// Presentation timestamp. If provided, it overwrites the PTS of
+  /// the first frame with the provided one. Otherwise, PTS are incremented per
+  /// an inverse of sample rate. Only values exceed the PTS values processed
+  /// internally.
+  ///
+  /// __NOTE__: The provided value is converted to integer value expressed
+  /// in basis of sample rate.
+  /// Therefore, it is truncated to the nearest value of ``n / sample_rate``.
+  /// @endparblock
+  void write_audio_chunk(
+      int i,
+      const torch::Tensor& frames,
+      const c10::optional<double>& pts = c10::nullopt);
   /// Write video data
   /// @param i Stream index.
-  /// @param chunk Video/image tensor. Shape: ``(time, channel, height,
+  /// @param frames Video/image tensor. Shape: ``(time, channel, height,
   /// width)``. The ``dtype`` must be ``torch.uint8``. The shape ``(height,
   /// width and the number of channels)`` must match what was configured when
   /// calling ``add_video_stream()``.
-  void write_video_chunk(int i, const torch::Tensor& chunk);
+  /// @param pts
+  /// @parblock
+  /// Presentation timestamp. If provided, it overwrites the PTS of
+  /// the first frame with the provided one. Otherwise, PTS are incremented per
+  /// an inverse of frame rate. Only values exceed the PTS values processed
+  /// internally.
+  ///
+  /// __NOTE__: The provided value is converted to integer value expressed
+  /// in basis of frame rate.
+  /// Therefore, it is truncated to the nearest value of ``n / frame_rate``.
+  /// @endparblock
+  void write_video_chunk(
+      int i,
+      const torch::Tensor& frames,
+      const c10::optional<double>& pts = c10::nullopt);
+  /// @cond
+  /// Write frame to stream.
+  /// @param i Stream index.
+  /// @param frame Frame to write.
+  void write_frame(int i, AVFrame* frame);
+  /// Write packet.
+  /// @param packet Packet to write, passed from ``StreamReader``.
+  void write_packet(const AVPacketPtr& packet);
+  /// @endcond
+
   /// Flush the frames from encoders and write the frames to the destination.
   void flush();
 
  private:
-  void validate_stream(int i, enum AVMediaType);
-  void write_planar_video(
-      OutputStream& os,
-      const torch::Tensor& chunk,
-      int num_planes);
-  void write_interlaced_video(OutputStream& os, const torch::Tensor& chunk);
-#ifdef USE_CUDA
-  void write_planar_video_cuda(
-      OutputStream& os,
-      const torch::Tensor& chunk,
-      int num_planes);
-  void write_interlaced_video_cuda(
-      OutputStream& os,
-      const torch::Tensor& chunk,
-      bool pad_extra = true);
-#endif
-  void flush_stream(OutputStream& os);
+  int num_output_streams();
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// StreamWriterCustomIO
+////////////////////////////////////////////////////////////////////////////////
+
+/// @cond
+
+namespace detail {
+struct CustomOutput {
+  AVIOContextPtr io_ctx;
+  CustomOutput(
+      void* opaque,
+      int buffer_size,
+      int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
+      int64_t (*seek)(void* opaque, int64_t offset, int whence));
+};
+} // namespace detail
+
+/// @endcond
+
+///
+/// A subclass of StreamReader which works with custom read function.
+/// Can be used for encoding media into memory or custom object.
+///
+class StreamWriterCustomIO : private detail::CustomOutput, public StreamWriter {
+ public:
+  /// Construct StreamWriterCustomIO with custom write and seek functions.
+  ///
+  /// @param opaque Custom data used by ``write_packet`` and ``seek`` functions.
+  /// @param format Specify output format.
+  /// @param buffer_size The size of the intermediate buffer, which FFmpeg uses
+  /// to pass data to write_packet function.
+  /// @param write_packet Custom write function that is called from FFmpeg to
+  /// actually write data to the custom destination.
+  /// @param seek Optional seek function that is used to seek the destination.
+  StreamWriterCustomIO(
+      void* opaque,
+      const c10::optional<std::string>& format,
+      int buffer_size,
+      int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
+      int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr);
 };
 
 } // namespace io

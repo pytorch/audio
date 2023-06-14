@@ -101,9 +101,49 @@ struct SrcStreamInfo {
 struct OutputStreamInfo {
   /// The index of the input source stream
   int source_index;
+
+  ///
+  /// The stream media type.
+  ///
+  /// Please see refer to
+  /// [the FFmpeg
+  /// documentation](https://ffmpeg.org/doxygen/4.1/group__lavu__misc.html#ga9a84bba4713dfced21a1a56163be1f48)
+  /// for the available values
+  ///
+  /// @todo Introduce own enum and get rid of FFmpeg dependency
+  ///
+  AVMediaType media_type = AVMEDIA_TYPE_UNKNOWN;
+  /// Media format. AVSampleFormat for audio or AVPixelFormat for video.
+  int format = -1;
+
   /// Filter graph definition, such as
   /// ``"aresample=16000,aformat=sample_fmts=fltp"``.
-  std::string filter_description;
+  std::string filter_description{};
+
+  /// @name AUDIO-SPECIFIC MEMBERS
+  ///@{
+
+  /// Sample rate
+  double sample_rate = -1;
+
+  /// The number of channels
+  int num_channels = -1;
+
+  ///@}
+
+  /// @name VIDEO-SPECIFIC MEMBERS
+  ///@{
+
+  /// Width
+  int width = -1;
+
+  /// Height
+  int height = -1;
+
+  /// Frame rate
+  AVRational frame_rate{0, 1};
+
+  ///@}
 };
 
 /// Stores decoded frames and metadata

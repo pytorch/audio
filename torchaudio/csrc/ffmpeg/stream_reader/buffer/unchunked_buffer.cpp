@@ -1,30 +1,18 @@
-#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 
-namespace torchaudio {
-namespace io {
-namespace detail {
+namespace torchaudio::io::detail {
 
-UnchunkedVideoBuffer::UnchunkedVideoBuffer(const torch::Device& device)
-    : device(device) {}
+UnchunkedBuffer::UnchunkedBuffer(AVRational time_base) : time_base(time_base){};
 
 bool UnchunkedBuffer::is_ready() const {
   return chunks.size() > 0;
 }
 
-void UnchunkedBuffer::push_tensor(const torch::Tensor& t, double pts_) {
+void UnchunkedBuffer::push_frame(torch::Tensor frame, int64_t pts_) {
   if (chunks.size() == 0) {
-    pts = pts_;
+    pts = double(pts_) * time_base.num / time_base.den;
   }
-  chunks.push_back(t);
-}
-
-void UnchunkedAudioBuffer::push_frame(AVFrame* frame, double pts_) {
-  push_tensor(convert_audio(frame), pts_);
-}
-
-void UnchunkedVideoBuffer::push_frame(AVFrame* frame, double pts_) {
-  push_tensor(convert_image(frame, device), pts_);
+  chunks.push_back(frame);
 }
 
 c10::optional<Chunk> UnchunkedBuffer::pop_chunk() {
@@ -42,6 +30,4 @@ void UnchunkedBuffer::flush() {
   chunks.clear();
 }
 
-} // namespace detail
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io::detail

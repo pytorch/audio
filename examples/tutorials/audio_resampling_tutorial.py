@@ -27,14 +27,14 @@ import math
 import timeit
 
 import librosa
-import resampy
-import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 import pandas as pd
-from IPython.display import Audio, display
+import resampy
+from IPython.display import Audio
 
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
 
 DEFAULT_OFFSET = 201
 
@@ -325,7 +325,7 @@ print("torchaudio and librosa kaiser fast MSE:", mse)
 #
 # Below are benchmarks for downsampling and upsampling waveforms between
 # two pairs of sampling rates. We demonstrate the performance implications
-# that the ``lowpass_filter_wdith``, window type, and sample rates can
+# that the ``lowpass_filter_width``, window type, and sample rates can
 # have. Additionally, we provide a comparison against ``librosa``\ ’s
 # ``kaiser_best`` and ``kaiser_fast`` using their corresponding parameters
 # in ``torchaudio``.
@@ -338,6 +338,7 @@ print(f"resampy: {resampy.__version__}")
 ######################################################################
 #
 
+
 def benchmark_resample_functional(
     waveform,
     sample_rate,
@@ -348,8 +349,9 @@ def benchmark_resample_functional(
     beta=None,
     iters=5,
 ):
-    return timeit.timeit(
-        stmt='''
+    return (
+        timeit.timeit(
+            stmt="""
 torchaudio.functional.resample(
     waveform,
     sample_rate,
@@ -359,15 +361,19 @@ torchaudio.functional.resample(
     resampling_method=resampling_method,
     beta=beta,
 )
-        ''',
-        setup='import torchaudio',
-        number=iters,
-        globals=locals(),
-    ) * 1000 / iters
+        """,
+            setup="import torchaudio",
+            number=iters,
+            globals=locals(),
+        )
+        * 1000
+        / iters
+    )
 
 
 ######################################################################
 #
+
 
 def benchmark_resample_transforms(
     waveform,
@@ -379,9 +385,10 @@ def benchmark_resample_transforms(
     beta=None,
     iters=5,
 ):
-    return timeit.timeit(
-        stmt='resampler(waveform)',
-        setup='''
+    return (
+        timeit.timeit(
+            stmt="resampler(waveform)",
+            setup="""
 import torchaudio
 
 resampler = torchaudio.transforms.Resample(
@@ -394,14 +401,18 @@ resampler = torchaudio.transforms.Resample(
     beta=beta,
 )
 resampler.to(waveform.device)
-        ''',
-        number=iters,
-        globals=locals(),
-    ) * 1000 / iters
+        """,
+            number=iters,
+            globals=locals(),
+        )
+        * 1000
+        / iters
+    )
 
 
 ######################################################################
 #
+
 
 def benchmark_resample_librosa(
     waveform,
@@ -411,23 +422,28 @@ def benchmark_resample_librosa(
     iters=5,
 ):
     waveform_np = waveform.squeeze().numpy()
-    return timeit.timeit(
-        stmt='''
+    return (
+        timeit.timeit(
+            stmt="""
 librosa.resample(
     waveform_np,
     orig_sr=sample_rate,
     target_sr=resample_rate,
     res_type=res_type,
 )
-        ''',
-        setup='import librosa',
-        number=iters,
-        globals=locals(),
-    ) * 1000 / iters
+        """,
+            setup="import librosa",
+            number=iters,
+            globals=locals(),
+        )
+        * 1000
+        / iters
+    )
 
 
 ######################################################################
 #
+
 
 def benchmark(sample_rate, resample_rate):
     times, rows = [], []
@@ -483,7 +499,7 @@ def plot(df):
     print(df.round(2))
     ax = df.plot(kind="bar")
     plt.ylabel("Time Elapsed [ms]")
-    plt.xticks(rotation = 0, fontsize=10)
+    plt.xticks(rotation=0, fontsize=10)
     for cont, col, color in zip(ax.containers, df.columns, mcolors.TABLEAU_COLORS):
         label = ["N/A" if v != v else str(v) for v in df[col].round(2)]
         ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")

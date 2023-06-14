@@ -3,10 +3,8 @@
 #include "c10/util/Exception.h"
 
 using namespace torch::indexing;
-using namespace torchaudio::sox_utils;
 
-namespace torchaudio {
-namespace sox_effects_chain {
+namespace torchaudio::sox {
 
 namespace {
 
@@ -300,5 +298,4 @@ int64_t SoxEffectsChain::getOutputSampleRate() {
   return interm_sig_.rate;
 }
 
-} // namespace sox_effects_chain
-} // namespace torchaudio
+} // namespace torchaudio::sox

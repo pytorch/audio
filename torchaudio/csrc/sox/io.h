@@ -4,8 +4,7 @@
 #include <torch/script.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_io {
+namespace torchaudio::sox {
 
 auto get_effects(
     const c10::optional<int64_t>& frame_offset,
@@ -37,7 +36,6 @@ void save_audio_file(
     c10::optional<std::string> encoding,
     c10::optional<int64_t> bits_per_sample);
 
-} // namespace sox_io
-} // namespace torchaudio
+} // namespace torchaudio::sox
 
 #endif

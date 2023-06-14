@@ -202,10 +202,9 @@ class AutoPool(nn.Module):
         return out
 
 
-class SQUIM_OBJECTIVE(nn.Module):
-    """SQUIM_OBJECTIVE model that predicts objective metric scorres for speech enhancement (e.g., STOI, PESQ, and SI-SDR).
-    The model uses *dual-path recurrent neural networks (DPRNN)* :cite:`luo2020dual` to model sequential signals,
-    and multiple transformer branches to estimate the objective metric scores, respectively.
+class SquimObjective(nn.Module):
+    """Speech Quality and Intelligibility Measures (SQUIM) model that predicts **objective** metric scores
+    for speech enhancement (e.g., STOI, PESQ, and SI-SDR).
 
     Args:
         encoder (torch.nn.Module): Encoder module to transform 1D waveform to 2D feature representation.
@@ -219,7 +218,7 @@ class SQUIM_OBJECTIVE(nn.Module):
         dprnn: nn.Module,
         branches: nn.ModuleList,
     ):
-        super(SQUIM_OBJECTIVE, self).__init__()
+        super(SquimObjective, self).__init__()
         self.encoder = encoder
         self.dprnn = dprnn
         self.branches = branches
@@ -285,8 +284,8 @@ def squim_objective_model(
     rnn_type: str,
     chunk_size: int,
     chunk_stride: Optional[int] = None,
-) -> SQUIM_OBJECTIVE:
-    """Build a custome :class:`torchaudio.prototype.models.SQUIM_OBJECTIVE` model.
+) -> SquimObjective:
+    """Build a custome :class:`torchaudio.prototype.models.SquimObjective` model.
 
     Args:
         feat_dim (int, optional): The feature dimension after Encoder module.
@@ -310,11 +309,11 @@ def squim_objective_model(
             _create_branch(d_model, nhead, "sisdr"),
         ]
     )
-    return SQUIM_OBJECTIVE(encoder, dprnn, branches)
+    return SquimObjective(encoder, dprnn, branches)
 
 
-def squim_objective_base() -> SQUIM_OBJECTIVE:
-    """Build :class:`torchaudio.prototype.models.SQUIM_OBJECTIVE` model with default arguments."""
+def squim_objective_base() -> SquimObjective:
+    """Build :class:`torchaudio.prototype.models.SquimObjective` model with default arguments."""
     return squim_objective_model(
         feat_dim=256,
         win_len=64,

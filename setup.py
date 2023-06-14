@@ -106,7 +106,7 @@ def _parse_url(path):
 
 def _parse_sources():
     third_party_dir = ROOT_DIR / "third_party"
-    libs = ["zlib", "bzip2", "lzma", "sox"]
+    libs = ["sox"]
     archive_dir = third_party_dir / "archives"
     archive_dir.mkdir(exist_ok=True)
     for lib in libs:
@@ -124,7 +124,8 @@ def _fetch_archives(src):
 
 
 def _fetch_third_party_libraries():
-    _init_submodule()
+    # Revert this when a submodule is added again
+    # _init_submodule()
     if os.name != "nt":
         _fetch_archives(_parse_sources())
 
@@ -144,12 +145,20 @@ def _main():
     _make_version_file(version, sha)
     _fetch_third_party_libraries()
 
+    with open("README.md") as f:
+        long_description = f.read()
+
     setup(
         name="torchaudio",
         version=version,
         description="An audio package for PyTorch",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
         url="https://github.com/pytorch/audio",
-        author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
+        author=(
+            "Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, "
+            "Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang"
+        ),
         author_email="soumith@pytorch.org",
         maintainer="Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
         maintainer_email="moto@meta.com",
@@ -165,6 +174,7 @@ def _main():
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Multimedia :: Sound/Audio",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",

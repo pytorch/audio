@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import io
 import math
+import tempfile
 import warnings
 from collections.abc import Sequence
 from typing import List, Optional, Tuple, Union
@@ -9,6 +9,8 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
+from torchaudio._extension import fail_if_no_align
+from torchaudio._internal.module_utils import deprecated
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -19,7 +21,6 @@ __all__ = [
     "amplitude_to_DB",
     "DB_to_amplitude",
     "compute_deltas",
-    "compute_kaldi_pitch",
     "melscale_fbanks",
     "linear_fbanks",
     "create_dct",
@@ -51,6 +52,7 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
+    "forced_align",
 ]
 
 
@@ -83,7 +85,7 @@ def spectrogram(
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
         power (float or None): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc.
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
         normalized (bool or str): Whether to normalize by magnitude after stft. If input is str, choices are
             ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
@@ -286,7 +288,7 @@ def griffinlim(
             Default: ``win_length // 2``)
         win_length (int): Window size. (Default: ``n_fft``)
         power (float): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc.
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc.
         n_iter (int): Number of iteration for phase recovery process.
         momentum (float): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
@@ -825,18 +827,25 @@ def mask_along_axis_iid(
     ``max_v = min(mask_param, floor(specgrams.size(axis) * p))`` otherwise.
 
     Args:
-        specgrams (Tensor): Real spectrograms `(batch, channel, freq, time)`
+        specgrams (Tensor): Real spectrograms `(..., freq, time)`, with at least 3 dimensions.
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
-        axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+        axis (int): Axis to apply masking on, which should be the one of the last two dimensions.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrograms of dimensions `(batch, channel, freq, time)`
+        Tensor: Masked spectrograms with the same dimensions as input specgrams Tensor`
     """
 
-    if axis not in [2, 3]:
-        raise ValueError("Only Frequency and Time masking are supported")
+    dim = specgrams.dim()
+
+    if dim < 3:
+        raise ValueError(f"Spectrogram must have at least three dimensions ({dim} given).")
+
+    if axis not in [dim - 2, dim - 1]:
+        raise ValueError(
+            f"Only Frequency and Time masking are supported (axis {dim-2} and axis {dim-1} supported; {axis} given)."
+        )
 
     if not 0.0 <= p <= 1.0:
         raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
@@ -848,8 +857,8 @@ def mask_along_axis_iid(
     device = specgrams.device
     dtype = specgrams.dtype
 
-    value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * mask_param
-    min_value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * (specgrams.size(axis) - value)
+    value = torch.rand(specgrams.shape[: (dim - 2)], device=device, dtype=dtype) * mask_param
+    min_value = torch.rand(specgrams.shape[: (dim - 2)], device=device, dtype=dtype) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
     mask_start = min_value.long()[..., None, None]
@@ -879,24 +888,31 @@ def mask_along_axis(
 
     Mask will be applied from indices ``[v_0, v_0 + v)``,
     where ``v`` is sampled from ``uniform(0, max_v)`` and
-    ``v_0`` from ``uniform(0, specgrams.size(axis) - v)``, with
+    ``v_0`` from ``uniform(0, specgram.size(axis) - v)``, with
     ``max_v = mask_param`` when ``p = 1.0`` and
-    ``max_v = min(mask_param, floor(specgrams.size(axis) * p))``
+    ``max_v = min(mask_param, floor(specgram.size(axis) * p))``
     otherwise.
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram `(channel, freq, time)`
+        specgram (Tensor): Real spectrograms `(..., freq, time)`, with at least 2 dimensions.
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
-        axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+        axis (int): Axis to apply masking on, which should be the one of the last two dimensions.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
 
     Returns:
-        Tensor: Masked spectrogram of dimensions `(channel, freq, time)`
+        Tensor: Masked spectrograms with the same dimensions as input specgram Tensor
     """
-    if axis not in [1, 2]:
-        raise ValueError("Only Frequency and Time masking are supported")
+    dim = specgram.dim()
+
+    if dim < 2:
+        raise ValueError(f"Spectrogram must have at least two dimensions (time and frequency) ({dim} given).")
+
+    if axis not in [dim - 2, dim - 1]:
+        raise ValueError(
+            f"Only Frequency and Time masking are supported (axis {dim-2} and axis {dim-1} supported; {axis} given)."
+        )
 
     if not 0.0 <= p <= 1.0:
         raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
@@ -908,14 +924,17 @@ def mask_along_axis(
     # pack batch
     shape = specgram.size()
     specgram = specgram.reshape([-1] + list(shape[-2:]))
+    # After packing, specgram is a 3D tensor, and the axis corresponding to the to-be-masked dimension
+    # is now (axis - dim + 3), e.g. a tensor of shape (10, 2, 50, 10, 2) becomes a tensor of shape (1000, 10, 2).
     value = torch.rand(1) * mask_param
-    min_value = torch.rand(1) * (specgram.size(axis) - value)
+    min_value = torch.rand(1) * (specgram.size(axis - dim + 3) - value)
 
     mask_start = (min_value.long()).squeeze()
     mask_end = (min_value.long() + value.long()).squeeze()
-    mask = torch.arange(0, specgram.shape[axis], device=specgram.device, dtype=specgram.dtype)
+    mask = torch.arange(0, specgram.shape[axis - dim + 3], device=specgram.device, dtype=specgram.dtype)
     mask = (mask >= mask_start) & (mask < mask_end)
-    if axis == 1:
+    # unsqueeze the mask if the axis is frequency
+    if axis == dim - 2:
         mask = mask.unsqueeze(-1)
 
     if mask_end - mask_start >= mask_param:
@@ -1271,6 +1290,7 @@ def spectral_centroid(
 
 
 @torchaudio._extension.fail_if_no_sox
+@deprecated("Please migrate to torchaudio.io.AudioEffector.", remove=False)
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1284,6 +1304,12 @@ def apply_codec(
     Apply codecs as a form of augmentation.
 
     .. devices:: CPU
+
+    .. warning::
+
+       This function has been deprecated.
+       Please migrate to :py:class:`torchaudio.io.AudioEffector`, which works on all platforms,
+       and supports streaming processing.
 
     Args:
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
@@ -1303,129 +1329,17 @@ def apply_codec(
         Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
-    bytes = io.BytesIO()
-    torchaudio.backend.sox_io_backend.save(
-        bytes, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
-    )
-    bytes.seek(0)
-    augmented, sr = torchaudio.backend.sox_io_backend.load(bytes, channels_first=channels_first, format=format)
+    with tempfile.NamedTemporaryFile() as f:
+        torchaudio.backend.sox_io_backend.save(
+            f.name, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+        )
+        augmented, sr = torchaudio.backend.sox_io_backend.load(f.name, channels_first=channels_first, format=format)
     if sr != sample_rate:
         augmented = resample(augmented, sr, sample_rate)
     return augmented
 
 
-@torchaudio._extension.fail_if_no_kaldi
-def compute_kaldi_pitch(
-    waveform: torch.Tensor,
-    sample_rate: float,
-    frame_length: float = 25.0,
-    frame_shift: float = 10.0,
-    min_f0: float = 50,
-    max_f0: float = 400,
-    soft_min_f0: float = 10.0,
-    penalty_factor: float = 0.1,
-    lowpass_cutoff: float = 1000,
-    resample_frequency: float = 4000,
-    delta_pitch: float = 0.005,
-    nccf_ballast: float = 7000,
-    lowpass_filter_width: int = 1,
-    upsample_filter_width: int = 5,
-    max_frames_latency: int = 0,
-    frames_per_chunk: int = 0,
-    simulate_first_pass_online: bool = False,
-    recompute_frame: int = 500,
-    snip_edges: bool = True,
-) -> torch.Tensor:
-    """Extract pitch based on method described in *A pitch extraction algorithm tuned
-    for automatic speech recognition* :cite:`6854049`.
-
-    .. devices:: CPU
-
-    .. properties:: TorchScript
-
-    This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
-
-    Args:
-        waveform (Tensor):
-            The input waveform of shape `(..., time)`.
-        sample_rate (float):
-            Sample rate of `waveform`.
-        frame_length (float, optional):
-            Frame length in milliseconds. (default: 25.0)
-        frame_shift (float, optional):
-            Frame shift in milliseconds. (default: 10.0)
-        min_f0 (float, optional):
-            Minimum F0 to search for (Hz)  (default: 50.0)
-        max_f0 (float, optional):
-            Maximum F0 to search for (Hz)  (default: 400.0)
-        soft_min_f0 (float, optional):
-            Minimum f0, applied in soft way, must not exceed min-f0  (default: 10.0)
-        penalty_factor (float, optional):
-            Cost factor for FO change.  (default: 0.1)
-        lowpass_cutoff (float, optional):
-            Cutoff frequency for LowPass filter (Hz) (default: 1000)
-        resample_frequency (float, optional):
-            Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.
-            (default: 4000)
-        delta_pitch( float, optional):
-            Smallest relative change in pitch that our algorithm measures. (default: 0.005)
-        nccf_ballast (float, optional):
-            Increasing this factor reduces NCCF for quiet frames (default: 7000)
-        lowpass_filter_width (int, optional):
-            Integer that determines filter width of lowpass filter, more gives sharper filter.
-            (default: 1)
-        upsample_filter_width (int, optional):
-            Integer that determines filter width when upsampling NCCF. (default: 5)
-        max_frames_latency (int, optional):
-            Maximum number of frames of latency that we allow pitch tracking to introduce into
-            the feature processing (affects output only if ``frames_per_chunk > 0`` and
-            ``simulate_first_pass_online=True``) (default: 0)
-        frames_per_chunk (int, optional):
-            The number of frames used for energy normalization. (default: 0)
-        simulate_first_pass_online (bool, optional):
-            If true, the function will output features that correspond to what an online decoder
-            would see in the first pass of decoding -- not the final version of the features,
-            which is the default. (default: False)
-            Relevant if ``frames_per_chunk > 0``.
-        recompute_frame (int, optional):
-            Only relevant for compatibility with online pitch extraction.
-            A non-critical parameter; the frame at which we recompute some of the forward pointers,
-            after revising our estimate of the signal energy.
-            Relevant if ``frames_per_chunk > 0``. (default: 500)
-        snip_edges (bool, optional):
-            If this is set to false, the incomplete frames near the ending edge won't be snipped,
-            so that the number of frames is the file size divided by the frame-shift.
-            This makes different types of features give the same number of frames. (default: True)
-
-    Returns:
-       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension
-       corresponds to pitch and NCCF.
-    """
-    shape = waveform.shape
-    waveform = waveform.reshape(-1, shape[-1])
-    result = torch.ops.torchaudio.kaldi_ComputeKaldiPitch(
-        waveform,
-        sample_rate,
-        frame_length,
-        frame_shift,
-        min_f0,
-        max_f0,
-        soft_min_f0,
-        penalty_factor,
-        lowpass_cutoff,
-        resample_frequency,
-        delta_pitch,
-        nccf_ballast,
-        lowpass_filter_width,
-        upsample_filter_width,
-        max_frames_latency,
-        frames_per_chunk,
-        simulate_first_pass_online,
-        recompute_frame,
-        snip_edges,
-    )
-    result = result.reshape(shape[:-1] + result.shape[-2:])
-    return result
+_CPU = torch.device("cpu")
 
 
 def _get_sinc_resample_kernel(
@@ -1436,10 +1350,9 @@ def _get_sinc_resample_kernel(
     rolloff: float = 0.99,
     resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
-    device: torch.device = torch.device("cpu"),
+    device: torch.device = _CPU,
     dtype: Optional[torch.dtype] = None,
 ):
-
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
         raise Exception(
             "Frequencies must be of integer type to ensure quality resampling computation. "
@@ -2580,3 +2493,51 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
     return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+
+
+@fail_if_no_align
+def forced_align(
+    log_probs: torch.Tensor,
+    targets: torch.Tensor,
+    input_lengths: torch.Tensor,
+    target_lengths: torch.Tensor,
+    blank: int = 0,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    r"""Computes forced alignment given the emissions from a CTC-trained model and a target label.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Args:
+        log_probs (torch.Tensor): log probability of CTC emission output.
+            Tensor of shape `(T, C)`. where `T` is the input length,
+            `C` is the number of characters in alphabet including blank.
+        targets (torch.Tensor): Target sequence. Tensor of shape `(L,)`,
+            where `L` is the target length.
+        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). 0-D Tensor (scalar).
+        target_lengths (torch.Tensor): Lengths of the targets. 0-D Tensor (scalar).
+        blank_id (int, optional): The index of blank symbol in CTC emission. (Default: 0)
+
+    Returns:
+        Tuple(torch.Tensor, torch.Tensor):
+            torch.Tensor: Label for each time step in the alignment path computed using forced alignment.
+
+            torch.Tensor: Log probability scores of the labels for each time step.
+
+    Note:
+        The sequence length of `log_probs` must satisfy:
+
+
+        .. math::
+            L_{\text{log\_probs}} \ge L_{\text{label}} + N_{\text{repeat}}
+
+        where :math:`N_{\text{repeat}}` is the number of consecutively repeated tokens.
+        For example, in str `"aabbc"`, the number of repeats are `2`.
+    """
+    if blank in targets:
+        raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")
+    if torch.max(targets) >= log_probs.shape[-1]:
+        raise ValueError("targets values must be less than the CTC dimension")
+    paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+    return paths, scores

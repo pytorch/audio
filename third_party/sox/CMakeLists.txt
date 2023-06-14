@@ -75,7 +75,7 @@ ExternalProject_Add(flac
   URL https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
   URL_HASH SHA256=91cfc3ed61dc40f47f050a109b08610667d73477af6ef36dcad31c31a4a8d53f
   PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/flac/
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/flac/configure ${COMMON_ARGS} --with-ogg --disable-cpplibs
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/flac/configure ${COMMON_ARGS} --with-ogg --disable-cpplibs --disable-xmms-plugin
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
@@ -193,7 +193,7 @@ ExternalProject_Add(sox
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2
   URL_HASH SHA256=81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c
-  PATCH_COMMAND patch -p1 < ${patch_dir}/sox.patch && cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/sox/
+  PATCH_COMMAND cp ${patch_dir}/config.guess ${patch_dir}/config.sub ${CMAKE_CURRENT_BINARY_DIR}/src/sox/
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/sox/configure ${COMMON_ARGS} ${SOX_OPTIONS}
   BUILD_BYPRODUCTS ${SOX_LIBRARIES}
   DOWNLOAD_NO_PROGRESS ON

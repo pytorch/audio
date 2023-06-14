@@ -1,37 +1,20 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/buffer/chunked_buffer.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/buffer/common.h>
 
-namespace torchaudio {
-namespace io {
-namespace detail {
+namespace torchaudio::io::detail {
 
 ChunkedBuffer::ChunkedBuffer(
-    int frames_per_chunk,
-    int num_chunks,
-    double frame_duration)
-    : frame_duration(frame_duration),
-      frames_per_chunk(frames_per_chunk),
-      num_chunks(num_chunks) {}
-
-ChunkedAudioBuffer::ChunkedAudioBuffer(
-    int frames_per_chunk,
-    int num_chunks,
-    double frame_duration)
-    : ChunkedBuffer(frames_per_chunk, num_chunks, frame_duration) {}
-
-ChunkedVideoBuffer::ChunkedVideoBuffer(
-    int frames_per_chunk,
-    int num_chunks,
-    double frame_duration,
-    const torch::Device& device_)
-    : ChunkedBuffer(frames_per_chunk, num_chunks, frame_duration),
-      device(device_) {}
+    AVRational time_base,
+    int frames_per_chunk_,
+    int num_chunks_)
+    : time_base(time_base),
+      frames_per_chunk(frames_per_chunk_),
+      num_chunks(num_chunks_){};
 
 bool ChunkedBuffer::is_ready() const {
   return num_buffered_frames >= frames_per_chunk;
 }
 
-void ChunkedBuffer::push_tensor(torch::Tensor frame, double pts_) {
+void ChunkedBuffer::push_frame(torch::Tensor frame, int64_t pts_) {
   using namespace torch::indexing;
   // Note:
   // Audio tensors contain multiple frames while video tensors contain only
@@ -70,7 +53,7 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame, double pts_) {
     num_buffered_frames += append;
     // frame = frame[append:]
     frame = frame.index({Slice(append)});
-    pts_ += double(append) * frame_duration;
+    pts_ += append;
   }
 
   // 2. Return if the number of input frames are smaller than the empty buffer.
@@ -94,7 +77,7 @@ void ChunkedBuffer::push_tensor(torch::Tensor frame, double pts_) {
     int64_t start = i * frames_per_chunk;
     // chunk = frame[i*frames_per_chunk:(i+1) * frames_per_chunk]
     auto chunk = frame.index({Slice(start, start + frames_per_chunk)});
-    double pts_val = pts_ + double(start) * frame_duration;
+    int64_t pts_val = pts_ + start;
     int64_t chunk_size = chunk.size(0);
     TORCH_INTERNAL_ASSERT(
         chunk_size <= frames_per_chunk,
@@ -128,7 +111,7 @@ c10::optional<Chunk> ChunkedBuffer::pop_chunk() {
     return {};
   }
   torch::Tensor chunk = chunks.front();
-  double pts_val = pts.front();
+  double pts_val = double(pts.front()) * time_base.num / time_base.den;
   chunks.pop_front();
   pts.pop_front();
   if (num_buffered_frames < frames_per_chunk) {
@@ -138,19 +121,9 @@ c10::optional<Chunk> ChunkedBuffer::pop_chunk() {
   return {Chunk{chunk, pts_val}};
 }
 
-void ChunkedAudioBuffer::push_frame(AVFrame* frame, double pts_) {
-  push_tensor(convert_audio(frame), pts_);
-}
-
-void ChunkedVideoBuffer::push_frame(AVFrame* frame, double pts_) {
-  push_tensor(convert_image(frame, device), pts_);
-}
-
 void ChunkedBuffer::flush() {
   num_buffered_frames = 0;
   chunks.clear();
 }
 
-} // namespace detail
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io::detail

@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import BinaryIO, Dict, Optional, Tuple, Union
+from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
 import torchaudio
@@ -9,31 +9,12 @@ from torchaudio.io import StreamWriter
 
 
 # Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
-def _info_audio(
-    s: torch.classes.torchaudio.ffmpeg_StreamReader,
-):
-    i = s.find_best_audio_stream()
-    sinfo = s.get_src_stream_info(i)
-    if sinfo[5] == 0:
-        waveform, _ = _load_audio(s)
-        num_frames = waveform.size(1)
-    else:
-        num_frames = sinfo[5]
-    return AudioMetaData(
-        int(sinfo[8]),
-        num_frames,
-        sinfo[9],
-        sinfo[6],
-        sinfo[1].upper(),
-    )
-
-
 def info_audio(
     src: str,
     format: Optional[str],
 ) -> AudioMetaData:
-    s = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, None)
-    return _info_audio(s)
+    i = torch.ops.torchaudio.compat_info(src, format)
+    return AudioMetaData(i[0], i[1], i[2], i[3], i[4].upper())
 
 
 def info_audio_fileobj(
@@ -42,7 +23,20 @@ def info_audio_fileobj(
     buffer_size: int = 4096,
 ) -> AudioMetaData:
     s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
-    return _info_audio(s)
+    i = s.find_best_audio_stream()
+    sinfo = s.get_src_stream_info(i)
+    if sinfo.num_frames == 0:
+        waveform = _load_audio_fileobj(s)
+        num_frames = waveform.size(1)
+    else:
+        num_frames = sinfo.num_frames
+    return AudioMetaData(
+        int(sinfo.sample_rate),
+        num_frames,
+        sinfo.num_channels,
+        sinfo.bits_per_sample,
+        sinfo.codec_name.upper(),
+    )
 
 
 def _get_load_filter(
@@ -72,28 +66,19 @@ def _get_load_filter(
     return "{},{}".format(atrim, aformat)
 
 
-# Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
-def _load_audio(
-    s: torch.classes.torchaudio.ffmpeg_StreamReader,
-    frame_offset: int = 0,
-    num_frames: int = -1,
-    convert: bool = True,
+def _load_audio_fileobj(
+    s: torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj,
+    filter: Optional[str] = None,
     channels_first: bool = True,
-) -> Tuple[torch.Tensor, int]:
+) -> torch.Tensor:
     i = s.find_best_audio_stream()
-    sinfo = s.get_src_stream_info(i)
-    sample_rate = int(sinfo[8])
-    option: Dict[str, str] = {}
-    s.add_audio_stream(i, -1, -1, _get_load_filter(frame_offset, num_frames, convert), None, option)
+    s.add_audio_stream(i, -1, -1, filter, None, None)
     s.process_all_packets()
     chunk = s.pop_chunks()[0]
     if chunk is None:
         raise RuntimeError("Failed to decode audio.")
-    assert chunk is not None
-    waveform = chunk[0]
-    if channels_first:
-        waveform = waveform.T
-    return waveform, sample_rate
+    waveform = chunk.frames
+    return waveform.T if channels_first else waveform
 
 
 def load_audio(
@@ -104,8 +89,8 @@ def load_audio(
     channels_first: bool = True,
     format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
-    s = torch.classes.torchaudio.ffmpeg_StreamReader(src, format, None)
-    return _load_audio(s, frame_offset, num_frames, convert, channels_first)
+    filter = _get_load_filter(frame_offset, num_frames, convert)
+    return torch.ops.torchaudio.compat_load(src, format, filter, channels_first)
 
 
 def load_audio_fileobj(
@@ -117,8 +102,12 @@ def load_audio_fileobj(
     format: Optional[str] = None,
     buffer_size: int = 4096,
 ) -> Tuple[torch.Tensor, int]:
-    s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
-    return _load_audio(s, frame_offset, num_frames, convert, channels_first)
+    demuxer = "ogg" if format == "vorbis" else format
+    s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, demuxer, None, buffer_size)
+    sample_rate = int(s.get_src_stream_info(s.find_best_audio_stream()).sample_rate)
+    filter = _get_load_filter(frame_offset, num_frames, convert)
+    waveform = _load_audio_fileobj(s, filter, channels_first)
+    return waveform, sample_rate
 
 
 def _get_sample_format(dtype: torch.dtype) -> str:
@@ -143,7 +132,7 @@ def _native_endianness() -> str:
         return "be"
 
 
-def _get_encoder_for_wav(dtype: torch.dtype, encoding: str, bits_per_sample: int) -> str:
+def _get_encoder_for_wav(encoding: str, bits_per_sample: int) -> str:
     if bits_per_sample not in {None, 8, 16, 24, 32, 64}:
         raise ValueError(f"Invalid bits_per_sample {bits_per_sample} for WAV encoding.")
     endianness = _native_endianness()
@@ -160,49 +149,93 @@ def _get_encoder_for_wav(dtype: torch.dtype, encoding: str, bits_per_sample: int
         if bits_per_sample == 8:
             raise ValueError("For WAV signed PCM, 8-bit encoding is not supported.")
         return f"pcm_s{bits_per_sample}{endianness}"
-    elif encoding == "PCM_U":
+    if encoding == "PCM_U":
         if bits_per_sample in (None, 8):
             return "pcm_u8"
         raise ValueError("For WAV unsigned PCM, only 8-bit encoding is supported.")
-    elif encoding == "PCM_F":
+    if encoding == "PCM_F":
         if not bits_per_sample:
             bits_per_sample = 32
         if bits_per_sample in (32, 64):
             return f"pcm_f{bits_per_sample}{endianness}"
         raise ValueError("For WAV float PCM, only 32- and 64-bit encodings are supported.")
-    elif encoding == "ULAW":
+    if encoding == "ULAW":
         if bits_per_sample in (None, 8):
             return "pcm_mulaw"
         raise ValueError("For WAV PCM mu-law, only 8-bit encoding is supported.")
-    elif encoding == "ALAW":
+    if encoding == "ALAW":
         if bits_per_sample in (None, 8):
             return "pcm_alaw"
         raise ValueError("For WAV PCM A-law, only 8-bit encoding is supported.")
     raise ValueError(f"WAV encoding {encoding} is not supported.")
 
 
-def _get_encoder(dtype: torch.dtype, format: str, encoding: str, bits_per_sample: int) -> str:
-    if format == "wav":
-        return _get_encoder_for_wav(dtype, encoding, bits_per_sample)
-    if format == "flac":
-        return "flac"
-    if format in ("ogg", "vorbis"):
-        if encoding or bits_per_sample:
-            raise ValueError("ogg/vorbis does not support encoding/bits_per_sample.")
-        return "vorbis"
-    return format
+def _get_flac_sample_fmt(bps):
+    if bps is None or bps == 16:
+        return "s16"
+    if bps == 24:
+        return "s32"
+    raise ValueError(f"FLAC only supports bits_per_sample values of 16 and 24 ({bps} specified).")
 
 
-def _get_encoder_format(format: str, bits_per_sample: Optional[int]) -> str:
-    if format == "flac":
-        if not bits_per_sample:
-            return "s16"
-        if bits_per_sample == 24:
-            return "s32"
-        if bits_per_sample == 16:
-            return "s16"
-        raise ValueError(f"FLAC only supports bits_per_sample values of 16 and 24 ({bits_per_sample} specified).")
-    return None
+def _parse_save_args(
+    ext: Optional[str],
+    format: Optional[str],
+    encoding: Optional[str],
+    bps: Optional[int],
+):
+    # torchaudio's save function accepts the followings, which do not 1to1 map
+    # to FFmpeg.
+    #
+    # - format: audio format
+    # - bits_per_sample: encoder sample format
+    # - encoding: such as PCM_U8.
+    #
+    # In FFmpeg, format is specified with the following three (and more)
+    #
+    # - muxer: could be audio format or container format.
+    # the one we passed to the constructor of StreamWriter
+    # - encoder: the audio encoder used to encode audio
+    # - encoder sample format: the format used by encoder to encode audio.
+    #
+    # If encoder sample format is different from source sample format, StreamWriter
+    # will insert a filter automatically.
+    #
+    def _type(spec):
+        # either format is exactly the specified one
+        # or extension matches to the spec AND there is no format override.
+        return format == spec or (format is None and ext == spec)
+
+    if _type("wav") or _type("amb"):
+        # wav is special because it supports different encoding through encoders
+        # each encoder only supports one encoder format
+        #
+        # amb format is a special case originated from libsox.
+        # It is basically a WAV format, with slight modification.
+        # https://github.com/chirlu/sox/commit/4a4ea33edbca5972a1ed8933cc3512c7302fa67a#diff-39171191a858add9df87f5f210a34a776ac2c026842ae6db6ce97f5e68836795
+        # It is a format so that decoders will recognize it as ambisonic.
+        # https://www.ambisonia.com/Members/mleese/file-format-for-b-format/
+        # FFmpeg does not recognize amb because it is basically a WAV format.
+        muxer = "wav"
+        encoder = _get_encoder_for_wav(encoding, bps)
+        sample_fmt = None
+    elif _type("vorbis"):
+        # FFpmeg does not recognize vorbis extension, while libsox used to do.
+        # For the sake of bakward compatibility, (and the simplicity),
+        # we support the case where users want to do save("foo.vorbis")
+        muxer = "ogg"
+        encoder = "vorbis"
+        sample_fmt = None
+    else:
+        muxer = format
+        encoder = None
+        sample_fmt = None
+        if _type("flac"):
+            sample_fmt = _get_flac_sample_fmt(bps)
+        if _type("ogg"):
+            sample_fmt = _get_flac_sample_fmt(bps)
+    print(ext, format, encoding, bps, "===>", muxer, encoder, sample_fmt)
+    return muxer, encoder, sample_fmt
 
 
 # NOTE: in contrast to load_audio* and info_audio*, this function is NOT compatible with TorchScript.
@@ -216,23 +249,27 @@ def save_audio(
     bits_per_sample: Optional[int] = None,
     buffer_size: int = 4096,
 ) -> None:
-    if hasattr(uri, "write") and format is None:
-        raise RuntimeError("'format' is required when saving to file object.")
-    s = StreamWriter(uri, format=format, buffer_size=buffer_size)
-    if format is None:
-        tokens = str(uri).split(".")
-        if len(tokens) > 1:
-            format = tokens[-1].lower()
+    ext = None
+    if hasattr(uri, "write"):
+        if format is None:
+            raise RuntimeError("'format' is required when saving to file object.")
+    else:
+        uri = os.path.normpath(uri)
+        if tokens := str(uri).split(".")[1:]:
+            ext = tokens[-1].lower()
+
+    muxer, encoder, enc_fmt = _parse_save_args(ext, format, encoding, bits_per_sample)
 
     if channels_first:
         src = src.T
+
+    s = StreamWriter(uri, format=muxer, buffer_size=buffer_size)
     s.add_audio_stream(
         sample_rate,
-        src.size(-1),
-        _get_sample_format(src.dtype),
-        _get_encoder(src.dtype, format, encoding, bits_per_sample),
-        {"strict": "experimental"},
-        _get_encoder_format(format, bits_per_sample),
+        num_channels=src.size(-1),
+        format=_get_sample_format(src.dtype),
+        encoder=encoder,
+        encoder_format=enc_fmt,
     )
     with s.open():
         s.write_audio_chunk(0, src)

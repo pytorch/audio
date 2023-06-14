@@ -1,12 +1,13 @@
 import io
 import itertools
+import pathlib
 import tarfile
 from functools import partial
 
 from parameterized import parameterized
 from torchaudio._backend.utils import get_load_func
 from torchaudio._internal import module_utils as _mod_utils
-from torchaudio.io._compat import _get_encoder
+from torchaudio.io._compat import _parse_save_args
 
 from torchaudio_unittest.backend.dispatcher.sox.common import name_func
 from torchaudio_unittest.common_utils import (
@@ -55,11 +56,10 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
          |
          |    1. Generate given format with Sox
          |
-         v    3. Convert to wav with FFmpeg
-        given format ----------------------> wav
+         + ----------------------------------+ 3. Convert to wav with FFmpeg
          |                                   |
-         |    2. Load with torchaudio        | 4. Load with scipy
-         |                                   |
+         |    2. Load the given format       | 4. Load with scipy
+         |       with torchaudio             |
          v                                   v
         tensor ----------> x <----------- tensor
                        5. Compare
@@ -71,7 +71,6 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         By combining i & ii, step 2. and 4. allow for loading reference given format
         data without using torchaudio
         """
-
         path = self.get_temp_path(f"1.original.{format}")
         ref_path = self.get_temp_path("2.reference.wav")
 
@@ -90,15 +89,15 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
         # 3. Convert to wav with ffmpeg
         if normalize:
-            acodec = "pcm_f32le"
+            encoder = "pcm_f32le"
         else:
             encoding_map = {
                 "floating-point": "PCM_F",
                 "signed-integer": "PCM_S",
                 "unsigned-integer": "PCM_U",
             }
-            acodec = _get_encoder(data.dtype, "wav", encoding_map.get(encoding), bit_depth)
-        _convert_audio_file(path, ref_path, acodec=acodec)
+            _, encoder, _ = _parse_save_args(format, format, encoding_map.get(encoding), bit_depth)
+        _convert_audio_file(path, ref_path, encoder=encoder)
 
         # 4. Load wav with scipy
         data_ref = load_wav(ref_path, normalize=normalize)[0]
@@ -124,6 +123,21 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 @skipIfNoFFmpeg
 class TestLoad(LoadTestBase):
     """Test the correctness of `self._load` for various formats"""
+
+    def test_pathlike(self):
+        """FFmpeg dispatcher can load waveform from pathlike object"""
+        sample_rate = 16000
+        dtype = "float32"
+        num_channels = 2
+        duration = 1
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(path, data, sample_rate)
+
+        waveform, sr = self._load(pathlib.Path(path))
+        self.assertEqual(sr, sample_rate)
+        self.assertEqual(waveform, data)
 
     @parameterized.expand(
         list(
@@ -261,7 +275,7 @@ class TestLoad(LoadTestBase):
         """`self._load` can load opus file correctly."""
         ops_path = get_asset_path("io", f"{bitrate}_{compression_level}_{num_channels}ch.opus")
         wav_path = self.get_temp_path(f"{bitrate}_{compression_level}_{num_channels}ch.opus.wav")
-        _convert_audio_file(ops_path, wav_path, acodec="pcm_f32le")
+        _convert_audio_file(ops_path, wav_path, encoder="pcm_f32le")
 
         expected, sample_rate = load_wav(wav_path)
         found, sr = self._load(ops_path)
@@ -285,15 +299,14 @@ class TestLoad(LoadTestBase):
     @parameterized.expand(
         list(
             itertools.product(
-                ["float32", "int32", "int16"],
-                [8000, 16000],
-                [1, 2],
+                ["int16"],
+                [3, 4, 16],
                 [False, True],
             )
         ),
         name_func=name_func,
     )
-    def test_amb(self, dtype, sample_rate, num_channels, normalize):
+    def test_amb(self, dtype, num_channels, normalize, sample_rate=8000):
         """`self._load` can load amb format correctly."""
         bit_depth = sox_utils.get_bit_depth(dtype)
         encoding = sox_utils.get_encoding(dtype)
@@ -307,6 +320,7 @@ class TestLoad(LoadTestBase):
     #     self.assert_format("amr-nb", sample_rate=8000, num_channels=1, bit_depth=32, duration=1)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadWithoutExtension(PytorchTestCase):
     _load = partial(get_load_func(), backend="ffmpeg")
@@ -587,6 +601,7 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
 
+@skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadNoSuchFile(PytorchTestCase):
     _load = partial(get_load_func(), backend="ffmpeg")

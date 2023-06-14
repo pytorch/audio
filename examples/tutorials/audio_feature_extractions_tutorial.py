@@ -25,6 +25,9 @@ import torchaudio.transforms as T
 print(torch.__version__)
 print(torchaudio.__version__)
 
+import librosa
+import matplotlib.pyplot as plt
+
 ######################################################################
 # Preparation
 # -----------
@@ -38,8 +41,6 @@ print(torchaudio.__version__)
 #       !pip install librosa
 #
 from IPython.display import Audio
-import librosa
-import matplotlib.pyplot as plt
 from torchaudio.utils import download_asset
 
 torch.random.manual_seed(0)
@@ -388,6 +389,7 @@ pitch = F.detect_pitch_frequency(SPEECH_WAVEFORM, SAMPLE_RATE)
 ######################################################################
 #
 
+
 def plot_pitch(waveform, sr, pitch):
     figure, axis = plt.subplots(1, 1)
     axis.set_title("Pitch Feature")
@@ -406,54 +408,3 @@ def plot_pitch(waveform, sr, pitch):
 
 
 plot_pitch(SPEECH_WAVEFORM, SAMPLE_RATE, pitch)
-
-######################################################################
-# Kaldi Pitch (beta)
-# ------------------
-#
-# Kaldi Pitch feature [1] is a pitch detection mechanism tuned for automatic
-# speech recognition (ASR) applications. This is a beta feature in ``torchaudio``,
-# and it is available as :py:func:`torchaudio.functional.compute_kaldi_pitch`.
-#
-# 1. A pitch extraction algorithm tuned for automatic speech recognition
-#
-#    Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S.
-#    Khudanpur
-#
-#    2014 IEEE International Conference on Acoustics, Speech and Signal
-#    Processing (ICASSP), Florence, 2014, pp. 2494-2498, doi:
-#    10.1109/ICASSP.2014.6854049.
-#    [`abstract <https://ieeexplore.ieee.org/document/6854049>`__],
-#    [`paper <https://danielpovey.com/files/2014_icassp_pitch.pdf>`__]
-#
-
-pitch_feature = F.compute_kaldi_pitch(SPEECH_WAVEFORM, SAMPLE_RATE)
-pitch, nfcc = pitch_feature[..., 0], pitch_feature[..., 1]
-
-######################################################################
-#
-
-def plot_kaldi_pitch(waveform, sr, pitch, nfcc):
-    _, axis = plt.subplots(1, 1)
-    axis.set_title("Kaldi Pitch Feature")
-    axis.grid(True)
-
-    end_time = waveform.shape[1] / sr
-    time_axis = torch.linspace(0, end_time, waveform.shape[1])
-    axis.plot(time_axis, waveform[0], linewidth=1, color="gray", alpha=0.3)
-
-    time_axis = torch.linspace(0, end_time, pitch.shape[1])
-    ln1 = axis.plot(time_axis, pitch[0], linewidth=2, label="Pitch", color="green")
-    axis.set_ylim((-1.3, 1.3))
-
-    axis2 = axis.twinx()
-    time_axis = torch.linspace(0, end_time, nfcc.shape[1])
-    ln2 = axis2.plot(time_axis, nfcc[0], linewidth=2, label="NFCC", color="blue", linestyle="--")
-
-    lns = ln1 + ln2
-    labels = [l.get_label() for l in lns]
-    axis.legend(lns, labels, loc=0)
-    plt.show(block=False)
-
-
-plot_kaldi_pitch(SPEECH_WAVEFORM, SAMPLE_RATE, pitch, nfcc)

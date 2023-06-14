@@ -112,14 +112,14 @@ class AutogradTestMixin(TestBaseMixin):
         sample_rate = 8000
         transform = T.MFCC(sample_rate=sample_rate, log_mels=log_mels)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     @parameterized.expand([(False,), (True,)])
     def test_lfcc(self, log_lf):
         sample_rate = 8000
         transform = T.LFCC(sample_rate=sample_rate, log_lf=log_lf)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     def test_compute_deltas(self):
         transform = T.ComputeDeltas()
@@ -189,8 +189,9 @@ class AutogradTestMixin(TestBaseMixin):
     def test_melscale(self):
         sample_rate = 8000
         n_fft = 400
-        n_mels = n_fft // 2 + 1
-        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels)
+        n_stft = n_fft // 2 + 1
+        n_mels = 128
+        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels, n_stft=n_stft)
         spec = get_spectrogram(
             get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
         )

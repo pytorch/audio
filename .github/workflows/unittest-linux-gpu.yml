@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.8", "3.9", "3.10"]
-        cuda_arch_version: ["11.7"]
+        cuda_arch_version: ["11.8"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
@@ -60,8 +60,8 @@ jobs:
         USE_FFMPEG=1 python3 -m pip install -v -e . --no-use-pep517
 
         # Install test tools
-        conda install -y --quiet -c conda-forge -c numba/label/dev 'librosa>=0.8.0' parameterized 'requests>=2.20'
-        python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag
+        conda install -y --quiet -c conda-forge -c numba/label/dev 'librosa==0.10.0' parameterized 'requests>=2.20'
+        python3 -m pip install --quiet kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' transformers expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag flashlight-text git+https://github.com/kpu/kenlm/
         python3 -m pip install --quiet git+https://github.com/pytorch/fairseq.git@e47a4c8
 
         # Run tests
@@ -72,12 +72,14 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_HW_ACCEL=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
 
         declare -a args=(
             '-v'
             '--cov=torchaudio'
-            "--junitxml=${PWD}/test-results/junit.xml"
+            "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
             '--durations' '100'
             '-k' 'cuda or gpu'
         )

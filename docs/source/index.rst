@@ -46,6 +46,7 @@ model implementations and application components.
    tutorials/streamwriter_advanced
    hw_acceleration_tutorial
 
+   tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
@@ -67,10 +68,12 @@ model implementations and application components.
    tutorials/asr_inference_with_ctc_decoder_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
+   tutorials/ctc_forced_alignment_api_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
    tutorials/hybrid_demucs_tutorial
+   tutorials/squim_tutorial
 
 .. toctree::
    :maxdepth: 1
@@ -148,6 +151,13 @@ Tutorials
    :tags: I/O
 
 .. customcarditem::
+   :header: CTC Forced Alignment API
+   :card_description: Learn how to use TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>).
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
+   :link: tutorials/ctc_forced_alignment_api_tutorial.html
+   :tags: CTC,Forced-Alignment
+
+.. customcarditem::
    :header: Streaming media decoding with StreamReader
    :card_description: Learn how to load audio/video to Tensors using <code>torchaudio.io.StreamReader</code> class.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamreader_basic_tutorial.png
@@ -167,7 +177,7 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamwriter_basic_tutorial.gif
    :link: tutorials/streamwriter_basic_tutorial.html
    :tags: I/O,StreamWriter
-   
+
 .. customcarditem::
    :header: Playing media with StreamWriter
    :card_description: Learn how to play audio/video with <code>torchaudio.io.StreamWriter</code>.
@@ -181,6 +191,13 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
    :link: hw_acceleration_tutorial.html
    :tags: I/O,StreamReader,StreamWriter
+
+.. customcarditem::
+   :header: Apply effects and codecs to waveform
+   :card_description: Learn how to apply effects and codecs to waveform using <code>torchaudio.io.AudioEffector</code>.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/effector_tutorial.png
+   :link: tutorials/effector_tutorial.html
+   :tags: Preprocessing
 
 .. customcarditem::
    :header: Audio resampling with bandlimited sinc interpolation
@@ -265,7 +282,7 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/online_asr_tutorial.gif
    :link: tutorials/online_asr_tutorial.html
    :tags: Pipelines,ASR,RNNT,StreamReader
-   
+
 .. customcarditem::
    :header: Real-time microphone ASR with Emformer RNN-T
    :card_description: Learn how to transcribe speech fomr microphone with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
@@ -286,7 +303,7 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/tacotron2_pipeline_tutorial.png
    :link: tutorials/tacotron2_pipeline_tutorial.html
    :tags: Pipelines,TTS-(Text-to-Speech)
-   
+
 .. customcarditem::
    :header: Speech Enhancement with MVDR Beamforming
    :card_description: Learn how to improve speech quality with MVDR Beamforming.
@@ -301,6 +318,12 @@ Tutorials
    :link: tutorials/hybrid_demucs_tutorial.html
    :tags: Pipelines,Source-Separation
 
+.. customcarditem::
+   :header: Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio
+   :card_description: Learn how to estimate subjective and objective metrics with pre-trained TorchAudio-SQUIM models (<code>torchaudio.pipelines.SQUIMObjective</code>).
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/squim_tutorial.png
+   :link: tutorials/squim_tutorial.html
+   :tags: Pipelines,Speech Assessment,Speech Enhancement
 .. customcardend::
 
 

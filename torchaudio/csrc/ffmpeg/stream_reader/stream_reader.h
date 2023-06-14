@@ -1,6 +1,6 @@
 #pragma once
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/packet_buffer.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <vector>
@@ -8,18 +8,27 @@
 namespace torchaudio {
 namespace io {
 
+//////////////////////////////////////////////////////////////////////////////
+// StreamReader
+//////////////////////////////////////////////////////////////////////////////
+
 ///
 /// Fetch and decode audio/video streams chunk by chunk.
 ///
 class StreamReader {
-  AVFormatInputContextPtr pFormatContext;
-  AVPacketPtr pPacket;
+  AVFormatInputContextPtr format_ctx;
+  AVPacketPtr packet{alloc_avpacket()};
 
   std::vector<std::unique_ptr<StreamProcessor>> processors;
   // Mapping from user-facing stream index to internal index.
   // The first one is processor index,
   // the second is the map key inside of processor.
   std::vector<std::pair<int, int>> stream_indices;
+
+  // For supporting reading raw packets.
+  std::unique_ptr<PacketBuffer> packet_buffer;
+  // Set of source stream indices to read packets for.
+  std::unordered_set<int> packet_stream_indices;
 
   // timestamp to seek to expressed in AV_TIME_BASE
   //
@@ -33,23 +42,36 @@ class StreamReader {
   // to determine whether the frames should be passed to downstream.
   int64_t seek_timestamp = 0;
 
- public:
   /// @name Constructors
   ///
   ///@{
 
   /// @cond
 
+ private:
   /// Construct StreamReader from already initialized AVFormatContext.
   /// This is a low level constructor interact with FFmpeg directly.
   /// One can provide custom AVFormatContext in case the other constructor
   /// does not meet a requirement.
-  /// @param pFormatContext An initialized AVFormatContext. StreamReader will
+  /// @param format_ctx An initialized AVFormatContext. StreamReader will
   /// own the resources and release it at the end.
-  explicit StreamReader(AVFormatContext* pFormatContext);
+  explicit StreamReader(AVFormatContext* format_ctx);
+
+ protected:
+  /// Concstruct media processor from custom IO.
+  ///
+  /// @param io_ctx Custom IO Context.
+  /// @param format Specifies format, such as mp4.
+  /// @param option Custom option passed when initializing format context
+  /// (opening source).
+  explicit StreamReader(
+      AVIOContext* io_ctx,
+      const c10::optional<std::string>& format = c10::nullopt,
+      const c10::optional<OptionDict>& option = c10::nullopt);
 
   /// @endcond
 
+ public:
   /// Construct media processor from soruce URI.
   ///
   /// @param src URL of source media, in the format FFmpeg can understand.
@@ -59,24 +81,8 @@ class StreamReader {
   /// (opening source).
   explicit StreamReader(
       const std::string& src,
-      const c10::optional<std::string>& format = {},
-      const c10::optional<OptionDict>& option = {});
-
-  /// @cond
-
-  /// Concstruct media processor from custom IO.
-  ///
-  /// @param io_ctx Custom IO Context.
-  /// @param format Specifies format, such as mp4.
-  /// @param option Custom option passed when initializing format context
-  /// (opening source).
-  // TODO: Move this to wrapper class
-  explicit StreamReader(
-      AVIOContext* io_ctx,
-      const c10::optional<std::string>& format = {},
-      const c10::optional<OptionDict>& option = {});
-
-  /// @endcond
+      const c10::optional<std::string>& format = c10::nullopt,
+      const c10::optional<OptionDict>& option = c10::nullopt);
 
   ///@}
 
@@ -91,15 +97,6 @@ class StreamReader {
   StreamReader& operator=(StreamReader&&) = default;
 
   /// @endcond
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Helper methods
-  //////////////////////////////////////////////////////////////////////////////
- private:
-  void validate_open_stream() const;
-  void validate_src_stream_index(int i) const;
-  void validate_output_stream_index(int i) const;
-  void validate_src_stream_type(int i, AVMediaType type);
 
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
@@ -137,6 +134,14 @@ class StreamReader {
   OutputStreamInfo get_out_stream_info(int i) const;
   /// Check if all the buffers of the output streams have enough decoded frames.
   bool is_buffer_ready() const;
+
+  /// @cond
+  /// Get source stream parameters. Necessary on the write side for packet
+  /// passthrough.
+  ///
+  /// @param i Source stream index.
+  StreamParams get_src_stream_params(int i);
+  /// @endcond
 
   ///@}
 
@@ -200,9 +205,9 @@ class StreamReader {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const c10::optional<std::string>& filter_desc,
-      const c10::optional<std::string>& decoder,
-      const c10::optional<OptionDict>& decoder_option);
+      const c10::optional<std::string>& filter_desc = c10::nullopt,
+      const c10::optional<std::string>& decoder = c10::nullopt,
+      const c10::optional<OptionDict>& decoder_option = c10::nullopt);
   /// Define an output video stream.
   ///
   /// @param i,frames_per_chunk,num_chunks,filter_desc,decoder,decoder_option
@@ -221,10 +226,20 @@ class StreamReader {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const c10::optional<std::string>& filter_desc,
-      const c10::optional<std::string>& decoder,
-      const c10::optional<OptionDict>& decoder_option,
-      const c10::optional<std::string>& hw_accel);
+      const c10::optional<std::string>& filter_desc = c10::nullopt,
+      const c10::optional<std::string>& decoder = c10::nullopt,
+      const c10::optional<OptionDict>& decoder_option = c10::nullopt,
+      const c10::optional<std::string>& hw_accel = c10::nullopt);
+
+  /// @cond
+  /// Add a output packet stream.
+  /// Allows for passing packets directly from the source stream, bypassing
+  /// the decode path, to ``StreamWriter`` for remuxing.
+  ///
+  /// @param i The index of the source stream.
+  void add_packet_stream(int i);
+  /// @endcond
+
   /// Remove an output stream.
   ///
   /// @param i The index of the output stream to be removed.
@@ -239,7 +254,7 @@ class StreamReader {
       AVMediaType media_type,
       int frames_per_chunk,
       int num_chunks,
-      const c10::optional<std::string>& filter_desc,
+      const std::string& filter_desc,
       const c10::optional<std::string>& decoder,
       const c10::optional<OptionDict>& decoder_option,
       const torch::Device& device);
@@ -283,7 +298,25 @@ class StreamReader {
   /// - ``>=0``: Keep retrying until the given time passes.
   /// - ``<0``: Keep retrying forever.
   /// @param backoff Time to wait before retrying in milli seconds.
-  int process_packet_block(double timeout, double backoff);
+  int process_packet_block(const double timeout, const double backoff);
+
+  /// @cond
+  // High-level method used by Python bindings.
+  int process_packet(
+      const c10::optional<double>& timeout,
+      const double backoff);
+  /// @endcond
+
+  /// Process packets unitl EOF
+  void process_all_packets();
+
+  /// Process packets until all the chunk buffers have at least one chunk
+  ///
+  /// @param timeout See `process_packet_block()`
+  /// @param backoff See `process_packet_block()`
+  int fill_buffer(
+      const c10::optional<double>& timeout = c10::nullopt,
+      const double backoff = 10.);
 
   ///@}
 
@@ -300,7 +333,56 @@ class StreamReader {
   /// Pop one chunk from each output stream if it is available.
   std::vector<c10::optional<Chunk>> pop_chunks();
 
+  /// @cond
+  /// Pop packets from buffer, if available.
+  std::vector<AVPacketPtr> pop_packets();
+  /// @endcond
   ///@}
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// StreamReaderCustomIO
+//////////////////////////////////////////////////////////////////////////////
+
+/// @cond
+
+namespace detail {
+struct CustomInput {
+  AVIOContextPtr io_ctx;
+  CustomInput(
+      void* opaque,
+      int buffer_size,
+      int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
+      int64_t (*seek)(void* opaque, int64_t offset, int whence));
+};
+} // namespace detail
+
+/// @endcond
+
+///
+/// A subclass of StreamReader which works with custom read function.
+/// Can be used for decoding media from memory or custom object.
+///
+class StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
+ public:
+  ///
+  /// Construct StreamReader with custom read and seek functions.
+  ///
+  /// @param opaque Custom data used by ``read_packet`` and ``seek`` functions.
+  /// @param format Specify input format.
+  /// @param buffer_size The size of the intermediate buffer, which FFmpeg uses
+  /// to pass data to function read_packet.
+  /// @param read_packet Custom read function that is called from FFmpeg to
+  /// read data from the destination.
+  /// @param seek Optional seek function that is used to seek the destination.
+  /// @param option Custom option passed when initializing format context.
+  StreamReaderCustomIO(
+      void* opaque,
+      const c10::optional<std::string>& format,
+      int buffer_size,
+      int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
+      int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr,
+      const c10::optional<OptionDict>& option = c10::nullopt);
 };
 
 } // namespace io

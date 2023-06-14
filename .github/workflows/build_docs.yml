@@ -7,26 +7,17 @@ on:
       - nightly
       - main
       - release/*
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]
+      - v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+
   workflow_dispatch:
 
 jobs:
-  upload:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: docs
-    - name: Tweak the doc artifact
-      run: |
-        ls .
-
-    
   build:
     strategy:
       matrix:
         python_version: ["3.10"]
-        cuda_arch_version: ["11.7"]
+        cuda_arch_version: ["11.8"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
@@ -46,6 +37,8 @@ jobs:
         export PYTHON_VERSION="${{ matrix.python_version }}"
         export CU_VERSION="${{ matrix.cuda_arch_version }}"
         export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
+        export CODEC_HEADER_VERSION=n11.1.5.2
+        export COMPUTE_CAPABILITY=86
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
@@ -57,6 +50,50 @@ jobs:
         # Create Conda Env
         conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
         conda activate ./ci_env
+
+        # Install FFmpeg-dependencies
+        conda install --quiet -y -c conda-forge yasm x264 gnutls pkg-config lame libopus libvpx openh264 openssl x264
+
+        # Build FFmpeg with NVIDIA Video Codec SDK
+        # TODO cache this
+        (
+            git clone --quiet https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+            cd nv-codec-headers
+            git checkout ${CODEC_HEADER_VERSION}
+            make PREFIX=${CONDA_PREFIX} install
+        )
+
+        (
+            wget -q https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
+            tar -xf n5.1.3.tar.gz
+            cd ./FFmpeg-n5.1.3
+            export revision=5.1.3
+            ./configure \
+                --prefix=${CONDA_PREFIX} \
+                --extra-cflags="-I${CONDA_PREFIX}/include" \
+                --extra-ldflags="-L${CONDA_PREFIX}/lib" \
+                --nvccflags="-gencode arch=compute_${COMPUTE_CAPABILITY},code=sm_${COMPUTE_CAPABILITY} -O2" \
+                --disable-doc \
+                --enable-rpath \
+                --disable-static \
+                --enable-protocol=https \
+                --enable-gnutls \
+                --enable-shared \
+                --enable-gpl \
+                --enable-nonfree \
+                --enable-libmp3lame \
+                --enable-libx264 \
+                --enable-cuda-nvcc \
+                --enable-nvenc \
+                --enable-cuvid \
+                --enable-nvdec
+            make clean
+            make -j > /dev/null 2>&1
+            make install
+            # test
+            # src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
+            # ffmpeg -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i "${src}" -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
+        )
 
         # Install PyTorch
         set -ex
@@ -72,7 +109,15 @@ jobs:
         # TODO: Enable NVDec/NVEnc
         conda install --quiet -y 'ffmpeg>=4.1' pkg-config
         pip --quiet install cmake>=3.18.0 ninja
-        USE_FFMPEG=1 pip install --progress-bar off -v -e . --no-use-pep517
+        BUILD_VERSION=$( cut -f 1 -d a version.txt )
+        BUILD_VERSION=$BUILD_VERSION.dev$(date "+%Y%m%d")
+        export BUILD_VERSION
+
+
+        FFMPEG_ROOT=${CONDA_PREFIX} USE_FFMPEG=1 USE_CUDA=1 pip install --progress-bar off -v -e . --no-use-pep517
+
+        # Install runtime dependencies
+        pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
 
         # Install build tools
         conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
@@ -82,4 +127,46 @@ jobs:
         export BUILD_GALLERY=true
         (cd docs && make html)
 
+        cp -rf docs/build/html/* "${RUNNER_DOCS_DIR}"
         mv docs/build/html /artifacts/
+
+  commit:
+    if: ${{ (github.repository == 'pytorch/audio') && ((github.event_name == 'push') && (github.ref_name == 'nightly')) }}
+    permissions:
+      # Required for `git push`
+      # Note:
+      #   This is not effective from fork.
+      #   When you debug this, make sure to make a branch on pytorch and
+      #   make PR from there.
+      contents: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+        fetch-depth: 5
+    - uses: actions/download-artifact@v3
+      with:
+        name: docs
+    - name: Update nightly doc
+      run: |
+        set -x
+
+        git config user.name "pytorchbot"
+        git config user.email "soumith+bot@pytorch.org"
+        # When `git clone`, `gh-pages` branch is fetched by default.
+        # The size of gh-pages grows significantly, so we use ammend and force push
+        # We add a new commit once a week
+        if [ "date +%u" = "1" ]; then
+           git commit --allow-empty -m "placeholder"
+        fi
+
+        # TODO: add tag-based process (need to handle the main directory name)
+        # Update the main doc
+        rm -rf main
+        mv html main
+        git add --all main || true
+
+        git commit --amend -m "auto-generating sphinx docs" || true
+        git push -f

@@ -64,7 +64,7 @@ SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-
 # Generate frame-wise label probability
 # -------------------------------------
 #
-# The first step is to generate the label class porbability of each aduio
+# The first step is to generate the label class porbability of each audio
 # frame. We can use a Wav2Vec2 model that is trained for ASR. Here we use
 # :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
 #
@@ -154,7 +154,7 @@ def get_trellis(emission, tokens, blank_id=0):
     # The extra dim for time axis is for simplification of the code.
     trellis = torch.empty((num_frame + 1, num_tokens + 1))
     trellis[0, 0] = 0
-    trellis[1:, 0] = torch.cumsum(emission[:, 0], 0)
+    trellis[1:, 0] = torch.cumsum(emission[:, blank_id], 0)
     trellis[0, -num_tokens:] = -float("inf")
     trellis[-num_tokens:, 0] = float("inf")
 
@@ -449,6 +449,7 @@ plot_alignments(
     waveform[0],
 )
 plt.show()
+
 
 ################################################################################
 #

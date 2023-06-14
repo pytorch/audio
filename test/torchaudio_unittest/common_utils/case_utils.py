@@ -12,6 +12,7 @@ import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import is_module_available
+from torchaudio.utils.ffmpeg_utils import get_video_decoders, get_video_encoders
 
 from .backend_utils import set_audio_backend
 
@@ -66,7 +67,7 @@ class HttpServerMixin(TempDirMixin):
     """
 
     _proc = None
-    _port = 8000
+    _port = 12345
 
     @classmethod
     def setUpClass(cls):
@@ -115,6 +116,7 @@ def is_ffmpeg_available():
 
 
 _IS_CTC_DECODER_AVAILABLE = None
+_IS_CUDA_CTC_DECODER_AVAILABLE = None
 
 
 def is_ctc_decoder_available():
@@ -127,6 +129,18 @@ def is_ctc_decoder_available():
         except Exception:
             _IS_CTC_DECODER_AVAILABLE = False
     return _IS_CTC_DECODER_AVAILABLE
+
+
+def is_cuda_ctc_decoder_available():
+    global _IS_CUDA_CTC_DECODER_AVAILABLE
+    if _IS_CUDA_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.models.decoder import CUCTCDecoder  # noqa: F401
+
+            _IS_CUDA_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CUDA_CTC_DECODER_AVAILABLE = False
+    return _IS_CUDA_CTC_DECODER_AVAILABLE
 
 
 def _eval_env(var, default):
@@ -220,11 +234,6 @@ skipIfNoSox = _skipIf(
     reason="Sox features are not available.",
     key="NO_SOX",
 )
-skipIfNoKaldi = _skipIf(
-    not torchaudio._extension._IS_KALDI_AVAILABLE,
-    reason="Kaldi features are not available.",
-    key="NO_KALDI",
-)
 skipIfNoRIR = _skipIf(
     not torchaudio._extension._IS_RIR_AVAILABLE,
     reason="RIR features are not available.",
@@ -234,6 +243,11 @@ skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),
     reason="CTC decoder not available.",
     key="NO_CTC_DECODER",
+)
+skipIfNoCuCtcDecoder = _skipIf(
+    not is_cuda_ctc_decoder_available(),
+    reason="CUCTC decoder not available.",
+    key="NO_CUCTC_DECODER",
 )
 skipIfRocm = _skipIf(
     _eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
@@ -268,6 +282,24 @@ skipIfNoMacOS = _skipIf(
     reason="This feature is only available for MacOS.",
     key="NO_MACOS",
 )
+disabledInCI = _skipIf(
+    "CI" in os.environ,
+    reason="Tests are failing on CI consistently. Disabled while investigating.",
+    key="TEMPORARY_DISABLED",
+)
+
+
+def skipIfNoHWAccel(name):
+    key = "NO_HW_ACCEL"
+    if not is_ffmpeg_available():
+        return _skipIf(True, reason="ffmpeg features are not available.", key=key)
+    if not torch.cuda.is_available():
+        return _skipIf(True, reason="CUDA is not available.", key=key)
+    if torchaudio._extension._check_cuda_version() is None:
+        return _skipIf(True, "Torchaudio is not compiled with CUDA.", key=key)
+    if name not in get_video_decoders() and name not in get_video_encoders():
+        return _skipIf(True, f"{name} is not in the list of available decoders or encoders", key=key)
+    return _pass
 
 
 def zip_equal(*iterables):

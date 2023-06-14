@@ -16,7 +16,7 @@ __all__ = [
 
 
 def _is_backend_dispatcher_enabled() -> bool:
-    return os.getenv("TORCHAUDIO_USE_BACKEND_DISPATCHER") == "1"
+    return os.getenv("TORCHAUDIO_USE_BACKEND_DISPATCHER", default="1") == "1"
 
 
 def list_audio_backends() -> List[str]:

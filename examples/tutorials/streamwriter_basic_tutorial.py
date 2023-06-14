@@ -51,27 +51,7 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
-#
-
-try:
-    from torchaudio.io import StreamWriter
-except ImportError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds by adding the following code block to the top
-            of the notebook before running it:
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
+from torchaudio.io import StreamWriter
 
 print("FFmpeg library versions")
 for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
@@ -84,8 +64,9 @@ import io
 import os
 import tempfile
 
-from torchaudio.utils import download_asset
 from IPython.display import Audio, Video
+
+from torchaudio.utils import download_asset
 
 SAMPLE_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 WAVEFORM, SAMPLE_RATE = torchaudio.load(SAMPLE_PATH, channels_first=False)
@@ -503,47 +484,7 @@ print(f"{bytes2[:10]}...{bytes2[-10:]}\n")
 
 assert bytes1 == bytes2
 
-######################################################################
-# Note on slicing and AAC
-# ~~~~~~~~~~~~~~~~~~~~~~~
-#
-# .. warning::
-#
-#    FFmpeg's native AAC encoder (which is used by default when
-#    saving video with MP4 format) has a bug that affects the audibility.
-#
-#    Please refer to the examples bellow.
-#
-
-def test_slice(audio_encoder, slice_size, ext="mp4"):
-    path = get_path(f"slice_{slice_size}.{ext}")
-
-    s = StreamWriter(dst=path)
-    s.add_audio_stream(SAMPLE_RATE, NUM_CHANNELS, encoder=audio_encoder)
-    with s.open():
-        for start in range(0, NUM_FRAMES, slice_size):
-            end = start + slice_size
-            s.write_audio_chunk(0, WAVEFORM[start:end, ...])
-    return path
-
-######################################################################
-#
-# This causes some artifacts.
-
-# note:
-# Chrome does not support playing AAC audio directly while Safari does.
-# Using MP4 container and specifying AAC allows Chrome to play it.
-Video(test_slice(audio_encoder="aac", slice_size=8000, ext="mp4"), embed=True)
-
-######################################################################
-#
-# It is more noticeable when using smaller slice.
-Video(test_slice(audio_encoder="aac", slice_size=512, ext="mp4"), embed=True)
-
-######################################################################
-#
-# Lame MP3 encoder works fine for the same slice size.
-Audio(test_slice(audio_encoder="libmp3lame", slice_size=512, ext="mp3"))
+import matplotlib.pyplot as plt
 
 ######################################################################
 #
@@ -559,7 +500,6 @@ Audio(test_slice(audio_encoder="libmp3lame", slice_size=512, ext="mp3"))
 # then use StreamWriter to convert them to video with the original audio.
 
 import torchaudio.transforms as T
-import matplotlib.pyplot as plt
 
 ######################################################################
 #
@@ -590,7 +530,7 @@ specs = trans(WAVEFORM.T)[0].T
 #
 
 spec_db = T.AmplitudeToDB(stype="magnitude", top_db=80)(specs.T)
-_ = plt.imshow(spec_db, aspect="auto", origin='lower')
+_ = plt.imshow(spec_db, aspect="auto", origin="lower")
 
 ######################################################################
 #
@@ -611,20 +551,26 @@ ncols, nrows = fig.canvas.get_width_height()
 def _plot(data):
     ax.clear()
     x = list(range(len(data)))
-    R, G, B = 238/255, 76/255, 44/255
+    R, G, B = 238 / 255, 76 / 255, 44 / 255
     for coeff, alpha in [(0.8, 0.7), (1, 1)]:
-        d = data ** coeff
+        d = data**coeff
         ax.fill_between(x, d, -d, color=[R, G, B, alpha])
     xlim = n_fft // 2 + 1
     ax.set_xlim([-1, n_fft // 2 + 1])
     ax.set_ylim([-1, 1])
     ax.text(
-        xlim, 0.95,
+        xlim,
+        0.95,
         f"Created with TorchAudio\n{torchaudio.__version__}",
-        color="white", ha="right", va="top", backgroundcolor="black")
+        color="white",
+        ha="right",
+        va="top",
+        backgroundcolor="black",
+    )
     fig.canvas.draw()
     frame = torch.frombuffer(fig.canvas.tostring_rgb(), dtype=torch.uint8)
     return frame.reshape(nrows, ncols, 3).permute(2, 0, 1)
+
 
 # sphinx_gallery_defer_figures
 
@@ -646,10 +592,10 @@ with s.open():
     # Process by second
     for t in range(0, NUM_FRAMES, SAMPLE_RATE):
         # Write audio chunk
-        s.write_audio_chunk(0, WAVEFORM[t:t + SAMPLE_RATE, :])
+        s.write_audio_chunk(0, WAVEFORM[t : t + SAMPLE_RATE, :])
 
         # write 1 second of video chunk
-        frames = [_plot(spec) for spec in specs[i:i+frame_rate]]
+        frames = [_plot(spec) for spec in specs[i : i + frame_rate]]
         if frames:
             s.write_video_chunk(1, torch.stack(frames))
         i += frame_rate
