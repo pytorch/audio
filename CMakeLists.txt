@@ -70,19 +70,6 @@ if(USE_CUDA AND USE_ROCM)
   message(FATAL "CUDA and ROCm are mutually exclusive")
 endif()
 
-if(USE_ROCM)
-  # Find the HIP package, set the HIP paths, load the HIP CMake.
-  include(cmake/LoadHIP.cmake)
-  if(NOT PYTORCH_FOUND_HIP)
-    set(USE_ROCM OFF)
-  endif()
-
-  if(CMAKE_VERSION VERSION_LESS 3.21.0)
-    message("Need at least CMake 3.21.0 to compile ROCm support.")
-    set(USE_ROCM OFF)
-  endif()
-endif()
-
 if(USE_CUDA)
   enable_language(CUDA)
   set(
@@ -95,12 +82,23 @@ if(USE_CUDA)
   )
 endif()
 
-if(USE_ROCM)
-  enable_language(HIP)
-endif()
-
 find_package(Torch REQUIRED)
 include(cmake/TorchAudioHelper.cmake)
+
+if(USE_ROCM)
+  # find_package(Torch) pulls in LoadHIP.cmake from pytorch project for most ROCm settings
+  if(NOT PYTORCH_FOUND_HIP)
+    message(FATAL_ERROR "USE_ROCM is set, but find_package(Torch) did not find HIP")
+  endif()
+
+  # use external hipify module
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/third_party/hipify_torch/cmake")
+  include(Hipify)
+
+  # override host compiler to be hipcc
+  set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE} CACHE STRING "C++ compiler" FORCE)
+  set(CMAKE_CXX_LINKER ${HIP_HIPCC_EXECUTABLE} CACHE STRING "C++ linker" FORCE)
+endif()
 
 # https://github.com/pytorch/pytorch/issues/54174
 function(CUDA_CONVERT_FLAGS EXISTING_TARGET)
@@ -151,6 +149,13 @@ if(MSVC)
 endif()
 
 if(USE_OPENMP)
+  if(USE_ROCM)
+    # use the openmp that comes with rocm by setting these vars before find_package
+    set(OPENMP_LIBRARIES "/opt/rocm/llvm/lib/")
+    set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+    set(OpenMP_CXX_FLAGS "-fopenmp=libomp")
+    set(OpenMP_omp_LIBRARY omp)
+  endif()
   find_package(OpenMP REQUIRED)
 endif()
 
