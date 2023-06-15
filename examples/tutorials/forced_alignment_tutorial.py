@@ -150,7 +150,7 @@ plt.show()
 #
 
 
-# We enclose the transcript with blank tokens, which represent SOS and EOS.
+# We enclose the transcript with space tokens, which represent SOS and EOS.
 transcript = "|I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT|"
 dictionary = {c: i for i, c in enumerate(labels)}
 
@@ -162,8 +162,8 @@ def get_trellis(emission, tokens, blank_id=0):
     num_frame = emission.size(0)
     num_tokens = len(tokens)
 
-    trellis = torch.empty((num_frame, num_tokens))
-    trellis[:, 0] = torch.cumsum(emission[:, blank_id], 0)
+    trellis = torch.zeros((num_frame, num_tokens))
+    trellis[1:, 0] = torch.cumsum(emission[1:, blank_id], 0)
     trellis[0, 1:] = -float("inf")
     trellis[-num_tokens + 1 :, 0] = float("inf")
 
@@ -433,7 +433,7 @@ def plot_alignments(trellis, segments, word_segments, waveform):
             ax1.annotate(f"{seg.score:.2f}", (seg.start, i + 3), fontsize=8)
 
     # The original waveform
-    ratio = waveform.size(0) / (trellis.size(0) - 1)
+    ratio = waveform.size(0) / trellis.size(0)
     ax2.plot(waveform)
     for word in word_segments:
         x0 = ratio * word.start
@@ -470,7 +470,7 @@ plt.show()
 # `IPython.display.Audio` has to be the last call in a cell,
 # and there should be only one call par cell.
 def display_segment(i):
-    ratio = waveform.size(1) / (trellis.size(0) - 1)
+    ratio = waveform.size(1) / trellis.size(0)
     word = word_segments[i]
     x0 = int(ratio * word.start)
     x1 = int(ratio * word.end)
