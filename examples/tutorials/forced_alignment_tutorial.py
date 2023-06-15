@@ -165,9 +165,9 @@ def get_trellis(emission, tokens, blank_id=0):
     trellis = torch.empty((num_frame, num_tokens))
     trellis[:, 0] = torch.cumsum(emission[:, blank_id], 0)
     trellis[0, 1:] = -float("inf")
-    trellis[-num_tokens+1:, 0] = float("inf")
+    trellis[-num_tokens + 1 :, 0] = float("inf")
 
-    for t in range(num_frame-1):
+    for t in range(num_frame - 1):
         trellis[t + 1, 1:] = torch.maximum(
             # Score for staying at the same token
             trellis[t, 1:] + emission[t, blank_id],
@@ -336,7 +336,7 @@ def plot_trellis_with_segments(trellis, segments, transcript):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            trellis_with_path[seg.start:seg.end, i] = float("nan")
+            trellis_with_path[seg.start : seg.end, i] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
     ax1.set_title("Path, label and probability for each label")
@@ -415,7 +415,7 @@ def plot_alignments(trellis, segments, word_segments, waveform):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
-            trellis_with_path[seg.start:seg.end, i] = float("nan")
+            trellis_with_path[seg.start : seg.end, i] = float("nan")
 
     fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9.5))
 
