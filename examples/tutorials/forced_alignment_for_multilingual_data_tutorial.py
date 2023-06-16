@@ -230,7 +230,9 @@ model = wav2vec2_model(
     aux_num_out=31,
 )
 
-torch.hub.download_url_to_file("https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt")
+torch.hub.download_url_to_file(
+    "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt"
+)
 checkpoint = torch.load("model.pt", map_location="cpu")
 
 model.load_state_dict(checkpoint)
@@ -247,8 +249,8 @@ def get_emission(waveform):
 
     # Append the extra dimension corresponding to the <star> token
     extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
-    emissions = torch.cat((emissions, extra_dim), 2)
-    emission = emissions[0].cpu().detach()
+    emissions = torch.cat((emissions.cpu(), extra_dim), 2)
+    emission = emissions[0].detach()
     return emission, waveform
 
 
@@ -304,13 +306,13 @@ dictionary = {
 #     text = re.sub(' +', ' ', text)
 #     return text.strip()
 #
-## German example:
+# German example:
 # echo 'aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid' > test.txt
 #
-## Chiense example:
+# Chiense example:
 # echo '关 服务 高端 产品 仍 处于 供不应求 的 局面' > test.txt
-## For character-based languages like Chinese, where word-level tokenization is usually missing in the raw written form,
-## one can use a word tokenizer to segment the transcript at word level, e.g. https://michelleful.github.io/code-blog/2015/09/10/parsing-chinese-with-stanford/
+# For character-based languages like Chinese, where word-level tokenization is usually missing in the raw written form,
+# one can use a word tokenizer to segment the transcript at word level, e.g. https://michelleful.github.io/code-blog/2015/09/10/parsing-chinese-with-stanford/
 #
 # git clone https://github.com/isi-nlp/uroman
 # uroman/bin/uroman.pl < test.txt > test_romanized.txt
