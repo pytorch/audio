@@ -52,7 +52,6 @@ except ModuleNotFoundError:
 # %matplotlib inline
 from dataclasses import dataclass
 
-import matplotlib
 import matplotlib.pyplot as plt
 
 torch.random.manual_seed(0)
@@ -304,7 +303,7 @@ dictionary = {
 #
 # Polish example:
 # echo 'wtedy ujrzałem na jego brzuchu okrągłą czarną ranę dlaczego mi nie powiedziałeś szepnąłem ze łzami' > test.txt
-# 
+#
 # Portuguese example:
 # echo 'mas na imensa extensão onde se esconde o inconsciente imortal só me responde um bramido um queixume e nada mais' > test.txt
 #
@@ -331,12 +330,7 @@ assert len(dictionary) == emission.shape[1]
 transcript = text_normalized
 
 segments, word_segments = compute_alignments(transcript, dictionary, emission)
-plot_alignments(
-    segments,
-    word_segments,
-    waveform[0],
-    emission.shape[0]
-)
+plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
 plt.show()
 
 
@@ -360,12 +354,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments = compute_alignments(transcript, dictionary, emission)
-plot_alignments(
-    segments,
-    word_segments,
-    waveform[0],
-    emission.shape[0]
-)
+plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
 plt.show()
 
 
@@ -383,12 +372,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments = compute_alignments(transcript, dictionary, emission)
-plot_alignments(
-    segments,
-    word_segments,
-    waveform[0],
-    emission.shape[0]
-)
+plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
 plt.show()
 
 
@@ -397,7 +381,9 @@ plt.show()
 #
 
 
-text_normalized = "mas na imensa extensao onde se esconde o inconsciente imortal so me responde um bramido um queixume e nada mais"
+text_normalized = (
+    "mas na imensa extensao onde se esconde o inconsciente imortal so me responde um bramido um queixume e nada mais"
+)
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/6566_5323_000027.flac")
 waveform, _ = torchaudio.load(SPEECH_FILE)
 
@@ -406,12 +392,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments = compute_alignments(transcript, dictionary, emission)
-plot_alignments(
-    segments,
-    word_segments,
-    waveform[0],
-    emission.shape[0]
-)
+plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
 plt.show()
 
 
@@ -420,7 +401,9 @@ plt.show()
 #
 
 
-text_normalized = "elle giacean per terra tutte quante fuor d'una ch'a seder si levo ratto ch'ella ci vide passarsi davante"
+text_normalized = (
+    "elle giacean per terra tutte quante fuor d'una ch'a seder si levo ratto ch'ella ci vide passarsi davante"
+)
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/642_529_000025.flac")
 waveform, _ = torchaudio.load(SPEECH_FILE)
 
@@ -429,12 +412,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments = compute_alignments(transcript, dictionary, emission)
-plot_alignments(
-    segments,
-    word_segments,
-    waveform[0],
-    emission.shape[0]
-)
+plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
 plt.show()
 
 
