@@ -51,6 +51,7 @@ model implementations and application components.
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
+   tutorials/ctc_forced_alignment_api_tutorial
 
    tutorials/oscillator_tutorial
    tutorials/additive_synthesis_tutorial
@@ -68,7 +69,6 @@ model implementations and application components.
    tutorials/asr_inference_with_ctc_decoder_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
-   tutorials/ctc_forced_alignment_api_tutorial
    tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
