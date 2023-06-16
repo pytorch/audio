@@ -510,8 +510,8 @@ with torch.inference_mode():
 
     # Append the extra dimension corresponding to the <star> token
     extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
-    emissions = torch.cat((emissions, extra_dim), 2)
-    emission = emissions[0].cpu().detach()
+    emissions = torch.cat((emissions.cpu(), extra_dim), 2)
+    emission = emissions[0].detach()
 
 # Extend the dictionary to include the <star> token.
 dictionary["*"] = 29
