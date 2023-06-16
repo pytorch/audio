@@ -69,6 +69,7 @@ model implementations and application components.
    tutorials/online_asr_tutorial
    tutorials/device_asr
    tutorials/ctc_forced_alignment_api_tutorial
+   tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
@@ -156,6 +157,13 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
    :link: tutorials/ctc_forced_alignment_api_tutorial.html
    :tags: CTC,Forced-Alignment
+
+.. customcarditem::
+   :header: Forced alignment for multilingual data
+   :card_description: Learn how to use align multiligual data using TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>) and a multiligual Wav2Vec2 model.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
+   :link: tutorials/forced_alignment_for_multilingual_data_tutorial.html
+   :tags: Forced-Alignment
 
 .. customcarditem::
    :header: Streaming media decoding with StreamReader

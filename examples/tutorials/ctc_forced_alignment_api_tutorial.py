@@ -9,8 +9,7 @@ This tutorial shows how to align transcripts to speech with
 ``torchaudio``'s CTC forced alignment API proposed in the paper
 `“Scaling Speech Technology to 1,000+
 Languages” <https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__,
-and two advanced usages, i.e. dealing with non-English data and
-transcription errors.
+and one advanced usage, i.e. dealing with transcription errors with a <star> token.
 
 Though there’s some overlap in visualization
 diagrams, the scope here is different from the `“Forced Alignment with
@@ -487,179 +486,44 @@ display_segment(8, waveform, word_segments, frame_alignment)
 
 
 ######################################################################
-# II. Advancd usages
-# ------------------
-#
-# Aligning non-English data
-# ~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# Here we show an example of computing forced alignments on a German
-# utterance using the multilingual Wav2vec2 model described in the paper
-# `“Scaling Speech Technology to 1,000+
-# Languages” <https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__.
-# The model was trained on 23K of audio data from 1100+ languages using
-# the `“uroman vocabulary” <https://www.isi.edu/~ulf/uroman.html>`__ as
-# targets.
-#
-
-from torchaudio.models import wav2vec2_model
-
-model = wav2vec2_model(
-    extractor_mode="layer_norm",
-    extractor_conv_layer_config=[
-        (512, 10, 5),
-        (512, 3, 2),
-        (512, 3, 2),
-        (512, 3, 2),
-        (512, 3, 2),
-        (512, 2, 2),
-        (512, 2, 2),
-    ],
-    extractor_conv_bias=True,
-    encoder_embed_dim=1024,
-    encoder_projection_dropout=0.0,
-    encoder_pos_conv_kernel=128,
-    encoder_pos_conv_groups=16,
-    encoder_num_layers=24,
-    encoder_num_heads=16,
-    encoder_attention_dropout=0.0,
-    encoder_ff_interm_features=4096,
-    encoder_ff_interm_dropout=0.1,
-    encoder_dropout=0.0,
-    encoder_layer_norm_first=True,
-    encoder_layer_drop=0.1,
-    aux_num_out=31,
-)
-
-torch.hub.download_url_to_file(
-    "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt"
-)
-checkpoint = torch.load("model.pt", map_location="cpu")
-
-model.load_state_dict(checkpoint)
-model.eval()
-
-
-waveform, _ = torchaudio.load(SPEECH_FILE)
-
-
-def get_emission(waveform):
-    # NOTE: this step is essential
-    waveform = torch.nn.functional.layer_norm(waveform, waveform.shape)
-
-    emissions, _ = model(waveform)
-    emissions = torch.log_softmax(emissions, dim=-1)
-    emission = emissions[0].cpu().detach()
-
-    # Append the extra dimension corresponding to the <star> token
-    extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
-    emissions = torch.cat((emissions, extra_dim), 2)
-    emission = emissions[0].cpu().detach()
-    return emission, waveform
-
-
-emission, waveform = get_emission(waveform)
-
-# Construct the dictionary
-# '@' represents the OOV token, '*' represents the <star> token.
-# <pad> and </s> are fairseq's legacy tokens, which're not used.
-dictionary = {
-    "<blank>": 0,
-    "<pad>": 1,
-    "</s>": 2,
-    "@": 3,
-    "a": 4,
-    "i": 5,
-    "e": 6,
-    "n": 7,
-    "o": 8,
-    "u": 9,
-    "t": 10,
-    "s": 11,
-    "r": 12,
-    "m": 13,
-    "k": 14,
-    "l": 15,
-    "d": 16,
-    "g": 17,
-    "h": 18,
-    "y": 19,
-    "b": 20,
-    "p": 21,
-    "w": 22,
-    "c": 23,
-    "v": 24,
-    "j": 25,
-    "z": 26,
-    "f": 27,
-    "'": 28,
-    "q": 29,
-    "x": 30,
-    "*": 31,
-}
-assert len(dictionary) == emission.shape[1]
-
-
-def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
-    frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
-    segments = merge_repeats(frames, transcript)
-    word_segments = merge_words(transcript, segments)
-    plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
-    plt.show()
-    return word_segments, frame_alignment
-
-
-# One can follow the following steps to download the uroman romanizer and use it to obtain normalized transcripts.
-# def normalize_uroman(text):
-#     text = text.lower()
-#     text = text.replace("’", "'")
-#     text = re.sub("([^a-z' ])", " ", text)
-#     text = re.sub(' +', ' ', text)
-#     return text.strip()
-#
-# echo 'aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid' > test.txt"
-# git clone https://github.com/isi-nlp/uroman
-# uroman/bin/uroman.pl < test.txt > test_romanized.txt
-#
-# file = "test_romanized.txt"
-# f = open(file, "r")
-# lines = f.readlines()
-# text_normalized = normalize_uroman(lines[0].strip())
-
-
-text_normalized = (
-    "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
-)
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/10349_8674_000087.flac")
-waveform, _ = torchaudio.load(SPEECH_FILE)
-
-emission, waveform = get_emission(waveform)
-
-transcript = text_normalized
-word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
-
-
-######################################################################
-# Dealing with missing transcripts using the <star> token
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# II. Advanced usage: Dealing with missing transcripts using the <star> token
+# ---------------------------------------------------------------------------
 #
 # Now let’s look at when the transcript is partially missing, how can we
 # improve alignment quality using the <star> token, which is capable of modeling
-# any token. Note that in the above section, we have manually added the
-# token to the vocabualry and the emission matrix.
+# any token.
 #
 # Here we use the same English example as used above. But we remove the
 # beginning text “i had that curiosity beside me at” from the transcript.
 # Aligning audio with such transcript results in wrong alignments of the
-# existing word “this”. Using the OOV token “@” to model the missing text
-# doesn’t help (still resulting in wrong alignments for “this”). However,
-# this issue can be mitigated by using a <star> token to model the missing text.
+# existing word “this”. However, this issue can be mitigated by using the
+# <star> token to model the missing text.
 #
 
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-waveform, _ = torchaudio.load(SPEECH_FILE)
-emission, waveform = get_emission(waveform)
-transcript = "i had that curiosity beside me at this moment"
+# Reload the emission tensor in order to add the extra dimension corresponding to the <star> token.
+with torch.inference_mode():
+    waveform, _ = torchaudio.load(SPEECH_FILE)
+    emissions, _ = model(waveform.to(device))
+    emissions = torch.log_softmax(emissions, dim=-1)
+    
+    # Append the extra dimension corresponding to the <star> token
+    extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)    
+    emissions = torch.cat((emissions, extra_dim), 2)
+    emission = emissions[0].cpu().detach()
+    
+# Extend the dictionary to include the <star> token.
+dictionary["*"] = 29
+
+assert len(dictionary) == emission.shape[1]
+
+def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
+    frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
+    segments = merge_repeats(frames, transcript)
+    word_segments = merge_words(transcript, segments, "|")
+    plot_alignments(segments, word_segments, waveform[0], emission.shape[0], 1)
+    plt.show()
+    return word_segments, frame_alignment
+
 # original:
 word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
 
@@ -667,19 +531,13 @@ word_segments, frame_alignment = compute_and_plot_alignments(transcript, diction
 
 # Demonstrate the effect of <star> token for dealing with deletion errors
 # ("i had that curiosity beside me at" missing from the transcript):
-transcript = "this moment"
-word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
-
-######################################################################
-
-# Replacing the missing transcript with the OOV token "@":
-transcript = "@ this moment"
+transcript = "THIS|MOMENT"
 word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
 
 ######################################################################
 
 # Replacing the missing transcript with the <star> token:
-transcript = "* this moment"
+transcript = "*|THIS|MOMENT"
 word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
 
 
@@ -688,9 +546,8 @@ word_segments, frame_alignment = compute_and_plot_alignments(transcript, diction
 # ----------
 #
 # In this tutorial, we looked at how to use torchaudio’s forced alignment
-# API and Wav2Vec2 pre-trained acoustic model to align and segment audio
-# files, and demonstrated two advanced usages: 1) Inference on non-English data
-# 2) How introducing a <star> token could improve alignment accuracy when
+# API to align and segment speech files, and demonstrated one advanced usage:
+# How introducing a <star> token could improve alignment accuracy when
 # transcription errors exist.
 #
 
