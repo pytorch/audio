@@ -43,7 +43,7 @@ except ModuleNotFoundError:
     raise
 
 ######################################################################
-# I. Basic usages
+# Basic usages
 # ---------------
 #
 # In this section, we cover the following content:
@@ -488,7 +488,7 @@ display_segment(8, waveform, word_segments, frame_alignment)
 
 
 ######################################################################
-# II. Advanced usage: Dealing with missing transcripts using the <star> token
+# Advanced usage: Dealing with missing transcripts using the <star> token
 # ---------------------------------------------------------------------------
 #
 # Now let’s look at when the transcript is partially missing, how can we

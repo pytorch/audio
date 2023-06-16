@@ -5,7 +5,7 @@ Forced alignment for multilingual data
 **Author**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__
 
 This tutorial shows how to compute forced alignments for speech data
-from multiple languages using ``torchaudio``\ ’s CTC forced alignment
+from multiple non-English languages using ``torchaudio``'s CTC forced alignment
 API described in `“CTC forced alignment
 tutorial” <https://pytorch.org/audio/stable/tutorials/forced_alignment_tutorial.html>`__
 and the multilingual Wav2vec2 model proposed in the paper `“Scaling
@@ -40,7 +40,7 @@ except ModuleNotFoundError:
     raise
 
 ######################################################################
-# I. Preparation
+# Preparation
 # --------------
 #
 # Here we import necessary packages, and define utility functions for
@@ -54,10 +54,6 @@ from dataclasses import dataclass
 
 import matplotlib
 import matplotlib.pyplot as plt
-import torchaudio.functional as F
-from IPython.display import Audio
-
-matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
 
@@ -88,7 +84,7 @@ class Segment:
         return self.end - self.start
 
 
-# compute frame alignments using torchaudio's forced alignment API
+# compute frame-level and word-level alignments using torchaudio's forced alignment API
 def compute_alignments(transcript, dictionary, emission):
     frames = []
     tokens = [dictionary[c] for c in transcript.replace(" ", "")]
@@ -97,8 +93,8 @@ def compute_alignments(transcript, dictionary, emission):
     input_lengths = torch.tensor(emission.shape[0])
     target_lengths = torch.tensor(targets.shape[0])
 
-    # This is the key step, where we call the forced alignment API functional.forced_align to compute alignments.
-    frame_alignment, frame_scores = F.forced_align(emission, targets, input_lengths, target_lengths, 0)
+    # This is the key step, where we call the forced alignment API functional.forced_align to compute frame alignments.
+    frame_alignment, frame_scores = forced_align(emission, targets, input_lengths, target_lengths, 0)
 
     assert len(frame_alignment) == input_lengths.item()
     assert len(targets) == target_lengths.item()
@@ -114,11 +110,8 @@ def compute_alignments(transcript, dictionary, emission):
             token_index += 1
         frames.append(Frame(token_index, i, frame_scores[i].exp().item()))
         prev_hyp = frame_alignment[i].item()
-    return frames, frame_alignment, frame_scores
 
-
-# compute frame alignments from token alignments
-def merge_repeats(frames, transcript):
+    # compute frame alignments from token alignments
     transcript_nospace = transcript.replace(" ", "")
     i1, i2 = 0, 0
     segments = []
@@ -126,7 +119,6 @@ def merge_repeats(frames, transcript):
         while i2 < len(frames) and frames[i1].token_index == frames[i2].token_index:
             i2 += 1
         score = sum(frames[k].score for k in range(i1, i2)) / (i2 - i1)
-        tokens = [dictionary[c] if c in dictionary else dictionary["@"] for c in transcript.replace(" ", "")]
 
         segments.append(
             Segment(
@@ -137,11 +129,9 @@ def merge_repeats(frames, transcript):
             )
         )
         i1 = i2
-    return segments
 
-
-# compue word alignments from token alignments
-def merge_words(transcript, segments, separator=" "):
+    # compue word alignments from token alignments
+    separator = " "
     words = []
     i1, i2, i3 = 0, 0, 0
     while i3 < len(transcript):
@@ -149,11 +139,7 @@ def merge_words(transcript, segments, separator=" "):
             if i1 != i2:
                 if i3 == len(transcript) - 1:
                     i2 += 1
-                if separator == "|":
-                    # s is the number of separators (counted as a valid modeling unit) we've seen
-                    s = len(words)
-                else:
-                    s = 0
+                s = 0
                 segs = segments[i1 + s : i2 + s]
                 word = "".join([seg.label for seg in segs])
                 score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
@@ -162,7 +148,7 @@ def merge_words(transcript, segments, separator=" "):
         else:
             i2 += 1
         i3 += 1
-    return words
+    return segments, words
 
 
 # utility function for plotting word alignments
@@ -193,11 +179,11 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
 
 
 ######################################################################
-# II. Aligning non-English data
+# Aligning non-English data
 # -----------------------------
 #
-# Here we show an example of computing forced alignments on two languages
-# (German and Chinese) utterance using the multilingual Wav2vec2 model.
+# Here we show an example of computing forced alignments of utterances in
+# 5 languages using the multilingual Wav2vec2 model.
 # Here we first load the model and dictionary.
 #
 
@@ -295,10 +281,14 @@ dictionary = {
 
 ######################################################################
 # Then we show an example of aligning a German utterance with its
-# transcripts, with the alignments visualized.
+# transcript, with the alignments visualized. In our examples, we always
+# align speech with transcripts which are already romanized.
+# The steps to romanize transcripts using the "uroman" tool have been
+# listed below in comments.
 #
 
-# One can follow the following steps to download the uroman romanizer and use it to obtain normalized transcripts.
+# Here are the steps for downloading the uroman romanizer and using it to obtain normalized transcripts.
+# import re
 # def normalize_uroman(text):
 #     text = text.lower()
 #     text = text.replace("’", "'")
@@ -311,8 +301,15 @@ dictionary = {
 #
 # Chiense example:
 # echo '关 服务 高端 产品 仍 处于 供不应求 的 局面' > test.txt
-# For character-based languages like Chinese, where word-level tokenization is usually missing in the raw written form,
-# one can use a word tokenizer to segment the transcript at word level, e.g. https://michelleful.github.io/code-blog/2015/09/10/parsing-chinese-with-stanford/
+#
+# Polish example:
+# echo 'wtedy ujrzałem na jego brzuchu okrągłą czarną ranę dlaczego mi nie powiedziałeś szepnąłem ze łzami' > test.txt
+# 
+# Portuguese example:
+# echo 'mas na imensa extensão onde se esconde o inconsciente imortal só me responde um bramido um queixume e nada mais' > test.txt
+#
+# Italian example:
+# echo "elle giacean per terra tutte quante fuor d'una ch'a seder si levò ratto ch'ella ci vide passarsi davante" > test.txt
 #
 # git clone https://github.com/isi-nlp/uroman
 # uroman/bin/uroman.pl < test.txt > test_romanized.txt
@@ -333,10 +330,13 @@ assert len(dictionary) == emission.shape[1]
 
 transcript = text_normalized
 
-frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
-segments = merge_repeats(frames, transcript)
-word_segments = merge_words(transcript, segments)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+segments, word_segments = compute_alignments(transcript, dictionary, emission)
+plot_alignments(
+    segments,
+    word_segments,
+    waveform[0],
+    emission.shape[0]
+)
 plt.show()
 
 
@@ -345,7 +345,7 @@ plt.show()
 # a character-based language, and there is not explicit word-level
 # tokenization (separated by spaces) in its raw written form. In order to
 # obtain word level alignments, you need to first tokenize the transcripts
-# at the word level by a word tokenizer like `“Stanford
+# at the word level using a word tokenizer like `“Stanford
 # Tokenizer” <https://michelleful.github.io/code-blog/2015/09/10/parsing-chinese-with-stanford/>`__.
 # However this is not needed if you only want character-level alignments.
 #
@@ -359,10 +359,82 @@ emission, waveform = get_emission(waveform)
 
 transcript = text_normalized
 
-frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
-segments = merge_repeats(frames, transcript)
-word_segments = merge_words(transcript, segments)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+segments, word_segments = compute_alignments(transcript, dictionary, emission)
+plot_alignments(
+    segments,
+    word_segments,
+    waveform[0],
+    emission.shape[0]
+)
+plt.show()
+
+
+######################################################################
+# Here is one example in Polish:
+#
+
+
+text_normalized = "wtedy ujrzalem na jego brzuchu okragla czarna rane dlaczego mi nie powiedziales szepnalem ze lzami"
+SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/5090_1447_000088.flac")
+waveform, _ = torchaudio.load(SPEECH_FILE)
+
+emission, waveform = get_emission(waveform)
+
+transcript = text_normalized
+
+segments, word_segments = compute_alignments(transcript, dictionary, emission)
+plot_alignments(
+    segments,
+    word_segments,
+    waveform[0],
+    emission.shape[0]
+)
+plt.show()
+
+
+######################################################################
+# Here is one example in Portuguese:
+#
+
+
+text_normalized = "mas na imensa extensao onde se esconde o inconsciente imortal so me responde um bramido um queixume e nada mais"
+SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/6566_5323_000027.flac")
+waveform, _ = torchaudio.load(SPEECH_FILE)
+
+emission, waveform = get_emission(waveform)
+
+transcript = text_normalized
+
+segments, word_segments = compute_alignments(transcript, dictionary, emission)
+plot_alignments(
+    segments,
+    word_segments,
+    waveform[0],
+    emission.shape[0]
+)
+plt.show()
+
+
+######################################################################
+# Here is one example in Italian:
+#
+
+
+text_normalized = "elle giacean per terra tutte quante fuor d'una ch'a seder si levo ratto ch'ella ci vide passarsi davante"
+SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/642_529_000025.flac")
+waveform, _ = torchaudio.load(SPEECH_FILE)
+
+emission, waveform = get_emission(waveform)
+
+transcript = text_normalized
+
+segments, word_segments = compute_alignments(transcript, dictionary, emission)
+plot_alignments(
+    segments,
+    word_segments,
+    waveform[0],
+    emission.shape[0]
+)
 plt.show()
 
 
@@ -372,7 +444,7 @@ plt.show()
 #
 # In this tutorial, we looked at how to use torchaudio’s forced alignment
 # API and a Wav2Vec2 pre-trained mulilingual acoustic model to align
-# speech data to transcripts in German and Chinese.
+# speech data to transcripts in five languages.
 #
 
 
