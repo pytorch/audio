@@ -18,7 +18,7 @@ def get_trainer(args):
         monitor="monitoring_step",
         mode="max",
         save_last=True,
-        filename="{{epoch}}",
+        filename="{epoch}",
         save_top_k=10,
     )
     lr_monitor = LearningRateMonitor(logging_interval="step")
@@ -68,9 +68,9 @@ def parse_args():
         required=True,
     )
     parser.add_argument(
-        "--dataset-path",
+        "--root-dir",
         type=str,
-        help="Path to LRW audio-visual datasets.",
+        help="Root directory to LRS3 audio-visual datasets.",
         required=True,
     )
     parser.add_argument(
@@ -91,7 +91,6 @@ def parse_args():
     )
     parser.add_argument(
         "--experiment-name",
-        default="online_avsr_public_test",
         type=str,
         help="Experiment name",
     )
