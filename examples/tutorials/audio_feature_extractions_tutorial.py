@@ -335,7 +335,6 @@ mel_spectrogram = T.MelSpectrogram(
     pad_mode="reflect",
     power=2.0,
     norm="slaney",
-    onesided=True,
     n_mels=n_mels,
     mel_scale="htk",
 )
