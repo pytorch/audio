@@ -161,7 +161,7 @@ Tutorials
 .. customcarditem::
    :header: Forced alignment for multilingual data
    :card_description: Learn how to use align multiligual data using TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>) and a multiligual Wav2Vec2 model.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/forced_alignment_for_multilingual_data_tutorial.png
    :link: tutorials/forced_alignment_for_multilingual_data_tutorial.html
    :tags: Forced-Alignment
 

@@ -251,6 +251,7 @@ frames, frame_alignment, frame_scores = compute_alignments(transcript, dictionar
 # frame-level confidence scores.
 #
 
+
 # Merge the labels
 @dataclass
 class Segment:
@@ -422,6 +423,7 @@ plt.show()
 
 ######################################################################
 
+
 # A trick to embed the resulting audio to the generated file.
 # `IPython.display.Audio` has to be the last call in a cell,
 # and there should be only one call par cell.
@@ -505,16 +507,17 @@ with torch.inference_mode():
     waveform, _ = torchaudio.load(SPEECH_FILE)
     emissions, _ = model(waveform.to(device))
     emissions = torch.log_softmax(emissions, dim=-1)
-    
+
     # Append the extra dimension corresponding to the <star> token
-    extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)    
+    extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
     emissions = torch.cat((emissions, extra_dim), 2)
     emission = emissions[0].cpu().detach()
-    
+
 # Extend the dictionary to include the <star> token.
 dictionary["*"] = 29
 
 assert len(dictionary) == emission.shape[1]
+
 
 def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
     frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
@@ -523,6 +526,7 @@ def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
     plot_alignments(segments, word_segments, waveform[0], emission.shape[0], 1)
     plt.show()
     return word_segments, frame_alignment
+
 
 # original:
 word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
