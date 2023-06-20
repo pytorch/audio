@@ -52,6 +52,8 @@ except ModuleNotFoundError:
 # %matplotlib inline
 from dataclasses import dataclass
 
+import IPython
+
 import matplotlib.pyplot as plt
 
 torch.random.manual_seed(0)
@@ -147,7 +149,9 @@ def compute_alignments(transcript, dictionary, emission):
         else:
             i2 += 1
         i3 += 1
-    return segments, words
+
+    num_frames = len(frame_alignment)
+    return segments, words, num_frames
 
 
 # utility function for plotting word alignments
@@ -177,13 +181,28 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
     ax2.set_yticks([])
 
 
+# utility function for playing audio segments.
+# A trick to embed the resulting audio to the generated file.
+# `IPython.display.Audio` has to be the last call in a cell,
+# and there should be only one call par cell.
+def display_segment(i, waveform, word_segments, num_frames):
+    ratio = waveform.size(1) / num_frames
+    word = word_segments[i]
+    x0 = int(ratio * word.start)
+    x1 = int(ratio * word.end)
+    print(f"{word.label} ({word.score:.2f}): {x0 / sample_rate:.3f} - {x1 / sample_rate:.3f} sec")
+    segment = waveform[:, x0:x1]
+    return IPython.display.Audio(segment.numpy(), rate=sample_rate)
+
+
 ######################################################################
 # Aligning non-English data
 # -----------------------------
 #
 # Here we show examples of computing forced alignments of utterances in
 # 5 languages using the multilingual Wav2vec2 model, with the alignments visualized.
-# Here we first load the model and dictionary.
+# One can also play the whole audio and audio segments aligned with each word, in
+# order to verify the alignment quality. Here we first load the model and dictionary.
 #
 
 from torchaudio.models import wav2vec2_model
@@ -215,12 +234,12 @@ model = wav2vec2_model(
     aux_num_out=31,
 )
 
-torch.hub.download_url_to_file(
-    "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt"
-)
-checkpoint = torch.load("model.pt", map_location="cpu")
 
-model.load_state_dict(checkpoint)
+model.load_state_dict(
+    torch.hub.load_state_dict_from_url(
+        "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt"
+    )
+)
 model.eval()
 
 
@@ -280,49 +299,47 @@ dictionary = {
 
 ######################################################################
 # Before aligning the speech with transcripts, we need to make sure
-# the transcripts are already romanized. The steps to romanize transcripts
-# using the "uroman" tool have been
-# listed below in comments.
+# the transcripts are already romanized. Here are the BASH commands
+# required for saving raw transcript to a file, downloading the uroman
+# romanizer and using it to obtain romanized transcripts, and PyThon
+# commands required for further normalizing the romanized transcript.
 #
 
-# Here are the steps for downloading the uroman romanizer and using it to obtain normalized transcripts.
-# import re
-# def normalize_uroman(text):
-#     text = text.lower()
-#     text = text.replace("’", "'")
-#     text = re.sub("([^a-z' ])", " ", text)
-#     text = re.sub(' +', ' ', text)
-#     return text.strip()
+# %%
+# .. code-block:: bash
 #
-# German example:
-# echo 'aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid' > test.txt
+#    %%bash
+#    Save the raw transcript to a file
+#    echo 'raw text' > text.txt
+#    git clone https://github.com/isi-nlp/uroman
+#    uroman/bin/uroman.pl < text.txt > text_romanized.txt
 #
-# Chiense example:
-# echo '关 服务 高端 产品 仍 处于 供不应求 的 局面' > test.txt
+
+######################################################################
+# .. code-block:: python
 #
-# Polish example:
-# echo 'wtedy ujrzałem na jego brzuchu okrągłą czarną ranę dlaczego mi nie powiedziałeś szepnąłem ze łzami' > test.txt
+#    import re
+#    def normalize_uroman(text):
+#        text = text.lower()
+#        text = text.replace("’", "'")
+#        text = re.sub("([^a-z' ])", " ", text)
+#        text = re.sub(' +', ' ', text)
+#        return text.strip()
 #
-# Portuguese example:
-# echo 'mas na imensa extensão onde se esconde o inconsciente imortal só me responde um bramido um queixume e nada mais' > test.txt
+#    file = "text_romanized.txt"
+#    f = open(file, "r")
+#    lines = f.readlines()
+#    text_normalized = normalize_uroman(lines[0].strip())
 #
-# Italian example:
-# echo "elle giacean per terra tutte quante fuor d'una ch'a seder si levò ratto ch'ella ci vide passarsi davante" > test.txt
-#
-# git clone https://github.com/isi-nlp/uroman
-# uroman/bin/uroman.pl < test.txt > test_romanized.txt
-#
-# file = "test_romanized.txt"
-# f = open(file, "r")
-# lines = f.readlines()
-# text_normalized = normalize_uroman(lines[0].strip())
 
 
 ######################################################################
 # German example:
 # ~~~~~~~~~~~~~~~~
 
-
+text_raw = (
+    "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
+)
 text_normalized = (
     "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
 )
@@ -334,9 +351,119 @@ assert len(dictionary) == emission.shape[1]
 
 transcript = text_normalized
 
-segments, word_segments = compute_alignments(transcript, dictionary, emission)
+segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
 plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
-plt.show()
+
+print("Raw Transcript: ", text_raw)
+print("Normalized Transcript: ", text_normalized)
+IPython.display.Audio(waveform, rate=sample_rate)
+
+######################################################################
+#
+
+display_segment(0, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(1, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(2, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(3, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(4, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(5, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(6, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(7, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(8, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(9, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(10, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(11, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(12, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(13, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(14, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(15, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(16, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(17, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(18, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(19, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(20, waveform, word_segments, num_frames)
 
 
 ######################################################################
@@ -351,7 +478,7 @@ plt.show()
 # However this is not needed if you only want character-level alignments.
 #
 
-
+text_raw = "关 服务 高端 产品 仍 处于 供不应求 的 局面"
 text_normalized = "guan fuwu gaoduan chanpin reng chuyu gongbuyingqiu de jumian"
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/mvdr/clean_speech.wav")
 waveform, _ = torchaudio.load(SPEECH_FILE)
@@ -360,9 +487,59 @@ emission, waveform = get_emission(waveform)
 
 transcript = text_normalized
 
-segments, word_segments = compute_alignments(transcript, dictionary, emission)
+segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
 plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
-plt.show()
+
+print("Raw Transcript: ", text_raw)
+print("Normalized Transcript: ", text_normalized)
+IPython.display.Audio(waveform, rate=sample_rate)
+
+######################################################################
+#
+
+display_segment(0, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(1, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(2, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(3, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(4, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(5, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(6, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(7, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(8, waveform, word_segments, num_frames)
 
 
 ######################################################################
@@ -370,6 +547,7 @@ plt.show()
 # ~~~~~~~~~~~~~~~
 
 
+text_raw = "wtedy ujrzałem na jego brzuchu okrągłą czarną ranę dlaczego mi nie powiedziałeś szepnąłem ze łzami"
 text_normalized = "wtedy ujrzalem na jego brzuchu okragla czarna rane dlaczego mi nie powiedziales szepnalem ze lzami"
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/5090_1447_000088.flac")
 waveform, _ = torchaudio.load(SPEECH_FILE)
@@ -378,9 +556,89 @@ emission, waveform = get_emission(waveform)
 
 transcript = text_normalized
 
-segments, word_segments = compute_alignments(transcript, dictionary, emission)
+segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
 plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
-plt.show()
+
+print("Raw Transcript: ", text_raw)
+print("Normalized Transcript: ", text_normalized)
+IPython.display.Audio(waveform, rate=sample_rate)
+
+######################################################################
+#
+
+display_segment(0, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(1, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(2, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(3, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(4, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(5, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(6, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(7, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(8, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(9, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(10, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(11, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(12, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(13, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(14, waveform, word_segments, num_frames)
 
 
 ######################################################################
@@ -388,6 +646,9 @@ plt.show()
 # ~~~~~~~~~~~~~~~~~~~
 
 
+text_raw = (
+    "mas na imensa extensão onde se esconde o inconsciente imortal só me responde um bramido um queixume e nada mais"
+)
 text_normalized = (
     "mas na imensa extensao onde se esconde o inconsciente imortal so me responde um bramido um queixume e nada mais"
 )
@@ -398,16 +659,121 @@ emission, waveform = get_emission(waveform)
 
 transcript = text_normalized
 
-segments, word_segments = compute_alignments(transcript, dictionary, emission)
+segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
 plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
-plt.show()
+
+print("Raw Transcript: ", text_raw)
+print("Normalized Transcript: ", text_normalized)
+IPython.display.Audio(waveform, rate=sample_rate)
+
+######################################################################
+#
+
+display_segment(0, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(1, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(2, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(3, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(4, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(5, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(6, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(7, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(8, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(9, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(10, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(11, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(12, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(13, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(14, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(15, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(16, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(17, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(18, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(19, waveform, word_segments, num_frames)
 
 
 ######################################################################
 # Italian example:
 # ~~~~~~~~~~~~~~~~
 
-
+text_raw = "elle giacean per terra tutte quante fuor d'una ch'a seder si levò ratto ch'ella ci vide passarsi davante"
 text_normalized = (
     "elle giacean per terra tutte quante fuor d'una ch'a seder si levo ratto ch'ella ci vide passarsi davante"
 )
@@ -418,9 +784,104 @@ emission, waveform = get_emission(waveform)
 
 transcript = text_normalized
 
-segments, word_segments = compute_alignments(transcript, dictionary, emission)
+segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
 plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
-plt.show()
+
+print("Raw Transcript: ", text_raw)
+print("Normalized Transcript: ", text_normalized)
+IPython.display.Audio(waveform, rate=sample_rate)
+
+######################################################################
+#
+
+display_segment(0, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(1, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(2, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(3, waveform, word_segments, num_frames)
+
+
+######################################################################
+#
+
+display_segment(4, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(5, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(6, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(7, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(8, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(9, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(10, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(11, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(12, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(13, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(14, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(15, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(16, waveform, word_segments, num_frames)
+
+######################################################################
+#
+
+display_segment(17, waveform, word_segments, num_frames)
 
 
 ######################################################################
