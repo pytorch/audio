@@ -181,8 +181,8 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
 # Aligning non-English data
 # -----------------------------
 #
-# Here we show an example of computing forced alignments of utterances in
-# 5 languages using the multilingual Wav2vec2 model.
+# Here we show examples of computing forced alignments of utterances in
+# 5 languages using the multilingual Wav2vec2 model, with the alignments visualized.
 # Here we first load the model and dictionary.
 #
 
@@ -279,10 +279,9 @@ dictionary = {
 
 
 ######################################################################
-# Then we show an example of aligning a German utterance with its
-# transcript, with the alignments visualized. In our examples, we always
-# align speech with transcripts which are already romanized.
-# The steps to romanize transcripts using the "uroman" tool have been
+# Before aligning the speech with transcripts, we need to make sure
+# the transcripts are already romanized. The steps to romanize transcripts
+# using the "uroman" tool have been
 # listed below in comments.
 #
 
@@ -318,6 +317,12 @@ dictionary = {
 # lines = f.readlines()
 # text_normalized = normalize_uroman(lines[0].strip())
 
+
+######################################################################
+# German example:
+# ~~~~~~~~~~~~~~~~
+
+
 text_normalized = (
     "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
 )
@@ -335,8 +340,10 @@ plt.show()
 
 
 ######################################################################
-# Now let’s look at an example from another language, Chinese. Chinese is
-# a character-based language, and there is not explicit word-level
+# Chinese example:
+# ~~~~~~~~~~~~~~~~
+#
+# Chinese is a character-based language, and there is not explicit word-level
 # tokenization (separated by spaces) in its raw written form. In order to
 # obtain word level alignments, you need to first tokenize the transcripts
 # at the word level using a word tokenizer like `“Stanford
@@ -359,8 +366,8 @@ plt.show()
 
 
 ######################################################################
-# Here is one example in Polish:
-#
+# Polish example:
+# ~~~~~~~~~~~~~~~
 
 
 text_normalized = "wtedy ujrzalem na jego brzuchu okragla czarna rane dlaczego mi nie powiedziales szepnalem ze lzami"
@@ -377,8 +384,8 @@ plt.show()
 
 
 ######################################################################
-# Here is one example in Portuguese:
-#
+# Portuguese example:
+# ~~~~~~~~~~~~~~~~~~~
 
 
 text_normalized = (
@@ -397,8 +404,8 @@ plt.show()
 
 
 ######################################################################
-# Here is one example in Italian:
-#
+# Italian example:
+# ~~~~~~~~~~~~~~~~
 
 
 text_normalized = (
