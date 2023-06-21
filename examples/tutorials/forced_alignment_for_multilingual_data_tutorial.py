@@ -41,7 +41,7 @@ except ModuleNotFoundError:
 
 ######################################################################
 # Preparation
-# --------------
+# -----------
 #
 # Here we import necessary packages, and define utility functions for
 # computing the frame-level alignments (using the API
@@ -196,8 +196,8 @@ def display_segment(i, waveform, word_segments, num_frames):
 
 
 ######################################################################
-# Aligning non-English data
-# -----------------------------
+# Aligning multilingual data
+# --------------------------
 #
 # Here we show examples of computing forced alignments of utterances in
 # 5 languages using the multilingual Wav2vec2 model, with the alignments visualized.
@@ -343,8 +343,8 @@ text_raw = (
 text_normalized = (
     "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
 )
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/10349_8674_000087.flac")
-waveform, _ = torchaudio.load(SPEECH_FILE)
+speech_file = torchaudio.utils.download_asset("tutorial-assets/10349_8674_000087.flac", progress=False)
+waveform, _ = torchaudio.load(speech_file)
 
 emission, waveform = get_emission(waveform)
 assert len(dictionary) == emission.shape[1]
@@ -480,8 +480,8 @@ display_segment(20, waveform, word_segments, num_frames)
 
 text_raw = "关 服务 高端 产品 仍 处于 供不应求 的 局面"
 text_normalized = "guan fuwu gaoduan chanpin reng chuyu gongbuyingqiu de jumian"
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/mvdr/clean_speech.wav")
-waveform, _ = torchaudio.load(SPEECH_FILE)
+speech_file = torchaudio.utils.download_asset("tutorial-assets/mvdr/clean_speech.wav", progress=False)
+waveform, _ = torchaudio.load(speech_file)
 
 emission, waveform = get_emission(waveform)
 
@@ -549,8 +549,8 @@ display_segment(8, waveform, word_segments, num_frames)
 
 text_raw = "wtedy ujrzałem na jego brzuchu okrągłą czarną ranę dlaczego mi nie powiedziałeś szepnąłem ze łzami"
 text_normalized = "wtedy ujrzalem na jego brzuchu okragla czarna rane dlaczego mi nie powiedziales szepnalem ze lzami"
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/5090_1447_000088.flac")
-waveform, _ = torchaudio.load(SPEECH_FILE)
+speech_file = torchaudio.utils.download_asset("tutorial-assets/5090_1447_000088.flac", progress=False)
+waveform, _ = torchaudio.load(speech_file)
 
 emission, waveform = get_emission(waveform)
 
@@ -652,8 +652,8 @@ text_raw = (
 text_normalized = (
     "mas na imensa extensao onde se esconde o inconsciente imortal so me responde um bramido um queixume e nada mais"
 )
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/6566_5323_000027.flac")
-waveform, _ = torchaudio.load(SPEECH_FILE)
+speech_file = torchaudio.utils.download_asset("tutorial-assets/6566_5323_000027.flac", progress=False)
+waveform, _ = torchaudio.load(speech_file)
 
 emission, waveform = get_emission(waveform)
 
@@ -777,8 +777,8 @@ text_raw = "elle giacean per terra tutte quante fuor d'una ch'a seder si levò r
 text_normalized = (
     "elle giacean per terra tutte quante fuor d'una ch'a seder si levo ratto ch'ella ci vide passarsi davante"
 )
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/642_529_000025.flac")
-waveform, _ = torchaudio.load(SPEECH_FILE)
+speech_file = torchaudio.utils.download_asset("tutorial-assets/642_529_000025.flac", progress=False)
+waveform, _ = torchaudio.load(speech_file)
 
 emission, waveform = get_emission(waveform)
 

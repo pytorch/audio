@@ -44,7 +44,7 @@ except ModuleNotFoundError:
 
 ######################################################################
 # Basic usages
-# ---------------
+# ------------
 #
 # In this section, we cover the following content:
 #
