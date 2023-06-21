@@ -10,5 +10,7 @@ torchaudio.prototype.transforms
     :nosignatures:
 
     BarkScale
-    InverseBarkScale
     BarkSpectrogram
+    ChromaScale
+    ChromaSpectrogram
+    InverseBarkScale
