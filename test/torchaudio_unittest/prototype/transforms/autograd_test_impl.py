@@ -44,3 +44,19 @@ class Autograd(TestBaseMixin):
             get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
         )
         self.assert_grad(transform, [spec])
+
+    def test_chroma_spectrogram(self):
+        sample_rate = 8000
+        transform = T.ChromaSpectrogram(sample_rate=sample_rate, n_fft=400)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
+    def test_chroma_scale(self):
+        sample_rate = 8000
+        n_fft = 400
+        n_chroma = 12
+        transform = T.ChromaScale(sample_rate=sample_rate, n_freqs=n_fft // 2 + 1, n_chroma=n_chroma)
+        waveform = get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
