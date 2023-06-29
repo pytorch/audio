@@ -29,6 +29,20 @@ import librosa
 import matplotlib.pyplot as plt
 
 ######################################################################
+# Overview of audio features
+# --------------------------
+#
+# The following diagram shows the relationship between common audio features
+# and torchaudio APIs to generate them.
+#
+# .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png
+#
+# For the complete list of available features, please refer to the
+# documentation.
+#
+
+
+######################################################################
 # Preparation
 # -----------
 #
@@ -81,20 +95,6 @@ def plot_fbank(fbank, title=None):
     axs.set_ylabel("frequency bin")
     axs.set_xlabel("mel bin")
     plt.show(block=False)
-
-
-######################################################################
-# Overview of audio features
-# --------------------------
-#
-# The following diagram shows the relationship between common audio features
-# and torchaudio APIs to generate them.
-#
-# .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png
-#
-# For the complete list of available features, please refer to the
-# documentation.
-#
 
 
 ######################################################################
@@ -156,7 +156,8 @@ Audio(SPEECH_WAVEFORM.numpy(), rate=SAMPLE_RATE)
 #    By default, (i.e. ``hop_length=None`` and ``win_length=None``),
 #    the value of ``n_fft // 4`` is used.
 #    Here we use the same ``hop_length`` value across different ``n_fft``
-#    so that the visualization.
+#    so that they have the same number of elemets in the time axis.
+#
 
 n_ffts = [32, 128, 512, 2048]
 hop_length = 64
@@ -181,11 +182,12 @@ fig.tight_layout()
 # When comparing signals, it is desirable to use the same sampling rate,
 # however if you must use the different sampling rate, care must be
 # taken for interpretating the meaning of ``n_fft``.
-# ``n_fft`` determines the resolution of the frequency, and what
-# each frequency bin represents is subject to the sampling rate.
+# Recall that ``n_fft`` determines the resolution of the frequency
+# axis for a given sampling rate. In other words, what each bin on
+# the frequency axis represents is subject to the sampling rate.
 #
 # As we have seen above, changing the value of ``n_fft`` does not change
-# the coverage of frequency range.
+# the coverage of frequency range for the same input signal.
 
 ######################################################################
 #
