@@ -20,10 +20,12 @@ to use and feel like a natural extension.
   - Load a variety of audio formats, such as `wav`, `mp3`, `ogg`, `flac`, `opus`, `sphere`, into a torch Tensor using SoX
   - [Kaldi (ark/scp)](http://pytorch.org/audio/main/kaldi_io.html)
 - [Dataloaders for common audio datasets](http://pytorch.org/audio/main/datasets.html)
+- Audio and speech processing functions
+  - [forced_align](https://pytorch.org/audio/main/generated/torchaudio.functional.forced_align.html)
 - Common audio transforms
-    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/main/transforms.html)
+  - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/main/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/main/compliance.kaldi.html)
+  - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/main/compliance.kaldi.html)
 
 Installation
 ------------
