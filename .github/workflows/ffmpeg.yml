@@ -31,19 +31,23 @@ jobs:
 
         cd "${FFMPEG_ROOT}/.."
         tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
-        mkdir -p "${RUNNER_ARTIFACT_DIR}/linux/"
-        mv ffmpeg.tar.gz "${RUNNER_ARTIFACT_DIR}/linux/${FFMPEG_VERSION}.tar.gz"
+
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/linux/"
+        mkdir -p "${artifact_dir}"
+        mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
   macOS-LGPL:
     strategy:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        runner: ["macos-m1-12", "macos-12"]
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      job-name: Build LGPL FFmpeg for macOS
+      job-name: Build LGPL FFmpeg for macOS ("${{ matrix.runner }}")
       upload-artifact: ffmpeg-macos-lgpl
       repository: pytorch/audio
+      runner: "${{ matrix.runner }}"
       script: |
         export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
         export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
@@ -51,8 +55,10 @@ jobs:
 
         cd "${FFMPEG_ROOT}/.."
         tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
-        mkdir -p "${RUNNER_ARTIFACT_DIR}/macos/"
-        mv ffmpeg.tar.gz "${RUNNER_ARTIFACT_DIR}/macos/${FFMPEG_VERSION}.tar.gz"
+
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/macos_$(uname -m)"
+        mkdir -p "${artifact_dir}"
+        mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
   Windows-LGPL:
     strategy:
@@ -71,5 +77,7 @@ jobs:
 
         cd "${FFMPEG_ROOT}/.."
         tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
-        mkdir -p "${RUNNER_ARTIFACT_DIR}/windows/"
-        mv ffmpeg.tar.gz "${RUNNER_ARTIFACT_DIR}/windows/${FFMPEG_VERSION}.tar.gz"
+
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/windows"
+        mkdir -p "${artifact_dir}"
+        mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
