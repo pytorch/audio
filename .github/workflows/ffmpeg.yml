@@ -32,7 +32,7 @@ jobs:
         cd "${FFMPEG_ROOT}/.."
         tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
 
-        artifact_dir="${RUNNER_ARTIFACT_DIR}/linux/"
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/$(date +%Y-%m-%d)/linux/"
         mkdir -p "${artifact_dir}"
         mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
@@ -56,7 +56,7 @@ jobs:
         cd "${FFMPEG_ROOT}/.."
         tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
 
-        artifact_dir="${RUNNER_ARTIFACT_DIR}/macos_$(uname -m)"
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/$(date +%Y-%m-%d)/macos_$(uname -m)"
         mkdir -p "${artifact_dir}"
         mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
@@ -78,6 +78,6 @@ jobs:
         cd "${FFMPEG_ROOT}/.."
         tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/bin
 
-        artifact_dir="${RUNNER_ARTIFACT_DIR}/windows"
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/$(date +%Y-%m-%d)/windows"
         mkdir -p "${artifact_dir}"
         mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
