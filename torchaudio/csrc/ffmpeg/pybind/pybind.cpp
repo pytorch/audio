@@ -2,7 +2,6 @@
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
-#include <torchaudio/csrc/ffmpeg/stub.h>
 
 namespace torchaudio::io {
 namespace {
@@ -10,15 +9,15 @@ namespace {
 std::map<std::string, std::tuple<int64_t, int64_t, int64_t>> get_versions() {
   std::map<std::string, std::tuple<int64_t, int64_t, int64_t>> ret;
 
-#define add_version(NAME)              \
-  {                                    \
-    int ver = FFMPEG NAME##_version(); \
-    ret.emplace(                       \
-        "lib" #NAME,                   \
-        std::make_tuple<>(             \
-            AV_VERSION_MAJOR(ver),     \
-            AV_VERSION_MINOR(ver),     \
-            AV_VERSION_MICRO(ver)));   \
+#define add_version(NAME)            \
+  {                                  \
+    int ver = NAME##_version();      \
+    ret.emplace(                     \
+        "lib" #NAME,                 \
+        std::make_tuple<>(           \
+            AV_VERSION_MAJOR(ver),   \
+            AV_VERSION_MINOR(ver),   \
+            AV_VERSION_MICRO(ver))); \
   }
 
   add_version(avutil);
@@ -35,7 +34,7 @@ std::map<std::string, std::string> get_demuxers(bool req_device) {
   std::map<std::string, std::string> ret;
   const AVInputFormat* fmt = nullptr;
   void* i = nullptr;
-  while ((fmt = FFMPEG av_demuxer_iterate(&i))) {
+  while ((fmt = av_demuxer_iterate(&i))) {
     assert(fmt);
     bool is_device = [&]() {
       const AVClass* avclass = fmt->priv_class;
@@ -52,7 +51,7 @@ std::map<std::string, std::string> get_muxers(bool req_device) {
   std::map<std::string, std::string> ret;
   const AVOutputFormat* fmt = nullptr;
   void* i = nullptr;
-  while ((fmt = FFMPEG av_muxer_iterate(&i))) {
+  while ((fmt = av_muxer_iterate(&i))) {
     assert(fmt);
     bool is_device = [&]() {
       const AVClass* avclass = fmt->priv_class;
@@ -71,10 +70,10 @@ std::map<std::string, std::string> get_codecs(
   const AVCodec* c = nullptr;
   void* i = nullptr;
   std::map<std::string, std::string> ret;
-  while ((c = FFMPEG av_codec_iterate(&i))) {
+  while ((c = av_codec_iterate(&i))) {
     assert(c);
-    if ((req_encoder && FFMPEG av_codec_is_encoder(c)) ||
-        (!req_encoder && FFMPEG av_codec_is_decoder(c))) {
+    if ((req_encoder && av_codec_is_encoder(c)) ||
+        (!req_encoder && av_codec_is_decoder(c))) {
       if (c->type == type && c->name) {
         ret.emplace(c->name, c->long_name ? c->long_name : "");
       }
@@ -87,7 +86,7 @@ std::vector<std::string> get_protocols(bool output) {
   void* opaque = nullptr;
   const char* name = nullptr;
   std::vector<std::string> ret;
-  while ((name = FFMPEG avio_enum_protocols(&opaque, output))) {
+  while ((name = avio_enum_protocols(&opaque, output))) {
     assert(name);
     ret.emplace_back(name);
   }
@@ -95,7 +94,7 @@ std::vector<std::string> get_protocols(bool output) {
 }
 
 std::string get_build_config() {
-  return FFMPEG avcodec_configuration();
+  return avcodec_configuration();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -188,9 +187,9 @@ struct StreamWriterFileObj : private FileObj, public StreamWriterCustomIO {
 };
 
 PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
-  m.def("init", []() { FFMPEG avdevice_register_all(); });
-  m.def("get_log_level", []() { return FFMPEG av_log_get_level(); });
-  m.def("set_log_level", [](int level) { FFMPEG av_log_set_level(level); });
+  m.def("init", []() { avdevice_register_all(); });
+  m.def("get_log_level", []() { return av_log_get_level(); });
+  m.def("set_log_level", [](int level) { av_log_set_level(level); });
   m.def("get_versions", &get_versions);
   m.def("get_muxers", []() { return get_muxers(false); });
   m.def("get_demuxers", []() { return get_demuxers(false); });
@@ -246,22 +245,21 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def_property_readonly(
           "media_type",
           [](const OutputStreamInfo& o) -> std::string {
-            return FFMPEG av_get_media_type_string(o.media_type);
+            return av_get_media_type_string(o.media_type);
           })
       .def_property_readonly(
           "format",
           [](const OutputStreamInfo& o) -> std::string {
             switch (o.media_type) {
               case AVMEDIA_TYPE_AUDIO:
-                return FFMPEG av_get_sample_fmt_name(
-                    (AVSampleFormat)(o.format));
+                return av_get_sample_fmt_name((AVSampleFormat)(o.format));
               case AVMEDIA_TYPE_VIDEO:
-                return FFMPEG av_get_pix_fmt_name((AVPixelFormat)(o.format));
+                return av_get_pix_fmt_name((AVPixelFormat)(o.format));
               default:
                 TORCH_INTERNAL_ASSERT(
                     false,
                     "FilterGraph is returning unexpected media type: ",
-                    FFMPEG av_get_media_type_string(o.media_type));
+                    av_get_media_type_string(o.media_type));
             }
           })
       .def_readonly("sample_rate", &OutputStreamInfo::sample_rate)
@@ -285,7 +283,7 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
       .def_property_readonly(
           "media_type",
           [](const SrcStreamInfo& s) {
-            return FFMPEG av_get_media_type_string(s.media_type);
+            return av_get_media_type_string(s.media_type);
           })
       .def_readonly("codec_name", &SrcStreamInfo::codec_name)
       .def_readonly("codec_long_name", &SrcStreamInfo::codec_long_name)
