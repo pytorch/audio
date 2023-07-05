@@ -76,7 +76,7 @@ jobs:
         ./packaging/ffmpeg/build.bat
 
         cd "${FFMPEG_ROOT}/.."
-        tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
+        tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/bin
 
         artifact_dir="${RUNNER_ARTIFACT_DIR}/windows"
         mkdir -p "${artifact_dir}"
