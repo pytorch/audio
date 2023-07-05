@@ -1,11 +1,6 @@
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/encode_process.h>
-#include <torchaudio/csrc/ffmpeg/stub.h>
 #include <cmath>
-
-extern "C" {
-#include <libavutil/rational.h>
-}
 
 namespace torchaudio::io {
 
@@ -61,7 +56,7 @@ void EncodeProcess::process_frame(AVFrame* src) {
     if (ret >= 0) {
       encoder.encode(dst_frame);
     }
-    FFMPEG av_frame_unref(dst_frame);
+    av_frame_unref(dst_frame);
   }
 }
 
@@ -76,8 +71,8 @@ void EncodeProcess::flush() {
 namespace {
 
 enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
-  auto fmt = FFMPEG av_get_sample_fmt(src.c_str());
-  if (fmt != AV_SAMPLE_FMT_NONE && !FFMPEG av_sample_fmt_is_planar(fmt)) {
+  auto fmt = av_get_sample_fmt(src.c_str());
+  if (fmt != AV_SAMPLE_FMT_NONE && !av_sample_fmt_is_planar(fmt)) {
     return fmt;
   }
   TORCH_CHECK(
@@ -94,7 +89,7 @@ enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
               AV_SAMPLE_FMT_S64,
               AV_SAMPLE_FMT_FLT,
               AV_SAMPLE_FMT_DBL}) {
-          ret.emplace_back(FFMPEG av_get_sample_fmt_name(fmt));
+          ret.emplace_back(av_get_sample_fmt_name(fmt));
         }
         return c10::Join(", ", ret);
       }(),
@@ -102,7 +97,7 @@ enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
 }
 
 enum AVPixelFormat get_src_pix_fmt(const std::string& src) {
-  AVPixelFormat fmt = FFMPEG av_get_pix_fmt(src.c_str());
+  AVPixelFormat fmt = av_get_pix_fmt(src.c_str());
   switch (fmt) {
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_RGB24:
@@ -123,7 +118,7 @@ enum AVPixelFormat get_src_pix_fmt(const std::string& src) {
               AV_PIX_FMT_RGB24,
               AV_PIX_FMT_BGR24,
               AV_PIX_FMT_YUV444P}) {
-          ret.emplace_back(FFMPEG av_get_pix_fmt_name(fmt));
+          ret.emplace_back(av_get_pix_fmt_name(fmt));
         }
         return c10::Join(", ", ret);
       }(),
@@ -137,21 +132,18 @@ const AVCodec* get_codec(
     AVCodecID default_codec,
     const c10::optional<std::string>& encoder) {
   if (encoder) {
-    const AVCodec* c =
-        FFMPEG avcodec_find_encoder_by_name(encoder.value().c_str());
+    const AVCodec* c = avcodec_find_encoder_by_name(encoder.value().c_str());
     TORCH_CHECK(c, "Unexpected codec: ", encoder.value());
     return c;
   }
-  const AVCodec* c = FFMPEG avcodec_find_encoder(default_codec);
+  const AVCodec* c = avcodec_find_encoder(default_codec);
   TORCH_CHECK(
-      c,
-      "Encoder not found for codec: ",
-      FFMPEG avcodec_get_name(default_codec));
+      c, "Encoder not found for codec: ", avcodec_get_name(default_codec));
   return c;
 }
 
 AVCodecContextPtr get_codec_ctx(const AVCodec* codec, int flags) {
-  AVCodecContext* ctx = FFMPEG avcodec_alloc_context3(codec);
+  AVCodecContext* ctx = avcodec_alloc_context3(codec);
   TORCH_CHECK(ctx, "Failed to allocate CodecContext.");
 
   if (flags & AVFMT_GLOBALHEADER) {
@@ -177,25 +169,25 @@ void open_codec(
   // while "libopus" refers to the one depends on libopusenc
   // https://ffmpeg.org/doxygen/4.1/libopusenc_8c.html#aa1d649e48cd2ec00cfe181cf9d0f3251
   if (std::strcmp(codec_ctx->codec->name, "vorbis") == 0) {
-    if (!FFMPEG av_dict_get(opt, "strict", nullptr, 0)) {
+    if (!av_dict_get(opt, "strict", nullptr, 0)) {
       TORCH_WARN_ONCE(
           "\"vorbis\" encoder is selected. Enabling '-strict experimental'. ",
           "If this is not desired, please provide \"strict\" encoder option ",
           "with desired value.");
-      FFMPEG av_dict_set(&opt, "strict", "experimental", 0);
+      av_dict_set(&opt, "strict", "experimental", 0);
     }
   }
   if (std::strcmp(codec_ctx->codec->name, "opus") == 0) {
-    if (!FFMPEG av_dict_get(opt, "strict", nullptr, 0)) {
+    if (!av_dict_get(opt, "strict", nullptr, 0)) {
       TORCH_WARN_ONCE(
           "\"opus\" encoder is selected. Enabling '-strict experimental'. ",
           "If this is not desired, please provide \"strict\" encoder option ",
           "with desired value.");
-      FFMPEG av_dict_set(&opt, "strict", "experimental", 0);
+      av_dict_set(&opt, "strict", "experimental", 0);
     }
   }
 
-  int ret = FFMPEG avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
+  int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
   clean_up_dict(opt);
   TORCH_CHECK(ret >= 0, "Failed to open codec: (", av_err2string(ret), ")");
 }
@@ -222,7 +214,7 @@ bool supported_sample_fmt(
 std::string get_supported_formats(const AVSampleFormat* sample_fmts) {
   std::vector<std::string> ret;
   while (*sample_fmts != AV_SAMPLE_FMT_NONE) {
-    ret.emplace_back(FFMPEG av_get_sample_fmt_name(*sample_fmts));
+    ret.emplace_back(av_get_sample_fmt_name(*sample_fmts));
     ++sample_fmts;
   }
   return c10::Join(", ", ret);
@@ -234,7 +226,7 @@ AVSampleFormat get_enc_fmt(
     const AVCodec* codec) {
   if (encoder_format) {
     auto& enc_fmt_val = encoder_format.value();
-    auto fmt = FFMPEG av_get_sample_fmt(enc_fmt_val.c_str());
+    auto fmt = av_get_sample_fmt(enc_fmt_val.c_str());
     TORCH_CHECK(
         fmt != AV_SAMPLE_FMT_NONE, "Unknown sample format: ", enc_fmt_val);
     TORCH_CHECK(
@@ -321,8 +313,8 @@ std::string get_supported_channels(const uint64_t* channel_layouts) {
   std::vector<std::string> names;
   while (*channel_layouts) {
     std::stringstream ss;
-    ss << FFMPEG av_get_channel_layout_nb_channels(*channel_layouts);
-    ss << " (" << FFMPEG av_get_channel_name(*channel_layouts) << ")";
+    ss << av_get_channel_layout_nb_channels(*channel_layouts);
+    ss << " (" << av_get_channel_name(*channel_layouts) << ")";
     names.emplace_back(ss.str());
     ++channel_layouts;
   }
@@ -339,10 +331,10 @@ uint64_t get_channel_layout(
     TORCH_CHECK(
         val > 0, "The number of channels must be greater than 0. Found: ", val);
     if (!codec->channel_layouts) {
-      return static_cast<uint64_t>(FFMPEG av_get_default_channel_layout(val));
+      return static_cast<uint64_t>(av_get_default_channel_layout(val));
     }
     for (const uint64_t* it = codec->channel_layouts; *it; ++it) {
-      if (FFMPEG av_get_channel_layout_nb_channels(*it) == val) {
+      if (av_get_channel_layout_nb_channels(*it) == val) {
         return *it;
       }
     }
@@ -379,9 +371,8 @@ void configure_audio_codec_ctx(
     const c10::optional<CodecConfig>& codec_config) {
   codec_ctx->sample_fmt = format;
   codec_ctx->sample_rate = sample_rate;
-  codec_ctx->time_base = av_inv_q(FFMPEG av_d2q(sample_rate, 1 << 24));
-  codec_ctx->channels =
-      FFMPEG av_get_channel_layout_nb_channels(channel_layout);
+  codec_ctx->time_base = av_inv_q(av_d2q(sample_rate, 1 << 24));
+  codec_ctx->channels = av_get_channel_layout_nb_channels(channel_layout);
   codec_ctx->channel_layout = channel_layout;
 
   // Set optional stuff
@@ -420,7 +411,7 @@ bool supported_pix_fmt(const AVPixelFormat fmt, const AVPixelFormat* pix_fmts) {
 std::string get_supported_formats(const AVPixelFormat* pix_fmts) {
   std::vector<std::string> ret;
   while (*pix_fmts != AV_PIX_FMT_NONE) {
-    ret.emplace_back(FFMPEG av_get_pix_fmt_name(*pix_fmts));
+    ret.emplace_back(av_get_pix_fmt_name(*pix_fmts));
     ++pix_fmts;
   }
   return c10::Join(", ", ret);
@@ -432,7 +423,7 @@ AVPixelFormat get_enc_fmt(
     const AVCodec* codec) {
   if (encoder_format) {
     const auto& val = encoder_format.value();
-    auto fmt = FFMPEG av_get_pix_fmt(val.c_str());
+    auto fmt = av_get_pix_fmt(val.c_str());
     TORCH_CHECK(
         supported_pix_fmt(fmt, codec->pix_fmts),
         codec->name,
@@ -470,7 +461,7 @@ AVRational get_enc_rate(
         std::isfinite(enc_rate) && enc_rate > 0,
         "Encoder sample rate must be positive and fininte. Found: ",
         enc_rate);
-    AVRational rate = FFMPEG av_d2q(enc_rate, 1 << 24);
+    AVRational rate = av_d2q(enc_rate, 1 << 24);
     TORCH_CHECK(
         supported_frame_rate(rate, codec->supported_framerates),
         codec->name,
@@ -554,14 +545,14 @@ void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
   // context to AVCodecContext. But this way, it will be deallocated
   // automatically at the time AVCodecContext is freed, so we do that.
 
-  ctx->hw_device_ctx = FFMPEG av_buffer_ref(get_cuda_context(device.index()));
+  ctx->hw_device_ctx = av_buffer_ref(get_cuda_context(device.index()));
   TORCH_INTERNAL_ASSERT(
       ctx->hw_device_ctx, "Failed to reference HW device context.");
 
   ctx->sw_pix_fmt = ctx->pix_fmt;
   ctx->pix_fmt = AV_PIX_FMT_CUDA;
 
-  ctx->hw_frames_ctx = FFMPEG av_hwframe_ctx_alloc(ctx->hw_device_ctx);
+  ctx->hw_frames_ctx = av_hwframe_ctx_alloc(ctx->hw_device_ctx);
   TORCH_CHECK(ctx->hw_frames_ctx, "Failed to create CUDA frame context.");
 
   auto frames_ctx = (AVHWFramesContext*)(ctx->hw_frames_ctx->data);
@@ -571,7 +562,7 @@ void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
   frames_ctx->height = ctx->height;
   frames_ctx->initial_pool_size = 5;
 
-  int ret = FFMPEG av_hwframe_ctx_init(ctx->hw_frames_ctx);
+  int ret = av_hwframe_ctx_init(ctx->hw_frames_ctx);
   TORCH_CHECK(
       ret >= 0,
       "Failed to initialize CUDA frame context: ",
@@ -583,11 +574,11 @@ void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
 ////////////////////////////////////////////////////////////////////////////////
 
 AVStream* get_stream(AVFormatContext* format_ctx, AVCodecContext* codec_ctx) {
-  AVStream* stream = FFMPEG avformat_new_stream(format_ctx, nullptr);
+  AVStream* stream = avformat_new_stream(format_ctx, nullptr);
   TORCH_CHECK(stream, "Failed to allocate stream.");
 
   stream->time_base = codec_ctx->time_base;
-  int ret = FFMPEG avcodec_parameters_from_context(stream->codecpar, codec_ctx);
+  int ret = avcodec_parameters_from_context(stream->codecpar, codec_ctx);
   TORCH_CHECK(
       ret >= 0, "Failed to copy the stream parameter: ", av_err2string(ret));
   return stream;
@@ -614,7 +605,7 @@ FilterGraph get_audio_filter_graph(
     if (filter_desc || src_fmt != enc_fmt ||
         src_sample_rate != enc_sample_rate || src_ch_layout != enc_ch_layout) {
       std::stringstream ss;
-      ss << "aformat=sample_fmts=" << FFMPEG av_get_sample_fmt_name(enc_fmt)
+      ss << "aformat=sample_fmts=" << av_get_sample_fmt_name(enc_fmt)
          << ":sample_rates=" << enc_sample_rate << ":channel_layouts=0x"
          << std::hex << enc_ch_layout;
       parts.push_back(ss.str());
@@ -665,7 +656,7 @@ FilterGraph get_video_filter_graph(
     }
     if (filter_desc || src_fmt != enc_fmt) {
       std::stringstream ss;
-      ss << "format=" << FFMPEG av_get_pix_fmt_name(enc_fmt);
+      ss << "format=" << av_get_pix_fmt_name(enc_fmt);
       parts.emplace_back(ss.str());
     }
     if (filter_desc ||
@@ -709,7 +700,7 @@ AVFramePtr get_audio_frame(
   frame->channel_layout = channel_layout;
   frame->sample_rate = sample_rate;
   frame->nb_samples = nb_samples;
-  int ret = FFMPEG av_frame_get_buffer(frame, 0);
+  int ret = av_frame_get_buffer(frame, 0);
   TORCH_CHECK(
       ret >= 0, "Error allocating the source audio frame:", av_err2string(ret));
 
@@ -725,7 +716,7 @@ AVFramePtr get_video_frame(AVPixelFormat src_fmt, int width, int height) {
   frame->format = src_fmt;
   frame->width = width;
   frame->height = height;
-  int ret = FFMPEG av_frame_get_buffer(frame, 0);
+  int ret = av_frame_get_buffer(frame, 0);
   TORCH_CHECK(
       ret >= 0, "Error allocating a video buffer :", av_err2string(ret));
 
@@ -770,10 +761,10 @@ EncodeProcess get_audio_encode_process(
   // case, restrictions on the format to support tensor inputs do not apply, and
   // so we directly get the format via FFmpeg.
   const AVSampleFormat src_fmt = (disable_converter)
-      ? FFMPEG av_get_sample_fmt(format.c_str())
+      ? av_get_sample_fmt(format.c_str())
       : get_src_sample_fmt(format);
-  const auto src_ch_layout = static_cast<uint64_t>(
-      FFMPEG av_get_default_channel_layout(src_num_channels));
+  const auto src_ch_layout =
+      static_cast<uint64_t>(av_get_default_channel_layout(src_num_channels));
 
   // 2. Fetch codec from default or override
   TORCH_CHECK(
@@ -793,7 +784,7 @@ EncodeProcess get_audio_encode_process(
       // https://github.com/FFmpeg/FFmpeg/blob/0684e58886881a998f1a7b510d73600ff1df2b90/libavcodec/vorbisenc.c#L1277
       // This is the case for at least until FFmpeg 6.0, so it will be
       // like this for a while.
-      return static_cast<uint64_t>(FFMPEG av_get_default_channel_layout(2));
+      return static_cast<uint64_t>(av_get_default_channel_layout(2));
     }
     return get_channel_layout(src_ch_layout, encoder_num_channels, codec);
   }();
@@ -881,9 +872,9 @@ EncodeProcess get_video_encode_process(
   // case, restrictions on the format to support tensor inputs do not apply, and
   // so we directly get the format via FFmpeg.
   const AVPixelFormat src_fmt = (disable_converter)
-      ? FFMPEG av_get_pix_fmt(format.c_str())
+      ? av_get_pix_fmt(format.c_str())
       : get_src_pix_fmt(format);
-  const AVRational src_rate = FFMPEG av_d2q(frame_rate, 1 << 24);
+  const AVRational src_rate = av_d2q(frame_rate, 1 << 24);
 
   // 2. Fetch codec from default or override
   TORCH_CHECK(
@@ -950,8 +941,7 @@ EncodeProcess get_video_encode_process(
   AVFramePtr src_frame = [&]() {
     if (codec_ctx->hw_frames_ctx) {
       AVFramePtr frame{alloc_avframe()};
-      int ret =
-          FFMPEG av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
+      int ret = av_hwframe_get_buffer(codec_ctx->hw_frames_ctx, frame, 0);
       TORCH_CHECK(ret >= 0, "Failed to fetch CUDA frame: ", av_err2string(ret));
       frame->nb_samples = 1;
       frame->pts = 0;

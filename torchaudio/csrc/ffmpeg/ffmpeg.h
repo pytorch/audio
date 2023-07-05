@@ -41,7 +41,10 @@ using OptionDict = std::map<std::string, std::string>;
 // Replacement of av_err2str, which causes
 // `error: taking address of temporary array`
 // https://github.com/joncampbell123/composite-video-simulator/issues/5
-std::string av_err2string(int errnum);
+av_always_inline std::string av_err2string(int errnum) {
+  char str[AV_ERROR_MAX_STRING_SIZE];
+  return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, errnum);
+}
 
 // Base structure that handles memory management.
 // Resource is freed by the destructor of unique_ptr,
