@@ -20,7 +20,7 @@ jobs:
         ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      job-name: Build binaries
+      job-name: Build
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
       script: |
@@ -42,7 +42,7 @@ jobs:
         ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      job-name: Build binaries
+      job-name: Build
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
       runner: "linux.t4g.2xlarge"
@@ -68,7 +68,7 @@ jobs:
         runner: ["macos-m1-12", "macos-12"]
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      job-name: Build binaries
+      job-name: Build
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
       runner: "${{ matrix.runner }}"
@@ -91,7 +91,7 @@ jobs:
         ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
-      job-name: Build LGPL binaries
+      job-name: Build
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
       script: |
