@@ -37,7 +37,6 @@ _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX"
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
 _USE_FFMPEG = _get_build("USE_FFMPEG", False)
-_DLOPEN_FFMPEG = _get_build("DLOPEN_FFMPEG", False)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
 _BUILD_ALIGN = _get_build("BUILD_ALIGN", True)
@@ -125,7 +124,6 @@ class CMakeBuild(build_ext):
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
             f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
-            f"-DDLOPEN_FFMPEG:BOOL={'ON' if _DLOPEN_FFMPEG else 'OFF'}",
         ]
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake

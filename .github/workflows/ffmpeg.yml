@@ -1,0 +1,82 @@
+# This job is not directly related to regular CI pipeline.
+# It is intended to create FFmpeg binaries that we upload on S3,
+# which then will be used during all the build process in CI or local.
+#
+# This job does not include uploading part.
+# Upload needs to be done manually, and it should be done only once
+# par new major release of FFmepg.
+name: FFmpeg Binaries
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # on sunday
+
+jobs:
+  Linux-LGPL:
+    strategy:
+      fail-fast: false
+      matrix:
+        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      job-name: Build LGPL FFmpeg for Linux
+      upload-artifact: ffmpeg-linux-lgpl
+      repository: pytorch/audio
+      script: |
+        export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
+        export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+        ./packaging/ffmpeg/build.sh
+
+        cd "${FFMPEG_ROOT}/.."
+        tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
+
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/$(date +%Y-%m-%d)/linux/"
+        mkdir -p "${artifact_dir}"
+        mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
+
+  macOS-LGPL:
+    strategy:
+      fail-fast: false
+      matrix:
+        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        runner: ["macos-m1-12", "macos-12"]
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      job-name: Build LGPL FFmpeg for macOS ("${{ matrix.runner }}")
+      upload-artifact: ffmpeg-macos-lgpl
+      repository: pytorch/audio
+      runner: "${{ matrix.runner }}"
+      script: |
+        export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
+        export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+        ./packaging/ffmpeg/build.sh
+
+        cd "${FFMPEG_ROOT}/.."
+        tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/lib
+
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/$(date +%Y-%m-%d)/macos_$(uname -m)"
+        mkdir -p "${artifact_dir}"
+        mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
+
+  Windows-LGPL:
+    strategy:
+      fail-fast: false
+      matrix:
+        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+    uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
+    with:
+      job-name: Build LGPL FFmpeg for Windows
+      upload-artifact: ffmpeg-windows-lgpl
+      repository: pytorch/audio
+      script: |
+        export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
+        export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
+        ./packaging/ffmpeg/build.bat
+
+        cd "${FFMPEG_ROOT}/.."
+        tar -cf ffmpeg.tar.gz ffmpeg/include ffmpeg/bin
+
+        artifact_dir="${RUNNER_ARTIFACT_DIR}/$(date +%Y-%m-%d)/windows"
+        mkdir -p "${artifact_dir}"
+        mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"

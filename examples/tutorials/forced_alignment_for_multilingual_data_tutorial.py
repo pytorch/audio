@@ -90,27 +90,27 @@ def compute_alignments(transcript, dictionary, emission):
     frames = []
     tokens = [dictionary[c] for c in transcript.replace(" ", "")]
 
-    targets = torch.tensor(tokens, dtype=torch.int32)
-    input_lengths = torch.tensor(emission.shape[0])
-    target_lengths = torch.tensor(targets.shape[0])
+    targets = torch.tensor(tokens, dtype=torch.int32).unsqueeze(0)
+    input_lengths = torch.tensor([emission.shape[1]])
+    target_lengths = torch.tensor([targets.shape[1]])
 
     # This is the key step, where we call the forced alignment API functional.forced_align to compute frame alignments.
     frame_alignment, frame_scores = forced_align(emission, targets, input_lengths, target_lengths, 0)
 
-    assert len(frame_alignment) == input_lengths.item()
-    assert len(targets) == target_lengths.item()
+    assert frame_alignment.shape[1] == input_lengths[0].item()
+    assert targets.shape[1] == target_lengths[0].item()
 
     token_index = -1
     prev_hyp = 0
-    for i in range(len(frame_alignment)):
-        if frame_alignment[i].item() == 0:
+    for i in range(frame_alignment.shape[1]):
+        if frame_alignment[0][i].item() == 0:
             prev_hyp = 0
             continue
 
-        if frame_alignment[i].item() != prev_hyp:
+        if frame_alignment[0][i].item() != prev_hyp:
             token_index += 1
-        frames.append(Frame(token_index, i, frame_scores[i].exp().item()))
-        prev_hyp = frame_alignment[i].item()
+        frames.append(Frame(token_index, i, frame_scores[0][i].exp().item()))
+        prev_hyp = frame_alignment[0][i].item()
 
     # compute frame alignments from token alignments
     transcript_nospace = transcript.replace(" ", "")
@@ -150,7 +150,7 @@ def compute_alignments(transcript, dictionary, emission):
             i2 += 1
         i3 += 1
 
-    num_frames = len(frame_alignment)
+    num_frames = frame_alignment.shape[1]
     return segments, words, num_frames
 
 
@@ -160,7 +160,7 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
     plt.rcParams.update({"font.size": 30})
 
     # The original waveform
-    ratio = waveform.size(0) / input_lengths
+    ratio = waveform.size(1) / input_lengths
     ax2.plot(waveform)
     ax2.set_ylim(-1.0 * scale, 1.0 * scale)
     ax2.set_xlim(0, waveform.size(-1))
@@ -249,12 +249,12 @@ def get_emission(waveform):
 
     emissions, _ = model(waveform)
     emissions = torch.log_softmax(emissions, dim=-1)
-    emission = emissions[0].cpu().detach()
+    emission = emissions.cpu().detach()
 
     # Append the extra dimension corresponding to the <star> token
     extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
     emissions = torch.cat((emissions.cpu(), extra_dim), 2)
-    emission = emissions[0].detach()
+    emission = emissions.detach()
     return emission, waveform
 
 
@@ -347,12 +347,12 @@ speech_file = torchaudio.utils.download_asset("tutorial-assets/10349_8674_000087
 waveform, _ = torchaudio.load(speech_file)
 
 emission, waveform = get_emission(waveform)
-assert len(dictionary) == emission.shape[1]
+assert len(dictionary) == emission.shape[2]
 
 transcript = text_normalized
 
 segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+plot_alignments(segments, word_segments, waveform, emission.shape[1])
 
 print("Raw Transcript: ", text_raw)
 print("Normalized Transcript: ", text_normalized)
@@ -482,13 +482,14 @@ text_raw = "关 服务 高端 产品 仍 处于 供不应求 的 局面"
 text_normalized = "guan fuwu gaoduan chanpin reng chuyu gongbuyingqiu de jumian"
 speech_file = torchaudio.utils.download_asset("tutorial-assets/mvdr/clean_speech.wav", progress=False)
 waveform, _ = torchaudio.load(speech_file)
+waveform = waveform[0:1]
 
 emission, waveform = get_emission(waveform)
 
 transcript = text_normalized
 
 segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+plot_alignments(segments, word_segments, waveform, emission.shape[1])
 
 print("Raw Transcript: ", text_raw)
 print("Normalized Transcript: ", text_normalized)
@@ -557,7 +558,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+plot_alignments(segments, word_segments, waveform, emission.shape[1])
 
 print("Raw Transcript: ", text_raw)
 print("Normalized Transcript: ", text_normalized)
@@ -660,7 +661,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+plot_alignments(segments, word_segments, waveform, emission.shape[1])
 
 print("Raw Transcript: ", text_raw)
 print("Normalized Transcript: ", text_normalized)
@@ -785,7 +786,7 @@ emission, waveform = get_emission(waveform)
 transcript = text_normalized
 
 segments, word_segments, num_frames = compute_alignments(transcript, dictionary, emission)
-plot_alignments(segments, word_segments, waveform[0], emission.shape[0])
+plot_alignments(segments, word_segments, waveform, emission.shape[1])
 
 print("Raw Transcript: ", text_raw)
 print("Normalized Transcript: ", text_normalized)

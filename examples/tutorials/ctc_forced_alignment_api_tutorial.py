@@ -96,7 +96,7 @@ with torch.inference_mode():
     emissions, _ = model(waveform.to(device))
     emissions = torch.log_softmax(emissions, dim=-1)
 
-emission = emissions[0].cpu().detach()
+emission = emissions.cpu().detach()
 dictionary = {c: i for i, c in enumerate(labels)}
 
 print(dictionary)
@@ -107,7 +107,7 @@ print(dictionary)
 # ^^^^^^^^^^^^^
 #
 
-plt.imshow(emission.T)
+plt.imshow(emission[0].T)
 plt.colorbar()
 plt.title("Frame-wise class probabilities")
 plt.xlabel("Time")
@@ -205,27 +205,27 @@ def compute_alignments(transcript, dictionary, emission):
     frames = []
     tokens = [dictionary[c] for c in transcript.replace(" ", "")]
 
-    targets = torch.tensor(tokens, dtype=torch.int32)
-    input_lengths = torch.tensor(emission.shape[0])
-    target_lengths = torch.tensor(targets.shape[0])
+    targets = torch.tensor(tokens, dtype=torch.int32).unsqueeze(0)
+    input_lengths = torch.tensor([emission.shape[1]])
+    target_lengths = torch.tensor([targets.shape[1]])
 
     # This is the key step, where we call the forced alignment API functional.forced_align to compute alignments.
     frame_alignment, frame_scores = forced_align(emission, targets, input_lengths, target_lengths, 0)
 
-    assert len(frame_alignment) == input_lengths.item()
-    assert len(targets) == target_lengths.item()
+    assert frame_alignment.shape[1] == input_lengths[0].item()
+    assert targets.shape[1] == target_lengths[0].item()
 
     token_index = -1
     prev_hyp = 0
-    for i in range(len(frame_alignment)):
-        if frame_alignment[i].item() == 0:
+    for i in range(frame_alignment.shape[1]):
+        if frame_alignment[0][i].item() == 0:
             prev_hyp = 0
             continue
 
-        if frame_alignment[i].item() != prev_hyp:
+        if frame_alignment[0][i].item() != prev_hyp:
             token_index += 1
-        frames.append(Frame(token_index, i, frame_scores[i].exp().item()))
-        prev_hyp = frame_alignment[i].item()
+        frames.append(Frame(token_index, i, frame_scores[0][i].exp().item()))
+        prev_hyp = frame_alignment[0][i].item()
     return frames, frame_alignment, frame_scores
 
 
@@ -390,7 +390,7 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
     plt.rcParams.update({"font.size": 30})
 
     # The original waveform
-    ratio = waveform.size(0) / input_lengths
+    ratio = waveform.size(1) / input_lengths
     ax2.plot(waveform)
     ax2.set_ylim(-1.0 * scale, 1.0 * scale)
     ax2.set_xlim(0, waveform.size(-1))
@@ -414,8 +414,8 @@ def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
 plot_alignments(
     segments,
     word_segments,
-    waveform[0],
-    emission.shape[0],
+    waveform,
+    emission.shape[1],
     1,
 )
 plt.show()
@@ -428,7 +428,7 @@ plt.show()
 # `IPython.display.Audio` has to be the last call in a cell,
 # and there should be only one call par cell.
 def display_segment(i, waveform, word_segments, frame_alignment):
-    ratio = waveform.size(1) / len(frame_alignment)
+    ratio = waveform.size(1) / frame_alignment.size(1)
     word = word_segments[i]
     x0 = int(ratio * word.start)
     x1 = int(ratio * word.end)
@@ -511,19 +511,19 @@ with torch.inference_mode():
     # Append the extra dimension corresponding to the <star> token
     extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
     emissions = torch.cat((emissions.cpu(), extra_dim), 2)
-    emission = emissions[0].detach()
+    emission = emissions.detach()
 
 # Extend the dictionary to include the <star> token.
 dictionary["*"] = 29
 
-assert len(dictionary) == emission.shape[1]
+assert len(dictionary) == emission.shape[2]
 
 
 def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
     frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
     segments = merge_repeats(frames, transcript)
     word_segments = merge_words(transcript, segments, "|")
-    plot_alignments(segments, word_segments, waveform[0], emission.shape[0], 1)
+    plot_alignments(segments, word_segments, waveform, emission.shape[1], 1)
     plt.show()
     return word_segments, frame_alignment
 
