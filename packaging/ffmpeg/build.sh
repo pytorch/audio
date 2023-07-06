@@ -20,8 +20,9 @@ args=""
 if [[ "$OSTYPE" == "msys" ]]; then
    args="--toolchain=msvc"
 fi
+ffmpeg_version="${FFMPEG_VERSION:-4.1.8}"
 
-archive="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION:-4.1.8}.tar.gz"
+archive="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${ffmpeg_version}.tar.gz"
 
 build_dir=$(mktemp -d -t ffmpeg-build.XXXXXXXXXX)
 cleanup() {
@@ -74,7 +75,7 @@ ls ${prefix}/*
 # macOS: Fix rpath so that the libraries are searched dynamically in user environment.
 # In Linux, this is handled by `--enable-rpath` flag.
 if [[ "$(uname)" == Darwin ]]; then
-    major_ver=${FFMPEG_VERSION:0:1}
+    major_ver=${ffmpeg_version:0:1}
     if [[ ${major_ver} == 4 ]]; then
         avutil=libavutil.56
         avcodec=libavcodec.58
