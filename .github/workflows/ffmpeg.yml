@@ -13,7 +13,7 @@ on:
     - cron: '0 0 * * 0'  # on sunday
 
 jobs:
-  Linux-x86_64:
+  LGPL-Linux-x86_64:
     strategy:
       fail-fast: false
       matrix:
@@ -35,7 +35,7 @@ jobs:
         mkdir -p "${artifact_dir}"
         mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
-  Linux-aarch64:
+  LGPL-Linux-aarch64:
     strategy:
       fail-fast: false
       matrix:
@@ -60,7 +60,7 @@ jobs:
         mkdir -p "${artifact_dir}"
         mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
-  macOS:
+  LGPL-macOS:
     strategy:
       fail-fast: false
       matrix:
@@ -68,7 +68,7 @@ jobs:
         runner: ["macos-m1-12", "macos-12"]
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      job-name: Build LGPL binaries ("${{ matrix.runner }}")
+      job-name: Build binaries
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
       runner: "${{ matrix.runner }}"
@@ -84,7 +84,7 @@ jobs:
         mkdir -p "${artifact_dir}"
         mv ffmpeg.tar.gz "${artifact_dir}/${FFMPEG_VERSION}.tar.gz"
 
-  Windows:
+  LGPL-Windows:
     strategy:
       fail-fast: false
       matrix:
