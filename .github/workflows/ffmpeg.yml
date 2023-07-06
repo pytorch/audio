@@ -18,11 +18,13 @@ jobs:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        runner: ["linux.2xlarge", "linux.t4g.2xlarge"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build LGPL FFmpeg for Linux
       upload-artifact: ffmpeg-linux-lgpl
       repository: pytorch/audio
+      runner: ${{ matrix.runner }}
       script: |
         export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
         export FFMPEG_ROOT="${PWD}/third_party/ffmpeg"
