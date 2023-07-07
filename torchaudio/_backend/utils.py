@@ -6,10 +6,10 @@ from typing import BinaryIO, Dict, Optional, Tuple, Union
 
 import torch
 import torchaudio.backend.soundfile_backend as soundfile_backend
-from torchaudio._extension import _FFMPEG_INITIALIZED, _SOX_INITIALIZED
+from torchaudio._extension import _FFMPEG_EXT, _SOX_INITIALIZED
 from torchaudio.backend.common import AudioMetaData
 
-if _FFMPEG_INITIALIZED:
+if _FFMPEG_EXT is not None:
     from torchaudio.io._compat import info_audio, info_audio_fileobj, load_audio, load_audio_fileobj, save_audio
 
 
@@ -262,7 +262,7 @@ class SoundfileBackend(Backend):
 @lru_cache(None)
 def get_available_backends() -> Dict[str, Backend]:
     backend_specs = {}
-    if _FFMPEG_INITIALIZED:
+    if _FFMPEG_EXT is not None:
         backend_specs["ffmpeg"] = FFmpegBackend
     if _SOX_INITIALIZED:
         backend_specs["sox"] = SoXBackend

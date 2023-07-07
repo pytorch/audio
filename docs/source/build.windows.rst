@@ -118,10 +118,6 @@ When using conda, the directories are ``${CONDA_PREFIX}/bin``, ``${CONDA_PREFIX}
 
    conda install cmake ninja
 
-.. code-block::
-
-   conda install -c conda-forge ffmpeg
-
 6. Build TorchAudio
 -------------------
 
@@ -136,20 +132,34 @@ Now that we have everything ready, we can build TorchAudio.
 .. code-block::
 
    # In Command Prompt
-   set USE_FFMPEG=1
    python setup.py develop
 
 .. code-block::
 
    # In Bash
-   USE_FFMPEG=1 python setup.py develop
+   python setup.py develop
 
 .. note::
    Due to the complexity of build process, TorchAudio only supports in-place build.
    To use ``pip``, please use ``--no-use-pep517`` option.
 
-   ``USE_FFMPEG=1 pip install -v -e . --no-use-pep517``
+   ``pip install -v -e . --no-use-pep517``
 
+[Optional] Build TorchAudio with a custom FFmpeg
+------------------------------------------------
+
+By default, torchaudio tries to build FFmpeg extension with support for multiple FFmpeg versions. This process uses pre-built FFmpeg libraries compiled for specific CPU architectures like ``x86_64``.
+
+If your CPU is different, then the build process can fail. To workaround, one can disable FFmpeg integration (by setting the environment variable ``USE_FFMPEG=0``) or switch to the single version FFmpeg extension.
+
+To build single version FFmpeg extension, FFmpeg binaries must be provided by user and available in the build environment. To do so, install FFmpeg and set ``FFMPEG_ROOT`` environment variable to specify the location of FFmpeg.
+
+.. code-block::
+
+   conda install -c conda-forge ffmpeg
+   FFMPEG_ROOT=${CONDA_PREFIX}/Library python setup.py develop
+
+   
 [Optional] Building FFmpeg from source
 --------------------------------------
 
@@ -169,6 +179,10 @@ To build FFmpeg in a way it is usable from the TorchAudio development environmen
 FFmpeg's official documentation touches this https://trac.ffmpeg.org/wiki/CompilationGuide/MinGW
 
 Please follow the instruction at https://www.msys2.org/ to install MSYS2.
+
+.. note::
+
+   In CI environment, often `Chocolatery <https://chocolatey.org/>`_ can be used to install MSYS2.
 
 2. Launch MSYS2
 ~~~~~~~~~~~~~~~
@@ -229,22 +243,3 @@ If the build succeeds, ``ffmpeg.exe`` should be found in the same directory. Mak
 Check that the resulting FFmpeg binary is accessible from Conda env
 
 Now launch a new command prompt and enable the TorchAudio development environment. Make sure that you can run the ``ffmpeg.exe`` command generated in the previous step.
-
-6. Build TorchAudio with the custom FFmpeg
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To use this FFmpeg libraries for building torchaudio, do the following;
-1. Uninstall ``ffmpeg`` package installed by conda. ``conda uninstall ffmpeg``.
-2. When building set ``FFMPEG_ROOT`` environment variable to the directory where the libraries like ``libavcodec`` are found.
-
-.. code-block::
-
-   # In Command Prompt
-   set USE_FFMPEG=1
-   set FFMPEG_ROOT=<FFMPEG_BUILD_DIR>
-   python setup.py clean develop
-
-.. code-block::
-
-   # In Bash
-   USE_FFMPEG=1 FFMPEG_ROOT=<FFMPEG_BUILD_DIR> python setup.py clean develop
