@@ -8,6 +8,8 @@ namespace torchaudio::io {
 
 namespace {
 
+using namespace torch::indexing;
+
 using InitFunc = TensorConverter::InitFunc;
 using ConvertFunc = TensorConverter::ConvertFunc;
 
@@ -104,6 +106,28 @@ void validate_video_input(
       "Expected tensor with shape (N, ",
       num_channels,
       ", ",
+      buffer->height,
+      ", ",
+      buffer->width,
+      ") (NCHW format). Found ",
+      t.sizes());
+}
+
+// Special case where encode pixel format is RGB0/BGR0 but the tensor is RGB/BGR
+void validate_rgb0(const torch::Tensor& t, AVFrame* buffer) {
+  if (buffer->hw_frames_ctx) {
+    TORCH_CHECK(t.device().is_cuda(), "Input tensor has to be on CUDA.");
+  } else {
+    TORCH_CHECK(t.device().is_cpu(), "Input tensor has to be on CPU.");
+  }
+  TORCH_CHECK(
+      t.dtype().toScalarType() == c10::ScalarType::Byte,
+      "Expected Tensor of uint8 type.");
+
+  TORCH_CHECK(t.dim() == 4, "Input Tensor has to be 4D.");
+  TORCH_CHECK(
+      t.size(2) == buffer->height && t.size(3) == buffer->width,
+      "Expected tensor with shape (N, 3, ",
       buffer->height,
       ", ",
       buffer->width,
@@ -276,16 +300,20 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
     auto frames_ctx = (AVHWFramesContext*)(buffer->hw_frames_ctx->data);
     auto sw_pix_fmt = frames_ctx->sw_format;
     switch (sw_pix_fmt) {
-      // Note:
-      // RGB0 / BGR0 expects 4 channel, but neither
-      // av_pix_fmt_desc_get(pix_fmt)->nb_components
-      // or av_pix_fmt_count_planes(pix_fmt) returns 4.
       case AV_PIX_FMT_RGB0:
       case AV_PIX_FMT_BGR0: {
         ConvertFunc convert_func = [](const torch::Tensor& t, AVFrame* f) {
           write_interlaced_video_cuda(t, f, 4);
         };
         InitFunc init_func = [](const torch::Tensor& t, AVFrame* f) {
+          // Special treatment for the case user pass regular RGB/BGR tensor.
+          if (t.dim() == 4 && t.size(1) == 3) {
+            validate_rgb0(t, f);
+            auto tmp =
+                torch::empty({t.size(0), t.size(2), t.size(3), 4}, t.options());
+            tmp.index_put_({"...", Slice(0, 3)}, t.permute({0, 2, 3, 1}));
+            return tmp;
+          }
           validate_video_input(t, f, 4);
           return init_interlaced(t);
         };
@@ -324,6 +352,24 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
       };
       ConvertFunc convert_func = [=](const torch::Tensor& t, AVFrame* f) {
         write_interlaced_video(t, f, channels);
+      };
+      return {init_func, convert_func};
+    }
+    case AV_PIX_FMT_RGB0:
+    case AV_PIX_FMT_BGR0: {
+      InitFunc init_func = [](const torch::Tensor& t, AVFrame* f) {
+        if (t.dim() == 4 && t.size(1) == 3) {
+          validate_rgb0(t, f);
+          auto tmp =
+              torch::empty({t.size(0), t.size(2), t.size(3), 4}, t.options());
+          tmp.index_put_({"...", Slice(0, 3)}, t.permute({0, 2, 3, 1}));
+          return tmp;
+        }
+        validate_video_input(t, f, 4);
+        return init_interlaced(t);
+      };
+      ConvertFunc convert_func = [](const torch::Tensor& t, AVFrame* f) {
+        write_interlaced_video(t, f, 4);
       };
       return {init_func, convert_func};
     }
