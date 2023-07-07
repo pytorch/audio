@@ -62,7 +62,29 @@ _encoder_option = """Options passed to encoder.
                 To list encoder options for a encoder, you can use
                 ``ffmpeg -h encoder=<ENCODER>`` command.
 
-                Default: ``None``."""
+                Default: ``None``.
+
+                |
+
+                In addition to encoder-specific options, you can also pass options related
+                to multithreading. They are effective only if the encoder support them.
+                If neither of them are provided, StreamReader defaults to single thread.
+
+                ``"threads"``: The number of threads (in str).
+                Providing the value ``"0"`` will let FFmpeg decides based on its heuristics.
+
+                ``"thread_type"``: Which multithreading method to use.
+                The valid values are ``"frame"`` or ``"slice"``.
+                Note that each encoder supports different set of methods.
+                If not provided, a default value is used.
+
+                - ``"frame"``: Encode more than one frame at once.
+                  Each thread handles one frame.
+                  This will increase decoding delay by one frame per thread
+                - ``"slice"``: Encode more than one part of a single frame at once.
+
+                |
+                """
 
 
 _encoder_format = """Format used to encode media.

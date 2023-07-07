@@ -184,6 +184,11 @@ void open_codec(
     }
   }
 
+  // Default to single thread execution.
+  if (!av_dict_get(opt, "threads", nullptr, 0)) {
+    av_dict_set(&opt, "threads", "1", 0);
+  }
+
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
   clean_up_dict(opt);
   TORCH_CHECK(ret >= 0, "Failed to open codec: (", av_err2string(ret), ")");
