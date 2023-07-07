@@ -3,8 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
-namespace torchaudio {
-namespace io {
+namespace torchaudio::io {
 namespace {
 
 std::map<std::string, std::tuple<int64_t, int64_t, int64_t>> get_versions() {
@@ -354,5 +353,4 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
 }
 
 } // namespace
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io

@@ -124,7 +124,8 @@ def _fetch_archives(src):
 
 
 def _fetch_third_party_libraries():
-    _init_submodule()
+    # Revert this when a submodule is added again
+    # _init_submodule()
     if os.name != "nt":
         _fetch_archives(_parse_sources())
 
@@ -154,7 +155,10 @@ def _main():
         long_description=long_description,
         long_description_content_type="text/markdown",
         url="https://github.com/pytorch/audio",
-        author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
+        author=(
+            "Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, "
+            "Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang"
+        ),
         author_email="soumith@pytorch.org",
         maintainer="Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang",
         maintainer_email="moto@meta.com",

@@ -389,6 +389,22 @@ class StreamWriterCorrectnessTest(TempDirMixin, TorchaudioTestCase):
             return
         self.assertEqual(saved.shape, data.shape)
 
+    def test_g722_sample_rate(self):
+        """Encoding G.722 properly converts sample rate to 16k"""
+        filename = "test.g722"
+        sample_rate = 41000
+        data = get_sinusoid(sample_rate=sample_rate, n_channels=1, channels_first=False)
+
+        # write data
+        dst = self.get_temp_path(filename)
+        w = StreamWriter(dst, format="g722")
+        w.add_audio_stream(sample_rate=sample_rate, num_channels=1)
+        with w.open():
+            w.write_audio_chunk(0, data)
+
+        r = StreamReader(src=self.get_temp_path(filename))
+        self.assertEqual(r.get_src_stream_info(0).sample_rate, 16000)
+
     def test_preserve_fps(self):
         """Decimal point frame rate is properly saved
 

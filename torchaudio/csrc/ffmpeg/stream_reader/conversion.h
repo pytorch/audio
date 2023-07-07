@@ -87,29 +87,40 @@ class NV12Converter : public ImageConverterBase {
 
 #ifdef USE_CUDA
 
-class NV12CudaConverter : ImageConverterBase {
-  torch::Tensor tmp_uv;
-
- public:
-  NV12CudaConverter(int height, int width, const torch::Device& device);
-  void convert(const AVFrame* src, torch::Tensor& dst);
-  torch::Tensor convert(const AVFrame* src);
-};
-
-class P010CudaConverter : ImageConverterBase {
-  torch::Tensor tmp_uv;
-
- public:
-  P010CudaConverter(int height, int width, const torch::Device& device);
-  void convert(const AVFrame* src, torch::Tensor& dst);
-  torch::Tensor convert(const AVFrame* src);
-};
-
-class YUV444PCudaConverter : ImageConverterBase {
+// Note:
+// GPU decoders are tricky. They allow to change the resolution as part of
+// decoder option, and the resulting resolution is (seemingly) not retrievable.
+// Therefore, we adopt delayed frame size initialization.
+// For that purpose, we do not inherit from ImageConverterBase.
+struct CudaImageConverterBase {
   const torch::Device device;
+  bool init = false;
+  int height = -1;
+  int width = -1;
+  explicit CudaImageConverterBase(const torch::Device& device);
+};
+
+class NV12CudaConverter : CudaImageConverterBase {
+  torch::Tensor tmp_uv{};
 
  public:
-  YUV444PCudaConverter(int height, int width, const torch::Device& device);
+  explicit NV12CudaConverter(const torch::Device& device);
+  void convert(const AVFrame* src, torch::Tensor& dst);
+  torch::Tensor convert(const AVFrame* src);
+};
+
+class P010CudaConverter : CudaImageConverterBase {
+  torch::Tensor tmp_uv{};
+
+ public:
+  explicit P010CudaConverter(const torch::Device& device);
+  void convert(const AVFrame* src, torch::Tensor& dst);
+  torch::Tensor convert(const AVFrame* src);
+};
+
+class YUV444PCudaConverter : CudaImageConverterBase {
+ public:
+  explicit YUV444PCudaConverter(const torch::Device& device);
   void convert(const AVFrame* src, torch::Tensor& dst);
   torch::Tensor convert(const AVFrame* src);
 };

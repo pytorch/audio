@@ -13,12 +13,14 @@ encode and save audio/video data into various formats/destinations.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=5.0, <6).
+#    This tutorial requires torchaudio nightly build and FFmpeg libraries (>=4.1, <4.4).
+#
+#    To install torchaudio nightly build, please refer to
+#    https://pytorch.org/get-started/locally/ .
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install -c conda-forge 'ffmpeg<6'`` will install
-#    the required libraries.
+#    ``conda install 'ffmpeg<4.4'`` will install the required FFmpeg libraries.
 #
 
 ######################################################################
@@ -49,27 +51,7 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
-#
-
-try:
-    from torchaudio.io import StreamWriter
-except ImportError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds by adding the following code block to the top
-            of the notebook before running it:
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
+from torchaudio.io import StreamWriter
 
 print("FFmpeg library versions")
 for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
@@ -82,8 +64,9 @@ import io
 import os
 import tempfile
 
-from torchaudio.utils import download_asset
 from IPython.display import Audio, Video
+
+from torchaudio.utils import download_asset
 
 SAMPLE_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 WAVEFORM, SAMPLE_RATE = torchaudio.load(SAMPLE_PATH, channels_first=False)
@@ -501,6 +484,8 @@ print(f"{bytes2[:10]}...{bytes2[-10:]}\n")
 
 assert bytes1 == bytes2
 
+import matplotlib.pyplot as plt
+
 ######################################################################
 #
 # Example - Spectrum Visualizer
@@ -515,7 +500,6 @@ assert bytes1 == bytes2
 # then use StreamWriter to convert them to video with the original audio.
 
 import torchaudio.transforms as T
-import matplotlib.pyplot as plt
 
 ######################################################################
 #
@@ -546,7 +530,7 @@ specs = trans(WAVEFORM.T)[0].T
 #
 
 spec_db = T.AmplitudeToDB(stype="magnitude", top_db=80)(specs.T)
-_ = plt.imshow(spec_db, aspect="auto", origin='lower')
+_ = plt.imshow(spec_db, aspect="auto", origin="lower")
 
 ######################################################################
 #
@@ -567,20 +551,26 @@ ncols, nrows = fig.canvas.get_width_height()
 def _plot(data):
     ax.clear()
     x = list(range(len(data)))
-    R, G, B = 238/255, 76/255, 44/255
+    R, G, B = 238 / 255, 76 / 255, 44 / 255
     for coeff, alpha in [(0.8, 0.7), (1, 1)]:
-        d = data ** coeff
+        d = data**coeff
         ax.fill_between(x, d, -d, color=[R, G, B, alpha])
     xlim = n_fft // 2 + 1
     ax.set_xlim([-1, n_fft // 2 + 1])
     ax.set_ylim([-1, 1])
     ax.text(
-        xlim, 0.95,
+        xlim,
+        0.95,
         f"Created with TorchAudio\n{torchaudio.__version__}",
-        color="white", ha="right", va="top", backgroundcolor="black")
+        color="white",
+        ha="right",
+        va="top",
+        backgroundcolor="black",
+    )
     fig.canvas.draw()
     frame = torch.frombuffer(fig.canvas.tostring_rgb(), dtype=torch.uint8)
     return frame.reshape(nrows, ncols, 3).permute(2, 0, 1)
+
 
 # sphinx_gallery_defer_figures
 
@@ -602,10 +592,10 @@ with s.open():
     # Process by second
     for t in range(0, NUM_FRAMES, SAMPLE_RATE):
         # Write audio chunk
-        s.write_audio_chunk(0, WAVEFORM[t:t + SAMPLE_RATE, :])
+        s.write_audio_chunk(0, WAVEFORM[t : t + SAMPLE_RATE, :])
 
         # write 1 second of video chunk
-        frames = [_plot(spec) for spec in specs[i:i+frame_rate]]
+        frames = [_plot(spec) for spec in specs[i : i + frame_rate]]
         if frames:
             s.write_video_chunk(1, torch.stack(frames))
         i += frame_rate

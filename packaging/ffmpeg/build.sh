@@ -20,6 +20,9 @@ args=""
 if [[ "$OSTYPE" == "msys" ]]; then
    args="--toolchain=msvc"
 fi
+ffmpeg_version="${FFMPEG_VERSION:-4.1.8}"
+
+archive="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${ffmpeg_version}.tar.gz"
 
 build_dir=$(mktemp -d -t ffmpeg-build.XXXXXXXXXX)
 cleanup() {
@@ -32,7 +35,7 @@ cd "${build_dir}"
 # NOTE:
 # When changing the version of FFmpeg, update the README so that the link to the source points
 # the same version.
-curl -LsS -o ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.0.3.tar.gz
+curl -LsS -o ffmpeg.tar.gz "${archive}"
 tar -xf ffmpeg.tar.gz --strip-components 1
 ./configure \
     --prefix="${prefix}" \
@@ -72,11 +75,29 @@ ls ${prefix}/*
 # macOS: Fix rpath so that the libraries are searched dynamically in user environment.
 # In Linux, this is handled by `--enable-rpath` flag.
 if [[ "$(uname)" == Darwin ]]; then
-    avcodec=libavcodec.59
-    avdevice=libavdevice.59
-    avfilter=libavfilter.8
-    avformat=libavformat.59
-    avutil=libavutil.57
+    major_ver=${ffmpeg_version:0:1}
+    if [[ ${major_ver} == 4 ]]; then
+        avutil=libavutil.56
+        avcodec=libavcodec.58
+        avformat=libavformat.58
+        avdevice=libavdevice.58
+        avfilter=libavfilter.7
+    elif [[ ${major_ver} == 5 ]]; then
+        avutil=libavutil.57
+        avcodec=libavcodec.59
+        avformat=libavformat.59
+        avdevice=libavdevice.59
+        avfilter=libavfilter.8
+    elif [[ ${major_ver} == 6 ]]; then
+        avutil=libavutil.58
+        avcodec=libavcodec.60
+        avformat=libavformat.60
+        avdevice=libavdevice.60
+        avfilter=libavfilter.9
+    else
+        printf "Error: unexpected FFmpeg major version: %s\n"  ${major_ver}
+        exit 1;
+    fi
 
     otool="/usr/bin/otool"
     # NOTE: miniconda has a version of otool and install_name_tool installed and we want

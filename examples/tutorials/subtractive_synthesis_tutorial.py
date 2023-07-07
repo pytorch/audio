@@ -33,17 +33,14 @@ print(torchaudio.__version__)
 #
 
 try:
-    from torchaudio.prototype.functional import (
-        sinc_impulse_response,
-        frequency_impulse_response,
-        filter_waveform,
-    )
+    from torchaudio.prototype.functional import filter_waveform, frequency_impulse_response, sinc_impulse_response
 except ModuleNotFoundError:
     print(
         "Failed to import prototype DSP features. "
         "Please install torchaudio nightly builds. "
         "Please refer to https://pytorch.org/get-started/locally "
-        "for instructions to install a nightly build.")
+        "for instructions to install a nightly build."
+    )
     raise
 
 import matplotlib.pyplot as plt
@@ -67,7 +64,7 @@ SAMPLE_RATE = 16_000
 duration = 4
 num_frames = int(duration * SAMPLE_RATE)
 
-noise = torch.rand((num_frames, )) - 0.5
+noise = torch.rand((num_frames,)) - 0.5
 
 
 ######################################################################
@@ -79,6 +76,7 @@ def plot_input():
     axes[0].grid(True)
     axes[1].specgram(noise, Fs=SAMPLE_RATE)
     Audio(noise, rate=SAMPLE_RATE)
+
 
 plot_input()
 
@@ -101,7 +99,7 @@ num_filters = 64 * duration
 window_size = 2049
 
 f_cutoff = torch.linspace(0.0, 0.8, num_filters)
-kernel = sinc_impulse_response(f_cutoff , window_size)
+kernel = sinc_impulse_response(f_cutoff, window_size)
 
 ######################################################################
 #
@@ -115,6 +113,7 @@ filtered = filter_waveform(noise, kernel)
 #
 # Let's look at the spectrogram of the resulting audio and listen to it.
 #
+
 
 def plot_sinc_ir(waveform, cutoff, sample_rate, vol=0.2):
     num_frames = waveform.size(0)
@@ -160,7 +159,7 @@ f_cutoff = f_cutoff_base + f_cutoff_osci
 ######################################################################
 #
 
-kernel = sinc_impulse_response(f_cutoff , window_size)
+kernel = sinc_impulse_response(f_cutoff, window_size)
 filtered = filter_waveform(noise, kernel)
 
 ######################################################################
@@ -182,7 +181,7 @@ f_cutoff = 0.07 + 0.06 * torch.sin(torch.cumsum(f_lfo, dim=0))
 ######################################################################
 #
 
-kernel = sinc_impulse_response(f_cutoff , window_size)
+kernel = sinc_impulse_response(f_cutoff, window_size)
 filtered = filter_waveform(noise, kernel)
 
 ######################################################################
@@ -200,12 +199,13 @@ plot_sinc_ir(filtered, f_cutoff, SAMPLE_RATE)
 #
 
 
-magnitudes = torch.sin(torch.linspace(0, 10, 64))**4.0
+magnitudes = torch.sin(torch.linspace(0, 10, 64)) ** 4.0
 kernel = frequency_impulse_response(magnitudes)
 filtered = filter_waveform(noise, kernel.unsqueeze(0))
 
 ######################################################################
 #
+
 
 def plot_waveform(magnitudes, filtered, sample_rate):
     nyquist = sample_rate / 2
@@ -218,8 +218,10 @@ def plot_waveform(magnitudes, filtered, sample_rate):
     offsets = duration * interval
     # Select N magnitudes for overlays
     mags = torch.stack(
-        [magnitudes for _ in range(N)] if magnitudes.ndim == 1 else
-        [magnitudes[int(i * magnitudes.size(0))] for i in interval])
+        [magnitudes for _ in range(N)]
+        if magnitudes.ndim == 1
+        else [magnitudes[int(i * magnitudes.size(0))] for i in interval]
+    )
     mag_x = offsets.unsqueeze(-1) + 0.1 * mags
     mag_y = torch.linspace(0, nyquist, magnitudes.size(-1)).tile((N, 1))
 
@@ -229,6 +231,7 @@ def plot_waveform(magnitudes, filtered, sample_rate):
     ax.specgram(filtered, Fs=sample_rate)
     return Audio(filtered, rate=sample_rate)
 
+
 ######################################################################
 #
 plot_waveform(magnitudes, filtered, SAMPLE_RATE)
@@ -237,8 +240,7 @@ plot_waveform(magnitudes, filtered, SAMPLE_RATE)
 #
 # It is also possible to make a non-stationary filter.
 
-magnitudes = torch.stack(
-    [torch.linspace(0.0, w, 1000) for w in torch.linspace(4.0, 40.0, 250)])
+magnitudes = torch.stack([torch.linspace(0.0, w, 1000) for w in torch.linspace(4.0, 40.0, 250)])
 magnitudes = torch.sin(magnitudes) ** 4.0
 
 ######################################################################

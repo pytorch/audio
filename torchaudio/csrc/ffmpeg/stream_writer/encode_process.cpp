@@ -278,6 +278,20 @@ int get_enc_sr(
     int src_sample_rate,
     const c10::optional<int>& encoder_sample_rate,
     const AVCodec* codec) {
+  // G.722 only supports 16000 Hz, but it does not list the sample rate in
+  // supported_samplerates so we hard code it here.
+  if (codec->id == AV_CODEC_ID_ADPCM_G722) {
+    if (encoder_sample_rate) {
+      auto val = encoder_sample_rate.value();
+      TORCH_CHECK(
+          val == 16'000,
+          codec->name,
+          " does not support sample rate ",
+          val,
+          ". Supported values are; 16000.");
+    }
+    return 16'000;
+  }
   if (encoder_sample_rate) {
     const int& encoder_sr = encoder_sample_rate.value();
     TORCH_CHECK(
@@ -664,7 +678,12 @@ FilterGraph get_video_filter_graph(
 
   FilterGraph f;
   f.add_video_src(
-      src_fmt, av_inv_q(src_rate), src_rate, src_width, src_height, {1, 1});
+      is_cuda ? AV_PIX_FMT_CUDA : src_fmt,
+      av_inv_q(src_rate),
+      src_rate,
+      src_width,
+      src_height,
+      {1, 1});
   f.add_video_sink();
   f.add_process(desc);
   f.create_filter();

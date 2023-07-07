@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torch/torch.h>
+#include <torch/types.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/post_process.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>

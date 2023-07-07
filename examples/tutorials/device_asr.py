@@ -10,11 +10,11 @@ on laptop.
 
 .. note::
 
-   This tutorial requires FFmpeg libraries (>=5.0, <6) and SentencePiece.
+   This tutorial requires FFmpeg libraries (>=4.1, <4.4) and SentencePiece.
 
    There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install -c conda-forge 'ffmpeg<6'`` will install
+   ``conda install 'ffmpeg<4.4'`` will install
    the required FFmpeg libraries.
 
    You can install SentencePiece by running ``pip install sentencepiece``.

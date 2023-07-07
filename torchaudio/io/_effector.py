@@ -260,13 +260,17 @@ class AudioEffector:
         self.codec_config = codec_config
         self.pad_end = pad_end
 
-    def _get_reader(self, waveform, sample_rate, frames_per_chunk=None):
+    def _get_reader(self, waveform, sample_rate, output_sample_rate, frames_per_chunk=None):
         num_frames, num_channels = waveform.shape
 
         if self.format is not None:
             muxer = self.format
             encoder = self.encoder
             option = {}
+            # Some formats are headerless, so need to provide these infomation.
+            if self.format == "mulaw":
+                option = {"sample_rate": f"{sample_rate}", "channels": f"{num_channels}"}
+
         else:  # PCM
             muxer = _get_muxer(waveform.dtype)
             encoder = None
@@ -279,7 +283,8 @@ class AudioEffector:
                 waveform, sample_rate, self.effect, muxer, encoder, self.codec_config, frames_per_chunk
             )
 
-        filter_desc = _get_afilter_desc(sample_rate, _get_sample_fmt(waveform.dtype), num_channels)
+        output_sr = sample_rate if output_sample_rate is None else output_sample_rate
+        filter_desc = _get_afilter_desc(output_sr, _get_sample_fmt(waveform.dtype), num_channels)
         if self.pad_end:
             filter_desc = f"{filter_desc},apad=whole_len={num_frames}"
 
@@ -287,12 +292,17 @@ class AudioEffector:
         reader.add_audio_stream(frames_per_chunk or -1, -1, filter_desc=filter_desc)
         return reader
 
-    def apply(self, waveform: Tensor, sample_rate: int) -> Tensor:
+    def apply(self, waveform: Tensor, sample_rate: int, output_sample_rate: Optional[int] = None) -> Tensor:
         """Apply the effect and/or codecs to the whole tensor.
 
         Args:
             waveform (Tensor): The input waveform. Shape: ``(time, channel)``
-            sample_rate (int): Sample rate of the waveform.
+            sample_rate (int): Sample rate of the input waveform.
+            output_sample_rate (int or None, optional): Output sample rate.
+                If provided, override the output sample rate.
+                Otherwise, the resulting tensor is resampled to have
+                the same sample rate as the input.
+                Default: ``None``.
 
         Returns:
             Tensor:
@@ -305,18 +315,25 @@ class AudioEffector:
         if waveform.numel() == 0:
             return waveform
 
-        reader = self._get_reader(waveform, sample_rate)
+        reader = self._get_reader(waveform, sample_rate, output_sample_rate)
         reader.process_all_packets()
         (applied,) = reader.pop_chunks()
         return Tensor(applied)
 
-    def stream(self, waveform: Tensor, sample_rate: int, frames_per_chunk: int) -> Iterator[Tensor]:
+    def stream(
+        self, waveform: Tensor, sample_rate: int, frames_per_chunk: int, output_sample_rate: Optional[int] = None
+    ) -> Iterator[Tensor]:
         """Apply the effect and/or codecs to the given tensor chunk by chunk.
 
         Args:
             waveform (Tensor): The input waveform. Shape: ``(time, channel)``
             sample_rate (int): Sample rate of the waveform.
             frames_per_chunk (int): The number of frames to return at a time.
+            output_sample_rate (int or None, optional): Output sample rate.
+                If provided, override the output sample rate.
+                Otherwise, the resulting tensor is resampled to have
+                the same sample rate as the input.
+                Default: ``None``.
 
         Returns:
             Iterator[Tensor]:
@@ -330,6 +347,6 @@ class AudioEffector:
         if waveform.numel() == 0:
             return waveform
 
-        reader = self._get_reader(waveform, sample_rate, frames_per_chunk)
+        reader = self._get_reader(waveform, sample_rate, output_sample_rate, frames_per_chunk)
         for (applied,) in reader.stream():
             yield Tensor(applied)

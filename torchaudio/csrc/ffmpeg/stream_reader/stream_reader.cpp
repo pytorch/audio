@@ -5,8 +5,7 @@
 #include <stdexcept>
 #include <thread>
 
-namespace torchaudio {
-namespace io {
+namespace torchaudio::io {
 
 using KeyType = StreamProcessor::KeyType;
 
@@ -607,5 +606,4 @@ StreamReaderCustomIO::StreamReaderCustomIO(
     : CustomInput(opaque, buffer_size, read_packet, seek),
       StreamReader(io_ctx, format, option) {}
 
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io

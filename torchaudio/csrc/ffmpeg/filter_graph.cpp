@@ -1,8 +1,7 @@
 #include <torchaudio/csrc/ffmpeg/filter_graph.h>
 #include <stdexcept>
 
-namespace torchaudio {
-namespace io {
+namespace torchaudio::io {
 
 namespace {
 AVFilterGraph* get_filter_graph() {
@@ -222,5 +221,4 @@ int FilterGraph::get_frame(AVFrame* pOutputFrame) {
   return av_buffersink_get_frame(buffersink_ctx, pOutputFrame);
 }
 
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io
