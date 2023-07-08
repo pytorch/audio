@@ -96,33 +96,30 @@ enum AVSampleFormat get_src_sample_fmt(const std::string& src) {
       ".");
 }
 
+const std::set<AVPixelFormat> SUPPORTED_PIX_FMTS{
+    AV_PIX_FMT_GRAY8,
+    AV_PIX_FMT_RGB0,
+    AV_PIX_FMT_BGR0,
+    AV_PIX_FMT_RGB24,
+    AV_PIX_FMT_BGR24,
+    AV_PIX_FMT_YUV444P};
+
 enum AVPixelFormat get_src_pix_fmt(const std::string& src) {
   AVPixelFormat fmt = av_get_pix_fmt(src.c_str());
-  switch (fmt) {
-    case AV_PIX_FMT_GRAY8:
-    case AV_PIX_FMT_RGB24:
-    case AV_PIX_FMT_BGR24:
-    case AV_PIX_FMT_YUV444P:
-      return fmt;
-    default:;
-  }
   TORCH_CHECK(
-      false,
+      SUPPORTED_PIX_FMTS.count(fmt),
       "Unsupported pixel format (",
       src,
       ") was provided. Valid values are ",
       []() -> std::string {
         std::vector<std::string> ret;
-        for (const auto& fmt :
-             {AV_PIX_FMT_GRAY8,
-              AV_PIX_FMT_RGB24,
-              AV_PIX_FMT_BGR24,
-              AV_PIX_FMT_YUV444P}) {
+        for (const auto& fmt : SUPPORTED_PIX_FMTS) {
           ret.emplace_back(av_get_pix_fmt_name(fmt));
         }
         return c10::Join(", ", ret);
       }(),
       ".");
+  return fmt;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,6 +182,11 @@ void open_codec(
           "with desired value.");
       av_dict_set(&opt, "strict", "experimental", 0);
     }
+  }
+
+  // Default to single thread execution.
+  if (!av_dict_get(opt, "threads", nullptr, 0)) {
+    av_dict_set(&opt, "threads", "1", 0);
   }
 
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opt);
