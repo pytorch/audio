@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Run smoke tests"""
 import argparse
 import logging
@@ -19,26 +20,44 @@ def ffmpeg_test():
     from torchaudio.io import StreamReader  # noqa: F401
 
 
-def main() -> None:
-    options = _parse_args()
+def _run_smoke_test(check_ffmpeg):
+    base_smoke_test()
+
+    if not check_ffmpeg:
+        print("Skipping ffmpeg test.")
+    else:
+        ffmpeg_test()
+
+    print("Smoke test passed.")
+
+
+def main(args=None) -> None:
+    options = _parse_args(args)
 
     if options.debug:
         logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
-    base_smoke_test()
-    if options.ffmpeg:
-        ffmpeg_test()
-    print("Smoke test passed.")
+    _chdir()
+    _run_smoke_test(options.ffmpeg)
 
 
-def _parse_args():
+def _parse_args(args):
     parser = argparse.ArgumentParser()
 
     # Warning: Please note this option should not be widely used, only use it when absolutely necessary
     parser.add_argument("--no-ffmpeg", dest="ffmpeg", action="store_false")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging.")
 
-    return parser.parse_args()
+    return parser.parse_args(args)
+
+
+def _chdir():
+    # smoke test should not be performed on the root directory of checked out source code.
+    import os
+    from pathlib import Path
+
+    os.chdir(Path(__file__).parent)
+    assert "torchaudio" not in os.listdir(os.getcwd())
 
 
 if __name__ == "__main__":
