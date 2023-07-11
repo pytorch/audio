@@ -32,10 +32,6 @@ jobs:
       matrix:
         include:
           - repository: pytorch/audio
-            cache-path: /third_party/ffmpeg
-            cache-key: macos-ffmpeg
-            pre-script: packaging/pre_build_script.sh
-            post-script: packaging/post_build_script.sh
             smoke-test-script: test/smoke_test/smoke_test_no_ffmpeg.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
@@ -46,14 +42,10 @@ jobs:
       test-infra-repository: pytorch/test-infra
       test-infra-ref: main
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
-      pre-script: ${{ matrix.pre-script }}
-      post-script: ${{ matrix.post-script }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
       runner-type: macos-12
       package-name: ${{ matrix.package-name }}
       trigger-event: ${{ github.event_name }}
-      cache-path: ${{ matrix.cache-path }}
-      cache-key: ${{ matrix.cache-key }}
     secrets:
       AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID: ${{ secrets.AWS_PYTORCH_UPLOADER_ACCESS_KEY_ID }}
       AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY: ${{ secrets.AWS_PYTORCH_UPLOADER_SECRET_ACCESS_KEY }}
