@@ -107,14 +107,13 @@ jobs:
 
         # Install torchaudio
         # TODO: Enable NVDec/NVEnc
-        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
+        conda install --quiet -y pkg-config
         pip --quiet install cmake>=3.18.0 ninja
         BUILD_VERSION=$( cut -f 1 -d a version.txt )
         BUILD_VERSION=$BUILD_VERSION.dev$(date "+%Y%m%d")
         export BUILD_VERSION
 
-
-        FFMPEG_ROOT=${CONDA_PREFIX} USE_FFMPEG=1 USE_CUDA=1 pip install --progress-bar off -v -e . --no-use-pep517
+        FFMPEG_ROOT=${CONDA_PREFIX} USE_CUDA=1 pip install --progress-bar off -v -e . --no-use-pep517
 
         # Install runtime dependencies
         pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
