@@ -2536,7 +2536,7 @@ def forced_align(
         For example, in str `"aabbc"`, the number of repeats are `2`.
 
     Note:
-        The current version only supports ``batch_size``==1.
+        The current version only supports ``batch_size==1``.
     """
     if blank in targets:
         raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")
