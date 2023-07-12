@@ -59,7 +59,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 )
 
 # 2. Install torchaudio
-conda install --quiet -y 'ffmpeg>=4.1' ninja cmake
+conda install --quiet -y ninja cmake
 
 printf "* Installing torchaudio\n"
 python setup.py install
@@ -75,7 +75,7 @@ fi
 # Note: installing librosa via pip fail because it will try to compile numba.
 (
     set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20'
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20' 'ffmpeg>=5,<7'
     pip install kaldi-io SoundFile coverage pytest pytest-cov 'scipy==1.7.3' expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 )
 # Install fairseq
