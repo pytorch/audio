@@ -1463,7 +1463,7 @@ def _apply_sinc_resample_kernel(
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
     resampled = torch.nn.functional.conv1d(waveform[:, None], kernel, stride=orig_freq)
     resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
-    target_length = int(math.ceil(new_freq * length / orig_freq))
+    target_length = torch.ceil(torch.as_tensor(new_freq * length / orig_freq)).long()
     resampled = resampled[..., :target_length]
 
     # unpack batch
@@ -2536,7 +2536,7 @@ def forced_align(
         For example, in str `"aabbc"`, the number of repeats are `2`.
 
     Note:
-        The current version only supports ``batch_size``==1.
+        The current version only supports ``batch_size==1``.
     """
     if blank in targets:
         raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")

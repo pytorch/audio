@@ -186,7 +186,11 @@ struct StreamWriterFileObj : private FileObj, public StreamWriterCustomIO {
             py::hasattr(fileobj, "seek") ? &seek_func : nullptr) {}
 };
 
-PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
+#ifndef TORCHAUDIO_FFMPEG_EXT_NAME
+#error TORCHAUDIO_FFMPEG_EXT_NAME must be defined.
+#endif
+
+PYBIND11_MODULE(TORCHAUDIO_FFMPEG_EXT_NAME, m) {
   m.def("init", []() { avdevice_register_all(); });
   m.def("get_log_level", []() { return av_log_get_level(); });
   m.def("set_log_level", [](int level) { av_log_set_level(level); });

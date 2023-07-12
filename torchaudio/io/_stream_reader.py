@@ -7,6 +7,11 @@ import torch
 import torchaudio
 from torch.utils._pytree import tree_map
 
+if torchaudio._extension._FFMPEG_EXT is not None:
+    _StreamReader = torchaudio._extension._FFMPEG_EXT.StreamReader
+    _StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj
+
+
 __all__ = [
     "StreamReader",
 ]
@@ -513,9 +518,9 @@ class StreamReader:
         buffer_size: int = 4096,
     ):
         if isinstance(src, str):
-            self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReader(src, format, option)
+            self._be = _StreamReader(src, format, option)
         elif hasattr(src, "read"):
-            self._be = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = _StreamReaderFileObj(src, format, option, buffer_size)
         else:
             raise ValueError("`src` must be either a string or file-like object.")
 

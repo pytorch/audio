@@ -7,6 +7,9 @@ import torchaudio
 from torchaudio.backend.common import AudioMetaData
 from torchaudio.io import StreamWriter
 
+if torchaudio._extension._FFMPEG_EXT is not None:
+    StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj
+
 
 # Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
 def info_audio(
@@ -22,7 +25,7 @@ def info_audio_fileobj(
     format: Optional[str],
     buffer_size: int = 4096,
 ) -> AudioMetaData:
-    s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, format, None, buffer_size)
+    s = StreamReaderFileObj(src, format, None, buffer_size)
     i = s.find_best_audio_stream()
     sinfo = s.get_src_stream_info(i)
     if sinfo.num_frames == 0:
@@ -67,7 +70,7 @@ def _get_load_filter(
 
 
 def _load_audio_fileobj(
-    s: torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj,
+    s: StreamReaderFileObj,
     filter: Optional[str] = None,
     channels_first: bool = True,
 ) -> torch.Tensor:
@@ -103,7 +106,7 @@ def load_audio_fileobj(
     buffer_size: int = 4096,
 ) -> Tuple[torch.Tensor, int]:
     demuxer = "ogg" if format == "vorbis" else format
-    s = torchaudio.lib._torchaudio_ffmpeg.StreamReaderFileObj(src, demuxer, None, buffer_size)
+    s = StreamReaderFileObj(src, demuxer, None, buffer_size)
     sample_rate = int(s.get_src_stream_info(s.find_best_audio_stream()).sample_rate)
     filter = _get_load_filter(frame_offset, num_frames, convert)
     waveform = _load_audio_fileobj(s, filter, channels_first)

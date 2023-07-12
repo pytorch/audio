@@ -4,7 +4,11 @@ import sys
 
 from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
 
-from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_ffmpeg, _init_sox, _load_lib
+try:
+    from .fb import _init_ffmpeg
+except ImportError:
+    from .utils import _init_ffmpeg
+from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_sox, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -20,7 +24,7 @@ __all__ = [
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_RIR_AVAILABLE",
     "_SOX_INITIALIZED",
-    "_FFMPEG_INITIALIZED",
+    "_FFMPEG_EXT",
 ]
 
 
@@ -59,11 +63,10 @@ if is_module_available("torchaudio.lib._torchaudio_sox"):
 
 
 # Initialize FFmpeg-related features
-_FFMPEG_INITIALIZED = False
-if is_module_available("torchaudio.lib._torchaudio_ffmpeg"):
+_FFMPEG_EXT = None
+if _IS_TORCHAUDIO_EXT_AVAILABLE:
     try:
-        _init_ffmpeg()
-        _FFMPEG_INITIALIZED = True
+        _FFMPEG_EXT = _init_ffmpeg()
     except Exception:
         # The initialization of FFmpeg extension will fail if supported FFmpeg
         # libraries are not found in the system.
@@ -81,7 +84,7 @@ fail_if_no_sox = (
     )
 )
 
-fail_if_no_ffmpeg = no_op if _FFMPEG_INITIALIZED else _fail_since_no_ffmpeg
+fail_if_no_ffmpeg = _fail_since_no_ffmpeg if _FFMPEG_EXT is None else no_op
 
 fail_if_no_rir = (
     no_op

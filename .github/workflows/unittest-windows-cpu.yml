@@ -22,7 +22,6 @@ jobs:
 
         # Set up Environment Variables
         export PYTHON_VERSION="3.8"
-        export USE_FFMPEG="1"
         unset CUDA_VERSION
 
         # Set CHANNEL
