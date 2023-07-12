@@ -16,7 +16,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
    each of which requires a corresponding PyTorch distribution.
 
 .. note::
-   This software was compiled against an unmodified copy of FFmpeg (licensed under `the LGPLv2.1 <https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1>`_), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded `here <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`_.
+   This software was compiled against an unmodified copies of FFmpeg, with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded from the following locations: `n4.1.8 <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n4.1.8/COPYING.LGPLv2.1>`__), `n5.0.3 <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n5.0.3/COPYING.LGPLv2.1>`__) and `n6.0 <https://github.com/FFmpeg/FFmpeg/releases/tag/n6.0>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n6.0/COPYING.LGPLv2.1>`__).
 
 Dependencies
 ------------

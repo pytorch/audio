@@ -5,10 +5,12 @@ import torch
 import torchaudio
 
 
-if torchaudio._extension._FFMPEG_INITIALIZED:
-    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.CodecConfig
-else:
+if torchaudio._extension._FFMPEG_EXT is None:
     ConfigBase = object
+else:
+    ConfigBase = torchaudio._extension._FFMPEG_EXT.CodecConfig
+    _StreamWriter = torchaudio._extension._FFMPEG_EXT.StreamWriter
+    _StreamWriterFileObj = torchaudio._extension._FFMPEG_EXT.StreamWriterFileObj
 
 
 @dataclass
@@ -187,9 +189,9 @@ class StreamWriter:
         buffer_size: int = 4096,
     ):
         if isinstance(dst, str):
-            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriter(dst, format)
+            self._s = _StreamWriter(dst, format)
         elif hasattr(dst, "write"):
-            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
+            self._s = _StreamWriterFileObj(dst, format, buffer_size)
         else:
             raise ValueError("`dst` must be either a string or a file-like object.")
         self._is_open = False

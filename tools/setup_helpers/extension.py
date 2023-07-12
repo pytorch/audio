@@ -65,12 +65,25 @@ def get_ext_modules():
             ]
         )
     if _USE_FFMPEG:
-        modules.extend(
-            [
-                Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
-                Extension(name="torchaudio.lib._torchaudio_ffmpeg", sources=[]),
-            ]
-        )
+        if "FFMPEG_ROOT" in os.environ:
+            # single version ffmpeg mode
+            modules.extend(
+                [
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg", sources=[]),
+                ]
+            )
+        else:
+            modules.extend(
+                [
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg4", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg4", sources=[]),
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg5", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg5", sources=[]),
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg6", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg6", sources=[]),
+                ]
+            )
     return modules
 
 

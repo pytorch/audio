@@ -24,7 +24,7 @@ def _fail_load(
     raise RuntimeError("Failed to load audio from {}".format(filepath))
 
 
-if torchaudio._extension._FFMPEG_INITIALIZED:
+if torchaudio._extension._FFMPEG_EXT is not None:
     import torchaudio.io._compat as _compat
 
     _fallback_info = _compat.info_audio

@@ -112,7 +112,7 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
 
 
 def is_ffmpeg_available():
-    return torchaudio._extension._FFMPEG_INITIALIZED
+    return torchaudio._extension._FFMPEG_EXT is not None
 
 
 _IS_CTC_DECODER_AVAILABLE = None
