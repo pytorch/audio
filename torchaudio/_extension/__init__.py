@@ -4,7 +4,11 @@ import sys
 
 from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
 
-from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_ffmpeg, _init_sox, _load_lib
+try:
+    from .fb import _init_ffmpeg
+except ImportError:
+    from .utils import _init_ffmpeg
+from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_sox, _load_lib
 
 _LG = logging.getLogger(__name__)
 
