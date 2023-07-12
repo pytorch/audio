@@ -186,7 +186,8 @@ FilterGraphOutputInfo FilterGraph::get_output_info() const {
   switch (l->type) {
     case AVMEDIA_TYPE_AUDIO: {
       ret.sample_rate = l->sample_rate;
-#if LIBAVFILTER_VERSION_MAJOR >= 8 && LIBAVFILTER_VERSION_MINOR >= 44
+#if LIBAVFILTER_VERSION_MAJOR >= 9 || \
+    (LIBAVFILTER_VERSION_MAJOR == 8 && LIBAVFILTER_VERSION_MINOR >= 44)
       ret.num_channels = l->ch_layout.nb_channels;
 #else
       // Before FFmpeg 5.1
