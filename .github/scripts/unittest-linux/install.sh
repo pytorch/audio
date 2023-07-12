@@ -19,7 +19,7 @@ case "$(uname -s)" in
         eval "$("/opt/conda/bin/conda" shell.bash hook)"
 esac
 
-conda create -n ci python=${PYTHON_VERSION}
+conda create -n ci -y python="${PYTHON_VERSION}"
 conda activate ci
 
 # 1. Install PyTorch
