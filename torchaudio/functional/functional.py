@@ -1463,7 +1463,7 @@ def _apply_sinc_resample_kernel(
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
     resampled = torch.nn.functional.conv1d(waveform[:, None], kernel, stride=orig_freq)
     resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
-    target_length = int(math.ceil(new_freq * length / orig_freq))
+    target_length = torch.ceil(torch.as_tensor(new_freq * length / orig_freq)).long()
     resampled = resampled[..., :target_length]
 
     # unpack batch
