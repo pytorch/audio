@@ -98,6 +98,7 @@ torch::Tensor get_image_buffer(
       shape, torch::TensorOptions().dtype(dtype).layout(torch::kStrided));
 }
 
+#ifdef USE_CUDA
 torch::Tensor get_image_buffer(
     at::IntArrayRef shape,
     torch::Device device,
@@ -109,6 +110,7 @@ torch::Tensor get_image_buffer(
           .layout(torch::kStrided)
           .device(device));
 }
+#endif
 
 } // namespace
 
