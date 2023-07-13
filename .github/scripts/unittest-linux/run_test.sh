@@ -2,7 +2,7 @@
 
 set -e
 
-eval "$(/opt/conda/bin/conda shell.bash hook)"
+eval "$($(which conda) shell.bash hook)"
 
 conda activate ci
 
