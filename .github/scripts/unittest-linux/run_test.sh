@@ -2,7 +2,9 @@
 
 set -e
 
-eval "$(/opt/conda/bin/conda shell.bash hook)"
+eval "$($(which conda) shell.bash hook)"
+
+conda activate ci
 
 python -m torch.utils.collect_env
 env | grep TORCHAUDIO || true
