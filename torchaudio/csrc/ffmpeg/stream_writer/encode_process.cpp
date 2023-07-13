@@ -527,7 +527,6 @@ void configure_video_codec_ctx(
   }
 }
 
-#ifdef USE_CUDA
 void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
   torch::Device device{hw_accel};
   TORCH_CHECK(
@@ -571,7 +570,6 @@ void configure_hw_accel(AVCodecContext* ctx, const std::string& hw_accel) {
       "Failed to initialize CUDA frame context: ",
       av_err2string(ret));
 }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVStream
