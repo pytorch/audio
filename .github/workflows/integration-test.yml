@@ -31,8 +31,6 @@ jobs:
         python -m pip install --quiet --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
         python -m pip install --quiet pytest requests cmake ninja deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
         python setup.py install
-      env:
-        USE_FFMPEG: true
     - name: Run integration test
       run: |
         cd test && pytest integration_tests -v --use-tmp-hub-dir

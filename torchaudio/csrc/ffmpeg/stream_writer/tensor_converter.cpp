@@ -1,12 +1,14 @@
 #include <torchaudio/csrc/ffmpeg/stream_writer/tensor_converter.h>
-#include <torchaudio/csrc/ffmpeg/stub.h>
 
 #ifdef USE_CUDA
 #include <c10/cuda/CUDAStream.h>
 #endif
 
 namespace torchaudio::io {
+
 namespace {
+
+using namespace torch::indexing;
 
 using InitFunc = TensorConverter::InitFunc;
 using ConvertFunc = TensorConverter::ConvertFunc;
@@ -41,8 +43,8 @@ void convert_func_(const torch::Tensor& chunk, AVFrame* buffer) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(chunk.size(1) == buffer->channels);
 
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00334
-  if (!FFMPEG av_frame_is_writable(buffer)) {
-    int ret = FFMPEG av_frame_make_writable(buffer);
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
     TORCH_INTERNAL_ASSERT(
         ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
   }
@@ -111,6 +113,28 @@ void validate_video_input(
       t.sizes());
 }
 
+// Special case where encode pixel format is RGB0/BGR0 but the tensor is RGB/BGR
+void validate_rgb0(const torch::Tensor& t, AVFrame* buffer) {
+  if (buffer->hw_frames_ctx) {
+    TORCH_CHECK(t.device().is_cuda(), "Input tensor has to be on CUDA.");
+  } else {
+    TORCH_CHECK(t.device().is_cpu(), "Input tensor has to be on CPU.");
+  }
+  TORCH_CHECK(
+      t.dtype().toScalarType() == c10::ScalarType::Byte,
+      "Expected Tensor of uint8 type.");
+
+  TORCH_CHECK(t.dim() == 4, "Input Tensor has to be 4D.");
+  TORCH_CHECK(
+      t.size(2) == buffer->height && t.size(3) == buffer->width,
+      "Expected tensor with shape (N, 3, ",
+      buffer->height,
+      ", ",
+      buffer->width,
+      ") (NCHW format). Found ",
+      t.sizes());
+}
+
 // NCHW ->NHWC, ensure contiguous
 torch::Tensor init_interlaced(const torch::Tensor& tensor) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(tensor.dim() == 4);
@@ -145,8 +169,8 @@ void write_interlaced_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3) == num_channels);
 
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  if (!FFMPEG av_frame_is_writable(buffer)) {
-    int ret = FFMPEG av_frame_make_writable(buffer);
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
     TORCH_INTERNAL_ASSERT(
         ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
   }
@@ -187,7 +211,7 @@ void write_planar_video(
     AVFrame* buffer,
     int num_planes) {
   const auto num_colors =
-      FFMPEG av_pix_fmt_desc_get((AVPixelFormat)buffer->format)->nb_components;
+      av_pix_fmt_desc_get((AVPixelFormat)buffer->format)->nb_components;
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.dim() == 4);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(0) == 1);
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(1) == num_colors);
@@ -195,8 +219,8 @@ void write_planar_video(
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(frame.size(3), buffer->width);
 
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00472
-  if (!FFMPEG av_frame_is_writable(buffer)) {
-    int ret = FFMPEG av_frame_make_writable(buffer);
+  if (!av_frame_is_writable(buffer)) {
+    int ret = av_frame_make_writable(buffer);
     TORCH_INTERNAL_ASSERT(
         ret >= 0, "Failed to make frame writable: ", av_err2string(ret));
   }
@@ -276,16 +300,20 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
     auto frames_ctx = (AVHWFramesContext*)(buffer->hw_frames_ctx->data);
     auto sw_pix_fmt = frames_ctx->sw_format;
     switch (sw_pix_fmt) {
-      // Note:
-      // RGB0 / BGR0 expects 4 channel, but neither
-      // av_pix_fmt_desc_get(pix_fmt)->nb_components
-      // or av_pix_fmt_count_planes(pix_fmt) returns 4.
       case AV_PIX_FMT_RGB0:
       case AV_PIX_FMT_BGR0: {
         ConvertFunc convert_func = [](const torch::Tensor& t, AVFrame* f) {
           write_interlaced_video_cuda(t, f, 4);
         };
         InitFunc init_func = [](const torch::Tensor& t, AVFrame* f) {
+          // Special treatment for the case user pass regular RGB/BGR tensor.
+          if (t.dim() == 4 && t.size(1) == 3) {
+            validate_rgb0(t, f);
+            auto tmp =
+                torch::empty({t.size(0), t.size(2), t.size(3), 4}, t.options());
+            tmp.index_put_({"...", Slice(0, 3)}, t.permute({0, 2, 3, 1}));
+            return tmp;
+          }
           validate_video_input(t, f, 4);
           return init_interlaced(t);
         };
@@ -308,7 +336,7 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
         TORCH_CHECK(
             false,
             "Unexpected pixel format for CUDA: ",
-            FFMPEG av_get_pix_fmt_name(sw_pix_fmt));
+            av_get_pix_fmt_name(sw_pix_fmt));
     }
   }
 
@@ -317,13 +345,31 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24: {
-      int channels = FFMPEG av_pix_fmt_desc_get(pix_fmt)->nb_components;
+      int channels = av_pix_fmt_desc_get(pix_fmt)->nb_components;
       InitFunc init_func = [=](const torch::Tensor& t, AVFrame* f) {
         validate_video_input(t, f, channels);
         return init_interlaced(t);
       };
       ConvertFunc convert_func = [=](const torch::Tensor& t, AVFrame* f) {
         write_interlaced_video(t, f, channels);
+      };
+      return {init_func, convert_func};
+    }
+    case AV_PIX_FMT_RGB0:
+    case AV_PIX_FMT_BGR0: {
+      InitFunc init_func = [](const torch::Tensor& t, AVFrame* f) {
+        if (t.dim() == 4 && t.size(1) == 3) {
+          validate_rgb0(t, f);
+          auto tmp =
+              torch::empty({t.size(0), t.size(2), t.size(3), 4}, t.options());
+          tmp.index_put_({"...", Slice(0, 3)}, t.permute({0, 2, 3, 1}));
+          return tmp;
+        }
+        validate_video_input(t, f, 4);
+        return init_interlaced(t);
+      };
+      ConvertFunc convert_func = [](const torch::Tensor& t, AVFrame* f) {
+        write_interlaced_video(t, f, 4);
       };
       return {init_func, convert_func};
     }
@@ -339,9 +385,7 @@ std::pair<InitFunc, ConvertFunc> get_video_func(AVFrame* buffer) {
     }
     default:
       TORCH_CHECK(
-          false,
-          "Unexpected pixel format: ",
-          FFMPEG av_get_pix_fmt_name(pix_fmt));
+          false, "Unexpected pixel format: ", av_get_pix_fmt_name(pix_fmt));
   }
 }
 
@@ -385,9 +429,7 @@ TensorConverter::TensorConverter(AVMediaType type, AVFrame* buf, int buf_size)
       break;
     default:
       TORCH_INTERNAL_ASSERT(
-          false,
-          "Unsupported media type: ",
-          FFMPEG av_get_media_type_string(type));
+          false, "Unsupported media type: ", av_get_media_type_string(type));
   }
 }
 

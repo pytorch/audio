@@ -37,8 +37,10 @@ jobs:
         export PYTHON_VERSION="${{ matrix.python_version }}"
         export CU_VERSION="${{ matrix.cuda_arch_version }}"
         export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
-        export CODEC_HEADER_VERSION=n11.1.5.2
+        export FFMPEG_VERSION=6.0
+        export CODEC_HEADER_VERSION=n12.0.16.0 
         export COMPUTE_CAPABILITY=86
+        export BUILD_VERSION="$( cut -f 1 -d a version.txt )".dev"$(date "+%Y%m%d")"
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
@@ -51,8 +53,22 @@ jobs:
         conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
         conda activate ./ci_env
 
+        # Install PyTorch / TorchAudio first
+        set -ex
+        set +u  # don't know why
+        conda install \
+          --yes \
+          --quiet \
+          -c "pytorch-${CHANNEL}" \
+          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
+          "${CUDATOOLKIT}"
+
+        # Install torchaudio
+        conda install --quiet --yes pkg-config cmake>=3.18.0 ninja
+        pip install --progress-bar off -v -e . --no-use-pep517
+
         # Install FFmpeg-dependencies
-        conda install --quiet -y -c conda-forge yasm x264 gnutls pkg-config lame libopus libvpx openh264 openssl x264
+        conda install --quiet --yes -c conda-forge yasm x264 gnutls pkg-config lame libopus libvpx openh264 openssl x264
 
         # Build FFmpeg with NVIDIA Video Codec SDK
         # TODO cache this
@@ -64,10 +80,10 @@ jobs:
         )
 
         (
-            wget -q https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
-            tar -xf n5.1.3.tar.gz
-            cd ./FFmpeg-n5.1.3
-            export revision=5.1.3
+            wget -q https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz
+            tar -xf n${FFMPEG_VERSION}.tar.gz
+            cd ./FFmpeg-n${FFMPEG_VERSION}
+            export revision=${FFMPEG_VERSION}
             ./configure \
                 --prefix=${CONDA_PREFIX} \
                 --extra-cflags="-I${CONDA_PREFIX}/include" \
@@ -94,27 +110,6 @@ jobs:
             # src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
             # ffmpeg -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i "${src}" -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
         )
-
-        # Install PyTorch
-        set -ex
-        set +u  # don't know why
-        conda install \
-          --yes \
-          --quiet \
-          -c "pytorch-${CHANNEL}" \
-          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
-          "${CUDATOOLKIT}"
-
-        # Install torchaudio
-        # TODO: Enable NVDec/NVEnc
-        conda install --quiet -y 'ffmpeg>=4.1' pkg-config
-        pip --quiet install cmake>=3.18.0 ninja
-        BUILD_VERSION=$( cut -f 1 -d a version.txt )
-        BUILD_VERSION=$BUILD_VERSION.dev$(date "+%Y%m%d")
-        export BUILD_VERSION
-
-
-        FFMPEG_ROOT=${CONDA_PREFIX} USE_FFMPEG=1 USE_CUDA=1 pip install --progress-bar off -v -e . --no-use-pep517
 
         # Install runtime dependencies
         pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text

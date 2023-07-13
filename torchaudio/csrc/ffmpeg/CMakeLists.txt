@@ -1,14 +1,5 @@
-message(STATUS "FFMPEG_ROOT=$ENV{FFMPEG_ROOT}")
-find_package(FFMPEG 4.1 REQUIRED COMPONENTS avdevice avfilter avformat avcodec avutil)
-add_library(ffmpeg INTERFACE)
-target_include_directories(ffmpeg INTERFACE "${FFMPEG_INCLUDE_DIRS}")
-if (NOT DLOPEN_FFMPEG)
-target_link_libraries(ffmpeg INTERFACE "${FFMPEG_LIBRARIES}")
-endif()
-
 set(
   sources
-  stub.cpp
   ffmpeg.cpp
   filter_graph.cpp
   hw_context.cpp
@@ -27,30 +18,77 @@ set(
   compat.cpp
   )
 
+set(
+  ext_sources
+  pybind/pybind.cpp
+  )
+
 if (USE_CUDA)
   set(
     additional_lib
     cuda_deps)
 endif()
 
-if (DLOPEN_FFMPEG)
-  set(compile_definitions DLOPEN_FFMPEG)
-endif()
-
-torchaudio_library(
-  libtorchaudio_ffmpeg
-  "${sources}"
-  ""
-  "torch;ffmpeg;${additional_lib}"
-  "${compile_definitions}"
-  )
-
-if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-  torchaudio_extension(
-    _torchaudio_ffmpeg
-    pybind/pybind.cpp
+if (TARGET ffmpeg)
+  torchaudio_library(
+    libtorchaudio_ffmpeg
+    "${sources}"
     ""
-    "libtorchaudio_ffmpeg"
-    "${compile_definitions}"
+    "torch;ffmpeg;${additional_lib}"
+    ""
     )
-endif ()
+  if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+    torchaudio_extension(
+      _torchaudio_ffmpeg
+      "${ext_sources}"
+      ""
+      "libtorchaudio_ffmpeg"
+      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg"
+      )
+  endif()
+else()
+  torchaudio_library(
+    libtorchaudio_ffmpeg4
+    "${sources}"
+    ""
+    "torch;ffmpeg4;${additional_lib}"
+    ""
+    )
+  torchaudio_library(
+    libtorchaudio_ffmpeg5
+    "${sources}"
+    ""
+    "torch;ffmpeg5;${additional_lib}"
+    ""
+    )
+  torchaudio_library(
+    libtorchaudio_ffmpeg6
+    "${sources}"
+    ""
+    "torch;ffmpeg6;${additional_lib}"
+    ""
+    )
+  if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+    torchaudio_extension(
+      _torchaudio_ffmpeg4
+      "${ext_sources}"
+      ""
+      "libtorchaudio_ffmpeg4"
+      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg4"
+      )
+    torchaudio_extension(
+      _torchaudio_ffmpeg5
+      "${ext_sources}"
+      ""
+      "libtorchaudio_ffmpeg5"
+      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg5"
+      )
+    torchaudio_extension(
+      _torchaudio_ffmpeg6
+      "${ext_sources}"
+      ""
+      "libtorchaudio_ffmpeg6"
+      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg6"
+      )
+  endif ()
+endif()

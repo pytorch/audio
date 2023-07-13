@@ -1463,7 +1463,7 @@ def _apply_sinc_resample_kernel(
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
     resampled = torch.nn.functional.conv1d(waveform[:, None], kernel, stride=orig_freq)
     resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
-    target_length = int(math.ceil(new_freq * length / orig_freq))
+    target_length = torch.ceil(torch.as_tensor(new_freq * length / orig_freq)).long()
     resampled = resampled[..., :target_length]
 
     # unpack batch
@@ -2511,12 +2511,12 @@ def forced_align(
 
     Args:
         log_probs (torch.Tensor): log probability of CTC emission output.
-            Tensor of shape `(T, C)`. where `T` is the input length,
+            Tensor of shape `(B, T, C)`. where `B` is the batch size, `T` is the input length,
             `C` is the number of characters in alphabet including blank.
-        targets (torch.Tensor): Target sequence. Tensor of shape `(L,)`,
+        targets (torch.Tensor): Target sequence. Tensor of shape `(B, L)`,
             where `L` is the target length.
-        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). 0-D Tensor (scalar).
-        target_lengths (torch.Tensor): Lengths of the targets. 0-D Tensor (scalar).
+        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). 1-D Tensor of shape `(B,)`.
+        target_lengths (torch.Tensor): Lengths of the targets. 1-D Tensor of shape `(B,)`.
         blank_id (int, optional): The index of blank symbol in CTC emission. (Default: 0)
 
     Returns:
@@ -2534,6 +2534,9 @@ def forced_align(
 
         where :math:`N_{\text{repeat}}` is the number of consecutively repeated tokens.
         For example, in str `"aabbc"`, the number of repeats are `2`.
+
+    Note:
+        The current version only supports ``batch_size==1``.
     """
     if blank in targets:
         raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")

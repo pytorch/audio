@@ -28,7 +28,6 @@ jobs:
         export PYTHON_VERSION="3.8"
         export CU_VERSION=""
         export CUDATOOLKIT=""
-        export USE_FFMPEG="1"
         export USE_OPENMP="0"
 
         # Set CHANNEL

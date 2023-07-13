@@ -1,10 +1,10 @@
 #include <torchaudio/csrc/ffmpeg/hw_context.h>
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_processor.h>
-#include <torchaudio/csrc/ffmpeg/stub.h>
 #include <stdexcept>
 #include <string_view>
 
 namespace torchaudio::io {
+
 namespace {
 AVCodecContextPtr alloc_codec_context(
     enum AVCodecID codec_id,
@@ -12,24 +12,25 @@ AVCodecContextPtr alloc_codec_context(
   const AVCodec* codec = [&]() {
     if (decoder_name) {
       const AVCodec* c =
-          FFMPEG avcodec_find_decoder_by_name(decoder_name.value().c_str());
+          avcodec_find_decoder_by_name(decoder_name.value().c_str());
       TORCH_CHECK(c, "Unsupported codec: ", decoder_name.value());
       return c;
     } else {
-      const AVCodec* c = FFMPEG avcodec_find_decoder(codec_id);
-      TORCH_CHECK(c, "Unsupported codec: ", FFMPEG avcodec_get_name(codec_id));
+      const AVCodec* c = avcodec_find_decoder(codec_id);
+      TORCH_CHECK(c, "Unsupported codec: ", avcodec_get_name(codec_id));
       return c;
     }
   }();
 
-  AVCodecContext* codec_ctx = FFMPEG avcodec_alloc_context3(codec);
+  AVCodecContext* codec_ctx = avcodec_alloc_context3(codec);
   TORCH_CHECK(codec_ctx, "Failed to allocate CodecContext.");
   return AVCodecContextPtr(codec_ctx);
 }
 
+#ifdef USE_CUDA
 const AVCodecHWConfig* get_cuda_config(const AVCodec* codec) {
   for (int i = 0;; ++i) {
-    const AVCodecHWConfig* config = FFMPEG avcodec_get_hw_config(codec, i);
+    const AVCodecHWConfig* config = avcodec_get_hw_config(codec, i);
     if (!config) {
       break;
     }
@@ -80,9 +81,10 @@ enum AVPixelFormat get_hw_format(
   TORCH_WARN("Failed to get HW surface format.");
   return AV_PIX_FMT_NONE;
 }
+#endif
 
 AVBufferRef* get_hw_frames_ctx(AVCodecContext* codec_ctx) {
-  AVBufferRef* p = FFMPEG av_hwframe_ctx_alloc(codec_ctx->hw_device_ctx);
+  AVBufferRef* p = av_hwframe_ctx_alloc(codec_ctx->hw_device_ctx);
   TORCH_CHECK(
       p,
       "Failed to allocate CUDA frame context from device context at ",
@@ -93,11 +95,11 @@ AVBufferRef* get_hw_frames_ctx(AVCodecContext* codec_ctx) {
   frames_ctx->width = codec_ctx->width;
   frames_ctx->height = codec_ctx->height;
   frames_ctx->initial_pool_size = 5;
-  int ret = FFMPEG av_hwframe_ctx_init(p);
+  int ret = av_hwframe_ctx_init(p);
   if (ret >= 0) {
     return p;
   }
-  FFMPEG av_buffer_unref(&p);
+  av_buffer_unref(&p);
   TORCH_CHECK(
       false, "Failed to initialize CUDA frame context: ", av_err2string(ret));
 }
@@ -106,7 +108,7 @@ void configure_codec_context(
     AVCodecContext* codec_ctx,
     const AVCodecParameters* params,
     const torch::Device& device) {
-  int ret = FFMPEG avcodec_parameters_to_context(codec_ctx, params);
+  int ret = avcodec_parameters_to_context(codec_ctx, params);
   TORCH_CHECK(
       ret >= 0, "Failed to set CodecContext parameter: ", av_err2string(ret));
 
@@ -121,8 +123,7 @@ void configure_codec_context(
     // 2. Set pCodecContext->get_format call back function which
     // will retrieve the HW pixel format from opaque pointer.
     codec_ctx->get_format = get_hw_format;
-    codec_ctx->hw_device_ctx =
-        FFMPEG av_buffer_ref(get_cuda_context(device.index()));
+    codec_ctx->hw_device_ctx = av_buffer_ref(get_cuda_context(device.index()));
     TORCH_INTERNAL_ASSERT(
         codec_ctx->hw_device_ctx, "Failed to reference HW device context.");
 #endif
@@ -135,16 +136,18 @@ void open_codec(
   AVDictionary* opts = get_option_dict(decoder_option);
 
   // Default to single thread execution.
-  if (!FFMPEG av_dict_get(opts, "threads", nullptr, 0)) {
-    FFMPEG av_dict_set(&opts, "threads", "1", 0);
+  if (!av_dict_get(opts, "threads", nullptr, 0)) {
+    av_dict_set(&opts, "threads", "1", 0);
   }
 
+#if LIBAVUTIL_VERSION_MAJOR < 58
   if (!codec_ctx->channel_layout) {
     codec_ctx->channel_layout =
-        FFMPEG av_get_default_channel_layout(codec_ctx->channels);
+        av_get_default_channel_layout(codec_ctx->channels);
   }
+#endif
 
-  int ret = FFMPEG avcodec_open2(codec_ctx, codec_ctx->codec, &opts);
+  int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opts);
   clean_up_dict(opts);
   TORCH_CHECK(
       ret >= 0, "Failed to initialize CodecContext: ", av_err2string(ret));
@@ -259,8 +262,8 @@ void StreamProcessor::remove_stream(KeyType key) {
 
 void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
   TORCH_CHECK(timestamp >= 0, "timestamp must be non-negative.");
-  discard_before_pts = FFMPEG av_rescale_q(
-      timestamp, FFMPEG av_get_time_base_q(), stream_time_base);
+  discard_before_pts =
+      av_rescale_q(timestamp, av_get_time_base_q(), stream_time_base);
 }
 
 void StreamProcessor::set_decoder(
@@ -306,9 +309,9 @@ int StreamProcessor::process_packet(AVPacket* packet) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       is_decoder_set(),
       "Decoder must have been set prior to calling this function.");
-  int ret = FFMPEG avcodec_send_packet(codec_ctx, packet);
+  int ret = avcodec_send_packet(codec_ctx, packet);
   while (ret >= 0) {
-    ret = FFMPEG avcodec_receive_frame(codec_ctx, frame);
+    ret = avcodec_receive_frame(codec_ctx, frame);
     //  AVERROR(EAGAIN) means that new input data is required to return new
     //  output.
     if (ret == AVERROR(EAGAIN))
@@ -333,7 +336,12 @@ int StreamProcessor::process_packet(AVPacket* packet) {
         // This is because they might be intra-frames not in chronological
         // order. In this case, we use received frames as-is in the order they
         // are received.
+
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+        frame->pts = codec_ctx->frame_num + 1;
+#else
         frame->pts = codec_ctx->frame_number + 1;
+#endif
       } else {
         frame->pts = frame->best_effort_timestamp;
       }
@@ -355,7 +363,7 @@ int StreamProcessor::process_packet(AVPacket* packet) {
     }
 
     // else we can just unref the frame and continue
-    FFMPEG av_frame_unref(frame);
+    av_frame_unref(frame);
   }
   return ret;
 }
@@ -364,7 +372,7 @@ void StreamProcessor::flush() {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       is_decoder_set(),
       "Decoder must have been set prior to calling this function.");
-  FFMPEG avcodec_flush_buffers(codec_ctx);
+  avcodec_flush_buffers(codec_ctx);
   for (auto& ite : post_processes) {
     ite.second->flush();
   }

@@ -36,8 +36,7 @@ def _get_build(var, default=False):
 _BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
-_USE_FFMPEG = _get_build("USE_FFMPEG", False)
-_DLOPEN_FFMPEG = _get_build("DLOPEN_FFMPEG", False)
+_USE_FFMPEG = _get_build("USE_FFMPEG", True)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
 _BUILD_ALIGN = _get_build("BUILD_ALIGN", True)
@@ -66,12 +65,25 @@ def get_ext_modules():
             ]
         )
     if _USE_FFMPEG:
-        modules.extend(
-            [
-                Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
-                Extension(name="torchaudio.lib._torchaudio_ffmpeg", sources=[]),
-            ]
-        )
+        if "FFMPEG_ROOT" in os.environ:
+            # single version ffmpeg mode
+            modules.extend(
+                [
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg", sources=[]),
+                ]
+            )
+        else:
+            modules.extend(
+                [
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg4", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg4", sources=[]),
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg5", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg5", sources=[]),
+                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg6", sources=[]),
+                    Extension(name="torchaudio.lib._torchaudio_ffmpeg6", sources=[]),
+                ]
+            )
     return modules
 
 
@@ -125,7 +137,6 @@ class CMakeBuild(build_ext):
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
             f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
-            f"-DDLOPEN_FFMPEG:BOOL={'ON' if _DLOPEN_FFMPEG else 'OFF'}",
         ]
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake

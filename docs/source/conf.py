@@ -223,7 +223,7 @@ html_theme_options = {
     "display_version": True,
     "logo_only": True,
     "navigation_with_keys": True,
-    "analytics_id": "UA-117752657-2",
+    "analytics_id": "GTM-T8XT4PS",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
