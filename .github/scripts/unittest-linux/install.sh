@@ -13,7 +13,9 @@ set -e
 
 case "$(uname -s)" in
     Darwin*)
-        os=MacOSX;;
+        os=MacOSX
+        eval "$($(which conda) shell.bash hook)"
+        ;;
     *)
         os=Linux
         eval "$("/opt/conda/bin/conda" shell.bash hook)"
