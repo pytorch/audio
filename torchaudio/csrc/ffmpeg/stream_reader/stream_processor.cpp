@@ -27,7 +27,6 @@ AVCodecContextPtr alloc_codec_context(
   return AVCodecContextPtr(codec_ctx);
 }
 
-#ifdef USE_CUDA
 const AVCodecHWConfig* get_cuda_config(const AVCodec* codec) {
   for (int i = 0;; ++i) {
     const AVCodecHWConfig* config = avcodec_get_hw_config(codec, i);
@@ -81,7 +80,6 @@ enum AVPixelFormat get_hw_format(
   TORCH_WARN("Failed to get HW surface format.");
   return AV_PIX_FMT_NONE;
 }
-#endif
 
 AVBufferRef* get_hw_frames_ctx(AVCodecContext* codec_ctx) {
   AVBufferRef* p = av_hwframe_ctx_alloc(codec_ctx->hw_device_ctx);
@@ -140,12 +138,10 @@ void open_codec(
     av_dict_set(&opts, "threads", "1", 0);
   }
 
-#if LIBAVUTIL_VERSION_MAJOR < 58
   if (!codec_ctx->channel_layout) {
     codec_ctx->channel_layout =
         av_get_default_channel_layout(codec_ctx->channels);
   }
-#endif
 
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opts);
   clean_up_dict(opts);
@@ -336,12 +332,7 @@ int StreamProcessor::process_packet(AVPacket* packet) {
         // This is because they might be intra-frames not in chronological
         // order. In this case, we use received frames as-is in the order they
         // are received.
-
-#if LIBAVCODEC_VERSION_MAJOR >= 60
-        frame->pts = codec_ctx->frame_num + 1;
-#else
         frame->pts = codec_ctx->frame_number + 1;
-#endif
       } else {
         frame->pts = frame->best_effort_timestamp;
       }
