@@ -13,11 +13,16 @@ set -e
 
 case "$(uname -s)" in
     Darwin*)
-        os=MacOSX;;
+        os=MacOSX
+        eval "$($(which conda) shell.bash hook)"
+        ;;
     *)
         os=Linux
         eval "$("/opt/conda/bin/conda" shell.bash hook)"
 esac
+
+conda create -n ci -y python="${PYTHON_VERSION}"
+conda activate ci
 
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
