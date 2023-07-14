@@ -13,12 +13,12 @@ to perform online speech recognition.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <4.4) and SentencePiece.
+#    This tutorial requires FFmpeg libraries (>=4.1, <7) and SentencePiece.
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install 'ffmpeg<4.4'`` will install
-#    the required FFmpeg libraries.
+#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
+#    compatible FFmpeg libraries.
 #
 #    You can install SentencePiece by running ``pip install sentencepiece``.
 
