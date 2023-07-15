@@ -195,8 +195,26 @@ FilterGraphOutputInfo FilterGraph::get_output_info() const {
       break;
     }
     case AVMEDIA_TYPE_VIDEO: {
-      if (l->format == AV_PIX_FMT_CUDA && l->hw_frames_ctx) {
-        auto frames_ctx = (AVHWFramesContext*)(l->hw_frames_ctx->data);
+      // If this is CUDA, retrieve the software pixel format from HW frames
+      // context.
+      if (l->format == AV_PIX_FMT_CUDA) {
+        // Originally, we were expecting that filter graph would propagate the
+        // HW frames context, so that we can retrieve it from the sink link.
+        // However, this is sometimes not the case.
+        // We do not know what is causing this behavior (GPU? libavfilter?
+        // format?) we resort to the source link in such case.
+        //
+        // (Technically, filters like scale_cuda could change the pixel format.
+        // We expect that hw_frames_ctx is propagated in such cases, but we do
+        // not know.
+        // TODO: check how scale_cuda interferes.
+        auto frames_ctx = [&]() -> AVHWFramesContext* {
+          if (l->hw_frames_ctx) {
+            return (AVHWFramesContext*)(l->hw_frames_ctx->data);
+          }
+          return (AVHWFramesContext*)(buffersrc_ctx->outputs[0]
+                                          ->hw_frames_ctx->data);
+        }();
         ret.format = frames_ctx->sw_format;
       }
       ret.frame_rate = l->frame_rate;
