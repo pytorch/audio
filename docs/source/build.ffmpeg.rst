@@ -25,7 +25,7 @@ To use NVENC/NVDEC with TorchAudio, the following items are required.
 
 TorchAudio’s official binary distributions are compiled to work with FFmpeg 4 libraries, and they contain the logic required for hardware-based decoding/encoding.
 
-In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. If you would like to use FFmpeg 5, then you need to build TorchAudio with it.
+In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. You can use FFmpeg 5 or 6 as well.
 
 The following procedure was tested on Ubuntu.
 
