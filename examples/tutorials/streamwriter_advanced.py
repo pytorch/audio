@@ -23,16 +23,13 @@ play audio and video.
 #
 # .. note::
 #
-#    This tutorial requires torchaudio nightly build and FFmpeg libraries (>=4.1, <4.4).
-#
-#    To install torchaudio nightly build, please refer to
-#    https://pytorch.org/get-started/locally/ .
-#
+#    This tutorial requires FFmpeg libraries (>=4.1, <7).
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install 'ffmpeg<4.4'`` will install the required FFmpeg libraries,
-#    however, this distribution does not have SDL plugin, so it cannot play
+#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
+#    compatible FFmpeg libraries.
+#    However, this distribution does not have SDL plugin, so it cannot play
 #    video.
 #
 
