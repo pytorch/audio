@@ -102,6 +102,9 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 
 ######################################################################
+#
+# .. _lavfi:
+#
 # Synthetic source streams
 # ------------------------
 #

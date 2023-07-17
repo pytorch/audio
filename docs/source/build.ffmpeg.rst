@@ -9,7 +9,7 @@ Using NVIDIA's GPU decoder and encoder, it is also possible to pass around CUDA 
 
 This improves the video throughput significantly. However, please note that not all the video formats are supported by hardware acceleration.
 
-This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see `Hardware-Accelerated Video Decoding and Encoding <./hw_acceleration_tutorial.html>`_
+This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see :ref:`NVDEC tutoial <nvdec_tutorial>` and :ref:`NVENC tutorial <nvenc_tutorial>`.
 
 Overview
 --------
@@ -465,9 +465,9 @@ It is often the case where there are multiple FFmpeg installations in the system
    ['h264_nvenc', 'nvenc', 'nvenc_h264', 'nvenc_hevc', 'hevc_nvenc']
 
 
-Using the hardware decoder
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the hardware decoder and encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.
 
-For the detail on the performance of GPU decoder please see :ref:`NVDEC tutoial <nvdec_tutorial>`.
+For the detail on the performance of GPU decoder and encoder please see :ref:`NVDEC tutoial <nvdec_tutorial>` and :ref:`NVENC tutorial <nvenc_tutorial>`.

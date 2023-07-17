@@ -674,6 +674,11 @@ plot([xga_cuda, xga_cpu, xga_cuda_resize, xga_cpu_resize2, xga_cpu_resize1], "xg
 # In the following, we perform the same benchmark using videos with
 # smaller resolutionm VGA (640x480) and QVGA (320x240).
 #
+# For smaller resolutions like QVGA, HW decoding is mostly slower than
+# software decoding. For VGA, the result depends on the type of GPU.
+# When running the same code of V100, HW decoding is slower than CPU,
+# but with A10G, HW decoding is faster than software decoding.
+#
 
 src = torchaudio.utils.download_asset("tutorial-assets/testsrc2_vga.h264.mp4")
 
@@ -745,3 +750,7 @@ plot([vga_cuda, vga_cpu, vga_cuda_resize, vga_cpu_resize2, vga_cpu_resize1], "vg
 #
 
 plot([qvga_cuda, qvga_cpu, qvga_cuda_resize, qvga_cpu_resize2, qvga_cpu_resize1], "qvga (320x240)")
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`
