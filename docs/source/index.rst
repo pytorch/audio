@@ -45,6 +45,7 @@ model implementations and application components.
    tutorials/streamwriter_basic_tutorial
    tutorials/streamwriter_advanced
    hw_acceleration_tutorial
+   tutorials/nvdec_tutorial
 
    tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
@@ -193,6 +194,13 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamwriter_advanced.gif
    :link: tutorials/streamwriter_advanced.html
    :tags: I/O,StreamWriter
+
+.. customcarditem::
+   :header: Hardware accelerated video decoding with NVDEC
+   :card_description: Learn how to use HW video decoder.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
+   :link: tutorials/nvdec_tutorial.html
+   :tags: I/O,StreamReader
 
 .. customcarditem::
    :header: Hardware accelerated video I/O with NVDEC/NVENC
