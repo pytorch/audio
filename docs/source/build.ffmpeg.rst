@@ -1,3 +1,5 @@
+.. _enabling_hw_decoder:
+
 Enabling GPU video decoder/encoder
 ==================================
 
@@ -379,7 +381,7 @@ The following command fetches video from remote server, decode with NVDEC (cuvid
         -b:v 5M test.mp4
 
 Note that there is ``Stream #0:0 -> #0:0 (h264 (h264_cuvid) -> h264 (h264_nvenc))``, which means that video is decoded with ``h264_cuvid`` decoder and ``h264_nvenc`` encoder.
-         
+
 .. code-block::
 
    Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4':
@@ -468,28 +470,4 @@ Using the hardware decoder
 
 Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.
 
-For the detail on the performance of GPU decoder and encoder please see `Hardware-Accelerated Video Decoding and Encoding <./hw_acceleration_tutorial.html>`_
-
-
-.. code-block:: python
-
-   from torchaudio.io import StreamReader
-
-   src = "https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
-
-   s = StreamReader(src)
-   s.add_video_stream(
-       5,
-       decoder="h264_cuvid",
-       hw_accel="cuda:0",
-       decoder_option={
-           "resize": "360x240",
-       },
-   )
-   s.fill_buffer()
-   chunk, = s.pop_chunks()
-   print(' - Chunk:', chunk.shape, chunk.device, chunk.dtype)
-
-.. code-block:: text
-
-   - Chunk: torch.Size([5, 3, 240, 360]) cuda:0 torch.uint8
+For the detail on the performance of GPU decoder please see :ref:`NVDEC tutoial <nvdec_tutorial>`.
