@@ -237,6 +237,7 @@ def test_encodes(height, width, duration):
         "encoder_format": "yuv444p",
         "encoder_option": {"gpu": "0"}, 
     }
+    data = data.to(torch.device("cuda:0"))
 
     fps_cuda, size_cuda = test_encode(
         data,
