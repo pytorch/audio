@@ -193,153 +193,88 @@ def test_encode(data, encoder, width, height, hw_accel=None, **config):
         f" ({fps:7.2f} fps) Encoded data size: {size} bytes")
     return fps, size
 
+######################################################################
+#
+
+def test_encodes(height, width, duration):
+    pict_config = {
+        "height": height,
+        "width": width,
+        "frame_rate": 30000/1001,
+        "format": "yuv444p",
+    }
+
+    data = get_data(**pict_config, duration=duration)
+
+    sw_encoder_config = {
+        "encoder": "libx264",
+        "encoder_format": "yuv444p",
+    }
+
+    fps_cpu1, size_cpu = test_encode(
+        data,
+        encoder_option={"threads": "1"},
+        **pict_config,
+        **sw_encoder_config,
+    )
+
+    fps_cpu4, _ = test_encode(
+        data,
+        encoder_option={"threads": "4"},
+        **pict_config,
+        **sw_encoder_config,
+    )
+
+    fps_cpu8, _ = test_encode(
+        data,
+        encoder_option={"threads": "8"},
+        **pict_config,
+        **sw_encoder_config,
+    )
+
+    encoder_config = {
+        "encoder": "h264_nvenc",
+        "encoder_format": "yuv444p",
+        "encoder_option": {"gpu": "0"}, 
+    }
+
+    fps_cuda, size_cuda = test_encode(
+        data,
+        **pict_config,
+        **encoder_config,
+    )    
+
+    fps_cuda_accel, _ = test_encode(
+        data,
+        **pict_config,
+        **encoder_config,
+        hw_accel="cuda:0",
+    )
+    fps = [fps_cpu_1, fps_cpu_4, fps_cpu_8, fps_cuda, fps_cuda_accel]
+    sizes = [size_cpu, size_cuda]
+    return fps, sizes
+
 
 ######################################################################
 # 360P
 # ----
 #
 
-pict_config = {
-    "height": 360,
-    "width": 640,
-    "frame_rate": 30000/1001,
-    "format": "yuv444p",
-}
-
-data = get_data(**pict_config, duration=30)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "libx264",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"threads": "4"},
-}
-
-fps_360_cpu, size_360_cpu = test_encode(data, **pict_config, **encoder_config)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "h264_nvenc",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"gpu": "0"}, 
-}
-
-fps_360_cuda, size_360_cuda = test_encode(data, **pict_config, **encoder_config)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "h264_nvenc",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"gpu": "0"},
-    "hw_accel": "cuda:0"
-}
-
-fps_360_cuda_hw, _ = test_encode(data.to(cuda), **pict_config, **encoder_config)
+test_encodes(360, 640, 30)
 
 ######################################################################
 # 720P
 # ----
 #
 
-pict_config = {
-    "height": 720,
-    "width": 1280,
-    "frame_rate": 30000/1001,
-    "format": "yuv444p",
-}
-
-data = get_data(**pict_config, duration=10)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "libx264",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"threads": "4"},
-}
-
-fps_720_cpu, size_720_cpu = test_encode(data, **pict_config, **encoder_config)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "h264_nvenc",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"gpu": "0"}, 
-}
-
-fps_720_cuda, size_720_cuda = test_encode(data, **pict_config, **encoder_config)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "h264_nvenc",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"gpu": "0"},
-    "hw_accel": "cuda:0"
-}
-
-fps_720_cuda_hw, _ = test_encode(data.to(cuda), **pict_config, **encoder_config)
+test_encodes(720, 1280, 10)
 
 ######################################################################
 # 1080P
 # ----
 #
 
-pict_config = {
-    "height": 1080,
-    "width": 1920,
-    "frame_rate": 30000/1001,
-    "format": "yuv444p",
-}
-
-data = get_data(**pict_config, duration=5)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "libx264",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"threads": "4"},
-}
-
-fps_1080_cpu, size_1080_cpu = test_encode(data, **pict_config, **encoder_config)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "h264_nvenc",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"gpu": "0"}, 
-}
-
-fps_1080_cuda, size_1080_cuda = test_encode(data, **pict_config, **encoder_config)
-
-######################################################################
-#
-
-encoder_config = {
-    "encoder": "h264_nvenc",
-    "encoder_format": "yuv444p",
-    "encoder_option": {"gpu": "0"},
-    "hw_accel": "cuda:0"
-}
-
-fps_1080_cuda_hw, _ = test_encode(data.to(cuda), **pict_config, **encoder_config)
-
-######################################################################
-#
+test_encodes(1080, 1920, 5)
 
 ######################################################################
 #
