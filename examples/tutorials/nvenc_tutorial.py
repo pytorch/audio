@@ -250,7 +250,7 @@ def test_encodes(height, width, duration):
         **encoder_config,
         hw_accel="cuda:0",
     )
-    fps = [fps_cpu_1, fps_cpu_4, fps_cpu_8, fps_cuda, fps_cuda_accel]
+    fps = [fps_cpu1, fps_cpu4, fps_cpu8, fps_cuda, fps_cuda_accel]
     sizes = [size_cpu, size_cuda]
     return fps, sizes
 
