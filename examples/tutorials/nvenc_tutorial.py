@@ -249,21 +249,57 @@ def run_tests(height, width, duration=15):
 # ----
 #
 
-run_tests(360, 640)
+time_360, size_360 = run_tests(360, 640)
 
 ######################################################################
 # 720P
 # ----
 #
 
-run_tests(720, 1280)
+time_720, size_720 = run_tests(720, 1280)
 
 ######################################################################
 # 1080P
 # ----
 #
 
-run_tests(1080, 1920)
+time_1080, size_1080 = run_tests(1080, 1920)
+
+######################################################################
+#
+
+def plot():
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=[9.6, 7.2])
+
+    for items in zip(time_360, time_720, time_1080, 'ov^+x'):
+        axes[0].plot(items[:-1], marker=items[-1])
+    axes[0].grid(axis="both")
+    axes[0].set_xticks([0, 1, 2], ["360p", "720p", "1080p"], visible=True)
+    axes[0].tick_params(labeltop=False)
+    axes[0].legend([
+        "Software Encoding (threads=1)",
+        "Software Encoding (threads=4)",
+        "Software Encoding (threads=8)",
+        "Hardware Encoding (CPU Tensor)",
+        "Hardware Encoding (CUDA Tensor)",
+    ])
+    axes[0].set_title("Time to encode videos with different resolutions")
+    axes[0].set_ylabel("Time [s]")
+
+    size_cpu, size_cuda = list(zip(size_360, size_720, size_1080))
+    axes[1].bar([-0.15, 0.85, 1.85], size_cpu, 0.3, label='Software encoding', edgecolor='black', facecolor='white', hatch='..')
+    axes[1].bar([0.15, 1.15, 2.15], size_cuda, 0.3, label='HW encoding', edgecolor='black', facecolor='white', hatch='oo')
+    axes[1].grid(axis="both")
+    axes[1].set_axisbelow(True)
+    axes[1].set_xticks([0, 1, 2], ["360p", "720p", "1080p"])
+    axes[1].set_ylabel("The encoded size [bytes]")
+    axes[1].set_title("The size of encoded videos")
+    axes[1].legend()
+
+    plt.tight_layout()
+    return fig
+
+plot()
 
 ######################################################################
 #
