@@ -552,6 +552,7 @@ def plot():
         "Software Decoding (threads=1)",
         "Software Decoding (threads=4)",
         "Software Decoding (threads=8)",
+        "Software Decoding (threads=16)",
         "Hardware Decoding (CUDA Tensor)",
     ])
     ax.set_title("Speed of processing video frames")
