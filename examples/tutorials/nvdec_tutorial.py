@@ -505,7 +505,7 @@ def test_decode_cuda(src, decoder, hw_accel="cuda", frames_per_chunk=5):
 def run_decode_tests(src, frames_per_chunk=5):
     fps = []
     print(f"Testing: {os.path.basename(src)}")
-    for threads in [1, 4, 8]:
+    for threads in [1, 4, 8, 16]:
         print(f"* Software decoding (num_threads={threads})")
         fps.append(test_decode_cpu(src, threads))
     print("* Hardware decoding")
@@ -544,7 +544,7 @@ fps_xga = run_decode_tests(src_xga)
 def plot():
     fig, ax = plt.subplots(figsize=[9.6, 6.4])
 
-    for items in zip(fps_qvga, fps_vga, fps_xga, 'ov^x'):
+    for items in zip(fps_qvga, fps_vga, fps_xga, 'ov^sx'):
         ax.plot(items[:-1], marker=items[-1])
     ax.grid(axis="both")
     ax.set_xticks([0, 1, 2], ["QVGA (320x240)", "VGA (640x480)", "XGA (1024x768)"])
@@ -565,19 +565,19 @@ plot()
 #
 # We observe couple of things
 #
-# - Hardware decoding is slower than software decoding when the
-#   resolution of the video is low.
-# - Hardware decoding is faster than software decoding when the
-#   resolution of the video is high.
+# - At lower resolutions like QVGA, hardware decoding is slower than
+#   software decoding
+# - At higher resolutions like XGA, hardware decoding is faster
+#   than software decoding.
 #
-
-'''
-######################################################################
-# The following is the time it takes to decode video chunk-by-chunk
-# using HW decoder.
+# The performance gain from using hardware decoder depends on the
+# resolution of video.
 #
-
-xga_cuda = test_decode_cuda(src, decoder="h264_cuvid", hw_accel="cuda")
+# It is worth noting that the performance gain also depends on the
+# type of GPU.
+# We observed that decoding VGA video using V100 GPU is slower than
+# software decoding, but it is faster on A10 GPU.
+# 
 
 ######################################################################
 # Decode and resize
