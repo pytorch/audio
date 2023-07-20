@@ -88,7 +88,7 @@ print(torch.cuda.get_device_properties(0))
 # :ref:`StreamReader Advanced Usage <lavfi>`.
 
 
-def get_data(height, width, format="yuv444p", frame_rate=30000 / 1001, duration=3):
+def get_data(height, width, format="yuv444p", frame_rate=30000 / 1001, duration=4):
     src = f"testsrc2=rate={frame_rate}:size={width}x{height}:duration={duration}"
     s = StreamReader(src=src, format="lavfi")
     s.add_basic_video_stream(-1, format=format)
@@ -147,32 +147,12 @@ video_cuda = buffer.read()
 Video(video_cuda, embed=True, mimetype="video/mp4")
 
 ######################################################################
-# .. note::
-#
-#    It is known that GPU encoders generate bigger files than
-#    software encoders.
-#
-
-buffer = io.BytesIO()
-w = StreamWriter(buffer, format="mp4")
-w.add_video_stream(**pict_config, encoder="libx264", encoder_format="yuv444p")
-with w.open():
-    w.write_video_chunk(0, frame_data)
-buffer.seek(0)
-video_cpu = buffer.read()
-
-######################################################################
-#
-
-print("The size of the video encoded with software encoder: ", len(video_cpu))
-print("The size of the video encoded with hardware encoder: ", len(video_cuda))
-
-
-######################################################################
 # Benchmark NVENC with StreamWriter
 # ---------------------------------
 #
-
+# The following function encode the given frames and measure the time
+# it takes to encode and the size of the resulting video data.
+#
 
 def test_encode(data, encoder, width, height, hw_accel=None, **config):
     buffer = io.BytesIO()
@@ -184,14 +164,21 @@ def test_encode(data, encoder, width, height, hw_accel=None, **config):
         s.write_video_chunk(0, data)
         elapsed = time.monotonic() - t0
     size = buffer.tell()
-    print(f" - Processed {len(data)} frames in {elapsed:.2f} seconds.")
+    buffer.seek(0)
+    fps = len(data) / elapsed
+    print(f" - Processed {len(data)} frames in {elapsed:.2f} seconds. ({fps:.2f} fps)")
     print(f" - Encoded data size: {size} bytes")
-    return elapsed, size
+    return elapsed, size, buffer.read()
 
 ######################################################################
 #
+# We conduct the tests for the following configurations
+#
+# - Software encoder with the number of threads 1, 4, 8
+# - Hardware encoder with and without ``hw_accel`` option.
+#
 
-def run_tests(height, width, duration=15):
+def run_tests(height, width, duration=4):
     print(f"Testing resolution: {width}x{height}")
     pict_config = {
         "height": height,
@@ -210,7 +197,7 @@ def run_tests(height, width, duration=15):
     times = []
     for num_threads in [1, 4, 8]:
         print(f"* Software Encoder (num_threads={num_threads})")
-        time_cpu, size_cpu = test_encode(
+        time_cpu, size_cpu, _ = test_encode(
             data,
             encoder_option={"threads": str(num_threads)},
             **pict_config,
@@ -225,7 +212,7 @@ def run_tests(height, width, duration=15):
         "encoder_option": {"gpu": "0"}, 
     }
 
-    time_cuda, size_cuda = test_encode(
+    time_cuda, size_cuda, video_cuda = test_encode(
         data,
         **pict_config,
         **encoder_config,
@@ -233,7 +220,7 @@ def run_tests(height, width, duration=15):
     times.append(time_cuda)
 
     print(f"* Hardware Encoder (CUDA frames)")
-    time_cuda_accel, _ = test_encode(
+    time_cuda_accel, _, _ = test_encode(
         data.to(torch.device("cuda:0")),
         **pict_config,
         **encoder_config,
@@ -241,37 +228,43 @@ def run_tests(height, width, duration=15):
     )
     times.append(time_cuda_accel)
     sizes = [size_cpu, size_cuda]
-    return times, sizes
+    return times, sizes, video_cuda
 
 
 ######################################################################
+#
+# And we change the resolution of videos to see how these measurement
+# change.
+#
 # 360P
 # ----
 #
 
-time_360, size_360 = run_tests(360, 640)
+time_360, size_360, sample_360 = run_tests(360, 640)
 
 ######################################################################
 # 720P
 # ----
 #
 
-time_720, size_720 = run_tests(720, 1280)
+time_720, size_720, sample_720 = run_tests(720, 1280)
 
 ######################################################################
 # 1080P
-# ----
+# -----
 #
 
-time_1080, size_1080 = run_tests(1080, 1920)
+time_1080, size_1080, sample_1080 = run_tests(1080, 1920)
 
 ######################################################################
+#
+# Now we plot the result.
 #
 
 def plot():
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=[9.6, 7.2])
 
-    for items in zip(time_360, time_720, time_1080, 'ov^+x'):
+    for items in zip(time_360, time_720, time_1080, 'ov^X+'):
         axes[0].plot(items[:-1], marker=items[-1])
     axes[0].grid(axis="both")
     axes[0].set_xticks([0, 1, 2], ["360p", "720p", "1080p"], visible=True)
@@ -288,7 +281,7 @@ def plot():
 
     size_cpu, size_cuda = list(zip(size_360, size_720, size_1080))
     axes[1].bar([-0.15, 0.85, 1.85], size_cpu, 0.3, label='Software encoding', edgecolor='black', facecolor='white', hatch='..')
-    axes[1].bar([0.15, 1.15, 2.15], size_cuda, 0.3, label='HW encoding', edgecolor='black', facecolor='white', hatch='oo')
+    axes[1].bar([0.15, 1.15, 2.15], size_cuda, 0.3, label='Hardware encoding', edgecolor='black', facecolor='white', hatch='oo')
     axes[1].grid(axis="both")
     axes[1].set_axisbelow(True)
     axes[1].set_xticks([0, 1, 2], ["360p", "720p", "1080p"])
@@ -300,6 +293,38 @@ def plot():
     return fig
 
 plot()
+
+######################################################################
+#
+# We can see that the time it takes to encode video grows as the
+# resolution gets bigger.
+#
+# In the case of software encoding, increasing the number of threads
+# helps reduce the decoding time.
+#
+# Hardware encoding is faster than software encoding in general.
+# Using ``hw_accel`` does not improve the speed of encoding itself
+# as much, but if the data are generated by model in CUDA.
+#
+# The time it takes to move data from CUDA to CPU tensor might add
+# up, so it is recommended to test your use case.
+#
+# The relationship between the resollution of video and the size of
+# encoded video file and is a bit tricky to interpret.
+#
+# In general, it is said that the harware encoder produces larger
+# video size. We can see that's the case for 360P.
+#
+
+Video(sample_360, embed=True, mimetype="video/mp4")
+
+######################################################################
+#
+Video(sample_720, embed=True, mimetype="video/mp4")
+
+######################################################################
+#
+Video(sample_1080, embed=True, mimetype="video/mp4")
 
 ######################################################################
 #
