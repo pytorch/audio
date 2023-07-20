@@ -173,8 +173,6 @@ print("The size of the video encoded with hardware encoder: ", len(video_cuda))
 # ---------------------------------
 #
 
-cuda = torch.device("cuda:0")
-
 
 def test_encode(data, encoder, width, height, hw_accel=None, **config):
     buffer = io.BytesIO()
@@ -185,18 +183,16 @@ def test_encode(data, encoder, width, height, hw_accel=None, **config):
         t0 = time.monotonic()
         s.write_video_chunk(0, data)
         elapsed = time.monotonic() - t0
-    fps = len(data) / elapsed
     size = buffer.tell()
-    print(f"Test: {encoder}{'' if hw_accel is None else ' (CUDA frames)'}")
-    print(
-        f" - Processed {len(data)} frames ({width}x{height}) in {elapsed:.2f} seconds."
-        f" ({fps:7.2f} fps) Encoded data size: {size} bytes")
-    return fps, size
+    print(f" - Processed {len(data)} frames in {elapsed:.2f} seconds.")
+    print(f" - Encoded data size: {size} bytes")
+    return elapsed, size
 
 ######################################################################
 #
 
-def test_encodes(height, width, duration):
+def run_tests(height, width, duration=15):
+    print(f"Testing resolution: {width}x{height}")
     pict_config = {
         "height": height,
         "width": width,
@@ -211,48 +207,41 @@ def test_encodes(height, width, duration):
         "encoder_format": "yuv444p",
     }
 
-    fps_cpu1, size_cpu = test_encode(
-        data,
-        encoder_option={"threads": "1"},
-        **pict_config,
-        **sw_encoder_config,
-    )
+    times = []
+    for num_threads in [1, 4, 8]:
+        print(f"* Software Encoder (num_threads={num_threads})")
+        time_cpu, size_cpu = test_encode(
+            data,
+            encoder_option={"threads": str(num_threads)},
+            **pict_config,
+            **sw_encoder_config,
+        )
+        times.append(time_cpu)
 
-    fps_cpu4, _ = test_encode(
-        data,
-        encoder_option={"threads": "4"},
-        **pict_config,
-        **sw_encoder_config,
-    )
-
-    fps_cpu8, _ = test_encode(
-        data,
-        encoder_option={"threads": "8"},
-        **pict_config,
-        **sw_encoder_config,
-    )
-
+    print(f"* Hardware Encoder")
     encoder_config = {
         "encoder": "h264_nvenc",
         "encoder_format": "yuv444p",
         "encoder_option": {"gpu": "0"}, 
     }
 
-    fps_cuda, size_cuda = test_encode(
+    time_cuda, size_cuda = test_encode(
         data,
         **pict_config,
         **encoder_config,
-    )    
+    )
+    times.append(time_cuda)
 
-    fps_cuda_accel, _ = test_encode(
+    print(f"* Hardware Encoder (CUDA frames)")
+    time_cuda_accel, _ = test_encode(
         data.to(torch.device("cuda:0")),
         **pict_config,
         **encoder_config,
         hw_accel="cuda:0",
     )
-    fps = [fps_cpu1, fps_cpu4, fps_cpu8, fps_cuda, fps_cuda_accel]
+    times.append(time_cuda_accel)
     sizes = [size_cpu, size_cuda]
-    return fps, sizes
+    return times, sizes
 
 
 ######################################################################
@@ -260,21 +249,21 @@ def test_encodes(height, width, duration):
 # ----
 #
 
-test_encodes(360, 640, 30)
+run_tests(360, 640)
 
 ######################################################################
 # 720P
 # ----
 #
 
-test_encodes(720, 1280, 10)
+run_tests(720, 1280)
 
 ######################################################################
 # 1080P
 # ----
 #
 
-test_encodes(1080, 1920, 5)
+run_tests(1080, 1920)
 
 ######################################################################
 #
