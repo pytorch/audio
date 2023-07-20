@@ -312,19 +312,15 @@ plot()
 # The relationship between the resollution of video and the size of
 # encoded video file and is a bit tricky to interpret.
 #
-# In general, it is said that the harware encoder produces larger
-# video size. We can see that's the case for 360P.
+# Hardware encoder are said to produce larger video size.
+# We can see that's the case for 360P. However, this is
+# not applicable to 720P and 1080P.
 #
+# Software encoders are more configurable, and said to produce more
+# optimized results. On the other hand, hardware encoders are designed
+# for processing speed.
 
-Video(sample_360, embed=True, mimetype="video/mp4")
-
-######################################################################
-#
-Video(sample_720, embed=True, mimetype="video/mp4")
-
-######################################################################
-#
-Video(sample_1080, embed=True, mimetype="video/mp4")
+Video(sample_1080, embed=True, width=540, mimetype="video/mp4")
 
 ######################################################################
 #
