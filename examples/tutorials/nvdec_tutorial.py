@@ -30,7 +30,7 @@ print(torchaudio.__version__)
 
 ######################################################################
 #
-
+import os
 import time
 
 import matplotlib
@@ -441,30 +441,34 @@ plot()
 # decoding and HW video decoding.
 #
 
-
-src = torchaudio.utils.download_asset("tutorial-assets/testsrc2_xga.h264.mp4")
-
 ######################################################################
 # Decode as CUDA frames
 # ---------------------
 #
-# First, we compare the time it takes to decode video.
+# First, we compare the time it takes for software decoder and
+# hardware encoder to decode the same video.
 #
-# Because HW decoder currently only supports reading videos as
-# YUV444P format, we decode frames into YUV444P format for the case of
-# software decoder as well.
+# To make the result comparable, when using software decoder, we move
+# the resulting tensor to CUDA.
 #
-# Also, so as to make it more comparable, for software decoding,
-# after frames are decoder, we move the tensor to CUDA.
+# - Use hardware decoder and place data on CUDA directly
+# - Use software decoder, generate CPU Tensors and move them to CUDA.
+#
+# .. note:
+#
+#    Because HW decoder currently only supports reading videos as
+#    YUV444P format, we decode frames into YUV444P format for the case of
+#    software decoder as well.
+#
 #
 
 
-def test_decode_cpu(src, device):
-    print("Test software decoding")
+def test_decode_cpu(src, threads, decoder=None, frames_per_chunk=5):
     s = StreamReader(src)
-    s.add_video_stream(5)
+    s.add_video_stream(frames_per_chunk, decoder=decoder, decoder_option={"threads": f"{threads}"})
 
     num_frames = 0
+    device = torch.device("cuda")
     t0 = time.monotonic()
     for i, (chunk,) in enumerate(s.stream()):
         if i == 0:
@@ -473,36 +477,101 @@ def test_decode_cpu(src, device):
         chunk = chunk.to(device)
     elapsed = time.monotonic() - t0
     fps = num_frames / elapsed
-    print(f" - Processed {num_frames} frames in {elapsed} seconds. ({fps} fps)")
+    print(f" - Processed {num_frames} frames in {elapsed:.2f} seconds. ({fps:.2f} fps)")
     return fps
 
 
 ######################################################################
 #
-def test_decode_cuda(src, decoder, hw_accel):
-    print("Test NVDEC")
+def test_decode_cuda(src, decoder, hw_accel="cuda", frames_per_chunk=5):
     s = StreamReader(src)
-    s.add_video_stream(5, decoder=decoder, hw_accel=hw_accel)
+    s.add_video_stream(frames_per_chunk, decoder=decoder, hw_accel=hw_accel)
 
     num_frames = 0
+    chunk = None
     t0 = time.monotonic()
-    for i, (chunk,) in enumerate(s.stream()):
-        if i == 0:
-            print(f" - Shape: {chunk.shape}")
+    for chunk in s.stream():
         num_frames += chunk.shape[0]
     elapsed = time.monotonic() - t0
+    print(f" - Shape: {chunk.shape}")
     fps = num_frames / elapsed
-    print(f" - Processed {num_frames} frames in {elapsed} seconds. ({fps} fps)")
+    print(f" - Processed {num_frames} frames in {elapsed:.2f} seconds. ({fps:.2f} fps)")
     return fps
 
 
 ######################################################################
-# The following is the time it takes to decode video chunk-by-chunk and
-# move each chunk to CUDA device.
 #
 
-xga_cpu = test_decode_cpu(src, device=torch.device("cuda"))
+def run_decode_tests(src, frames_per_chunk=5):
+    fps = []
+    print(f"Testing: {os.path.basename(src)}")
+    for threads in [1, 4, 8]:
+        print(f"* Software decoding (num_threads={threads})")
+        fps.append(test_decode_cpu(src, threads))
+    print("* Hardware decoding")
+    fps.append(test_decode_cuda(src, decoder="h264_cuvid"))
+    return fps
 
+
+######################################################################
+# Now we run the tests with videos of different resolutions.
+#
+# QVGA
+# ~~~~
+
+src_qvga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_qvga.h264.mp4")
+fps_qvga = run_decode_tests(src_qvga)
+
+######################################################################
+# VGA
+# ~~~
+
+src_vga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_vga.h264.mp4")
+fps_vga = run_decode_tests(src_vga)
+
+######################################################################
+# XGA
+# ~~~
+
+src_xga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_xga.h264.mp4")
+fps_xga = run_decode_tests(src_xga)
+
+
+######################################################################
+#
+# Now we plot the result.
+
+def plot():
+    fig, ax = plt.subplots(figsize=[9.6, 6.4])
+
+    for items in zip(fps_qvga, fps_vga, fps_xga, 'ov^x'):
+        ax.plot(items[:-1], marker=items[-1])
+    ax.grid(axis="both")
+    ax.set_xticks([0, 1, 2], ["QVGA (320x240)", "VGA (640x480)", "XGA (1024x768)"])
+    ax.legend([
+        "Software Decoding (threads=1)",
+        "Software Decoding (threads=4)",
+        "Software Decoding (threads=8)",
+        "Hardware Decoding (CUDA Tensor)",
+    ])
+    ax.set_title("Speed of processing video frames")
+    ax.set_ylabel("Frames per second")
+    plt.tight_layout()
+
+
+plot()
+
+######################################################################
+#
+# We observe couple of things
+#
+# - Hardware decoding is slower than software decoding when the
+#   resolution of the video is low.
+# - Hardware decoding is faster than software decoding when the
+#   resolution of the video is high.
+#
+
+'''
 ######################################################################
 # The following is the time it takes to decode video chunk-by-chunk
 # using HW decoder.
@@ -750,6 +819,7 @@ plot([vga_cuda, vga_cpu, vga_cuda_resize, vga_cpu_resize2, vga_cpu_resize1], "vg
 #
 
 plot([qvga_cuda, qvga_cpu, qvga_cuda_resize, qvga_cpu_resize2, qvga_cpu_resize1], "qvga (320x240)")
+'''
 
 ######################################################################
 #
