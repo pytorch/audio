@@ -447,9 +447,10 @@ plot()
 #
 # First, we compare the time it takes for software decoder and
 # hardware encoder to decode the same video.
-#
 # To make the result comparable, when using software decoder, we move
 # the resulting tensor to CUDA.
+#
+# The procedures to test look like the following
 #
 # - Use hardware decoder and place data on CUDA directly
 # - Use software decoder, generate CPU Tensors and move them to CUDA.
@@ -460,8 +461,29 @@ plot()
 #    YUV444P format, we decode frames into YUV444P format for the case of
 #    software decoder as well.
 #
-#
 
+
+######################################################################
+# The following function implements the software decoder test case.
+
+def test_decode_cuda(src, decoder, hw_accel="cuda", frames_per_chunk=5):
+    s = StreamReader(src)
+    s.add_video_stream(frames_per_chunk, decoder=decoder, hw_accel=hw_accel)
+
+    num_frames = 0
+    chunk = None
+    t0 = time.monotonic()
+    for chunk, in s.stream():
+        num_frames += chunk.shape[0]
+    elapsed = time.monotonic() - t0
+    print(f" - Shape: {chunk.shape}")
+    fps = num_frames / elapsed
+    print(f" - Processed {num_frames} frames in {elapsed:.2f} seconds. ({fps:.2f} fps)")
+    return fps
+
+
+######################################################################
+# The following function implements the hardware decoder test case.
 
 def test_decode_cpu(src, threads, decoder=None, frames_per_chunk=5):
     s = StreamReader(src)
@@ -482,25 +504,8 @@ def test_decode_cpu(src, threads, decoder=None, frames_per_chunk=5):
 
 
 ######################################################################
-#
-def test_decode_cuda(src, decoder, hw_accel="cuda", frames_per_chunk=5):
-    s = StreamReader(src)
-    s.add_video_stream(frames_per_chunk, decoder=decoder, hw_accel=hw_accel)
-
-    num_frames = 0
-    chunk = None
-    t0 = time.monotonic()
-    for chunk, in s.stream():
-        num_frames += chunk.shape[0]
-    elapsed = time.monotonic() - t0
-    print(f" - Shape: {chunk.shape}")
-    fps = num_frames / elapsed
-    print(f" - Processed {num_frames} frames in {elapsed:.2f} seconds. ({fps:.2f} fps)")
-    return fps
-
-
-######################################################################
-#
+# For each resolution of video, we run multiple software decoder test
+# cases with different number of threads.
 
 def run_decode_tests(src, frames_per_chunk=5):
     fps = []
@@ -703,8 +708,9 @@ def run_resize_tests(src):
 
 ######################################################################
 #
-# Now we runt tests.
+# Now we run the tests.
 
+######################################################################
 # QVGA
 # ~~~~
 
