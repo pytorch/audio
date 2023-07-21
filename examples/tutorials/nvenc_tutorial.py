@@ -308,13 +308,13 @@ plot()
 #
 # - The time to encode video grows as the resolution becomes larger.
 # - In the case of software encoding, increasing the number of threads
-# helps reduce the decoding time.
+#   helps reduce the decoding time.
 # - The gain from extra threads diminishes around 8.
 # - Hardware encoding is faster than software encoding in general.
 # - Using ``hw_accel`` does not improve the speed of encoding itself
-# as much.
+#   as much.
 # - The size of the resulting videos grow as the resolution becomes
-# larger.
+#   larger.
 # - Hardware encoder produces smaller video file at larger resolution.
 #
 # The last point is somewhat strange to the author (who is not an
