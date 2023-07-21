@@ -46,7 +46,7 @@ import io
 import time
 
 import matplotlib.pyplot as plt
-from IPython.display import Video
+from IPython.display import Video, HTML
 from torchaudio.io import StreamReader, StreamWriter
 
 ######################################################################
@@ -150,25 +150,34 @@ Video(video_cuda, embed=True, mimetype="video/mp4")
 # Benchmark NVENC with StreamWriter
 # ---------------------------------
 #
+# Now we compare the performance of software encoder and hardware
+# encoder.
+#
+# Similar to the benchmark in NVDEC, we pass the data
+#
 # The following function encode the given frames and measure the time
 # it takes to encode and the size of the resulting video data.
 #
 
 def test_encode(data, encoder, width, height, hw_accel=None, **config):
+    assert data.is_cuda
+
     buffer = io.BytesIO()
     s = StreamWriter(buffer, format="mp4")
     s.add_video_stream(
         encoder=encoder, width=width, height=height, hw_accel=hw_accel, **config)
     with s.open():
         t0 = time.monotonic()
+        if hw_accel is None:
+            data = data.to("cpu")
         s.write_video_chunk(0, data)
         elapsed = time.monotonic() - t0
     size = buffer.tell()
-    buffer.seek(0)
     fps = len(data) / elapsed
     print(f" - Processed {len(data)} frames in {elapsed:.2f} seconds. ({fps:.2f} fps)")
     print(f" - Encoded data size: {size} bytes")
-    return elapsed, size, buffer.read()
+    return elapsed, size
+
 
 ######################################################################
 #
@@ -188,47 +197,44 @@ def run_tests(height, width, duration=4):
     }
 
     data = get_data(**pict_config, duration=duration)
+    data = data.to(torch.device("cuda:0"))
 
-    sw_encoder_config = {
+    times = []
+    sizes = []
+
+    encoder_config = {
         "encoder": "libx264",
         "encoder_format": "yuv444p",
     }
-
-    times = []
-    for num_threads in [1, 4, 8]:
+    for i, num_threads in enumerate([1, 4, 8]):
         print(f"* Software Encoder (num_threads={num_threads})")
-        time_cpu, size_cpu, _ = test_encode(
+        time_, size = test_encode(
             data,
             encoder_option={"threads": str(num_threads)},
             **pict_config,
-            **sw_encoder_config,
+            **encoder_config,
         )
-        times.append(time_cpu)
+        times.append(time_)
+        if i == 0:
+            sizes.append(size)
 
-    print(f"* Hardware Encoder")
     encoder_config = {
         "encoder": "h264_nvenc",
         "encoder_format": "yuv444p",
         "encoder_option": {"gpu": "0"}, 
     }
-
-    time_cuda, size_cuda, video_cuda = test_encode(
-        data,
-        **pict_config,
-        **encoder_config,
-    )
-    times.append(time_cuda)
-
-    print(f"* Hardware Encoder (CUDA frames)")
-    time_cuda_accel, _, _ = test_encode(
-        data.to(torch.device("cuda:0")),
-        **pict_config,
-        **encoder_config,
-        hw_accel="cuda:0",
-    )
-    times.append(time_cuda_accel)
-    sizes = [size_cpu, size_cuda]
-    return times, sizes, video_cuda
+    for i, hw_accel in enumerate([None, "cuda"]):
+        print(f"* Hardware Encoder {'(CUDA frames)' if hw_accel else ''}")
+        time_, size = test_encode(
+            data,
+            **pict_config,
+            **encoder_config,
+            hw_accel=hw_accel,
+        )
+        times.append(time_)
+        if i == 0:
+            sizes.append(size)
+    return times, sizes
 
 
 ######################################################################
@@ -240,21 +246,21 @@ def run_tests(height, width, duration=4):
 # ----
 #
 
-time_360, size_360, sample_360 = run_tests(360, 640)
+time_360, size_360 = run_tests(360, 640)
 
 ######################################################################
 # 720P
 # ----
 #
 
-time_720, size_720, sample_720 = run_tests(720, 1280)
+time_720, size_720 = run_tests(720, 1280)
 
 ######################################################################
 # 1080P
 # -----
 #
 
-time_1080, size_1080, sample_1080 = run_tests(1080, 1920)
+time_1080, size_1080 = run_tests(1080, 1920)
 
 ######################################################################
 #
@@ -296,31 +302,69 @@ plot()
 
 ######################################################################
 #
-# We can see that the time it takes to encode video grows as the
-# resolution gets bigger.
+# We observe couple of things;
 #
-# In the case of software encoding, increasing the number of threads
+# - The time to encode video grows as the resolution becomes larger.
+# - In the case of software encoding, increasing the number of threads
 # helps reduce the decoding time.
+# - The gain from extra threads diminishes around 8.
+# - Hardware encoding is faster than software encoding in general.
+# - Using ``hw_accel`` does not improve the speed of encoding itself
+# as much.
+# - The size of the resulting videos grow as the resolution becomes
+# larger.
+# - Hardware encoder produces smaller video file at larger resolution.
 #
-# Hardware encoding is faster than software encoding in general.
-# Using ``hw_accel`` does not improve the speed of encoding itself
-# as much, but if the data are generated by model in CUDA.
+# The last point is somewhat strange to the author (who is not an
+# expert in production of videos.)
+# It is often said that hardware decoders produce larger video
+# compared to software encoders.
+# Some says that software encoders allow fine-grained control over
+# encoding configuration, so the resulting video is more optimal.
+# Meanwhile, hardware encoders are optimized for performance, thus
+# does not provide as much control over quality and binary size.
 #
-# The time it takes to move data from CUDA to CPU tensor might add
-# up, so it is recommended to test your use case.
+######################################################################
+# Quality Spotcheck
+# -----------------
+# 
+# So, how are the quality of videos produced with hardware encoders?
+# A quick spot check of high resolution videos uncovers that they have
+# more noticeable artifacts on higher resolution.
+# Which might be an explanation of the smaller binary size. (meaning,
+# it is not allocating enough bits to produce quality output.)
 #
-# The relationship between the resollution of video and the size of
-# encoded video file and is a bit tricky to interpret.
+# The following images are raw frames of videos encoded with hardware
+# encoders.
 #
-# Hardware encoder are said to produce larger video size.
-# We can see that's the case for 360P. However, this is
-# not applicable to 720P and 1080P.
-#
-# Software encoders are more configurable, and said to produce more
-# optimized results. On the other hand, hardware encoders are designed
-# for processing speed.
 
-Video(sample_1080, embed=True, width=540, mimetype="video/mp4")
+######################################################################
+# 360P
+# ----
+
+HTML('<img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_360_097.png" alt="NVENC sample 360P">')
+
+######################################################################
+# 720P
+# ----
+
+HTML('<img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_720_097.png" alt="NVENC sample 720P">')
+
+######################################################################
+# 1080P
+# -----
+
+HTML('<img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_1080_097.png" alt="NVENC sample 1080P">')
+
+######################################################################
+#
+# We can see that there are more artifacts at higher resolution, which
+# are noticeable.
+#
+# Perhaps one might be able to reduce these using ``encoder_options``
+# arguments.
+# We did not try, but if you try that and find a better quality
+# setting, feel free to let us know. ;)
 
 ######################################################################
 #
