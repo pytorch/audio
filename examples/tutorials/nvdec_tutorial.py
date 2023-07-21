@@ -730,9 +730,8 @@ fps_xga = run_resize_tests(src_xga)
 
 ######################################################################
 #
-# The following figures illustrates the benchmark result.
+# Now we plot the result.
 #
-# Notice that HW decoder has almost no overhead for reizing operation.
 
 def plot():
     fig, ax = plt.subplots(figsize=[9.6, 6.4])

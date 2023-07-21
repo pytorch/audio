@@ -279,18 +279,18 @@ def plot():
     axes[0].set_title("Time to encode videos with different resolutions")
     axes[0].set_ylabel("Time [s]")
 
-    size_cpu, size_cuda = list(zip(size_360, size_720, size_1080))
-    axes[1].bar([-0.15, 0.85, 1.85], size_cpu, 0.3, label='Software encoding', edgecolor='black', facecolor='white', hatch='..')
-    axes[1].bar([0.15, 1.15, 2.15], size_cuda, 0.3, label='Hardware encoding', edgecolor='black', facecolor='white', hatch='oo')
+    for items in zip(size_360, size_720, size_1080, 'v^'):
+        axes[1].plot(items[:-1], marker=items[-1])
     axes[1].grid(axis="both")
-    axes[1].set_axisbelow(True)
     axes[1].set_xticks([0, 1, 2], ["360p", "720p", "1080p"])
     axes[1].set_ylabel("The encoded size [bytes]")
     axes[1].set_title("The size of encoded videos")
-    axes[1].legend()
+    axes[1].legend([
+        "Software Encoding",
+        "Hardware Encoding",
+    ])
 
     plt.tight_layout()
-    return fig
 
 plot()
 
