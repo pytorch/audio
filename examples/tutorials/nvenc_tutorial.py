@@ -301,6 +301,8 @@ def plot():
 plot()
 
 ######################################################################
+# Result
+# ------
 #
 # We observe couple of things;
 #
@@ -324,6 +326,7 @@ plot()
 # Meanwhile, hardware encoders are optimized for performance, thus
 # does not provide as much control over quality and binary size.
 #
+
 ######################################################################
 # Quality Spotcheck
 # -----------------
