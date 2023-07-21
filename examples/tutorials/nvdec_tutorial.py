@@ -522,27 +522,29 @@ def run_decode_tests(src, frames_per_chunk=5):
 # Now we run the tests with videos of different resolutions.
 #
 # QVGA
-# ~~~~
+# ----
 
 src_qvga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_qvga.h264.mp4")
 fps_qvga = run_decode_tests(src_qvga)
 
 ######################################################################
 # VGA
-# ~~~
+# ---
 
 src_vga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_vga.h264.mp4")
 fps_vga = run_decode_tests(src_vga)
 
 ######################################################################
 # XGA
-# ~~~
+# ---
 
 src_xga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_xga.h264.mp4")
 fps_xga = run_decode_tests(src_xga)
 
 
 ######################################################################
+# Result
+# ------
 #
 # Now we plot the result.
 
@@ -712,24 +714,25 @@ def run_resize_tests(src):
 
 ######################################################################
 # QVGA
-# ~~~~
+# ----
 
 fps_qvga = run_resize_tests(src_qvga)
 
 ######################################################################
 # VGA
-# ~~~
+# ---
 
 fps_vga = run_resize_tests(src_vga)
 
 ######################################################################
 # XGA
-# ~~~
+# ---
 
 fps_xga = run_resize_tests(src_xga)
 
 ######################################################################
-#
+# Result
+# ------
 # Now we plot the result.
 #
 
@@ -751,6 +754,10 @@ def plot():
 
 
 plot()
+
+######################################################################
+#
+#
 
 ######################################################################
 #
