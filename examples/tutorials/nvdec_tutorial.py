@@ -56,7 +56,7 @@ from torchaudio.utils import ffmpeg_utils
 
 print("FFmpeg Library versions:")
 for k, ver in ffmpeg_utils.get_versions().items():
-    print(f"  {k}: {'.'.join(str(v) for v in ver)}")
+    print(f"  {k}:\t{'.'.join(str(v) for v in ver)}")
 
 ######################################################################
 #
@@ -104,7 +104,7 @@ src = torchaudio.utils.download_asset(
 # To use HW video decoder, you need to specify the HW decoder when
 # defining the output video stream.
 #
-# To do so, you need to use
+# To do so, you can use
 # :py:meth:`~torchaudio.io.StreamReader.add_video_stream`
 # method, and provide ``decoder`` option.
 #
@@ -246,7 +246,6 @@ def plot():
     axes[0][1].set_title("HW decoder")
     plt.setp(axes, xticks=[], yticks=[])
     plt.tight_layout()
-    return fig
 
 
 plot()
@@ -323,8 +322,8 @@ plot()
 # Comparing resizing methods
 # --------------------------
 #
-# Unlike software scaling, NVDEC does not provide an option for
-# scaling algorithm.
+# Unlike software scaling, NVDEC does not provide an option to choose
+# the scaling algorithm.
 # In ML applicatoins, it is often necessary to construct a
 # preprocessing pipeline with a similar numerical property.
 # So here we compare the result of hardware resizing with software
@@ -422,7 +421,6 @@ def plot():
 
     plt.setp(axes, xticks=[], yticks=[])
     plt.tight_layout()
-    return fig
 
 
 plot()
@@ -464,7 +462,7 @@ plot()
 
 
 ######################################################################
-# The following function implements the software decoder test case.
+# The following function implements the hardware decoder test case.
 
 def test_decode_cuda(src, decoder, hw_accel="cuda", frames_per_chunk=5):
     s = StreamReader(src)
@@ -483,7 +481,7 @@ def test_decode_cuda(src, decoder, hw_accel="cuda", frames_per_chunk=5):
 
 
 ######################################################################
-# The following function implements the hardware decoder test case.
+# The following function implements the software decoder test case.
 
 def test_decode_cpu(src, threads, decoder=None, frames_per_chunk=5):
     s = StreamReader(src)
@@ -573,18 +571,21 @@ plot()
 #
 # We observe couple of things
 #
+# - Increasing the number of threads in software decoding makes the
+#   pipeline faster, but the performance saturates around 8 threads.
+# - The performance gain from using hardware decoder depends on the
+# resolution of video.
 # - At lower resolutions like QVGA, hardware decoding is slower than
 #   software decoding
 # - At higher resolutions like XGA, hardware decoding is faster
 #   than software decoding.
 #
-# The performance gain from using hardware decoder depends on the
-# resolution of video.
 #
 # It is worth noting that the performance gain also depends on the
 # type of GPU.
-# We observed that decoding VGA video is slower when using V100 and
-# A100 GPUs, but faster on A10 GPU.
+# We observed that when decoding VGA videos using V100 or A100 GPUs,
+# hardware decoders are slower than software decoders. But using A10
+# GPU hardware deocder is faster than software decodr.
 #
 
 ######################################################################
@@ -604,9 +605,7 @@ plot()
 # 3. Decode and resize video simulaneously with HW decoder, read the
 #    resulting frames as CUDA tensor.
 #
-# The pipeline 1 represents common video loading implementaations.
-# The library used for decoding part could be different, such as OpenCV,
-# torchvision and PyAV.
+# The pipeline 1 represents common video loading implementations.
 #
 # The pipeline 2 uses FFmpeg's filter graph, which allows to manipulate
 # raw frames before converting them to Tensors.
@@ -694,6 +693,8 @@ def test_hw_decode_and_resize(
 
 ######################################################################
 #
+# The following function run the benchmark functions on given sources.
+#
 
 def run_resize_tests(src):
     print(f"Testing: {os.path.basename(src)}")
@@ -749,6 +750,7 @@ def plot():
         "NVDEC\nwith resizing",
     ])
     ax.set_title("Speed of processing video frames")
+    ax.set_xlabel("Input video resolution")
     ax.set_ylabel("Frames per second")
     plt.tight_layout()
 
@@ -757,6 +759,17 @@ plot()
 
 ######################################################################
 #
+# Hardware deocder shows a similar trend as previous experiment.
+# In fact, the performance is almost the same. Hardware resizing has
+# almost zero overhead for scaling down the frames.
+#
+# Software decoding also shows a similar trend. Performing resizing as
+# part of decoding is faster. One possible explanation is that, video
+# frames are internally stored as YUV420P, which has half the number
+# of pixels compared to RGB24, or YUV444P. This means that if resizing
+# before copying frame data to PyTorch tensor, the number of pixels
+# manipulated and copied are smaller than the case where applying
+# resizing after frames are converted to Tensor.
 #
 
 ######################################################################
