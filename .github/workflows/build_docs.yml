@@ -30,18 +30,11 @@ jobs:
       upload-artifact: docs
 
       script: |
-        # Mark Build Directory Safe
-        git config --global --add safe.directory /__w/audio/audio
-
-        echo "::group::Set up environments"
-
+        set -ex
         # Set up Environment Variables
         export PYTHON_VERSION="${{ matrix.python_version }}"
         export CU_VERSION="${{ matrix.cuda_arch_version }}"
         export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
-        export FFMPEG_VERSION=6.0
-        export CODEC_HEADER_VERSION=n12.0.16.0 
-        export COMPUTE_CAPABILITY=86
         export BUILD_VERSION="$( cut -f 1 -d a version.txt )".dev"$(date "+%Y%m%d")"
 
         # Set CHANNEL
@@ -51,15 +44,14 @@ jobs:
           export CHANNEL=nightly
         fi
 
-        echo "::endgroup::"
         echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
         conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
         conda activate ./ci_env
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
-        set -ex
-        set +u  # don't know why
         conda install \
           --yes \
           --quiet \
@@ -70,22 +62,21 @@ jobs:
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
         conda install --quiet --yes pkg-config cmake>=3.18.0 ninja
-        pip install --progress-bar off -v -e . --no-use-pep517
-
-        echo "::endgroup::"
-        echo "::group::Install Dependencies"
-        conda install \
-          --quiet --yes \
-          -c conda-forge \
-          yasm x264 gnutls pkg-config lame libopus libvpx openh264 openssl x264 \
-          pandoc doxygen pysoundfile
-        pip install --progress-bar off \
-            git+https://github.com/kpu/kenlm/ flashlight-text \
-            -r docs/requirements.txt -r docs/requirements-tutorials.txt
+        pip3 install --progress-bar off -v -e . --no-use-pep517
 
         echo "::endgroup::"
         echo "::group::Build FFmpeg"
         .github/scripts/ffmpeg/build_gpu.sh
+
+        echo "::endgroup::"
+        echo "::group::Install other dependencies"
+        conda install \
+          --quiet --yes \
+          -c conda-forge \
+          pandoc doxygen pysoundfile
+        pip install --progress-bar off \
+            git+https://github.com/kpu/kenlm/ flashlight-text \
+            -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
         echo "::endgroup::"
         echo "::group::Build documentation"

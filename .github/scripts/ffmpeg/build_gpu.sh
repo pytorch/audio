@@ -22,6 +22,11 @@ ccap="${COMPUTE_CAPABILITY:-86}"
     make PREFIX=${prefix} install
 )
 
+conda install \
+      --quiet --yes \
+      -c conda-forge \
+      yasm x264 gnutls pkg-config lame libopus libvpx openh264 openssl x264
+
 (
     wget -q https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${revision}.tar.gz
     tar -xf n${revision}.tar.gz
