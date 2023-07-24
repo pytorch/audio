@@ -46,7 +46,7 @@ import io
 import time
 
 import matplotlib.pyplot as plt
-from IPython.display import Video, HTML
+from IPython.display import Video
 from torchaudio.io import StreamReader, StreamWriter
 
 ######################################################################
@@ -159,13 +159,13 @@ Video(video_cuda, embed=True, mimetype="video/mp4")
 # it takes to encode and the size of the resulting video data.
 #
 
+
 def test_encode(data, encoder, width, height, hw_accel=None, **config):
     assert data.is_cuda
 
     buffer = io.BytesIO()
     s = StreamWriter(buffer, format="mp4")
-    s.add_video_stream(
-        encoder=encoder, width=width, height=height, hw_accel=hw_accel, **config)
+    s.add_video_stream(encoder=encoder, width=width, height=height, hw_accel=hw_accel, **config)
     with s.open():
         t0 = time.monotonic()
         if hw_accel is None:
@@ -187,12 +187,13 @@ def test_encode(data, encoder, width, height, hw_accel=None, **config):
 # - Hardware encoder with and without ``hw_accel`` option.
 #
 
+
 def run_tests(height, width, duration=4):
     print(f"Testing resolution: {width}x{height}")
     pict_config = {
         "height": height,
         "width": width,
-        "frame_rate": 30000/1001,
+        "frame_rate": 30000 / 1001,
         "format": "yuv444p",
     }
 
@@ -221,7 +222,7 @@ def run_tests(height, width, duration=4):
     encoder_config = {
         "encoder": "h264_nvenc",
         "encoder_format": "yuv444p",
-        "encoder_option": {"gpu": "0"}, 
+        "encoder_option": {"gpu": "0"},
     }
     for i, hw_accel in enumerate([None, "cuda"]):
         print(f"* Hardware Encoder {'(CUDA frames)' if hw_accel else ''}")
@@ -267,36 +268,42 @@ time_1080, size_1080 = run_tests(1080, 1920)
 # Now we plot the result.
 #
 
+
 def plot():
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=[9.6, 7.2])
 
-    for items in zip(time_360, time_720, time_1080, 'ov^X+'):
+    for items in zip(time_360, time_720, time_1080, "ov^X+"):
         axes[0].plot(items[:-1], marker=items[-1])
     axes[0].grid(axis="both")
     axes[0].set_xticks([0, 1, 2], ["360p", "720p", "1080p"], visible=True)
     axes[0].tick_params(labeltop=False)
-    axes[0].legend([
-        "Software Encoding (threads=1)",
-        "Software Encoding (threads=4)",
-        "Software Encoding (threads=8)",
-        "Hardware Encoding (CPU Tensor)",
-        "Hardware Encoding (CUDA Tensor)",
-    ])
+    axes[0].legend(
+        [
+            "Software Encoding (threads=1)",
+            "Software Encoding (threads=4)",
+            "Software Encoding (threads=8)",
+            "Hardware Encoding (CPU Tensor)",
+            "Hardware Encoding (CUDA Tensor)",
+        ]
+    )
     axes[0].set_title("Time to encode videos with different resolutions")
     axes[0].set_ylabel("Time [s]")
 
-    for items in zip(size_360, size_720, size_1080, 'v^'):
+    for items in zip(size_360, size_720, size_1080, "v^"):
         axes[1].plot(items[:-1], marker=items[-1])
     axes[1].grid(axis="both")
     axes[1].set_xticks([0, 1, 2], ["360p", "720p", "1080p"])
     axes[1].set_ylabel("The encoded size [bytes]")
     axes[1].set_title("The size of encoded videos")
-    axes[1].legend([
-        "Software Encoding",
-        "Hardware Encoding",
-    ])
+    axes[1].legend(
+        [
+            "Software Encoding",
+            "Hardware Encoding",
+        ]
+    )
 
     plt.tight_layout()
+
 
 plot()
 
@@ -330,7 +337,7 @@ plot()
 ######################################################################
 # Quality Spotcheck
 # -----------------
-# 
+#
 # So, how are the quality of videos produced with hardware encoders?
 # A quick spot check of high resolution videos uncovers that they have
 # more noticeable artifacts on higher resolution.
@@ -344,20 +351,26 @@ plot()
 ######################################################################
 # 360P
 # ----
-
-HTML('<img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_360_097.png" alt="NVENC sample 360P">')
+#
+# .. raw:: html
+#
+#    <img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_360_097.png" alt="NVENC sample 360P">
 
 ######################################################################
 # 720P
 # ----
-
-HTML('<img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_720_097.png" alt="NVENC sample 720P">')
+#
+# .. raw:: html
+#
+#    <img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_720_097.png" alt="NVENC sample 720P">
 
 ######################################################################
 # 1080P
 # -----
-
-HTML('<img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_1080_097.png" alt="NVENC sample 1080P">')
+#
+# .. raw:: html
+#
+#    <img style="max-width: 100%" src="https://download.pytorch.org/torchaudio/tutorial-assets/nvenc_testsrc2_1080_097.png" alt="NVENC sample 1080P">
 
 ######################################################################
 #
