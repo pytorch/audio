@@ -11,7 +11,6 @@ with TorchAudio, and how it improves the performance of video encoding.
 """
 
 ######################################################################
-#
 # .. note::
 #
 #    This tutorial requires FFmpeg libraries compiled with HW
@@ -65,7 +64,7 @@ from torchaudio.utils import ffmpeg_utils
 
 print("FFmpeg Library versions:")
 for k, ver in ffmpeg_utils.get_versions().items():
-    print(f"  {k}: {'.'.join(str(v) for v in ver)}")
+    print(f"  {k}:\t{'.'.join(str(v) for v in ver)}")
 
 ######################################################################
 #
@@ -82,7 +81,6 @@ print(torch.cuda.get_device_properties(0))
 
 
 ######################################################################
-#
 # We use the following helper function to generate test frame data.
 # For the detail of synthetic video generation please refer to
 # :ref:`StreamReader Advanced Usage <lavfi>`.
@@ -102,12 +100,8 @@ def get_data(height, width, format="yuv444p", frame_rate=30000 / 1001, duration=
 # --------------------------
 #
 # To use HW video encoder, you need to specify the HW encoder when
-# defining the output video stream.
-#
-# To do so, you need to use
-# :py:meth:`~torchaudio.io.StreamWriter.add_video_stream`
-# method, and provide ``encoder`` option.
-#
+# defining the output video stream by providing ``encoder`` option to
+# :py:meth:`~torchaudio.io.StreamWriter.add_video_stream`.
 #
 
 ######################################################################
@@ -144,6 +138,9 @@ with w.open():
 buffer.seek(0)
 video_cuda = buffer.read()
 
+######################################################################
+#
+
 Video(video_cuda, embed=True, mimetype="video/mp4")
 
 ######################################################################
@@ -153,9 +150,13 @@ Video(video_cuda, embed=True, mimetype="video/mp4")
 # Now we compare the performance of software encoder and hardware
 # encoder.
 #
-# Similar to the benchmark in NVDEC, we pass the data
+# Similar to the benchmark in NVDEC, we process the videos of different
+# resolution, and measure the time it takes to encode them.
 #
-# The following function encode the given frames and measure the time
+# We also measure the size of resulting video file.
+
+######################################################################
+# The following function encodes the given frames and measure the time
 # it takes to encode and the size of the resulting video data.
 #
 
@@ -180,7 +181,6 @@ def test_encode(data, encoder, width, height, hw_accel=None, **config):
 
 
 ######################################################################
-#
 # We conduct the tests for the following configurations
 #
 # - Software encoder with the number of threads 1, 4, 8
@@ -189,6 +189,7 @@ def test_encode(data, encoder, width, height, hw_accel=None, **config):
 
 
 def run_tests(height, width, duration=4):
+    # Generate the test data
     print(f"Testing resolution: {width}x{height}")
     pict_config = {
         "height": height,
@@ -203,6 +204,7 @@ def run_tests(height, width, duration=4):
     times = []
     sizes = []
 
+    # Test software encoding
     encoder_config = {
         "encoder": "libx264",
         "encoder_format": "yuv444p",
@@ -219,6 +221,7 @@ def run_tests(height, width, duration=4):
         if i == 0:
             sizes.append(size)
 
+    # Test hardware encoding
     encoder_config = {
         "encoder": "h264_nvenc",
         "encoder_format": "yuv444p",
@@ -239,7 +242,6 @@ def run_tests(height, width, duration=4):
 
 
 ######################################################################
-#
 # And we change the resolution of videos to see how these measurement
 # change.
 #
@@ -264,7 +266,6 @@ time_720, size_720 = run_tests(720, 1280)
 time_1080, size_1080 = run_tests(1080, 1920)
 
 ######################################################################
-#
 # Now we plot the result.
 #
 

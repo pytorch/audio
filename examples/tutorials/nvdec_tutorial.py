@@ -98,11 +98,8 @@ src = torchaudio.utils.download_asset(
 # --------------------------
 #
 # To use HW video decoder, you need to specify the HW decoder when
-# defining the output video stream.
-#
-# To do so, you can use
-# :py:meth:`~torchaudio.io.StreamReader.add_video_stream`
-# method, and provide ``decoder`` option.
+# defining the output video stream by passing ``decoder`` option to
+# :py:meth:`~torchaudio.io.StreamReader.add_video_stream` method.
 #
 
 s = StreamReader(src)
@@ -112,14 +109,22 @@ s.fill_buffer()
 
 ######################################################################
 #
-# By default, the decoded frame data are sent back to CPU memory.
+# The video frames are decoded and returned as tensor of NCHW format.
 
-print(video.shape, video.dtype, video.device)
+print(video.shape, video.dtype)
 
 ######################################################################
 #
-# To keep the data in GPU as CUDA tensor, you need to specify
-# ``hw_accel`` option, which takes the string values and pass it
+# By default, the decoded frames are sent back to CPU memory, and
+# CPU tensors are created.
+
+print(video.device)
+
+######################################################################
+#
+# By specifying ``hw_accel`` option, you can convert the decoded frames
+# to CUDA tensor.
+# ``hw_accel`` option takes string values and pass it
 # to :py:class:`torch.device`.
 #
 # .. note::
@@ -140,12 +145,11 @@ print(video.shape, video.dtype, video.device)
 
 
 ######################################################################
-# When there are multiple of GPUs available, ``StreamReader`` by
-# default uses the first GPU. You can change this by providing
-# ``"gpu"`` option.
+# .. note::
 #
-# ``hw_accel`` option can be specified independently. If they do not
-# match data will be transfered automatically.
+#    When there are multiple of GPUs available, ``StreamReader`` by
+#    default uses the first GPU. You can change this by providing
+#    ``"gpu"`` option.
 #
 # .. code::
 #
@@ -157,6 +161,15 @@ print(video.shape, video.dtype, video.device)
 #        decoder_option={"gpu": "0"},
 #        hw_accel="cuda:0",
 #    )
+#
+# .. note::
+#
+#    ``"gpu"`` option and ``hw_accel`` option can be specified
+#    independently. If they do not match, decoded frames are
+#    transfered to the device specified by ``hw_accell``
+#    automatically.
+#
+# .. code::
 #
 #    # Video data is sent to CUDA device 0, and decoded there.
 #    # Then it is transfered to CUDA device 1, and converted to
@@ -280,7 +293,7 @@ def test_options(option):
     s.add_video_stream(1, decoder="h264_cuvid", hw_accel="cuda:0", decoder_option=option)
     s.fill_buffer()
     (video,) = s.pop_chunks()
-    print(f"{option}, {video.shape}")
+    print(f"Option: {option}:\t{video.shape}")
     return video[0]
 
 
@@ -330,7 +343,7 @@ plot()
 #
 # .. code::
 #
-#    ffmpeg -y -f lavfi -t 12.05 -i mptestsrc  -movflags +faststart mptestsrc.mp4
+#    ffmpeg -y -f lavfi -t 12.05 -i mptestsrc -movflags +faststart mptestsrc.mp4
 #
 # .. raw:: html
 #
