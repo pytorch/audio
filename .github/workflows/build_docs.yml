@@ -116,7 +116,7 @@ jobs:
         # When `git clone`, `gh-pages` branch is fetched by default.
         # The size of gh-pages grows significantly, so we use ammend and force push
         # We add a new commit once a week
-        if [ "date +%u" = "1" ]; then
+        if [ "$(date +%d)" = "1" ]; then
            git commit --allow-empty -m "placeholder"
         fi
 
