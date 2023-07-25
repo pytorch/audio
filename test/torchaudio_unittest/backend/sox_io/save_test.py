@@ -11,6 +11,7 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     skipIfNoExec,
     skipIfNoSox,
+    skipIfNoSoxEncoder,
     sox_utils,
     TempDirMixin,
     TorchaudioTestCase,
@@ -265,6 +266,7 @@ class SaveTest(SaveTestBase):
             7,
         ],
     )
+    @skipIfNoSoxEncoder("amr-nb")
     def test_save_amr_nb(self, bit_rate):
         self.assert_save_consistency("amr-nb", compression=bit_rate, num_channels=1)
 
@@ -281,12 +283,18 @@ class SaveTest(SaveTestBase):
             ("flac",),
             ("vorbis",),
             ("sph", "PCM_S", 16),
-            ("amr-nb",),
             ("amb", "PCM_S", 16),
         ],
         name_func=name_func,
     )
     def test_save_large(self, format, encoding=None, bits_per_sample=None):
+        self._test_save_large(format, encoding, bits_per_sample)
+
+    @skipIfNoSoxEncoder("amr-nb")
+    def test_save_large_amr_nb(self):
+        self._test_save_large("amr_nb")
+
+    def _test_save_large(self, format, encoding=None, bits_per_sample=None):
         """`sox_io_backend.save` can save large files."""
         sample_rate = 8000
         one_hour = 60 * 60 * sample_rate
