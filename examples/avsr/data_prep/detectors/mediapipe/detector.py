@@ -6,9 +6,10 @@
 
 import warnings
 
+import mediapipe as mp
+
 import numpy as np
 import torchvision
-import mediapipe as mp
 
 warnings.filterwarnings("ignore")
 
@@ -16,7 +17,9 @@ warnings.filterwarnings("ignore")
 class LandmarksDetector:
     def __init__(self):
         self.mp_face_detection = mp.solutions.face_detection
-        self.short_range_detector = self.mp_face_detection.FaceDetection(min_detection_confidence=0.5, model_selection=0)
+        self.short_range_detector = self.mp_face_detection.FaceDetection(
+            min_detection_confidence=0.5, model_selection=0
+        )
         self.full_range_detector = self.mp_face_detection.FaceDetection(min_detection_confidence=0.5, model_selection=1)
 
     def __call__(self, video_frames):
@@ -43,11 +46,7 @@ class LandmarksDetector:
                 bbox_size = (bbox[2] - bbox[0]) + (bbox[3] - bbox[1])
                 if bbox_size > max_size:
                     max_id, max_size = idx, bbox_size
-                lmx = [[int(bboxC.xmin * iw),
-                        int(bboxC.ymin * ih)],
-                       [int(bboxC.width * iw),
-                        int(bboxC.height * ih)]
-                      ]
+                lmx = [[int(bboxC.xmin * iw), int(bboxC.ymin * ih)], [int(bboxC.width * iw), int(bboxC.height * ih)]]
                 face_points.append(lmx)
             landmarks.append(np.reshape(np.array(face_points[max_id]), (2, 2)))
         return landmarks

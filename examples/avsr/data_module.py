@@ -111,9 +111,13 @@ class LRS3DataModule(LightningDataModule):
 
     def train_dataloader(self):
         dataset = LRS3(self.args, subset="train")
-        dataset = CustomBucketDataset(dataset, dataset.lengths, self.max_frames, self.train_num_buckets, batch_size=self.batch_size)
+        dataset = CustomBucketDataset(
+            dataset, dataset.lengths, self.max_frames, self.train_num_buckets, batch_size=self.batch_size
+        )
         dataset = TransformDataset(dataset, self.train_transform)
-        dataloader = torch.utils.data.DataLoader(dataset,num_workers=self.num_workers,batch_size=None,shuffle=self.train_shuffle)
+        dataloader = torch.utils.data.DataLoader(
+            dataset, num_workers=self.num_workers, batch_size=None, shuffle=self.train_shuffle
+        )
         return dataloader
 
     def val_dataloader(self):

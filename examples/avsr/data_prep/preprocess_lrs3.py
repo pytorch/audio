@@ -83,12 +83,8 @@ print(f"Directory {os.path.dirname(label_filename)} created")
 
 f = open(label_filename, "w")
 # Step 2, extract mouth patches from segments.
-dst_vid_dir = os.path.join(
-    args.root_dir, dataset, dataset + f"_video_seg{seg_duration}s"
-)
-dst_txt_dir = os.path.join(
-    args.root_dir, dataset, dataset + f"_text_seg{seg_duration}s"
-)
+dst_vid_dir = os.path.join(args.root_dir, dataset, dataset + f"_video_seg{seg_duration}s")
+dst_txt_dir = os.path.join(args.root_dir, dataset, dataset + f"_text_seg{seg_duration}s")
 if args.subset == "test":
     filenames = glob.glob(os.path.join(args.data_dir, args.subset, "**", "*.mp4"), recursive=True)
 elif args.subset == "train":
