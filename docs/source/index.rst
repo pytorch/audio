@@ -86,7 +86,7 @@ model implementations and application components.
    Emformer RNN-T ASR <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>
    Conv-TasNet Source Separation <https://github.com/pytorch/audio/tree/main/examples/source_separation>
    HuBERT Pre-training and Fine-tuning (ASR) <https://github.com/pytorch/audio/tree/main/examples/hubert>
-   Conformer/Emformer RNN-T ASR/VSR/AV-ASR <https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt>
+   Real-time AV-ASR <https://github.com/pytorch/audio/tree/main/examples/avsr>
 
 .. toctree::
    :maxdepth: 1
