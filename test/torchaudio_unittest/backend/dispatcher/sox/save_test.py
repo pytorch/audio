@@ -280,7 +280,7 @@ class SaveTest(SaveTestBase):
 
     @skipIfNoSoxEncoder("amr-nb")
     def test_save_large_amr_nb(self):
-        self._test_save_large("amr_nb")
+        self._test_save_large("amr-nb")
 
     def _test_save_large(self, format, encoding=None, bits_per_sample=None):
         """`self._save` can save large files."""
