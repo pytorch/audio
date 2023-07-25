@@ -234,6 +234,24 @@ skipIfNoSox = _skipIf(
     reason="Sox features are not available.",
     key="NO_SOX",
 )
+
+
+def skipIfNoSoxDecoder(ext):
+    return _skipIf(
+        not torchaudio._extension._SOX_INITIALIZED or ext not in torchaudio.utils.sox_utils.list_read_formats(),
+        f'sox does not handle "{ext}" for read.',
+        key="NO_SOX_DECODER",
+    )
+
+
+def skipIfNoSoxEncoder(ext):
+    return _skipIf(
+        not torchaudio._extension._SOX_INITIALIZED or ext not in torchaudio.utils.sox_utils.list_write_formats(),
+        f'sox does not handle "{ext}" for write.',
+        key="NO_SOX_ENCODER",
+    )
+
+
 skipIfNoRIR = _skipIf(
     not torchaudio._extension._IS_RIR_AVAILABLE,
     reason="RIR features are not available.",
