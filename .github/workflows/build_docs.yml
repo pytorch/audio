@@ -30,16 +30,11 @@ jobs:
       upload-artifact: docs
 
       script: |
-        # Mark Build Directory Safe
-        git config --global --add safe.directory /__w/audio/audio
-
+        set -ex
         # Set up Environment Variables
         export PYTHON_VERSION="${{ matrix.python_version }}"
         export CU_VERSION="${{ matrix.cuda_arch_version }}"
         export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
-        export FFMPEG_VERSION=6.0
-        export CODEC_HEADER_VERSION=n12.0.16.0 
-        export COMPUTE_CAPABILITY=86
         export BUILD_VERSION="$( cut -f 1 -d a version.txt )".dev"$(date "+%Y%m%d")"
 
         # Set CHANNEL
@@ -49,13 +44,14 @@ jobs:
           export CHANNEL=nightly
         fi
 
-        # Create Conda Env
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
         conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
         conda activate ./ci_env
 
-        # Install PyTorch / TorchAudio first
-        set -ex
-        set +u  # don't know why
+        echo "::endgroup::"
+        echo "::group::Install PyTorch"
         conda install \
           --yes \
           --quiet \
@@ -63,65 +59,32 @@ jobs:
           -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
           "${CUDATOOLKIT}"
 
-        # Install torchaudio
+        echo "::endgroup::"
+        echo "::group::Install TorchAudio"
         conda install --quiet --yes pkg-config cmake>=3.18.0 ninja
-        pip install --progress-bar off -v -e . --no-use-pep517
+        pip3 install --progress-bar off -v -e . --no-use-pep517
 
-        # Install FFmpeg-dependencies
-        conda install --quiet --yes -c conda-forge yasm x264 gnutls pkg-config lame libopus libvpx openh264 openssl x264
+        echo "::endgroup::"
+        echo "::group::Build FFmpeg"
+        .github/scripts/ffmpeg/build_gpu.sh
 
-        # Build FFmpeg with NVIDIA Video Codec SDK
-        # TODO cache this
-        (
-            git clone --quiet https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
-            cd nv-codec-headers
-            git checkout ${CODEC_HEADER_VERSION}
-            make PREFIX=${CONDA_PREFIX} install
-        )
+        echo "::endgroup::"
+        echo "::group::Install other dependencies"
+        conda install \
+          --quiet --yes \
+          -c conda-forge \
+          pandoc doxygen pysoundfile
+        pip install --progress-bar off \
+            git+https://github.com/kpu/kenlm/ flashlight-text \
+            -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
-        (
-            wget -q https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz
-            tar -xf n${FFMPEG_VERSION}.tar.gz
-            cd ./FFmpeg-n${FFMPEG_VERSION}
-            export revision=${FFMPEG_VERSION}
-            ./configure \
-                --prefix=${CONDA_PREFIX} \
-                --extra-cflags="-I${CONDA_PREFIX}/include" \
-                --extra-ldflags="-L${CONDA_PREFIX}/lib" \
-                --nvccflags="-gencode arch=compute_${COMPUTE_CAPABILITY},code=sm_${COMPUTE_CAPABILITY} -O2" \
-                --disable-doc \
-                --enable-rpath \
-                --disable-static \
-                --enable-protocol=https \
-                --enable-gnutls \
-                --enable-shared \
-                --enable-gpl \
-                --enable-nonfree \
-                --enable-libmp3lame \
-                --enable-libx264 \
-                --enable-cuda-nvcc \
-                --enable-nvenc \
-                --enable-cuvid \
-                --enable-nvdec
-            make clean
-            make -j > /dev/null 2>&1
-            make install
-            # test
-            # src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
-            # ffmpeg -y -vsync 0 -hwaccel cuvid -hwaccel_output_format cuda -c:v h264_cuvid -resize 360x240 -i "${src}" -c:a copy -c:v h264_nvenc -b:v 5M test.mp4
-        )
-
-        # Install runtime dependencies
-        pip --quiet install git+https://github.com/kpu/kenlm/ flashlight-text
-
-        # Install build tools
-        conda install --quiet -y -c conda-forge pandoc doxygen pysoundfile
-        pip install --quiet -r docs/requirements.txt -r docs/requirements-tutorials.txt
-
-        # Build docs
+        echo "::endgroup::"
+        echo "::group::Build documentation"
         export BUILD_GALLERY=true
         (cd docs && make html)
 
+        echo "::endgroup::"
+        echo "::group::Copy artifact"
         cp -rf docs/build/html/* "${RUNNER_DOCS_DIR}"
         mv docs/build/html /artifacts/
 
