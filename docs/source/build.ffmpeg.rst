@@ -33,8 +33,8 @@ The following procedure was tested on Ubuntu.
 
 † For details on NVDEC/NVENC and FFmpeg, please refer to the following articles.
 
-- https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/
-- https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg
+- https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/
+- https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg
 - https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/
 
 Check the GPU and CUDA version
