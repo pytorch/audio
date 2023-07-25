@@ -57,9 +57,9 @@ class ConformerRNNTModule(LightningModule):
         )
         self.blank_idx = spm_vocab_size
 
-        if args.md == "v":
+        if args.modality == "video":
             self.frontend = video_resnet()
-        if args.md == "a":
+        if args.modality == "audio":
             self.frontend = audio_resnet()
 
         if args.mode == "online":
@@ -116,33 +116,13 @@ class ConformerRNNTModule(LightningModule):
             [{"scheduler": self.warmup_lr_scheduler, "interval": self.lr_scheduler_interval}],
         )
 
-    def forward(self, batch: Batch):
+    def forward(self, batch):
         decoder = RNNTBeamSearch(self.model, self.blank_idx)
         x = self.frontend(batch.inputs.to(self.device))
         hypotheses = decoder(x, batch.input_lengths.to(self.device), beam_width=20)
         return post_process_hypos(hypotheses, self.sp_model)[0][0]
 
-    def training_step(self, batch: Batch, batch_idx):
-        """Custom training step.
-
-        By default, DDP does the following on each train step:
-        - For each GPU, compute loss and gradient on shard of training data.
-        - Sync and average gradients across all GPUs. The final gradient
-          is (sum of gradients across all GPUs) / N, where N is the world
-          size (total number of GPUs).
-        - Update parameters on each GPU.
-
-        Here, we do the following:
-        - For k-th GPU, compute loss and scale it by (N / B_total), where B_total is
-          the sum of batch sizes across all GPUs. Compute gradient from scaled loss.
-        - Sync and average gradients across all GPUs. The final gradient
-          is (sum of gradients across all GPUs) / B_total.
-        - Update parameters on each GPU.
-
-        Doing so allows us to account for the variability in batch sizes that
-        variable-length sequential data commonly yields.
-        """
-
+    def training_step(self, batch, batch_idx):
         opt = self.optimizers()
         opt.zero_grad()
         loss = self._step(batch, batch_idx, "train")
@@ -157,7 +137,7 @@ class ConformerRNNTModule(LightningModule):
         sch = self.lr_schedulers()
         sch.step()
 
-        self.log("monitoring_step", self.global_step)
+        self.log("monitoring_step", torch.tensor(self.global_step, dtype=torch.float32))
 
         return loss
 

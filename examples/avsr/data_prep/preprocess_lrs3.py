@@ -1,8 +1,8 @@
+import argparse
 import glob
 import math
 import os
 import shutil
-
 import warnings
 
 import ffmpeg
@@ -12,52 +12,60 @@ from utils import save_vid_aud_txt, split_file
 
 warnings.filterwarnings("ignore")
 
-from argparse import ArgumentParser
+# Argument Parsing
+parser = argparse.ArgumentParser(description="LRS3 Preprocessing")
+parser.add_argument(
+    "--data-dir",
+    type=str,
+    help="The directory for sequence.",
+)
+parser.add_argument(
+    "--detector",
+    type=str,
+    default="retinaface",
+    help="Face detector used in the experiment.",
+)
+parser.add_argument(
+    "--dataset",
+    type=str,
+    help="Specify the dataset name used in the experiment",
+)
+parser.add_argument(
+    "--root-dir",
+    type=str,
+    help="The root directory of cropped-face dataset.",
+)
+parser.add_argument(
+    "--subset",
+    type=str,
+    required=True,
+    help="Subset of the dataset used in the experiment.",
+)
+parser.add_argument(
+    "--seg-duration",
+    type=int,
+    default=16,
+    help="Length of the segment in seconds.",
+)
+parser.add_argument(
+    "--groups",
+    type=int,
+    default=1,
+    help="Number of threads to be used in parallel.",
+)
+parser.add_argument(
+    "--job-index",
+    type=int,
+    default=0,
+    help="Index to identify separate jobs (useful for parallel processing).",
+)
+args = parser.parse_args()
 
-
-def load_args(default_config=None):
-    parser = ArgumentParser(description="Preprocess LRS3 to crop full-face images")
-    # -- for benchmark evaluation
-    parser.add_argument(
-        "--data-dir",
-        type=str,
-        help="The directory for sequence.",
-    )
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        help="Specify the dataset name used in the experiment",
-    )
-    parser.add_argument(
-        "--root-dir",
-        type=str,
-        help="The root directory of cropped-face dataset.",
-    )
-    parser.add_argument("--job-index", type=int, default=0, help="job index")
-    parser.add_argument(
-        "--groups",
-        type=int,
-        default=1,
-        help="specify the number of threads to be used",
-    )
-    parser.add_argument(
-        "--folder",
-        type=str,
-        default="test",
-        help="specify the set used in the experiment",
-    )
-    args = parser.parse_args()
-    return args
-
-
-args = load_args()
-
-seg_duration = 16
-detector = "retinaface"
+seg_duration = args.seg_duration
 dataset = args.dataset
 
 args.data_dir = os.path.normpath(args.data_dir)
-vid_dataloader = AVSRDataLoader(modality="video", detector=detector, resize=(96, 96))
+vid_dataloader = AVSRDataLoader(modality="video", detector=args.detector, resize=(96, 96))
 aud_dataloader = AVSRDataLoader(modality="audio")
 # Step 2, extract mouth patches from segments.
 seg_vid_len = seg_duration * 25
@@ -66,20 +74,24 @@ seg_aud_len = seg_duration * 16000
 label_filename = os.path.join(
     args.root_dir,
     "labels",
-    f"{dataset}_{args.folder}_transcript_lengths_seg{seg_duration}s.csv"
+    f"{dataset}_{args.subset}_transcript_lengths_seg{seg_duration}s.csv"
     if args.groups <= 1
-    else f"{dataset}_{args.folder}_transcript_lengths_seg{seg_duration}s.{args.groups}.{args.job_index}.csv",
+    else f"{dataset}_{args.subset}_transcript_lengths_seg{seg_duration}s.{args.groups}.{args.job_index}.csv",
 )
 os.makedirs(os.path.dirname(label_filename), exist_ok=True)
 print(f"Directory {os.path.dirname(label_filename)} created")
 
 f = open(label_filename, "w")
 # Step 2, extract mouth patches from segments.
-dst_vid_dir = os.path.join(args.root_dir, dataset, dataset + f"_video_seg{seg_duration}s")
-dst_txt_dir = os.path.join(args.root_dir, dataset, dataset + f"_text_seg{seg_duration}s")
-if args.folder == "test":
-    filenames = glob.glob(os.path.join(args.data_dir, args.folder, "**", "*.mp4"), recursive=True)
-elif args.folder == "train":
+dst_vid_dir = os.path.join(
+    args.root_dir, dataset, dataset + f"_video_seg{seg_duration}s"
+)
+dst_txt_dir = os.path.join(
+    args.root_dir, dataset, dataset + f"_text_seg{seg_duration}s"
+)
+if args.subset == "test":
+    filenames = glob.glob(os.path.join(args.data_dir, args.subset, "**", "*.mp4"), recursive=True)
+elif args.subset == "train":
     filenames = glob.glob(os.path.join(args.data_dir, "trainval", "**", "*.mp4"), recursive=True)
     filenames.extend(glob.glob(os.path.join(args.data_dir, "pretrain", "**", "*.mp4"), recursive=True))
     filenames.sort()
@@ -96,7 +108,7 @@ for data_filename in tqdm(filenames):
     except UnboundLocalError:
         continue
 
-    if os.path.normpath(data_filename).split(os.sep)[-3] in ["trainval", "test", "main"]:
+    if os.path.normpath(data_filename).split(os.sep)[-3] in ["trainval", "test"]:
         dst_vid_filename = f"{data_filename.replace(args.data_dir, dst_vid_dir)[:-4]}.mp4"
         dst_aud_filename = f"{data_filename.replace(args.data_dir, dst_vid_dir)[:-4]}.wav"
         dst_txt_filename = f"{data_filename.replace(args.data_dir, dst_txt_dir)[:-4]}.txt"
