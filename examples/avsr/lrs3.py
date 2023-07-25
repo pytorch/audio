@@ -40,12 +40,12 @@ def load_transcript(path):
     return open(transcript_path).read().splitlines()[0]
 
 
-def load_item(path, md):
-    if md == "v":
+def load_item(path, modality):
+    if modality == "video":
         return (load_video(path), load_transcript(path))
-    if md == "a":
+    if modality == "audio":
         return (load_audio(path), load_transcript(path))
-    if md == "av":
+    if modality == "audiovisual":
         return (load_audio(path), load_video(path), load_transcript(path))
 
 
@@ -62,15 +62,15 @@ class LRS3(Dataset):
         self.args = args
 
         if subset == "train":
-            self._filelist, self._lengthlist = _load_list(self.args, "lrs3_train_transcript_lengths_seg16s.csv")
+            self.files, self.lengths = _load_list(self.args, "lrs3_train_transcript_lengths_seg16s.csv")
         if subset == "val":
-            self._filelist, self._lengthlist = _load_list(self.args, "lrs3_test_transcript_lengths_seg16s.csv")
+            self.files, self.lengths = _load_list(self.args, "lrs3_test_transcript_lengths_seg16s.csv")
         if subset == "test":
-            self._filelist, self._lengthlist = _load_list(self.args, "lrs3_test_transcript_lengths_seg16s.csv")
+            self.files, self.lengths = _load_list(self.args, "lrs3_test_transcript_lengths_seg16s.csv")
 
     def __getitem__(self, n):
-        path = self._filelist[n]
-        return load_item(path, self.args.md)
+        path = self.files[n]
+        return load_item(path, self.args.modality)
 
     def __len__(self) -> int:
-        return len(self._filelist)
+        return len(self.files)

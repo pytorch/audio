@@ -32,5 +32,5 @@ class FeedForwardModule(torch.nn.Module):
         return self.sequential(input)
 
 
-def fusion_module():
-    return FeedForwardModule(1024, 3072, 512, 0.1)
+def fusion_module(input_dim=1024, hidden_dim=3072, output_dim=512, dropout=0.1):
+    return FeedForwardModule(input_dim, hidden_dim, output_dim, dropout)
