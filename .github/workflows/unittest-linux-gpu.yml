@@ -75,7 +75,7 @@ jobs:
         echo "::group::Install other Dependencies"
         conda install \
           --quiet --yes \
-          -c conda-forge
+          -c conda-forge \
           -c numba/label/dev \
           'librosa==0.10.0' parameterized 'requests>=2.20'
         pip3 install --progress-bar off \
