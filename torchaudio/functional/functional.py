@@ -549,7 +549,7 @@ def melscale_fbanks(
         meaning number of frequencies to highlight/apply to x the number of filterbanks.
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
-        ``A * melscale_fbanks(A.size(-1), ...)``.
+        ``A @ melscale_fbanks(A.size(-1), ...)``.
 
     """
 
