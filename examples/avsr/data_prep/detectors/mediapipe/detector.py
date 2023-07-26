@@ -29,8 +29,7 @@ class LandmarksDetector:
             assert any(l is not None for l in landmarks), "Cannot detect any frames in the video"
         return landmarks
 
-    def detect(self, filename, detector):
-        video_frames = torchvision.io.read_video(filename, pts_unit="sec")[0].numpy()
+    def detect(self, video_frames, detector):
         landmarks = []
         for frame in video_frames:
             results = detector.process(frame)
