@@ -32,8 +32,8 @@ class AVSRDataLoader:
             audio = self.audio_process(audio, sample_rate)
             return audio
         if self.modality == "video":
-            landmarks = self.landmarks_detector(data_filename)
             video = self.load_video(data_filename)
+            landmarks = self.landmarks_detector(video)
             video = self.video_process(video, landmarks)
             video = torch.tensor(video)
             return video
