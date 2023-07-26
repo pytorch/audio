@@ -7,7 +7,6 @@
 import warnings
 
 import numpy as np
-import torchvision
 from ibug.face_detection import RetinaFacePredictor
 
 warnings.filterwarnings("ignore")

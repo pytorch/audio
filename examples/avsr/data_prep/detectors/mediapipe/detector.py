@@ -9,7 +9,6 @@ import warnings
 import mediapipe as mp
 
 import numpy as np
-import torchvision
 
 warnings.filterwarnings("ignore")
 
