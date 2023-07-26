@@ -14,7 +14,6 @@ requirements:
   host:
     - python
     - setuptools
-    - pkg-config  # [not win]
     - cmake
     - ninja
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]

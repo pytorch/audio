@@ -65,7 +65,7 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
-        conda install --quiet --yes pkg-config 'cmake>=3.18.0' ninja
+        conda install --quiet --yes 'cmake>=3.18.0' ninja
         pip3 install --progress-bar off -v -e . --no-use-pep517
 
         echo "::endgroup::"
