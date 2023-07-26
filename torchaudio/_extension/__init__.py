@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
+from torchaudio._internal.module_utils import eval_env, fail_with_message, is_module_available, no_op
 
 try:
     from .fb import _init_ffmpeg
@@ -57,14 +57,30 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
 # At that point, this initialization should handle the case where
 # sox integration is built but libsox is not found.
 _SOX_INITIALIZED = False
-if is_module_available("torchaudio.lib._torchaudio_sox"):
+_USE_SOX = False if os.name == "nt" else eval_env("TORCHAUDIO_USE_SOX", True)
+_SOX_MODULE_AVAILABLE = is_module_available("torchaudio.lib._torchaudio_sox")
+if _USE_SOX and _SOX_MODULE_AVAILABLE:
     _init_sox()
     _SOX_INITIALIZED = True
 
 
+if os.name == "nt":
+    fail_if_no_sox = fail_with_message("requires sox extension, which is not supported on Windows.")
+elif not _USE_SOX:
+    fail_if_no_sox = fail_with_message("requires sox extension, but it is disabled. (TORCHAUDIO_USE_SOX=0)")
+elif not _SOX_MODULE_AVAILABLE:
+    fail_if_no_sox = fail_with_message(
+        "requires sox extension, but TorchAudio is not compiled with it. "
+        "Please build TorchAudio with libsox support. (BUILD_SOX=1)"
+    )
+else:
+    fail_if_no_sox = no_op
+
+
 # Initialize FFmpeg-related features
 _FFMPEG_EXT = None
-if _IS_TORCHAUDIO_EXT_AVAILABLE:
+_USE_FFMPEG = eval_env("TORCHAUDIO_USE_FFMPEG", True)
+if _USE_FFMPEG and _IS_TORCHAUDIO_EXT_AVAILABLE:
     try:
         _FFMPEG_EXT = _init_ffmpeg()
     except Exception:
@@ -76,15 +92,11 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
         _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
 
 
-fail_if_no_sox = (
-    no_op
-    if _SOX_INITIALIZED
-    else fail_with_message(
-        "requires sox extension, but TorchAudio is not compiled with it. Please build TorchAudio with libsox support."
-    )
-)
+if _USE_FFMPEG:
+    fail_if_no_ffmpeg = _fail_since_no_ffmpeg if _FFMPEG_EXT is None else no_op
+else:
+    fail_if_no_ffmpeg = fail_with_message("requires ffmpeg extension, but it is disabled. (TORCHAUDIO_USE_FFMPEG=0)")
 
-fail_if_no_ffmpeg = _fail_since_no_ffmpeg if _FFMPEG_EXT is None else no_op
 
 fail_if_no_rir = (
     no_op
