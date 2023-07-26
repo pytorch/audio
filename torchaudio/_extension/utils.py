@@ -70,13 +70,6 @@ def _init_sox():
     _load_lib("libtorchaudio_sox")
     import torchaudio.lib._torchaudio_sox  # noqa
 
-    torchaudio.lib._torchaudio_sox.set_verbosity(0)
-
-    import atexit
-
-    torch.ops.torchaudio.sox_effects_initialize_sox_effects()
-    atexit.register(torch.ops.torchaudio.sox_effects_shutdown_sox_effects)
-
 
 def _try_access_avutil(ffmpeg_ver):
     libname_template = {

@@ -1,6 +1,7 @@
 #include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/effects_chain.h>
 #include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/sox/stub.h>
 #include <torchaudio/csrc/sox/types.h>
 #include <torchaudio/csrc/sox/utils.h>
 
@@ -11,7 +12,7 @@ namespace torchaudio::sox {
 c10::optional<MetaDataTuple> get_info_file(
     const std::string& path,
     const c10::optional<std::string>& format) {
-  SoxFormat sf(sox_open_read(
+  SoxFormat sf(SOX sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
       /*encoding=*/nullptr,
@@ -107,7 +108,7 @@ void save_audio_file(
   const auto encoding_info = get_encodinginfo_for_save(
       filetype, tensor.dtype(), compression, encoding, bits_per_sample);
 
-  SoxFormat sf(sox_open_write(
+  SoxFormat sf(SOX sox_open_write(
       path.c_str(),
       &signal_info,
       &encoding_info,

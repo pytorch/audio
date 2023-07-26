@@ -128,6 +128,7 @@ class CMakeBuild(build_ext):
             "-DCMAKE_VERBOSE_MAKEFILE=ON",
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
+            "-DDLOPEN_SOX:BOOL=ON",
             f"-DBUILD_RIR:BOOL={'ON' if _BUILD_RIR else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             f"-DBUILD_ALIGN:BOOL={'ON' if _BUILD_ALIGN else 'OFF'}",
