@@ -9,7 +9,7 @@ Using NVIDIA's GPU decoder and encoder, it is also possible to pass around CUDA 
 
 This improves the video throughput significantly. However, please note that not all the video formats are supported by hardware acceleration.
 
-This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see `Hardware-Accelerated Video Decoding and Encoding <./hw_acceleration_tutorial.html>`_
+This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see :ref:`NVDEC tutoial <nvdec_tutorial>` and :ref:`NVENC tutorial <nvenc_tutorial>`.
 
 Overview
 --------
@@ -25,16 +25,16 @@ To use NVENC/NVDEC with TorchAudio, the following items are required.
 
 3. PyTorch / TorchAudio with CUDA support.
 
-TorchAudio’s official binary distributions are compiled to work with FFmpeg 4 libraries, and they contain the logic required for hardware-based decoding/encoding.
+TorchAudio’s official binary distributions are compiled to work with FFmpeg libraries, and they contain the logic to use hardware decoding/encoding.
 
-In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. You can use FFmpeg 5 or 6 as well.
+In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. You can also use FFmpeg 5 or 6.
 
 The following procedure was tested on Ubuntu.
 
 † For details on NVDEC/NVENC and FFmpeg, please refer to the following articles.
 
-- https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/
-- https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg
+- https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/
+- https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg
 - https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/
 
 Check the GPU and CUDA version
@@ -156,7 +156,7 @@ which we use later for verifying the installation.
 Build FFmpeg with NVDEC/NVENC support
 -------------------------------------
 
-Next we download the source code of FFmpeg 4. We use 4.4.2 here. Any version later than 4.1 should work with TorchAudio binary distributions. If you want to use FFmpeg 5, then you need to build TorchAudio after building FFmpeg.
+Next we download the source code of FFmpeg 4. We use 4.4.2 here.
 
 .. code-block:: bash
 
@@ -465,9 +465,9 @@ It is often the case where there are multiple FFmpeg installations in the system
    ['h264_nvenc', 'nvenc', 'nvenc_h264', 'nvenc_hevc', 'hevc_nvenc']
 
 
-Using the hardware decoder
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the hardware decoder and encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.
 
-For the detail on the performance of GPU decoder please see :ref:`NVDEC tutoial <nvdec_tutorial>`.
+For the detail on the performance of GPU decoder and encoder please see :ref:`NVDEC tutoial <nvdec_tutorial>` and :ref:`NVENC tutorial <nvenc_tutorial>`.

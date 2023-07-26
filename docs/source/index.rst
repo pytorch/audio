@@ -44,8 +44,8 @@ model implementations and application components.
    tutorials/streamreader_advanced_tutorial
    tutorials/streamwriter_basic_tutorial
    tutorials/streamwriter_advanced
-   hw_acceleration_tutorial
    tutorials/nvdec_tutorial
+   tutorials/nvenc_tutorial
 
    tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
@@ -86,7 +86,7 @@ model implementations and application components.
    Emformer RNN-T ASR <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>
    Conv-TasNet Source Separation <https://github.com/pytorch/audio/tree/main/examples/source_separation>
    HuBERT Pre-training and Fine-tuning (ASR) <https://github.com/pytorch/audio/tree/main/examples/hubert>
-   Conformer/Emformer RNN-T ASR/VSR/AV-ASR <https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt>
+   Real-time AV-ASR <https://github.com/pytorch/audio/tree/main/examples/avsr>
 
 .. toctree::
    :maxdepth: 1
@@ -203,11 +203,11 @@ Tutorials
    :tags: I/O,StreamReader
 
 .. customcarditem::
-   :header: Hardware accelerated video I/O with NVDEC/NVENC
-   :card_description: Learn how to setup and use HW accelerated video I/O.
+   :header: Hardware accelerated video encoding with NVENC
+   :card_description: Learn how to use HW video encoder.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
-   :link: hw_acceleration_tutorial.html
-   :tags: I/O,StreamReader,StreamWriter
+   :link: tutorials/nvenc_tutorial.html
+   :tags: I/O,StreamWriter
 
 .. customcarditem::
    :header: Apply effects and codecs to waveform

@@ -23,9 +23,6 @@ def average_checkpoints(last):
 
 
 def ensemble(args):
-    last = [
-        os.path.join(args.exp_dir, args.experiment_name, f"epoch={n}.ckpt")
-        for n in range(args.epochs - 10, args.epochs)
-    ]
-    model_path = os.path.join(args.exp_dir, args.experiment_name, "model_avg_10.pth")
+    last = [os.path.join(args.exp_dir, args.exp_name, f"epoch={n}.ckpt") for n in range(args.epochs - 10, args.epochs)]
+    model_path = os.path.join(args.exp_dir, args.exp_name, "model_avg_10.pth")
     torch.save({"state_dict": average_checkpoints(last)}, model_path)

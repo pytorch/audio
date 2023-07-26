@@ -1,70 +1,75 @@
-<p align="center"><img width="160" src="doc/lip_white.png" alt="logo"></p>
-<h1 align="center">RNN-T ASR/VSR/AV-ASR Examples</h1>
+<p align="center"><img width="160" src="https://download.pytorch.org/torchaudio/doc-assets/avsr/lip_white.png" alt="logo"></p>
+<h1 align="center">Real-time ASR/VSR/AV-ASR Examples</h1>
 
-This repository contains sample implementations of training and evaluation pipelines for RNNT based automatic, visual, and audio-visual (ASR, VSR, AV-ASR) models on LRS3. This repository includes both streaming/non-streaming modes. We follow the same training pipeline as [AutoAVSR](https://arxiv.org/abs/2303.14307).
+<div align="center">
+
+[📘Introduction](#introduction) |
+[📊Training](#Training) |
+[🔮Evaluation](#Evaluation)
+</div>
+
+## Introduction
+
+This directory contains the training recipe for real-time audio, visual, and audio-visual speech recognition (ASR, VSR, AV-ASR) models, which is an extension of [Auto-AVSR](https://arxiv.org/abs/2303.14307).
+
+Please refer to [this tutorial]() for real-time AV-ASR inference from microphone and camera.
 
 ## Preparation
-1. Setup the environment.
-```
-conda create -y -n autoavsr python=3.8
-conda activate autoavsr
-```
 
-2. Install PyTorch nightly version (Pytorch, Torchvision, Torchaudio) from [source](https://pytorch.org/get-started/), along with all necessary packages:
+1. Install PyTorch (pytorch, torchvision, torchaudio) from [source](https://pytorch.org/get-started/), along with all necessary packages:
 
 ```Shell
-pip install pytorch-lightning sentencepiece
+pip install torch torchvision torchaudio pytorch-lightning sentencepiece
 ```
 
-3. Preprocess LRS3 to a cropped-face dataset from the [data_prep](./data_prep) folder.
+2. Preprocess LRS3. See the instructions in the [data_prep](./data_prep) folder.
 
-4. `[sp_model_path]` is a sentencepiece model to encode targets, which can be generated using `train_spm.py`.
+## Usage
 
-### Training ASR or VSR model
-
-- `[root_dir]` is the root directory for the LRS3 cropped-face dataset.
-- `[modality]` is the input modality type, including `v`, `a`, and `av`.
-- `[mode]` is the model type, including `online` and `offline`.
-
+### Training
 
 ```Shell
-
-python train.py --root-dir [root_dir] \
-                --sp-model-path ./spm_unigram_1023.model
-                --exp-dir ./exp \
-                --num-nodes 8 \
-                --gpus 8 \
-                --md [modality] \
-                --mode [mode]
+python train.py --exp-dir=[exp_dir] \
+                --exp-name=[exp_name] \
+                --modality=[modality] \
+                --mode=[mode] \
+                --root-dir=[root-dir] \
+                --sp-model-path=[sp_model_path] \
+                --num-nodes=[num_nodes] \
+                --gpus=[gpus]
 ```
 
-### Training AV-ASR model
+- `exp-dir` and `exp-name`: The directory where the checkpoints will be saved, will be stored at the location `[exp_dir]`/`[exp_name]`.
+- `modality`: Type of the input modality. Valid values are: `video`, `audio`, and `audiovisual`.
+- `mode`: Type of the mode. Valid values are: `online` and `offline`.
+- `root-dir`: Path to the root directory where all preprocessed files will be stored.
+- `sp-model-path`: Path to the sentencepiece model. Default: `./spm_unigram_1023.model`, which can be produced using `train_spm.py`.
+- `num-nodes`: The number of machines used. Default: 4.
+- `gpus`: The number of gpus in each machine. Default: 8.
+
+### Evaluation
 
 ```Shell
-python train.py --root-dir [root-dir] \
-                --sp-model-path ./spm_unigram_1023.model
-                --exp-dir ./exp \
-                --num-nodes 8 \
-                --gpus 8 \
-                --md av \
-                --mode [mode]
+python eval.py --modality=[modality] \
+               --mode=[mode] \
+               --root-dir=[dataset_path] \
+               --sp-model-path=[sp_model_path] \
+               --checkpoint-path=[checkpoint_path]
 ```
 
-### Evaluating models
+- `modality`: Type of the input modality. Valid values are: `video`, `audio`, and `audiovisual`.
+- `mode`: Type of the mode. Valid values are: `online` and `offline`.
+- `root-dir`: Path to the root directory where all preprocessed files will be stored.
+- `sp-model-path`: Path to the sentencepiece model. Default: `./spm_unigram_1023.model`.
+- `checkpoint-path`: Path to a pretraned model.
 
-```Shell
-python eval.py --dataset-path [dataset_path] \
-               --sp-model-path ./spm_unigram_1023.model
-               --md [modality] \
-               --mode [mode] \
-               --checkpoint-path [checkpoint_path]
-```
+## Results
 
-The table below contains WER for AV-ASR models [offline evaluation].
+The table below contains WER for AV-ASR models that were trained from scratch [offline evaluation].
 
-|    Model    |    WER [%]   |   Params (M)   |
-|:-----------:|:------------:|:--------------:|
-| Non-streaming models       |                |
-|    AV-ASR   |      4.0     |       50       |
-| Streaming models           |                |
-|    AV-ASR   |      4.3     |       40       |
+|         Model        | Training dataset (hours) | WER [%] | Params (M) |
+|:--------------------:|:------------------------:|:-------:|:----------:|
+| Non-streaming models |                          |         |            |
+|        AV-ASR        |        LRS3 (438)        |   3.9   |     50     |
+|  Streaming models    |                          |         |            |
+|        AV-ASR        |        LRS3 (438)        |   3.9   |     40     |

@@ -16,7 +16,7 @@ def compute_word_level_distance(seq1, seq2):
 
 def get_lightning_module(args):
     sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
-    if args.md == "av":
+    if args.modality == "audiovisual":
         from lightning_av import AVConformerRNNTModule
 
         model = AVConformerRNNTModule(args, sp_model)
@@ -49,7 +49,7 @@ def run_eval(model, data_module):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        "--md",
+        "--modality",
         type=str,
         help="Modality",
         required=True,
@@ -69,19 +69,14 @@ def parse_args():
     parser.add_argument(
         "--sp-model-path",
         type=str,
-        help="Path to SentencePiece model.",
+        help="Path to sentencepiece model.",
         required=True,
     )
     parser.add_argument(
         "--checkpoint-path",
         type=str,
-        help="Path to checkpoint model.",
+        help="Path to a checkpoint model.",
         required=True,
-    )
-    parser.add_argument(
-        "--pretrained-model-path",
-        type=str,
-        help="Path to Pretraned model.",
     )
     parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
     return parser.parse_args()

@@ -110,52 +110,19 @@ class LRS3DataModule(LightningDataModule):
         self.num_workers = num_workers
 
     def train_dataloader(self):
-        datasets = [LRS3(self.args, subset="train")]
-
-        if not self.train_dataset_lengths:
-            self.train_dataset_lengths = [dataset._lengthlist for dataset in datasets]
-
-        dataset = torch.utils.data.ConcatDataset(
-            [
-                CustomBucketDataset(
-                    dataset,
-                    lengths,
-                    self.max_frames,
-                    self.train_num_buckets,
-                    batch_size=self.batch_size,
-                )
-                for dataset, lengths in zip(datasets, self.train_dataset_lengths)
-            ]
+        dataset = LRS3(self.args, subset="train")
+        dataset = CustomBucketDataset(
+            dataset, dataset.lengths, self.max_frames, self.train_num_buckets, batch_size=self.batch_size
         )
-
         dataset = TransformDataset(dataset, self.train_transform)
         dataloader = torch.utils.data.DataLoader(
-            dataset,
-            num_workers=self.num_workers,
-            batch_size=None,
-            shuffle=self.train_shuffle,
+            dataset, num_workers=self.num_workers, batch_size=None, shuffle=self.train_shuffle
         )
         return dataloader
 
     def val_dataloader(self):
-        datasets = [LRS3(self.args, subset="val")]
-
-        if not self.val_dataset_lengths:
-            self.val_dataset_lengths = [dataset._lengthlist for dataset in datasets]
-
-        dataset = torch.utils.data.ConcatDataset(
-            [
-                CustomBucketDataset(
-                    dataset,
-                    lengths,
-                    self.max_frames,
-                    1,
-                    batch_size=self.batch_size,
-                )
-                for dataset, lengths in zip(datasets, self.val_dataset_lengths)
-            ]
-        )
-
+        dataset = LRS3(self.args, subset="val")
+        dataset = CustomBucketDataset(dataset, dataset.lengths, self.max_frames, 1, batch_size=self.batch_size)
         dataset = TransformDataset(dataset, self.val_transform)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=None, num_workers=self.num_workers)
         return dataloader

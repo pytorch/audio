@@ -14,7 +14,7 @@ def get_trainer(args):
     seed_everything(1)
 
     checkpoint = ModelCheckpoint(
-        dirpath=os.path.join(args.exp_dir, args.experiment_name) if args.exp_dir else None,
+        dirpath=os.path.join(args.exp_dir, args.exp_name) if args.exp_dir else None,
         monitor="monitoring_step",
         mode="max",
         save_last=True,
@@ -36,13 +36,12 @@ def get_trainer(args):
         strategy=DDPStrategy(find_unused_parameters=False),
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
-        resume_from_checkpoint=args.resume_from_checkpoint,
     )
 
 
 def get_lightning_module(args):
     sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
-    if args.md == "av":
+    if args.modality == "audiovisual":
         from lightning_av import AVConformerRNNTModule
 
         model = AVConformerRNNTModule(args, sp_model)
@@ -56,7 +55,7 @@ def get_lightning_module(args):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        "--md",
+        "--modality",
         type=str,
         help="Modality",
         required=True,
@@ -86,19 +85,20 @@ def parse_args():
     )
     parser.add_argument(
         "--exp-dir",
+        default="./exp",
         type=str,
         help="Directory to save checkpoints and logs to. (Default: './exp')",
     )
     parser.add_argument(
-        "--experiment-name",
+        "--exp-name",
         type=str,
         help="Experiment name",
     )
     parser.add_argument(
         "--num-nodes",
-        default=8,
+        default=4,
         type=int,
-        help="Number of nodes to use for training. (Default: 8)",
+        help="Number of nodes to use for training. (Default: 4)",
     )
     parser.add_argument(
         "--gpus",
@@ -113,9 +113,16 @@ def parse_args():
         help="Number of epochs to train for. (Default: 55)",
     )
     parser.add_argument(
-        "--resume-from-checkpoint", default=None, type=str, help="Path to the checkpoint to resume from"
+        "--resume-from-checkpoint",
+        default=None,
+        type=str,
+        help="Path to the checkpoint to resume from",
     )
-    parser.add_argument("--debug", action="store_true", help="whether to use debug level for logging")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Whether to use debug level for logging",
+    )
     return parser.parse_args()
 
 
