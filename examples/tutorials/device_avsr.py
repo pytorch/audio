@@ -28,7 +28,7 @@ attention due to its robustness against noise.
 .. note::
 
    We do not have any pre-trained models available at this time. The
-   following recipe use placedholder for the sentencepiece model path
+   following recipe uses placedholders for the sentencepiece model path
    ``spm_model_path`` and the pretrained model path ``avsr_model_path``.
 
    If you are interested in the training recipe for real-time AV-ASR
