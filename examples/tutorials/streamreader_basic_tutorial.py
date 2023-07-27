@@ -592,7 +592,6 @@ for i, vid in enumerate(vids2):
         if i == 0 and j == 0:
             ax.set_ylabel("Stream 2")
 plt.tight_layout()
-plt.show(block=False)
 
 ######################################################################
 #

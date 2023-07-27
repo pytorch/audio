@@ -69,7 +69,7 @@ import torchvision
 # -------------------
 #
 # Firstly, we define the function to collect videos from microphone and
-# camera. To be specific, we use :py:func:`~torchaudio.io.StreamReader`
+# camera. To be specific, we use :py:class:`~torchaudio.io.StreamReader`
 # class for the purpose of data collection, which supports capturing
 # audio/video from microphone and camera. For the detailed usage of this
 # class, please refer to the

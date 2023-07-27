@@ -33,11 +33,8 @@ print(torchaudio.__version__)
 import os
 import time
 
-import matplotlib
 import matplotlib.pyplot as plt
 from torchaudio.io import StreamReader
-
-matplotlib.rcParams["image.interpolation"] = "none"
 
 ######################################################################
 #
