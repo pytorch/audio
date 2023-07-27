@@ -130,7 +130,7 @@ class ContextCacher:
 # differences across frames. The final step in the pre-processing module
 # is to crop the face region from the aligned face image.
 #
-# .. list-table:: An example of pre-processing steps
+# .. list-table::
 #    :widths: 25 25 25 25
 #    :header-rows: 0
 #
