@@ -197,6 +197,25 @@ def _check_cuda_version():
     return version
 
 
+def _fail_since_no_sox(func):
+    @wraps(func)
+    def wrapped(*_args, **_kwargs):
+        try:
+            # Note:
+            # We run _init_sox again just to show users the stacktrace.
+            # _init_sox would not succeed here.
+            _init_sox()
+        except Exception as err:
+            raise RuntimeError(
+                f"{func.__name__} requires sox extension which is not available. "
+                "Please refer to the stacktrace above for how to resolve this."
+            ) from err
+        # This should not happen in normal execution, but just in case.
+        return func(*_args, **_kwargs)
+
+    return wrapped
+
+
 def _fail_since_no_ffmpeg(func):
     @wraps(func)
     def wrapped(*_args, **_kwargs):

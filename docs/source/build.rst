@@ -10,7 +10,6 @@ TorchAudio integrates PyTorch for numerical computation and third party librarie
    - `GCC <https://gcc.gnu.org/>`_ (Linux)
    - `Clang <https://clang.llvm.org/>`_ (macOS)
    - `MSVC <https://visualstudio.microsoft.com>`_  2019 or newer (Windows)
-- `pkg-config <https://www.freedesktop.org/wiki/Software/pkg-config/>`_ (Linux/macOS, if building sox extension)
 - `CUDA toolkit <https://developer.nvidia.com/cudnn>`_ and `cuDNN <https://developer.nvidia.com/cudnn>`_ (if building CUDA extension)
 
 Most of the tools are available in `Conda <https://conda.io/>`_, so we recommend using conda.
