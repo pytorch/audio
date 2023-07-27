@@ -22,7 +22,7 @@ Here, we install nightly build.
 
 .. code-block::
 
-   conda install cmake ninja pkg-config
+   conda install cmake ninja
 
 4. Clone the torchaudio repository
 ----------------------------------
