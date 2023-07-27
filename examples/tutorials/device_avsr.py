@@ -46,10 +46,6 @@ import torch
 import torchaudio
 import torchvision
 
-print(torch.__version__)
-print(torchaudio.__version__)
-print(torchvision.__version__)
-
 import numpy as np
 import sentencepiece as spm
 
@@ -74,7 +70,7 @@ import sentencepiece as spm
 # -------------------
 #
 # Firstly, we define the function to collect videos from microphone and
-# camera. To be specific, we use :py:class:``~torchaudio.io.StreamReader``
+# camera. To be specific, we use :py:func:`~torchaudio.io.StreamReader`
 # class for the purpose of data collection, which supports capturing
 # audio/video from microphone and camera. For the detailed usage of this
 # class, please refer to the
@@ -208,7 +204,7 @@ class Preprocessing(torch.nn.Module):
 # .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/architecture.png
 #
 
-from avsr.models.fusion import FeedForwardModule
+from avsr.models.fusion import fusion_module
 from avsr.models.resnet import video_resnet
 from avsr.models.resnet1d import audio_resnet
 
@@ -279,7 +275,7 @@ def _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path):
     model = AVSR(
         audio_frontend=audio_resnet(),
         video_frontend=video_resnet(),
-        fusion=FeedForwardModule(
+        fusion=fusion_module(
             1024,
             avsr_model_config["transformer_ffn_dim"],
             avsr_model_config["input_dim"],
