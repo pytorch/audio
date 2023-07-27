@@ -7,7 +7,6 @@
 import warnings
 
 import numpy as np
-import torchvision
 from ibug.face_detection import RetinaFacePredictor
 
 warnings.filterwarnings("ignore")
@@ -19,8 +18,7 @@ class LandmarksDetector:
             device=device, threshold=0.8, model=RetinaFacePredictor.get_model(model_name)
         )
 
-    def __call__(self, filename):
-        video_frames = torchvision.io.read_video(filename, pts_unit="sec")[0].numpy()
+    def __call__(self, video_frames):
         landmarks = []
         for frame in video_frames:
             detected_faces = self.face_detector(frame, rgb=False)
