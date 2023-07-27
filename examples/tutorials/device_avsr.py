@@ -3,11 +3,7 @@ Device AV-ASR with Emformer RNN-T
 =================================
 
 **Author**: `Pingchuan Ma <pingchuanma@meta.com>`__, `Moto
-Hira <moto@meta.com>`__, `Zhaoheng Ni <zni@meta.com>`__, `Jeff
-Hwang <jeffhwang@meta.com>`__, `Xiaohui
-Zhang <xiaohuizhang@meta.com>`__, `Stavros
-Petridis <stavrosp@meta.com>`__, `Yumeng Tao <yumeng@meta.com>`__, `Maja
-Pantic <majapantic@meta.com>`__
+Hira <moto@meta.com>`__.
 
 This tutorial shows how to run on-device audio-visual speech recognition
 (AV-ASR, or AVSR) with TorchAudio on a streaming device input,
