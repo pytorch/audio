@@ -1,6 +1,6 @@
 import torch
 from parameterized import parameterized
-from torchaudio.prototype.models import squim_objective_base, squim_subjective_base
+from torchaudio.models import squim_objective_base, squim_subjective_base
 from torchaudio_unittest.common_utils import skipIfNoCuda, torch_script, TorchaudioTestCase
 
 

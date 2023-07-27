@@ -2,13 +2,13 @@ from dataclasses import dataclass
 
 from torchaudio._internal import load_state_dict_from_url
 
-from torchaudio.prototype.models import squim_objective_base, squim_subjective_base, SquimObjective, SquimSubjective
+from torchaudio.models import squim_objective_base, squim_subjective_base, SquimObjective, SquimSubjective
 
 
 @dataclass
 class SquimObjectiveBundle:
     """Data class that bundles associated information to use pretrained
-    :py:class:`~torchaudio.prototype.models.SquimObjective` model.
+    :py:class:`~torchaudio.models.SquimObjective` model.
 
     This class provides interfaces for instantiating the pretrained model along with
     the information necessary to retrieve pretrained weights and additional data
@@ -24,8 +24,7 @@ class SquimObjectiveBundle:
     Example: Estimate the objective metric scores for the input waveform.
         >>> import torch
         >>> import torchaudio
-        >>> # Since SquimObjective bundle is in prototypes, it needs to be exported explicitly
-        >>> from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE as bundle
+        >>> from torchaudio.pipelines import SQUIM_OBJECTIVE as bundle
         >>>
         >>> # Load the SquimObjective bundle
         >>> model = bundle.get_model()
@@ -59,7 +58,7 @@ class SquimObjectiveBundle:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
 
         Returns:
-            Variation of :py:class:`~torchaudio.prototype.models.SquimObjective`.
+            Variation of :py:class:`~torchaudio.models.SquimObjective`.
         """
         model = squim_objective_base()
         model.load_state_dict(self._get_state_dict(dl_kwargs))
@@ -82,7 +81,7 @@ SQUIM_OBJECTIVE = SquimObjectiveBundle(
 SQUIM_OBJECTIVE.__doc__ = """SquimObjective pipeline trained using approach described in
     :cite:`kumar2023torchaudio` on the *DNS 2020 Dataset* :cite:`reddy2020interspeech`.
 
-    The underlying model is constructed by :py:func:`torchaudio.prototype.models.squim_objective_base`.
+    The underlying model is constructed by :py:func:`torchaudio.models.squim_objective_base`.
     The weights are under `Creative Commons Attribution 4.0 International License
     <https://github.com/microsoft/DNS-Challenge/blob/interspeech2020/master/LICENSE>`__.
 
@@ -93,7 +92,7 @@ SQUIM_OBJECTIVE.__doc__ = """SquimObjective pipeline trained using approach desc
 @dataclass
 class SquimSubjectiveBundle:
     """Data class that bundles associated information to use pretrained
-    :py:class:`~torchaudio.prototype.models.SquimSubjective` model.
+    :py:class:`~torchaudio.models.SquimSubjective` model.
 
     This class provides interfaces for instantiating the pretrained model along with
     the information necessary to retrieve pretrained weights and additional data
@@ -109,8 +108,7 @@ class SquimSubjectiveBundle:
     Example: Estimate the subjective metric scores for the input waveform.
         >>> import torch
         >>> import torchaudio
-        >>> # Since SquimSubjective bundle is in prototypes, it needs to be exported explicitly
-        >>> from torchaudio.prototype.pipelines import SQUIM_SUBJECTIVE as bundle
+        >>> from torchaudio.pipelines import SQUIM_SUBJECTIVE as bundle
         >>>
         >>> # Load the SquimSubjective bundle
         >>> model = bundle.get_model()
@@ -146,7 +144,7 @@ class SquimSubjectiveBundle:
             dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
 
         Returns:
-            Variation of :py:class:`~torchaudio.prototype.models.SquimObjective`.
+            Variation of :py:class:`~torchaudio.models.SquimObjective`.
         """
         model = squim_subjective_base()
         model.load_state_dict(self._get_state_dict(dl_kwargs))
@@ -170,7 +168,7 @@ SQUIM_SUBJECTIVE.__doc__ = """SquimSubjective pipeline trained
     as described in :cite:`manocha2022speech` and :cite:`kumar2023torchaudio`
     on the *BVCC* :cite:`cooper2021voices` and *DAPS* :cite:`mysore2014can` datasets.
 
-    The underlying model is constructed by :py:func:`torchaudio.prototype.models.squim_subjective_base`.
+    The underlying model is constructed by :py:func:`torchaudio.models.squim_subjective_base`.
     The weights are under `Creative Commons Attribution Non Commercial 4.0 International
     <https://zenodo.org/record/4660670#.ZBtWPOxuerN>`__.
 

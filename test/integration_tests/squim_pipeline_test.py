@@ -1,6 +1,6 @@
 import pytest
 import torchaudio
-from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
+from torchaudio.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 
 
 @pytest.mark.parametrize(
