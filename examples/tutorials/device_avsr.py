@@ -395,7 +395,6 @@ if __name__ == "__main__":
 # .. code::
 #
 #    Building pipeline...
-#    INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
 #    Building StreamReader...
 #    SourceVideoStream(media_type='video', codec='rawvideo', codec_long_name='raw video', format='uyvy422', bit_rate=0, num_frames=0, bits_per_sample=0, metadata={}, width=1552, height=1552, frame_rate=1000000.0)
 #    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=1536000, num_frames=0, bits_per_sample=0, metadata={}, sample_rate=48000.0, num_channels=1)
