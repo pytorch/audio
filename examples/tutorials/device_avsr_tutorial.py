@@ -15,52 +15,44 @@ i.e. microphone on laptop. AV-ASR is the task of transcribing text from
 audio and visual streams, which has recently attracted a lot of research
 attention due to its robustness against noise.
 
-.. container:: alert alert-info
-
-   .. raw:: html
-
-      <h4>
-
-   Note
-
-   .. raw:: html
-
-      </h4>
-
-   .. raw:: html
-
-      <p>
+.. note::
 
    This tutorial requires ffmpeg, sentencepiece, mediapipe,
-   opencv-python and scikit-image libraries. There are multiple ways to
-   install ffmpeg libraries. If you are using Anaconda Python
+   opencv-python and scikit-image libraries.
+
+   There are multiple ways to install ffmpeg libraries.
+   If you are using Anaconda Python
    distribution, ``conda install -c conda-forge 'ffmpeg<7'`` will
-   install compatible FFmpeg libraries. You can run
+   install compatible FFmpeg libraries.
+
+   You can run
    ``pip install sentencepiece mediapipe opencv-python scikit-image`` to
    install the other libraries mentioned.
 
-   .. raw:: html
-
-      </p>
-
-   .. raw:: html
-
-      <p>
-
-   .. raw:: html
-
-      </p>
+.. note::
 
    We do not have any pre-trained models available at this time. The
    following recipe use placedholder for the sentencepiece model path
    ``spm_model_path`` and the pretrained model path ``avsr_model_path``.
+
    If you are interested in the training recipe for real-time AV-ASR
    models (AV-ASR), it can be found at `real-time
    AV-ASR <https://github.com/pytorch/audio/tree/main/examples/avsr>`__
    recipe.
 
+.. note::
+
+   To run this tutorial, please make sure you are in the `tutorial` folder.
+
 """
 
+import torch
+import torchaudio
+import torchvision
+
+print(torch.__version__)
+print(torchaudio.__version__)
+print(torchvision.__version__)
 
 import numpy as np
 import sentencepiece as spm
@@ -77,13 +69,7 @@ import sentencepiece as spm
 # location and crop out face. Next, we feed the raw audio stream and the
 # pre-processed video stream into our end-to-end model for inference.
 #
-# .. raw:: html
-#
-#    <p align="center">
-#
-# .. raw:: html
-#
-#    </p>
+# .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/overview.png
 #
 
 
@@ -96,12 +82,8 @@ import sentencepiece as spm
 # class for the purpose of data collection, which supports capturing
 # audio/video from microphone and camera. For the detailed usage of this
 # class, please refer to the
-# `tutorial <https://pytorch.org/audio/main/tutorials/streamreader_basic_tutorial.html>`__.
+# `tutorial <./streamreader_basic_tutorial.html>`__.
 #
-
-import torch
-import torchaudio
-import torchvision
 
 
 def stream(q, format, option, src, segment_length, sample_rate):
@@ -156,101 +138,19 @@ class ContextCacher:
 # differences across frames. The final step in the pre-processing module
 # is to crop the face region from the aligned face image.
 #
-# .. raw:: html
+# .. list-table:: An example of pre-processing steps
+#    :widths: 25 25 25 25
+#    :header-rows: 0
 #
-#    <table align="center">
+#    * - .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/original.gif
+#      - .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/detected.gif
+#      - .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/transformed.gif
+#      - .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/cropped.gif
 #
-# .. raw:: html
-#
-#    <tr>
-#
-# .. raw:: html
-#
-#    <td>
-#
-# <img
-# src=“https://download.pytorch.org/torchaudio/doc-assets/avsr/original.gif”,
-# width=“144”>
-#
-# .. raw:: html
-#
-#    </td>
-#
-# .. raw:: html
-#
-#    <td>
-#
-# .. raw:: html
-#
-#    </td>
-#
-# .. raw:: html
-#
-#    <td>
-#
-# .. raw:: html
-#
-#    </td>
-#
-# .. raw:: html
-#
-#    <td>
-#
-# .. raw:: html
-#
-#    </td>
-#
-# .. raw:: html
-#
-#    <tr>
-#
-# .. raw:: html
-#
-#    <td>
-#
-# 0. Original
-#
-#    .. raw:: html
-#
-#       </td>
-#
-#    .. raw:: html
-#
-#       <td>
-#
-#    1. Detection
-#
-#       .. raw:: html
-#
-#          </td>
-#
-#       .. raw:: html
-#
-#          <td>
-#
-#       2. Transformation
-#
-#          .. raw:: html
-#
-#             </td>
-#
-#          .. raw:: html
-#
-#             <td>
-#
-#          3. Face ROIs
-#
-#             .. raw:: html
-#
-#                </td>
-#
-#             .. raw:: html
-#
-#                </tr>
-#
-#             .. raw:: html
-#
-#                </table>
+#    * - 0. Original
+#      - 1. Detected
+#      - 2. Transformed
+#      - 3. Cropped
 #
 
 import sys
@@ -297,10 +197,10 @@ class Preprocessing(torch.nn.Module):
 
 
 ######################################################################
-# Building Inference pipeline
-# ---------------------------
+# 3. Building inference pipeline
+# ------------------------------
 #
-# The next step is to create components reuiqred for pipeline.
+# The next step is to create components required for pipeline.
 #
 # We use convolutional-based front-ends to extract features from both the
 # raw audio and video streams. These features are then passed through a
@@ -309,13 +209,7 @@ class Preprocessing(torch.nn.Module):
 # predictor, and a joint network. The architecture of the proposed AV-ASR
 # model is illustrated as follows.
 #
-# .. raw:: html
-#
-#    <p align="center">
-#
-# .. raw:: html
-#
-#    </p>
+# .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/architecture.png
 #
 
 from avsr.models.fusion import FeedForwardModule
@@ -415,17 +309,15 @@ def _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path):
 
 
 ######################################################################
-# The main process
-# ----------------
+# 4. The main process
+# -------------------
 #
 # The execution flow of the main process is as follows:
 #
-# ::
-#
-#    1. Initialize the inference pipeline.
-#    2. Launch data acquisition subprocess.
-#    3. Run inference.
-#    4. Clean up
+# 1. Initialize the inference pipeline.
+# 2. Launch data acquisition subprocess.
+# 3. Run inference.
+# 4. Clean up
 #
 
 
