@@ -70,6 +70,7 @@ model implementations and application components.
    tutorials/asr_inference_with_ctc_decoder_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
+   tutorials/device_avsr_tutorial
    tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/tacotron2_pipeline_tutorial
