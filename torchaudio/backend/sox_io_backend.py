@@ -7,33 +7,6 @@ import torchaudio
 from .common import AudioMetaData
 
 
-# Note: need to comply TorchScript syntax -- need annotation and no f-string
-def _fail_info(filepath: str, format: Optional[str]) -> AudioMetaData:
-    raise RuntimeError("Failed to fetch metadata from {}".format(filepath))
-
-
-# Note: need to comply TorchScript syntax -- need annotation and no f-string
-def _fail_load(
-    filepath: str,
-    frame_offset: int = 0,
-    num_frames: int = -1,
-    normalize: bool = True,
-    channels_first: bool = True,
-    format: Optional[str] = None,
-) -> Tuple[torch.Tensor, int]:
-    raise RuntimeError("Failed to load audio from {}".format(filepath))
-
-
-if torchaudio._extension._FFMPEG_EXT is not None:
-    import torchaudio.io._compat as _compat
-
-    _fallback_info = _compat.info_audio
-    _fallback_load = _compat.load_audio
-else:
-    _fallback_info = _fail_info
-    _fallback_load = _fail_load
-
-
 @torchaudio._extension.fail_if_no_sox
 def info(
     filepath: str,
@@ -58,9 +31,7 @@ def info(
             raise RuntimeError("sox_io backend does not support file-like object.")
         filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    if sinfo is not None:
-        return AudioMetaData(*sinfo)
-    return _fallback_info(filepath, format)
+    return AudioMetaData(*sinfo)
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -153,12 +124,9 @@ def load(
         if hasattr(filepath, "read"):
             raise RuntimeError("sox_io backend does not support file-like object.")
         filepath = os.fspath(filepath)
-    ret = torch.ops.torchaudio.sox_io_load_audio_file(
+    return torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format
     )
-    if ret is not None:
-        return ret
-    return _fallback_load(filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
 @torchaudio._extension.fail_if_no_sox
