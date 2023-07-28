@@ -372,9 +372,17 @@ def amplitude_to_DB(
 
     Args:
 
-        x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take
-          the form `(..., freq, time)`. Batched inputs should include a channel dimension and
-          have the form `(batch, channel, freq, time)`.
+        x (Tensor): Input spectrogram(s) before being converted to decibel scale.
+            The expected shapes are ``(freq, time)``, ``(channel, freq, time)`` or
+            ``(..., batch, channel, freq, time)``.
+
+            .. note::
+
+               When ``top_db`` is specified, cut-off values are computed for each audio
+               in the batch. Therefore if the input shape is 4D (or larger), different
+               cut-off values are used for audio data in the batch.
+               If the input shape is 2D or 3D, a single cutoff value is used.
+
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
