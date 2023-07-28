@@ -28,21 +28,40 @@ Dependencies
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-* `FFmpeg <https://ffmpeg.org>`_.
+* `FFmpeg <https://ffmpeg.org>`__
 
-  Required to use :py:mod:`torchaudio.io` module.
-  TorchAudio official binary distributions are compatible with FFmpeg 4.1 to 4.4.
-  If you need to use FFmpeg 5, please build TorchAudio from source.
+  Required to use :py:mod:`torchaudio.io` module. and ``backend="ffmpeg"`` in
+  I/O functions. (:py:func:`torchaudio.info`, :py:func:`torchaudio.load`,
+  :py:func:`torchaudio.save`).
 
-* `sentencepiece <https://pypi.org/project/sentencepiece/>`_
+  TorchAudio official binary distributions are compatible with FFmpeg 4 to 6.
+
+  TorchAudio searches FFmpeg 6, 5 then 4. You can use the environment variable
+  ``TORCHAUDIO_USE_FFMPEG_VERSION`` to specify the version you would like to use.
+  For example, ``TORCHAUDIO_USE_FFMPEG_VERSION=5``, will only search for FFmpeg 5.
+
+  If dynamic linking is causing an issue, you can set the environment variable
+  ``TORCHAUDIO_USE_FFMPEG=0``, and TorchAudio won't use FFmpeg.
+
+* `SoX <https://sox.sourceforge.net/>`__
+
+  Required to use ``backend="sox"`` in I/O functions. (:py:func:`torchaudio.info`,
+  :py:func:`torchaudio.load`, :py:func:`torchaudio.save`).
+
+  TorchAudio is tested on libsox 14.4.2. Other versions are not supported.
+
+  If dynamic linking is causing an issue, you can set the environment variable
+  ``TORCHAUDIO_USE_SOX=0``, and TorchAudio won't use SoX.
+
+* `sentencepiece <https://pypi.org/project/sentencepiece/>`__
 
   Required for performing automatic speech recognition with :ref:`Emformer RNN-T<RNNT>`.
 
-* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`_
+* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`__
 
   Required for performing text-to-speech with :ref:`Tacotron2`.
 
-* `kaldi_io <https://pypi.org/project/kaldi-io/>`_
+* `kaldi_io <https://pypi.org/project/kaldi-io/>`__
 
   Required to use :py:mod:`torchaudio.kaldi_io` module.
 
