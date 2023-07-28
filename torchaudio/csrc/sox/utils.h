@@ -52,6 +52,10 @@ struct SoxFormat {
 };
 
 ///
+/// Verify that input file is found, has known encoding, and not empty
+void validate_input_file(const SoxFormat& sf, const std::string& path);
+
+///
 /// Verify that input Tensor is 2D, CPU and either uin8, int16, int32 or float32
 void validate_input_tensor(const torch::Tensor&);
 

@@ -315,40 +315,19 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
 
         self._test(torch.ops.torchaudio.sox_io_load_audio_file, frame_offset, num_frames, channels_first, normalize)
 
-    @nested_params(
-        [0, 1, 10, 100, 1000],
-        [-1, 1, 10, 100, 1000],
-        [True, False],
-        [True, False],
-    )
-    def test_ffmpeg(self, frame_offset, num_frames, channels_first, normalize):
-        """The combination of properly changes the output tensor"""
-        from torchaudio.io._compat import load_audio, load_audio_fileobj
-
-        self._test(load_audio, frame_offset, num_frames, channels_first, normalize)
-
-        # test file-like obj
-        def func(path, *args):
-            with open(path, "rb") as fileobj:
-                return load_audio_fileobj(fileobj, *args)
-
-        self._test(func, frame_offset, num_frames, channels_first, normalize)
-
 
 @skipIfNoSox
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """MP3 file without extension can be loaded
 
-        Originally, we added `format` argument for this case, but now we use FFmpeg
-        for MP3 decoding, which works even without `format` argument.
         https://github.com/pytorch/audio/issues/1040
 
         The file was generated with the following command
             ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
         """
         path = get_asset_path("mp3_without_ext")
-        _, sr = sox_io_backend.load(path)
+        _, sr = sox_io_backend.load(path, format="mp3")
         assert sr == 16000
 
 
