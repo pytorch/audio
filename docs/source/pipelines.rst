@@ -217,3 +217,53 @@ Pretrained Models
    CONVTASNET_BASE_LIBRI2MIX
    HDEMUCS_HIGH_MUSDB_PLUS
    HDEMUCS_HIGH_MUSDB
+
+Squim Objective
+---------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimObjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **objecive** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimObjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_OBJECTIVE
+
+Squim Subjective
+----------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimSubjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **subjective** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimSubjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_SUBJECTIVE

@@ -23,8 +23,6 @@ For such models, factory functions are provided.
   ConformerWav2Vec2PretrainModel
   ConvEmformer
   HiFiGANVocoder
-  SquimObjective
-  SquimSubjective
 
 Prototype Factory Functions of Beta Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

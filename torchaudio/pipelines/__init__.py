@@ -4,6 +4,7 @@ from ._source_separation_pipeline import (
     HDEMUCS_HIGH_MUSDB_PLUS,
     SourceSeparationBundle,
 )
+from ._squim_pipeline import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE, SquimObjectiveBundle, SquimSubjectiveBundle
 from ._tts import (
     TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH,
     TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH,
@@ -90,4 +91,8 @@ __all__ = [
     "CONVTASNET_BASE_LIBRI2MIX",
     "HDEMUCS_HIGH_MUSDB_PLUS",
     "HDEMUCS_HIGH_MUSDB",
+    "SQUIM_OBJECTIVE",
+    "SQUIM_SUBJECTIVE",
+    "SquimObjectiveBundle",
+    "SquimSubjectiveBundle",
 ]
