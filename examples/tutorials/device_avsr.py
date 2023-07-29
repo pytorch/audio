@@ -42,12 +42,11 @@ attention due to its robustness against noise.
 
 """
 
+import numpy as np
+import sentencepiece as spm
 import torch
 import torchaudio
 import torchvision
-
-import numpy as np
-import sentencepiece as spm
 
 ######################################################################
 # Overview
