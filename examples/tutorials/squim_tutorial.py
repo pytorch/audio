@@ -80,7 +80,7 @@ print(torchaudio.__version__)
 try:
     from pesq import pesq
     from pystoi import stoi
-    from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
+    from torchaudio.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 except ImportError:
     import google.colab  # noqa: F401
 

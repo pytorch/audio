@@ -46,6 +46,14 @@
             "hdemucs_medium",
             "hdemucs_high",
         ],
+        "torchaudio.models.SquimObjective": [
+            "squim_objective_model",
+            "squim_objective_base",
+        ],
+        "torchaudio.models.SquimSubjective": [
+            "squim_subjective_model",
+            "squim_subjective_base",
+        ],
     }
 -%}
 {%- set prototype_factory = {

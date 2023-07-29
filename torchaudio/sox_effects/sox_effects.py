@@ -269,7 +269,4 @@ def apply_effects_file(
                 "Please use torchaudio.io.AudioEffector."
             )
         path = os.fspath(path)
-    ret = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
-    if ret is not None:
-        return ret
-    raise RuntimeError("Failed to load audio from {}".format(path))
+    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
