@@ -9,9 +9,10 @@ from torchaudio.io import StreamWriter
 
 if torchaudio._extension._FFMPEG_EXT is not None:
     StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj
+else:
+    StreamReaderFileObj = object
 
 
-# Note: need to comply TorchScript syntax -- need annotation and no f-string nor global
 def info_audio(
     src: str,
     format: Optional[str],
@@ -241,7 +242,6 @@ def _parse_save_args(
     return muxer, encoder, sample_fmt
 
 
-# NOTE: in contrast to load_audio* and info_audio*, this function is NOT compatible with TorchScript.
 def save_audio(
     uri: Union[BinaryIO, str, os.PathLike],
     src: torch.Tensor,
