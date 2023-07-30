@@ -5,8 +5,13 @@
 
 .. autoclass:: {{ fullname }}()
 
-{%- if name in ["RNNTBundle.FeatureExtractor", "RNNTBundle.TokenProcessor"] %}
+{%- set support_classes = [] %}
+{%- if name in ["RNNTBundle.FeatureExtractor", "RNNTBundle.TokenProcessor", "Wav2Vec2FABundle.Tokenizer"] %}
   {%- set methods = ["__call__"] %}
+{%- elif name == "Wav2Vec2FABundle.Aligner" %}
+  {%- set attributes = [] %}
+  {%- set methods = ["__call__"] %}
+  {%- set support_classes = ["Token"] %}
 {%- elif name == "Tacotron2TTSBundle.TextProcessor" %}
   {%- set attributes = ["tokens"] %}
   {%- set methods = ["__call__"] %}
@@ -21,12 +26,17 @@
   {%- set methods = ["__call__"] %}
 {% endif %}
 
-..
-   ATTRIBUTES
+{%- if attributes %}
+
+Properties
+----------
+
+{%- endif %}
+
 {%- for item in attributes %}
 {%- if not item.startswith('_') %}
 
-{{ item | underline("-") }}
+{{ item | underline("~") }}
 
 .. container:: py attribute
 
@@ -35,17 +45,42 @@
 {%- endif %}
 {%- endfor %}
 
-..
-   METHODS
+{%- if methods %}
+
+Methods
+-------
+
+{%- endif %}
 
 {%- for item in methods %}
 {%- if item != "__init__" %}
 
-{{item | underline("-") }}
+{{item | underline("~") }}
 
 .. container:: py attribute
 
    .. automethod:: {{[fullname, item] | join('.')}}
 
 {%- endif %}
+{%- endfor %}
+
+{%- if support_classes %}
+
+Support Structures
+------------------
+
+{%- endif %}
+
+{%- for item in support_classes %}
+
+{% set components = item.split('.') %}
+
+{{ components[-1] | underline("~") }}
+
+.. container:: py attribute
+
+   .. autoclass:: {{[fullname, item] | join('.')}}
+      :members:
+
+
 {%- endfor %}
