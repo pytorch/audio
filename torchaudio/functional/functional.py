@@ -1046,8 +1046,8 @@ def _compute_nccf(waveform: Tensor, sample_rate: int, frame_time: float, freq_lo
 
         output_frames = (
             (s1 * s2).sum(-1)
-            / (EPSILON + torch.norm(s1, p=2, dim=-1)).pow(2)
-            / (EPSILON + torch.norm(s2, p=2, dim=-1)).pow(2)
+            / (EPSILON + torch.linalg.vector_norm(s1, ord=2, dim=-1)).pow(2)
+            / (EPSILON + torch.linalg.vector_norm(s2, ord=2, dim=-1)).pow(2)
         )
 
         output_lag.append(output_frames.unsqueeze(-1))
