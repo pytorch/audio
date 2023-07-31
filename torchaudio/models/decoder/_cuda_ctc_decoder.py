@@ -63,7 +63,8 @@ class CUCTCDecoder:
             vocab_list (List[str]): list of vocabulary tokens
             beam_size (int, optional): max number of hypos to hold after each decode step (Default: 10)
             nbest (int): number of best decodings to return
-            blank_skip_threshold (float): skip frames if log_prob(blank) > log(blank_skip_threshold), to speed up decoding.
+            blank_skip_threshold (float):
+                skip frames if log_prob(blank) > log(blank_skip_threshold), to speed up decoding.
                 (Default: 0.95).
             cuda_stream (torch.cuda.streams.Stream): using assigned cuda stream (Default: using default stream)
 

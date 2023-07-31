@@ -15,7 +15,7 @@ CUDA-based CTC beam search decoder. We demonstrate this on a pretrained `Zipform
 #
 # Beam search decoding works by iteratively expanding text hypotheses (beams)
 # with next possible characters, and maintaining only the hypotheses with the
-# highest scores at each time step. 
+# highest scores at each time step.
 #
 # The underlying implementation uses cuda to acclerate the whole decoding process. A mathematical formula for the decoder can be
 # found in the `paper <https://arxiv.org/pdf/1408.2873.pdf>`__, and
@@ -48,14 +48,12 @@ print(torchaudio.__version__)
 #
 
 import time
-from typing import List
+from pathlib import Path
 
 import IPython
-import matplotlib.pyplot as plt
+import sentencepiece as spm
 from torchaudio.models.decoder import cuda_ctc_decoder
 from torchaudio.utils import download_asset
-from pathlib import Path
-import sentencepiece as spm
 
 ######################################################################
 #
@@ -64,12 +62,14 @@ import sentencepiece as spm
 # dataset <http://www.openslr.org/12>`__. The model is jointly trained with CTC and Transducer loss functions.
 # In this tutorial, we only use CTC head of the model.
 
+
 def download_asset_external(url, key):
     path = Path(torch.hub.get_dir()) / "torchaudio" / Path(key)
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
         torch.hub.download_url_to_file(url, path)
     return str(path)
+
 
 model_link = "https://huggingface.co/Zengwei/icefall-asr-librispeech-pruned-transducer-stateless7-ctc-2022-12-01/resolve/main/exp/cpu_jit.pt"
 model_path = download_asset_external(model_link, "cuda_ctc_decoder/cpu_jit.pt")
@@ -94,13 +94,11 @@ IPython.display.Audio(speech_file)
 #
 
 
-
-
 ######################################################################
 # Files and Data for Decoder
 # --------------------------
 #
-# Next, we load in our token from BPE model, which is the tokenizer for decoding. 
+# Next, we load in our token from BPE model, which is the tokenizer for decoding.
 #
 
 
@@ -163,20 +161,20 @@ cuda_decoder = cuda_ctc_decoder(tokens, nbest=10, beam_size=10, blank_skip_thres
 actual_transcript = "i really was very much afraid of showing him how much shocked i was at some parts of what he said"
 actual_transcript = actual_transcript.split()
 
-device=torch.device("cuda", 0)
-acoustic_model=torch.jit.load(model_path)
+device = torch.device("cuda", 0)
+acoustic_model = torch.jit.load(model_path)
 acoustic_model.to(device)
 acoustic_model.eval()
 
 waveform = waveform.to(device)
 
-feat = torchaudio.compliance.kaldi.fbank(waveform, num_mel_bins=80, snip_edges=False) 
+feat = torchaudio.compliance.kaldi.fbank(waveform, num_mel_bins=80, snip_edges=False)
 feat = feat.unsqueeze(0)
 feat_lens = torch.tensor(feat.size(1), device=device).unsqueeze(0)
 
 encoder_out, encoder_out_lens = acoustic_model.encoder(feat, feat_lens)
 nnet_output = acoustic_model.ctc_output(encoder_out)
-log_prob = torch.nn.functional.log_softmax(nnet_output,-1)
+log_prob = torch.nn.functional.log_softmax(nnet_output, -1)
 
 print(f"The shape of log_prob: {log_prob.shape}, the shape of encoder_out_lens: {encoder_out_lens.shape}")
 
@@ -215,8 +213,9 @@ def print_decoded(cuda_decoder, bpe_model, log_prob, encoder_out_lens, param, pa
     results = cuda_decoder(log_prob, encoder_out_lens.to(torch.int32))
     decode_time = time.monotonic() - start_time
     transcript = bpe_model.decode(results[0][0].tokens).lower()
-    score = results[0][0].score    
+    score = results[0][0].score
     print(f"{param} {param_value:<3}: {transcript} (score: {score:.2f}; {decode_time:.4f} secs)")
+
 
 ######################################################################
 # nbest
@@ -266,9 +265,9 @@ for beam_size in beam_sizes:
 #
 # The ``blank_skip_threshold`` parameter is used to prune the frames which have large blank probability.
 # Pruning these frames with a good blank_skip_threshold could speed up decoding
-# process a lot while no accuracy drop. 
-# Since the rule of CTC, we would keep at least one blank frame between two non-blank frames 
-# to avoid mistakenly merge two consecutive identical symbols.  
+# process a lot while no accuracy drop.
+# Since the rule of CTC, we would keep at least one blank frame between two non-blank frames
+# to avoid mistakenly merge two consecutive identical symbols.
 # We recommend to set blank_skip_threshold=0.95 for cuda beam search decoder.
 #
 
@@ -288,7 +287,7 @@ del cuda_decoder
 ######################################################################
 # Benchmark with flashlight CPU decoder
 # -------------------------------------
-# We benchmark the throughput and accuracy between CUDA decoder and CPU decoder using librispeech test_other set. 
+# We benchmark the throughput and accuracy between CUDA decoder and CPU decoder using librispeech test_other set.
 # To reproduce below benchmark results, you may refer `here <https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_cuda_ctc_decoder>`__.
 #
 # +--------------+------------------------------------------+---------+-----------------------+-----------------------------+
