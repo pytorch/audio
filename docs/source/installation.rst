@@ -16,7 +16,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
    each of which requires a corresponding PyTorch distribution.
 
 .. note::
-   This software was compiled against an unmodified copy of FFmpeg (licensed under `the LGPLv2.1 <https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1>`_), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded `here <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`_.
+   This software was compiled against an unmodified copies of FFmpeg, with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded from the following locations: `n4.1.8 <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n4.1.8/COPYING.LGPLv2.1>`__), `n5.0.3 <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n5.0.3/COPYING.LGPLv2.1>`__) and `n6.0 <https://github.com/FFmpeg/FFmpeg/releases/tag/n6.0>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n6.0/COPYING.LGPLv2.1>`__).
 
 Dependencies
 ------------
@@ -28,21 +28,40 @@ Dependencies
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-* `FFmpeg <https://ffmpeg.org>`_.
+* `FFmpeg <https://ffmpeg.org>`__
 
-  Required to use :py:mod:`torchaudio.io` module.
-  TorchAudio official binary distributions are compatible with FFmpeg 4.1 to 4.4.
-  If you need to use FFmpeg 5, please build TorchAudio from source.
+  Required to use :py:mod:`torchaudio.io` module. and ``backend="ffmpeg"`` in
+  I/O functions. (:py:func:`torchaudio.info`, :py:func:`torchaudio.load`,
+  :py:func:`torchaudio.save`).
 
-* `sentencepiece <https://pypi.org/project/sentencepiece/>`_
+  TorchAudio official binary distributions are compatible with FFmpeg 4 to 6.
+
+  TorchAudio searches FFmpeg 6, 5 then 4. You can use the environment variable
+  ``TORCHAUDIO_USE_FFMPEG_VERSION`` to specify the version you would like to use.
+  For example, ``TORCHAUDIO_USE_FFMPEG_VERSION=5``, will only search for FFmpeg 5.
+
+  If dynamic linking is causing an issue, you can set the environment variable
+  ``TORCHAUDIO_USE_FFMPEG=0``, and TorchAudio won't use FFmpeg.
+
+* `SoX <https://sox.sourceforge.net/>`__
+
+  Required to use ``backend="sox"`` in I/O functions. (:py:func:`torchaudio.info`,
+  :py:func:`torchaudio.load`, :py:func:`torchaudio.save`).
+
+  TorchAudio is tested on libsox 14.4.2. Other versions are not supported.
+
+  If dynamic linking is causing an issue, you can set the environment variable
+  ``TORCHAUDIO_USE_SOX=0``, and TorchAudio won't use SoX.
+
+* `sentencepiece <https://pypi.org/project/sentencepiece/>`__
 
   Required for performing automatic speech recognition with :ref:`Emformer RNN-T<RNNT>`.
 
-* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`_
+* `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`__
 
   Required for performing text-to-speech with :ref:`Tacotron2`.
 
-* `kaldi_io <https://pypi.org/project/kaldi-io/>`_
+* `kaldi_io <https://pypi.org/project/kaldi-io/>`__
 
   Required to use :py:mod:`torchaudio.kaldi_io` module.
 

@@ -5,12 +5,12 @@ from functools import lru_cache
 from typing import BinaryIO, Dict, Optional, Tuple, Union
 
 import torch
-import torchaudio.backend.soundfile_backend as soundfile_backend
-from torchaudio._extension import _FFMPEG_INITIALIZED, _SOX_INITIALIZED
+
+from torchaudio._extension import _FFMPEG_EXT, _SOX_INITIALIZED
+from torchaudio.backend import soundfile_backend
 from torchaudio.backend.common import AudioMetaData
 
-if _FFMPEG_INITIALIZED:
-    from torchaudio.io._compat import info_audio, info_audio_fileobj, load_audio, load_audio_fileobj, save_audio
+from . import ffmpeg
 
 
 class Backend(ABC):
@@ -80,9 +80,9 @@ class FFmpegBackend(Backend):
     @staticmethod
     def info(uri: Union[BinaryIO, str, os.PathLike], format: Optional[str], buffer_size: int = 4096) -> AudioMetaData:
         if hasattr(uri, "read"):
-            metadata = info_audio_fileobj(uri, format, buffer_size=buffer_size)
+            metadata = ffmpeg.info_audio_fileobj(uri, format, buffer_size=buffer_size)
         else:
-            metadata = info_audio(os.path.normpath(uri), format)
+            metadata = ffmpeg.info_audio(os.path.normpath(uri), format)
         metadata.bits_per_sample = _get_bits_per_sample(metadata.encoding, metadata.bits_per_sample)
         metadata.encoding = _map_encoding(metadata.encoding)
         return metadata
@@ -98,7 +98,7 @@ class FFmpegBackend(Backend):
         buffer_size: int = 4096,
     ) -> Tuple[torch.Tensor, int]:
         if hasattr(uri, "read"):
-            return load_audio_fileobj(
+            return ffmpeg.load_audio_fileobj(
                 uri,
                 frame_offset,
                 num_frames,
@@ -108,7 +108,7 @@ class FFmpegBackend(Backend):
                 buffer_size,
             )
         else:
-            return load_audio(os.path.normpath(uri), frame_offset, num_frames, normalize, channels_first, format)
+            return ffmpeg.load_audio(os.path.normpath(uri), frame_offset, num_frames, normalize, channels_first, format)
 
     @staticmethod
     def save(
@@ -121,7 +121,7 @@ class FFmpegBackend(Backend):
         bits_per_sample: Optional[int] = None,
         buffer_size: int = 4096,
     ) -> None:
-        save_audio(
+        ffmpeg.save_audio(
             uri,
             src,
             sample_rate,
@@ -262,7 +262,7 @@ class SoundfileBackend(Backend):
 @lru_cache(None)
 def get_available_backends() -> Dict[str, Backend]:
     backend_specs = {}
-    if _FFMPEG_INITIALIZED:
+    if _FFMPEG_EXT is not None:
         backend_specs["ffmpeg"] = FFmpegBackend
     if _SOX_INITIALIZED:
         backend_specs["sox"] = SoXBackend

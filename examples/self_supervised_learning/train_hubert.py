@@ -6,12 +6,11 @@ from typing import Dict, Tuple
 
 import torch
 import torchaudio.models
-from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.utilities.seed import seed_everything
+from lightning.pytorch import seed_everything, Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint
 
 from .data_modules import HuBERTDataModule
-from .lightning import SSLPretrainModule
+from .lightning_modules import SSLPretrainModule
 from .losses import hubert_loss
 from .lr_schedulers import LinearDecayLRScheduler
 
@@ -102,11 +101,11 @@ def run_train(args):
         num_nodes=args.num_nodes,
         devices=args.gpus,
         accelerator="gpu",
-        strategy="ddp",
+        strategy="ddp_find_unused_parameters_true",
         precision=args.precision,
         accumulate_grad_batches=args.accumulate_grad_batches,
         gradient_clip_val=args.clip_norm,
-        replace_sampler_ddp=False,
+        use_distributed_sampler=False,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
     )

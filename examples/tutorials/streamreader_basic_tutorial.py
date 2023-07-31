@@ -14,12 +14,12 @@ libavfilter provides.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <4.4).
+#    This tutorial requires FFmpeg libraries (>=4.1, <7).
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda 'ffmpeg<4.4'`` will install
-#    the required libraries.
+#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
+#    compatible FFmpeg libraries.
 #
 
 ######################################################################
@@ -65,29 +65,8 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
-#
-
-try:
-    from torchaudio.io import StreamReader
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install the requisite
-            third party libraries by running the following code:
-
-            !add-apt-repository -y ppa:savoury1/ffmpeg4
-            !apt-get -qq install -y ffmpeg
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
 import matplotlib.pyplot as plt
+from torchaudio.io import StreamReader
 
 base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"
 AUDIO_URL = f"{base_url}/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
@@ -613,7 +592,6 @@ for i, vid in enumerate(vids2):
         if i == 0 and j == 0:
             ax.set_ylabel("Stream 2")
 plt.tight_layout()
-plt.show(block=False)
 
 ######################################################################
 #

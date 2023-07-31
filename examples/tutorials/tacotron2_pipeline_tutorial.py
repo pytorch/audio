@@ -7,10 +7,6 @@ Text-to-Speech with Tacotron2
 
 """
 
-import IPython
-import matplotlib
-import matplotlib.pyplot as plt
-
 ######################################################################
 # Overview
 # --------
@@ -65,14 +61,19 @@ import matplotlib.pyplot as plt
 import torch
 import torchaudio
 
-matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
-
 torch.random.manual_seed(0)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
+
+
+######################################################################
+#
+
+import IPython
+import matplotlib.pyplot as plt
 
 
 ######################################################################
@@ -226,13 +227,17 @@ _ = plt.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 # therefor, the process of generating the spectrogram incurs randomness.
 #
 
-fig, ax = plt.subplots(3, 1, figsize=(16, 4.3 * 3))
-for i in range(3):
-    with torch.inference_mode():
-        spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
-    print(spec[0].shape)
-    ax[i].imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
-plt.show()
+
+def plot():
+    fig, ax = plt.subplots(3, 1)
+    for i in range(3):
+        with torch.inference_mode():
+            spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
+        print(spec[0].shape)
+        ax[i].imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
+
+
+plot()
 
 
 ######################################################################
@@ -270,11 +275,22 @@ with torch.inference_mode():
     spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
     waveforms, lengths = vocoder(spec, spec_lengths)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
+
+def plot(waveforms, spec, sample_rate):
+    waveforms = waveforms.cpu().detach()
+
+    fig, [ax1, ax2] = plt.subplots(2, 1)
+    ax1.plot(waveforms[0])
+    ax1.set_xlim(0, waveforms.size(-1))
+    ax1.grid(True)
+    ax2.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
+    return IPython.display.Audio(waveforms[0:1], rate=sample_rate)
+
+
+plot(waveforms, spec, vocoder.sample_rate)
 
 
 ######################################################################
@@ -300,11 +316,10 @@ with torch.inference_mode():
     spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
 waveforms, lengths = vocoder(spec, spec_lengths)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
+plot(waveforms, spec, vocoder.sample_rate)
 
 
 ######################################################################
@@ -339,8 +354,7 @@ waveglow.eval()
 with torch.no_grad():
     waveforms = waveglow.infer(spec)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-IPython.display.Audio(waveforms[0:1].cpu(), rate=22050)
+plot(waveforms, spec, 22050)

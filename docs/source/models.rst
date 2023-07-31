@@ -28,6 +28,8 @@ For such models, factory functions are provided.
    HuBERTPretrainModel
    RNNT
    RNNTBeamSearch
+   SquimObjective
+   SquimSubjective
    Tacotron2
    Wav2Letter
    Wav2Vec2Model

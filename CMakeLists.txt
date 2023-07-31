@@ -53,9 +53,9 @@ endif()
 
 # Options
 option(BUILD_SOX "Build libsox statically" ON)
-option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_RIR "Enable RIR simulation" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
+option(BUILD_ALIGN "Enable forced alignment" ON)
 option(BUILD_CUDA_CTC_DECODER "Build CUCTC decoder" OFF)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 option(USE_FFMPEG "Enable ffmpeg-based features" OFF)
@@ -80,6 +80,14 @@ endif()
 
 if(USE_CUDA)
   enable_language(CUDA)
+  set(
+    CMAKE_CUDA_FLAGS
+    "${CMAKE_CUDA_FLAGS} \
+    -DCUDA_HAS_FP16=1 \
+    -D__CUDA_NO_HALF_OPERATORS__ \
+    -D__CUDA_NO_HALF_CONVERSIONS__ \
+    -D__CUDA_NO_HALF2_OPERATORS__"
+  )
 endif()
 
 include(cmake/TorchAudioHelper.cmake)
@@ -108,7 +116,16 @@ if(MSVC)
       unsigned_compare_with_zero
       declared_but_not_referenced
       bad_friend_decl)
-      string(APPEND CMAKE_CUDA_FLAGS " -Xcudafe --diag_suppress=${diag}")
+      string(
+        APPEND
+        CMAKE_CUDA_FLAGS
+        " -Xcudafe \
+        --diag_suppress=${diag} \
+        -DCUDA_HAS_FP16=1 \
+        -D__CUDA_NO_HALF_OPERATORS__ \
+        -D__CUDA_NO_HALF_CONVERSIONS__ \
+        -D__CUDA_NO_HALF2_OPERATORS__"
+      )
     endforeach()
     CUDA_CONVERT_FLAGS(torch_cpu)
     if(TARGET torch_cuda)
@@ -148,12 +165,18 @@ else()
   message(STATUS "Could not find ccache. Consider installing ccache to speed up compilation.")
 endif()
 
-add_subdirectory(third_party)
 add_subdirectory(torchaudio/csrc)
 if (BUILD_SOX)
+  add_subdirectory(third_party/sox)
   add_subdirectory(torchaudio/csrc/sox)
 endif()
 if (USE_FFMPEG)
+  if (DEFINED ENV{FFMPEG_ROOT})
+    add_subdirectory(third_party/ffmpeg/single)
+  else()
+    message(STATUS "Building FFmpeg integration with multi version support")
+    add_subdirectory(third_party/ffmpeg/multi)
+  endif()
   add_subdirectory(torchaudio/csrc/ffmpeg)
 endif()
 if (BUILD_CUDA_CTC_DECODER)

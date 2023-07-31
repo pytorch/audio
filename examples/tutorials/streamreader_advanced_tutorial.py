@@ -20,34 +20,14 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
-#
-
-try:
-    from torchaudio.io import StreamReader
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install the requisite
-            third party libraries by running the following code:
-
-            !add-apt-repository -y ppa:savoury1/ffmpeg4
-            !apt-get -qq install -y ffmpeg
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
 import IPython
 import matplotlib.pyplot as plt
+from torchaudio.io import StreamReader
 
 base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"
 AUDIO_URL = f"{base_url}/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4"
+
 
 ######################################################################
 # Audio / Video device input
@@ -122,6 +102,9 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 
 ######################################################################
+#
+# .. _lavfi:
+#
 # Synthetic source streams
 # ------------------------
 #
@@ -372,13 +355,14 @@ chunks = next(streamer.stream())
 
 def _display(i):
     print("filter_desc:", streamer.get_out_stream_info(i).filter_description)
-    _, axs = plt.subplots(2, 1)
+    fig, axs = plt.subplots(2, 1)
     waveform = chunks[i][:, 0]
     axs[0].plot(waveform)
     axs[0].grid(True)
     axs[0].set_ylim([-1, 1])
     plt.setp(axs[0].get_xticklabels(), visible=False)
     axs[1].specgram(waveform, Fs=sample_rate)
+    fig.tight_layout()
     return IPython.display.Audio(chunks[i].T, rate=sample_rate)
 
 
@@ -457,7 +441,6 @@ def _display(i):
         axs[j].imshow(chunk[10 * j + 1].permute(1, 2, 0))
         axs[j].set_axis_off()
     plt.tight_layout()
-    plt.show(block=False)
 
 
 ######################################################################

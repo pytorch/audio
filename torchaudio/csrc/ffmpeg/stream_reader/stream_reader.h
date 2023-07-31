@@ -359,16 +359,23 @@ struct CustomInput {
 
 /// @endcond
 
-/// Construct StreamReader with custom read and seek functions.
 ///
-/// @param opaque Custom data used by read_packet and seek functions.
-/// @param format Specify input format.
-/// @param buffer_size The size of the intermediate buffer, which FFmpeg uses to
-/// pass data to function read_packet.
-/// @param read_packet Custom read function that is called from FFmpeg to
-/// read data from the destination.
-/// @param seek Optional seek function that is used to seek the destination.
-struct StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
+/// A subclass of StreamReader which works with custom read function.
+/// Can be used for decoding media from memory or custom object.
+///
+class StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
+ public:
+  ///
+  /// Construct StreamReader with custom read and seek functions.
+  ///
+  /// @param opaque Custom data used by ``read_packet`` and ``seek`` functions.
+  /// @param format Specify input format.
+  /// @param buffer_size The size of the intermediate buffer, which FFmpeg uses
+  /// to pass data to function read_packet.
+  /// @param read_packet Custom read function that is called from FFmpeg to
+  /// read data from the destination.
+  /// @param seek Optional seek function that is used to seek the destination.
+  /// @param option Custom option passed when initializing format context.
   StreamReaderCustomIO(
       void* opaque,
       const c10::optional<std::string>& format,

@@ -4,7 +4,6 @@
 
 from typing import Dict, List
 
-import torch
 import torchaudio
 
 
@@ -18,7 +17,7 @@ def set_seed(seed: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_seed(seed)
+    torchaudio.lib._torchaudio_sox.set_seed(seed)
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -36,7 +35,7 @@ def set_verbosity(verbosity: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_verbosity(verbosity)
+    torchaudio.lib._torchaudio_sox.set_verbosity(verbosity)
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -49,7 +48,7 @@ def set_buffer_size(buffer_size: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_buffer_size(buffer_size)
+    torchaudio.lib._torchaudio_sox.set_buffer_size(buffer_size)
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -63,7 +62,7 @@ def set_use_threads(use_threads: bool):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_use_threads(use_threads)
+    torchaudio.lib._torchaudio_sox.set_use_threads(use_threads)
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -73,7 +72,7 @@ def list_effects() -> Dict[str, str]:
     Returns:
         Dict[str, str]: Mapping from ``effect name`` to ``usage``
     """
-    return dict(torch.ops.torchaudio.sox_utils_list_effects())
+    return dict(torchaudio.lib._torchaudio_sox.list_effects())
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -83,7 +82,7 @@ def list_read_formats() -> List[str]:
     Returns:
         List[str]: List of supported audio formats
     """
-    return torch.ops.torchaudio.sox_utils_list_read_formats()
+    return torchaudio.lib._torchaudio_sox.list_read_formats()
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -93,7 +92,7 @@ def list_write_formats() -> List[str]:
     Returns:
         List[str]: List of supported audio formats
     """
-    return torch.ops.torchaudio.sox_utils_list_write_formats()
+    return torchaudio.lib._torchaudio_sox.list_write_formats()
 
 
 @torchaudio._extension.fail_if_no_sox
@@ -103,4 +102,4 @@ def get_buffer_size() -> int:
     Returns:
         int: size in bytes of buffers used for processing audio.
     """
-    return torch.ops.torchaudio.sox_utils_get_buffer_size()
+    return torchaudio.lib._torchaudio_sox.get_buffer_size()

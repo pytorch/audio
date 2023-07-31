@@ -3,8 +3,7 @@
 #include <torchaudio/csrc/ffmpeg/stream_reader/stream_reader.h>
 #include <torchaudio/csrc/ffmpeg/stream_writer/stream_writer.h>
 
-namespace torchaudio {
-namespace io {
+namespace torchaudio::io {
 namespace {
 
 std::map<std::string, std::tuple<int64_t, int64_t, int64_t>> get_versions() {
@@ -187,7 +186,11 @@ struct StreamWriterFileObj : private FileObj, public StreamWriterCustomIO {
             py::hasattr(fileobj, "seek") ? &seek_func : nullptr) {}
 };
 
-PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
+#ifndef TORCHAUDIO_FFMPEG_EXT_NAME
+#error TORCHAUDIO_FFMPEG_EXT_NAME must be defined.
+#endif
+
+PYBIND11_MODULE(TORCHAUDIO_FFMPEG_EXT_NAME, m) {
   m.def("init", []() { avdevice_register_all(); });
   m.def("get_log_level", []() { return av_log_get_level(); });
   m.def("set_log_level", [](int level) { av_log_set_level(level); });
@@ -354,5 +357,4 @@ PYBIND11_MODULE(_torchaudio_ffmpeg, m) {
 }
 
 } // namespace
-} // namespace io
-} // namespace torchaudio
+} // namespace torchaudio::io

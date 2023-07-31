@@ -30,14 +30,17 @@ class EffectorTest(TorchaudioTestCase):
             ("ogg", "flac"),  # flac only supports s16 and s32
             ("ogg", "opus"),  # opus only supports 48k Hz
             ("ogg", "vorbis"),  # vorbis only supports stereo
+            # ("ogg", "vorbis", 44100),
+            # this fails with small descrepancy; 441024 vs 441000
+            # TODO: investigate
             ("wav", None),
             ("wav", "pcm_u8"),
             ("mp3", None),
+            ("mulaw", None, 44100),  # mulaw is encoded without header
         ]
     )
-    def test_formats(self, format, encoder):
+    def test_formats(self, format, encoder, sample_rate=8000):
         """Formats (some with restrictions) just work without an issue in effector"""
-        sample_rate = 8000
 
         effector = AudioEffector(format=format, encoder=encoder)
         original = get_sinusoid(n_channels=3, sample_rate=sample_rate, channels_first=False)
@@ -80,3 +83,20 @@ class EffectorTest(TorchaudioTestCase):
 
         output = effector.apply(original, sample_rate)
         self.assertEqual(original.shape, output.shape)
+
+    def test_resample(self):
+        """Resample option allows to change the sampling rate"""
+        sample_rate = 8000
+        output_sample_rate = 16000
+        num_channels = 3
+
+        effector = AudioEffector(effect="lowpass")
+        original = get_sinusoid(n_channels=num_channels, sample_rate=sample_rate, channels_first=False)
+
+        output = effector.apply(original, sample_rate, output_sample_rate)
+        self.assertEqual(output.shape, [output_sample_rate, num_channels])
+
+        for chunk in effector.stream(
+            original, sample_rate, output_sample_rate=output_sample_rate, frames_per_chunk=output_sample_rate
+        ):
+            self.assertEqual(chunk.shape, [output_sample_rate, num_channels])

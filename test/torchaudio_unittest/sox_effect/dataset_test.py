@@ -94,8 +94,9 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=32,
-            num_workers=16,
+            num_workers=4,
             worker_init_fn=init_random_seed,
+            multiprocessing_context=torch.multiprocessing.get_context("spawn"),
         )
         for batch in loader:
             assert batch.shape == (32, 2, 2 * sample_rate)
@@ -115,8 +116,9 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=32,
-            num_workers=16,
+            num_workers=4,
             worker_init_fn=init_random_seed,
+            multiprocessing_context=torch.multiprocessing.get_context("spawn"),
         )
         for batch in loader:
             assert batch.shape == (32, 2, 2 * sample_rate)

@@ -205,9 +205,7 @@ torch::Tensor PlanarImageConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 // YUV420P
 ////////////////////////////////////////////////////////////////////////////////
-YUV420PConverter::YUV420PConverter(int h, int w)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer({1, 2, height / 2, width / 2})) {
+YUV420PConverter::YUV420PConverter(int h, int w) : ImageConverterBase(h, w, 3) {
   TORCH_WARN_ONCE(
       "The output format YUV420P is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -234,33 +232,37 @@ void YUV420PConverter::convert(const AVFrame* src, torch::Tensor& dst) {
       p_src += src->linesize[0];
     }
   }
-  // Write intermediate UV plane
-  {
-    uint8_t* p_dst = tmp_uv.data_ptr<uint8_t>();
-    uint8_t* p_src = src->data[1];
-    for (int h = 0; h < height / 2; ++h) {
-      memcpy(p_dst, p_src, width / 2);
-      p_dst += width / 2;
-      p_src += src->linesize[1];
-    }
-    p_src = src->data[2];
-    for (int h = 0; h < height / 2; ++h) {
-      memcpy(p_dst, p_src, width / 2);
-      p_dst += width / 2;
-      p_src += src->linesize[2];
-    }
+  // Chroma (U and V planes) are subsamapled by 2 in both vertical and
+  // holizontal directions.
+  // https://en.wikipedia.org/wiki/Chroma_subsampling
+  // Since we are returning data in Tensor, which has the same size for all
+  // color planes, we need to upsample the UV planes. PyTorch has interpolate
+  // function but it does not work for int16 type. So we manually copy them.
+  //
+  //              block1  block2  block3  block4
+  // ab -> aabb = a  b   *  a  b *       *
+  // cd    aabb                   a  b      a  b
+  //       ccdd   c  d      c  d
+  //       ccdd                   c  d      c  d
+  //
+  auto block00 = dst.slice(2, 0, {}, 2).slice(3, 0, {}, 2);
+  auto block01 = dst.slice(2, 0, {}, 2).slice(3, 1, {}, 2);
+  auto block10 = dst.slice(2, 1, {}, 2).slice(3, 0, {}, 2);
+  auto block11 = dst.slice(2, 1, {}, 2).slice(3, 1, {}, 2);
+  for (int i = 1; i < 3; ++i) {
+    // borrow data
+    auto tmp = torch::from_blob(
+        src->data[i],
+        {height / 2, width / 2},
+        {src->linesize[i], 1},
+        [](void*) {},
+        torch::TensorOptions().dtype(torch::kUInt8).layout(torch::kStrided));
+    // Copy to each block
+    block00.slice(1, i, i + 1).copy_(tmp);
+    block01.slice(1, i, i + 1).copy_(tmp);
+    block10.slice(1, i, i + 1).copy_(tmp);
+    block11.slice(1, i, i + 1).copy_(tmp);
   }
-  // Upsample width and height
-  namespace F = torch::nn::functional;
-  torch::Tensor uv = F::interpolate(
-      tmp_uv,
-      F::InterpolateFuncOptions()
-          .mode(torch::kNearest)
-          .size(std::vector<int64_t>({height, width})));
-  // Write to the UV plane
-  // dst[:, 1:] = uv
-  using namespace torch::indexing;
-  dst.index_put_({Slice(), Slice(1)}, uv);
 }
 
 torch::Tensor YUV420PConverter::convert(const AVFrame* src) {
@@ -270,11 +272,81 @@ torch::Tensor YUV420PConverter::convert(const AVFrame* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// YUV420P10LE
+////////////////////////////////////////////////////////////////////////////////
+YUV420P10LEConverter::YUV420P10LEConverter(int h, int w)
+    : ImageConverterBase(h, w, 3) {
+  TORCH_WARN_ONCE(
+      "The output format YUV420PLE is selected. "
+      "This will be implicitly converted to YUV444P (16-bit), "
+      "in which all the color components Y, U, V have the same dimension.");
+}
+
+void YUV420P10LEConverter::convert(const AVFrame* src, torch::Tensor& dst) {
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+      (AVPixelFormat)(src->format) == AV_PIX_FMT_YUV420P10LE);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src->height == height);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src->width == width);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(1) == 3);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(2) == height);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.size(3) == width);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(dst.dtype() == torch::kInt16);
+
+  // Write Y plane directly
+  {
+    int16_t* p_dst = dst.data_ptr<int16_t>();
+    uint8_t* p_src = src->data[0];
+    for (int h = 0; h < height; ++h) {
+      memcpy(p_dst, p_src, (size_t)width * 2);
+      p_dst += width;
+      p_src += src->linesize[0];
+    }
+  }
+  // Chroma (U and V planes) are subsamapled by 2 in both vertical and
+  // holizontal directions.
+  // https://en.wikipedia.org/wiki/Chroma_subsampling
+  // Since we are returning data in Tensor, which has the same size for all
+  // color planes, we need to upsample the UV planes. PyTorch has interpolate
+  // function but it does not work for int16 type. So we manually copy them.
+  //
+  //              block1  block2  block3  block4
+  // ab -> aabb = a  b   *  a  b *       *
+  // cd    aabb                   a  b      a  b
+  //       ccdd   c  d      c  d
+  //       ccdd                   c  d      c  d
+  //
+  auto block00 = dst.slice(2, 0, {}, 2).slice(3, 0, {}, 2);
+  auto block01 = dst.slice(2, 0, {}, 2).slice(3, 1, {}, 2);
+  auto block10 = dst.slice(2, 1, {}, 2).slice(3, 0, {}, 2);
+  auto block11 = dst.slice(2, 1, {}, 2).slice(3, 1, {}, 2);
+  for (int i = 1; i < 3; ++i) {
+    // borrow data
+    auto tmp = torch::from_blob(
+        src->data[i],
+        {height / 2, width / 2},
+        {src->linesize[i] / 2, 1},
+        [](void*) {},
+        torch::TensorOptions().dtype(torch::kInt16).layout(torch::kStrided));
+    // Copy to each block
+    block00.slice(1, i, i + 1).copy_(tmp);
+    block01.slice(1, i, i + 1).copy_(tmp);
+    block10.slice(1, i, i + 1).copy_(tmp);
+    block11.slice(1, i, i + 1).copy_(tmp);
+  }
+}
+
+torch::Tensor YUV420P10LEConverter::convert(const AVFrame* src) {
+  torch::Tensor buffer =
+      get_image_buffer({1, num_channels, height, width}, torch::kInt16);
+  convert(src, buffer);
+  return buffer;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // NV12
 ////////////////////////////////////////////////////////////////////////////////
-NV12Converter::NV12Converter(int h, int w)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer({1, height / 2, width / 2, 2})) {
+NV12Converter::NV12Converter(int h, int w) : ImageConverterBase(h, w, 3) {
   TORCH_WARN_ONCE(
       "The output format NV12 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -303,26 +375,19 @@ void NV12Converter::convert(const AVFrame* src, torch::Tensor& dst) {
   }
   // Write intermediate UV plane
   {
-    uint8_t* p_dst = tmp_uv.data_ptr<uint8_t>();
-    uint8_t* p_src = src->data[1];
-    for (int h = 0; h < height / 2; ++h) {
-      memcpy(p_dst, p_src, width);
-      p_dst += width;
-      p_src += src->linesize[1];
-    }
+    auto tmp = torch::from_blob(
+        src->data[1],
+        {height / 2, width},
+        {src->linesize[1], 1},
+        [](void*) {},
+        torch::TensorOptions().dtype(torch::kUInt8).layout(torch::kStrided));
+    tmp = tmp.view({1, height / 2, width / 2, 2}).permute({0, 3, 1, 2});
+    auto dst_uv = dst.slice(1, 1, 3);
+    dst_uv.slice(2, 0, {}, 2).slice(3, 0, {}, 2).copy_(tmp);
+    dst_uv.slice(2, 0, {}, 2).slice(3, 1, {}, 2).copy_(tmp);
+    dst_uv.slice(2, 1, {}, 2).slice(3, 0, {}, 2).copy_(tmp);
+    dst_uv.slice(2, 1, {}, 2).slice(3, 1, {}, 2).copy_(tmp);
   }
-  // Upsample width and height
-  namespace F = torch::nn::functional;
-  torch::Tensor uv = F::interpolate(
-      tmp_uv.permute({0, 3, 1, 2}),
-      F::InterpolateFuncOptions()
-          .mode(torch::kNearest)
-          .size(std::vector<int64_t>({height, width})));
-
-  // Write to the UV plane
-  // dst[:, 1:] = uv
-  using namespace torch::indexing;
-  dst.index_put_({Slice(), Slice(1)}, uv);
 }
 
 torch::Tensor NV12Converter::convert(const AVFrame* src) {
@@ -333,15 +398,14 @@ torch::Tensor NV12Converter::convert(const AVFrame* src) {
 
 #ifdef USE_CUDA
 
+CudaImageConverterBase::CudaImageConverterBase(const torch::Device& device)
+    : device(device) {}
+
 ////////////////////////////////////////////////////////////////////////////////
 // NV12 CUDA
 ////////////////////////////////////////////////////////////////////////////////
-NV12CudaConverter::NV12CudaConverter(int h, int w, const torch::Device& device)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer(
-          {1, height / 2, width / 2, 2},
-          device,
-          torch::kUInt8)) {
+NV12CudaConverter::NV12CudaConverter(const torch::Device& device)
+    : CudaImageConverterBase(device) {
   TORCH_WARN_ONCE(
       "The output format NV12 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -404,8 +468,16 @@ void NV12CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
 }
 
 torch::Tensor NV12CudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer =
-      get_image_buffer({1, num_channels, height, width}, tmp_uv.device());
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  if (!init) {
+    height = src->height;
+    width = src->width;
+    tmp_uv =
+        get_image_buffer({1, height / 2, width / 2, 2}, device, torch::kUInt8);
+    init = true;
+  }
+
+  torch::Tensor buffer = get_image_buffer({1, 3, height, width}, device);
   convert(src, buffer);
   return buffer;
 }
@@ -413,12 +485,8 @@ torch::Tensor NV12CudaConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 // P010 CUDA
 ////////////////////////////////////////////////////////////////////////////////
-P010CudaConverter::P010CudaConverter(int h, int w, const torch::Device& device)
-    : ImageConverterBase(h, w, 3),
-      tmp_uv(get_image_buffer(
-          {1, height / 2, width / 2, 2},
-          device,
-          torch::kInt16)) {
+P010CudaConverter::P010CudaConverter(const torch::Device& device)
+    : CudaImageConverterBase{device} {
   TORCH_WARN_ONCE(
       "The output format P010 is selected. "
       "This will be implicitly converted to YUV444P, "
@@ -485,8 +553,17 @@ void P010CudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
 }
 
 torch::Tensor P010CudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer = get_image_buffer(
-      {1, num_channels, height, width}, tmp_uv.device(), torch::kInt16);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  if (!init) {
+    height = src->height;
+    width = src->width;
+    tmp_uv =
+        get_image_buffer({1, height / 2, width / 2, 2}, device, torch::kInt16);
+    init = true;
+  }
+
+  torch::Tensor buffer =
+      get_image_buffer({1, 3, height, width}, device, torch::kInt16);
   convert(src, buffer);
   return buffer;
 }
@@ -494,11 +571,8 @@ torch::Tensor P010CudaConverter::convert(const AVFrame* src) {
 ////////////////////////////////////////////////////////////////////////////////
 // YUV444P CUDA
 ////////////////////////////////////////////////////////////////////////////////
-YUV444PCudaConverter::YUV444PCudaConverter(
-    int h,
-    int w,
-    const torch::Device& device)
-    : ImageConverterBase(h, w, 3), device(device) {}
+YUV444PCudaConverter::YUV444PCudaConverter(const torch::Device& device)
+    : CudaImageConverterBase(device) {}
 
 void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
@@ -523,7 +597,7 @@ void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
       av_get_pix_fmt_name(sw_fmt));
 
   // Write Y plane directly
-  for (int i = 0; i < num_channels; ++i) {
+  for (int i = 0; i < 3; ++i) {
     auto status = cudaMemcpy2D(
         dst.index({0, i}).data_ptr(),
         width,
@@ -538,8 +612,13 @@ void YUV444PCudaConverter::convert(const AVFrame* src, torch::Tensor& dst) {
 }
 
 torch::Tensor YUV444PCudaConverter::convert(const AVFrame* src) {
-  torch::Tensor buffer =
-      get_image_buffer({1, num_channels, height, width}, device);
+  TORCH_INTERNAL_ASSERT_DEBUG_ONLY(src);
+  if (!init) {
+    height = src->height;
+    width = src->width;
+    init = true;
+  }
+  torch::Tensor buffer = get_image_buffer({1, 3, height, width}, device);
   convert(src, buffer);
   return buffer;
 }

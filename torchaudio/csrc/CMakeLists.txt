@@ -46,6 +46,23 @@ if(BUILD_RIR)
   list(APPEND compile_definitions INCLUDE_RIR)
 endif()
 
+if(BUILD_ALIGN)
+  list(
+    APPEND
+    sources
+    forced_align/compute.cpp
+    forced_align/cpu/compute.cpp
+  )
+  list(APPEND compile_definitions INCLUDE_ALIGN)
+  if (USE_CUDA)
+    list(
+      APPEND
+      sources
+      forced_align/gpu/compute.cu
+    )
+  endif()
+endif()
+
 if(USE_CUDA)
   list(
     APPEND
@@ -57,12 +74,6 @@ if(USE_CUDA)
     additional_libs
     cuda_deps
     )
-endif()
-
-if(BUILD_KALDI)
-  list(APPEND additional_libs kaldi)
-  list(APPEND sources kaldi.cpp)
-  list(APPEND compile_definitions INCLUDE_KALDI)
 endif()
 
 if(OpenMP_CXX_FOUND)

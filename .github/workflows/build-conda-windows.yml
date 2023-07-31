@@ -28,12 +28,9 @@ jobs:
       matrix:
         include:
           - repository: pytorch/audio
-            pre-script: packaging/ffmpeg/build.bat
-            wheel-build-params: "--plat-name win_amd64"
-            post-script: ""
-            package-name: torchaudio
-            conda-package-directory: packaging/torchaudio
             smoke-test-script: test/smoke_test/smoke_test.py
+            conda-package-directory: packaging/torchaudio
+            package-name: torchaudio
     name: ${{ matrix.repository }}
     uses: pytorch/test-infra/.github/workflows/build_conda_windows.yml@main
     with:
@@ -43,12 +40,8 @@ jobs:
       test-infra-repository: pytorch/test-infra
       test-infra-ref: main
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
-      pre-script: ${{ matrix.pre-script }}
-      post-script: ${{ matrix.post-script }}
       package-name: ${{ matrix.package-name }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
-      # Using "development" as trigger event so these binaries are not uploaded
-      # to official channels yet
-      trigger-event: development
+      trigger-event: ${{ github.event_name }}
     secrets:
       CONDA_PYTORCHBOT_TOKEN: ${{ secrets.CONDA_PYTORCHBOT_TOKEN }}

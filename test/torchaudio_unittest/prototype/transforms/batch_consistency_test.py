@@ -2,7 +2,6 @@ import os
 
 import torch
 import torchaudio.prototype.transforms as T
-import torchaudio.transforms as transforms
 from torchaudio_unittest.common_utils import TorchaudioTestCase
 
 
@@ -40,3 +39,20 @@ class BatchConsistencyTest(TorchaudioTestCase):
         # Because InverseBarkScale runs SGD on randomly initialized values so they do not yield
         # exactly same result. For this reason, tolerance is very relaxed here.
         self.assert_batch_consistency(transform, bark_spec, atol=1.0, rtol=1e-5)
+
+    def test_batch_chroma_scale(self):
+        n_freqs = 201
+        specgram = torch.randn(3, 2, n_freqs, 256)
+
+        atol = 1e-6 if os.name == "nt" else 1e-8
+        transform = T.ChromaScale(16000, n_freqs, n_chroma=12)
+
+        self.assert_batch_consistency(transform, specgram, atol=atol)
+
+    def test_batch_chroma_spectrogram(self):
+        waveform = torch.randn(3, 2, 4000)
+
+        atol = 1e-6 if os.name == "nt" else 1e-8
+        transform = T.ChromaSpectrogram(16000, 512, n_chroma=12)
+
+        self.assert_batch_consistency(transform, waveform, atol=atol)

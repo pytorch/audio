@@ -121,7 +121,7 @@ Verify the installation by checking the version and CUDA device accessibility.
 
 .. code-block::
 
-   pip install cmake ninja pkg-config
+   pip install cmake ninja
 
 2. Install dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,7 +137,7 @@ Verify the installation by checking the version and CUDA device accessibility.
 
    git clone https://github.com/pytorch/audio
    cd audio
-   USE_CUDA=1 USE_FFMPEG=1 pip install -v -e . --no-use-pep517
+   USE_CUDA=1 pip install -v -e . --no-use-pep517
 
 4. Check the installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~

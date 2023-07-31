@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import io
 import math
+import tempfile
 import warnings
 from collections.abc import Sequence
 from typing import List, Optional, Tuple, Union
@@ -9,6 +9,8 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
+from torchaudio._extension import fail_if_no_align
+from torchaudio._internal.module_utils import deprecated
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -19,7 +21,6 @@ __all__ = [
     "amplitude_to_DB",
     "DB_to_amplitude",
     "compute_deltas",
-    "compute_kaldi_pitch",
     "melscale_fbanks",
     "linear_fbanks",
     "create_dct",
@@ -51,6 +52,7 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
+    "forced_align",
 ]
 
 
@@ -370,9 +372,17 @@ def amplitude_to_DB(
 
     Args:
 
-        x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take
-          the form `(..., freq, time)`. Batched inputs should include a channel dimension and
-          have the form `(batch, channel, freq, time)`.
+        x (Tensor): Input spectrogram(s) before being converted to decibel scale.
+            The expected shapes are ``(freq, time)``, ``(channel, freq, time)`` or
+            ``(..., batch, channel, freq, time)``.
+
+            .. note::
+
+               When ``top_db`` is specified, cut-off values are computed for each audio
+               in the batch. Therefore if the input shape is 4D (or larger), different
+               cut-off values are used for audio data in the batch.
+               If the input shape is 2D or 3D, a single cutoff value is used.
+
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
@@ -547,7 +557,7 @@ def melscale_fbanks(
         meaning number of frequencies to highlight/apply to x the number of filterbanks.
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
-        ``A * melscale_fbanks(A.size(-1), ...)``.
+        ``A @ melscale_fbanks(A.size(-1), ...)``.
 
     """
 
@@ -1288,6 +1298,7 @@ def spectral_centroid(
 
 
 @torchaudio._extension.fail_if_no_sox
+@deprecated("Please migrate to torchaudio.io.AudioEffector.", remove=False)
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1301,6 +1312,12 @@ def apply_codec(
     Apply codecs as a form of augmentation.
 
     .. devices:: CPU
+
+    .. warning::
+
+       This function has been deprecated.
+       Please migrate to :py:class:`torchaudio.io.AudioEffector`, which works on all platforms,
+       and supports streaming processing.
 
     Args:
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
@@ -1320,129 +1337,17 @@ def apply_codec(
         Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
-    bytes = io.BytesIO()
-    torchaudio.backend.sox_io_backend.save(
-        bytes, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
-    )
-    bytes.seek(0)
-    augmented, sr = torchaudio.backend.sox_io_backend.load(bytes, channels_first=channels_first, format=format)
+    with tempfile.NamedTemporaryFile() as f:
+        torchaudio.backend.sox_io_backend.save(
+            f.name, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
+        )
+        augmented, sr = torchaudio.backend.sox_io_backend.load(f.name, channels_first=channels_first, format=format)
     if sr != sample_rate:
         augmented = resample(augmented, sr, sample_rate)
     return augmented
 
 
-@torchaudio._extension.fail_if_no_kaldi
-def compute_kaldi_pitch(
-    waveform: torch.Tensor,
-    sample_rate: float,
-    frame_length: float = 25.0,
-    frame_shift: float = 10.0,
-    min_f0: float = 50,
-    max_f0: float = 400,
-    soft_min_f0: float = 10.0,
-    penalty_factor: float = 0.1,
-    lowpass_cutoff: float = 1000,
-    resample_frequency: float = 4000,
-    delta_pitch: float = 0.005,
-    nccf_ballast: float = 7000,
-    lowpass_filter_width: int = 1,
-    upsample_filter_width: int = 5,
-    max_frames_latency: int = 0,
-    frames_per_chunk: int = 0,
-    simulate_first_pass_online: bool = False,
-    recompute_frame: int = 500,
-    snip_edges: bool = True,
-) -> torch.Tensor:
-    """Extract pitch based on method described in *A pitch extraction algorithm tuned
-    for automatic speech recognition* :cite:`6854049`.
-
-    .. devices:: CPU
-
-    .. properties:: TorchScript
-
-    This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
-
-    Args:
-        waveform (Tensor):
-            The input waveform of shape `(..., time)`.
-        sample_rate (float):
-            Sample rate of `waveform`.
-        frame_length (float, optional):
-            Frame length in milliseconds. (default: 25.0)
-        frame_shift (float, optional):
-            Frame shift in milliseconds. (default: 10.0)
-        min_f0 (float, optional):
-            Minimum F0 to search for (Hz)  (default: 50.0)
-        max_f0 (float, optional):
-            Maximum F0 to search for (Hz)  (default: 400.0)
-        soft_min_f0 (float, optional):
-            Minimum f0, applied in soft way, must not exceed min-f0  (default: 10.0)
-        penalty_factor (float, optional):
-            Cost factor for FO change.  (default: 0.1)
-        lowpass_cutoff (float, optional):
-            Cutoff frequency for LowPass filter (Hz) (default: 1000)
-        resample_frequency (float, optional):
-            Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.
-            (default: 4000)
-        delta_pitch( float, optional):
-            Smallest relative change in pitch that our algorithm measures. (default: 0.005)
-        nccf_ballast (float, optional):
-            Increasing this factor reduces NCCF for quiet frames (default: 7000)
-        lowpass_filter_width (int, optional):
-            Integer that determines filter width of lowpass filter, more gives sharper filter.
-            (default: 1)
-        upsample_filter_width (int, optional):
-            Integer that determines filter width when upsampling NCCF. (default: 5)
-        max_frames_latency (int, optional):
-            Maximum number of frames of latency that we allow pitch tracking to introduce into
-            the feature processing (affects output only if ``frames_per_chunk > 0`` and
-            ``simulate_first_pass_online=True``) (default: 0)
-        frames_per_chunk (int, optional):
-            The number of frames used for energy normalization. (default: 0)
-        simulate_first_pass_online (bool, optional):
-            If true, the function will output features that correspond to what an online decoder
-            would see in the first pass of decoding -- not the final version of the features,
-            which is the default. (default: False)
-            Relevant if ``frames_per_chunk > 0``.
-        recompute_frame (int, optional):
-            Only relevant for compatibility with online pitch extraction.
-            A non-critical parameter; the frame at which we recompute some of the forward pointers,
-            after revising our estimate of the signal energy.
-            Relevant if ``frames_per_chunk > 0``. (default: 500)
-        snip_edges (bool, optional):
-            If this is set to false, the incomplete frames near the ending edge won't be snipped,
-            so that the number of frames is the file size divided by the frame-shift.
-            This makes different types of features give the same number of frames. (default: True)
-
-    Returns:
-       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension
-       corresponds to pitch and NCCF.
-    """
-    shape = waveform.shape
-    waveform = waveform.reshape(-1, shape[-1])
-    result = torch.ops.torchaudio.kaldi_ComputeKaldiPitch(
-        waveform,
-        sample_rate,
-        frame_length,
-        frame_shift,
-        min_f0,
-        max_f0,
-        soft_min_f0,
-        penalty_factor,
-        lowpass_cutoff,
-        resample_frequency,
-        delta_pitch,
-        nccf_ballast,
-        lowpass_filter_width,
-        upsample_filter_width,
-        max_frames_latency,
-        frames_per_chunk,
-        simulate_first_pass_online,
-        recompute_frame,
-        snip_edges,
-    )
-    result = result.reshape(shape[:-1] + result.shape[-2:])
-    return result
+_CPU = torch.device("cpu")
 
 
 def _get_sinc_resample_kernel(
@@ -1453,7 +1358,7 @@ def _get_sinc_resample_kernel(
     rolloff: float = 0.99,
     resampling_method: str = "sinc_interp_hann",
     beta: Optional[float] = None,
-    device: torch.device = torch.device("cpu"),
+    device: torch.device = _CPU,
     dtype: Optional[torch.dtype] = None,
 ):
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
@@ -1566,7 +1471,7 @@ def _apply_sinc_resample_kernel(
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
     resampled = torch.nn.functional.conv1d(waveform[:, None], kernel, stride=orig_freq)
     resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
-    target_length = int(math.ceil(new_freq * length / orig_freq))
+    target_length = torch.ceil(torch.as_tensor(new_freq * length / orig_freq)).long()
     resampled = resampled[..., :target_length]
 
     # unpack batch
@@ -2596,3 +2501,54 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
     return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+
+
+@fail_if_no_align
+def forced_align(
+    log_probs: torch.Tensor,
+    targets: torch.Tensor,
+    input_lengths: torch.Tensor,
+    target_lengths: torch.Tensor,
+    blank: int = 0,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    r"""Computes forced alignment given the emissions from a CTC-trained model and a target label.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: TorchScript
+
+    Args:
+        log_probs (torch.Tensor): log probability of CTC emission output.
+            Tensor of shape `(B, T, C)`. where `B` is the batch size, `T` is the input length,
+            `C` is the number of characters in alphabet including blank.
+        targets (torch.Tensor): Target sequence. Tensor of shape `(B, L)`,
+            where `L` is the target length.
+        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). 1-D Tensor of shape `(B,)`.
+        target_lengths (torch.Tensor): Lengths of the targets. 1-D Tensor of shape `(B,)`.
+        blank_id (int, optional): The index of blank symbol in CTC emission. (Default: 0)
+
+    Returns:
+        Tuple(torch.Tensor, torch.Tensor):
+            torch.Tensor: Label for each time step in the alignment path computed using forced alignment.
+
+            torch.Tensor: Log probability scores of the labels for each time step.
+
+    Note:
+        The sequence length of `log_probs` must satisfy:
+
+
+        .. math::
+            L_{\text{log\_probs}} \ge L_{\text{label}} + N_{\text{repeat}}
+
+        where :math:`N_{\text{repeat}}` is the number of consecutively repeated tokens.
+        For example, in str `"aabbc"`, the number of repeats are `2`.
+
+    Note:
+        The current version only supports ``batch_size==1``.
+    """
+    if blank in targets:
+        raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")
+    if torch.max(targets) >= log_probs.shape[-1]:
+        raise ValueError("targets values must be less than the CTC dimension")
+    paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+    return paths, scores

@@ -44,13 +44,15 @@ model implementations and application components.
    tutorials/streamreader_advanced_tutorial
    tutorials/streamwriter_basic_tutorial
    tutorials/streamwriter_advanced
-   hw_acceleration_tutorial
+   tutorials/nvdec_tutorial
+   tutorials/nvenc_tutorial
 
    tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
+   tutorials/ctc_forced_alignment_api_tutorial
 
    tutorials/oscillator_tutorial
    tutorials/additive_synthesis_tutorial
@@ -69,7 +71,9 @@ model implementations and application components.
    tutorials/asr_inference_with_cuda_ctc_decoder_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
+   tutorials/device_avsr
    tutorials/forced_alignment_tutorial
+   tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
    tutorials/hybrid_demucs_tutorial
@@ -84,6 +88,7 @@ model implementations and application components.
    Emformer RNN-T ASR <https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt>
    Conv-TasNet Source Separation <https://github.com/pytorch/audio/tree/main/examples/source_separation>
    HuBERT Pre-training and Fine-tuning (ASR) <https://github.com/pytorch/audio/tree/main/examples/hubert>
+   Real-time AV-ASR <https://github.com/pytorch/audio/tree/main/examples/avsr>
 
 .. toctree::
    :maxdepth: 1
@@ -144,11 +149,32 @@ Tutorials
 .. customcardstart::
 
 .. customcarditem::
+   :header: On device audio-visual automatic speech recognition
+   :card_description: Learn how to stream audio and video from laptop webcam and perform audio-visual automatic speech recognition using Emformer-RNNT model.
+   :image: https://download.pytorch.org/torchaudio/doc-assets/avsr/transformed.gif
+   :link: tutorials/device_avsr.html
+   :tags: I/O,Pipelines,RNNT
+
+.. customcarditem::
    :header: Loading waveform Tensors from files and saving them
    :card_description: Learn how to query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_io_tutorial.png
    :link: tutorials/audio_io_tutorial.html
    :tags: I/O
+
+.. customcarditem::
+   :header: CTC Forced Alignment API
+   :card_description: Learn how to use TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>).
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
+   :link: tutorials/ctc_forced_alignment_api_tutorial.html
+   :tags: CTC,Forced-Alignment
+
+.. customcarditem::
+   :header: Forced alignment for multilingual data
+   :card_description: Learn how to use align multiligual data using TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>) and a multiligual Wav2Vec2 model.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/forced_alignment_for_multilingual_data_tutorial.png
+   :link: tutorials/forced_alignment_for_multilingual_data_tutorial.html
+   :tags: Forced-Alignment
 
 .. customcarditem::
    :header: Streaming media decoding with StreamReader
@@ -179,11 +205,18 @@ Tutorials
    :tags: I/O,StreamWriter
 
 .. customcarditem::
-   :header: Hardware accelerated video I/O with NVDEC/NVENC
-   :card_description: Learn how to setup and use HW accelerated video I/O.
+   :header: Hardware accelerated video decoding with NVDEC
+   :card_description: Learn how to use HW video decoder.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
-   :link: hw_acceleration_tutorial.html
-   :tags: I/O,StreamReader,StreamWriter
+   :link: tutorials/nvdec_tutorial.html
+   :tags: I/O,StreamReader
+
+.. customcarditem::
+   :header: Hardware accelerated video encoding with NVENC
+   :card_description: Learn how to use HW video encoder.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
+   :link: tutorials/nvenc_tutorial.html
+   :tags: I/O,StreamWriter
 
 .. customcarditem::
    :header: Apply effects and codecs to waveform

@@ -5,10 +5,12 @@ import torch
 import torchaudio
 
 
-if torchaudio._extension._FFMPEG_INITIALIZED:
-    ConfigBase = torchaudio.lib._torchaudio_ffmpeg.CodecConfig
-else:
+if torchaudio._extension._FFMPEG_EXT is None:
     ConfigBase = object
+else:
+    ConfigBase = torchaudio._extension._FFMPEG_EXT.CodecConfig
+    _StreamWriter = torchaudio._extension._FFMPEG_EXT.StreamWriter
+    _StreamWriterFileObj = torchaudio._extension._FFMPEG_EXT.StreamWriterFileObj
 
 
 @dataclass
@@ -62,7 +64,29 @@ _encoder_option = """Options passed to encoder.
                 To list encoder options for a encoder, you can use
                 ``ffmpeg -h encoder=<ENCODER>`` command.
 
-                Default: ``None``."""
+                Default: ``None``.
+
+                |
+
+                In addition to encoder-specific options, you can also pass options related
+                to multithreading. They are effective only if the encoder support them.
+                If neither of them are provided, StreamReader defaults to single thread.
+
+                ``"threads"``: The number of threads (in str).
+                Providing the value ``"0"`` will let FFmpeg decides based on its heuristics.
+
+                ``"thread_type"``: Which multithreading method to use.
+                The valid values are ``"frame"`` or ``"slice"``.
+                Note that each encoder supports different set of methods.
+                If not provided, a default value is used.
+
+                - ``"frame"``: Encode more than one frame at once.
+                  Each thread handles one frame.
+                  This will increase decoding delay by one frame per thread
+                - ``"slice"``: Encode more than one part of a single frame at once.
+
+                |
+                """
 
 
 _encoder_format = """Format used to encode media.
@@ -165,9 +189,9 @@ class StreamWriter:
         buffer_size: int = 4096,
     ):
         if isinstance(dst, str):
-            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriter(dst, format)
+            self._s = _StreamWriter(dst, format)
         elif hasattr(dst, "write"):
-            self._s = torchaudio.lib._torchaudio_ffmpeg.StreamWriterFileObj(dst, format, buffer_size)
+            self._s = _StreamWriterFileObj(dst, format, buffer_size)
         else:
             raise ValueError("`dst` must be either a string or a file-like object.")
         self._is_open = False

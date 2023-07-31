@@ -3,8 +3,7 @@
 #include <torchaudio/csrc/sox/types.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_utils {
+namespace torchaudio::sox {
 
 void set_seed(const int64_t seed) {
   sox_get_globals()->ranqd1 = static_cast<sox_int32_t>(seed);
@@ -94,7 +93,7 @@ void validate_input_file(const SoxFormat& sf, const std::string& path) {
       "Error loading audio file: unknown encoding.");
 }
 
-void validate_input_tensor(const torch::Tensor tensor) {
+void validate_input_tensor(const torch::Tensor& tensor) {
   TORCH_CHECK(tensor.device().is_cpu(), "Input tensor has to be on CPU.");
 
   TORCH_CHECK(tensor.ndimension() == 2, "Input tensor has to be 2D.");
@@ -185,7 +184,7 @@ torch::Tensor convert_to_tensor(
   return t.contiguous();
 }
 
-const std::string get_filetype(const std::string path) {
+const std::string get_filetype(const std::string& path) {
   std::string ext = path.substr(path.find_last_of(".") + 1);
   std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
   return ext;
@@ -279,9 +278,9 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
 
 std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const std::string& format,
-    const caffe2::TypeMeta dtype,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample) {
+    const caffe2::TypeMeta& dtype,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
   const Format fmt = get_format_from_string(format);
   const Encoding enc = get_encoding_from_option(encoding);
   const BitDepth bps = get_bit_depth_from_option(bits_per_sample);
@@ -313,7 +312,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
       TORCH_CHECK(
           bps == BitDepth::NOT_PROVIDED,
           "vorbis does not support `bits_per_sample` option.");
-      return std::make_tuple<>(SOX_ENCODING_VORBIS, 16);
+      return std::make_tuple<>(SOX_ENCODING_VORBIS, 0);
     case Format::AMR_NB:
       TORCH_CHECK(
           enc == Encoding::NOT_PROVIDED,
@@ -386,7 +385,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
   }
 }
 
-unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
+unsigned get_precision(const std::string& filetype, caffe2::TypeMeta dtype) {
   if (filetype == "mp3")
     return SOX_UNSPEC;
   if (filetype == "flac")
@@ -426,7 +425,7 @@ unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
 sox_signalinfo_t get_signalinfo(
     const torch::Tensor* waveform,
     const int64_t sample_rate,
-    const std::string filetype,
+    const std::string& filetype,
     const bool channels_first) {
   return sox_signalinfo_t{
       /*rate=*/static_cast<sox_rate_t>(sample_rate),
@@ -477,10 +476,10 @@ sox_encodinginfo_t get_tensor_encodinginfo(caffe2::TypeMeta dtype) {
 
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
-    const caffe2::TypeMeta dtype,
-    const c10::optional<double> compression,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample) {
+    const caffe2::TypeMeta& dtype,
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
   auto enc = get_save_encoding(format, dtype, encoding, bits_per_sample);
   return sox_encodinginfo_t{
       /*encoding=*/std::get<0>(enc),
@@ -492,30 +491,4 @@ sox_encodinginfo_t get_encodinginfo_for_save(
       /*opposite_endian=*/sox_false};
 }
 
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::sox_utils_set_seed", &torchaudio::sox_utils::set_seed);
-  m.def(
-      "torchaudio::sox_utils_set_verbosity",
-      &torchaudio::sox_utils::set_verbosity);
-  m.def(
-      "torchaudio::sox_utils_set_use_threads",
-      &torchaudio::sox_utils::set_use_threads);
-  m.def(
-      "torchaudio::sox_utils_set_buffer_size",
-      &torchaudio::sox_utils::set_buffer_size);
-  m.def(
-      "torchaudio::sox_utils_list_effects",
-      &torchaudio::sox_utils::list_effects);
-  m.def(
-      "torchaudio::sox_utils_list_read_formats",
-      &torchaudio::sox_utils::list_read_formats);
-  m.def(
-      "torchaudio::sox_utils_list_write_formats",
-      &torchaudio::sox_utils::list_write_formats);
-  m.def(
-      "torchaudio::sox_utils_get_buffer_size",
-      &torchaudio::sox_utils::get_buffer_size);
-}
-
-} // namespace sox_utils
-} // namespace torchaudio
+} // namespace torchaudio::sox

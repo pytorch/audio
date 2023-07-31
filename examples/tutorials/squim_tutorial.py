@@ -78,34 +78,38 @@ print(torchaudio.__version__)
 #
 
 try:
-    from torchaudio.prototype.pipelines import SQUIM_OBJECTIVE
-    from torchaudio.prototype.pipelines import SQUIM_SUBJECTIVE
     from pesq import pesq
     from pystoi import stoi
+    from torchaudio.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 except ImportError:
-    import google.colab
+    try:
+        import google.colab  # noqa: F401
 
-    print(
-        """
-        To enable running this notebook in Google Colab, install nightly
-        torch and torchaudio builds by adding the following code block to the top
-        of the notebook before running it:
-        !pip3 uninstall -y torch torchvision torchaudio
-        !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-        !pip3 install pesq
-        !pip3 install pystoi
-        """
-    )
+        print(
+            """
+            To enable running this notebook in Google Colab, install nightly
+            torch and torchaudio builds by adding the following code block to the top
+            of the notebook before running it:
+            !pip3 uninstall -y torch torchvision torchaudio
+            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+            !pip3 install pesq
+            !pip3 install pystoi
+            """
+        )
+    except Exception:
+        pass
+    raise
 
+
+import matplotlib.pyplot as plt
 
 ######################################################################
 #
 #
 
 import torchaudio.functional as F
-from torchaudio.utils import download_asset
 from IPython.display import Audio
-import matplotlib.pyplot as plt
+from torchaudio.utils import download_asset
 
 
 def si_snr(estimate, reference, epsilon=1e-8):
@@ -128,27 +132,17 @@ def si_snr(estimate, reference, epsilon=1e-8):
     return si_snr.item()
 
 
-def plot_waveform(waveform, title):
+def plot(waveform, title, sample_rate=16000):
     wav_numpy = waveform.numpy()
 
     sample_size = waveform.shape[1]
-    time_axis = torch.arange(0, sample_size) / 16000
+    time_axis = torch.arange(0, sample_size) / sample_rate
 
-    figure, axes = plt.subplots(1, 1)
-    axes = figure.gca()
-    axes.plot(time_axis, wav_numpy[0], linewidth=1)
-    axes.grid(True)
+    figure, axes = plt.subplots(2, 1)
+    axes[0].plot(time_axis, wav_numpy[0], linewidth=1)
+    axes[0].grid(True)
+    axes[1].specgram(wav_numpy[0], Fs=sample_rate)
     figure.suptitle(title)
-    plt.show(block=False)
-
-
-def plot_specgram(waveform, sample_rate, title):
-    wav_numpy = waveform.numpy()
-    figure, axes = plt.subplots(1, 1)
-    axes = figure.gca()
-    axes.specgram(wav_numpy[0], Fs=sample_rate)
-    figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################
@@ -238,32 +232,28 @@ Audio(WAVEFORM_DISTORTED.numpy()[1], rate=16000)
 # Visualize speech sample
 #
 
-plot_waveform(WAVEFORM_SPEECH, "Clean Speech")
-plot_specgram(WAVEFORM_SPEECH, 16000, "Clean Speech Spectrogram")
+plot(WAVEFORM_SPEECH, "Clean Speech")
 
 
 ######################################################################
 # Visualize noise sample
 #
 
-plot_waveform(WAVEFORM_NOISE, "Noise")
-plot_specgram(WAVEFORM_NOISE, 16000, "Noise Spectrogram")
+plot(WAVEFORM_NOISE, "Noise")
 
 
 ######################################################################
 # Visualize distorted speech with 20dB SNR
 #
 
-plot_waveform(WAVEFORM_DISTORTED[0:1], f"Distorted Speech with {snr_dbs[0]}dB SNR")
-plot_specgram(WAVEFORM_DISTORTED[0:1], 16000, f"Distorted Speech with {snr_dbs[0]}dB SNR")
+plot(WAVEFORM_DISTORTED[0:1], f"Distorted Speech with {snr_dbs[0]}dB SNR")
 
 
 ######################################################################
 # Visualize distorted speech with -5dB SNR
 #
 
-plot_waveform(WAVEFORM_DISTORTED[1:2], f"Distorted Speech with {snr_dbs[1]}dB SNR")
-plot_specgram(WAVEFORM_DISTORTED[1:2], 16000, f"Distorted Speech with {snr_dbs[1]}dB SNR")
+plot(WAVEFORM_DISTORTED[1:2], f"Distorted Speech with {snr_dbs[1]}dB SNR")
 
 
 ######################################################################

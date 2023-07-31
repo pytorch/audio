@@ -363,6 +363,11 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_video_process(
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter), C{h, w}, B{tb});
     }
+    case AV_PIX_FMT_YUV420P10LE: {
+      using C = YUV420P10LEConverter;
+      return std::make_unique<ProcessImpl<C, B>>(
+          std::move(filter), C{h, w}, B{tb});
+    }
     case AV_PIX_FMT_NV12: {
       using C = NV12Converter;
       return std::make_unique<ProcessImpl<C, B>>(
@@ -395,17 +400,17 @@ std::unique_ptr<IPostDecodeProcess> get_unchunked_cuda_video_process(
     case AV_PIX_FMT_NV12: {
       using C = NV12CudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
-          std::move(filter), C{i.height, i.width, device}, B{i.time_base});
+          std::move(filter), C{device}, B{i.time_base});
     }
     case AV_PIX_FMT_P010: {
       using C = P010CudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
-          std::move(filter), C{i.height, i.width, device}, B{i.time_base});
+          std::move(filter), C{device}, B{i.time_base});
     }
     case AV_PIX_FMT_YUV444P: {
       using C = YUV444PCudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
-          std::move(filter), C{i.height, i.width, device}, B{i.time_base});
+          std::move(filter), C{device}, B{i.time_base});
     }
     case AV_PIX_FMT_P016: {
       TORCH_CHECK(
@@ -474,6 +479,11 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_video_process(
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter), C{h, w}, B{tb, frames_per_chunk, num_chunks});
     }
+    case AV_PIX_FMT_YUV420P10LE: {
+      using C = YUV420P10LEConverter;
+      return std::make_unique<ProcessImpl<C, B>>(
+          std::move(filter), C{h, w}, B{tb, frames_per_chunk, num_chunks});
+    }
     case AV_PIX_FMT_NV12: {
       using C = NV12Converter;
       return std::make_unique<ProcessImpl<C, B>>(
@@ -509,21 +519,21 @@ std::unique_ptr<IPostDecodeProcess> get_chunked_cuda_video_process(
       using C = NV12CudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter),
-          C{i.height, i.width, device},
+          C{device},
           B{i.time_base, frames_per_chunk, num_chunks});
     }
     case AV_PIX_FMT_P010: {
       using C = P010CudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter),
-          C{i.height, i.width, device},
+          C{device},
           B{i.time_base, frames_per_chunk, num_chunks});
     }
     case AV_PIX_FMT_YUV444P: {
       using C = YUV444PCudaConverter;
       return std::make_unique<ProcessImpl<C, B>>(
           std::move(filter),
-          C{i.height, i.width, device},
+          C{device},
           B{i.time_base, frames_per_chunk, num_chunks});
     }
     case AV_PIX_FMT_P016: {

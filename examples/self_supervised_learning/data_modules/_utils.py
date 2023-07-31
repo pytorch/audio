@@ -9,7 +9,7 @@ import torchaudio
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
 
-from ..lightning import Batch
+from ..lightning_modules import Batch
 
 
 class BucketizeBatchSampler(BatchSampler):

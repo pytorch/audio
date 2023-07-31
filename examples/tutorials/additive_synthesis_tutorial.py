@@ -35,17 +35,14 @@ print(torchaudio.__version__)
 #
 
 try:
-    from torchaudio.prototype.functional import (
-        oscillator_bank,
-        extend_pitch,
-        adsr_envelope,
-    )
+    from torchaudio.prototype.functional import adsr_envelope, extend_pitch, oscillator_bank
 except ModuleNotFoundError:
     print(
         "Failed to import prototype DSP features. "
         "Please install torchaudio nightly builds. "
         "Please refer to https://pytorch.org/get-started/locally "
-        "for instructions to install a nightly build.")
+        "for instructions to install a nightly build."
+    )
     raise
 
 import matplotlib.pyplot as plt
@@ -78,7 +75,7 @@ from IPython.display import Audio
 PI = torch.pi
 PI2 = 2 * torch.pi
 
-F0 = 344.  # fundamental frequency
+F0 = 344.0  # fundamental frequency
 DURATION = 1.1  # [seconds]
 SAMPLE_RATE = 16_000  # [Hz]
 
@@ -87,31 +84,24 @@ NUM_FRAMES = int(DURATION * SAMPLE_RATE)
 ######################################################################
 #
 
-def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
+
+def plot(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
     t = torch.arange(waveform.size(0)) / sample_rate
 
     fig, axes = plt.subplots(4, 1, sharex=True)
     axes[0].plot(t, freq)
-    axes[0].set(
-        title=f"Oscillator bank (bank size: {amp.size(-1)})",
-        ylabel="Frequency [Hz]",
-        ylim=[-0.03, None])
+    axes[0].set(title=f"Oscillator bank (bank size: {amp.size(-1)})", ylabel="Frequency [Hz]", ylim=[-0.03, None])
     axes[1].plot(t, amp)
-    axes[1].set(
-        ylabel="Amplitude",
-        ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
+    axes[1].set(ylabel="Amplitude", ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
     axes[2].plot(t, waveform)
     axes[2].set(ylabel="Waveform")
     axes[3].specgram(waveform, Fs=sample_rate)
-    axes[3].set(
-        ylabel="Spectrogram",
-        xlabel="Time [s]",
-        xlim=[-0.01, t[-1] + 0.01])
+    axes[3].set(ylabel="Spectrogram", xlabel="Time [s]", xlim=[-0.01, t[-1] + 0.01])
 
     for i in range(4):
         axes[i].grid(True)
     pos = axes[2].get_position()
-    plt.tight_layout()
+    fig.tight_layout()
 
     if zoom is not None:
         ax = fig.add_axes([pos.x0 + 0.02, pos.y0 + 0.03, pos.width / 2.5, pos.height / 2.0])
@@ -120,6 +110,7 @@ def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
 
     waveform /= waveform.abs().max()
     return Audio(vol * waveform, rate=sample_rate, normalize=False)
+
 
 ######################################################################
 # Harmonic Overtones
@@ -159,10 +150,11 @@ def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
 # and adds extend pitch in accordance with the formula above.
 #
 
+
 def sawtooth_wave(freq0, amp0, num_pitches, sample_rate):
     freq = extend_pitch(freq0, num_pitches)
 
-    mults = [-((-1) ** i) / (PI * i) for i in range(1, 1+num_pitches)]
+    mults = [-((-1) ** i) / (PI * i) for i in range(1, 1 + num_pitches)]
     amp = extend_pitch(amp0, mults)
     waveform = oscillator_bank(freq, amp, sample_rate=sample_rate)
     return freq, amp, waveform
@@ -176,7 +168,7 @@ def sawtooth_wave(freq0, amp0, num_pitches, sample_rate):
 freq0 = torch.full((NUM_FRAMES, 1), F0)
 amp0 = torch.ones((NUM_FRAMES, 1))
 freq, amp, waveform = sawtooth_wave(freq0, amp0, int(SAMPLE_RATE / F0), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 #
@@ -191,7 +183,7 @@ phase = torch.linspace(0, fm * PI2 * DURATION, NUM_FRAMES)
 freq0 = F0 + f_dev * torch.sin(phase).unsqueeze(-1)
 
 freq, amp, waveform = sawtooth_wave(freq0, amp0, int(SAMPLE_RATE / F0), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Square wave
@@ -212,22 +204,23 @@ show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
 
 
 def square_wave(freq0, amp0, num_pitches, sample_rate):
-    mults = [2. * i + 1. for i in range(num_pitches)]
+    mults = [2.0 * i + 1.0 for i in range(num_pitches)]
     freq = extend_pitch(freq0, mults)
 
-    mults = [4 / (PI * (2. * i + 1.)) for i in range(num_pitches)]
+    mults = [4 / (PI * (2.0 * i + 1.0)) for i in range(num_pitches)]
     amp = extend_pitch(amp0, mults)
 
     waveform = oscillator_bank(freq, amp, sample_rate=sample_rate)
     return freq, amp, waveform
+
 
 ######################################################################
 #
 
 freq0 = torch.full((NUM_FRAMES, 1), F0)
 amp0 = torch.ones((NUM_FRAMES, 1))
-freq, amp, waveform = square_wave(freq0, amp0, int(SAMPLE_RATE/F0/2), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+freq, amp, waveform = square_wave(freq0, amp0, int(SAMPLE_RATE / F0 / 2), SAMPLE_RATE)
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Triangle wave
@@ -248,11 +241,11 @@ show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
 
 
 def triangle_wave(freq0, amp0, num_pitches, sample_rate):
-    mults = [2. * i + 1. for i in range(num_pitches)]
+    mults = [2.0 * i + 1.0 for i in range(num_pitches)]
     freq = extend_pitch(freq0, mults)
 
-    c = 8 / (PI ** 2)
-    mults = [c * ((-1) ** i) / ((2. * i + 1.) ** 2) for i in range(num_pitches)]
+    c = 8 / (PI**2)
+    mults = [c * ((-1) ** i) / ((2.0 * i + 1.0) ** 2) for i in range(num_pitches)]
     amp = extend_pitch(amp0, mults)
 
     waveform = oscillator_bank(freq, amp, sample_rate=sample_rate)
@@ -263,7 +256,7 @@ def triangle_wave(freq0, amp0, num_pitches, sample_rate):
 #
 
 freq, amp, waveform = triangle_wave(freq0, amp0, int(SAMPLE_RATE / F0 / 2), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1/F0, 3/F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Inharmonic Paritials
@@ -288,22 +281,22 @@ duration = 2.0
 num_frames = int(SAMPLE_RATE * duration)
 
 freq0 = torch.full((num_frames, 1), F0)
-mults = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3., 3.76, 4.07]
+mults = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3.0, 3.76, 4.07]
 freq = extend_pitch(freq0, mults)
 
 amp = adsr_envelope(
     num_frames=num_frames,
     attack=0.002,
     decay=0.998,
-    sustain=0.,
-    release=0.,
+    sustain=0.0,
+    release=0.0,
     n_decay=2,
 )
-amp = torch.stack([amp * (0.5 ** i) for i in range(num_tones)], dim=-1)
+amp = torch.stack([amp * (0.5**i) for i in range(num_tones)], dim=-1)
 
 waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-show(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
+plot(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
 
 ######################################################################
 #
@@ -315,7 +308,7 @@ show(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
 freq = extend_pitch(freq0, num_tones)
 waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-show(freq, amp, waveform, SAMPLE_RATE)
+plot(freq, amp, waveform, SAMPLE_RATE)
 
 ######################################################################
 # References
