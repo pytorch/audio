@@ -407,30 +407,45 @@ print(timesteps, timesteps.shape[0])
 #
 
 
-def plot_alignments(waveform, emission, tokens, timesteps):
-    fig, ax = plt.subplots(figsize=(32, 10))
+def plot_alignments(waveform, emission, tokens, timesteps, sample_rate):
 
-    ax.plot(waveform)
+    t = torch.arange(waveform.size(0)) / sample_rate
+    ratio = waveform.size(0) / emission.size(1) / sample_rate
 
-    ratio = waveform.shape[0] / emission.shape[1]
-    word_start = 0
+    chars = []
+    words = []
+    word_start = None
+    for token, timestep in zip(tokens, timesteps * ratio):
+        if token == "|":
+            if word_start is not None:
+                words.append((word_start, timestep))
+            word_start = None
+        else:
+            chars.append((token, timestep))
+            if word_start is None:
+                word_start = timestep
 
-    for i in range(len(tokens)):
-        if i != 0 and tokens[i - 1] == "|":
-            word_start = timesteps[i]
-        if tokens[i] != "|":
-            plt.annotate(tokens[i].upper(), (timesteps[i] * ratio, waveform.max() * 1.02), size=14)
-        elif i != 0:
-            word_end = timesteps[i]
-            ax.axvspan(word_start * ratio, word_end * ratio, alpha=0.1, color="red")
+    fig, axes = plt.subplots(3, 1)
 
-    xticks = ax.get_xticks()
-    plt.xticks(xticks, xticks / bundle.sample_rate)
-    ax.set_xlabel("time (sec)")
-    ax.set_xlim(0, waveform.shape[0])
+    def _plot(ax, xlim):
+        ax.plot(t, waveform)
+        for token, timestep in chars:
+            ax.annotate(token.upper(), (timestep, 0.5))
+        for word_start, word_end in words:
+            ax.axvspan(word_start, word_end, alpha=0.1, color="red")
+        ax.set_ylim(-0.6, 0.7)
+        ax.set_yticks([0])
+        ax.grid(True, axis="y")
+        ax.set_xlim(xlim)
+
+    _plot(axes[0], (0.3, 2.5))
+    _plot(axes[1], (2.5, 4.7))
+    _plot(axes[2], (4.7, 6.9))
+    axes[2].set_xlabel("time (sec)")
+    fig.tight_layout()
 
 
-plot_alignments(waveform[0], emission, predicted_tokens, timesteps)
+plot_alignments(waveform[0], emission, predicted_tokens, timesteps, bundle.sample_rate)
 
 
 ######################################################################

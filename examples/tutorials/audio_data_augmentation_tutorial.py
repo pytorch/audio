@@ -100,7 +100,6 @@ def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None):
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################
@@ -122,7 +121,6 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################

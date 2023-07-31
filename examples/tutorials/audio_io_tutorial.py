@@ -181,7 +181,6 @@ def plot_waveform(waveform, sample_rate):
         if num_channels > 1:
             axes[c].set_ylabel(f"Channel {c+1}")
     figure.suptitle("waveform")
-    plt.show(block=False)
 
 
 ######################################################################
@@ -204,7 +203,6 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram"):
         if num_channels > 1:
             axes[c].set_ylabel(f"Channel {c+1}")
     figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################

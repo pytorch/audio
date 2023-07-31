@@ -85,7 +85,7 @@ NUM_FRAMES = int(DURATION * SAMPLE_RATE)
 #
 
 
-def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
+def plot(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
     t = torch.arange(waveform.size(0)) / sample_rate
 
     fig, axes = plt.subplots(4, 1, sharex=True)
@@ -101,7 +101,7 @@ def show(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
     for i in range(4):
         axes[i].grid(True)
     pos = axes[2].get_position()
-    plt.tight_layout()
+    fig.tight_layout()
 
     if zoom is not None:
         ax = fig.add_axes([pos.x0 + 0.02, pos.y0 + 0.03, pos.width / 2.5, pos.height / 2.0])
@@ -168,7 +168,7 @@ def sawtooth_wave(freq0, amp0, num_pitches, sample_rate):
 freq0 = torch.full((NUM_FRAMES, 1), F0)
 amp0 = torch.ones((NUM_FRAMES, 1))
 freq, amp, waveform = sawtooth_wave(freq0, amp0, int(SAMPLE_RATE / F0), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 #
@@ -183,7 +183,7 @@ phase = torch.linspace(0, fm * PI2 * DURATION, NUM_FRAMES)
 freq0 = F0 + f_dev * torch.sin(phase).unsqueeze(-1)
 
 freq, amp, waveform = sawtooth_wave(freq0, amp0, int(SAMPLE_RATE / F0), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Square wave
@@ -220,7 +220,7 @@ def square_wave(freq0, amp0, num_pitches, sample_rate):
 freq0 = torch.full((NUM_FRAMES, 1), F0)
 amp0 = torch.ones((NUM_FRAMES, 1))
 freq, amp, waveform = square_wave(freq0, amp0, int(SAMPLE_RATE / F0 / 2), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Triangle wave
@@ -256,7 +256,7 @@ def triangle_wave(freq0, amp0, num_pitches, sample_rate):
 #
 
 freq, amp, waveform = triangle_wave(freq0, amp0, int(SAMPLE_RATE / F0 / 2), SAMPLE_RATE)
-show(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
+plot(freq, amp, waveform, SAMPLE_RATE, zoom=(1 / F0, 3 / F0))
 
 ######################################################################
 # Inharmonic Paritials
@@ -296,7 +296,7 @@ amp = torch.stack([amp * (0.5**i) for i in range(num_tones)], dim=-1)
 
 waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-show(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
+plot(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
 
 ######################################################################
 #
@@ -308,7 +308,7 @@ show(freq, amp, waveform, SAMPLE_RATE, vol=0.4)
 freq = extend_pitch(freq0, num_tones)
 waveform = oscillator_bank(freq, amp, sample_rate=SAMPLE_RATE)
 
-show(freq, amp, waveform, SAMPLE_RATE)
+plot(freq, amp, waveform, SAMPLE_RATE)
 
 ######################################################################
 # References

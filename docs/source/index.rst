@@ -71,8 +71,8 @@ model implementations and application components.
    tutorials/online_asr_tutorial
    tutorials/device_asr
    tutorials/device_avsr
-   tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/forced_alignment_tutorial
+   tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/tacotron2_pipeline_tutorial
    tutorials/mvdr_tutorial
    tutorials/hybrid_demucs_tutorial
@@ -146,6 +146,13 @@ Tutorials
 ---------
 
 .. customcardstart::
+
+.. customcarditem::
+   :header: On device audio-visual automatic speech recognition
+   :card_description: Learn how to stream audio and video from laptop webcam and perform audio-visual automatic speech recognition using Emformer-RNNT model.
+   :image: https://download.pytorch.org/torchaudio/doc-assets/avsr/transformed.gif
+   :link: tutorials/device_avsr.html
+   :tags: I/O,Pipelines,RNNT
 
 .. customcarditem::
    :header: Loading waveform Tensors from files and saving them
