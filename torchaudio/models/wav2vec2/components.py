@@ -212,7 +212,7 @@ class ConvolutionalPositionalEmbedding(Module):
         self.num_remove: int = 1 if kernel_size % 2 == 0 else 0
 
     def __prepare_scriptable__(self):
-        if self.conv.__class__.__name__ == "ParameterizedConv1d":
+        if self.conv.__class__.__name__ == "ParametrizedConv1d":
             _LG.warning("Removing weight_norm from %s", self.__class__.__name__)
             torch.nn.utils.parametrize.remove_parametrizations(self.conv, "weight")
         return self
