@@ -170,7 +170,7 @@ Audio(rir_raw, rate=sample_rate)
 #
 
 rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
-rir = rir / torch.norm(rir, p=2)
+rir = rir / torch.linalg.vector_norm(rir, ord=2)
 
 plot_waveform(rir, sample_rate, title="Room Impulse Response")
 

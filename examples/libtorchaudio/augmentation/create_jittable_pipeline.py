@@ -35,7 +35,7 @@ class Pipeline(torch.nn.Module):
         rir, _ = torchaudio.sox_effects.apply_effects_tensor(
             self.rir, self.rir_sample_rate, effects=[["rate", str(sample_rate)]]
         )
-        rir = rir / torch.norm(rir, p=2)
+        rir = rir / torch.linalg.vector_norm(rir, ord=2)
         rir = torch.flip(rir, [1])
 
         # 4. Apply RIR filter
