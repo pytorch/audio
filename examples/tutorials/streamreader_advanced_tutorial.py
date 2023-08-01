@@ -355,13 +355,14 @@ chunks = next(streamer.stream())
 
 def _display(i):
     print("filter_desc:", streamer.get_out_stream_info(i).filter_description)
-    _, axs = plt.subplots(2, 1)
+    fig, axs = plt.subplots(2, 1)
     waveform = chunks[i][:, 0]
     axs[0].plot(waveform)
     axs[0].grid(True)
     axs[0].set_ylim([-1, 1])
     plt.setp(axs[0].get_xticklabels(), visible=False)
     axs[1].specgram(waveform, Fs=sample_rate)
+    fig.tight_layout()
     return IPython.display.Audio(chunks[i].T, rate=sample_rate)
 
 
@@ -440,7 +441,6 @@ def _display(i):
         axs[j].imshow(chunk[10 * j + 1].permute(1, 2, 0))
         axs[j].set_axis_off()
     plt.tight_layout()
-    plt.show(block=False)
 
 
 ######################################################################

@@ -19,24 +19,18 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# Preparing data and utility functions (skip this section)
-# --------------------------------------------------------
+# Preparation
+# -----------
 #
 
-# @title Prepare data and utility functions. {display-mode: "form"}
-# @markdown
-# @markdown You do not need to look into this cell.
-# @markdown Just execute once and you are good to go.
-# @markdown
-# @markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/),
-# @markdown which is licensed under Creative Commos BY 4.0.
-
-# -------------------------------------------------------------------------------
-# Preparation of data and helper functions.
-# -------------------------------------------------------------------------------
 import librosa
 import matplotlib.pyplot as plt
 from torchaudio.utils import download_asset
+
+######################################################################
+# In this tutorial, we will use a speech data from
+# `VOiCES dataset <https://iqtlabs.github.io/voices/>`__,
+# which is licensed under Creative Commos BY 4.0.
 
 SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
@@ -75,16 +69,9 @@ def get_spectrogram(
     return spectrogram(waveform)
 
 
-def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
-    fig, axs = plt.subplots(1, 1)
-    axs.set_title(title or "Spectrogram (db)")
-    axs.set_ylabel(ylabel)
-    axs.set_xlabel("frame")
-    im = axs.imshow(librosa.power_to_db(spec), origin="lower", aspect=aspect)
-    if xmax:
-        axs.set_xlim((0, xmax))
-    fig.colorbar(im, ax=axs)
-    plt.show(block=False)
+def plot_spec(ax, spec, title, ylabel="freq_bin"):
+    ax.set_title(title)
+    ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
 
 
 ######################################################################
@@ -108,43 +95,47 @@ def plot_spectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=No
 spec = get_spectrogram(power=None)
 stretch = T.TimeStretch()
 
-rate = 1.2
-spec_ = stretch(spec, rate)
-plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
-
-plot_spectrogram(torch.abs(spec[0]), title="Original", aspect="equal", xmax=304)
-
-rate = 0.9
-spec_ = stretch(spec, rate)
-plot_spectrogram(torch.abs(spec_[0]), title=f"Stretched x{rate}", aspect="equal", xmax=304)
+spec_12 = stretch(spec, overriding_rate=1.2)
+spec_09 = stretch(spec, overriding_rate=0.9)
 
 ######################################################################
-# TimeMasking
-# -----------
+#
+
+
+def plot():
+    fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
+    plot_spec(axes[0], torch.abs(spec_12[0]), title="Stretched x1.2")
+    plot_spec(axes[1], torch.abs(spec[0]), title="Original")
+    plot_spec(axes[2], torch.abs(spec_09[0]), title="Stretched x0.9")
+    fig.tight_layout()
+
+
+plot()
+
+######################################################################
+# Time and Frequency Masking
+# --------------------------
 #
 
 torch.random.manual_seed(4)
 
+time_masking = T.TimeMasking(time_mask_param=80)
+freq_masking = T.FrequencyMasking(freq_mask_param=80)
+
 spec = get_spectrogram()
-plot_spectrogram(spec[0], title="Original")
-
-masking = T.TimeMasking(time_mask_param=80)
-spec = masking(spec)
-
-plot_spectrogram(spec[0], title="Masked along time axis")
+time_masked = time_masking(spec)
+freq_masked = freq_masking(spec)
 
 ######################################################################
-# FrequencyMasking
-# ----------------
 #
 
 
-torch.random.manual_seed(4)
+def plot():
+    fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
+    plot_spec(axes[0], spec[0], title="Original")
+    plot_spec(axes[1], time_masked[0], title="Masked along time axis")
+    plot_spec(axes[2], freq_masked[0], title="Masked along frequency axis")
+    fig.tight_layout()
 
-spec = get_spectrogram()
-plot_spectrogram(spec[0], title="Original")
 
-masking = T.FrequencyMasking(freq_mask_param=80)
-spec = masking(spec)
-
-plot_spectrogram(spec[0], title="Masked along frequency axis")
+plot()

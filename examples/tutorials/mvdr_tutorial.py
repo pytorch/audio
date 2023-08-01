@@ -98,23 +98,21 @@ SAMPLE_NOISE = download_asset("tutorial-assets/mvdr/noise.wav")
 #
 
 
-def plot_spectrogram(stft, title="Spectrogram", xlim=None):
+def plot_spectrogram(stft, title="Spectrogram"):
     magnitude = stft.abs()
     spectrogram = 20 * torch.log10(magnitude + 1e-8).numpy()
     figure, axis = plt.subplots(1, 1)
     img = axis.imshow(spectrogram, cmap="viridis", vmin=-100, vmax=0, origin="lower", aspect="auto")
-    figure.suptitle(title)
+    axis.set_title(title)
     plt.colorbar(img, ax=axis)
-    plt.show()
 
 
-def plot_mask(mask, title="Mask", xlim=None):
+def plot_mask(mask, title="Mask"):
     mask = mask.numpy()
     figure, axis = plt.subplots(1, 1)
     img = axis.imshow(mask, cmap="viridis", origin="lower", aspect="auto")
-    figure.suptitle(title)
+    axis.set_title(title)
     plt.colorbar(img, ax=axis)
-    plt.show()
 
 
 def si_snr(estimate, reference, epsilon=1e-8):

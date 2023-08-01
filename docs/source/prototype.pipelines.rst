@@ -45,3 +45,28 @@ Pretrained Models
    :template: autosummary/bundle_data.rst
 
    HIFIGAN_VOCODER_V3_LJSPEECH
+
+VGGish
+------
+
+Interface
+~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   VGGishBundle
+   VGGishBundle.VGGish
+   VGGishBundle.VGGishInputProcessor
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   VGGISH

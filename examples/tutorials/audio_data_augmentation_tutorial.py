@@ -100,7 +100,6 @@ def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None):
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################
@@ -122,7 +121,6 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
         if xlim:
             axes[c].set_xlim(xlim)
     figure.suptitle(title)
-    plt.show(block=False)
 
 
 ######################################################################
@@ -172,7 +170,7 @@ Audio(rir_raw, rate=sample_rate)
 #
 
 rir = rir_raw[:, int(sample_rate * 1.01) : int(sample_rate * 1.3)]
-rir = rir / torch.norm(rir, p=2)
+rir = rir / torch.linalg.vector_norm(rir, ord=2)
 
 plot_waveform(rir, sample_rate, title="Room Impulse Response")
 

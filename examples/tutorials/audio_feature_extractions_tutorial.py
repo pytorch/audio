@@ -75,7 +75,6 @@ def plot_waveform(waveform, sr, title="Waveform", ax=None):
     ax.grid(True)
     ax.set_xlim([0, time_axis[-1]])
     ax.set_title(title)
-    plt.show(block=False)
 
 
 def plot_spectrogram(specgram, title=None, ylabel="freq_bin", ax=None):
@@ -85,7 +84,6 @@ def plot_spectrogram(specgram, title=None, ylabel="freq_bin", ax=None):
         ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.imshow(librosa.power_to_db(specgram), origin="lower", aspect="auto", interpolation="nearest")
-    plt.show(block=False)
 
 
 def plot_fbank(fbank, title=None):
@@ -94,7 +92,6 @@ def plot_fbank(fbank, title=None):
     axs.imshow(fbank, aspect="auto")
     axs.set_ylabel("frequency bin")
     axs.set_xlabel("mel bin")
-    plt.show(block=False)
 
 
 ######################################################################
@@ -486,7 +483,6 @@ def plot_pitch(waveform, sr, pitch):
     axis2.plot(time_axis, pitch[0], linewidth=2, label="Pitch", color="green")
 
     axis2.legend(loc=0)
-    plt.show(block=False)
 
 
 plot_pitch(SPEECH_WAVEFORM, SAMPLE_RATE, pitch)
