@@ -13,6 +13,12 @@
 {%- elif name == "Tacotron2TTSBundle.Vocoder" %}
   {%- set attributes=["sample_rate"] %}
   {%- set methods = ["__call__"] %}
+{%- elif name == "VGGishBundle.VGGish" %}
+  {%- set attributes = [] %}
+  {%- set methods = ["forward"] %}
+{%- elif name == "VGGishBundle.VGGishInputProcessor" %}
+  {%- set attributes = [] %}
+  {%- set methods = ["__call__"] %}
 {% endif %}
 
 ..
