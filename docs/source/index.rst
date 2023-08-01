@@ -68,6 +68,7 @@ model implementations and application components.
 
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/asr_inference_with_ctc_decoder_tutorial
+   tutorials/asr_inference_with_cuda_ctc_decoder_tutorial
    tutorials/online_asr_tutorial
    tutorials/device_asr
    tutorials/device_avsr
@@ -146,6 +147,13 @@ Tutorials
 ---------
 
 .. customcardstart::
+
+.. customcarditem::
+   :header: AM inference with CUDA CTC Beam Seach Decoder
+   :card_description: Learn how to perform ASR beam search decoding with GPU, using <code>torchaudio.models.decoder.cuda_ctc_decoder</code>.
+   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/asr_inference_with_ctc_decoder_tutorial.png
+   :link: tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html
+   :tags: Pipelines,ASR,CTC-Decoder,CUDA-CTC-Decoder
 
 .. customcarditem::
    :header: On device audio-visual automatic speech recognition
