@@ -43,9 +43,9 @@ def run_inference(args):
         )
     else:
         assert vocabs[0] == "<blk>", "idx of blank token has to be zero"
-        blank_frame_skip_threshold = float(torch.log(torch.tensor(args.blank_skip_threshold)))
+
         cuda_decoder = cuda_ctc_decoder(
-            vocabs, nbest=args.nbest, beam_size=args.beam_size, blank_skip_threshold=blank_frame_skip_threshold
+            vocabs, nbest=args.nbest, beam_size=args.beam_size, blank_skip_threshold=args.blank_skip_threshold
         )
 
     dataset = torchaudio.datasets.LIBRISPEECH(args.librispeech_path, url=args.split, download=True)
