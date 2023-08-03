@@ -27,7 +27,7 @@ RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``RNNTBundle`` defines ASR pipelines and consists of three steps: feature extraction, inference, and de-tokenization.
 
@@ -47,7 +47,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.RNNTBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -61,7 +61,7 @@ wav2vec 2.0 / HuBERT / WavLM - SSL
 ----------------------------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``Wav2Vec2Bundle`` instantiates models that generate acoustic features that can be used for downstream inference and fine-tuning.
 
@@ -75,7 +75,7 @@ Interface
    Wav2Vec2Bundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -100,7 +100,7 @@ wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``Wav2Vec2ASRBundle`` instantiates models that generate probability distribution over pre-defined labels, that can be used for ASR.
 
@@ -118,7 +118,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.Wav2Vec2ASRBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -157,7 +157,7 @@ Tacotron2 Text-To-Speech
 Similarly ``Vocoder`` can be an algorithm without learning parameters, like `Griffin-Lim`, or a neural-network-based model like `Waveglow`.
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -173,7 +173,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.Tacotron2TTSBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -189,7 +189,7 @@ Source Separation
 -----------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``SourceSeparationBundle`` instantiates source separation models which take single channel audio and generates multi-channel audio.
 
@@ -207,7 +207,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.SourceSeparationBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated

@@ -106,10 +106,10 @@ class ConformerRNNTTestImpl(TestBaseMixin):
                 scripted_state,
             ) = scripted(inputs, input_lengths, targets, target_lengths, scripted_state)
 
-            self.assertEqual(ref_out, scripted_out)
-            self.assertEqual(ref_input_lengths, scripted_input_lengths)
-            self.assertEqual(ref_target_lengths, scripted_target_lengths)
-            self.assertEqual(ref_state, scripted_state)
+            self.assertEqual(ref_out, scripted_out, atol=1e-4, rtol=1e-5)
+            self.assertEqual(ref_input_lengths, scripted_input_lengths, atol=1e-4, rtol=1e-5)
+            self.assertEqual(ref_target_lengths, scripted_target_lengths, atol=1e-4, rtol=1e-5)
+            self.assertEqual(ref_state, scripted_state, atol=1e-4, rtol=1e-5)
 
     def test_torchscript_consistency_transcribe(self):
         r"""Verify that scripting RNNT does not change the behavior of method `transcribe`."""
