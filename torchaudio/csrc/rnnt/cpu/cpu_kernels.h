@@ -319,6 +319,7 @@ void ComputeGradientsOneSequence(
   const int& D = options.numTargets_;
   const int& blank = options.blank_;
   const CAST_DTYPE clamp = options.clamp_;
+  const CAST_DTYPE fastemit_lambda = options.fastemit_lambda_;
   const bool& fusedLogSmax = options.fusedLogSmax_;
 
   CAST_DTYPE cost = -beta({0, 0});
@@ -357,7 +358,7 @@ void ComputeGradientsOneSequence(
         }
       }
     }
-  } else {
+  } else {  // Non fused log softmax case
     for (int t = 0; t < T; ++t) {
       for (int u = 0; u < U; ++u) {
         for (int d = 0; d < D; ++d) {
@@ -374,6 +375,10 @@ void ComputeGradientsOneSequence(
           }
 
           gradients({t, u, d}) = -(std::exp(gradients({t, u, d})));
+
+          if (fastemit_lambda != 0 && d != blank) {
+            gradients({t, u, d}) = gradients({t, u, d}) * (1.0 + fastemit_lambda);
+          }
 
           if (clamp > 0) {
             gradients({t, u, d}) =

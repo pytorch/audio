@@ -8,6 +8,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss(
     const torch::Tensor& target_lengths,
     int64_t blank,
     double clamp,
+    double fastemit_lambda,
     bool fused_log_softmax = true) {
   static auto op = torch::Dispatcher::singleton()
                        .findSchemaOrThrow("torchaudio::rnnt_loss", "")
@@ -19,6 +20,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss(
       target_lengths,
       blank,
       clamp,
+      fastemit_lambda,
       fused_log_softmax);
 }
 
@@ -30,5 +32,6 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       "Tensor target_lengths,"
       "int blank,"
       "float clamp,"
+      "float fastemit_lambda,"
       "bool fused_log_softmax) -> (Tensor, Tensor?)");
 }

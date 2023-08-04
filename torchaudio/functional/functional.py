@@ -1774,6 +1774,7 @@ def rnnt_loss(
     blank: int = -1,
     clamp: float = -1,
     reduction: str = "mean",
+    fastemit_lambda: float = 0.0,
     fused_log_softmax: bool = True,
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
@@ -1797,11 +1798,17 @@ def rnnt_loss(
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fastemit_lambda (float, optional): FastEmit scaling factor (https://arxiv.org/abs/2010.11148).
+            Setting this to 0 turns off FastEmit regularization. Note that this currently is currently
+            only implemented for the case if ``fused_log_softmax=False``. (Default: 0.0)
         fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
     Returns:
         Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size `(batch)`,
         otherwise scalar.
     """
+    if fastemit_lambda != 0.0 and fused_log_softmax:
+        raise RuntimeError("FastEmit is only supported with nonfused log softmax option.")
+
     if reduction not in ["none", "mean", "sum"]:
         raise ValueError('reduction should be one of "none", "mean", or "sum"')
 
@@ -1815,6 +1822,7 @@ def rnnt_loss(
         target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
+        fastemit_lambda=fastemit_lambda,
         fused_log_softmax=fused_log_softmax,
     )
 

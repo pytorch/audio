@@ -673,6 +673,18 @@ class Functional(TestBaseMixin):
             ref_gradients=ref_gradients,
         )
 
+    @parameterized.expand([(0,), (1,), (100,)])
+    def test_rnnt_loss_fastemit(self, fastemit_lambda):
+        data = rnnt_utils.get_B1_T10_U3_D4_data()  # non fused log softmax
+        data["fastemit_lambda"] = fastemit_lambda
+        ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
+
+        self._test_costs_and_gradients(
+            data=data,
+            ref_costs=ref_costs,
+            ref_gradients=ref_gradients,
+        )
+
     def test_psd(self):
         """Verify the ``F.psd`` method by the numpy implementation.
         Given the multi-channel complex-valued spectrum as the input,

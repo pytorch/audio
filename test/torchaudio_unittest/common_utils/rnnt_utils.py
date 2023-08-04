@@ -1,4 +1,5 @@
 import random
+from tokenize import blank_re
 import unittest
 
 import numpy as np
@@ -18,6 +19,7 @@ class _NumpyTransducer(torch.autograd.Function):
         target_lengths,
         targets,
         blank=-1,
+        fastemit_lambda=0.0,
     ):
         device = log_probs.device
         log_probs = log_probs.cpu().data.numpy()
@@ -31,6 +33,7 @@ class _NumpyTransducer(torch.autograd.Function):
             target_lengths=target_lengths,
             targets=targets,
             blank=blank,
+            fastemit_lambda=fastemit_lambda,
         )
 
         costs = torch.FloatTensor(costs).to(device=device)
@@ -42,7 +45,7 @@ class _NumpyTransducer(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
         grad_output = grad_output.view(-1, 1, 1, 1).to(ctx.grads)
-        return ctx.grads.mul(grad_output), None, None, None, None, None, None, None, None
+        return ctx.grads.mul(grad_output), None, None, None, None, None
 
     @staticmethod
     def compute_alpha_one_sequence(log_probs, targets, blank=-1):
@@ -85,7 +88,7 @@ class _NumpyTransducer(torch.autograd.Function):
         return beta, cost
 
     @staticmethod
-    def compute_gradients_one_sequence(log_probs, alpha, beta, targets, blank=-1):
+    def compute_gradients_one_sequence(log_probs, alpha, beta, targets, blank=-1, fastemit_lambda=0.0):
         max_T, max_U, D = log_probs.shape
         gradients = np.full(log_probs.shape, float("-inf"))
         cost = -beta[0, 0]
@@ -98,6 +101,11 @@ class _NumpyTransducer(torch.autograd.Function):
             gradients[:, u, l] = alpha[:, u] + beta[:, u + 1]
 
         gradients = -(np.exp(gradients + log_probs + cost))
+
+        if fastemit_lambda != 0.0:
+            blank_gradients = gradients[:, :, blank]
+            gradients = gradients * (1 + fastemit_lambda)
+            gradients[:, :, blank] = blank_gradients
         return gradients
 
     @staticmethod
@@ -107,6 +115,7 @@ class _NumpyTransducer(torch.autograd.Function):
         target_lengths,
         targets,
         blank=-1,
+        fastemit_lambda=0.0,
     ):
         gradients = np.zeros_like(log_probs)
         B_tgt, max_T, max_U, D = log_probs.shape
@@ -141,6 +150,7 @@ class _NumpyTransducer(torch.autograd.Function):
                 beta=beta,
                 targets=seq_targets,
                 blank=blank,
+                fastemit_lambda=fastemit_lambda,
             )
             np.testing.assert_almost_equal(alpha_cost, beta_cost, decimal=2)
             gradients[b_tgt, :T, :U, :] = seq_gradients
@@ -162,6 +172,7 @@ class NumpyTransducerLoss(torch.nn.Module):
         logit_lengths,
         target_lengths,
         targets,
+        fastemit_lambda=0.0,
     ):
         log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
         return _NumpyTransducer.apply(
@@ -170,6 +181,7 @@ class NumpyTransducerLoss(torch.nn.Module):
             target_lengths,
             targets,
             self.blank,
+            fastemit_lambda,
         )
 
 
@@ -179,6 +191,7 @@ def compute_with_numpy_transducer(data):
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],
         targets=data["targets"],
+        fastemit_lambda=data.get("fastemit_lambda", 0.0)
     )
 
     loss = torch.sum(costs)
@@ -201,6 +214,7 @@ def compute_with_pytorch_transducer(data):
         targets=data["targets"],
         blank=data["blank"],
         reduction="none",
+        fastemit_lambda=data.get("fastemit_lambda", 0.0),
         fused_log_softmax=fused_log_softmax,
     )
 

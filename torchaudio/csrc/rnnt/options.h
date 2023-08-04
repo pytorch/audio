@@ -48,6 +48,9 @@ typedef struct Options {
   // True by default
   bool fusedLogSmax_;
 
+  // FastEmit scaling factor
+  float fastemit_lambda_;
+
   Options()
       : device_(UNDEFINED),
         numThreads_(0),
@@ -59,7 +62,8 @@ typedef struct Options {
         maxSrcLen_(0),
         maxTgtLen_(0),
         numTargets_(0),
-        fusedLogSmax_(true) {}
+        fusedLogSmax_(true),
+        fastemit_lambda_(0.0) {}
 
   int BU() const {
     return batchSize_ * maxTgtLen_ * nHypos_;
