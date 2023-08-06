@@ -2505,33 +2505,35 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
 
 @fail_if_no_align
 def forced_align(
-    log_probs: torch.Tensor,
-    targets: torch.Tensor,
-    input_lengths: torch.Tensor,
-    target_lengths: torch.Tensor,
+    log_probs: Tensor,
+    targets: Tensor,
+    input_lengths: Optional[Tensor] = None,
+    target_lengths: Optional[Tensor] = None,
     blank: int = 0,
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    r"""Computes forced alignment given the emissions from a CTC-trained model and a target label.
+) -> Tuple[Tensor, Tensor]:
+    r"""Align a CTC label sequence to an emission.
 
     .. devices:: CPU CUDA
 
     .. properties:: TorchScript
 
     Args:
-        log_probs (torch.Tensor): log probability of CTC emission output.
+        log_probs (Tensor): log probability of CTC emission output.
             Tensor of shape `(B, T, C)`. where `B` is the batch size, `T` is the input length,
             `C` is the number of characters in alphabet including blank.
-        targets (torch.Tensor): Target sequence. Tensor of shape `(B, L)`,
+        targets (Tensor): Target sequence. Tensor of shape `(B, L)`,
             where `L` is the target length.
-        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). 1-D Tensor of shape `(B,)`.
-        target_lengths (torch.Tensor): Lengths of the targets. 1-D Tensor of shape `(B,)`.
+        input_lengths (Tensor or None, optional):
+            Lengths of the inputs (max value must each be <= `T`). 1-D Tensor of shape `(B,)`.
+        target_lengths (Tensor or None, optional):
+            Lengths of the targets. 1-D Tensor of shape `(B,)`.
         blank_id (int, optional): The index of blank symbol in CTC emission. (Default: 0)
 
     Returns:
-        Tuple(torch.Tensor, torch.Tensor):
-            torch.Tensor: Label for each time step in the alignment path computed using forced alignment.
+        Tuple(Tensor, Tensor):
+            Tensor: Label for each time step in the alignment path computed using forced alignment.
 
-            torch.Tensor: Log probability scores of the labels for each time step.
+            Tensor: Log probability scores of the labels for each time step.
 
     Note:
         The sequence length of `log_probs` must satisfy:
@@ -2550,5 +2552,17 @@ def forced_align(
         raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")
     if torch.max(targets) >= log_probs.shape[-1]:
         raise ValueError("targets values must be less than the CTC dimension")
+
+    if input_lengths is None:
+        batch_size, length = log_probs.size(0), log_probs.size(1)
+        input_lengths = torch.full((batch_size,), length, dtype=torch.int64, device=log_probs.device)
+    if target_lengths is None:
+        batch_size, length = targets.size(0), targets.size(1)
+        target_lengths = torch.full((batch_size,), length, dtype=torch.int64, device=targets.device)
+
+    # For TorchScript compatibility
+    assert input_lengths is not None
+    assert target_lengths is not None
+
     paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
     return paths, scores
