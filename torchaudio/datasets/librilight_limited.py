@@ -4,8 +4,8 @@ from typing import List, Tuple, Union
 
 import torchaudio
 from torch import Tensor
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
+from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.librispeech import _get_librispeech_metadata
 from torchaudio.datasets.utils import _extract_tar
 
