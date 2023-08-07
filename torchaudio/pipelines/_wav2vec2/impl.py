@@ -1,4 +1,3 @@
-import copy
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
 
@@ -93,7 +92,7 @@ class Wav2Vec2Bundle:
         state_dict = self._get_state_dict(dl_kwargs)
         model.load_state_dict(state_dict)
         if self._normalize_waveform:
-            model = utils._apply_input_layer_norm(model)
+            model = utils._extend_model(model, normalize_waveform=True)
         model.eval()
         return model
 
@@ -1587,11 +1586,6 @@ class Wav2Vec2FABundle(Wav2Vec2ASRBundle):
         labels = super().get_labels(blank=blank)
         return labels if star is None else (*labels, star)
 
-    def _get_params_with_star(self):
-        params = copy.deepcopy(self._params)
-        params["aux_num_out"] += 1
-        return params
-
     def get_model(self, with_star: bool = True, *, dl_kwargs=None) -> Module:
         """Construct the model and load the pretrained weight.
 
@@ -1605,13 +1599,19 @@ class Wav2Vec2FABundle(Wav2Vec2ASRBundle):
 
         Returns:
             Variation of :py:class:`~torchaudio.models.Wav2Vec2Model`.
+
+            .. note::
+
+               The model created with this method returns probability in log-domain,
+               (i.e. :py:func:`torch.nn.functional.log_softmax` is applied), whereas
+               the other Wav2Vec2 models returns logit.
         """
-        params = self._get_params_with_star() if with_star else self._params
-        model = utils._get_model(self._model_type, params)
-        state_dict = utils._get_state_dict(self._path, dl_kwargs, self._remove_aux_axis, with_star)
+        model = utils._get_model(self._model_type, self._params)
+        state_dict = utils._get_state_dict(self._path, dl_kwargs, self._remove_aux_axis)
         model.load_state_dict(state_dict)
-        if self._normalize_waveform:
-            model = utils._apply_input_layer_norm(model)
+        model = utils._extend_model(
+            model, normalize_waveform=self._normalize_waveform, apply_log_softmax=True, append_star=with_star
+        )
         model.eval()
         return model
 
@@ -1650,7 +1650,7 @@ class Wav2Vec2FABundle(Wav2Vec2ASRBundle):
         Returns:
             Aligner
         """
-        return aligner.Aligner()
+        return aligner.Aligner(blank=0)
 
 
 MMS_FA = Wav2Vec2FABundle(
