@@ -142,6 +142,38 @@ Pretrained Models
    HUBERT_ASR_LARGE
    HUBERT_ASR_XLARGE
 
+wav2vec 2.0 / HuBERT - Forced Alignment
+---------------------------------------
+
+Interface
+~~~~~~~~~
+
+``Wav2Vec2FABundle`` bundles pre-trained model and its associated dictionary. Additionally, it supports appending ``star`` token dimension.
+
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2fabundle.png
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   Wav2Vec2FABundle
+   Wav2Vec2FABundle.Tokenizer
+   Wav2Vec2FABundle.Aligner
+
+.. rubric:: Tutorials using ``Wav2Vec2FABundle``
+
+.. minigallery:: torchaudio.pipelines.Wav2Vec2FABundle
+
+Pertrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   MMS_FA
 
 .. _Tacotron2:
    
