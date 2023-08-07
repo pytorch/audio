@@ -43,6 +43,7 @@ from .functional import (
     mask_along_axis,
     mask_along_axis_iid,
     melscale_fbanks,
+    merge_tokens,
     mu_law_decoding,
     mu_law_encoding,
     mvdr_weights_rtf,
@@ -59,6 +60,7 @@ from .functional import (
     spectral_centroid,
     spectrogram,
     speed,
+    TokenSpan,
 )
 
 __all__ = [
@@ -94,6 +96,8 @@ __all__ = [
     "filtfilt",
     "flanger",
     "forced_align",
+    "merge_tokens",
+    "TokenSpan",
     "gain",
     "highpass_biquad",
     "lfilter",
