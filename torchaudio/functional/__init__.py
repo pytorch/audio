@@ -1,3 +1,4 @@
+from ._alignment import forced_align, merge_tokens, TokenSpan
 from .filtering import (
     allpass_biquad,
     band_biquad,
@@ -35,7 +36,6 @@ from .functional import (
     detect_pitch_frequency,
     edit_distance,
     fftconvolve,
-    forced_align,
     griffinlim,
     inverse_spectrogram,
     linear_fbanks,
@@ -43,7 +43,6 @@ from .functional import (
     mask_along_axis,
     mask_along_axis_iid,
     melscale_fbanks,
-    merge_tokens,
     mu_law_decoding,
     mu_law_encoding,
     mvdr_weights_rtf,
@@ -60,7 +59,6 @@ from .functional import (
     spectral_centroid,
     spectrogram,
     speed,
-    TokenSpan,
 )
 
 __all__ = [
