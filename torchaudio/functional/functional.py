@@ -4,6 +4,7 @@ import math
 import tempfile
 import warnings
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
 
 import torch
@@ -53,6 +54,8 @@ __all__ = [
     "preemphasis",
     "deemphasis",
     "forced_align",
+    "TokenSpan",
+    "merge_tokens",
 ]
 
 
@@ -2566,3 +2569,61 @@ def forced_align(
 
     paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
     return paths, scores
+
+
+@dataclass
+class TokenSpan:
+    """TokenSpan()
+    Token with time stamps and score. Returned by :py:func:`merge_tokens`.
+    """
+
+    token: int
+    """The token"""
+    start: int
+    """The start time (inclusive) in emission time axis."""
+    end: int
+    """The end time (exclusive) in emission time axis."""
+    score: float
+    """The score of the this token."""
+
+    def __len__(self) -> int:
+        """Returns the time span"""
+        return self.end - self.start
+
+
+def merge_tokens(tokens: Tensor, scores: Tensor, blank: int = 0) -> List[TokenSpan]:
+    """Removes repeated tokens and blank tokens from the given CTC token sequence.
+
+    Args:
+        tokens (Tensor): Alignment tokens (unbatched) returned from :py:func:`forced_align`.
+            Shape: `(time, )`.
+        scores (Tensor): Alignment scores (unbatched) returned from :py:func:`forced_align`.
+            Shape: `(time, )`. When computing the token-size score, the given score is averaged
+            across the corresponding time span.
+
+    Returns:
+        list of TokenSpan
+
+    Example:
+        >>> aligned_tokens, scores = forced_align(emission, targets, input_lengths, target_lengths)
+        >>> token_spans = merge_tokens(aligned_tokens[0], scores[0])
+    """
+    if tokens.ndim != 1 or scores.ndim != 1:
+        raise ValueError("`tokens` and `scores` must be 1D Tensor.")
+    if len(tokens) != len(scores):
+        raise ValueError("`tokens` and `scores` must be the same length.")
+
+    t_prev = blank
+    i = start = -1
+    spans = []
+    for t, token in enumerate(tokens):
+        if token != t_prev:
+            if t_prev != blank:
+                spans.append(TokenSpan(t_prev.item(), start, t, scores[start:t].mean().item()))
+            if token != blank:
+                i += 1
+                start = t
+            t_prev = token
+    if t_prev != blank:
+        spans.append(TokenSpan(t_prev.item(), start, len(tokens), scores[start:].mean().item()))
+    return spans
