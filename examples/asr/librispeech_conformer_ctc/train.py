@@ -12,7 +12,7 @@ from transforms import get_data_module
 
 class MyFitStartCallback(Callback):
     def on_fit_start(self, trainer, pl_module):
-        pl_module.initialize_loss_func(topo_type="hmm", subsampling_factor=1)
+        pl_module.initialize_loss_func(topo_type="ctc", subsampling_factor=4)
 
 
 def run_train(args):
