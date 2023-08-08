@@ -14,6 +14,7 @@ _decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
 _gain = pow(10, 0.05 * _decibel)
 
 _spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160)
+_speed_perturb_transform = torchaudio.transforms.SpeedPerturbation(orig_freq=16000, factors=[0.9, 1.0, 1.1])
 
 
 def _piecewise_linear_log(x):
@@ -57,7 +58,10 @@ def _extract_labels(sp_model, samples: List):
     return targets, lengths
 
 
-def _extract_features(data_pipeline, samples: List):
+def _extract_features(data_pipeline, samples: List, speed_perturbation=False):
+    if speed_perturbation:
+        samples = [_speed_perturb_transform(sample[0].squeeze()) for sample in samples]
+
     mel_features = [_spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in samples]
     features = torch.nn.utils.rnn.pad_sequence(mel_features, batch_first=True)
     features = data_pipeline(features)
