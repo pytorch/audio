@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Union
 
 import torch
-
+from torchaudio._internal import download_url_to_file
 
 _LG = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def _get_local_path(key):
 
 def _download(key, path, progress):
     url = f"https://download.pytorch.org/torchaudio/{key}"
-    torch.hub.download_url_to_file(url, path, progress=progress)
+    download_url_to_file(url, path, progress=progress)
 
 
 def _get_hash(path, hash, chunk_size=1028):
