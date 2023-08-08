@@ -65,13 +65,23 @@ def _remove_aux_axes(state_dict, axes):
         state_dict[key] = torch.stack([mat[i] for i in range(mat.size(0)) if i not in axes])
 
 
-def _get_state_dict(url, dl_kwargs, remove_axes=None):
+def _add_star_dim(state_dict):
+    w, b = state_dict["aux.weight"], state_dict["aux.bias"]
+    zeros = torch.zeros((1, w.size(1)), device=w.device, dtype=w.dtype)
+    state_dict["aux.weight"] = torch.cat((zeros, w), dim=0)
+    ones = torch.ones((1,), device=b.device, dtype=b.dtype)
+    state_dict["aux.bias"] = torch.cat((b, ones), dim=0)
+
+
+def _get_state_dict(url, dl_kwargs, remove_axes=None, add_star=False):
     if not url.startswith("https"):
         url = f"https://download.pytorch.org/torchaudio/models/{url}"
     dl_kwargs = {} if dl_kwargs is None else dl_kwargs
     state_dict = load_state_dict_from_url(url, **dl_kwargs)
     if remove_axes:
         _remove_aux_axes(state_dict, remove_axes)
+    if add_star:
+        _add_star_dim(state_dict)
     return state_dict
 
 
@@ -300,4 +310,36 @@ def _get_it_labels():
         "ó",
         "í",
         "ï",
+    )
+
+
+def _get_mms_labels():
+    return (
+        "a",
+        "i",
+        "e",
+        "n",
+        "o",
+        "u",
+        "t",
+        "s",
+        "r",
+        "m",
+        "k",
+        "l",
+        "d",
+        "g",
+        "h",
+        "y",
+        "b",
+        "p",
+        "w",
+        "c",
+        "v",
+        "j",
+        "z",
+        "f",
+        "'",
+        "q",
+        "x",
     )

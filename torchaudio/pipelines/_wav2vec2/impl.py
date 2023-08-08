@@ -1,9 +1,10 @@
+import copy
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from torch.nn import Module
 
-from . import utils
+from . import aligner, utils
 
 
 __all__ = []  # type: ignore
@@ -146,7 +147,7 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
         *,
         blank: str = "-",
     ) -> Tuple[str, ...]:
-        """The output class labels (only applicable to fine-tuned bundles)
+        """The output class labels.
 
         The first is blank token, and it is customizable.
 
@@ -159,8 +160,8 @@ class Wav2Vec2ASRBundle(Wav2Vec2Bundle):
             the output class labels.
 
         Example
-            >>> import torchaudio
-            >>> torchaudio.models.HUBERT_ASR_LARGE.get_labels()
+            >>> from torchaudio.pipelines import HUBERT_ASR_LARGE as bundle
+            >>> bundle.get_labels()
             ('-', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
         """  # noqa: E501
         return (blank, *self._labels)
@@ -1517,4 +1518,182 @@ redistributed with the same license.
 `Source <https://github.com/facebookresearch/fairseq/tree/30c912b73c0f88d41171879b2f03226a171004ef/examples/wav2vec/xlsr#xls-r>`__]
 
 Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2Bundle` for usage details.
+"""  # noqa: E501
+
+
+@dataclass
+class Wav2Vec2FABundle(Wav2Vec2ASRBundle):
+    """Data class that bundles associated information to use pretrained :py:class:`~torchaudio.models.Wav2Vec2Model` for forced alignment.
+
+    This class provides interfaces for instantiating the pretrained model along with
+    the information necessary to retrieve pretrained weights and additional data
+    to be used with the model.
+
+    Torchaudio library instantiates objects of this class, each of which represents
+    a different pretrained model. Client code should access pretrained models via these
+    instances.
+
+    Please see below for the usage and the available values.
+
+    Example - Feature Extraction
+        >>> import torchaudio
+        >>>
+        >>> bundle = torchaudio.pipelines.MMS_FA
+        >>>
+        >>> # Build the model and load pretrained weight.
+        >>> model = bundle.get_model()
+        Downloading:
+        100%|███████████████████████████████| 1.18G/1.18G [00:05<00:00, 216MB/s]
+        >>>
+        >>> # Resample audio to the expected sampling rate
+        >>> waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
+        >>>
+        >>> # Estimate the probability of token distribution
+        >>> emission, _ = model(waveform)
+        >>>
+        >>> # Generate frame-wise alignment
+        >>> alignment, scores = torchaudio.functional.forced_align(
+        >>>     emission, targets, input_lengths, target_lengths, blank=0)
+        >>>
+    """  # noqa: E501
+
+    class Tokenizer(aligner.ITokenizer):
+        """Interface of the tokenizer"""
+
+    class Aligner(aligner.IAligner):
+        """Interface of the aligner"""
+
+    def get_labels(self, star: Optional[str] = "*", blank: str = "-") -> Tuple[str, ...]:
+        """Get the labels corresponding to the feature dimension of emission.
+
+        The first is blank token, and it is customizable.
+
+        Args:
+            star (str or None, optional): Change or disable star token. (default: ``"*"``)
+            blank (str, optional): Change the blank token. (default: ``'-'``)
+
+        Returns:
+            Tuple[str, ...]:
+            For models fine-tuned on ASR, returns the tuple of strings representing
+            the output class labels.
+
+        Example
+            >>> from torchaudio.pipelines import MMS_FA as bundle
+            >>> bundle.get_labels()
+            ('-', 'a', 'i', 'e', 'n', 'o', 'u', 't', 's', 'r', 'm', 'k', 'l', 'd', 'g', 'h', 'y', 'b', 'p', 'w', 'c', 'v', 'j', 'z', 'f', "'", 'q', 'x', '*')
+            >>> bundle.get_labels(star=None)
+            ('-', 'a', 'i', 'e', 'n', 'o', 'u', 't', 's', 'r', 'm', 'k', 'l', 'd', 'g', 'h', 'y', 'b', 'p', 'w', 'c', 'v', 'j', 'z', 'f', "'", 'q', 'x')
+        """  # noqa: E501
+        labels = super().get_labels(blank=blank)
+        return labels if star is None else (*labels, star)
+
+    def _get_params_with_star(self):
+        params = copy.deepcopy(self._params)
+        params["aux_num_out"] += 1
+        return params
+
+    def get_model(self, with_star: bool = True, *, dl_kwargs=None) -> Module:
+        """Construct the model and load the pretrained weight.
+
+        The weight file is downloaded from the internet and cached with
+        :func:`torch.hub.load_state_dict_from_url`
+
+        Args:
+            with_star (bool, optional): If enabled, the last dimension of output layer is
+                extended by one, which corresponds to `star` token.
+            dl_kwargs (dictionary of keyword arguments): Passed to :func:`torch.hub.load_state_dict_from_url`.
+
+        Returns:
+            Variation of :py:class:`~torchaudio.models.Wav2Vec2Model`.
+        """
+        params = self._get_params_with_star() if with_star else self._params
+        model = utils._get_model(self._model_type, params)
+        state_dict = utils._get_state_dict(self._path, dl_kwargs, self._remove_aux_axis, with_star)
+        model.load_state_dict(state_dict)
+        if self._normalize_waveform:
+            model = utils._apply_input_layer_norm(model)
+        model.eval()
+        return model
+
+    def get_dict(self, star: Optional[str] = "*", blank: str = "-") -> Dict[str, int]:
+        """Get the mapping from token to index (in emission feature dim)
+
+        Args:
+            star (str or None, optional): Change or disable star token. (default: ``"*"``)
+            blank (str, optional): Change the blank token. (default: ``'-'``)
+
+        Returns:
+            Tuple[str, ...]:
+            For models fine-tuned on ASR, returns the tuple of strings representing
+            the output class labels.
+
+        Example
+            >>> from torchaudio.pipelines import MMS_FA as bundle
+            >>> bundle.get_dict()
+            {'-': 0, 'a': 1, 'i': 2, 'e': 3, 'n': 4, 'o': 5, 'u': 6, 't': 7, 's': 8, 'r': 9, 'm': 10, 'k': 11, 'l': 12, 'd': 13, 'g': 14, 'h': 15, 'y': 16, 'b': 17, 'p': 18, 'w': 19, 'c': 20, 'v': 21, 'j': 22, 'z': 23, 'f': 24, "'": 25, 'q': 26, 'x': 27, '*': 28}
+            >>> bundle.get_dict(star=None)
+            {'-': 0, 'a': 1, 'i': 2, 'e': 3, 'n': 4, 'o': 5, 'u': 6, 't': 7, 's': 8, 'r': 9, 'm': 10, 'k': 11, 'l': 12, 'd': 13, 'g': 14, 'h': 15, 'y': 16, 'b': 17, 'p': 18, 'w': 19, 'c': 20, 'v': 21, 'j': 22, 'z': 23, 'f': 24, "'": 25, 'q': 26, 'x': 27}
+        """  # noqa: E501
+        return {k: i for i, k in enumerate(self.get_labels(star=star, blank=blank))}
+
+    def get_tokenizer(self) -> Tokenizer:
+        """Instantiate a Tokenizer.
+
+        Returns:
+            Tokenizer
+        """
+        return aligner.Tokenizer(self.get_dict())
+
+    def get_aligner(self) -> Aligner:
+        """Instantiate an Aligner.
+
+        Returns:
+            Aligner
+        """
+        return aligner.Aligner()
+
+
+MMS_FA = Wav2Vec2FABundle(
+    "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt",
+    {
+        "extractor_mode": "layer_norm",
+        "extractor_conv_layer_config": [
+            (512, 10, 5),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 3, 2),
+            (512, 2, 2),
+            (512, 2, 2),
+        ],
+        "extractor_conv_bias": True,
+        "encoder_embed_dim": 1024,
+        "encoder_projection_dropout": 0.0,
+        "encoder_pos_conv_kernel": 128,
+        "encoder_pos_conv_groups": 16,
+        "encoder_num_layers": 24,
+        "encoder_num_heads": 16,
+        "encoder_attention_dropout": 0.0,
+        "encoder_ff_interm_features": 4096,
+        "encoder_ff_interm_dropout": 0.1,
+        "encoder_dropout": 0.0,
+        "encoder_layer_norm_first": True,
+        "encoder_layer_drop": 0.1,
+        "aux_num_out": 28,
+    },
+    _labels=utils._get_mms_labels(),
+    _sample_rate=16000,
+    _normalize_waveform=True,
+    _model_type="Wav2Vec2",
+)
+MMS_FA.__doc__ = """
+Trained on 31K hours of data in 1,130 languages from *Scaling Speech Technology to 1,000+ Languages* :cite:`pratap2023scaling`.
+
+Published by the authors of *Scaling Speech Technology to 1,000+ Languages* :cite:`pratap2023scaling` under [`CC-BY-NC 4.0 License <https://github.com/facebookresearch/fairseq/tree/100cd91db19bb27277a06a25eb4154c805b10189/examples/mms#license>`__].
+
+Please refer to :py:class:`torchaudio.pipelines.Wav2Vec2FABundle` for usage details.
+
+.. note::
+
+   Unlike other Wav2Vec2 bundles, this model does not have a token for word boundary (like `|`). This makes the post-processing of alignments slightly different.
 """  # noqa: E501
