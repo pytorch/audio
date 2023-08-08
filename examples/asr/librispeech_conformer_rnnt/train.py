@@ -49,7 +49,12 @@ def run_train(args):
 
     sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
     model = ConformerRNNTModule(sp_model)
-    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
+    data_module = get_data_module(
+        args.librispeech_path,
+        args.global_stats_path,
+        str(args.sp_model_path),
+        args.musan_path,
+    )
     trainer.fit(model, data_module, ckpt_path=args.checkpoint_path)
 
 
@@ -78,6 +83,13 @@ def cli_main():
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
         required=True,
+    )
+    parser.add_argument(
+        "--musan-path",
+        type=pathlib.Path,
+        help="Path to MUSAN dataset for addtive noise.",
+        default=None,
+        required=False,
     )
     parser.add_argument(
         "--sp-model-path",
