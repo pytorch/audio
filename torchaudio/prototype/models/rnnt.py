@@ -224,7 +224,7 @@ class _ConformerEncoder(torch.nn.Module, _Transcriber):
         subsampling_type: str,
     ) -> None:
         super().__init__()
-        
+
         self.subsampling_type = subsampling_type
         if subsampling_type == "splice":
             # Default subsampling in torchaudio:
@@ -265,7 +265,7 @@ class _ConformerEncoder(torch.nn.Module, _Transcriber):
             time_reduction_out, time_reduction_lengths = self.time_reduction(input, lengths)
             input_linear_out = self.input_linear(time_reduction_out)
         elif self.subsampling_type == "conv":
-            mask = (~make_source_mask(lengths)[:, None, :])
+            mask = ~make_source_mask(lengths)[:, None, :]
             input_linear_out, mask = self.input_linear(input, mask)
             time_reduction_lengths = mask.squeeze(1).sum(1).int()
 

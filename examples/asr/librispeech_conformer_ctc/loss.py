@@ -1,9 +1,10 @@
-from typing import List, Optional, Union, Tuple
+from typing import List, Tuple, Union
+
 import k2
 import torch
-from torch import Tensor, nn
 
 from bpe_graph_compiler import BpeCtcTrainingGraphCompiler
+from torch import nn, Tensor
 
 
 class MaximumLikelihoodLoss(nn.Module):
@@ -19,8 +20,8 @@ class MaximumLikelihoodLoss(nn.Module):
         padding_value=1.0,
         subsampling_factor: int = 4,
         ctc_beam_size: float = 10.0,
-        reduction = "sum",
-        use_double_scores = True,
+        reduction="sum",
+        use_double_scores=True,
     ):
         super().__init__()
         self.graph_compiler = graph_compiler
@@ -31,9 +32,7 @@ class MaximumLikelihoodLoss(nn.Module):
         self.reduction = reduction
         self.use_double_scores = use_double_scores
 
-    def encode_supervisions(
-        self, targets, input_lengths
-    ) -> Tuple[torch.Tensor, Union[List[str], List[List[int]]]]:
+    def encode_supervisions(self, targets, input_lengths) -> Tuple[torch.Tensor, Union[List[str], List[List[int]]]]:
         """
         Encodes Lhotse's ``batch["supervisions"]`` dict into
         a pair of torch Tensor, and a list of transcription strings or token indexes
@@ -67,7 +66,7 @@ class MaximumLikelihoodLoss(nn.Module):
     def forward(self, log_probs: Tensor, targets: Tensor, input_lengths: Tensor, target_lengths: Tensor) -> Tensor:
         supervision_segments, texts = self.encode_supervisions(targets, input_lengths)
         token_ids = texts
-        
+
         decoding_graph = self.graph_compiler.compile(token_ids)
 
         log_probs = log_probs.permute(1, 0, 2)  # (T, N, C) ->(N, T, C)
@@ -87,4 +86,3 @@ class MaximumLikelihoodLoss(nn.Module):
             use_double_scores=self.use_double_scores,
         )
         return loss
-    

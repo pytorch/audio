@@ -1,5 +1,6 @@
-import torch
 import random
+
+import torch
 import torchaudio.functional as F
 
 
@@ -7,9 +8,9 @@ class AddNoise(torch.nn.Module):
     def __init__(
         self,
         noise_dataset,
-        sampling_rate = 16000,
-        snr = (10, 20),
-        p = 0.5,
+        sampling_rate=16000,
+        snr=(10, 20),
+        p=0.5,
         seed: int = 42,
     ):
         # `noise_dataset` is a pytorch dataset that contains noise samples
@@ -26,7 +27,6 @@ class AddNoise(torch.nn.Module):
         self.noise_batch = None
         self.position = 0
 
-
     def fetch_noise_batch(self, total_length):
         # This will fetch noise until the number of sample points is equal or more than the speech samples
 
@@ -41,11 +41,10 @@ class AddNoise(torch.nn.Module):
         self.position = self.rng.randint(0, self.noise_batch.size(-1) - 1)
         return self.noise_batch
 
-
     def get_my_noise(self, length):
         noise_list = []
         while length > 0:
-            noise = self.noise_batch[:, self.position:self.position+length]
+            noise = self.noise_batch[:, self.position : self.position + length]
             noise_list.append(noise)
             length -= noise.size(-1)
             self.position += length
@@ -53,9 +52,8 @@ class AddNoise(torch.nn.Module):
                 self.position = 0
         return torch.cat(noise_list, dim=-1)
 
-
     def forward(self, sample: torch.Tensor) -> torch.Tensor:
-        # You might need to resample the input or noise such that their 
+        # You might need to resample the input or noise such that their
         # sample rates are matched.
         # We don't need to do this here for Librispeech, because
         # Librispeech and Musan are both 16kHz.

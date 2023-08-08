@@ -1,9 +1,9 @@
 import logging
+import math
 import pathlib
 from argparse import ArgumentParser
 
 import sentencepiece as spm
-import math
 
 import torch
 import torchaudio
@@ -33,7 +33,9 @@ def run_eval(args):
         "sil_score": 0,
     }
 
-    model = ConformerCTCModule.load_from_checkpoint(args.checkpoint_path, sp_model=sp_model, inference_args=inference_args).eval()
+    model = ConformerCTCModule.load_from_checkpoint(
+        args.checkpoint_path, sp_model=sp_model, inference_args=inference_args
+    ).eval()
     data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
 
     if args.use_cuda:

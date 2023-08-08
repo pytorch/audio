@@ -1,14 +1,12 @@
+from typing import List, Tuple
+
 import torch
 import torch.nn as nn
 from torchaudio.prototype.models.rnnt import _ConformerEncoder
 
-import math
-from typing import Dict, List, Optional, Tuple
-
 
 class CTCModel(torch.nn.Module):
-    r"""
-    """
+    r""" """
 
     def __init__(self, encoder, encoder_output_layer) -> None:
         super().__init__()
@@ -30,7 +28,7 @@ class CTCModel(torch.nn.Module):
         x = x.permute(1, 0, 2)  # (T, N, C) ->(N, T, C)
         x = nn.functional.log_softmax(x, dim=-1)  # (N, T, C)
         return x
-        
+
     def forward(
         self,
         sources: torch.Tensor,
@@ -130,9 +128,7 @@ def conformer_ctc_model(
         conformer_dropout=conformer_dropout,
         subsampling_type=subsampling_type,
     )
-    encoder_output_layer = nn.Sequential(
-        nn.Dropout(p=conformer_dropout), nn.Linear(encoding_dim, num_symbols)
-    )
+    encoder_output_layer = nn.Sequential(nn.Dropout(p=conformer_dropout), nn.Linear(encoding_dim, num_symbols))
 
     return CTCModel(encoder, encoder_output_layer)
 

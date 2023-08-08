@@ -5,7 +5,7 @@ import sentencepiece as spm
 
 from lightning import ConformerCTCModule
 from pytorch_lightning import seed_everything, Trainer
-from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint, Callback
+from pytorch_lightning.callbacks import Callback, LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.strategies import DDPStrategy
 from transforms import get_data_module
 

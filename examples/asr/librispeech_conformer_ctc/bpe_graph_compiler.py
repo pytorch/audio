@@ -15,9 +15,9 @@
 # limitations under the License.
 
 
+from collections import defaultdict
 from pathlib import Path
 from typing import List, Union
-from collections import defaultdict
 
 import k2
 import sentencepiece as spm
@@ -29,7 +29,7 @@ class BpeCtcTrainingGraphCompiler(object):
         self,
         bpe_model_path: Path,
         device: Union[str, torch.device] = "cpu",
-        topo_type = "ctc",
+        topo_type="ctc",
     ) -> None:
         """
         Args:
@@ -51,9 +51,11 @@ class BpeCtcTrainingGraphCompiler(object):
         self.sp = sp
         self.device = device
 
-        self.start_tokens = {token_id for token_id in range(sp.vocab_size()) if sp.id_to_piece(token_id).startswith("▁")}
+        self.start_tokens = {
+            token_id for token_id in range(sp.vocab_size()) if sp.id_to_piece(token_id).startswith("▁")
+        }
         self.remove_intra_word_blk_flag = True
- 
+
         if topo_type == "hmm":
             self.max_token_id = sp.vocab_size() + 1  # hard-coded for torch audio
             self.topo = BpeCtcTrainingGraphCompiler.hmm_topo(self.max_token_id, self.start_tokens, sil_id=0)
@@ -115,11 +117,11 @@ class BpeCtcTrainingGraphCompiler(object):
                     condition2 = True
                 elif arc[0] != arc[1] and arc[2] == 0:
                     eps_arc_i = i
-            
+
             if condition1 and condition2:
                 # print(f"state {state} should remove an arc {eps_self_loop}: {arc_list[eps_self_loop]}")
                 new_arcs.extend(arc_list[:eps_arc_i])
-                new_arcs.extend(arc_list[eps_arc_i+1:])
+                new_arcs.extend(arc_list[eps_arc_i + 1 :])
             else:
                 new_arcs.extend(arc_list)
         new_arcs.append([final_state])
@@ -135,14 +137,14 @@ class BpeCtcTrainingGraphCompiler(object):
     def remove_intra_word_blk(self, decoding_graphs, start_tokens, flag=True):
         if len(decoding_graphs.shape) == 2:
             decoding_graphs = k2.create_fsa_vec([decoding_graphs])
-       
+
         num_fsas = decoding_graphs.shape[0]
         decoding_graph_list = []
         for i in range(num_fsas):
             decoding_graph_i = self._remove_intra_word_blk(decoding_graphs[i], start_tokens, flag=flag)
             decoding_graph_i = k2.connect(decoding_graph_i)
             decoding_graph_list.append(decoding_graph_i)
-        
+
         decoding_graphs = k2.create_fsa_vec(decoding_graph_list)
         decoding_graphs = k2.arc_sort(decoding_graphs)
         decoding_graphs = decoding_graphs.to(self.device)
@@ -157,7 +159,7 @@ class BpeCtcTrainingGraphCompiler(object):
 
         Args:
           piece_ids:
-           IDs. It is a list-of-list integer 
+           IDs. It is a list-of-list integer
           modified:
            See :func:`k2.ctc_graph` for its meaning.
         Return:
@@ -173,14 +175,13 @@ class BpeCtcTrainingGraphCompiler(object):
     def hmm_topo(
         max_token: int,
         start_tokens: list,
-        device = None,
+        device=None,
         sil_id: int = 0,
     ) -> k2.Fsa:
-        '''
+        """
         HMM topo
-        '''
+        """
         print(f"Creating HMM topo for {max_token} tokens")
-        num_tokens = max_token
 
         start_tokens = set(start_tokens)
 
@@ -209,7 +210,7 @@ class BpeCtcTrainingGraphCompiler(object):
             arcs.append([loop_state, cur_state, i, i, 0])
             arcs.append([cur_state, cur_state, i, blk, 0])
             arcs.append([cur_state, loop_state, i, blk, 0])
-            
+
             arcs.append([start_state, cur_state, i, i, 0])
 
             if i in start_tokens:
@@ -220,7 +221,7 @@ class BpeCtcTrainingGraphCompiler(object):
         next_available_state += 1
         arcs.append([start_state, final_state, -1, -1, 0])
         arcs.append([loop_state, final_state, -1, -1, 0])
-        arcs.append([blk_state, final_state, -1, -1, 0])    
+        arcs.append([blk_state, final_state, -1, -1, 0])
         arcs.append([final_state])
 
         arcs = sorted(arcs, key=lambda arc: arc[0])
@@ -230,7 +231,7 @@ class BpeCtcTrainingGraphCompiler(object):
 
         fst = k2.Fsa.from_str(arcs, acceptor=False)
         fst = k2.arc_sort(fst)
-        
+
         if device is not None:
             fst = fst.to(device)
 
@@ -244,12 +245,10 @@ class BpeCtcTrainingGraphCompiler(object):
         transcript_fsa = k2.linear_fsa(piece_ids)
         transcript_fsa = k2.arc_sort(transcript_fsa)
 
-        decoding_graphs = k2.compose(
-            self.topo, transcript_fsa, treat_epsilons_specially=True
-        )
+        decoding_graphs = k2.compose(self.topo, transcript_fsa, treat_epsilons_specially=True)
         decoding_graphs = k2.connect(decoding_graphs)
         decoding_graphs = decoding_graphs.to(self.device)
-        
+
         return decoding_graphs
 
     def compile(
@@ -263,4 +262,3 @@ class BpeCtcTrainingGraphCompiler(object):
             return self.compile_hmm(piece_ids, modified)
         else:
             raise NotImplementedError
-

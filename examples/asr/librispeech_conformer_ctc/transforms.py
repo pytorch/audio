@@ -6,10 +6,10 @@ from typing import List
 import sentencepiece as spm
 import torch
 import torchaudio
-from data_module import LibriSpeechDataModule
-from lightning import Batch
 
 import torchaudio.transforms as T
+from data_module import LibriSpeechDataModule
+from lightning import Batch
 
 
 _decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)

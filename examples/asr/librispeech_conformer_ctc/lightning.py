@@ -5,14 +5,13 @@ from typing import List, Tuple
 
 import sentencepiece as spm
 import torch
-import torchaudio
-from pytorch_lightning import LightningModule
-from torchaudio.models import Hypothesis, RNNTBeamSearch
-from torchaudio.models.decoder import ctc_decoder, download_pretrained_files
-# from torchaudio.models import Conformer
-from ctc_model import conformer_ctc_model, conformer_ctc_model_base
-from loss import MaximumLikelihoodLoss
 from bpe_graph_compiler import BpeCtcTrainingGraphCompiler
+
+# from torchaudio.models import Conformer
+from ctc_model import conformer_ctc_model
+from loss import MaximumLikelihoodLoss
+from pytorch_lightning import LightningModule
+from torchaudio.models import Hypothesis
 
 
 logger = logging.getLogger()
@@ -133,7 +132,7 @@ class ConformerCTCModule(LightningModule):
         # For greater customizability, please refer to ``conformer_rnnt_model``.
         # self.model = conformer_ctc_model_base()
         self.model = conformer_ctc_customized()
-        
+
         # Option 1:
         # self.loss = torch.nn.CTCLoss(blank=self.blank_idx, reduction="sum")
 
@@ -145,7 +144,7 @@ class ConformerCTCModule(LightningModule):
         # )
         # self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=4)
         self.loss = None
-        
+
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
 
@@ -156,7 +155,7 @@ class ConformerCTCModule(LightningModule):
                 blank=self.blank_idx,
             )
             self.decoder = greedy_decoder
-    
+
     def initialize_loss_func(self, topo_type="ctc", subsampling_factor=4):
         graph_compiler = BpeCtcTrainingGraphCompiler(
             bpe_model_path="./spm_unigram_1023.model",
@@ -221,7 +220,7 @@ class ConformerCTCModule(LightningModule):
         except:
             loss = 0
             for model_param_name, model_param_value in self.model.named_parameters():  # encoder_output_layer.
-                    loss += model_param_value.abs().sum()
+                loss += model_param_value.abs().sum()
             loss = loss * 1e-5
             logger.info(f"[{self.global_rank}] batch {batch_idx} is bad")
         batch_size = batch.features.size(0)
@@ -235,4 +234,3 @@ class ConformerCTCModule(LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self._step(batch, batch_idx, "test")
-
