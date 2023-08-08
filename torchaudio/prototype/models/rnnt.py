@@ -70,6 +70,124 @@ class Conv2dSubsampling(torch.nn.Module):
         return self.out[key]
 
 
+class Conv2dSubsampling1(torch.nn.Module):
+    """Similar to Conv2dSubsampling module, but without any subsampling performed.
+
+    Args:
+        idim (int): Input dimension.
+        odim (int): Output dimension.
+        dropout_rate (float): Dropout rate.
+        pos_enc (torch.nn.Module): Custom position encoding layer.
+
+    """
+
+    def __init__(self, idim, odim, dropout_rate, pos_enc=None):
+        """Construct an Conv2dSubsampling1 object."""
+        super(Conv2dSubsampling1, self).__init__()
+        self.conv = torch.nn.Sequential(
+            torch.nn.Conv2d(1, odim, 3, 1),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(odim, odim, 3, 1),
+            torch.nn.ReLU(),
+        )
+        self.out = torch.nn.Sequential(
+            torch.nn.Linear(odim * (idim - 4), odim),
+            pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
+        )
+
+    def forward(self, x, x_mask):
+        """Pass x through 2 Conv2d layers without subsampling.
+
+        Args:
+            x (torch.Tensor): Input tensor (#batch, time, idim).
+            x_mask (torch.Tensor): Input mask (#batch, 1, time).
+
+        Returns:
+            torch.Tensor: Subsampled tensor (#batch, time', odim).
+                where time' = time - 4.
+            torch.Tensor: Subsampled mask (#batch, 1, time').
+                where time' = time - 4.
+
+        """
+        x = x.unsqueeze(1)  # (b, c, t, f)
+        x = self.conv(x)
+        b, c, t, f = x.size()
+        x = self.out(x.transpose(1, 2).contiguous().view(b, t, c * f))
+        if x_mask is None:
+            return x, None
+        return x, x_mask[:, :, :-4]
+
+    def __getitem__(self, key):
+        """Get item.
+
+        When reset_parameters() is called, if use_scaled_pos_enc is used,
+            return the positioning encoding.
+
+        """
+        if key != -1:
+            raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
+        return self.out[key]
+
+
+class Conv2dSubsampling2(torch.nn.Module):
+    """Convolutional 2D subsampling (to 1/2 length).
+
+    Args:
+        idim (int): Input dimension.
+        odim (int): Output dimension.
+        dropout_rate (float): Dropout rate.
+        pos_enc (torch.nn.Module): Custom position encoding layer.
+
+    """
+
+    def __init__(self, idim, odim, dropout_rate, pos_enc=None):
+        """Construct an Conv2dSubsampling2 object."""
+        super(Conv2dSubsampling2, self).__init__()
+        self.conv = torch.nn.Sequential(
+            torch.nn.Conv2d(1, odim, 3, 2),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(odim, odim, 3, 1),
+            torch.nn.ReLU(),
+        )
+        self.out = torch.nn.Sequential(
+            torch.nn.Linear(odim * (((idim - 1) // 2 - 2)), odim),
+            pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
+        )
+
+    def forward(self, x, x_mask):
+        """Subsample x.
+
+        Args:
+            x (torch.Tensor): Input tensor (#batch, time, idim).
+            x_mask (torch.Tensor): Input mask (#batch, 1, time).
+
+        Returns:
+            torch.Tensor: Subsampled tensor (#batch, time', odim),
+                where time' = time // 2.
+            torch.Tensor: Subsampled mask (#batch, 1, time'),
+                where time' = time // 2.
+
+        """
+        x = x.unsqueeze(1)  # (b, c, t, f)
+        x = self.conv(x)
+        b, c, t, f = x.size()
+        x = self.out(x.transpose(1, 2).contiguous().view(b, t, c * f))
+        if x_mask is None:
+            return x, None
+        return x, x_mask[:, :, :-2:2][:, :, :-2:1]
+
+    def __getitem__(self, key):
+        """Get item.
+
+        When reset_parameters() is called, if use_scaled_pos_enc is used,
+            return the positioning encoding.
+
+        """
+        if key != -1:
+            raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
+        return self.out[key]
+
+
 def make_source_mask(lengths: torch.Tensor) -> torch.Tensor:
     """Create source mask for given lengths.
 
@@ -115,7 +233,10 @@ class _ConformerEncoder(torch.nn.Module, _Transcriber):
         elif subsampling_type == "conv":
             # Default subsampling in espnet:
             # time_reduction_stride=4 is hard-wired in the following code
-            # For other stride sizes, just check out:
+            # For other stride sizes, you can use:
+            #   - Conv2dSubsampling1
+            #   - Conv2dSubsampling2
+            # above, or check out for more options:
             # https://github.com/espnet/espnet/blob/master/espnet/nets/pytorch_backend/transformer/subsampling.py
             self.input_linear = Conv2dSubsampling(
                 input_dim,
