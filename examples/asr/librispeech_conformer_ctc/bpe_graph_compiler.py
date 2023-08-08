@@ -106,7 +106,7 @@ class BpeCtcTrainingGraphCompiler(object):
             state_arcs[arc[0]].append(arc)
 
         new_arcs = []
-        for state, arc_list in state_arcs.items():
+        for _state, arc_list in state_arcs.items():
             condition1 = False
             condition2 = False
             eps_arc_i = None

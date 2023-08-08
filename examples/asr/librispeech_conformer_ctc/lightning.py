@@ -217,9 +217,9 @@ class ConformerCTCModule(LightningModule):
         """
         try:
             loss = self._step(batch, batch_idx, "train")
-        except:
+        except BaseException:
             loss = 0
-            for model_param_name, model_param_value in self.model.named_parameters():  # encoder_output_layer.
+            for _model_param_name, model_param_value in self.model.named_parameters():  # encoder_output_layer.
                 loss += model_param_value.abs().sum()
             loss = loss * 1e-5
             logger.info(f"[{self.global_rank}] batch {batch_idx} is bad")
