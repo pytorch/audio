@@ -8,7 +8,7 @@ import torch
 import torchaudio
 from pytorch_lightning import LightningModule
 from torchaudio.models import Hypothesis, RNNTBeamSearch
-from torchaudio.prototype.models import conformer_rnnt_base, conformer_rnnt_model
+from torchaudio.prototype.models import conformer_rnnt_model
 
 
 logger = logging.getLogger()
@@ -75,7 +75,7 @@ def post_process_hypos(
     return nbest_batch
 
 
-def conformer_rnnt_torchaudio2_1_paper():
+def conformer_rnnt_customized():
     return conformer_rnnt_model(
         input_dim=80,
         encoding_dim=512,
@@ -114,7 +114,7 @@ class ConformerRNNTModule(LightningModule):
         # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
         # For greater customizability, please refer to ``conformer_rnnt_model``.
         # self.model = conformer_rnnt_base()
-        self.model = conformer_rnnt_torchaudio2_1_paper()
+        self.model = conformer_rnnt_customized()
         self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
         self.optimizer = torch.optim.Adam(
             self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9, weight_decay=1e-3

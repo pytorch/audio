@@ -7,7 +7,6 @@ import sentencepiece as spm
 import torch
 import torchaudio
 
-import torchaudio.transforms as T
 from additive_noise import AddNoise
 from data_module import LibriSpeechDataModule
 from lightning import Batch
@@ -82,16 +81,6 @@ def _extract_features(data_pipeline, samples: List, speed_perturbation=False, mu
 class TrainTransform:
     def __init__(self, global_stats_path: str, sp_model_path: str):
         self.sp_model = spm.SentencePieceProcessor(model_file=sp_model_path)
-
-        spec_aug_transform = T.SpecAugment(
-            n_time_masks=10,
-            time_mask_param=30,
-            p=0.2,
-            n_freq_masks=2,
-            freq_mask_param=27,
-            iid_masks=True,
-            zero_masking=True,
-        )
 
         self.train_data_pipeline = torch.nn.Sequential(
             FunctionalModule(_piecewise_linear_log),
