@@ -26,7 +26,7 @@ There are currently two implementations available.
 Availability
 ------------
 
-``"sox_io"`` backend requires C++ extension module, which is included in Linux/macOS binary distributions. This backend is not available on Windows.
+``"sox_io"`` backend requires C++ extension module. torchaudio<2.1.0 will include libsox in the Linux/macOS binary distributions, for later versions please install `libsox`. This backend is not available on Windows.
 
 ``"soundfile"`` backend requires ``SoundFile``. Please refer to `the SoundFile documentation <https://pysoundfile.readthedocs.io/en/latest/>`_ for the installation.
 
