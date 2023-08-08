@@ -94,6 +94,7 @@ def conformer_rnnt_torchaudio2_1_paper():
         lstm_layer_norm_epsilon=1e-5,
         lstm_dropout=0.3,
         joiner_activation="tanh",
+        subsampling_type="conv",
     )
 
 

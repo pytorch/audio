@@ -18,12 +18,17 @@ class Musan(Dataset):
         subset (str): Subset of the dataset to use. Options: [``"music"``, ``"noise"``, ``"speech"``].
     """
 
-    def __init__(self, root: Union[str, Path], subset: str):
-        if subset not in _SUBSETS:
-            raise ValueError(f"Invalid subset '{subset}' given. Please provide one of {_SUBSETS}")
+    def __init__(self, root: Union[str, Path], subsets: Union[str, list]):
+        if type(subsets) is str:
+            subsets = [subsets]
 
-        subset_path = Path(root) / subset
-        self._walker = [str(p) for p in subset_path.glob("*/*.*")]
+        self._walker = []
+        for subset in subsets:
+            if subset not in _SUBSETS:
+                raise ValueError(f"Invalid subset '{subset}' given. Please provide one of {_SUBSETS}")
+
+            subset_path = Path(root) / subset
+            self._walker += [str(p) for p in subset_path.glob("*/*.*")]
 
     def get_metadata(self, n: int) -> Tuple[str, int, str]:
         r"""Get metadata for the n-th sample in the dataset. Returns filepath instead of waveform,

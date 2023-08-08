@@ -9,6 +9,87 @@ from torchaudio.models.rnnt import _Joiner, _Predictor, _TimeReduction, _Transcr
 TrieNode = Tuple[Dict[int, "TrieNode"], int, Optional[Tuple[int, int]]]
 
 
+class Conv2dSubsampling(torch.nn.Module):
+    """Convolutional 2D subsampling (to 1/4 length).
+
+    Reference: https://github.com/espnet/espnet/blob/master/espnet/nets/pytorch_backend/transformer/subsampling.py
+
+    Args:
+        idim (int): Input dimension.
+        odim (int): Output dimension.
+        dropout_rate (float): Dropout rate.
+        pos_enc (torch.nn.Module): Custom position encoding layer.
+
+    """
+
+    def __init__(self, idim, odim, dropout_rate, pos_enc=None):
+        """Construct an Conv2dSubsampling object."""
+        super(Conv2dSubsampling, self).__init__()
+        self.conv = torch.nn.Sequential(
+            torch.nn.Conv2d(1, odim, 3, 2),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(odim, odim, 3, 2),
+            torch.nn.ReLU(),
+        )
+        self.out = torch.nn.Sequential(
+            torch.nn.Linear(odim * (((idim - 1) // 2 - 1) // 2), odim),
+            # pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
+        )
+
+    def forward(self, x, x_mask):
+        """Subsample x.
+
+        Args:
+            x (torch.Tensor): Input tensor (#batch, time, idim).
+            x_mask (torch.Tensor): Input mask (#batch, 1, time).
+
+        Returns:
+            torch.Tensor: Subsampled tensor (#batch, time', odim),
+                where time' = time // 4.
+            torch.Tensor: Subsampled mask (#batch, 1, time'),
+                where time' = time // 4.
+
+        """
+        x = x.unsqueeze(1)  # (b, c, t, f)
+        x = self.conv(x)
+        b, c, t, f = x.size()
+        x = self.out(x.transpose(1, 2).contiguous().view(b, t, c * f))
+        if x_mask is None:
+            return x, None
+        return x, x_mask[:, :, :-2:2][:, :, :-2:2]
+
+    def __getitem__(self, key):
+        """Get item.
+
+        When reset_parameters() is called, if use_scaled_pos_enc is used,
+            return the positioning encoding.
+
+        """
+        if key != -1:
+            raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
+        return self.out[key]
+
+
+def make_source_mask(lengths: torch.Tensor) -> torch.Tensor:
+    """Create source mask for given lengths.
+
+    Reference: https://github.com/k2-fsa/icefall/blob/master/icefall/utils.py
+
+    Args:
+        lengths: Sequence lengths. (B,)
+
+    Returns:
+        : Mask for the sequence lengths. (B, max_len)
+
+    """
+    max_len = lengths.max()
+    batch_size = lengths.size(0)
+
+    expanded_lengths = torch.arange(max_len).expand(batch_size, max_len).to(lengths)
+
+    return expanded_lengths >= lengths.unsqueeze(1)
+
+
 class _ConformerEncoder(torch.nn.Module, _Transcriber):
     def __init__(
         self,
@@ -22,10 +103,29 @@ class _ConformerEncoder(torch.nn.Module, _Transcriber):
         conformer_num_heads: int,
         conformer_depthwise_conv_kernel_size: int,
         conformer_dropout: float,
+        subsampling_type: str,
     ) -> None:
         super().__init__()
-        self.time_reduction = _TimeReduction(time_reduction_stride)
-        self.input_linear = torch.nn.Linear(input_dim * time_reduction_stride, conformer_input_dim)
+        
+        self.subsampling_type = subsampling_type
+        if subsampling_type == "splice":
+            # Default subsampling in torchaudio:
+            self.time_reduction = _TimeReduction(time_reduction_stride)
+            self.input_linear = torch.nn.Linear(input_dim * time_reduction_stride, conformer_input_dim)
+        elif subsampling_type == "conv":
+            # Default subsampling in espnet:
+            # time_reduction_stride=4 is hard-wired in the following code
+            # For other stride sizes, just check out:
+            # https://github.com/espnet/espnet/blob/master/espnet/nets/pytorch_backend/transformer/subsampling.py
+            self.input_linear = Conv2dSubsampling(
+                input_dim,
+                conformer_input_dim,
+                dropout_rate=conformer_dropout,
+                pos_enc=None,
+            )
+        else:
+            raise NotImplementedError
+
         self.conformer = Conformer(
             num_layers=conformer_num_layers,
             input_dim=conformer_input_dim,
@@ -40,8 +140,14 @@ class _ConformerEncoder(torch.nn.Module, _Transcriber):
         self.layer_norm = torch.nn.LayerNorm(output_dim)
 
     def forward(self, input: torch.Tensor, lengths: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        time_reduction_out, time_reduction_lengths = self.time_reduction(input, lengths)
-        input_linear_out = self.input_linear(time_reduction_out)
+        if self.subsampling_type == "splice":
+            time_reduction_out, time_reduction_lengths = self.time_reduction(input, lengths)
+            input_linear_out = self.input_linear(time_reduction_out)
+        elif self.subsampling_type == "conv":
+            mask = (~make_source_mask(lengths)[:, None, :])
+            input_linear_out, mask = self.input_linear(input, mask)
+            time_reduction_lengths = mask.squeeze(1).sum(1).int()
+
         x, lengths = self.conformer(input_linear_out, time_reduction_lengths)
         output_linear_out = self.output_linear(x)
         layer_norm_out = self.layer_norm(output_linear_out)
@@ -491,6 +597,7 @@ def conformer_rnnt_model(
     lstm_layer_norm_epsilon: int,
     lstm_dropout: int,
     joiner_activation: str,
+    subsampling_type: str = "splice",
 ) -> RNNT:
     r"""Builds Conformer-based recurrent neural network transducer (RNN-T) model.
 
@@ -514,6 +621,8 @@ def conformer_rnnt_model(
         lstm_dropout (float): LSTM dropout probability.
         joiner_activation (str): activation function to use in the joiner.
             Must be one of ("relu", "tanh"). (Default: "relu")
+        subsampling_type (str): the subsampling strategy used in the conformer, either linear or convoluational.
+            Must be one of ("splice", "conv"). (Default: "splice")
 
         Returns:
             RNNT:
@@ -529,6 +638,7 @@ def conformer_rnnt_model(
         conformer_num_heads=conformer_num_heads,
         conformer_depthwise_conv_kernel_size=conformer_depthwise_conv_kernel_size,
         conformer_dropout=conformer_dropout,
+        subsampling_type=subsampling_type,
     )
     predictor = _Predictor(
         num_symbols=num_symbols,
