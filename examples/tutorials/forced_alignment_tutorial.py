@@ -11,15 +11,23 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
 .. note::
 
-   The implementation in this tutorial is simplified for
-   educational purpose.
+   This tutorial was originally written to illustrate a usecase
+   for Wav2Vec2 pretrained model.
+
+   TorchAudio now has a set of APIs designed for forced alignment.
+   The `CTC forced alignment API tutorial
+   <./ctc_forced_alignment_api_tutorial.html>`__ illustrates the
+   usage of :py:func:`torchaudio.functional.forced_align`, which is
+   the core API.
 
    If you are looking to align your corpus, we recommend to use
-   :py:func:`torchaudio.functional.forced_align`, which is more
-   accurate and faster.
-
-   Please refer to `this tutorial <./ctc_forced_alignment_api_tutorial.html>`__
-   for the detail of :py:func:`~torchaudio.functional.forced_align`.
+   :py:class:`torchaudio.pipelines.Wav2Vec2FABundle`, which combines
+   :py:func:`~torchaudio.functional.forced_align` and other support
+   functions with pre-trained model specifically trained for
+   forced-alignment. Please refer to the
+   `Forced alignment for multilingual data
+   <forced_alignment_for_multilingual_data_tutorial.html>`__ which
+   illustrates its usage.
 """
 
 import torch
@@ -102,11 +110,13 @@ print(labels)
 
 
 def plot():
-    plt.imshow(emission.T)
-    plt.colorbar()
-    plt.title("Frame-wise class probability")
-    plt.xlabel("Time")
-    plt.ylabel("Labels")
+    fig, ax = plt.subplots()
+    img = ax.imshow(emission.T)
+    ax.set_title("Frame-wise class probability")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Labels")
+    fig.colorbar(img, ax=ax, shrink=0.6, location="bottom")
+    fig.tight_layout()
 
 
 plot()
@@ -185,10 +195,12 @@ trellis = get_trellis(emission, tokens)
 
 
 def plot():
-    plt.imshow(trellis.T, origin="lower")
-    plt.annotate("- Inf", (trellis.size(1) / 5, trellis.size(1) / 1.5))
-    plt.annotate("+ Inf", (trellis.size(0) - trellis.size(1) / 5, trellis.size(1) / 3))
-    plt.colorbar()
+    fig, ax = plt.subplots()
+    img = ax.imshow(trellis.T, origin="lower")
+    ax.annotate("- Inf", (trellis.size(1) / 5, trellis.size(1) / 1.5))
+    ax.annotate("+ Inf", (trellis.size(0) - trellis.size(1) / 5, trellis.size(1) / 3))
+    fig.colorbar(img, ax=ax, shrink=0.6, location="bottom")
+    fig.tight_layout()
 
 
 plot()
@@ -280,10 +292,11 @@ def plot_trellis_with_path(trellis, path):
     for _, p in enumerate(path):
         trellis_with_path[p.time_index, p.token_index] = float("nan")
     plt.imshow(trellis_with_path.T, origin="lower")
+    plt.title("The path found by backtracking")
+    plt.tight_layout()
 
 
 plot_trellis_with_path(trellis, path)
-plt.title("The path found by backtracking")
 
 ######################################################################
 # Looking good.
@@ -308,7 +321,7 @@ class Segment:
     score: float
 
     def __repr__(self):
-        return f"{self.label} ({self.score:4.2f}): [{self.start:5d}, {self.end:5d})"
+        return f"{self.label}\t({self.score:4.2f}): [{self.start:5d}, {self.end:5d})"
 
     @property
     def length(self):
@@ -427,7 +440,7 @@ for word in word_segments:
 ################################################################################
 # Visualization
 # ~~~~~~~~~~~~~
-def plot_alignments(trellis, segments, word_segments, waveform):
+def plot_alignments(trellis, segments, word_segments, waveform, sample_rate=bundle.sample_rate):
     trellis_with_path = trellis.clone()
     for i, seg in enumerate(segments):
         if seg.label != "|":
@@ -436,12 +449,12 @@ def plot_alignments(trellis, segments, word_segments, waveform):
     fig, [ax1, ax2] = plt.subplots(2, 1)
 
     ax1.imshow(trellis_with_path.T, origin="lower", aspect="auto")
+    ax1.set_facecolor("lightgray")
     ax1.set_xticks([])
     ax1.set_yticks([])
 
     for word in word_segments:
-        ax1.axvline(word.start - 0.5)
-        ax1.axvline(word.end - 0.5)
+        ax1.axvspan(word.start - 0.5, word.end - 0.5, edgecolor="white", facecolor="none")
 
     for i, seg in enumerate(segments):
         if seg.label != "|":
@@ -449,23 +462,19 @@ def plot_alignments(trellis, segments, word_segments, waveform):
             ax1.annotate(f"{seg.score:.2f}", (seg.start, i + 3), size="small")
 
     # The original waveform
-    ratio = waveform.size(0) / trellis.size(0)
-    ax2.plot(waveform)
+    ratio = waveform.size(0) / sample_rate / trellis.size(0)
+    ax2.specgram(waveform, Fs=sample_rate)
     for word in word_segments:
         x0 = ratio * word.start
         x1 = ratio * word.end
-        ax2.axvspan(x0, x1, alpha=0.1, color="red")
-        ax2.annotate(f"{word.score:.2f}", (x0, 0.8))
+        ax2.axvspan(x0, x1, facecolor="none", edgecolor="white", hatch="/")
+        ax2.annotate(f"{word.score:.2f}", (x0, sample_rate * 0.51), annotation_clip=False)
 
     for seg in segments:
         if seg.label != "|":
-            ax2.annotate(seg.label, (seg.start * ratio, 0.9))
-    xticks = ax2.get_xticks()
-    plt.xticks(xticks, xticks / bundle.sample_rate)
+            ax2.annotate(seg.label, (seg.start * ratio, sample_rate * 0.55), annotation_clip=False)
     ax2.set_xlabel("time [second]")
     ax2.set_yticks([])
-    ax2.set_ylim(-1.0, 1.0)
-    ax2.set_xlim(0, waveform.size(-1))
     fig.tight_layout()
 
 
@@ -482,9 +491,7 @@ plot_alignments(
 # -------------
 #
 
-# A trick to embed the resulting audio to the generated file.
-# `IPython.display.Audio` has to be the last call in a cell,
-# and there should be only one call par cell.
+
 def display_segment(i):
     ratio = waveform.size(1) / trellis.size(0)
     word = word_segments[i]
