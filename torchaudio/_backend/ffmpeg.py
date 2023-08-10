@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from typing import BinaryIO, Optional, Tuple, Union
 
@@ -6,6 +7,8 @@ import torch
 import torchaudio
 from torchaudio.backend.common import AudioMetaData
 from torchaudio.io import StreamWriter
+
+from .backend import Backend
 
 if torchaudio._extension._FFMPEG_EXT is not None:
     StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj
@@ -276,3 +279,87 @@ def save_audio(
     )
     with s.open():
         s.write_audio_chunk(0, src)
+
+
+def _map_encoding(encoding: str) -> str:
+    for dst in ["PCM_S", "PCM_U", "PCM_F"]:
+        if dst in encoding:
+            return dst
+    if encoding == "PCM_MULAW":
+        return "ULAW"
+    elif encoding == "PCM_ALAW":
+        return "ALAW"
+    return encoding
+
+
+def _get_bits_per_sample(encoding: str, bits_per_sample: int) -> str:
+    if m := re.search(r"PCM_\w(\d+)\w*", encoding):
+        return int(m.group(1))
+    elif encoding in ["PCM_ALAW", "PCM_MULAW"]:
+        return 8
+    return bits_per_sample
+
+
+class FFmpegBackend(Backend):
+    @staticmethod
+    def info(uri: Union[BinaryIO, str, os.PathLike], format: Optional[str], buffer_size: int = 4096) -> AudioMetaData:
+        if hasattr(uri, "read"):
+            metadata = info_audio_fileobj(uri, format, buffer_size=buffer_size)
+        else:
+            metadata = info_audio(os.path.normpath(uri), format)
+        metadata.bits_per_sample = _get_bits_per_sample(metadata.encoding, metadata.bits_per_sample)
+        metadata.encoding = _map_encoding(metadata.encoding)
+        return metadata
+
+    @staticmethod
+    def load(
+        uri: Union[BinaryIO, str, os.PathLike],
+        frame_offset: int = 0,
+        num_frames: int = -1,
+        normalize: bool = True,
+        channels_first: bool = True,
+        format: Optional[str] = None,
+        buffer_size: int = 4096,
+    ) -> Tuple[torch.Tensor, int]:
+        if hasattr(uri, "read"):
+            return load_audio_fileobj(
+                uri,
+                frame_offset,
+                num_frames,
+                normalize,
+                channels_first,
+                format,
+                buffer_size,
+            )
+        else:
+            return load_audio(os.path.normpath(uri), frame_offset, num_frames, normalize, channels_first, format)
+
+    @staticmethod
+    def save(
+        uri: Union[BinaryIO, str, os.PathLike],
+        src: torch.Tensor,
+        sample_rate: int,
+        channels_first: bool = True,
+        format: Optional[str] = None,
+        encoding: Optional[str] = None,
+        bits_per_sample: Optional[int] = None,
+        buffer_size: int = 4096,
+    ) -> None:
+        save_audio(
+            uri,
+            src,
+            sample_rate,
+            channels_first,
+            format,
+            encoding,
+            bits_per_sample,
+            buffer_size,
+        )
+
+    @staticmethod
+    def can_decode(uri: Union[BinaryIO, str, os.PathLike], format: Optional[str]) -> bool:
+        return True
+
+    @staticmethod
+    def can_encode(uri: Union[BinaryIO, str, os.PathLike], format: Optional[str]) -> bool:
+        return True
