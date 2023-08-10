@@ -58,19 +58,19 @@ def get_info_func():
     ) -> AudioMetaData:
         """Get signal information of an audio file.
 
+        Note:
+            When the input type is file-like object, this function cannot
+            get the correct length (``num_samples``) for certain formats,
+            such as ``vorbis``.
+            In this case, the value of ``num_samples`` is ``0``.
+
         Args:
             uri (path-like object or file-like object):
                 Source of audio data. The following types are accepted:
 
-                    * ``path-like``: file path
-                    * ``file-like``: Object with ``read(size: int) -> bytes`` method,
-                      which returns byte string of at most ``size`` length.
-
-                Note:
-                    When the input type is file-like object, this function cannot
-                    get the correct length (``num_samples``) for certain formats,
-                    such as ``vorbis``.
-                    In this case, the value of ``num_samples`` is ``0``.
+                * ``path-like``: File path or URL.
+                * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                  which returns byte string of at most ``size`` length.
 
             format (str or None, optional):
                 If not ``None``, interpreted as hint that may allow backend to override the detected format.
@@ -80,12 +80,17 @@ def get_info_func():
                 Size of buffer to use when processing file-like objects, in bytes. (Default: ``4096``)
 
             backend (str or None, optional):
-                I/O backend to use. If ``None``, function selects backend given input and available backends.
-                Otherwise, must be one of ["ffmpeg", "sox", "soundfile"], with the corresponding backend available.
+                I/O backend to use.
+                If ``None``, function selects backend given input and available backends.
+                Otherwise, must be one of [``"ffmpeg"``, ``"sox"``, ``"soundfile"``],
+                with the corresponding backend available.
                 (Default: ``None``)
 
+                .. seealso::
+                   :ref:`backend`
+
         Returns:
-            AudioMetaData: Metadata of the given audio.
+            AudioMetaData
         """
         backend = dispatcher(uri, format, backend)
         return backend.info(uri, format, buffer_size)
@@ -117,26 +122,18 @@ def get_load_func():
         buffer_size: int = 4096,
         backend: Optional[str] = None,
     ) -> Tuple[torch.Tensor, int]:
-        """Load audio data from file.
-
-        Note:
-            The formats this function can handle depend on backend availability.
-            This function is tested on the following formats:
-
-            * WAV
-
-                * 32-bit floating-point
-                * 32-bit signed integer
-                * 24-bit signed integer
-                * 16-bit signed integer
-                * 8-bit unsigned integer
-
-            * FLAC
-            * OGG/VORBIS
-            * SPHERE
+        """Load audio data from source.
 
         By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with
         ``float32`` dtype, and the shape of `[channel, time]`.
+
+        Note:
+            The formats this function can handle depend on the availability of backends.
+            Please use the following functions to fetch the supported formats.
+
+            - FFmpeg: :py:func:`torchaudio.utils.ffmpeg_utils.get_audio_decoders`
+            - Sox: :py:func:`torchaudio.utils.sox_utils.list_read_formats`
+            - SoundFile: Refer to `the official document <https://pysoundfile.readthedocs.io/>`__.
 
         .. warning::
 
@@ -187,9 +184,13 @@ def get_load_func():
                 Size of buffer to use when processing file-like objects, in bytes. (Default: ``4096``)
 
             backend (str or None, optional):
-                I/O backend to use. If ``None``, function selects backend given input and available backends.
-                Otherwise, must be one of ["ffmpeg", "sox", "soundfile"], with the corresponding
-                backend being available. (Default: ``None``)
+                I/O backend to use.
+                If ``None``, function selects backend given input and available backends.
+                Otherwise, must be one of [``"ffmpeg"``, ``"sox"``, ``"soundfile"``],
+                with the corresponding backend being available. (Default: ``None``)
+
+                .. seealso::
+                   :ref:`backend`
 
         Returns:
             (torch.Tensor, int): Resulting Tensor and sample rate.
@@ -232,17 +233,11 @@ def get_save_func():
 
         Note:
             The formats this function can handle depend on the availability of backends.
-            This function is tested on the following formats:
+            Please use the following functions to fetch the supported formats.
 
-            * WAV
-
-                * 32-bit floating-point
-                * 32-bit signed integer
-                * 16-bit signed integer
-                * 8-bit unsigned integer
-
-            * FLAC
-            * OGG/VORBIS
+            - FFmpeg: :py:func:`torchaudio.utils.ffmpeg_utils.get_audio_encoders`
+            - Sox: :py:func:`torchaudio.utils.sox_utils.list_write_formats`
+            - SoundFile: Refer to `the official document <https://pysoundfile.readthedocs.io/>`__.
 
         Args:
             uri (str or pathlib.Path): Path to audio file.
@@ -263,11 +258,11 @@ def get_save_func():
                 This argument is effective only for supported formats, i.e.
                 ``"wav"`` and ``""flac"```. Valid values are
 
-                    - ``"PCM_S"`` (signed integer Linear PCM)
-                    - ``"PCM_U"`` (unsigned integer Linear PCM)
-                    - ``"PCM_F"`` (floating point PCM)
-                    - ``"ULAW"`` (mu-law)
-                    - ``"ALAW"`` (a-law)
+                - ``"PCM_S"`` (signed integer Linear PCM)
+                - ``"PCM_U"`` (unsigned integer Linear PCM)
+                - ``"PCM_F"`` (floating point PCM)
+                - ``"ULAW"`` (mu-law)
+                - ``"ALAW"`` (a-law)
 
             bits_per_sample (int or None, optional): Changes the bit depth for the
                 supported formats.
@@ -279,33 +274,14 @@ def get_save_func():
                 Size of buffer to use when processing file-like objects, in bytes. (Default: ``4096``)
 
             backend (str or None, optional):
-                I/O backend to use. If ``None``, function selects backend given input and available backends.
-                Otherwise, must be one of ["ffmpeg", "sox", "soundfile"], with the corresponding
-                backend being available. (Default: ``None``)
+                I/O backend to use.
+                If ``None``, function selects backend given input and available backends.
+                Otherwise, must be one of [``"ffmpeg"``, ``"sox"``, ``"soundfile"``],
+                with the corresponding backend being available.
+                (Default: ``None``)
 
-
-
-        Supported formats/encodings/bit depth/compression are:
-
-        ``"wav"``
-            - 32-bit floating-point PCM
-            - 32-bit signed integer PCM
-            - 24-bit signed integer PCM
-            - 16-bit signed integer PCM
-            - 8-bit unsigned integer PCM
-            - 8-bit mu-law
-            - 8-bit a-law
-
-            Note:
-                Default encoding/bit depth is determined by the dtype of
-                the input Tensor.
-
-        ``"flac"``
-            - 16-bit (default)
-            - 24-bit
-
-        ``"ogg"``
-            - Doesn't accept changing configuration.
+                .. seealso::
+                   :ref:`backend`
         """
         backend = dispatcher(uri, format, backend)
         return backend.save(uri, src, sample_rate, channels_first, format, encoding, bits_per_sample, buffer_size)
