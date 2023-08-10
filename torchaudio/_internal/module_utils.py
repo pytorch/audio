@@ -1,9 +1,27 @@
 import importlib.util
+import os
 import warnings
 from functools import wraps
 from typing import Optional
 
-import torch
+
+def eval_env(var, default):
+    """Check if environment varable has True-y value"""
+    if var not in os.environ:
+        return default
+
+    val = os.environ.get(var, "0")
+    trues = ["1", "true", "TRUE", "on", "ON", "yes", "YES"]
+    falses = ["0", "false", "FALSE", "off", "OFF", "no", "NO"]
+    if val in trues:
+        return True
+    if val not in falses:
+        # fmt: off
+        raise RuntimeError(
+            f"Unexpected environment variable value `{var}={val}`. "
+            f"Expected one of {trues + falses}")
+        # fmt: on
+    return False
 
 
 def is_module_available(*modules: str) -> bool:
@@ -42,22 +60,21 @@ def requires_module(*modules: str):
     return decorator
 
 
-def deprecated(direction: str, version: Optional[str] = None):
+def deprecated(direction: str, version: Optional[str] = None, remove: bool = False):
     """Decorator to add deprecation message
 
     Args:
         direction (str): Migration steps to be given to users.
         version (str or int): The version when the object will be removed
+        remove (bool): If enabled, append future removal message.
     """
 
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
-            message = (
-                f"{func.__module__}.{func.__name__} has been deprecated "
-                f'and will be removed from {"future" if version is None else version} release. '
-                f"{direction}"
-            )
+            message = f"{func.__module__}.{func.__name__} has been deprecated. {direction}"
+            if remove:
+                message += f' It will be removed from {"future" if version is None else version} release. '
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
 
@@ -66,82 +83,19 @@ def deprecated(direction: str, version: Optional[str] = None):
     return decorator
 
 
-def is_kaldi_available():
-    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_kaldi_available()
+def fail_with_message(message):
+    """Generate decorator to give users message about missing TorchAudio extension."""
 
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            raise RuntimeError(f"{func.__module__}.{func.__name__} {message}")
 
-def requires_kaldi():
-    if is_kaldi_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires kaldi")
-
-            return wrapped
+        return wrapped
 
     return decorator
 
 
-def _check_soundfile_importable():
-    if not is_module_available("soundfile"):
-        return False
-    try:
-        import soundfile  # noqa: F401
-
-        return True
-    except Exception:
-        warnings.warn("Failed to import soundfile. 'soundfile' backend is not available.")
-        return False
-
-
-_is_soundfile_importable = _check_soundfile_importable()
-
-
-def is_soundfile_available():
-    return _is_soundfile_importable
-
-
-def requires_soundfile():
-    if is_soundfile_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires soundfile")
-
-            return wrapped
-
-    return decorator
-
-
-def is_sox_available():
-    return is_module_available("torchaudio._torchaudio") and torch.ops.torchaudio.is_sox_available()
-
-
-def requires_sox():
-    if is_sox_available():
-
-        def decorator(func):
-            return func
-
-    else:
-
-        def decorator(func):
-            @wraps(func)
-            def wrapped(*args, **kwargs):
-                raise RuntimeError(f"{func.__module__}.{func.__name__} requires sox")
-
-            return wrapped
-
-    return decorator
+def no_op(func):
+    """Op-op decorator. Used in place of fail_with_message when a functionality that requires extension works fine."""
+    return func

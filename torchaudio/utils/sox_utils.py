@@ -1,10 +1,13 @@
+"""Module to change the configuration of libsox, which is used by I/O functions like
+:py:mod:`~torchaudio.backend.sox_io_backend` and :py:mod:`~torchaudio.sox_effects`.
+"""
+
 from typing import Dict, List
 
-import torch
-from torchaudio._internal import module_utils as _mod_utils
+import torchaudio
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def set_seed(seed: int):
     """Set libsox's PRNG
 
@@ -14,10 +17,10 @@ def set_seed(seed: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_seed(seed)
+    torchaudio.lib._torchaudio_sox.set_seed(seed)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def set_verbosity(verbosity: int):
     """Set libsox's verbosity
 
@@ -32,10 +35,10 @@ def set_verbosity(verbosity: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_verbosity(verbosity)
+    torchaudio.lib._torchaudio_sox.set_verbosity(verbosity)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def set_buffer_size(buffer_size: int):
     """Set buffer size for sox effect chain
 
@@ -45,10 +48,10 @@ def set_buffer_size(buffer_size: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_buffer_size(buffer_size)
+    torchaudio.lib._torchaudio_sox.set_buffer_size(buffer_size)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def set_use_threads(use_threads: bool):
     """Set multithread option for sox effect chain
 
@@ -59,44 +62,44 @@ def set_use_threads(use_threads: bool):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torch.ops.torchaudio.sox_utils_set_use_threads(use_threads)
+    torchaudio.lib._torchaudio_sox.set_use_threads(use_threads)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def list_effects() -> Dict[str, str]:
     """List the available sox effect names
 
     Returns:
         Dict[str, str]: Mapping from ``effect name`` to ``usage``
     """
-    return dict(torch.ops.torchaudio.sox_utils_list_effects())
+    return dict(torchaudio.lib._torchaudio_sox.list_effects())
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def list_read_formats() -> List[str]:
     """List the supported audio formats for read
 
     Returns:
         List[str]: List of supported audio formats
     """
-    return torch.ops.torchaudio.sox_utils_list_read_formats()
+    return torchaudio.lib._torchaudio_sox.list_read_formats()
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def list_write_formats() -> List[str]:
     """List the supported audio formats for write
 
     Returns:
         List[str]: List of supported audio formats
     """
-    return torch.ops.torchaudio.sox_utils_list_write_formats()
+    return torchaudio.lib._torchaudio_sox.list_write_formats()
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def get_buffer_size() -> int:
     """Get buffer size for sox effect chain
 
     Returns:
         int: size in bytes of buffers used for processing audio.
     """
-    return torch.ops.torchaudio.sox_utils_get_buffer_size()
+    return torchaudio.lib._torchaudio_sox.get_buffer_size()

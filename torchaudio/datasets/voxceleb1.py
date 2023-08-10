@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import List, Tuple, Union
 
 from torch import Tensor
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import _load_waveform, extract_archive
+from torchaudio._internal import download_url_to_file
+from torchaudio.datasets.utils import _extract_zip, _load_waveform
 
 
 SAMPLE_RATE = 16000
@@ -54,7 +54,7 @@ def _download_extract_wavs(root: str):
             url = _ARCHIVE_CONFIGS[archive]["url"]
             checksum = _ARCHIVE_CONFIGS[archive]["checksum"]
             download_url_to_file(url, archive_path, hash_prefix=checksum)
-        extract_archive(archive_path)
+        _extract_zip(archive_path)
 
 
 def _get_flist(root: str, file_path: str, subset: str) -> List[str]:
@@ -135,6 +135,18 @@ class VoxCeleb1Identification(VoxCeleb1):
             (Default: ``"https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/iden_split.txt"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
+
+    Note:
+        The file structure of `VoxCeleb1Identification` dataset is as follows:
+
+        └─ root/
+
+         └─ wav/
+
+         └─ speaker_id folders
+
+        Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
+        the extracted files into the same ``root`` directory.
     """
 
     def __init__(
@@ -215,6 +227,18 @@ class VoxCeleb1Verification(VoxCeleb1):
             (Default: ``"https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/veri_test.txt"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (Default: ``False``).
+
+    Note:
+        The file structure of `VoxCeleb1Verification` dataset is as follows:
+
+        └─ root/
+
+         └─ wav/
+
+         └─ speaker_id folders
+
+        Users who pre-downloaded the ``"vox1_dev_wav.zip"`` and ``"vox1_test_wav.zip"`` files need to move
+        the extracted files into the same ``root`` directory.
     """
 
     def __init__(self, root: Union[str, Path], meta_url: str = _VERI_TEST_URL, download: bool = False) -> None:

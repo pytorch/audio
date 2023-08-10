@@ -4,9 +4,9 @@ from typing import List, Tuple, Union
 
 import torchaudio
 from torch import Tensor
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio._internal import download_url_to_file
+from torchaudio.datasets.utils import _extract_tar
 
 
 _RELEASE_CONFIGS = {
@@ -52,7 +52,7 @@ class YESNO(Dataset):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS["release1"]["checksum"]
                     download_url_to_file(url, archive, hash_prefix=checksum)
-                extract_archive(archive)
+                _extract_tar(archive)
 
         if not os.path.isdir(self._path):
             raise RuntimeError("Dataset not found. Please use `download=True` to download it.")

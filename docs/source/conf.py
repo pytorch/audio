@@ -25,6 +25,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.abspath("."))
 
+
 import pytorch_sphinx_theme
 
 # -- General configuration ------------------------------------------------
@@ -52,7 +53,19 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
     "nbsphinx",
+    "breathe",
 ]
+
+breathe_projects = {"libtorchaudio": "cpp/xml"}
+
+breathe_default_project = "libtorchaudio"
+
+breathe_projects_source = {
+    "libtorchaudio": (
+        "../../torchaudio/csrc/ffmpeg/",
+        ["ffmpeg.h"],
+    )
+}
 
 nbsphinx_requirejs_path = ""
 
@@ -114,6 +127,22 @@ def _get_pattern():
     return ret
 
 
+def reset_mpl(gallery_conf, fname):
+    from sphinx_gallery.scrapers import _reset_matplotlib
+
+    _reset_matplotlib(gallery_conf, fname)
+    import matplotlib
+
+    matplotlib.rcParams.update(
+        {
+            "image.interpolation": "none",
+            "figure.figsize": (9.6, 4.8),
+            "font.size": 8.0,
+            "axes.axisbelow": True,
+        }
+    )
+
+
 sphinx_gallery_conf = {
     "examples_dirs": [
         "../../examples/tutorials",
@@ -123,8 +152,10 @@ sphinx_gallery_conf = {
     ],
     **_get_pattern(),
     "backreferences_dir": "gen_modules/backreferences",
+    "promote_jupyter_magic": True,
     "first_notebook_cell": None,
     "doc_module": ("torchaudio",),
+    "reset_modules": (reset_mpl, "seaborn"),
 }
 autosummary_generate = True
 
@@ -163,6 +194,15 @@ else:
     version = f"Nightly Build ({torchaudio.__version__})"
     release = "nightly"
 
+
+#
+# Specify the version of the current stable release.
+# Used in `docs/source/_templates/breadcrumbs.html`
+#
+# https://stackoverflow.com/a/33845358/1106930
+#
+html_context = {"version_stable": "2.0.1"}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
@@ -188,6 +228,8 @@ todo_include_todos = True
 html_theme = "pytorch_sphinx_theme"
 html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
 
+html_favicon = "_static/img/favicon.ico"
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -198,10 +240,8 @@ html_theme_options = {
     "display_version": True,
     "logo_only": True,
     "navigation_with_keys": True,
-    "analytics_id": "UA-117752657-2",
+    "analytics_id": "GTM-T8XT4PS",
 }
-
-html_logo = "_static/img/pytorch-logo-dark.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -346,7 +386,7 @@ def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
 
 
-from custom_directives import SupportedDevices, SupportedProperties
+from custom_directives import CustomCardEnd, CustomCardItem, CustomCardStart, SupportedDevices, SupportedProperties
 
 # Register custom directives
 
@@ -354,3 +394,6 @@ from docutils.parsers import rst
 
 rst.directives.register_directive("devices", SupportedDevices)
 rst.directives.register_directive("properties", SupportedProperties)
+rst.directives.register_directive("customcardstart", CustomCardStart)
+rst.directives.register_directive("customcarditem", CustomCardItem)
+rst.directives.register_directive("customcardend", CustomCardEnd)

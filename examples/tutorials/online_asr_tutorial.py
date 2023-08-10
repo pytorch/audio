@@ -2,7 +2,7 @@
 Online ASR with Emformer RNN-T
 ==============================
 
-**Author**: `Jeff Hwang <jeffhwang@fb.com>`__, `Moto Hira <moto@fb.com>`__
+**Author**: `Jeff Hwang <jeffhwang@meta.com>`__, `Moto Hira <moto@meta.com>`__
 
 This tutorial shows how to use Emformer RNN-T and streaming API
 to perform online speech recognition.
@@ -13,12 +13,12 @@ to perform online speech recognition.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <4.4) and SentencePiece.
+#    This tutorial requires FFmpeg libraries (>=4.1, <7) and SentencePiece.
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install 'ffmpeg<4.4'`` will install
-#    the required FFmpeg libraries.
+#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
+#    compatible FFmpeg libraries.
 #
 #    You can install SentencePiece by running ``pip install sentencepiece``.
 
@@ -45,29 +45,9 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
-#
 import IPython
-
-try:
-    from torchaudio.io import StreamReader
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install the requisite
-            third party libraries by running the following code block:
-
-            !add-apt-repository -y ppa:savoury1/ffmpeg4
-            !apt-get -qq install -y ffmpeg
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
+import matplotlib.pyplot as plt
+from torchaudio.io import StreamReader
 
 ######################################################################
 # 3. Construct the pipeline
@@ -115,7 +95,7 @@ print(f"Right context: {context_length} frames ({context_length / sample_rate} s
 # Next, we configure the input audio stream using :py:class:`torchaudio.io.StreamReader`.
 #
 # For the detail of this API, please refer to the
-# `Media Stream API tutorial <./streaming_api_tutorial.html>`__.
+# `StreamReader Basic Usage <./streamreader_basic_tutorial.html>`__.
 #
 
 ######################################################################
@@ -195,22 +175,43 @@ state, hypothesis = None, None
 stream_iterator = streamer.stream()
 
 
+def _plot(feats, num_iter, unit=25):
+    unit_dur = segment_length / sample_rate * unit
+    num_plots = num_iter // unit + (1 if num_iter % unit else 0)
+    fig, axes = plt.subplots(num_plots, 1)
+    t0 = 0
+    for i, ax in enumerate(axes):
+        feats_ = feats[i * unit : (i + 1) * unit]
+        t1 = t0 + segment_length / sample_rate * len(feats_)
+        feats_ = torch.cat([f[2:-2] for f in feats_])  # remove boundary effect and overlap
+        ax.imshow(feats_.T, extent=[t0, t1, 0, 1], aspect="auto", origin="lower")
+        ax.tick_params(which="both", left=False, labelleft=False)
+        ax.set_xlim(t0, t0 + unit_dur)
+        t0 = t1
+    fig.suptitle("MelSpectrogram Feature")
+    plt.tight_layout()
+
+
 @torch.inference_mode()
-def run_inference(num_iter=200):
+def run_inference(num_iter=100):
     global state, hypothesis
     chunks = []
+    feats = []
     for i, (chunk,) in enumerate(stream_iterator, start=1):
         segment = cacher(chunk[:, 0])
         features, length = feature_extractor(segment)
         hypos, state = decoder.infer(features, length, 10, state=state, hypothesis=hypothesis)
-        hypothesis = hypos[0]
-        transcript = token_processor(hypothesis[0], lstrip=False)
-        print(transcript, end="", flush=True)
+        hypothesis = hypos
+        transcript = token_processor(hypos[0][0], lstrip=False)
+        print(transcript, end="\r", flush=True)
 
         chunks.append(chunk)
+        feats.append(features)
         if i == num_iter:
             break
 
+    # Plot the features
+    _plot(feats, num_iter)
     return IPython.display.Audio(torch.cat(chunks).T.numpy(), rate=bundle.sample_rate)
 
 
@@ -248,3 +249,37 @@ run_inference()
 #
 
 run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+
+run_inference()
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`

@@ -2,6 +2,8 @@
 StreamReader Basic Usages
 =========================
 
+**Author**: `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use :py:class:`torchaudio.io.StreamReader` to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.
@@ -12,12 +14,12 @@ libavfilter provides.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <4.4).
+#    This tutorial requires FFmpeg libraries (>=4.1, <7).
 #
 #    There are multiple ways to install FFmpeg libraries.
 #    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda 'ffmpeg<4.4'`` will install
-#    the required libraries.
+#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
+#    compatible FFmpeg libraries.
 #
 
 ######################################################################
@@ -63,29 +65,8 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
-#
-
-try:
-    from torchaudio.io import StreamReader
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install the requisite
-            third party libraries by running the following code:
-
-            !add-apt-repository -y ppa:savoury1/ffmpeg4
-            !apt-get -qq install -y ffmpeg
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
-
 import matplotlib.pyplot as plt
+from torchaudio.io import StreamReader
 
 base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"
 AUDIO_URL = f"{base_url}/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
@@ -105,7 +86,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 #
 # The following section covers how to open common media formats.
 # For the other streams, please refer to the
-# `Media Stream API - Pt.2 <./streaming_api2_tutorial.html>`__.
+# `StreamReader Advanced Usage <./streamreader_advanced_tutorial.html>`__.
 #
 # .. note::
 #
@@ -611,4 +592,7 @@ for i, vid in enumerate(vids2):
         if i == 0 and j == 0:
             ax.set_ylabel("Stream 2")
 plt.tight_layout()
-plt.show(block=False)
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`

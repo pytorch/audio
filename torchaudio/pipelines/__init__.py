@@ -4,6 +4,7 @@ from ._source_separation_pipeline import (
     HDEMUCS_HIGH_MUSDB_PLUS,
     SourceSeparationBundle,
 )
+from ._squim_pipeline import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE, SquimObjectiveBundle, SquimSubjectiveBundle
 from ._tts import (
     TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH,
     TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH,
@@ -17,6 +18,7 @@ from ._wav2vec2.impl import (
     HUBERT_BASE,
     HUBERT_LARGE,
     HUBERT_XLARGE,
+    MMS_FA,
     VOXPOPULI_ASR_BASE_10K_DE,
     VOXPOPULI_ASR_BASE_10K_EN,
     VOXPOPULI_ASR_BASE_10K_ES,
@@ -35,8 +37,15 @@ from ._wav2vec2.impl import (
     WAV2VEC2_LARGE,
     WAV2VEC2_LARGE_LV60K,
     WAV2VEC2_XLSR53,
+    WAV2VEC2_XLSR_1B,
+    WAV2VEC2_XLSR_2B,
+    WAV2VEC2_XLSR_300M,
     Wav2Vec2ASRBundle,
     Wav2Vec2Bundle,
+    Wav2Vec2FABundle,
+    WAVLM_BASE,
+    WAVLM_BASE_PLUS,
+    WAVLM_LARGE,
 )
 from .rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH, RNNTBundle
 
@@ -44,6 +53,7 @@ from .rnnt_pipeline import EMFORMER_RNNT_BASE_LIBRISPEECH, RNNTBundle
 __all__ = [
     "Wav2Vec2Bundle",
     "Wav2Vec2ASRBundle",
+    "Wav2Vec2FABundle",
     "WAV2VEC2_BASE",
     "WAV2VEC2_LARGE",
     "WAV2VEC2_LARGE_LV60K",
@@ -57,6 +67,9 @@ __all__ = [
     "WAV2VEC2_ASR_LARGE_LV60K_100H",
     "WAV2VEC2_ASR_LARGE_LV60K_960H",
     "WAV2VEC2_XLSR53",
+    "WAV2VEC2_XLSR_300M",
+    "WAV2VEC2_XLSR_1B",
+    "WAV2VEC2_XLSR_2B",
     "VOXPOPULI_ASR_BASE_10K_EN",
     "VOXPOPULI_ASR_BASE_10K_ES",
     "VOXPOPULI_ASR_BASE_10K_DE",
@@ -67,6 +80,10 @@ __all__ = [
     "HUBERT_XLARGE",
     "HUBERT_ASR_LARGE",
     "HUBERT_ASR_XLARGE",
+    "MMS_FA",
+    "WAVLM_BASE",
+    "WAVLM_BASE_PLUS",
+    "WAVLM_LARGE",
     "Tacotron2TTSBundle",
     "TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH",
     "TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH",
@@ -78,4 +95,8 @@ __all__ = [
     "CONVTASNET_BASE_LIBRI2MIX",
     "HDEMUCS_HIGH_MUSDB_PLUS",
     "HDEMUCS_HIGH_MUSDB",
+    "SQUIM_OBJECTIVE",
+    "SQUIM_SUBJECTIVE",
+    "SquimObjectiveBundle",
+    "SquimSubjectiveBundle",
 ]

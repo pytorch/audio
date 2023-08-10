@@ -4,8 +4,7 @@
 #include <torch/script.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_effects {
+namespace torchaudio::sox {
 
 void initialize_sox_effects();
 
@@ -23,9 +22,8 @@ auto apply_effects_file(
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
     const c10::optional<std::string>& format)
-    -> c10::optional<std::tuple<torch::Tensor, int64_t>>;
+    -> std::tuple<torch::Tensor, int64_t>;
 
-} // namespace sox_effects
-} // namespace torchaudio
+} // namespace torchaudio::sox
 
 #endif

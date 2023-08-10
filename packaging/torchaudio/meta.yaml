@@ -14,11 +14,8 @@ requirements:
   host:
     - python
     - setuptools
-    - pkg-config  # [not win]
     - cmake
     - ninja
-    - numpy>=1.11 # [py <= 39]
-    - numpy>=1.21.2 # [py >= 310]
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_EXTRA_BUILD_CONSTRAINT', '') }}
@@ -26,8 +23,7 @@ requirements:
 
   run:
     - python
-    - numpy>=1.11 # [py <= 39]
-    - numpy>=1.21.2 # [py >= 310]
+    - numpy
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT', 'pytorch') }}
     {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT', '') }}
@@ -49,7 +45,6 @@ build:
     - TORCH_CUDA_ARCH_LIST
     - USE_FFMPEG
     - USE_OPENMP
-    - FFMPEG_ROOT
     - MACOSX_DEPLOYMENT_TARGET
 
 test:

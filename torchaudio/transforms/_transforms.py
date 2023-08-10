@@ -2,7 +2,7 @@
 
 import math
 import warnings
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Sequence, Tuple, Union
 
 import torch
 from torch import Tensor
@@ -12,6 +12,7 @@ from torch.nn.parameter import UninitializedParameter
 from torchaudio import functional as F
 from torchaudio.functional.functional import (
     _apply_sinc_resample_kernel,
+    _check_convolve_mode,
     _fix_waveform_shape,
     _get_sinc_resample_kernel,
     _stretch_waveform,
@@ -35,7 +36,7 @@ class Spectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float or None, optional): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc.
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc.
             If None, then the complex spectrum is returned instead. (Default: ``2``)
         normalized (bool or str, optional): Whether to normalize by magnitude after stft. If input is str, choices are
             ``"window"`` and ``"frame_length"``, if specific normalization type is desirable. ``True`` maps to
@@ -75,6 +76,7 @@ class Spectrogram(torch.nn.Module):
         return_complex: Optional[bool] = None,
     ) -> None:
         super(Spectrogram, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.Spectrogram")
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequencies due to onesided=True in torch.stft
@@ -225,7 +227,7 @@ class GriffinLim(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc. (Default: ``2``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         momentum (float, optional): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
@@ -418,7 +420,7 @@ class InverseMelScale(torch.nn.Module):
     .. devices:: CPU CUDA
 
     It minimizes the euclidian norm between the input mel-spectrogram and the product between
-    the estimated spectrogram and the filter banks using SGD.
+    the estimated spectrogram and the filter banks using `torch.linalg.lstsq`.
 
     Args:
         n_stft (int): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`.
@@ -426,13 +428,13 @@ class InverseMelScale(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
-        max_iter (int, optional): Maximum number of optimization iterations. (Default: ``100000``)
-        tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
-        tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
-        sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+        driver (str, optional): Name of the LAPACK/MAGMA method to be used for `torch.lstsq`.
+            For CPU inputs the valid values are ``"gels"``, ``"gelsy"``, ``"gelsd"``, ``"gelss"``.
+            For CUDA input, the only valid driver is ``"gels"``, which assumes that A is full-rank.
+            (Default: ``"gels``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -447,10 +449,6 @@ class InverseMelScale(torch.nn.Module):
         "sample_rate",
         "f_min",
         "f_max",
-        "max_iter",
-        "tolerance_loss",
-        "tolerance_change",
-        "sgdargs",
     ]
 
     def __init__(
@@ -460,25 +458,22 @@ class InverseMelScale(torch.nn.Module):
         sample_rate: int = 16000,
         f_min: float = 0.0,
         f_max: Optional[float] = None,
-        max_iter: int = 100000,
-        tolerance_loss: float = 1e-5,
-        tolerance_change: float = 1e-8,
-        sgdargs: Optional[dict] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
+        driver: str = "gels",
     ) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max or float(sample_rate // 2)
         self.f_min = f_min
-        self.max_iter = max_iter
-        self.tolerance_loss = tolerance_loss
-        self.tolerance_change = tolerance_change
-        self.sgdargs = sgdargs or {"lr": 0.1, "momentum": 0.9}
+        self.driver = driver
 
         if f_min > self.f_max:
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
+
+        if driver not in ["gels", "gelsy", "gelsd", "gelss"]:
+            raise ValueError(f'driver must be one of ["gels", "gelsy", "gelsd", "gelss"]. Found {driver}.')
 
         fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm, mel_scale)
         self.register_buffer("fb", fb)
@@ -497,34 +492,10 @@ class InverseMelScale(torch.nn.Module):
 
         n_mels, time = shape[-2], shape[-1]
         freq, _ = self.fb.size()  # (freq, n_mels)
-        melspec = melspec.transpose(-1, -2)
         if self.n_mels != n_mels:
             raise ValueError("Expected an input with {} mel bins. Found: {}".format(self.n_mels, n_mels))
 
-        specgram = torch.rand(
-            melspec.size()[0], time, freq, requires_grad=True, dtype=melspec.dtype, device=melspec.device
-        )
-
-        optim = torch.optim.SGD([specgram], **self.sgdargs)
-
-        loss = float("inf")
-        for _ in range(self.max_iter):
-            optim.zero_grad()
-            diff = melspec - specgram.matmul(self.fb)
-            new_loss = diff.pow(2).sum(axis=-1).mean()
-            # take sum over mel-frequency then average over other dimensions
-            # so that loss threshold is applied par unit timeframe
-            new_loss.backward()
-            optim.step()
-            specgram.data = specgram.data.clamp(min=0)
-
-            new_loss = new_loss.item()
-            if new_loss < self.tolerance_loss or abs(loss - new_loss) < self.tolerance_change:
-                break
-            loss = new_loss
-
-        specgram.requires_grad_(False)
-        specgram = specgram.clamp(min=0).transpose(-1, -2)
+        specgram = torch.relu(torch.linalg.lstsq(self.fb.transpose(-1, -2)[None], melspec, driver=self.driver).solution)
 
         # unpack batch
         specgram = specgram.view(shape[:-2] + (freq, time))
@@ -538,7 +509,7 @@ class MelSpectrogram(torch.nn.Module):
 
     .. properties:: Autograd TorchScript
 
-    This is a composition of :py:func:`torchaudio.transforms.Spectrogram` and
+    This is a composition of :py:func:`torchaudio.transforms.Spectrogram`
     and :py:func:`torchaudio.transforms.MelScale`.
 
     Sources
@@ -558,7 +529,7 @@ class MelSpectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+            (must be > 0) e.g., 1 for magnitude, 2 for power, etc. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
@@ -566,8 +537,7 @@ class MelSpectrogram(torch.nn.Module):
             (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
             :attr:`center` is ``True``. (Default: ``"reflect"``)
-        onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy. (Default: ``True``)
+        onesided: Deprecated and unused.
         norm (str or None, optional): If "slaney", divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
@@ -599,11 +569,18 @@ class MelSpectrogram(torch.nn.Module):
         wkwargs: Optional[dict] = None,
         center: bool = True,
         pad_mode: str = "reflect",
-        onesided: bool = True,
+        onesided: Optional[bool] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
     ) -> None:
         super(MelSpectrogram, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.MelSpectrogram")
+
+        if onesided is not None:
+            warnings.warn(
+                "Argument 'onesided' has been deprecated and has no influence on the behavior of this module."
+            )
+
         self.sample_rate = sample_rate
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
@@ -625,7 +602,7 @@ class MelSpectrogram(torch.nn.Module):
             wkwargs=wkwargs,
             center=center,
             pad_mode=pad_mode,
-            onesided=onesided,
+            onesided=True,
         )
         self.mel_scale = MelScale(
             self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm, mel_scale
@@ -935,7 +912,7 @@ class Resample(torch.nn.Module):
         orig_freq (int, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (int, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method to use.
-            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``"sinc_interpolation"``)
+            Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -959,7 +936,7 @@ class Resample(torch.nn.Module):
         self,
         orig_freq: int = 16000,
         new_freq: int = 16000,
-        resampling_method: str = "sinc_interpolation",
+        resampling_method: str = "sinc_interp_hann",
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         beta: Optional[float] = None,
@@ -1188,15 +1165,16 @@ class _AxisMasking(torch.nn.Module):
 
     Args:
         mask_param (int): Maximum possible length of the mask.
-        axis (int): What dimension the mask is applied on.
+        axis (int): What dimension the mask is applied on (assuming the tensor is 3D).
+            For frequency masking, axis = 1.
+            For time masking, axis = 2.
         iid_masks (bool): Applies iid masks to each of the examples in the batch dimension.
-            This option is applicable only when the input tensor is 4D.
+            This option is applicable only when the dimension of the input tensor is >= 3.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
     """
     __constants__ = ["mask_param", "axis", "iid_masks", "p"]
 
     def __init__(self, mask_param: int, axis: int, iid_masks: bool, p: float = 1.0) -> None:
-
         super(_AxisMasking, self).__init__()
         self.mask_param = mask_param
         self.axis = axis
@@ -1213,10 +1191,14 @@ class _AxisMasking(torch.nn.Module):
             Tensor: Masked spectrogram of dimensions `(..., freq, time)`.
         """
         # if iid_masks flag marked and specgram has a batch dimension
-        if self.iid_masks and specgram.dim() == 4:
-            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1, p=self.p)
+        # self.axis + specgram.dim() - 3 gives the time/frequency dimension (last two dimensions)
+        # for input tensor for which the dimension is not 3.
+        if self.iid_masks:
+            return F.mask_along_axis_iid(
+                specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p
+            )
         else:
-            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis, p=self.p)
+            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p)
 
 
 class FrequencyMasking(_AxisMasking):
@@ -1233,7 +1215,7 @@ class FrequencyMasking(_AxisMasking):
             Indices uniformly sampled from [0, freq_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
-            This option is applicable only when the input tensor is 4D.
+            This option is applicable only when the input tensor >= 3D.
 
     Example
         >>> spectrogram = torchaudio.transforms.Spectrogram()
@@ -1267,7 +1249,7 @@ class TimeMasking(_AxisMasking):
             Indices uniformly sampled from [0, time_mask_param).
         iid_masks (bool, optional): whether to apply different masks to each
             example/channel in the batch. (Default: ``False``)
-            This option is applicable only when the input tensor is 4D.
+            This option is applicable only when the input tensor >= 3D.
         p (float, optional): maximum proportion of time steps that can be masked.
             Must be within range [0.0, 1.0]. (Default: 1.0)
 
@@ -1289,6 +1271,77 @@ class TimeMasking(_AxisMasking):
         if not 0.0 <= p <= 1.0:
             raise ValueError(f"The value of p must be between 0.0 and 1.0 ({p} given).")
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks, p=p)
+
+
+class SpecAugment(torch.nn.Module):
+    r"""Apply time and frequency masking to a spectrogram.
+    Args:
+        n_time_masks (int): Number of time masks. If its value is zero, no time masking will be applied.
+        time_mask_param (int): Maximum possible length of the time mask.
+        n_freq_masks (int): Number of frequency masks. If its value is zero, no frequency masking will be applied.
+        freq_mask_param (int): Maximum possible length of the frequency mask.
+        iid_masks (bool, optional): Applies iid masks to each of the examples in the batch dimension.
+            This option is applicable only when the input tensor is 4D. (Default: ``True``)
+        p (float, optional): maximum proportion of time steps that can be masked.
+            Must be within range [0.0, 1.0]. (Default: 1.0)
+        zero_masking (bool, optional): If ``True``, use 0 as the mask value,
+            else use mean of the input tensor. (Default: ``False``)
+    """
+    __constants__ = [
+        "n_time_masks",
+        "time_mask_param",
+        "n_freq_masks",
+        "freq_mask_param",
+        "iid_masks",
+        "p",
+        "zero_masking",
+    ]
+
+    def __init__(
+        self,
+        n_time_masks: int,
+        time_mask_param: int,
+        n_freq_masks: int,
+        freq_mask_param: int,
+        iid_masks: bool = True,
+        p: float = 1.0,
+        zero_masking: bool = False,
+    ) -> None:
+        super(SpecAugment, self).__init__()
+        self.n_time_masks = n_time_masks
+        self.time_mask_param = time_mask_param
+        self.n_freq_masks = n_freq_masks
+        self.freq_mask_param = freq_mask_param
+        self.iid_masks = iid_masks
+        self.p = p
+        self.zero_masking = zero_masking
+
+    def forward(self, specgram: Tensor) -> Tensor:
+        r"""
+        Args:
+            specgram (Tensor): Tensor of shape `(..., freq, time)`.
+        Returns:
+            Tensor: Masked spectrogram of shape `(..., freq, time)`.
+        """
+        if self.zero_masking:
+            mask_value = 0.0
+        else:
+            mask_value = specgram.mean()
+        time_dim = specgram.dim() - 1
+        freq_dim = time_dim - 1
+
+        if specgram.dim() > 2 and self.iid_masks is True:
+            for _ in range(self.n_time_masks):
+                specgram = F.mask_along_axis_iid(specgram, self.time_mask_param, mask_value, time_dim, p=self.p)
+            for _ in range(self.n_freq_masks):
+                specgram = F.mask_along_axis_iid(specgram, self.freq_mask_param, mask_value, freq_dim, p=self.p)
+        else:
+            for _ in range(self.n_time_masks):
+                specgram = F.mask_along_axis(specgram, self.time_mask_param, mask_value, time_dim, p=self.p)
+            for _ in range(self.n_freq_masks):
+                specgram = F.mask_along_axis(specgram, self.freq_mask_param, mask_value, freq_dim, p=self.p)
+
+        return specgram
 
 
 class Loudness(torch.nn.Module):
@@ -1739,6 +1792,7 @@ class RNNTLoss(torch.nn.Module):
         clamp (float, optional): clamp for gradients (Default: ``-1``)
         reduction (string, optional): Specifies the reduction to apply to the output:
             ``"none"`` | ``"mean"`` | ``"sum"``. (Default: ``"mean"``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside of loss (Default: ``True``)
 
     Example
         >>> # Hypothetical values
@@ -1763,11 +1817,13 @@ class RNNTLoss(torch.nn.Module):
         blank: int = -1,
         clamp: float = -1.0,
         reduction: str = "mean",
+        fused_log_softmax: bool = True,
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
         self.reduction = reduction
+        self.fused_log_softmax = fused_log_softmax
 
     def forward(
         self,
@@ -1787,4 +1843,292 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(logits, targets, logit_lengths, target_lengths, self.blank, self.clamp, self.reduction)
+        return F.rnnt_loss(
+            logits,
+            targets,
+            logit_lengths,
+            target_lengths,
+            self.blank,
+            self.clamp,
+            self.reduction,
+            self.fused_log_softmax,
+        )
+
+
+class Convolve(torch.nn.Module):
+    r"""
+    Convolves inputs along their last dimension using the direct method.
+    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation
+    operator, this module applies the true `convolution`_ operator.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`, where
+              `N` and `M` are the trailing dimensions of the two inputs. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+
+    def __init__(self, mode: str = "full") -> None:
+        _check_convolve_mode(mode)
+
+        super().__init__()
+        self.mode = mode
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+            y (torch.Tensor): Second convolution operand, with shape `(..., M)`
+                (leading dimensions must be broadcast-able with those of ``x``).
+
+        Returns:
+            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+            the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
+        """
+        return F.convolve(x, y, mode=self.mode)
+
+
+class FFTConvolve(torch.nn.Module):
+    r"""
+    Convolves inputs along their last dimension using FFT. For inputs with large last dimensions, this module
+    is generally much faster than :class:`Convolve`.
+    Note that, in contrast to :class:`torch.nn.Conv1d`, which actually applies the valid cross-correlation
+    operator, this module applies the true `convolution`_ operator.
+    Also note that this module can only output float tensors (int tensor inputs will be cast to float).
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        mode (str, optional): Must be one of ("full", "valid", "same").
+
+            * "full": Returns the full convolution result, with shape `(..., N + M - 1)`, where
+              `N` and `M` are the trailing dimensions of the two inputs. (Default)
+            * "valid": Returns the segment of the full convolution result corresponding to where
+              the two inputs overlap completely, with shape `(..., max(N, M) - min(N, M) + 1)`.
+            * "same": Returns the center segment of the full convolution result, with shape `(..., N)`.
+
+    .. _convolution:
+        https://en.wikipedia.org/wiki/Convolution
+    """
+
+    def __init__(self, mode: str = "full") -> None:
+        _check_convolve_mode(mode)
+
+        super().__init__()
+        self.mode = mode
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            x (torch.Tensor): First convolution operand, with shape `(..., N)`.
+            y (torch.Tensor): Second convolution operand, with shape `(..., M)`
+                (leading dimensions must be broadcast-able with those of ``x``).
+
+        Returns:
+            torch.Tensor: Result of convolving ``x`` and ``y``, with shape `(..., L)`, where
+            the leading dimensions match those of ``x`` and `L` is dictated by ``mode``.
+        """
+        return F.fftconvolve(x, y, mode=self.mode)
+
+
+def _source_target_sample_rate(orig_freq: int, speed: float) -> Tuple[int, int]:
+    source_sample_rate = int(speed * orig_freq)
+    target_sample_rate = int(orig_freq)
+    gcd = math.gcd(source_sample_rate, target_sample_rate)
+    return source_sample_rate // gcd, target_sample_rate // gcd
+
+
+class Speed(torch.nn.Module):
+    r"""Adjusts waveform speed.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factor (float): Factor by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+    """
+
+    def __init__(self, orig_freq, factor) -> None:
+        super().__init__()
+
+        self.orig_freq = orig_freq
+        self.factor = factor
+
+        self.source_sample_rate, self.target_sample_rate = _source_target_sample_rate(orig_freq, factor)
+        self.resampler = Resample(orig_freq=self.source_sample_rate, new_freq=self.target_sample_rate)
+
+    def forward(self, waveform, lengths: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+                If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
+
+        Returns:
+            (torch.Tensor, torch.Tensor or None):
+                torch.Tensor
+                    Speed-adjusted waveform, with shape `(..., new_time).`
+                torch.Tensor or None
+                    If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                    with shape `(...)`; otherwise, ``None``.
+        """
+
+        if lengths is None:
+            out_lengths = None
+        else:
+            out_lengths = torch.ceil(lengths * self.target_sample_rate / self.source_sample_rate).to(lengths.dtype)
+
+        return self.resampler(waveform), out_lengths
+
+
+class SpeedPerturbation(torch.nn.Module):
+    r"""Applies the speed perturbation augmentation introduced in
+    *Audio augmentation for speech recognition* :cite:`ko15_interspeech`. For a given input,
+    the module samples a speed-up factor from ``factors`` uniformly at random and adjusts
+    the speed of the input by that factor.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        orig_freq (int): Original frequency of the signals in ``waveform``.
+        factors (Sequence[float]): Factors by which to adjust speed of input. Values greater than 1.0
+            compress ``waveform`` in time, whereas values less than 1.0 stretch ``waveform`` in time.
+
+    Example
+        >>> speed_perturb = SpeedPerturbation(16000, [0.9, 1.1, 1.0, 1.0, 1.0])
+        >>> # waveform speed will be adjusted by factor 0.9 with 20% probability,
+        >>> # 1.1 with 20% probability, and 1.0 (i.e. kept the same) with 60% probability.
+        >>> speed_perturbed_waveform = speed_perturb(waveform, lengths)
+    """
+
+    def __init__(self, orig_freq: int, factors: Sequence[float]) -> None:
+        super().__init__()
+
+        self.speeders = torch.nn.ModuleList([Speed(orig_freq=orig_freq, factor=factor) for factor in factors])
+
+    def forward(
+        self, waveform: torch.Tensor, lengths: Optional[torch.Tensor] = None
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input signals, with shape `(..., time)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform``, with shape `(...)`.
+                If ``None``, all elements in ``waveform`` are treated as valid. (Default: ``None``)
+
+        Returns:
+            (torch.Tensor, torch.Tensor or None):
+                torch.Tensor
+                    Speed-adjusted waveform, with shape `(..., new_time).`
+                torch.Tensor or None
+                    If ``lengths`` is not ``None``, valid lengths of signals in speed-adjusted waveform,
+                    with shape `(...)`; otherwise, ``None``.
+        """
+
+        idx = int(torch.randint(len(self.speeders), ()))
+        # NOTE: we do this because TorchScript doesn't allow for
+        # indexing ModuleList instances with non-literals.
+        for speeder_idx, speeder in enumerate(self.speeders):
+            if idx == speeder_idx:
+                return speeder(waveform, lengths)
+        raise RuntimeError("Speeder not found; execution should have never reached here.")
+
+
+class AddNoise(torch.nn.Module):
+    r"""Scales and adds noise to waveform per signal-to-noise ratio.
+    See :meth:`torchaudio.functional.add_noise` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+    """
+
+    def forward(
+        self, waveform: torch.Tensor, noise: torch.Tensor, snr: torch.Tensor, lengths: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Input waveform, with shape `(..., L)`.
+            noise (torch.Tensor): Noise, with shape `(..., L)` (same shape as ``waveform``).
+            snr (torch.Tensor): Signal-to-noise ratios in dB, with shape `(...,)`.
+            lengths (torch.Tensor or None, optional): Valid lengths of signals in ``waveform`` and ``noise``,
+            with shape `(...,)` (leading dimensions must match those of ``waveform``). If ``None``, all
+            elements in ``waveform`` and ``noise`` are treated as valid. (Default: ``None``)
+
+        Returns:
+            torch.Tensor: Result of scaling and adding ``noise`` to ``waveform``, with shape `(..., L)`
+            (same shape as ``waveform``).
+        """
+        return F.add_noise(waveform, noise, snr, lengths)
+
+
+class Preemphasis(torch.nn.Module):
+    r"""Pre-emphasizes a waveform along its last dimension.
+    See :meth:`torchaudio.functional.preemphasis` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        coeff (float, optional): Pre-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+    """
+
+    def __init__(self, coeff: float = 0.97) -> None:
+        super().__init__()
+        self.coeff = coeff
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+
+        Returns:
+            torch.Tensor: Pre-emphasized waveform, with shape `(..., N)`.
+        """
+        return F.preemphasis(waveform, coeff=self.coeff)
+
+
+class Deemphasis(torch.nn.Module):
+    r"""De-emphasizes a waveform along its last dimension.
+    See :meth:`torchaudio.functional.deemphasis` for more details.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Args:
+        coeff (float, optional): De-emphasis coefficient. Typically between 0.0 and 1.0.
+            (Default: 0.97)
+    """
+
+    def __init__(self, coeff: float = 0.97) -> None:
+        super().__init__()
+        self.coeff = coeff
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        r"""
+        Args:
+            waveform (torch.Tensor): Waveform, with shape `(..., N)`.
+
+        Returns:
+            torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+        """
+        return F.deemphasis(waveform, coeff=self.coeff)

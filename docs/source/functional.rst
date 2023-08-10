@@ -26,6 +26,22 @@ Utility
    apply_codec
    resample
    loudness
+   convolve
+   fftconvolve
+   add_noise
+   preemphasis
+   deemphasis
+   speed
+
+Forced Alignment
+----------------
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   forced_align
+   merge_tokens
+   TokenSpan
 
 
 Filtering
@@ -73,7 +89,6 @@ Feature Extractions
    compute_deltas
    detect_pitch_frequency
    sliding_window_cmn
-   compute_kaldi_pitch
    spectral_centroid
 
 Multi-channel

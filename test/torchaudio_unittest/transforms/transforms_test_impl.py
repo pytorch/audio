@@ -1,6 +1,13 @@
+import math
+import random
+from unittest.mock import patch
+
+import numpy as np
 import torch
 import torchaudio.transforms as T
 from parameterized import param, parameterized
+from scipy import signal
+from torchaudio.functional import lfilter, preemphasis
 from torchaudio.functional.functional import _get_sinc_resample_kernel
 from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
 from torchaudio_unittest.common_utils.psd_utils import psd_numpy
@@ -11,11 +18,11 @@ def _get_ratio(mat):
 
 
 class TransformsTestBase(TestBaseMixin):
-    def test_InverseMelScale(self):
+    def test_inverse_melscale(self):
         """Gauge the quality of InverseMelScale transform.
 
         As InverseMelScale is currently implemented with
-        random initialization + iterative optimization,
+        sub-optimal solution (compute matrix inverse + relu),
         it is not practically possible to assert the difference between
         the estimated spectrogram and the original spectrogram as a whole.
         Estimated spectrogram has very huge descrepency locally.
@@ -53,7 +60,7 @@ class TransformsTestBase(TestBaseMixin):
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
 
     @nested_params(
-        ["sinc_interpolation", "kaiser_window"],
+        ["sinc_interp_hann", "sinc_interp_kaiser"],
         [16000, 44100],
     )
     def test_resample_identity(self, resampling_method, sample_rate):
@@ -65,7 +72,7 @@ class TransformsTestBase(TestBaseMixin):
         self.assertEqual(waveform, resampled)
 
     @nested_params(
-        ["sinc_interpolation", "kaiser_window"],
+        ["sinc_interp_hann", "sinc_interp_kaiser"],
         [None, torch.float64],
     )
     def test_resample_cache_dtype(self, resampling_method, dtype):
@@ -158,3 +165,316 @@ class TransformsTestBase(TestBaseMixin):
             trans.orig_freq, sample_rate, trans.gcd, device=self.device, dtype=self.dtype
         )
         self.assertEqual(trans.kernel, expected)
+
+    @nested_params(
+        [(10, 4), (4, 3, 1, 2), (2,), ()],
+        [(100, 43), (21, 45)],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, leading_dims, lengths, mode):
+        """Check that Convolve returns values identical to those that SciPy produces."""
+        L_x, L_y = lengths
+
+        x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
+        y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
+
+        convolve = T.Convolve(mode=mode).to(self.device)
+        actual = convolve(x, y)
+
+        num_signals = torch.tensor(leading_dims).prod() if leading_dims else 1
+        x_reshaped = x.reshape((num_signals, L_x))
+        y_reshaped = y.reshape((num_signals, L_y))
+        expected = [
+            signal.convolve(x_reshaped[i].detach().cpu().numpy(), y_reshaped[i].detach().cpu().numpy(), mode=mode)
+            for i in range(num_signals)
+        ]
+        expected = torch.tensor(np.array(expected))
+        expected = expected.reshape(leading_dims + (-1,))
+
+        self.assertEqual(expected, actual)
+
+    @nested_params(
+        [(10, 4), (4, 3, 1, 2), (2,), ()],
+        [(100, 43), (21, 45)],
+        ["full", "valid", "same"],
+    )
+    def test_fftconvolve(self, leading_dims, lengths, mode):
+        """Check that FFTConvolve returns values identical to those that SciPy produces."""
+        L_x, L_y = lengths
+
+        x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
+        y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
+
+        convolve = T.FFTConvolve(mode=mode).to(self.device)
+        actual = convolve(x, y)
+
+        expected = signal.fftconvolve(x.detach().cpu().numpy(), y.detach().cpu().numpy(), axes=-1, mode=mode)
+        expected = torch.tensor(expected)
+
+        self.assertEqual(expected, actual)
+
+    def test_speed_identity(self):
+        """speed of 1.0 does not alter input waveform and length"""
+        leading_dims = (5, 4, 2)
+        time = 1000
+        waveform = torch.rand(*leading_dims, time)
+        lengths = torch.randint(1, 1000, leading_dims)
+        speed = T.Speed(1000, 1.0)
+        actual_waveform, actual_lengths = speed(waveform, lengths)
+        self.assertEqual(waveform, actual_waveform)
+        self.assertEqual(lengths, actual_lengths)
+
+    @nested_params([0.8, 1.1, 1.2], [True, False])
+    def test_speed_accuracy(self, factor, use_lengths):
+        """sinusoidal waveform is properly compressed by factor"""
+        n_to_trim = 20
+
+        sample_rate = 1000
+        freq = 2
+        times = torch.arange(0, 5, 1.0 / sample_rate)
+        waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
+
+        if use_lengths:
+            lengths = torch.tensor([waveform.size(1)])
+        else:
+            lengths = None
+
+        speed = T.Speed(sample_rate, factor).to(self.device, self.dtype)
+        output, output_lengths = speed(waveform, lengths)
+
+        if use_lengths:
+            self.assertEqual(output.size(1), output_lengths[0])
+        else:
+            self.assertEqual(None, output_lengths)
+
+        new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
+        expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)
+
+        self.assertEqual(
+            expected_waveform[..., n_to_trim:-n_to_trim], output[..., n_to_trim:-n_to_trim], atol=1e-1, rtol=1e-4
+        )
+
+    def test_speed_perturbation(self):
+        """sinusoidal waveform is properly compressed by sampled factors"""
+        n_to_trim = 20
+
+        sample_rate = 1000
+        freq = 2
+        times = torch.arange(0, 5, 1.0 / sample_rate)
+        waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
+        lengths = torch.tensor([waveform.size(1)])
+
+        factors = [0.8, 1.1, 1.0]
+        indices = random.choices(range(len(factors)), k=5)
+
+        speed_perturb = T.SpeedPerturbation(sample_rate, factors).to(self.device, self.dtype)
+
+        with patch("torch.randint", side_effect=indices):
+            for idx in indices:
+                output, output_lengths = speed_perturb(waveform, lengths)
+                self.assertEqual(output.size(1), output_lengths[0])
+                factor = factors[idx]
+                new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
+                expected_waveform = (
+                    torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)
+                )
+                self.assertEqual(
+                    expected_waveform[..., n_to_trim:-n_to_trim],
+                    output[..., n_to_trim:-n_to_trim],
+                    atol=1e-1,
+                    rtol=1e-4,
+                )
+
+    def test_add_noise_broadcast(self):
+        """Check that AddNoise produces correct outputs when broadcasting input dimensions."""
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(5, 1, 1, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(5, 1, 3, dtype=self.dtype, device=self.device)
+        snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
+
+        add_noise = T.AddNoise()
+        actual = add_noise(waveform, noise, snr, lengths)
+
+        noise_expanded = noise.expand(*leading_dims, L)
+        snr_expanded = snr.expand(*leading_dims)
+        lengths_expanded = lengths.expand(*leading_dims)
+        expected = add_noise(waveform, noise_expanded, snr_expanded, lengths_expanded)
+
+        self.assertEqual(expected, actual)
+
+    @parameterized.expand(
+        [((5, 2, 3), (2, 1, 1), (5, 2), (5, 2, 3)), ((2, 1), (5,), (5,), (5,)), ((3,), (5, 2, 3), (2, 1, 1), (5, 2))]
+    )
+    def test_add_noise_leading_dim_check(self, waveform_dims, noise_dims, lengths_dims, snr_dims):
+        """Check that AddNoise properly rejects inputs with different leading dimension lengths."""
+        L = 51
+
+        waveform = torch.rand(*waveform_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*noise_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*lengths_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*snr_dims, dtype=self.dtype, device=self.device) * 10
+
+        add_noise = T.AddNoise()
+
+        with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
+            add_noise(waveform, noise, snr, lengths)
+
+    def test_add_noise_length_check(self):
+        """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, 50, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+
+        add_noise = T.AddNoise()
+
+        with self.assertRaisesRegex(ValueError, "Length dimensions"):
+            add_noise(waveform, noise, snr, lengths)
+
+    @nested_params(
+        [(2, 1, 31)],
+        [0.97, 0.72],
+    )
+    def test_preemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        preemphasis = T.Preemphasis(coeff=coeff).to(dtype=self.dtype, device=self.device)
+        actual = preemphasis(waveform)
+
+        a_coeffs = torch.tensor([1.0, 0.0], device=self.device, dtype=self.dtype)
+        b_coeffs = torch.tensor([1.0, -coeff], device=self.device, dtype=self.dtype)
+        expected = lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+        self.assertEqual(actual, expected)
+
+    @nested_params(
+        [(2, 1, 31)],
+        [0.97, 0.72],
+    )
+    def test_deemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        preemphasized = preemphasis(waveform, coeff=coeff)
+        deemphasis = T.Deemphasis(coeff=coeff).to(dtype=self.dtype, device=self.device)
+        deemphasized = deemphasis(preemphasized)
+        self.assertEqual(deemphasized, waveform)
+
+    @nested_params(
+        [(100, 200), (5, 10, 20), (50, 50, 100, 200)],
+    )
+    def test_time_masking(self, input_shape):
+        transform = T.TimeMasking(time_mask_param=5)
+        # Genearte a specgram tensor containing 1's only, for the ease of testing.
+        specgram = torch.ones(*input_shape)
+        masked = transform(specgram)
+        dim = len(input_shape)
+        # Across the axis (dim-1) where we apply masking,
+        # the mean tensor should contain equal elements,
+        # and the value should be between 0 and 1.
+        m_masked = torch.mean(masked, dim - 1)
+        self.assertEqual(torch.var(m_masked), 0)
+        self.assertTrue(torch.mean(m_masked) > 0)
+        self.assertTrue(torch.mean(m_masked) < 1)
+
+        # Across all other dimensions, the mean tensor should contain at least
+        # one zero element, and all non-zero elements should be 1.
+        for axis in range(dim - 1):
+            unmasked_axis_mean = torch.mean(masked, axis)
+            self.assertTrue(0 in unmasked_axis_mean)
+            self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))
+
+    @nested_params(
+        [(100, 200), (5, 10, 20), (50, 50, 100, 200)],
+    )
+    def test_freq_masking(self, input_shape):
+        transform = T.FrequencyMasking(freq_mask_param=5)
+        # Genearte a specgram tensor containing 1's only, for the ease of testing.
+        specgram = torch.ones(*input_shape)
+        masked = transform(specgram)
+        dim = len(input_shape)
+        # Across the axis (dim-2) where we apply masking,
+        # the mean tensor should contain equal elements,
+        # and the value should be between 0 and 1.
+        m_masked = torch.mean(masked, dim - 2)
+        self.assertEqual(torch.var(m_masked), 0)
+        self.assertTrue(torch.mean(m_masked) > 0)
+        self.assertTrue(torch.mean(m_masked) < 1)
+
+        # Across all other dimensions, the mean tensor should contain at least
+        # one zero element, and all non-zero elements should be 1.
+        for axis in range(dim):
+            if axis != dim - 2:
+                unmasked_axis_mean = torch.mean(masked, axis)
+                self.assertTrue(0 in unmasked_axis_mean)
+                self.assertFalse(False in torch.eq(unmasked_axis_mean[unmasked_axis_mean != 0], 1))
+
+    @parameterized.expand(
+        [
+            param(10, 20, 10, 20, False),
+            param(0, 20, 10, 20, False),
+            param(10, 20, 0, 20, False),
+            param(10, 20, 10, 20, True),
+            param(0, 20, 10, 20, True),
+            param(10, 20, 0, 20, True),
+        ]
+    )
+    def test_specaugment(self, n_time_masks, time_mask_param, n_freq_masks, freq_mask_param, iid_masks):
+        """Make sure SpecAug masking works as expected"""
+        spec = torch.ones(2, 200, 200)
+        transform = T.SpecAugment(
+            n_time_masks=n_time_masks,
+            time_mask_param=time_mask_param,
+            n_freq_masks=n_freq_masks,
+            freq_mask_param=freq_mask_param,
+            iid_masks=iid_masks,
+            zero_masking=True,
+        )
+        spec_masked = transform(spec)
+        f_axis_mean = torch.mean(spec_masked, 1)
+        t_axis_mean = torch.mean(spec_masked, 2)
+        if n_time_masks == 0 and n_freq_masks == 0:
+            self.assertEqual(spec, spec_masked)
+        elif n_time_masks > 0 and n_freq_masks > 0:
+            # Across both time and frequency dimensions, the mean tensor should contain
+            # at least one zero element, and all non-zero elements should be less than 1.
+            self.assertTrue(0 in t_axis_mean)
+            self.assertFalse(False in torch.lt(t_axis_mean[t_axis_mean != 0], 1))
+            self.assertTrue(0 in f_axis_mean)
+            self.assertFalse(False in torch.lt(f_axis_mean[f_axis_mean != 0], 1))
+        elif n_freq_masks > 0:
+            # Across the frequency axis where we apply masking,
+            # the mean tensor should contain equal elements,
+            # and the value should be between 0 and 1.
+            self.assertFalse(False in torch.eq(f_axis_mean[0], f_axis_mean[0][0]))
+            self.assertFalse(False in torch.eq(f_axis_mean[1], f_axis_mean[1][0]))
+            self.assertTrue(f_axis_mean[0][0] < 1)
+            self.assertTrue(f_axis_mean[1][0] > 0)
+
+            # Across the time axis where we don't mask, the mean tensor should contain at
+            # least one zero element, and all non-zero elements should be 1.
+            self.assertTrue(0 in t_axis_mean)
+            self.assertFalse(False in torch.eq(t_axis_mean[t_axis_mean != 0], 1))
+        else:
+            # Across the time axis where we apply masking,
+            # the mean tensor should contain equal elements,
+            # and the value should be between 0 and 1.
+            self.assertFalse(False in torch.eq(t_axis_mean[0], t_axis_mean[0][0]))
+            self.assertFalse(False in torch.eq(t_axis_mean[1], t_axis_mean[1][0]))
+            self.assertTrue(t_axis_mean[0][0] < 1)
+            self.assertTrue(t_axis_mean[1][0] > 0)
+
+            # Across the frequency axis where we don't mask, the mean tensor should contain at
+            # least one zero element, and all non-zero elements should be 1.
+            self.assertTrue(0 in f_axis_mean)
+            self.assertFalse(False in torch.eq(f_axis_mean[f_axis_mean != 0], 1))
+
+        # Test if iid_masks gives different masking results for different spectrograms across the 0th dimension.
+        diff = torch.linalg.vector_norm(spec_masked[0] - spec_masked[1]).item()
+        print(diff)
+        if iid_masks is True:
+            self.assertTrue(diff > 0)
+        else:
+            self.assertTrue(diff == 0)

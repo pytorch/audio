@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import torch
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import _load_waveform, extract_archive
+from torchaudio._internal import download_url_to_file
+from torchaudio.datasets.utils import _extract_tar, _load_waveform
 
 
 URL = "https://speech.fit.vutbr.cz/files/quesst14Database.tgz"
@@ -62,7 +62,7 @@ class QUESST14(Dataset):
                 if not download:
                     raise RuntimeError("Dataset not found. Please use `download=True` to download")
                 download_url_to_file(URL, archive, hash_prefix=_CHECKSUM)
-            extract_archive(archive, root)
+            _extract_tar(archive, root)
 
         if subset == "docs":
             self.data = filter_audio_paths(self._path, language, "language_key_utterances.lst")

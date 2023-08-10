@@ -3,6 +3,8 @@
 Audio Resampling
 ================
 
+**Author**: `Caroline Chen <carolinechen@meta.com>`__, `Moto Hira <moto@meta.com>`__
+
 This tutorial shows how to use torchaudio's resampling API.
 """
 
@@ -20,24 +22,19 @@ print(torchaudio.__version__)
 #
 # First, we import the modules and define the helper functions.
 #
-# .. note::
-#    When running this tutorial in Google Colab, install the required packages
-#    with the following.
-#
-#    .. code::
-#
-#       !pip install librosa
 
 import math
-import time
+import timeit
 
 import librosa
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import pandas as pd
-from IPython.display import Audio, display
+import resampy
+from IPython.display import Audio
 
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
 
 DEFAULT_OFFSET = 201
 
@@ -61,18 +58,18 @@ def _get_inverse_log_freq(freq, sample_rate, offset):
 def _get_freq_ticks(sample_rate, offset, f_max):
     # Given the original sample rate used for generating the sweep,
     # find the x-axis value where the log-scale major frequency values fall in
-    time, freq = [], []
+    times, freq = [], []
     for exp in range(2, 5):
         for v in range(1, 10):
             f = v * 10**exp
             if f < sample_rate // 2:
                 t = _get_inverse_log_freq(f, sample_rate, offset) / sample_rate
-                time.append(t)
+                times.append(t)
                 freq.append(f)
     t_max = _get_inverse_log_freq(f_max, sample_rate, offset) / sample_rate
-    time.append(t_max)
+    times.append(t_max)
     freq.append(f_max)
-    return time, freq
+    return times, freq
 
 
 def get_sine_sweep(sample_rate, offset=DEFAULT_OFFSET):
@@ -108,7 +105,6 @@ def plot_sweep(
     axis.yaxis.grid(True, alpha=0.67)
     figure.suptitle(f"{title} (sample rate: {sample_rate} Hz)")
     plt.colorbar(cax)
-    plt.show(block=True)
 
 
 ######################################################################
@@ -116,7 +112,7 @@ def plot_sweep(
 # -------------------
 #
 # To resample an audio waveform from one freqeuncy to another, you can use
-# :py:func:`torchaudio.transforms.Resample` or
+# :py:class:`torchaudio.transforms.Resample` or
 # :py:func:`torchaudio.functional.resample`.
 # ``transforms.Resample`` precomputes and caches the kernel used for resampling,
 # while ``functional.resample`` computes it on the fly, so using
@@ -161,6 +157,9 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 #
 # We see that in the spectrogram of the resampled waveform, there is an
 # artifact, which was not present in the original waveform.
+# This effect is called aliasing.
+# `This page <https://music.arts.uci.edu/dobrian/digitalaudio.htm>`__ has
+# an explanation of how it happens, and why it looks like a reflection.
 
 resample_rate = 32000
 resampler = T.Resample(sample_rate, resample_rate, dtype=waveform.dtype)
@@ -240,13 +239,13 @@ plot_sweep(resampled_waveform, resample_rate, title="rolloff=0.8")
 sample_rate = 48000
 resample_rate = 32000
 
-resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interpolation")
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interp_hann")
 plot_sweep(resampled_waveform, resample_rate, title="Hann Window Default")
 
 ######################################################################
 #
 
-resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="kaiser_window")
+resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interp_kaiser")
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
@@ -271,7 +270,7 @@ resampled_waveform = F.resample(
     resample_rate,
     lowpass_filter_width=64,
     rolloff=0.9475937167399596,
-    resampling_method="kaiser_window",
+    resampling_method="sinc_interp_kaiser",
     beta=14.769656459379492,
 )
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
@@ -300,7 +299,7 @@ resampled_waveform = F.resample(
     resample_rate,
     lowpass_filter_width=16,
     rolloff=0.85,
-    resampling_method="kaiser_window",
+    resampling_method="sinc_interp_kaiser",
     beta=8.555504641634386,
 )
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
@@ -325,152 +324,231 @@ print("torchaudio and librosa kaiser fast MSE:", mse)
 #
 # Below are benchmarks for downsampling and upsampling waveforms between
 # two pairs of sampling rates. We demonstrate the performance implications
-# that the ``lowpass_filter_wdith``, window type, and sample rates can
+# that the ``lowpass_filter_width``, window type, and sample rates can
 # have. Additionally, we provide a comparison against ``librosa``\ ’s
 # ``kaiser_best`` and ``kaiser_fast`` using their corresponding parameters
 # in ``torchaudio``.
+#
+
+print(f"torchaudio: {torchaudio.__version__}")
+print(f"librosa: {librosa.__version__}")
+print(f"resampy: {resampy.__version__}")
+
+######################################################################
+#
+
+
+def benchmark_resample_functional(
+    waveform,
+    sample_rate,
+    resample_rate,
+    lowpass_filter_width=6,
+    rolloff=0.99,
+    resampling_method="sinc_interp_hann",
+    beta=None,
+    iters=5,
+):
+    return (
+        timeit.timeit(
+            stmt="""
+torchaudio.functional.resample(
+    waveform,
+    sample_rate,
+    resample_rate,
+    lowpass_filter_width=lowpass_filter_width,
+    rolloff=rolloff,
+    resampling_method=resampling_method,
+    beta=beta,
+)
+        """,
+            setup="import torchaudio",
+            number=iters,
+            globals=locals(),
+        )
+        * 1000
+        / iters
+    )
+
+
+######################################################################
+#
+
+
+def benchmark_resample_transforms(
+    waveform,
+    sample_rate,
+    resample_rate,
+    lowpass_filter_width=6,
+    rolloff=0.99,
+    resampling_method="sinc_interp_hann",
+    beta=None,
+    iters=5,
+):
+    return (
+        timeit.timeit(
+            stmt="resampler(waveform)",
+            setup="""
+import torchaudio
+
+resampler = torchaudio.transforms.Resample(
+    sample_rate,
+    resample_rate,
+    lowpass_filter_width=lowpass_filter_width,
+    rolloff=rolloff,
+    resampling_method=resampling_method,
+    dtype=waveform.dtype,
+    beta=beta,
+)
+resampler.to(waveform.device)
+        """,
+            number=iters,
+            globals=locals(),
+        )
+        * 1000
+        / iters
+    )
+
+
+######################################################################
+#
+
+
+def benchmark_resample_librosa(
+    waveform,
+    sample_rate,
+    resample_rate,
+    res_type=None,
+    iters=5,
+):
+    waveform_np = waveform.squeeze().numpy()
+    return (
+        timeit.timeit(
+            stmt="""
+librosa.resample(
+    waveform_np,
+    orig_sr=sample_rate,
+    target_sr=resample_rate,
+    res_type=res_type,
+)
+        """,
+            setup="import librosa",
+            number=iters,
+            globals=locals(),
+        )
+        * 1000
+        / iters
+    )
+
+
+######################################################################
+#
+
+
+def benchmark(sample_rate, resample_rate):
+    times, rows = [], []
+    waveform = get_sine_sweep(sample_rate).to(torch.float32)
+
+    args = (waveform, sample_rate, resample_rate)
+
+    # sinc 64 zero-crossings
+    f_time = benchmark_resample_functional(*args, lowpass_filter_width=64)
+    t_time = benchmark_resample_transforms(*args, lowpass_filter_width=64)
+    times.append([None, f_time, t_time])
+    rows.append("sinc (width 64)")
+
+    # sinc 6 zero-crossings
+    f_time = benchmark_resample_functional(*args, lowpass_filter_width=16)
+    t_time = benchmark_resample_transforms(*args, lowpass_filter_width=16)
+    times.append([None, f_time, t_time])
+    rows.append("sinc (width 16)")
+
+    # kaiser best
+    kwargs = {
+        "lowpass_filter_width": 64,
+        "rolloff": 0.9475937167399596,
+        "resampling_method": "sinc_interp_kaiser",
+        "beta": 14.769656459379492,
+    }
+    lib_time = benchmark_resample_librosa(*args, res_type="kaiser_best")
+    f_time = benchmark_resample_functional(*args, **kwargs)
+    t_time = benchmark_resample_transforms(*args, **kwargs)
+    times.append([lib_time, f_time, t_time])
+    rows.append("kaiser_best")
+
+    # kaiser fast
+    kwargs = {
+        "lowpass_filter_width": 16,
+        "rolloff": 0.85,
+        "resampling_method": "sinc_interp_kaiser",
+        "beta": 8.555504641634386,
+    }
+    lib_time = benchmark_resample_librosa(*args, res_type="kaiser_fast")
+    f_time = benchmark_resample_functional(*args, **kwargs)
+    t_time = benchmark_resample_transforms(*args, **kwargs)
+    times.append([lib_time, f_time, t_time])
+    rows.append("kaiser_fast")
+
+    df = pd.DataFrame(times, columns=["librosa", "functional", "transforms"], index=rows)
+    return df
+
+
+######################################################################
+#
+def plot(df):
+    print(df.round(2))
+    ax = df.plot(kind="bar")
+    plt.ylabel("Time Elapsed [ms]")
+    plt.xticks(rotation=0, fontsize=10)
+    for cont, col, color in zip(ax.containers, df.columns, mcolors.TABLEAU_COLORS):
+        label = ["N/A" if v != v else str(v) for v in df[col].round(2)]
+        ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")
+
+
+######################################################################
+#
+# Downsample (48 -> 44.1 kHz)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+df = benchmark(48_000, 44_100)
+plot(df)
+
+######################################################################
+#
+# Downsample (16 -> 8 kHz)
+# ~~~~~~~~~~~~~~~~~~~~~~~~
+
+df = benchmark(16_000, 8_000)
+plot(df)
+
+######################################################################
+#
+# Upsample (44.1 -> 48 kHz)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+df = benchmark(44_100, 48_000)
+plot(df)
+
+######################################################################
+#
+# Upsample (8 -> 16 kHz)
+# ~~~~~~~~~~~~~~~~~~~~~~
+
+df = benchmark(8_000, 16_000)
+plot(df)
+
+######################################################################
+#
+# Summary
+# ~~~~~~~
 #
 # To elaborate on the results:
 #
 # - a larger ``lowpass_filter_width`` results in a larger resampling kernel,
 #   and therefore increases computation time for both the kernel computation
 #   and convolution
-# - using ``kaiser_window`` results in longer computation times than the default
-#   ``sinc_interpolation`` because it is more complex to compute the intermediate
-#   window values - a large GCD between the sample and resample rate will result
+# - using ``sinc_interp_kaiser`` results in longer computation times than the default
+#   ``sinc_interp_hann`` because it is more complex to compute the intermediate
+#   window values
+# - a large GCD between the sample and resample rate will result
 #   in a simplification that allows for a smaller kernel and faster kernel computation.
 #
-
-
-def benchmark_resample(
-    method,
-    waveform,
-    sample_rate,
-    resample_rate,
-    lowpass_filter_width=6,
-    rolloff=0.99,
-    resampling_method="sinc_interpolation",
-    beta=None,
-    librosa_type=None,
-    iters=5,
-):
-    if method == "functional":
-        begin = time.monotonic()
-        for _ in range(iters):
-            F.resample(
-                waveform,
-                sample_rate,
-                resample_rate,
-                lowpass_filter_width=lowpass_filter_width,
-                rolloff=rolloff,
-                resampling_method=resampling_method,
-            )
-        elapsed = time.monotonic() - begin
-        return elapsed / iters
-    elif method == "transforms":
-        resampler = T.Resample(
-            sample_rate,
-            resample_rate,
-            lowpass_filter_width=lowpass_filter_width,
-            rolloff=rolloff,
-            resampling_method=resampling_method,
-            dtype=waveform.dtype,
-        )
-        begin = time.monotonic()
-        for _ in range(iters):
-            resampler(waveform)
-        elapsed = time.monotonic() - begin
-        return elapsed / iters
-    elif method == "librosa":
-        waveform_np = waveform.squeeze().numpy()
-        begin = time.monotonic()
-        for _ in range(iters):
-            librosa.resample(waveform_np, orig_sr=sample_rate, target_sr=resample_rate, res_type=librosa_type)
-        elapsed = time.monotonic() - begin
-        return elapsed / iters
-
-
-######################################################################
-#
-
-configs = {
-    "downsample (48 -> 44.1 kHz)": [48000, 44100],
-    "downsample (16 -> 8 kHz)": [16000, 8000],
-    "upsample (44.1 -> 48 kHz)": [44100, 48000],
-    "upsample (8 -> 16 kHz)": [8000, 16000],
-}
-
-for label in configs:
-    times, rows = [], []
-    sample_rate = configs[label][0]
-    resample_rate = configs[label][1]
-    waveform = get_sine_sweep(sample_rate)
-
-    # sinc 64 zero-crossings
-    f_time = benchmark_resample("functional", waveform, sample_rate, resample_rate, lowpass_filter_width=64)
-    t_time = benchmark_resample("transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=64)
-    times.append([None, 1000 * f_time, 1000 * t_time])
-    rows.append("sinc (width 64)")
-
-    # sinc 6 zero-crossings
-    f_time = benchmark_resample("functional", waveform, sample_rate, resample_rate, lowpass_filter_width=16)
-    t_time = benchmark_resample("transforms", waveform, sample_rate, resample_rate, lowpass_filter_width=16)
-    times.append([None, 1000 * f_time, 1000 * t_time])
-    rows.append("sinc (width 16)")
-
-    # kaiser best
-    lib_time = benchmark_resample("librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_best")
-    f_time = benchmark_resample(
-        "functional",
-        waveform,
-        sample_rate,
-        resample_rate,
-        lowpass_filter_width=64,
-        rolloff=0.9475937167399596,
-        resampling_method="kaiser_window",
-        beta=14.769656459379492,
-    )
-    t_time = benchmark_resample(
-        "transforms",
-        waveform,
-        sample_rate,
-        resample_rate,
-        lowpass_filter_width=64,
-        rolloff=0.9475937167399596,
-        resampling_method="kaiser_window",
-        beta=14.769656459379492,
-    )
-    times.append([1000 * lib_time, 1000 * f_time, 1000 * t_time])
-    rows.append("kaiser_best")
-
-    # kaiser fast
-    lib_time = benchmark_resample("librosa", waveform, sample_rate, resample_rate, librosa_type="kaiser_fast")
-    f_time = benchmark_resample(
-        "functional",
-        waveform,
-        sample_rate,
-        resample_rate,
-        lowpass_filter_width=16,
-        rolloff=0.85,
-        resampling_method="kaiser_window",
-        beta=8.555504641634386,
-    )
-    t_time = benchmark_resample(
-        "transforms",
-        waveform,
-        sample_rate,
-        resample_rate,
-        lowpass_filter_width=16,
-        rolloff=0.85,
-        resampling_method="kaiser_window",
-        beta=8.555504641634386,
-    )
-    times.append([1000 * lib_time, 1000 * f_time, 1000 * t_time])
-    rows.append("kaiser_fast")
-
-    df = pd.DataFrame(times, columns=["librosa", "functional", "transforms"], index=rows)
-    df.columns = pd.MultiIndex.from_product([[f"{label} time (ms)"], df.columns])
-
-    print(f"torchaudio: {torchaudio.__version__}")
-    print(f"librosa: {librosa.__version__}")
-    display(df.round(2))

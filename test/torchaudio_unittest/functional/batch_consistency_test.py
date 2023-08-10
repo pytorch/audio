@@ -27,7 +27,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     backend = "default"
 
-    def assert_batch_consistency(self, functional, inputs, atol=1e-8, rtol=1e-5, seed=42):
+    def assert_batch_consistency(self, functional, inputs, atol=1e-6, rtol=1e-5, seed=42):
         n = inputs[0].size(0)
         for i in range(1, len(inputs)):
             self.assertEqual(inputs[i].size(0), n)
@@ -65,7 +65,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "rand_init": False,
         }
         func = partial(F.griffinlim, **kwargs)
-        self.assert_batch_consistency(func, inputs=(batch,), atol=5e-5)
+        self.assert_batch_consistency(func, inputs=(batch,), atol=1e-4)
 
     @parameterized.expand(
         list(
@@ -194,7 +194,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_phaser(self):
-        sample_rate = 44100
+        sample_rate = 8000
         n_channels = 2
         waveform = common_utils.get_whitenoise(
             sample_rate=sample_rate, n_channels=self.batch_size * n_channels, duration=1
@@ -208,7 +208,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     def test_flanger(self):
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        sample_rate = 44100
+        sample_rate = 8000
         kwargs = {
             "sample_rate": sample_rate,
         }
@@ -233,7 +233,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         func = partial(F.sliding_window_cmn, **kwargs)
         self.assert_batch_consistency(func, inputs=(spectrogram,))
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform(self, resampling_method):
         num_channels = 3
         sr = 16000
@@ -256,18 +256,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             rtol=1e-4,
             atol=1e-7,
         )
-
-    @common_utils.skipIfNoKaldi
-    def test_compute_kaldi_pitch(self):
-        sample_rate = 44100
-        n_channels = 2
-        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, n_channels=self.batch_size * n_channels)
-        batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
-        kwargs = {
-            "sample_rate": sample_rate,
-        }
-        func = partial(F.compute_kaldi_pitch, **kwargs)
-        self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_lfilter(self):
         signal_length = 2048
@@ -407,3 +395,90 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
         beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
         self.assert_batch_consistency(F.apply_beamforming, (beamform_weights, specgram))
+
+    @common_utils.nested_params(
+        ["convolve", "fftconvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, fn, mode):
+        leading_dims = (2, 3)
+        L_x, L_y = 89, 43
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+
+        fn = getattr(F, fn)
+        actual = fn(x, y, mode)
+        expected = torch.stack(
+            [
+                torch.stack(
+                    [fn(x[i, j].unsqueeze(0), y[i, j].unsqueeze(0), mode).squeeze(0) for j in range(leading_dims[1])]
+                )
+                for i in range(leading_dims[0])
+            ]
+        )
+
+        self.assertEqual(expected, actual)
+
+    def test_add_noise(self):
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+
+        actual = F.add_noise(waveform, noise, snr, lengths)
+
+        expected = []
+        for i in range(leading_dims[0]):
+            for j in range(leading_dims[1]):
+                for k in range(leading_dims[2]):
+                    expected.append(F.add_noise(waveform[i][j][k], noise[i][j][k], snr[i][j][k], lengths[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, L))
+
+    def test_speed(self):
+        B = 5
+        orig_freq = 100
+        factor = 0.8
+        input_lengths = torch.randint(1, 1000, (B,), dtype=torch.int32)
+
+        unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
+        batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
+
+        output, output_lengths = F.speed(batched_input, orig_freq=orig_freq, factor=factor, lengths=input_lengths)
+
+        unbatched_output = []
+        unbatched_output_lengths = []
+        for idx in range(len(unbatched_input)):
+            w, l = F.speed(unbatched_input[idx], orig_freq=orig_freq, factor=factor, lengths=input_lengths[idx])
+            unbatched_output.append(w)
+            unbatched_output_lengths.append(l)
+
+        self.assertEqual(output_lengths, torch.stack(unbatched_output_lengths))
+        for idx in range(len(unbatched_output)):
+            w, l = output[idx], output_lengths[idx]
+            self.assertEqual(unbatched_output[idx], w[:l])
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        actual = F.preemphasis(waveform, coeff=coeff)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            expected.append(F.preemphasis(waveform[i], coeff=coeff))
+
+        self.assertEqual(torch.stack(expected), actual)
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        actual = F.deemphasis(waveform, coeff=coeff)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            expected.append(F.deemphasis(waveform[i], coeff=coeff))
+
+        self.assertEqual(torch.stack(expected), actual)

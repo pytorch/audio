@@ -2,12 +2,15 @@ Jinja2<3.1.0
 matplotlib
 pyparsing<3,>=2.0.2
 
+# C++ docs
+breathe==4.34.0
+
 # Note:
 # When changing Sphinx-related packages, make sure that the custom behaviors in the following
 # locations are working as expected.
 # - source/_templates/layout.html
 # - source/_static/css/custom.css
--e git+https://github.com/pytorch/pytorch_sphinx_theme.git@cece053#egg=pytorch_sphinx_theme
+-e git+https://github.com/pytorch/pytorch_sphinx_theme.git@32a6550#egg=pytorch_sphinx_theme
 sphinx==5.1.1
 sphinxcontrib.katex==0.8.6
 sphinxcontrib.bibtex==2.4.2

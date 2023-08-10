@@ -1,6 +1,6 @@
 // One stop header for all ffmepg needs
 #pragma once
-#include <torch/torch.h>
+#include <torch/types.h>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -22,10 +22,12 @@ extern "C" {
 #include <libavutil/pixdesc.h>
 }
 
-namespace torchaudio {
-namespace ffmpeg {
+/// @cond
 
-using OptionDict = c10::Dict<std::string, std::string>;
+namespace torchaudio {
+namespace io {
+
+using OptionDict = std::map<std::string, std::string>;
 
 // https://github.com/FFmpeg/FFmpeg/blob/4e6debe1df7d53f3f59b37449b82265d5c08a172/doc/APIchanges#L252-L260
 // Starting from libavformat 59 (ffmpeg 5),
@@ -52,7 +54,6 @@ av_always_inline std::string av_err2string(int errnum) {
 // The resource allocation will be provided by custom constructors.
 template <typename T, typename Deleter>
 class Wrapper {
- protected:
   std::unique_ptr<T, Deleter> ptr;
 
  public:
@@ -121,8 +122,10 @@ struct AVPacketDeleter {
 };
 
 struct AVPacketPtr : public Wrapper<AVPacket, AVPacketDeleter> {
-  AVPacketPtr();
+  explicit AVPacketPtr(AVPacket* p);
 };
+
+AVPacketPtr alloc_avpacket();
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket - buffer unref
@@ -150,8 +153,10 @@ struct AVFrameDeleter {
 };
 
 struct AVFramePtr : public Wrapper<AVFrame, AVFrameDeleter> {
-  AVFramePtr();
+  explicit AVFramePtr(AVFrame* p);
 };
+
+AVFramePtr alloc_avframe();
 
 ////////////////////////////////////////////////////////////////////////////////
 // AutoBufferUnrer is responsible for performing unref at the end of lifetime
@@ -162,8 +167,7 @@ struct AutoBufferUnref {
 };
 
 struct AVBufferRefPtr : public Wrapper<AVBufferRef, AutoBufferUnref> {
-  AVBufferRefPtr();
-  void reset(AVBufferRef* p);
+  explicit AVBufferRefPtr(AVBufferRef* p);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,8 +188,27 @@ struct AVFilterGraphDeleter {
   void operator()(AVFilterGraph* p);
 };
 struct AVFilterGraphPtr : public Wrapper<AVFilterGraph, AVFilterGraphDeleter> {
-  AVFilterGraphPtr();
-  void reset();
+  explicit AVFilterGraphPtr(AVFilterGraph* p);
 };
-} // namespace ffmpeg
+
+////////////////////////////////////////////////////////////////////////////////
+// AVCodecParameters
+////////////////////////////////////////////////////////////////////////////////
+struct AVCodecParametersDeleter {
+  void operator()(AVCodecParameters* p);
+};
+
+struct AVCodecParametersPtr
+    : public Wrapper<AVCodecParameters, AVCodecParametersDeleter> {
+  explicit AVCodecParametersPtr(AVCodecParameters* p);
+};
+
+struct StreamParams {
+  AVCodecParametersPtr codec_params{nullptr};
+  AVRational time_base{};
+  int stream_index{};
+};
+} // namespace io
 } // namespace torchaudio
+
+/// @endcond

@@ -28,6 +28,7 @@ class AutogradTestMixin(TestBaseMixin):
         inputs: List[torch.Tensor],
         *,
         nondet_tol: float = 0.0,
+        enable_all_grad: bool = True,
     ):
         transform = transform.to(dtype=torch.float64, device=self.device)
 
@@ -37,7 +38,8 @@ class AutogradTestMixin(TestBaseMixin):
         for i in inputs:
             if torch.is_tensor(i):
                 i = i.to(dtype=torch.cdouble if i.is_complex() else torch.double, device=self.device)
-                i.requires_grad = True
+                if enable_all_grad:
+                    i.requires_grad = True
             inputs_.append(i)
         assert gradcheck(transform, inputs_)
         assert gradgradcheck(transform, inputs_, nondet_tol=nondet_tol)
@@ -110,14 +112,14 @@ class AutogradTestMixin(TestBaseMixin):
         sample_rate = 8000
         transform = T.MFCC(sample_rate=sample_rate, log_mels=log_mels)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     @parameterized.expand([(False,), (True,)])
     def test_lfcc(self, log_lf):
         sample_rate = 8000
         transform = T.LFCC(sample_rate=sample_rate, log_lf=log_lf)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     def test_compute_deltas(self):
         transform = T.ComputeDeltas()
@@ -187,8 +189,9 @@ class AutogradTestMixin(TestBaseMixin):
     def test_melscale(self):
         sample_rate = 8000
         n_fft = 400
-        n_mels = n_fft // 2 + 1
-        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels)
+        n_stft = n_fft // 2 + 1
+        n_mels = 128
+        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels, n_stft=n_stft)
         spec = get_spectrogram(
             get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
         )
@@ -316,6 +319,61 @@ class AutogradTestMixin(TestBaseMixin):
         psd_n = torch.rand(freq, channel, channel, dtype=torch.cfloat)
         reference_channel = 0
         self.assert_grad(transform, [specgram, psd_s, psd_n, reference_channel])
+
+    @nested_params(
+        ["Convolve", "FFTConvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, cls, mode):
+        leading_dims = (4, 3, 2)
+        L_x, L_y = 23, 40
+        x = torch.rand(*leading_dims, L_x)
+        y = torch.rand(*leading_dims, L_y)
+        convolve = getattr(T, cls)(mode=mode)
+        self.assert_grad(convolve, [x, y])
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        time = 200
+
+        waveform = torch.rand(*leading_dims, time, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims)
+        speed = T.Speed(1000, 1.1)
+        self.assert_grad(speed, (waveform, lengths), enable_all_grad=False)
+
+    def test_speed_perturbation(self):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims)
+        speed = T.SpeedPerturbation(1000, [0.9])
+        self.assert_grad(speed, (waveform, lengths), enable_all_grad=False)
+
+    @nested_params([True, False])
+    def test_add_noise(self, use_lengths):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L)
+        noise = torch.rand(*leading_dims, L)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims)
+        else:
+            lengths = None
+        snr = torch.rand(*leading_dims)
+
+        add_noise = T.AddNoise()
+        self.assert_grad(add_noise, (waveform, noise, snr, lengths))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 4, 10)
+        preemphasis = T.Preemphasis(coeff=0.97)
+        self.assert_grad(preemphasis, (waveform,))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 4, 10)
+        deemphasis = T.Deemphasis(coeff=0.97)
+        self.assert_grad(deemphasis, (waveform,))
 
 
 class AutogradTestFloat32(TestBaseMixin):

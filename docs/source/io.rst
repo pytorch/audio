@@ -12,7 +12,9 @@ torchaudio.io
 
    StreamReader
    StreamWriter
+   AudioEffector
+   play_audio
 
-.. rubric:: Tutorials using Streaming API
+.. rubric:: Tutorials using ``torchaudio.io``
 
-.. minigallery:: torchaudio.io.StreamReader torchaudio.io.StreamWriter
+.. minigallery:: torchaudio.io

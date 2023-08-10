@@ -8,7 +8,7 @@ to torchaudio with no labeling responsibility, so we don't want to bother them.
 import json
 import os
 import sys
-from typing import Any, Optional, Set, Tuple
+from typing import Any, Optional, Set
 
 import requests
 
@@ -20,19 +20,21 @@ PRIMARY_LABELS = {
     "bug fix",
     "new feature",
     "improvement",
-    "example",
     "prototype",
     "other",
 }
 
 SECONDARY_LABELS = {
-    "module: I/O",
+    "module: io",
     "module: ops",
     "module: models",
     "module: pipelines",
     "module: datasets",
     "module: docs",
     "module: tests",
+    "tutorial",
+    "recipe",
+    "example",
     "build",
     "style",
     "perf",
@@ -72,7 +74,38 @@ def post_github_comment(pr_number: int, merger: str) -> Any:
         "body": f"Hey @{merger}."
         + """
 You merged this PR, but labels were not properly added. Please add a primary and secondary label \
-(See https://github.com/pytorch/audio/blob/main/.github/process_commit.py)"""
+(See https://github.com/pytorch/audio/blob/main/.github/process_commit.py).
+
+---
+
+## Some guidance:
+
+Use 'module: ops' for operations under 'torchaudio/{transforms, functional}', \
+and ML-related components under 'torchaudio/csrc' (e.g. RNN-T loss).
+
+Things in "examples" directory:
+- 'recipe' is applicable to training recipes under the 'examples' folder,
+- 'tutorial' is applicable to tutorials under the “examples/tutorials” folder
+- 'example' is applicable to everything else (e.g. C++ examples)
+- 'module: docs' is applicable to code documentations (not to tutorials).
+
+Regarding examples in code documentations, please also use 'module: docs'.
+
+Please use 'other' tag only when you’re sure the changes are not much relevant to users, \
+or when all other tags are not applicable. Try not to use it often, in order to minimize \
+efforts required when we prepare release notes.
+
+---
+
+When preparing release notes, please make sure 'documentation' and 'tutorials' occur as the \
+last sub-categories under each primary category like 'new feature', 'improvements' or 'prototype'.
+
+Things related to build are by default excluded from the release note, \
+except when it impacts users. For example:
+    * Drop support of Python 3.7.
+    * Add support of Python 3.X.
+    * Change the way a third party library is bound (so that user needs to install it separately).
+"""
     }
 
     response = requests.post(

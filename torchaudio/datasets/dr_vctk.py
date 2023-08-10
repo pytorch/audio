@@ -3,9 +3,9 @@ from typing import Dict, Tuple, Union
 
 import torchaudio
 from torch import Tensor
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import extract_archive
+from torchaudio._internal import download_url_to_file
+from torchaudio.datasets.utils import _extract_zip
 
 
 _URL = "https://datashare.ed.ac.uk/bitstream/handle/10283/3038/DR-VCTK.zip"
@@ -52,7 +52,7 @@ class DR_VCTK(Dataset):
                 if not download:
                     raise RuntimeError("Dataset not found. Please use `download=True` to download it.")
                 download_url_to_file(url, archive, hash_prefix=_CHECKSUM)
-            extract_archive(archive, root)
+            _extract_zip(archive, root)
 
         self._config = self._load_config(self._config_filepath)
         self._filename_list = sorted(self._config)

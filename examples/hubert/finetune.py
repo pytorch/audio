@@ -12,10 +12,10 @@ import pathlib
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from typing import Tuple
 
-from lightning import HuBERTFineTuneModule
+from lightning.pytorch import seed_everything, Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint
 
-from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
+from lightning_modules import HuBERTFineTuneModule
 
 
 logger = logging.getLogger(__name__)
@@ -29,10 +29,11 @@ class _Formatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
 
 
 def run_train(args):
+    seed_everything(1337)
     checkpoint_dir = args.exp_dir / f"checkpoints_{args.model_name}"
     checkpoint = ModelCheckpoint(
         checkpoint_dir,
-        monitor="Losses/val_loss",
+        monitor="val_loss",
         mode="min",
         save_top_k=5,
         save_weights_only=False,
@@ -40,7 +41,7 @@ def run_train(args):
     )
     train_checkpoint = ModelCheckpoint(
         checkpoint_dir,
-        monitor="Losses/train_loss",
+        monitor="train_loss",
         mode="min",
         save_top_k=5,
         save_weights_only=False,
@@ -54,13 +55,14 @@ def run_train(args):
         default_root_dir=args.exp_dir,
         max_steps=args.max_updates,
         num_nodes=args.num_nodes,
-        gpus=args.gpus,
+        devices=args.gpus,
         accelerator="gpu",
-        strategy="ddp",
-        replace_sampler_ddp=False,
+        strategy="ddp_find_unused_parameters_true",
+        use_distributed_sampler=False,
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
-        accumulate_grad_batches=args.accumulate_grad_batches,
+        val_check_interval=500,
+        check_val_every_n_epoch=None,
     )
 
     model = HuBERTFineTuneModule(
@@ -73,6 +75,7 @@ def run_train(args):
         mask_prob=args.mask_prob,
         mask_channel_prob=args.mask_channel_prob,
         mask_channel_length=args.mask_channel_length,
+        num_classes=args.num_classes,
         aux_num_out=args.aux_num_out,
         checkpoint=args.checkpoint,
         dataset_path=args.dataset_path,
@@ -87,7 +90,7 @@ def run_train(args):
         hold_updates=args.hold_updates,
         decay_updates=args.decay_updates,
     )
-    trainer.fit(model)
+    trainer.fit(model, ckpt_path=args.resume_checkpoint)
 
 
 def _parse_args():
@@ -100,6 +103,18 @@ def _parse_args():
         type=pathlib.Path,
         required=True,
         help="Path to the LibriSpeech and LibriLightLimited datasets.",
+    )
+    parser.add_argument(
+        "--checkpoint",
+        type=str,
+        required=True,
+        help="Path to the pre-trained HuBERTPretrainModel checkpoint as the initialization.",
+    )
+    parser.add_argument(
+        "--resume-checkpoint",
+        default=None,
+        type=str,
+        help="The path to the checkpoint to resume the fine-tuning if training fails in the middle.",
     )
     parser.add_argument(
         "--exp-dir",
@@ -141,7 +156,7 @@ def _parse_args():
     )
     parser.add_argument(
         "--encoder-layer-drop",
-        default=0.1,
+        default=0.05,
         type=float,
         help="Probability to drop each encoder layer during training. (Default: 0.1)",
     )
@@ -164,10 +179,11 @@ def _parse_args():
         help="Minimum space between spans (if no overlap is enabled) for channel masking." "(Default: 64)",
     )
     parser.add_argument(
-        "--accumulate-grad-batches",
-        default=1,
+        "--num-classes",
+        choices=[100, 500],
         type=int,
-        help="Number of batches to accumulate the gradients during training. (Default: 1)",
+        default=500,
+        help="The ``num_class`` in the pre-trained checkpoint. (Default: 500)",
     )
     parser.add_argument(
         "--aux-num-out",
@@ -176,13 +192,7 @@ def _parse_args():
         help="The dimension of linear layer for CTC training. (Default: 29)",
     )
     parser.add_argument(
-        "--checkpoint",
-        type=str,
-        required=True,
-        help="Path to the pre-trained HuBERTPretrainModel checpoint.",
-    )
-    parser.add_argument(
-        "--learning-rate", default=1e-4, type=float, help="The learning rate of Adam optimizer. (Default: 2e-5)"
+        "--learning-rate", default=5e-5, type=float, help="The learning rate of Adam optimizer. (Default: 5e-5)"
     )
     parser.add_argument(
         "--betas",
@@ -198,7 +208,7 @@ def _parse_args():
     )
     parser.add_argument(
         "--weight-decay",
-        default=1e-6,
+        default=0.0,
         type=float,
         help="Weight decay (L2 penalty) (Default: 0.0)",
     )

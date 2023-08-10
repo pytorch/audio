@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace torchaudio {
-namespace ffmpeg {
+namespace torchaudio::io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
@@ -14,8 +13,8 @@ namespace ffmpeg {
 AVDictionary* get_option_dict(const c10::optional<OptionDict>& option) {
   AVDictionary* opt = nullptr;
   if (option) {
-    for (const auto& it : option.value()) {
-      av_dict_set(&opt, it.key().c_str(), it.value().c_str(), 0);
+    for (auto const& [key, value] : option.value()) {
+      av_dict_set(&opt, key.c_str(), value.c_str(), 0);
     }
   }
   return opt;
@@ -73,16 +72,13 @@ void AVPacketDeleter::operator()(AVPacket* p) {
   av_packet_free(&p);
 };
 
-namespace {
-AVPacket* get_av_packet() {
-  AVPacket* pPacket = av_packet_alloc();
-  TORCH_CHECK(pPacket, "Failed to allocate AVPacket object.");
-  return pPacket;
-}
-} // namespace
+AVPacketPtr::AVPacketPtr(AVPacket* p) : Wrapper<AVPacket, AVPacketDeleter>(p) {}
 
-AVPacketPtr::AVPacketPtr()
-    : Wrapper<AVPacket, AVPacketDeleter>(get_av_packet()) {}
+AVPacketPtr alloc_avpacket() {
+  AVPacket* p = av_packet_alloc();
+  TORCH_CHECK(p, "Failed to allocate AVPacket object.");
+  return AVPacketPtr{p};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVPacket - buffer unref
@@ -101,15 +97,14 @@ AutoPacketUnref::operator AVPacket*() const {
 void AVFrameDeleter::operator()(AVFrame* p) {
   av_frame_free(&p);
 };
-namespace {
-AVFrame* get_av_frame() {
-  AVFrame* pFrame = av_frame_alloc();
-  TORCH_CHECK(pFrame, "Failed to allocate AVFrame object.");
-  return pFrame;
-}
-} // namespace
 
-AVFramePtr::AVFramePtr() : Wrapper<AVFrame, AVFrameDeleter>(get_av_frame()) {}
+AVFramePtr::AVFramePtr(AVFrame* p) : Wrapper<AVFrame, AVFrameDeleter>(p) {}
+
+AVFramePtr alloc_avframe() {
+  AVFrame* p = av_frame_alloc();
+  TORCH_CHECK(p, "Failed to allocate AVFrame object.");
+  return AVFramePtr{p};
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVCodecContext
@@ -128,15 +123,8 @@ void AutoBufferUnref::operator()(AVBufferRef* p) {
   av_buffer_unref(&p);
 }
 
-AVBufferRefPtr::AVBufferRefPtr()
-    : Wrapper<AVBufferRef, AutoBufferUnref>(nullptr) {}
-
-void AVBufferRefPtr::reset(AVBufferRef* p) {
-  TORCH_CHECK(
-      !ptr,
-      "InternalError: A valid AVBufferRefPtr is being reset. Please file an issue.");
-  ptr.reset(p);
-}
+AVBufferRefPtr::AVBufferRefPtr(AVBufferRef* p)
+    : Wrapper<AVBufferRef, AutoBufferUnref>(p) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVFilterGraph
@@ -145,18 +133,17 @@ void AVFilterGraphDeleter::operator()(AVFilterGraph* p) {
   avfilter_graph_free(&p);
 };
 
-namespace {
-AVFilterGraph* get_filter_graph() {
-  AVFilterGraph* ptr = avfilter_graph_alloc();
-  TORCH_CHECK(ptr, "Failed to allocate resouce.");
-  return ptr;
-}
-} // namespace
-AVFilterGraphPtr::AVFilterGraphPtr()
-    : Wrapper<AVFilterGraph, AVFilterGraphDeleter>(get_filter_graph()) {}
+AVFilterGraphPtr::AVFilterGraphPtr(AVFilterGraph* p)
+    : Wrapper<AVFilterGraph, AVFilterGraphDeleter>(p) {}
 
-void AVFilterGraphPtr::reset() {
-  ptr.reset(get_filter_graph());
+////////////////////////////////////////////////////////////////////////////////
+// AVCodecParameters
+////////////////////////////////////////////////////////////////////////////////
+void AVCodecParametersDeleter::operator()(AVCodecParameters* codecpar) {
+  avcodec_parameters_free(&codecpar);
 }
-} // namespace ffmpeg
-} // namespace torchaudio
+
+AVCodecParametersPtr::AVCodecParametersPtr(AVCodecParameters* p)
+    : Wrapper<AVCodecParameters, AVCodecParametersDeleter>(p) {}
+
+} // namespace torchaudio::io

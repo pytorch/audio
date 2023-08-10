@@ -4,22 +4,18 @@
 #include <torch/script.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-namespace torchaudio {
-namespace sox_io {
+namespace torchaudio::sox {
 
 auto get_effects(
     const c10::optional<int64_t>& frame_offset,
     const c10::optional<int64_t>& num_frames)
     -> std::vector<std::vector<std::string>>;
 
-using MetaDataTuple =
-    std::tuple<int64_t, int64_t, int64_t, int64_t, std::string>;
-
-c10::optional<MetaDataTuple> get_info_file(
+std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
     const std::string& path,
     const c10::optional<std::string>& format);
 
-c10::optional<std::tuple<torch::Tensor, int64_t>> load_audio_file(
+std::tuple<torch::Tensor, int64_t> load_audio_file(
     const std::string& path,
     const c10::optional<int64_t>& frame_offset,
     const c10::optional<int64_t>& num_frames,
@@ -37,7 +33,6 @@ void save_audio_file(
     c10::optional<std::string> encoding,
     c10::optional<int64_t> bits_per_sample);
 
-} // namespace sox_io
-} // namespace torchaudio
+} // namespace torchaudio::sox
 
 #endif

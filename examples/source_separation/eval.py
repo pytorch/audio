@@ -31,7 +31,7 @@ def _eval(model, data_loader, device):
 
 def cli_main():
     parser = ArgumentParser()
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0mix", "librimix"])
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -79,7 +79,7 @@ def cli_main():
 
     _, _, eval_loader = _get_dataloader(
         args.dataset,
-        args.data_dir,
+        args.root_dir,
         args.num_speakers,
         args.sample_rate,
         1,  # batch size is set to 1 to avoid masking

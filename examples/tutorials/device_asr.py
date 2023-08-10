@@ -2,7 +2,7 @@
 Device ASR with Emformer RNN-T
 ==============================
 
-**Author** : `Moto Hira <moto@fb.com>`__, `Jeff Hwang <jeffhwang@fb.com>`__.
+**Author**: `Moto Hira <moto@meta.com>`__, `Jeff Hwang <jeffhwang@meta.com>`__.
 
 This tutorial shows how to use Emformer RNN-T and streaming API
 to perform speech recognition on a streaming device input, i.e. microphone
@@ -10,12 +10,12 @@ on laptop.
 
 .. note::
 
-   This tutorial requires FFmpeg libraries (>=4.1, <4.4) and SentencePiece.
+   This tutorial requires FFmpeg libraries (>=4.1, <7) and SentencePiece.
 
    There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install 'ffmpeg<4.4'`` will install
-   the required FFmpeg libraries.
+   ``conda install -c conda-forge 'ffmpeg<7'`` will install
+   compatible FFmpeg libraries.
 
    You can install SentencePiece by running ``pip install sentencepiece``.
 
@@ -36,7 +36,7 @@ on laptop.
 #
 # For the basic usage of the streaming API and Emformer RNN-T
 # please refer to
-# `Media Stream API tutorial <./streaming_api_tutorial.html>`__ and
+# `StreamReader Basic Usage <./streamreader_basic_tutorial.html>`__ and
 # `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 #
 
@@ -327,4 +327,9 @@ if __name__ == "__main__":
 #    Streaming...
 #
 #    hello world
+#
+
+######################################################################
+#
+# Tag: :obj:`torchaudio.io`
 #

@@ -45,6 +45,8 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
+import matplotlib.pyplot as plt
+
 ######################################################################
 # In addition to ``torchaudio``, ``mir_eval`` is required to perform
 # signal-to-distortion ratio (SDR) calculations. To install ``mir_eval``
@@ -52,30 +54,9 @@ print(torchaudio.__version__)
 #
 
 from IPython.display import Audio
+from mir_eval import separation
+from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
 from torchaudio.utils import download_asset
-import matplotlib.pyplot as plt
-
-try:
-    from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
-    from mir_eval import separation
-
-except ModuleNotFoundError:
-    try:
-        import google.colab
-
-        print(
-            """
-            To enable running this notebook in Google Colab, install nightly
-            torch and torchaudio builds by adding the following code block to the top
-            of the notebook before running it:
-            !pip3 uninstall -y torch torchvision torchaudio
-            !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            !pip3 install mir_eval
-            """
-        )
-    except ModuleNotFoundError:
-        pass
-    raise
 
 ######################################################################
 # 3. Construct the pipeline
@@ -130,11 +111,11 @@ from torchaudio.transforms import Fade
 
 
 def separate_sources(
-        model,
-        mix,
-        segment=10.,
-        overlap=0.1,
-        device=None,
+    model,
+    mix,
+    segment=10.0,
+    overlap=0.1,
+    device=None,
 ):
     """
     Apply model to a given mixture. Use fade, and add segments together in order to add model segment by segment.
@@ -157,11 +138,11 @@ def separate_sources(
     start = 0
     end = chunk_len
     overlap_frames = overlap * sample_rate
-    fade = Fade(fade_in_len=0, fade_out_len=int(overlap_frames), fade_shape='linear')
+    fade = Fade(fade_in_len=0, fade_out_len=int(overlap_frames), fade_shape="linear")
 
     final = torch.zeros(batch, len(model.sources), channels, length, device=device)
 
-    while start < length:
+    while start < length - overlap_frames:
         chunk = mix[:, :, start:end]
         with torch.no_grad():
             out = model.forward(chunk)
@@ -173,17 +154,18 @@ def separate_sources(
         else:
             start += chunk_len
         end += chunk_len
+        if end >= length:
+            fade.fade_out_len = 0
     return final
 
 
 def plot_spectrogram(stft, title="Spectrogram"):
     magnitude = stft.abs()
     spectrogram = 20 * torch.log10(magnitude + 1e-8).numpy()
-    figure, axis = plt.subplots(1, 1)
-    img = axis.imshow(spectrogram, cmap="viridis", vmin=-60, vmax=0, origin="lower", aspect="auto")
-    figure.suptitle(title)
-    plt.colorbar(img, ax=axis)
-    plt.show()
+    _, axis = plt.subplots(1, 1)
+    axis.imshow(spectrogram, cmap="viridis", vmin=-60, vmax=0, origin="lower", aspect="auto")
+    axis.set_title(title)
+    plt.tight_layout()
 
 
 ######################################################################
@@ -206,7 +188,7 @@ def plot_spectrogram(stft, title="Spectrogram"):
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
 SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
-waveform.to(device)
+waveform = waveform.to(device)
 mixture = waveform
 
 # parameters
@@ -263,12 +245,13 @@ stft = torchaudio.transforms.Spectrogram(
 # scores.
 #
 
+
 def output_results(original_source: torch.Tensor, predicted_source: torch.Tensor, source: str):
-    print("SDR score is:",
-          separation.bss_eval_sources(
-              original_source.detach().numpy(),
-              predicted_source.detach().numpy())[0].mean())
-    plot_spectrogram(stft(predicted_source)[0], f'Spectrogram {source}')
+    print(
+        "SDR score is:",
+        separation.bss_eval_sources(original_source.detach().numpy(), predicted_source.detach().numpy())[0].mean(),
+    )
+    plot_spectrogram(stft(predicted_source)[0], f"Spectrogram - {source}")
     return Audio(predicted_source, rate=sample_rate)
 
 
@@ -283,23 +266,19 @@ bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
 vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
 other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
 
-drums_spec = audios["drums"][:, frame_start: frame_end]
+drums_spec = audios["drums"][:, frame_start:frame_end].cpu()
 drums, sample_rate = torchaudio.load(drums_original)
-drums.to(device)
 
-bass_spec = audios["bass"][:, frame_start: frame_end]
+bass_spec = audios["bass"][:, frame_start:frame_end].cpu()
 bass, sample_rate = torchaudio.load(bass_original)
-bass.to(device)
 
-vocals_spec = audios["vocals"][:, frame_start: frame_end]
+vocals_spec = audios["vocals"][:, frame_start:frame_end].cpu()
 vocals, sample_rate = torchaudio.load(vocals_original)
-vocals.to(device)
 
-other_spec = audios["other"][:, frame_start: frame_end]
+other_spec = audios["other"][:, frame_start:frame_end].cpu()
 other, sample_rate = torchaudio.load(other_original)
-other.to(device)
 
-mix_spec = mixture[:, frame_start: frame_end]
+mix_spec = mixture[:, frame_start:frame_end].cpu()
 
 
 ######################################################################
@@ -314,7 +293,7 @@ mix_spec = mixture[:, frame_start: frame_end]
 #
 
 # Mixture Clip
-plot_spectrogram(stft(mix_spec)[0], "Spectrogram Mixture")
+plot_spectrogram(stft(mix_spec)[0], "Spectrogram - Mixture")
 Audio(mix_spec, rate=sample_rate)
 
 ######################################################################

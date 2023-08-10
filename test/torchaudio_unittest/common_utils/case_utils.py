@@ -6,11 +6,13 @@ import sys
 import tempfile
 import time
 import unittest
+from itertools import zip_longest
 
 import torch
 import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import is_kaldi_available, is_module_available, is_sox_available
+from torchaudio._internal.module_utils import eval_env, is_module_available
+from torchaudio.utils.ffmpeg_utils import get_video_decoders, get_video_encoders
 
 from .backend_utils import set_audio_backend
 
@@ -65,7 +67,7 @@ class HttpServerMixin(TempDirMixin):
     """
 
     _proc = None
-    _port = 8000
+    _port = 12345
 
     @classmethod
     def setUpClass(cls):
@@ -110,10 +112,11 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
 
 
 def is_ffmpeg_available():
-    return torchaudio._extension._FFMPEG_INITIALIZED
+    return torchaudio._extension._FFMPEG_EXT is not None
 
 
 _IS_CTC_DECODER_AVAILABLE = None
+_IS_CUDA_CTC_DECODER_AVAILABLE = None
 
 
 def is_ctc_decoder_available():
@@ -128,22 +131,16 @@ def is_ctc_decoder_available():
     return _IS_CTC_DECODER_AVAILABLE
 
 
-def _eval_env(var, default):
-    if var not in os.environ:
-        return default
+def is_cuda_ctc_decoder_available():
+    global _IS_CUDA_CTC_DECODER_AVAILABLE
+    if _IS_CUDA_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.models.decoder import CUCTCDecoder  # noqa: F401
 
-    val = os.environ.get(var, "0")
-    trues = ["1", "true", "TRUE", "on", "ON", "yes", "YES"]
-    falses = ["0", "false", "FALSE", "off", "OFF", "no", "NO"]
-    if val in trues:
-        return True
-    if val not in falses:
-        # fmt: off
-        raise RuntimeError(
-            f"Unexpected environment variable value `{var}={val}`. "
-            f"Expected one of {trues + falses}")
-        # fmt: on
-    return False
+            _IS_CUDA_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CUDA_CTC_DECODER_AVAILABLE = False
+    return _IS_CUDA_CTC_DECODER_AVAILABLE
 
 
 def _fail(reason):
@@ -170,7 +167,7 @@ def _pass(test_item):
     return test_item
 
 
-_IN_CI = _eval_env("CI", default=False)
+_IN_CI = eval_env("CI", default=False)
 
 
 def _skipIf(condition, reason, key):
@@ -180,7 +177,7 @@ def _skipIf(condition, reason, key):
     # In CI, default to fail, so as to prevent accidental skip.
     # In other env, default to skip
     var = f"TORCHAUDIO_TEST_ALLOW_SKIP_IF_{key}"
-    skip_allowed = _eval_env(var, default=not _IN_CI)
+    skip_allowed = eval_env(var, default=not _IN_CI)
     if skip_allowed:
         return unittest.skip(reason)
     return _fail(f"{reason} But the test cannot be skipped. (CI={_IN_CI}, {var}={skip_allowed}.)")
@@ -207,23 +204,53 @@ skipIfNoCuda = _skipIf(
     reason="CUDA is not available.",
     key="NO_CUDA",
 )
+# Skip test if CUDA memory is not enough
+# TODO: detect the real CUDA memory size and allow call site to configure how much the test needs
+skipIfCudaSmallMemory = _skipIf(
+    "CI" in os.environ and torch.cuda.is_available(),  # temporary
+    reason="CUDA does not have enough memory.",
+    key="CUDA_SMALL_MEMORY",
+)
 skipIfNoSox = _skipIf(
-    not is_sox_available(),
+    not torchaudio._extension._SOX_INITIALIZED,
     reason="Sox features are not available.",
     key="NO_SOX",
 )
-skipIfNoKaldi = _skipIf(
-    not is_kaldi_available(),
-    reason="Kaldi features are not available.",
-    key="NO_KALDI",
+
+
+def skipIfNoSoxDecoder(ext):
+    return _skipIf(
+        not torchaudio._extension._SOX_INITIALIZED or ext not in torchaudio.utils.sox_utils.list_read_formats(),
+        f'sox does not handle "{ext}" for read.',
+        key="NO_SOX_DECODER",
+    )
+
+
+def skipIfNoSoxEncoder(ext):
+    return _skipIf(
+        not torchaudio._extension._SOX_INITIALIZED or ext not in torchaudio.utils.sox_utils.list_write_formats(),
+        f'sox does not handle "{ext}" for write.',
+        key="NO_SOX_ENCODER",
+    )
+
+
+skipIfNoRIR = _skipIf(
+    not torchaudio._extension._IS_RIR_AVAILABLE,
+    reason="RIR features are not available.",
+    key="NO_RIR",
 )
 skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),
     reason="CTC decoder not available.",
     key="NO_CTC_DECODER",
 )
+skipIfNoCuCtcDecoder = _skipIf(
+    not is_cuda_ctc_decoder_available(),
+    reason="CUCTC decoder not available.",
+    key="NO_CUCTC_DECODER",
+)
 skipIfRocm = _skipIf(
-    _eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
+    eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
     reason="The test doesn't currently work on the ROCm stack.",
     key="ON_ROCM",
 )
@@ -245,3 +272,44 @@ skipIfPy310 = _skipIf(
     ),
     key="ON_PYTHON_310",
 )
+skipIfNoAudioDevice = _skipIf(
+    not torchaudio.utils.ffmpeg_utils.get_output_devices(),
+    reason="No output audio device is available.",
+    key="NO_AUDIO_OUT_DEVICE",
+)
+skipIfNoMacOS = _skipIf(
+    sys.platform != "darwin",
+    reason="This feature is only available for MacOS.",
+    key="NO_MACOS",
+)
+disabledInCI = _skipIf(
+    "CI" in os.environ,
+    reason="Tests are failing on CI consistently. Disabled while investigating.",
+    key="TEMPORARY_DISABLED",
+)
+
+
+def skipIfNoHWAccel(name):
+    key = "NO_HW_ACCEL"
+    if not is_ffmpeg_available():
+        return _skipIf(True, reason="ffmpeg features are not available.", key=key)
+    if not torch.cuda.is_available():
+        return _skipIf(True, reason="CUDA is not available.", key=key)
+    if torchaudio._extension._check_cuda_version() is None:
+        return _skipIf(True, "Torchaudio is not compiled with CUDA.", key=key)
+    if name not in get_video_decoders() and name not in get_video_encoders():
+        return _skipIf(True, f"{name} is not in the list of available decoders or encoders", key=key)
+    return _pass
+
+
+def zip_equal(*iterables):
+    """With the regular Python `zip` function, if one iterable is longer than the other,
+    the remainder portions are ignored.This is resolved in Python 3.10 where we can use
+    `strict=True` in the `zip` function
+    From https://github.com/pytorch/text/blob/c047efeba813ac943cb8046a49e858a8b529d577/test/torchtext_unittest/common/case_utils.py#L45-L54  # noqa: E501
+    """
+    sentinel = object()
+    for combo in zip_longest(*iterables, fillvalue=sentinel):
+        if sentinel in combo:
+            raise ValueError("Iterables have different lengths")
+        yield combo

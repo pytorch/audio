@@ -20,7 +20,7 @@ from torchaudio_unittest.common_utils import (
 
 class Functional(TestBaseMixin):
     def _test_resample_waveform_accuracy(
-        self, up_scale_factor=None, down_scale_factor=None, resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4
+        self, up_scale_factor=None, down_scale_factor=None, resampling_method="sinc_interp_hann", atol=1e-1, rtol=1e-4
     ):
         # resample the signal and compare it to the ground truth
         n_to_trim = 20
@@ -51,6 +51,7 @@ class Functional(TestBaseMixin):
     def _test_costs_and_gradients(self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2):
         logits_shape = data["logits"].shape
         costs, gradients = rnnt_utils.compute_with_pytorch_transducer(data=data)
+
         self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
         self.assertEqual(logits_shape, gradients.shape)
         self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
@@ -396,22 +397,38 @@ class Functional(TestBaseMixin):
         close_to_limit = decibels < 6.0207
         assert close_to_limit.any(), f"No values were close to the limit. Did it over-clamp?\n{decibels}"
 
+    @parameterized.expand(list(itertools.product([(1, 201, 100), (10, 2, 201, 300)])))
+    def test_mask_along_axis_input_axis_check(self, shape):
+        specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
+        message = "Only Frequency and Time masking are supported"
+        with self.assertRaisesRegex(ValueError, message):
+            F.mask_along_axis(specgram, 100, 0.0, 0, 1.0)
+
     @parameterized.expand(
-        list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0]))
+        list(
+            itertools.product([(1025, 400), (1, 201, 100), (10, 2, 201, 300)], [100], [0.0, 30.0], [1, 2], [0.33, 1.0])
+        )
     )
-    def test_mask_along_axis(self, shape, mask_param, mask_value, axis, p):
+    def test_mask_along_axis(self, shape, mask_param, mask_value, last_axis, p):
         specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
 
+        # last_axis = 1 means the last axis; 2 means the second-to-last axis.
+        axis = len(shape) - last_axis
         if p != 1.0:
             mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis, p=p)
         else:
             mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
 
-        other_axis = 1 if axis == 2 else 2
+        other_axis = axis - 1 if last_axis == 1 else axis + 1
 
         masked_columns = (mask_specgram == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
-        num_masked_columns = torch.div(num_masked_columns, mask_specgram.size(0), rounding_mode="floor")
+
+        den = 1
+        for i in range(len(shape) - 2):
+            den *= mask_specgram.size(i)
+
+        num_masked_columns = torch.div(num_masked_columns, den, rounding_mode="floor")
 
         if p != 1.0:
             mask_param = min(mask_param, int(specgram.shape[axis] * p))
@@ -470,7 +487,7 @@ class Functional(TestBaseMixin):
     @parameterized.expand(
         list(
             itertools.product(
-                ["sinc_interpolation", "kaiser_window"],
+                ["sinc_interp_hann", "sinc_interp_kaiser"],
                 [16000, 44100],
             )
         )
@@ -481,7 +498,7 @@ class Functional(TestBaseMixin):
         resampled = F.resample(waveform, sample_rate, sample_rate)
         self.assertEqual(waveform, resampled)
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform_upsample_size(self, resampling_method):
         sr = 16000
         waveform = get_whitenoise(
@@ -491,7 +508,7 @@ class Functional(TestBaseMixin):
         upsampled = F.resample(waveform, sr, sr * 2, resampling_method=resampling_method)
         assert upsampled.size(-1) == waveform.size(-1) * 2
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform_downsample_size(self, resampling_method):
         sr = 16000
         waveform = get_whitenoise(
@@ -501,7 +518,7 @@ class Functional(TestBaseMixin):
         downsampled = F.resample(waveform, sr, sr // 2, resampling_method=resampling_method)
         assert downsampled.size(-1) == waveform.size(-1) // 2
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform_identity_size(self, resampling_method):
         sr = 16000
         waveform = get_whitenoise(
@@ -514,7 +531,7 @@ class Functional(TestBaseMixin):
     @parameterized.expand(
         list(
             itertools.product(
-                ["sinc_interpolation", "kaiser_window"],
+                ["sinc_interp_hann", "sinc_interp_kaiser"],
                 list(range(1, 20)),
             )
         )
@@ -525,7 +542,7 @@ class Functional(TestBaseMixin):
     @parameterized.expand(
         list(
             itertools.product(
-                ["sinc_interpolation", "kaiser_window"],
+                ["sinc_interp_hann", "sinc_interp_kaiser"],
                 list(range(1, 20)),
             )
         )
@@ -637,12 +654,24 @@ class Functional(TestBaseMixin):
             rtol=rtol,
         )
 
-    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self):
+    @parameterized.expand([(True,), (False,)])
+    def test_rnnt_loss_costs_and_gradients_random_data_with_numpy_fp32(self, fused_log_softmax):
         seed = 777
         for i in range(5):
-            data = rnnt_utils.get_random_data(dtype=torch.float32, device=self.device, seed=(seed + i))
+            data = rnnt_utils.get_random_data(
+                fused_log_softmax=fused_log_softmax, dtype=torch.float32, device=self.device, seed=(seed + i)
+            )
             ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
             self._test_costs_and_gradients(data=data, ref_costs=ref_costs, ref_gradients=ref_gradients)
+
+    def test_rnnt_loss_nonfused_softmax(self):
+        data = rnnt_utils.get_B1_T10_U3_D4_data()
+        ref_costs, ref_gradients = rnnt_utils.compute_with_numpy_transducer(data=data)
+        self._test_costs_and_gradients(
+            data=data,
+            ref_costs=ref_costs,
+            ref_gradients=ref_gradients,
+        )
 
     def test_psd(self):
         """Verify the ``F.psd`` method by the numpy implementation.
@@ -879,6 +908,380 @@ class Functional(TestBaseMixin):
             torch.tensor(specgram_enhanced, dtype=self.complex_dtype, device=self.device), specgram_enhanced_audio
         )
 
+    @nested_params(
+        [(10, 4), (4, 3, 1, 2), (2,), ()],
+        [(100, 43), (21, 45)],
+        ["full", "valid", "same"],
+    )
+    def test_convolve_numerics(self, leading_dims, lengths, mode):
+        """Check that convolve returns values identical to those that SciPy produces."""
+        L_x, L_y = lengths
+
+        x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
+        y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
+
+        actual = F.convolve(x, y, mode=mode)
+
+        num_signals = torch.tensor(leading_dims).prod() if leading_dims else 1
+        x_reshaped = x.reshape((num_signals, L_x))
+        y_reshaped = y.reshape((num_signals, L_y))
+        expected = [
+            signal.convolve(x_reshaped[i].detach().cpu().numpy(), y_reshaped[i].detach().cpu().numpy(), mode=mode)
+            for i in range(num_signals)
+        ]
+        expected = torch.tensor(np.array(expected))
+        expected = expected.reshape(leading_dims + (-1,))
+
+        self.assertEqual(expected, actual)
+
+    @nested_params(
+        [(10, 4), (4, 3, 1, 2), (2,), ()],
+        [(100, 43), (21, 45)],
+        ["full", "valid", "same"],
+    )
+    def test_fftconvolve_numerics(self, leading_dims, lengths, mode):
+        """Check that fftconvolve returns values identical to those that SciPy produces."""
+        L_x, L_y = lengths
+
+        x = torch.rand(*(leading_dims + (L_x,)), dtype=self.dtype, device=self.device)
+        y = torch.rand(*(leading_dims + (L_y,)), dtype=self.dtype, device=self.device)
+
+        actual = F.fftconvolve(x, y, mode=mode)
+
+        expected = signal.fftconvolve(x.detach().cpu().numpy(), y.detach().cpu().numpy(), axes=-1, mode=mode)
+        expected = torch.tensor(expected)
+
+        self.assertEqual(expected, actual)
+
+    @nested_params(
+        ["convolve", "fftconvolve"],
+        [(5, 2, 3)],
+        [(5, 1, 3), (1, 2, 3), (1, 1, 3)],
+    )
+    def test_convolve_broadcast(self, fn, x_shape, y_shape):
+        """convolve works for Tensors for different shapes if they are broadcast-able"""
+        # 1. Test broadcast case
+        x = torch.rand(x_shape, dtype=self.dtype, device=self.device)
+        y = torch.rand(y_shape, dtype=self.dtype, device=self.device)
+        out1 = getattr(F, fn)(x, y)
+        # 2. Test without broadcast
+        y_clone = y.expand(x_shape).clone()
+        assert y is not y_clone
+        assert y_clone.shape == x.shape
+        out2 = getattr(F, fn)(x, y_clone)
+        # check that they are same
+        self.assertEqual(out1, out2)
+
+    @parameterized.expand(
+        [
+            # fmt: off
+            # different ndim
+            (0, F.convolve, (4, 3, 1, 2), (10, 4)),
+            (0, F.convolve, (4, 3, 1, 2), (2, 2, 2)),
+            (0, F.convolve, (1, ), (10, 4)),
+            (0, F.convolve, (1, ), (2, 2, 2)),
+            (0, F.fftconvolve, (4, 3, 1, 2), (10, 4)),
+            (0, F.fftconvolve, (4, 3, 1, 2), (2, 2, 2)),
+            (0, F.fftconvolve, (1, ), (10, 4)),
+            (0, F.fftconvolve, (1, ), (2, 2, 2)),
+            # non-broadcastable leading dimensions
+            (1, F.convolve, (5, 2, 3), (5, 3, 3)),
+            (1, F.convolve, (5, 2, 3), (5, 3, 4)),
+            (1, F.convolve, (5, 2, 3), (5, 3, 5)),
+            (1, F.fftconvolve, (5, 2, 3), (5, 3, 3)),
+            (1, F.fftconvolve, (5, 2, 3), (5, 3, 4)),
+            (1, F.fftconvolve, (5, 2, 3), (5, 3, 5)),
+            # fmt: on
+        ],
+    )
+    def test_convolve_input_dim_check(self, case, fn, x_shape, y_shape):
+        """Check that convolve properly rejects inputs with incompatible dimensions."""
+        x = torch.rand(*x_shape, dtype=self.dtype, device=self.device)
+        y = torch.rand(*y_shape, dtype=self.dtype, device=self.device)
+
+        message = [
+            "The operands must be the same dimension",
+            "Leading dimensions of x and y are not broadcastable",
+        ][case]
+        with self.assertRaisesRegex(ValueError, message):
+            fn(x, y)
+
+    def test_add_noise_broadcast(self):
+        """Check that add_noise produces correct outputs when broadcasting input dimensions."""
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(5, 1, 1, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(5, 1, 3, dtype=self.dtype, device=self.device)
+        snr = torch.rand(1, 1, 1, dtype=self.dtype, device=self.device) * 10
+        actual = F.add_noise(waveform, noise, snr, lengths)
+
+        noise_expanded = noise.expand(*leading_dims, L)
+        snr_expanded = snr.expand(*leading_dims)
+        lengths_expanded = lengths.expand(*leading_dims)
+        expected = F.add_noise(waveform, noise_expanded, snr_expanded, lengths_expanded)
+
+        self.assertEqual(expected, actual)
+
+    @parameterized.expand(
+        [((5, 2, 3), (2, 1, 1), (5, 2), (5, 2, 3)), ((2, 1), (5,), (5,), (5,)), ((3,), (5, 2, 3), (2, 1, 1), (5, 2))]
+    )
+    def test_add_noise_leading_dim_check(self, waveform_dims, noise_dims, lengths_dims, snr_dims):
+        """Check that add_noise properly rejects inputs with different leading dimension lengths."""
+        L = 51
+
+        waveform = torch.rand(*waveform_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*noise_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*lengths_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*snr_dims, dtype=self.dtype, device=self.device) * 10
+
+        with self.assertRaisesRegex(ValueError, "Input leading dimensions"):
+            F.add_noise(waveform, noise, snr, lengths)
+
+    def test_add_noise_length_check(self):
+        """Check that add_noise properly rejects inputs that have inconsistent length dimensions."""
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, 50, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+
+        with self.assertRaisesRegex(ValueError, "Length dimensions"):
+            F.add_noise(waveform, noise, snr, lengths)
+
+    def test_speed_identity(self):
+        """speed of 1.0 does not alter input waveform and length"""
+        leading_dims = (5, 4, 2)
+        T = 1000
+        waveform = torch.rand(*leading_dims, T)
+        lengths = torch.randint(1, 1000, leading_dims)
+        actual_waveform, actual_lengths = F.speed(waveform, orig_freq=1000, factor=1.0, lengths=lengths)
+        self.assertEqual(waveform, actual_waveform)
+        self.assertEqual(lengths, actual_lengths)
+
+    @nested_params([0.8, 1.1, 1.2], [True, False])
+    def test_speed_accuracy(self, factor, use_lengths):
+        """sinusoidal waveform is properly compressed by factor"""
+        n_to_trim = 20
+
+        sample_rate = 1000
+        freq = 2
+        times = torch.arange(0, 5, 1.0 / sample_rate)
+        waveform = torch.cos(2 * math.pi * freq * times).unsqueeze(0).to(self.device, self.dtype)
+
+        if use_lengths:
+            lengths = torch.tensor([waveform.size(1)])
+        else:
+            lengths = None
+
+        output, output_lengths = F.speed(waveform, orig_freq=sample_rate, factor=factor, lengths=lengths)
+
+        if use_lengths:
+            self.assertEqual(output.size(1), output_lengths[0])
+        else:
+            self.assertEqual(None, output_lengths)
+
+        new_times = torch.arange(0, 5 / factor, 1.0 / sample_rate)
+        expected_waveform = torch.cos(2 * math.pi * freq * factor * new_times).unsqueeze(0).to(self.device, self.dtype)
+
+        self.assertEqual(
+            expected_waveform[..., n_to_trim:-n_to_trim], output[..., n_to_trim:-n_to_trim], atol=1e-1, rtol=1e-4
+        )
+
+    @nested_params(
+        [(3, 2, 100), (95,)],
+        [0.97, 0.9, 0.68],
+    )
+    def test_preemphasis(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
+        actual = F.preemphasis(waveform, coeff=coeff)
+
+        a_coeffs = torch.tensor([1.0, 0.0], device=self.device, dtype=self.dtype)
+        b_coeffs = torch.tensor([1.0, -coeff], device=self.device, dtype=self.dtype)
+        expected = F.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+        self.assertEqual(actual, expected)
+
+    @nested_params(
+        [(3, 2, 100), (95,)],
+        [0.97, 0.9, 0.68],
+    )
+    def test_preemphasis_deemphasis_roundtrip(self, input_shape, coeff):
+        waveform = torch.rand(*input_shape, device=self.device, dtype=self.dtype)
+        preemphasized = F.preemphasis(waveform, coeff=coeff)
+        deemphasized = F.deemphasis(preemphasized, coeff=coeff)
+        self.assertEqual(deemphasized, waveform)
+
+    @parameterized.expand(
+        [
+            ([[0, 1, 1, 0]], [[0, 1, 5, 1, 0]], torch.int32),
+            ([[0, 1, 2, 3, 4]], [[0, 1, 2, 3, 4]], torch.int32),
+            ([[3, 3, 3]], [[3, 5, 3, 5, 3]], torch.int64),
+            ([[0, 1, 2]], [[0, 1, 1, 1, 2]], torch.int64),
+        ]
+    )
+    def test_forced_align(self, targets, ref_path, targets_dtype):
+        emission = torch.tensor(
+            [
+                [
+                    [0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
+                    [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
+                    [0.0357786, 0.633813, 0.321418, 0.00249248, 0.00272882, 0.0037688],
+                    [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
+                    [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107],
+                ]
+            ],
+            dtype=self.dtype,
+            device=self.device,
+        )
+        blank = 5
+        batch_index = 0
+        ref_path = torch.tensor(ref_path, dtype=targets_dtype, device=self.device)
+        ref_scores = torch.tensor(
+            [torch.log(emission[batch_index, i, ref_path[batch_index, i]]).item() for i in range(emission.shape[1])],
+            dtype=emission.dtype,
+            device=self.device,
+        ).unsqueeze(0)
+        log_probs = torch.log(emission)
+        targets = torch.tensor(targets, dtype=targets_dtype, device=self.device)
+        input_lengths = torch.tensor([log_probs.shape[1]], device=self.device)
+        target_lengths = torch.tensor([targets.shape[1]], device=self.device)
+        hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+        assert hyp_path.shape == ref_path.shape
+        assert hyp_scores.shape == ref_scores.shape
+        self.assertEqual(hyp_path, ref_path)
+        self.assertEqual(hyp_scores, ref_scores)
+
+    @parameterized.expand([(torch.int32,), (torch.int64,)])
+    def test_forced_align_fail(self, targets_dtype):
+        log_probs = torch.rand(1, 5, 6, dtype=self.dtype, device=self.device)
+        targets = torch.tensor([[0, 1, 2, 3, 4, 4]], dtype=targets_dtype, device=self.device)
+        blank = 5
+        input_lengths = torch.tensor([log_probs.shape[1]], device=self.device)
+        target_lengths = torch.tensor([targets.shape[1]], device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"targets length is too long for CTC"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([[5, 3, 3]], dtype=targets_dtype, device=self.device)
+        with self.assertRaisesRegex(ValueError, r"targets Tensor shouldn't contain blank index"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        log_probs = log_probs.int()
+        targets = torch.tensor([[0, 1, 2, 3]], dtype=targets_dtype, device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"log_probs must be float64, float32 or float16"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        log_probs = log_probs.float()
+        targets = targets.float()
+        with self.assertRaisesRegex(RuntimeError, r"targets must be int32 or int64 type"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        log_probs = torch.rand(3, 4, 6, dtype=self.dtype, device=self.device)
+        targets = targets.int()
+        with self.assertRaisesRegex(
+            RuntimeError, r"The batch dimension for log_probs must be 1 at the current version"
+        ):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.randint(0, 4, (3, 4), device=self.device)
+        log_probs = torch.rand(1, 3, 6, dtype=self.dtype, device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"The batch dimension for targets must be 1 at the current version"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([[0, 1, 2, 3]], dtype=targets_dtype, device=self.device)
+        input_lengths = torch.randint(1, 5, (3, 5), device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"input_lengths must be 1-D"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        input_lengths = torch.tensor([log_probs.shape[0]], device=self.device)
+        target_lengths = torch.randint(1, 5, (3, 5), device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"target_lengths must be 1-D"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        input_lengths = torch.tensor([10000], device=self.device)
+        target_lengths = torch.tensor([targets.shape[1]], device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"input length mismatch"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        input_lengths = torch.tensor([log_probs.shape[1]], device=self.device)
+        target_lengths = torch.tensor([10000], device=self.device)
+        with self.assertRaisesRegex(RuntimeError, r"target length mismatch"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([[7, 8, 9, 10]], dtype=targets_dtype, device=self.device)
+        log_probs = torch.rand(1, 10, 5, dtype=self.dtype, device=self.device)
+        with self.assertRaisesRegex(ValueError, r"targets values must be less than the CTC dimension"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+        targets = torch.tensor([[1, 3, 3]], dtype=targets_dtype, device=self.device)
+        blank = 10000
+        with self.assertRaisesRegex(RuntimeError, r"blank must be within \[0, num classes\)"):
+            hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+
+    def _assert_tokens(self, first, second):
+        assert len(first) == len(second)
+
+        for f, s in zip(first, second):
+            self.assertEqual(f.token, s.token)
+            self.assertEqual(f.score, s.score)
+            self.assertEqual(f.start, s.start)
+            self.assertEqual(f.end, s.end)
+
+    @parameterized.expand(
+        [
+            ([], [], []),
+            ([F.TokenSpan(1, 0, 1, 1.0)], [1], [1.0]),
+            ([F.TokenSpan(1, 0, 2, 0.5)], [1, 1], [0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 3, 0.6)], [1, 1, 1], [0.5, 0.6, 0.7]),
+            ([F.TokenSpan(1, 0, 1, 0.8), F.TokenSpan(2, 1, 2, 0.9)], [1, 2], [0.8, 0.9]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 1, 3, 0.5)], [1, 2, 2], [1.0, 0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 1, 0.8), F.TokenSpan(1, 2, 3, 1.0)], [1, 0, 1], [0.8, 0.9, 1.0]),
+            ([F.TokenSpan(1, 0, 1, 0.8), F.TokenSpan(2, 2, 3, 1.0)], [1, 0, 2], [0.8, 0.9, 1.0]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(1, 2, 4, 0.5)], [1, 0, 1, 1], [1.0, 0.1, 0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 2, 4, 0.5)], [1, 0, 2, 2], [1.0, 0.1, 0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(1, 3, 4, 0.4)], [1, 0, 0, 1], [1.0, 0.9, 0.7, 0.4]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 3, 4, 0.4)], [1, 0, 0, 2], [1.0, 0.9, 0.7, 0.4]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(1, 3, 5, 0.5)], [1, 0, 0, 1, 1], [1.0, 0.9, 0.8, 0.6, 0.4]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 3, 5, 0.5)], [1, 0, 0, 2, 2], [1.0, 0.9, 0.8, 0.6, 0.4]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 2, 3, 0.5)], [1, 1, 2], [1.0, 0.8, 0.5]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 3, 4, 0.7)], [1, 1, 0, 1], [1.0, 0.8, 0.1, 0.7]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 3, 4, 0.7)], [1, 1, 0, 2], [1.0, 0.8, 0.1, 0.7]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 3, 5, 0.4)], [1, 1, 0, 1, 1], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 3, 5, 0.4)], [1, 1, 0, 2, 2], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 4, 5, 0.3)], [1, 1, 0, 0, 1], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 4, 5, 0.3)], [1, 1, 0, 0, 2], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            (
+                [F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 4, 6, 0.2)],
+                [1, 1, 0, 0, 1, 1],
+                [1.0, 0.8, 0.6, 0.5, 0.3, 0.1],
+            ),
+            (
+                [F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 4, 6, 0.2)],
+                [1, 1, 0, 0, 2, 2],
+                [1.0, 0.8, 0.6, 0.5, 0.3, 0.1],
+            ),
+        ]
+    )
+    def test_merge_repeated_tokens(self, expected, tokens, scores):
+        scores_ = torch.tensor(scores, dtype=torch.float32, device=self.device)
+        tokens_ = torch.tensor(tokens, dtype=torch.int64, device=self.device)
+        spans = F.merge_tokens(tokens_, scores_, blank=0)
+        print(tokens_, scores_)
+        self._assert_tokens(spans, expected)
+
+        # Append blanks at the beginning and at the end.
+        for num_prefix, num_suffix in itertools.product([0, 1, 2], repeat=2):
+            tokens_ = ([0] * num_prefix) + tokens + ([0] * num_suffix)
+            scores_ = ([0.1] * num_prefix) + scores + ([0.1] * num_suffix)
+            tokens_ = torch.tensor(tokens_, dtype=torch.int64, device=self.device)
+            scores_ = torch.tensor(scores_, dtype=torch.float32, device=self.device)
+            expected_ = [F.TokenSpan(s.token, s.start + num_prefix, s.end + num_prefix, s.score) for s in expected]
+            print(tokens_, scores_)
+            spans = F.merge_tokens(tokens_, scores_, blank=0)
+            self._assert_tokens(spans, expected_)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):
@@ -898,3 +1301,27 @@ class FunctionalCPUOnly(TestBaseMixin):
             warnings.simplefilter("always")
             F.melscale_fbanks(201, 0, 8000, 128, 16000)
         assert len(w) == 1
+
+
+class FunctionalCUDAOnly(TestBaseMixin):
+    @nested_params(
+        [torch.half, torch.float, torch.double],
+        [torch.int32, torch.int64],
+        [(1, 50, 100), (1, 100, 100)],
+        [(1, 10), (1, 40), (1, 45)],
+    )
+    def test_forced_align_same_result(self, log_probs_dtype, targets_dtype, log_probs_shape, targets_shape):
+        log_probs = torch.rand(log_probs_shape, dtype=log_probs_dtype, device=self.device)
+        targets = torch.randint(1, 100, targets_shape, dtype=targets_dtype, device=self.device)
+        input_lengths = torch.tensor([log_probs.shape[1]], device=self.device)
+        target_lengths = torch.tensor([targets.shape[1]], device=self.device)
+        log_probs_cuda = log_probs.cuda()
+        targets_cuda = targets.cuda()
+        input_lengths_cuda = input_lengths.cuda()
+        target_lengths_cuda = target_lengths.cuda()
+        hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths)
+        hyp_path_cuda, hyp_scores_cuda = F.forced_align(
+            log_probs_cuda, targets_cuda, input_lengths_cuda, target_lengths_cuda
+        )
+        self.assertEqual(hyp_path, hyp_path_cuda.cpu())
+        self.assertEqual(hyp_scores, hyp_scores_cuda.cpu())

@@ -2,14 +2,10 @@
 Text-to-Speech with Tacotron2
 =============================
 
-**Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
-`Moto Hira <moto@fb.com>`__
+**Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
+`Moto Hira <moto@meta.com>`__
 
 """
-
-import IPython
-import matplotlib
-import matplotlib.pyplot as plt
 
 ######################################################################
 # Overview
@@ -35,9 +31,8 @@ import matplotlib.pyplot as plt
 #    The last step is converting the spectrogram into the waveform. The
 #    process to generate speech from spectrogram is also called Vocoder.
 #    In this tutorial, three different vocoders are used,
-#    `WaveRNN <https://pytorch.org/audio/stable/models/wavernn.html>`__,
-#    `Griffin-Lim <https://pytorch.org/audio/stable/transforms.html#griffinlim>`__,
-#    and
+#    :py:class:`~torchaudio.models.WaveRNN`,
+#    :py:class:`~torchaudio.transforms.GriffinLim`, and
 #    `Nvidia's WaveGlow <https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/>`__.
 #
 #
@@ -57,13 +52,14 @@ import matplotlib.pyplot as plt
 # encoding.
 #
 
-# When running this example in notebook, install DeepPhonemizer
-# !pip3 install deep_phonemizer
+# %%
+#  .. code-block:: bash
+#
+#      %%bash
+#      pip3 install deep_phonemizer
 
 import torch
 import torchaudio
-
-matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -71,6 +67,13 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
+
+
+######################################################################
+#
+
+import IPython
+import matplotlib.pyplot as plt
 
 
 ######################################################################
@@ -216,7 +219,7 @@ with torch.inference_mode():
     spec, _, _ = tacotron2.infer(processed, lengths)
 
 
-plt.imshow(spec[0].cpu().detach())
+_ = plt.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 
 
 ######################################################################
@@ -224,13 +227,17 @@ plt.imshow(spec[0].cpu().detach())
 # therefor, the process of generating the spectrogram incurs randomness.
 #
 
-fig, ax = plt.subplots(3, 1, figsize=(16, 4.3 * 3))
-for i in range(3):
-    with torch.inference_mode():
-        spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
-    print(spec[0].shape)
-    ax[i].imshow(spec[0].cpu().detach())
-plt.show()
+
+def plot():
+    fig, ax = plt.subplots(3, 1)
+    for i in range(3):
+        with torch.inference_mode():
+            spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
+        print(spec[0].shape)
+        ax[i].imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
+
+
+plot()
 
 
 ######################################################################
@@ -268,11 +275,22 @@ with torch.inference_mode():
     spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
     waveforms, lengths = vocoder(spec, spec_lengths)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
+
+def plot(waveforms, spec, sample_rate):
+    waveforms = waveforms.cpu().detach()
+
+    fig, [ax1, ax2] = plt.subplots(2, 1)
+    ax1.plot(waveforms[0])
+    ax1.set_xlim(0, waveforms.size(-1))
+    ax1.grid(True)
+    ax2.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
+    return IPython.display.Audio(waveforms[0:1], rate=sample_rate)
+
+
+plot(waveforms, spec, vocoder.sample_rate)
 
 
 ######################################################################
@@ -298,19 +316,18 @@ with torch.inference_mode():
     spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
 waveforms, lengths = vocoder(spec, spec_lengths)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
+plot(waveforms, spec, vocoder.sample_rate)
 
 
 ######################################################################
 # Waveglow
 # ~~~~~~~~
 #
-# Waveglow is a vocoder published by Nvidia. The pretrained weight is
-# publishe on Torch Hub. One can instantiate the model using ``torch.hub``
+# Waveglow is a vocoder published by Nvidia. The pretrained weights are
+# published on Torch Hub. One can instantiate the model using ``torch.hub``
 # module.
 #
 
@@ -337,8 +354,7 @@ waveglow.eval()
 with torch.no_grad():
     waveforms = waveglow.infer(spec)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-IPython.display.Audio(waveforms[0:1].cpu(), rate=22050)
+plot(waveforms, spec, 22050)

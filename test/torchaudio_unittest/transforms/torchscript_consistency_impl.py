@@ -192,6 +192,85 @@ class Transforms(TestBaseMixin):
         reference_channel = 0
         self._assert_consistency_complex(T.SoudenMVDR(), specgram, psd_s, psd_n, reference_channel)
 
+    @common_utils.nested_params(
+        ["Convolve", "FFTConvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, cls, mode):
+        leading_dims = (2, 3, 2)
+        L_x, L_y = 32, 55
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+
+        convolve = getattr(T, cls)(mode=mode).to(device=self.device, dtype=self.dtype)
+        output = convolve(x, y)
+        ts_output = torch_script(convolve)(x, y)
+        self.assertEqual(ts_output, output)
+
+    @common_utils.nested_params([True, False])
+    def test_speed(self, use_lengths):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, dtype=self.dtype, device=self.device, requires_grad=True)
+
+        if use_lengths:
+            lengths = torch.randint(1, time, leading_dims, dtype=self.dtype, device=self.device)
+        else:
+            lengths = None
+
+        speed = T.Speed(1000, 0.9).to(self.device, self.dtype)
+        output = speed(waveform, lengths)
+        ts_output = torch_script(speed)(waveform, lengths)
+        self.assertEqual(ts_output, output)
+
+    @common_utils.nested_params([True, False])
+    def test_speed_perturbation(self, use_lengths):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, dtype=self.dtype, device=self.device, requires_grad=True)
+
+        if use_lengths:
+            lengths = torch.randint(1, time, leading_dims, dtype=self.dtype, device=self.device)
+        else:
+            lengths = None
+
+        speed = T.SpeedPerturbation(1000, [0.9]).to(self.device, self.dtype)
+        output = speed(waveform, lengths)
+        ts_output = torch_script(speed)(waveform, lengths)
+        self.assertEqual(ts_output, output)
+
+    @common_utils.nested_params([True, False])
+    def test_add_noise(self, use_lengths):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device, requires_grad=True)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True)
+        else:
+            lengths = None
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device, requires_grad=True) * 10
+
+        add_noise = T.AddNoise().to(self.device, self.dtype)
+        output = add_noise(waveform, noise, snr, lengths)
+        ts_output = torch_script(add_noise)(waveform, noise, snr, lengths)
+        self.assertEqual(ts_output, output)
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=self.dtype, device=self.device)
+        preemphasis = T.Preemphasis(coeff=0.97).to(dtype=self.dtype, device=self.device)
+        output = preemphasis(waveform)
+        ts_output = torch_script(preemphasis)(waveform)
+        self.assertEqual(ts_output, output)
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 4, 10, dtype=self.dtype, device=self.device)
+        deemphasis = T.Deemphasis(coeff=0.97).to(dtype=self.dtype, device=self.device)
+        output = deemphasis(waveform)
+        ts_output = torch_script(deemphasis)(waveform)
+        self.assertEqual(ts_output, output)
+
 
 class TransformsFloat32Only(TestBaseMixin):
     def test_rnnt_loss(self):

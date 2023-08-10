@@ -1,35 +1,38 @@
 #pragma once
 
-#include <torch/torch.h>
+#include <torch/types.h>
 #include <torchaudio/csrc/ffmpeg/ffmpeg.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/decoder.h>
-#include <torchaudio/csrc/ffmpeg/stream_reader/sink.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/post_process.h>
+#include <torchaudio/csrc/ffmpeg/stream_reader/typedefs.h>
 #include <map>
 
 namespace torchaudio {
-namespace ffmpeg {
+namespace io {
 
 class StreamProcessor {
  public:
   using KeyType = int;
 
  private:
-  AVFramePtr pFrame1;
-  AVFramePtr pFrame2;
+  // Stream time base which is not stored in AVCodecContextPtr
+  AVRational stream_time_base;
 
   // Components for decoding source media
-  double decoder_time_base; // for debug
-  Decoder decoder;
+  AVCodecContextPtr codec_ctx{nullptr};
+  AVFramePtr frame{alloc_avframe()};
 
   KeyType current_key = 0;
-  std::map<KeyType, Sink> sinks;
+  std::map<KeyType, std::unique_ptr<IPostDecodeProcess>> post_processes;
+
+  // Used for precise seek.
+  // 0: no discard
+  // Positive Values: decoded frames with PTS values less than this are
+  // discarded.
+  // Negative values: UB. Should not happen.
+  int64_t discard_before_pts = 0;
 
  public:
-  StreamProcessor(
-      AVCodecParameters* codecpar,
-      const c10::optional<std::string>& decoder_name,
-      const c10::optional<OptionDict>& decoder_option,
-      const torch::Device& device);
+  explicit StreamProcessor(const AVRational& time_base);
   ~StreamProcessor() = default;
   // Non-copyable
   StreamProcessor(const StreamProcessor&) = delete;
@@ -48,21 +51,33 @@ class StreamProcessor {
   // 3. Configure a buffer.
   // 4. Return filter ID.
   KeyType add_stream(
-      AVRational input_time_base,
-      AVCodecParameters* codecpar,
       int frames_per_chunk,
       int num_chunks,
-      const c10::optional<std::string>& filter_description,
+      AVRational frame_rate,
+      const std::string& filter_description,
       const torch::Device& device);
 
   // 1. Remove the stream
   void remove_stream(KeyType key);
 
+  // Set discard
+  // The input timestamp must be expressed in AV_TIME_BASE unit.
+  void set_discard_timestamp(int64_t timestamp);
+
+  void set_decoder(
+      const AVCodecParameters* codecpar,
+      const c10::optional<std::string>& decoder_name,
+      const c10::optional<OptionDict>& decoder_option,
+      const torch::Device& device);
+
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
   //////////////////////////////////////////////////////////////////////////////
-  std::string get_filter_description(KeyType key) const;
+  [[nodiscard]] std::string get_filter_description(KeyType key) const;
+  [[nodiscard]] FilterGraphOutputInfo get_filter_output_info(KeyType key) const;
+
   bool is_buffer_ready() const;
+  [[nodiscard]] bool is_decoder_set() const;
 
   //////////////////////////////////////////////////////////////////////////////
   // The streaming process
@@ -85,8 +100,8 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Get the chunk from the given filter result
-  c10::optional<torch::Tensor> pop_chunk(KeyType key);
+  c10::optional<Chunk> pop_chunk(KeyType key);
 };
 
-} // namespace ffmpeg
+} // namespace io
 } // namespace torchaudio

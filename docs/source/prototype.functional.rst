@@ -4,17 +4,35 @@ torchaudio.prototype.functional
 .. py:module:: torchaudio.prototype.functional
 .. currentmodule:: torchaudio.prototype.functional
 
-add_noise
-~~~~~~~~~
+Utility
+~~~~~~~
 
-.. autofunction:: add_noise
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
 
-convolve
-~~~~~~~~
+   barkscale_fbanks
+   chroma_filterbank
 
-.. autofunction:: convolve
+DSP
+~~~
 
-fftconvolve
-~~~~~~~~~~~
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
 
-.. autofunction:: fftconvolve
+   adsr_envelope
+   filter_waveform
+   extend_pitch
+   oscillator_bank
+   sinc_impulse_response
+   frequency_impulse_response
+
+Room Impulse Response Simulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   simulate_rir_ism

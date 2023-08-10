@@ -24,4 +24,12 @@ docset: html
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
+	doxygen source/Doxyfile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@python post_process_dispatcher.py $(BUILDDIR)
+
+clean:
+	rm -rf $(BUILDDIR)/*
+	rm -rf $(SOURCEDIR)/generated/
+	rm -rf $(SOURCEDIR)/aen_images/
+	rm -rf $(SOURCEDIR)/gen_modules/

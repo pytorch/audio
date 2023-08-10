@@ -1,0 +1,119 @@
+name: Unit-tests on Linux GPU
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        python_version: ["3.8", "3.9", "3.10"]
+        cuda_arch_version: ["11.8"]
+      fail-fast: false
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      repository: pytorch/audio
+      gpu-arch-type: cuda
+      gpu-arch-version: ${{ matrix.cuda_arch_version }}
+      timeout: 120
+
+      script: |
+        set -ex
+        # Set up Environment Variables
+        export PYTHON_VERSION="${{ matrix.python_version }}"
+        export CU_VERSION="${{ matrix.cuda_arch_version }}"
+        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
+
+        # Set CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export CHANNEL=test
+        else
+          export CHANNEL=nightly
+        fi
+
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
+        conda activate ./ci_env
+
+        echo "::endgroup::"
+        echo "::group::Install PyTorch"
+        conda install \
+          --yes \
+          --quiet \
+          -c "pytorch-${CHANNEL}" \
+          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
+          "${CUDATOOLKIT}"
+
+        echo "::endgroup::"
+        echo "::group::Install TorchAudio"
+        conda install --quiet --yes 'cmake>=3.18.0' ninja
+        pip3 install --progress-bar off -v -e . --no-use-pep517
+
+        echo "::endgroup::"
+        echo "::group::Build FFmpeg"
+        .github/scripts/ffmpeg/build_gpu.sh
+
+        echo "::endgroup::"
+        echo "::group::Install other Dependencies"
+        conda install \
+          --quiet --yes \
+          -c conda-forge \
+          -c numba/label/dev \
+          sox libvorbis 'librosa==0.10.0' parameterized 'requests>=2.20'
+        pip3 install --progress-bar off \
+          kaldi-io \
+          SoundFile \
+          coverage \
+          pytest \
+          pytest-cov \
+          'scipy==1.7.3' \
+          transformers \
+          expecttest \
+          unidecode \
+          inflect \
+          Pillow \
+          sentencepiece \
+          pytorch-lightning \
+          'protobuf<4.21.0' \
+          demucs \
+          tinytag \
+          flashlight-text \
+          git+https://github.com/kpu/kenlm/ \
+          git+https://github.com/pytorch/fairseq.git@e47a4c8
+
+        echo "::endgroup::"
+        echo "::group::Run tests"
+        export PATH="${PWD}/third_party/install/bin/:${PATH}"
+
+        declare -a args=(
+            '-v'
+            '--cov=torchaudio'
+            "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
+            '--durations' '100'
+            '-k' 'cuda or gpu'
+        )
+
+        cd test
+        python3 -m torch.utils.collect_env
+        env | grep TORCHAUDIO || true
+        pytest "${args[@]}" torchaudio_unittest
+        coverage html

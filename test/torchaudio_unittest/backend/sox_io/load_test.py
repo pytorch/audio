@@ -1,32 +1,23 @@
-import io
 import itertools
-import tarfile
 
 import torch
-import torchaudio
 from parameterized import parameterized
-from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import sox_io_backend
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     get_wav_data,
-    HttpServerMixin,
     load_wav,
     nested_params,
     PytorchTestCase,
     save_wav,
     skipIfNoExec,
-    skipIfNoModule,
     skipIfNoSox,
+    skipIfNoSoxDecoder,
     sox_utils,
     TempDirMixin,
 )
 
 from .common import name_func
-
-
-if _mod_utils.is_module_available("requests"):
-    import requests
 
 
 class LoadTestBase(TempDirMixin, PytorchTestCase):
@@ -244,6 +235,7 @@ class TestLoad(LoadTestBase):
         ),
         name_func=name_func,
     )
+    @skipIfNoSoxDecoder("opus")
     def test_opus(self, bitrate, num_channels, compression_level):
         """`sox_io_backend.load` can load opus file correctly."""
         ops_path = get_asset_path("io", f"{bitrate}_{compression_level}_{num_channels}ch.opus")
@@ -288,6 +280,7 @@ class TestLoad(LoadTestBase):
             "amb", sample_rate, num_channels, bit_depth=bit_depth, duration=1, encoding=encoding, normalize=normalize
         )
 
+    @skipIfNoSoxDecoder("amr-nb")
     def test_amr_nb(self):
         """`sox_io_backend.load` can load amr_nb format correctly."""
         self.assert_format("amr-nb", sample_rate=8000, num_channels=1, bit_depth=32, duration=1)
@@ -322,305 +315,20 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
 
         self._test(torch.ops.torchaudio.sox_io_load_audio_file, frame_offset, num_frames, channels_first, normalize)
 
-        # test file-like obj
-        def func(path, *args):
-            with open(path, "rb") as fileobj:
-                return torchaudio._torchaudio.load_audio_fileobj(fileobj, *args)
-
-        self._test(func, frame_offset, num_frames, channels_first, normalize)
-
-    @nested_params(
-        [0, 1, 10, 100, 1000],
-        [-1, 1, 10, 100, 1000],
-        [True, False],
-        [True, False],
-    )
-    def test_ffmpeg(self, frame_offset, num_frames, channels_first, normalize):
-        """The combination of properly changes the output tensor"""
-        from torchaudio.io._compat import load_audio, load_audio_fileobj
-
-        self._test(load_audio, frame_offset, num_frames, channels_first, normalize)
-
-        # test file-like obj
-        def func(path, *args):
-            with open(path, "rb") as fileobj:
-                return load_audio_fileobj(fileobj, *args)
-
-        self._test(func, frame_offset, num_frames, channels_first, normalize)
-
 
 @skipIfNoSox
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """MP3 file without extension can be loaded
 
-        Originally, we added `format` argument for this case, but now we use FFmpeg
-        for MP3 decoding, which works even without `format` argument.
         https://github.com/pytorch/audio/issues/1040
 
         The file was generated with the following command
             ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
         """
         path = get_asset_path("mp3_without_ext")
-        _, sr = sox_io_backend.load(path)
+        _, sr = sox_io_backend.load(path, format="mp3")
         assert sr == 16000
-
-        with open(path, "rb") as fileobj:
-            _, sr = sox_io_backend.load(fileobj)
-        assert sr == 16000
-
-
-class CloggedFileObj:
-    def __init__(self, fileobj):
-        self.fileobj = fileobj
-
-    def read(self, _):
-        return self.fileobj.read(2)
-
-    def seek(self, offset, whence):
-        return self.fileobj.seek(offset, whence)
-
-
-@skipIfNoSox
-@skipIfNoExec("sox")
-class TestFileObject(TempDirMixin, PytorchTestCase):
-    """
-    In this test suite, the result of file-like object input is compared against file path input,
-    because `load` function is rigrously tested for file path inputs to match libsox's result,
-    """
-
-    @parameterized.expand(
-        [
-            ("wav", {"bit_depth": 16}),
-            ("wav", {"bit_depth": 24}),
-            ("wav", {"bit_depth": 32}),
-            ("mp3", {"compression": 128}),
-            ("mp3", {"compression": 320}),
-            ("flac", {"compression": 0}),
-            ("flac", {"compression": 5}),
-            ("flac", {"compression": 8}),
-            ("vorbis", {"compression": -1}),
-            ("vorbis", {"compression": 10}),
-            ("amb", {}),
-        ]
-    )
-    def test_fileobj(self, ext, kwargs):
-        """Loading audio via file object returns the same result as via file path."""
-        sample_rate = 16000
-        format_ = ext if ext in ["mp3"] else None
-        path = self.get_temp_path(f"test.{ext}")
-
-        sox_utils.gen_audio_file(path, sample_rate, num_channels=2, **kwargs)
-        expected, _ = sox_io_backend.load(path)
-
-        with open(path, "rb") as fileobj:
-            found, sr = sox_io_backend.load(fileobj, format=format_)
-
-        assert sr == sample_rate
-        self.assertEqual(expected, found)
-
-    @parameterized.expand(
-        [
-            ("wav", {"bit_depth": 16}),
-            ("wav", {"bit_depth": 24}),
-            ("wav", {"bit_depth": 32}),
-            ("mp3", {"compression": 128}),
-            ("mp3", {"compression": 320}),
-            ("flac", {"compression": 0}),
-            ("flac", {"compression": 5}),
-            ("flac", {"compression": 8}),
-            ("vorbis", {"compression": -1}),
-            ("vorbis", {"compression": 10}),
-            ("amb", {}),
-        ]
-    )
-    def test_bytesio(self, ext, kwargs):
-        """Loading audio via BytesIO object returns the same result as via file path."""
-        sample_rate = 16000
-        format_ = ext if ext in ["mp3"] else None
-        path = self.get_temp_path(f"test.{ext}")
-
-        sox_utils.gen_audio_file(path, sample_rate, num_channels=2, **kwargs)
-        expected, _ = sox_io_backend.load(path)
-
-        with open(path, "rb") as file_:
-            fileobj = io.BytesIO(file_.read())
-        found, sr = sox_io_backend.load(fileobj, format=format_)
-
-        assert sr == sample_rate
-        self.assertEqual(expected, found)
-
-    @parameterized.expand(
-        [
-            ("wav", {"bit_depth": 16}),
-            ("wav", {"bit_depth": 24}),
-            ("wav", {"bit_depth": 32}),
-            ("mp3", {"compression": 128}),
-            ("mp3", {"compression": 320}),
-            ("flac", {"compression": 0}),
-            ("flac", {"compression": 5}),
-            ("flac", {"compression": 8}),
-            ("vorbis", {"compression": -1}),
-            ("vorbis", {"compression": 10}),
-            ("amb", {}),
-        ]
-    )
-    def test_bytesio_clogged(self, ext, kwargs):
-        """Loading audio via clogged file object returns the same result as via file path.
-
-        This test case validates the case where fileobject returns shorter bytes than requeted.
-        """
-        sample_rate = 16000
-        format_ = ext if ext in ["mp3"] else None
-        path = self.get_temp_path(f"test.{ext}")
-
-        sox_utils.gen_audio_file(path, sample_rate, num_channels=2, **kwargs)
-        expected, _ = sox_io_backend.load(path)
-
-        with open(path, "rb") as file_:
-            fileobj = CloggedFileObj(io.BytesIO(file_.read()))
-        found, sr = sox_io_backend.load(fileobj, format=format_)
-
-        assert sr == sample_rate
-        self.assertEqual(expected, found)
-
-    @parameterized.expand(
-        [
-            ("wav", {"bit_depth": 16}),
-            ("wav", {"bit_depth": 24}),
-            ("wav", {"bit_depth": 32}),
-            ("mp3", {"compression": 128}),
-            ("mp3", {"compression": 320}),
-            ("flac", {"compression": 0}),
-            ("flac", {"compression": 5}),
-            ("flac", {"compression": 8}),
-            ("vorbis", {"compression": -1}),
-            ("vorbis", {"compression": 10}),
-            ("amb", {}),
-        ]
-    )
-    def test_bytesio_tiny(self, ext, kwargs):
-        """Loading very small audio via file object returns the same result as via file path."""
-        sample_rate = 16000
-        format_ = ext if ext in ["mp3"] else None
-        path = self.get_temp_path(f"test.{ext}")
-
-        sox_utils.gen_audio_file(path, sample_rate, num_channels=2, duration=1 / 1600, **kwargs)
-        expected, _ = sox_io_backend.load(path)
-
-        with open(path, "rb") as file_:
-            fileobj = io.BytesIO(file_.read())
-        found, sr = sox_io_backend.load(fileobj, format=format_)
-
-        assert sr == sample_rate
-        self.assertEqual(expected, found)
-
-    @parameterized.expand(
-        [
-            ("wav", {"bit_depth": 16}),
-            ("wav", {"bit_depth": 24}),
-            ("wav", {"bit_depth": 32}),
-            ("mp3", {"compression": 128}),
-            ("mp3", {"compression": 320}),
-            ("flac", {"compression": 0}),
-            ("flac", {"compression": 5}),
-            ("flac", {"compression": 8}),
-            ("vorbis", {"compression": -1}),
-            ("vorbis", {"compression": 10}),
-            ("amb", {}),
-        ]
-    )
-    def test_tarfile(self, ext, kwargs):
-        """Loading compressed audio via file-like object returns the same result as via file path."""
-        sample_rate = 16000
-        format_ = ext if ext in ["mp3"] else None
-        audio_file = f"test.{ext}"
-        audio_path = self.get_temp_path(audio_file)
-        archive_path = self.get_temp_path("archive.tar.gz")
-
-        sox_utils.gen_audio_file(audio_path, sample_rate, num_channels=2, **kwargs)
-        expected, _ = sox_io_backend.load(audio_path)
-
-        with tarfile.TarFile(archive_path, "w") as tarobj:
-            tarobj.add(audio_path, arcname=audio_file)
-        with tarfile.TarFile(archive_path, "r") as tarobj:
-            fileobj = tarobj.extractfile(audio_file)
-            found, sr = sox_io_backend.load(fileobj, format=format_)
-
-        assert sr == sample_rate
-        self.assertEqual(expected, found)
-
-
-class Unseekable:
-    def __init__(self, fileobj):
-        self.fileobj = fileobj
-
-    def read(self, n):
-        return self.fileobj.read(n)
-
-
-@skipIfNoSox
-@skipIfNoExec("sox")
-@skipIfNoModule("requests")
-class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
-    @parameterized.expand(
-        [
-            ("wav", {"bit_depth": 16}),
-            ("wav", {"bit_depth": 24}),
-            ("wav", {"bit_depth": 32}),
-            ("mp3", {"compression": 128}),
-            ("mp3", {"compression": 320}),
-            ("flac", {"compression": 0}),
-            ("flac", {"compression": 5}),
-            ("flac", {"compression": 8}),
-            ("vorbis", {"compression": -1}),
-            ("vorbis", {"compression": 10}),
-            ("amb", {}),
-        ]
-    )
-    def test_requests(self, ext, kwargs):
-        sample_rate = 16000
-        format_ = ext if ext in ["mp3"] else None
-        audio_file = f"test.{ext}"
-        audio_path = self.get_temp_path(audio_file)
-
-        sox_utils.gen_audio_file(audio_path, sample_rate, num_channels=2, **kwargs)
-        expected, _ = sox_io_backend.load(audio_path)
-
-        url = self.get_url(audio_file)
-        with requests.get(url, stream=True) as resp:
-            found, sr = sox_io_backend.load(Unseekable(resp.raw), format=format_)
-
-        assert sr == sample_rate
-        if ext != "mp3":
-            self.assertEqual(expected, found)
-
-    @parameterized.expand(
-        list(
-            itertools.product(
-                [0, 1, 10, 100, 1000],
-                [-1, 1, 10, 100, 1000],
-            )
-        ),
-        name_func=name_func,
-    )
-    def test_frame(self, frame_offset, num_frames):
-        """num_frames and frame_offset correctly specify the region of data"""
-        sample_rate = 8000
-        audio_file = "test.wav"
-        audio_path = self.get_temp_path(audio_file)
-
-        original = get_wav_data("float32", num_channels=2)
-        save_wav(audio_path, original, sample_rate)
-        frame_end = None if num_frames == -1 else frame_offset + num_frames
-        expected = original[:, frame_offset:frame_end]
-
-        url = self.get_url(audio_file)
-        with requests.get(url, stream=True) as resp:
-            found, sr = sox_io_backend.load(resp.raw, frame_offset, num_frames)
-
-        assert sr == sample_rate
-        self.assertEqual(expected, found)
 
 
 @skipIfNoSox

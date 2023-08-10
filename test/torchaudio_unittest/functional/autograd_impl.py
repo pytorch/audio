@@ -6,7 +6,14 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from torch import Tensor
 from torch.autograd import gradcheck, gradgradcheck
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, rnnt_utils, TestBaseMixin
+from torchaudio_unittest.common_utils import (
+    get_spectrogram,
+    get_whitenoise,
+    nested_params,
+    rnnt_utils,
+    TestBaseMixin,
+    use_deterministic_algorithms,
+)
 
 
 class Autograd(TestBaseMixin):
@@ -71,26 +78,30 @@ class Autograd(TestBaseMixin):
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         a.requires_grad = True
-        self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
 
     def test_filtfilt_b(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         b.requires_grad = True
-        self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b), enable_all_grad=False)
 
     def test_filtfilt_all_inputs(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
-        self.assert_grad(F.filtfilt, (x, a, b))
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b))
 
     def test_filtfilt_batching(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
         a = torch.tensor([[0.7, 0.2, 0.6], [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9], [0.7, 0.2, 0.6]])
-        self.assert_grad(F.filtfilt, (x, a, b))
+        with use_deterministic_algorithms(True, False):
+            self.assert_grad(F.filtfilt, (x, a, b))
 
     def test_biquad(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=1)
@@ -334,6 +345,43 @@ class Autograd(TestBaseMixin):
         specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
         beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
         self.assert_grad(F.apply_beamforming, (beamform_weights, specgram))
+
+    @nested_params(
+        ["convolve", "fftconvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, fn, mode):
+        leading_dims = (4, 3, 2)
+        L_x, L_y = 23, 40
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+        self.assert_grad(getattr(F, fn), (x, y, mode))
+
+    def test_add_noise(self):
+        leading_dims = (5, 2, 3)
+        L = 51
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+        self.assert_grad(F.add_noise, (waveform, noise, snr, lengths))
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        T = 200
+        waveform = torch.rand(*leading_dims, T, dtype=self.dtype, device=self.device, requires_grad=True)
+        lengths = torch.randint(1, T, leading_dims, dtype=self.dtype, device=self.device)
+        self.assert_grad(F.speed, (waveform, 1000, 1.1, lengths), enable_all_grad=False)
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assert_grad(F.preemphasis, (waveform, coeff))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype, requires_grad=True)
+        coeff = 0.9
+        self.assert_grad(F.deemphasis, (waveform, coeff))
 
 
 class AutogradFloat32(TestBaseMixin):

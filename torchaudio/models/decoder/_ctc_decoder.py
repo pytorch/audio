@@ -1,57 +1,39 @@
 from __future__ import annotations
 
 import itertools as it
+
 from abc import abstractmethod
 from collections import namedtuple
 from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
 import torch
-import torchaudio
+
+from flashlight.lib.text.decoder import (
+    CriterionType as _CriterionType,
+    LexiconDecoder as _LexiconDecoder,
+    LexiconDecoderOptions as _LexiconDecoderOptions,
+    LexiconFreeDecoder as _LexiconFreeDecoder,
+    LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
+    LM as _LM,
+    LMState as _LMState,
+    SmearingMode as _SmearingMode,
+    Trie as _Trie,
+    ZeroLM as _ZeroLM,
+)
+from flashlight.lib.text.dictionary import (
+    create_word_dict as _create_word_dict,
+    Dictionary as _Dictionary,
+    load_words as _load_words,
+)
 from torchaudio.utils import download_asset
 
 try:
-    # We prioritize the version from upstream flashlight here.
-    # This will allow applications that use the upstream flashlight
-    # alongside torchaudio.
-    from flashlight.lib.text.decoder import (
-        CriterionType as _CriterionType,
-        KenLM as _KenLM,
-        LexiconDecoder as _LexiconDecoder,
-        LexiconDecoderOptions as _LexiconDecoderOptions,
-        LexiconFreeDecoder as _LexiconFreeDecoder,
-        LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as _LM,
-        LMState as _LMState,
-        SmearingMode as _SmearingMode,
-        Trie as _Trie,
-        ZeroLM as _ZeroLM,
-    )
-    from flashlight.lib.text.dictionary import (
-        create_word_dict as _create_word_dict,
-        Dictionary as _Dictionary,
-        load_words as _load_words,
-    )
+    from flashlight.lib.text.decoder.kenlm import KenLM as _KenLM
 except Exception:
-    torchaudio._extension._load_lib("libflashlight-text")
-    from torchaudio.flashlight_lib_text_decoder import (
-        CriterionType as _CriterionType,
-        KenLM as _KenLM,
-        LexiconDecoder as _LexiconDecoder,
-        LexiconDecoderOptions as _LexiconDecoderOptions,
-        LexiconFreeDecoder as _LexiconFreeDecoder,
-        LexiconFreeDecoderOptions as _LexiconFreeDecoderOptions,
-        LM as _LM,
-        LMState as _LMState,
-        SmearingMode as _SmearingMode,
-        Trie as _Trie,
-        ZeroLM as _ZeroLM,
-    )
-    from torchaudio.flashlight_lib_text_dictionary import (
-        create_word_dict as _create_word_dict,
-        Dictionary as _Dictionary,
-        load_words as _load_words,
-    )
-
+    try:
+        from flashlight.lib.text.decoder import KenLM as _KenLM
+    except Exception:
+        _KenLM = None
 
 __all__ = [
     "CTCHypothesis",
@@ -173,8 +155,10 @@ class CTCDecoderLM(_LM):
 
         Returns:
             (CTCDecoderLMState, float)
-                CTCDecoderLMState: new LM state
-                float: score
+                CTCDecoderLMState:
+                    new LM state
+                float:
+                    score
         """
         raise NotImplementedError
 
@@ -254,6 +238,12 @@ class CTCDecoder:
             )
         else:
             self.decoder = _LexiconFreeDecoder(decoder_options, lm, silence, self.blank, transitions)
+        # https://github.com/pytorch/audio/issues/3218
+        # If lm is passed like rvalue reference, the lm object gets garbage collected,
+        # and later call to the lm fails.
+        # This ensures that lm object is not deleted as long as the decoder is alive.
+        # https://github.com/pybind/pybind11/discussions/4013
+        self.lm = lm
 
     def _get_tokens(self, idxs: torch.IntTensor) -> torch.LongTensor:
         idxs = (g[0] for g in it.groupby(idxs))
@@ -291,6 +281,9 @@ class CTCDecoder:
 
         if emissions.is_cuda:
             raise RuntimeError("emissions must be a CPU tensor.")
+
+        if not emissions.is_contiguous():
+            raise RuntimeError("emissions must be contiguous.")
 
         if lengths is not None and lengths.is_cuda:
             raise RuntimeError("lengths must be a CPU tensor.")
@@ -425,6 +418,11 @@ def ctc_decoder(
     word_dict = _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word)
 
     if type(lm) == str:
+        if _KenLM is None:
+            raise RuntimeError(
+                "flashlight-text is installed, but KenLM is not installed. "
+                "Please refer to https://github.com/kpu/kenlm#python-module for how to install it."
+            )
         lm = _KenLM(lm, word_dict)
     elif lm is None:
         lm = _ZeroLM()

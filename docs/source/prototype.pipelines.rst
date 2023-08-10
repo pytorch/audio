@@ -1,3 +1,4 @@
+
 torchaudio.prototype.pipelines
 ==============================
 
@@ -9,18 +10,63 @@ The pipelines subpackage contains APIs to models with pretrained weights and rel
 RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
-EMFORMER_RNNT_BASE_MUSTC
-~~~~~~~~~~~~~~~~~~~~~~~~
+Pretrained Models
+~~~~~~~~~~~~~~~~~
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-   .. autodata:: EMFORMER_RNNT_BASE_MUSTC
-      :no-value:
+   EMFORMER_RNNT_BASE_MUSTC
+   EMFORMER_RNNT_BASE_TEDLIUM3
 
-EMFORMER_RNNT_BASE_TEDLIUM3
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HiFiGAN Vocoder
+---------------
 
-.. container:: py attribute
+Interface
+~~~~~~~~~
 
-   .. autodata:: EMFORMER_RNNT_BASE_TEDLIUM3
-      :no-value:
+:py:class:`HiFiGANVocoderBundle` defines HiFiGAN Vocoder pipeline capable of transforming mel spectrograms into waveforms.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   HiFiGANVocoderBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   HIFIGAN_VOCODER_V3_LJSPEECH
+
+VGGish
+------
+
+Interface
+~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   VGGishBundle
+   VGGishBundle.VGGish
+   VGGishBundle.VGGishInputProcessor
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   VGGISH

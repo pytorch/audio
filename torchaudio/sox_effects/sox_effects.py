@@ -3,11 +3,11 @@ from typing import List, Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal.module_utils import deprecated
 from torchaudio.utils.sox_utils import list_effects
 
 
-@_mod_utils.requires_sox()
+@deprecated("Please remove the call. This function is called automatically.")
 def init_sox_effects():
     """Initialize resources required to use sox effects.
 
@@ -19,10 +19,10 @@ def init_sox_effects():
     Once :func:`shutdown_sox_effects` is called, you can no longer use SoX effects and initializing
     again will result in error.
     """
-    torch.ops.torchaudio.sox_effects_initialize_sox_effects()
+    pass
 
 
-@_mod_utils.requires_sox()
+@deprecated("Please remove the call. This function is called automatically.")
 def shutdown_sox_effects():
     """Clean up resources required to use sox effects.
 
@@ -33,10 +33,10 @@ def shutdown_sox_effects():
     Once :py:func:`shutdown_sox_effects` is called, you can no longer use SoX effects and
     initializing again will result in error.
     """
-    torch.ops.torchaudio.sox_effects_shutdown_sox_effects()
+    pass
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -50,7 +50,7 @@ def effect_names() -> List[str]:
     return list(list_effects().keys())
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def apply_effects_tensor(
     tensor: torch.Tensor,
     sample_rate: int,
@@ -155,7 +155,7 @@ def apply_effects_tensor(
     return torch.ops.torchaudio.sox_effects_apply_effects_tensor(tensor, sample_rate, effects, channels_first)
 
 
-@_mod_utils.requires_sox()
+@torchaudio._extension.fail_if_no_sox
 def apply_effects_file(
     path: str,
     effects: List[List[str]],
@@ -178,18 +178,8 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (path-like object or file-like object):
-            Source of audio data. When the function is not compiled by TorchScript,
-            (e.g. ``torch.jit.script``), the following types are accepted:
-
-                  * ``path-like``: file path
-                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
-                    which returns byte string of at most ``size`` length.
-
-            When the function is compiled by TorchScript, only ``str`` type is allowed.
-
-            Note: This argument is intentionally annotated as ``str`` only for
-            TorchScript compiler compatibility.
+        path (path-like object):
+            Source of audio data.
         effects (List[List[str]]): List of effects.
         normalize (bool, optional):
             When ``True``, this function converts the native sample type to ``float32``.
@@ -274,12 +264,9 @@ def apply_effects_file(
     """
     if not torch.jit.is_scripting():
         if hasattr(path, "read"):
-            ret = torchaudio._torchaudio.apply_effects_fileobj(path, effects, normalize, channels_first, format)
-            if ret is None:
-                raise RuntimeError("Failed to load audio from {}".format(path))
-            return ret
+            raise RuntimeError(
+                "apply_effects_file function does not support file-like object. "
+                "Please use torchaudio.io.AudioEffector."
+            )
         path = os.fspath(path)
-    ret = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
-    if ret is not None:
-        return ret
-    raise RuntimeError("Failed to load audio from {}".format(path))
+    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)

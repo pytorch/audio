@@ -19,7 +19,7 @@ from common import (
     piecewise_linear_log,
     spectrogram_transform,
 )
-from must.dataset import MUSTC
+from mustc.dataset import MUSTC
 
 
 logger = logging.getLogger()

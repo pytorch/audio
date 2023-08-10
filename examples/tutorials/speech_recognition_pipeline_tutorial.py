@@ -2,7 +2,7 @@
 Speech Recognition with Wav2Vec2
 ================================
 
-**Author**: `Moto Hira <moto@fb.com>`__
+**Author**: `Moto Hira <moto@meta.com>`__
 
 This tutorial shows how to perform speech recognition using using
 pre-trained models from wav2vec 2.0
@@ -160,8 +160,7 @@ for i, feats in enumerate(features):
     ax[i].set_title(f"Feature from transformer layer {i+1}")
     ax[i].set_xlabel("Feature dimension")
     ax[i].set_ylabel("Frame (time-axis)")
-plt.tight_layout()
-plt.show()
+fig.tight_layout()
 
 
 ######################################################################
@@ -190,7 +189,7 @@ plt.imshow(emission[0].cpu().T, interpolation="nearest")
 plt.title("Classification result")
 plt.xlabel("Frame (time-axis)")
 plt.ylabel("Class")
-plt.show()
+plt.tight_layout()
 print("Class labels:", bundle.get_labels())
 
 

@@ -12,12 +12,21 @@ from .model import (
     wav2vec2_large,
     wav2vec2_large_lv60k,
     wav2vec2_model,
+    wav2vec2_xlsr_1b,
+    wav2vec2_xlsr_2b,
+    wav2vec2_xlsr_300m,
     Wav2Vec2Model,
+    wavlm_base,
+    wavlm_large,
+    wavlm_model,
 )
 
 __all__ = [
     "Wav2Vec2Model",
     "HuBERTPretrainModel",
+    "wavlm_model",
+    "wavlm_base",
+    "wavlm_large",
     "wav2vec2_model",
     "wav2vec2_base",
     "wav2vec2_large",
@@ -30,4 +39,7 @@ __all__ = [
     "hubert_pretrain_large",
     "hubert_pretrain_xlarge",
     "utils",
+    "wav2vec2_xlsr_300m",
+    "wav2vec2_xlsr_1b",
+    "wav2vec2_xlsr_2b",
 ]

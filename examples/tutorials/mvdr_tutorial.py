@@ -2,7 +2,7 @@
 Speech Enhancement with MVDR Beamforming
 ========================================
 
-**Author** `Zhaoheng Ni <zni@fb.com>`__
+**Author**: `Zhaoheng Ni <zni@meta.com>`__
 
 """
 
@@ -37,6 +37,10 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 
+import matplotlib.pyplot as plt
+import mir_eval
+from IPython.display import Audio
+
 ######################################################################
 # 2. Preparation
 # --------------
@@ -59,10 +63,6 @@ print(torchaudio.__version__)
 
 from pesq import pesq
 from pystoi import stoi
-import mir_eval
-
-import matplotlib.pyplot as plt
-from IPython.display import Audio
 from torchaudio.utils import download_asset
 
 ######################################################################
@@ -98,23 +98,21 @@ SAMPLE_NOISE = download_asset("tutorial-assets/mvdr/noise.wav")
 #
 
 
-def plot_spectrogram(stft, title="Spectrogram", xlim=None):
+def plot_spectrogram(stft, title="Spectrogram"):
     magnitude = stft.abs()
     spectrogram = 20 * torch.log10(magnitude + 1e-8).numpy()
     figure, axis = plt.subplots(1, 1)
     img = axis.imshow(spectrogram, cmap="viridis", vmin=-100, vmax=0, origin="lower", aspect="auto")
-    figure.suptitle(title)
+    axis.set_title(title)
     plt.colorbar(img, ax=axis)
-    plt.show()
 
 
-def plot_mask(mask, title="Mask", xlim=None):
+def plot_mask(mask, title="Mask"):
     mask = mask.numpy()
     figure, axis = plt.subplots(1, 1)
     img = axis.imshow(mask, cmap="viridis", origin="lower", aspect="auto")
-    figure.suptitle(title)
+    axis.set_title(title)
     plt.colorbar(img, ax=axis)
-    plt.show()
 
 
 def si_snr(estimate, reference, epsilon=1e-8):
