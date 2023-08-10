@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import torchaudio
 from torchaudio_unittest import common_utils
 
@@ -10,13 +8,12 @@ class BackendSwitchMixin:
     backend = None
     backend_module = None
 
-    @patch("torchaudio.backend.utils._is_backend_dispatcher_enabled", lambda: False)
     def test_switch(self):
-        torchaudio.set_audio_backend(self.backend)
+        torchaudio.backend.utils.set_audio_backend(self.backend)
         if self.backend is None:
-            assert torchaudio.get_audio_backend() is None
+            assert torchaudio.backend.utils.get_audio_backend() is None
         else:
-            assert torchaudio.get_audio_backend() == self.backend
+            assert torchaudio.backend.utils.get_audio_backend() == self.backend
         assert torchaudio.load == self.backend_module.load
         assert torchaudio.save == self.backend_module.save
         assert torchaudio.info == self.backend_module.info
