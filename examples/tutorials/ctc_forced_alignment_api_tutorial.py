@@ -13,7 +13,7 @@ This tutorial shows how to align transcripts to speech using
 :py:func:`~torchaudio.functional.forced_align` has custom CPU and CUDA
 implementations which are more performant than the vanilla Python
 implementation above, and are more accurate.
-It can also handle missing transcript with special <star> token.
+It can also handle missing transcript with special ``<star>`` token.
 
 There is also a high-level API, :py:class:`torchaudio.pipelines.Wav2Vec2FABundle`,
 which wraps the pre/post-processing explained in this tutorial and makes it easy
@@ -22,6 +22,10 @@ to run forced-alignments.
 <./forced_alignment_for_multilingual_data_tutorial.html>`__ uses this API to
 illustrate how to align non-English transcripts.
 """
+
+######################################################################
+# Preparation
+# -----------
 
 import torch
 import torchaudio
@@ -36,9 +40,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 ######################################################################
-# Preparation
-# -----------
 #
+
 import IPython
 import matplotlib.pyplot as plt
 
@@ -138,19 +141,34 @@ aligned_tokens, alignment_scores = align(emission, tokenized_transcript)
 
 ######################################################################
 # Now let's look at the output.
-# Notice that the alignment is expressed in the frame cordinate of
-# emission, which is different from the original waveform.
 
 for i, (ali, score) in enumerate(zip(aligned_tokens, alignment_scores)):
     print(f"{i:3d}:\t{ali:2d} [{LABELS[ali]}], {score:.2f}")
 
 ######################################################################
 #
-# The ``Frame`` instance represents the most likely token at each frame
-# with its confidence.
+# .. note::
 #
-# When interpreting it, one must remember that the meaning of blank token
-# and repeated token are context dependent.
+#    The alignment is expressed in the frame cordinate of the emission,
+#    which is different from the original waveform.
+#
+# It contains blank tokens and repeated tokens. The following is the
+# interpretation of the non-blank tokens.
+#
+# .. code-block::
+#
+#    31:     0 [-], 1.00
+#    32:     2 [i], 1.00  "i" starts and ends
+#    33:     0 [-], 1.00
+#    34:     0 [-], 1.00
+#    35:    15 [h], 1.00  "h" starts
+#    36:    15 [h], 0.93  "h" ends
+#    37:     1 [a], 1.00  "a" starts and ends
+#    38:     0 [-], 0.96
+#    39:     0 [-], 1.00
+#    40:     0 [-], 1.00
+#    41:    13 [d], 1.00  "d" starts and ends
+#    42:     0 [-], 1.00
 #
 # .. note::
 #
@@ -165,37 +183,16 @@ for i, (ali, score) in enumerate(zip(aligned_tokens, alignment_scores)):
 #       a - a b -> a a b
 #         ^^^       ^^^
 #
-# .. code-block::
-#
-#     29:  0 [-], 1.00
-#     30:  7 [I], 1.00 # "I" starts and ends
-#     31:  0 [-], 0.98 #
-#     32:  0 [-], 1.00 #
-#     33:  1 [|], 0.85 # "|" (word boundary) starts
-#     34:  1 [|], 1.00 # "|" ends
-#     35:  0 [-], 0.61 #
-#     36:  8 [H], 1.00 # "H" starts and ends
-#     37:  0 [-], 1.00 #
-#     38:  4 [A], 1.00 # "A" starts and ends
-#     39:  0 [-], 0.99 #
-#     40: 11 [D], 0.92 # "D" starts and ends
-#     41:  0 [-], 0.93 #
-#     42:  1 [|], 0.98 # "|" starts
-#     43:  1 [|], 1.00 # "|" ends
-#     44:  3 [T], 1.00 # "T" starts
-#     45:  3 [T], 0.90 # "T" ends
-#     46:  8 [H], 1.00 # "H" starts and ends
-#     47:  0 [-], 1.00 #
 
 ######################################################################
 # Obtain token-level alignment
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Next step is to resolve the repetation. So that what alignment represents
-# do not depend on previous alignments.
-# From the outputs ``alignment``, we compute the following ``Span`` object,
-# which explains what token (in transcript) is present at what time span.
-
+# Next step is to resolve the repetation, so that each alignment does
+# not depend on previous alignments.
+# :py:func:`torchaudio.functional.merge_tokens` computes the
+# :py:class:`~torchaudio.functional.TokenSpan` object, which represents
+# which token from the transcript is present at what time span.
 
 ######################################################################
 #
@@ -206,12 +203,11 @@ print("Token\tTime\tScore")
 for s in token_spans:
     print(f"{LABELS[s.token]}\t[{s.start:3d}, {s.end:3d})\t{s.score:.2f}")
 
+
 ######################################################################
 # Visualization
 # ~~~~~~~~~~~~~
 #
-
-
 def plot_scores(spans, scores):
     fig, ax = plt.subplots()
     ax.set_title("frame-level and token-level confidence scores")
@@ -241,8 +237,6 @@ plot_scores(token_spans, alignment_scores)
 # Obtain word-level alignments and confidence scores
 # --------------------------------------------------
 #
-
-######################################################################
 # Now let’s merge the token-level alignments and confidence scores to get
 # word-level alignments and confidence scores. Then, finally, we verify
 # the quality of word alignments by 1) plotting the word-level alignments
