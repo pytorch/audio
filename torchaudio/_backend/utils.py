@@ -219,11 +219,11 @@ class SoXBackend(Backend):
 
 
 class SoundfileBackend(Backend):
-    @abstractmethod
+    @staticmethod
     def info(uri: Union[BinaryIO, str, os.PathLike], format: Optional[str], buffer_size: int = 4096) -> AudioMetaData:
         return soundfile_backend.info(uri, format)
 
-    @abstractmethod
+    @staticmethod
     def load(
         uri: Union[BinaryIO, str, os.PathLike],
         frame_offset: int = 0,
@@ -235,7 +235,7 @@ class SoundfileBackend(Backend):
     ) -> Tuple[torch.Tensor, int]:
         return soundfile_backend.load(uri, frame_offset, num_frames, normalize, channels_first, format)
 
-    @abstractmethod
+    @staticmethod
     def save(
         uri: Union[BinaryIO, str, os.PathLike],
         src: torch.Tensor,
@@ -250,11 +250,11 @@ class SoundfileBackend(Backend):
             uri, src, sample_rate, channels_first, format=format, encoding=encoding, bits_per_sample=bits_per_sample
         )
 
-    @abstractmethod
+    @staticmethod
     def can_decode(uri, format) -> bool:
         return True
 
-    @abstractmethod
+    @staticmethod
     def can_encode(uri, format) -> bool:
         return True
 
