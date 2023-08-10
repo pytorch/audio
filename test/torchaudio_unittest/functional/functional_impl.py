@@ -1282,6 +1282,38 @@ class Functional(TestBaseMixin):
             spans = F.merge_tokens(tokens_, scores_, blank=0)
             self._assert_tokens(spans, expected_)
 
+    def test_frechet_distance_univariate(self):
+        r"""Check that Frechet distance is computed correctly for simple one-dimensional case."""
+        mu_x = torch.rand((1,), device=self.device)
+        sigma_x = torch.rand((1, 1), device=self.device)
+
+        mu_y = torch.rand((1,), device=self.device)
+        sigma_y = torch.rand((1, 1), device=self.device)
+
+        # Matrix square root reduces to scalar square root.
+        expected = (mu_x - mu_y) ** 2 + sigma_x + sigma_y - 2 * torch.sqrt(sigma_x * sigma_y)
+        expected = expected.item()
+        actual = F.frechet_distance(mu_x, sigma_x, mu_y, sigma_y)
+
+        self.assertEqual(expected, actual)
+
+    def test_frechet_distance_diagonal_covariance(self):
+        r"""Check that Frechet distance is computed correctly for case where covariance matrices are diagonal."""
+        N = 15
+        mu_x = torch.rand((N,), device=self.device)
+        sigma_x = torch.diag(torch.rand((N,), device=self.device))
+
+        mu_y = torch.rand((N,), device=self.device)
+        sigma_y = torch.diag(torch.rand((N,), device=self.device))
+
+        expected = (
+            torch.sum((mu_x - mu_y) ** 2) + torch.sum(sigma_x + sigma_y) - 2 * torch.sum(torch.sqrt(sigma_x * sigma_y))
+        )
+        expected = expected.item()
+        actual = F.frechet_distance(mu_x, sigma_x, mu_y, sigma_y)
+
+        self.assertEqual(expected, actual)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):
