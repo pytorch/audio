@@ -36,6 +36,7 @@ from .functional import (
     detect_pitch_frequency,
     edit_distance,
     fftconvolve,
+    frechet_distance,
     griffinlim,
     inverse_spectrogram,
     linear_fbanks,
@@ -122,4 +123,5 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
+    "frechet_distance",
 ]

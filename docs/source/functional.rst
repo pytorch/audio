@@ -32,6 +32,7 @@ Utility
    preemphasis
    deemphasis
    speed
+   frechet_distance
 
 Forced Alignment
 ----------------
