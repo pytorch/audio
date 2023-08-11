@@ -38,7 +38,7 @@ Structures used to report the metadata of audio files.
 AudioMetaData
 -------------
 
-.. autoclass:: torchaudio.backend.common.AudioMetaData
+.. autoclass:: torchaudio.AudioMetaData
 
 .. py:module:: torchaudio.backend.sox_io_backend
 
