@@ -1,4 +1,4 @@
-from torchaudio import (  # noqa: F401
+from . import (  # noqa: F401
     _extension,
     compliance,
     datasets,
@@ -11,6 +11,8 @@ from torchaudio import (  # noqa: F401
     transforms,
     utils,
 )
+from .backend.common import AudioMetaData
+
 
 try:
     from .version import __version__, git_version  # noqa: F401
@@ -34,6 +36,7 @@ _init_backend()
 
 
 __all__ = [
+    "AudioMetaData",
     "io",
     "compliance",
     "datasets",
