@@ -305,9 +305,15 @@ def _get_subtype(dtype: torch.dtype, format: str, encoding: str, bits_per_sample
             raise ValueError("flac does not support bits_per_sample > 24.")
         return "PCM_S8" if bits_per_sample == 8 else f"PCM_{bits_per_sample}"
     if format in ("ogg", "vorbis"):
-        if encoding or bits_per_sample:
-            raise ValueError("ogg/vorbis does not support encoding/bits_per_sample.")
-        return "VORBIS"
+        if bits_per_sample:
+            raise ValueError("ogg/vorbis does not support bits_per_sample.")
+        if encoding is None or encoding == "vorbis":
+            return "VORBIS"
+        if encoding == "opus":
+            return "OPUS"
+        raise ValueError(f"Unexpected encoding: {encoding}")
+    if format == "mp3":
+        return "MPEG_LAYER_III"
     if format == "sph":
         return _get_subtype_for_sphere(encoding, bits_per_sample)
     if format in ("nis", "nist"):
