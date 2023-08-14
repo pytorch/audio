@@ -102,7 +102,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(autouse=True)
 def temp_hub_dir(tmp_path, pytestconfig):
-    if not pytestconfig.getoption("use_tmp_hub_dir"):
+    if not pytestconfig.getoption("use_tmp_hub_dir", default=False):
         yield
     else:
         org_dir = torch.hub.get_dir()
