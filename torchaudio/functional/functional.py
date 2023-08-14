@@ -1296,7 +1296,7 @@ def spectral_centroid(
 
 
 @torchaudio._extension.fail_if_no_sox
-@deprecated("Please migrate to torchaudio.io.AudioEffector.", remove=False)
+@deprecated("Please migrate to :py:class:`torchaudio.io.AudioEffector`.", remove=False)
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1310,12 +1310,6 @@ def apply_codec(
     Apply codecs as a form of augmentation.
 
     .. devices:: CPU
-
-    .. warning::
-
-       This function has been deprecated.
-       Please migrate to :py:class:`torchaudio.io.AudioEffector`, which works on all platforms,
-       and supports streaming processing.
 
     Args:
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.

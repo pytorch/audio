@@ -78,6 +78,18 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
 
+        message = "This function has been deprecated. "
+        if remove:
+            message += f'It will be removed from {"future" if version is None else version} release. '
+
+        wrapped.__doc__ = f"""DEPRECATED: {func.__doc__}
+
+    .. warning::
+
+       {message}
+       {direction}
+        """
+
         return wrapped
 
     return decorator

@@ -97,7 +97,6 @@ model implementations and application components.
 
    torchaudio
    io
-   backend
    functional
    transforms
    datasets

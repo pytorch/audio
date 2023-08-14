@@ -146,9 +146,7 @@ class AudioEffector:
         pad_end (bool, optional): When enabled, and if the waveform becomes shorter after applying
             effects/codec, then pad the end with silence.
 
-    Examples:
-        * Basic usage
-
+    Example - Basic usage
         To use ``AudioEffector``, first instantiate it with a set of
         ``effect`` and ``format``.
 
@@ -165,8 +163,7 @@ class AudioEffector:
         >>> for chunk in effector.stream(waveform, sample_rate):
         >>>    ...
 
-        * Applying effects
-
+    Example - Applying effects
         Please refer to
         https://ffmpeg.org/ffmpeg-filters.html#Filtergraph-description
         for the overview of filter description, and
@@ -197,8 +194,7 @@ class AudioEffector:
 
         >>> AudioEffector(effect="")
 
-        * Applying codec
-
+    Example - Applying codec
         One can apply codec using ``format`` argument. ``format`` can be
         audio format or container format. If the container format supports
         multiple encoders, you can specify it with ``encoder`` argument.
@@ -225,8 +221,7 @@ class AudioEffector:
 
         >>> AudioEffector(format="webm", encoder="opus")
 
-        * Applying codec with configuration
-
+    Example - Applying codec with configuration
         Reference: https://trac.ffmpeg.org/wiki/Encode/MP3
 
         MP3 with default config
