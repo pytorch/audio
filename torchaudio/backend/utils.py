@@ -3,9 +3,10 @@ import warnings
 from typing import List, Optional
 
 import torchaudio
+from torchaudio._backend import soundfile_backend
 from torchaudio._internal import module_utils as _mod_utils
 
-from . import no_backend, soundfile_backend, sox_io_backend
+from . import _no_backend as no_backend, _sox_io_backend as sox_io_backend
 
 __all__ = [
     "list_audio_backends",
@@ -53,13 +54,18 @@ def set_audio_backend(backend: Optional[str]):
 
 
 def _init_backend():
+    warnings.warn(
+        "TorchAudio's global backend is now deprecated. "
+        "Please enable distpatcher by setting `TORCHAUDIO_USE_BACKEND_DISPATCHER=1`, "
+        "and specify backend when calling load/info/save function.",
+        stacklevel=3,
+    )
     backends = list_audio_backends()
     if "sox_io" in backends:
         set_audio_backend("sox_io")
     elif "soundfile" in backends:
         set_audio_backend("soundfile")
     else:
-        warnings.warn("No audio backend is available.")
         set_audio_backend(None)
 
 

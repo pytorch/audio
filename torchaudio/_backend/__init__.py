@@ -3,11 +3,11 @@ from typing import List, Optional
 import torchaudio
 from torchaudio._internal.module_utils import deprecated
 
-from . import utils
-
 
 # TODO: Once legacy global backend is removed, move this to torchaudio.__init__
 def _init_backend():
+    from . import utils
+
     torchaudio.info = utils.get_info_func()
     torchaudio.load = utils.get_load_func()
     torchaudio.save = utils.get_save_func()
@@ -24,6 +24,8 @@ def list_audio_backends() -> List[str]:
         - Dispatcher mode: ``"ffmpeg"``, ``"sox"`` and ``"soundfile"``.
         - Legacy backend mode: ``"sox_io"``, ``"soundfile"``.
     """
+    from . import utils
+
     return list(utils.get_available_backends().keys())
 
 

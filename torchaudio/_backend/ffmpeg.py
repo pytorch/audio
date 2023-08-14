@@ -5,10 +5,10 @@ from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
 import torchaudio
-from torchaudio.backend.common import AudioMetaData
 from torchaudio.io import StreamWriter
 
 from .backend import Backend
+from .common import AudioMetaData
 
 if torchaudio._extension._FFMPEG_EXT is not None:
     StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj

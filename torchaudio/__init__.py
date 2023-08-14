@@ -11,8 +11,7 @@ from . import (  # noqa: F401
     transforms,
     utils,
 )
-from .backend.common import AudioMetaData
-
+from ._backend.common import AudioMetaData  # noqa
 
 try:
     from .version import __version__, git_version  # noqa: F401
@@ -33,6 +32,9 @@ else:
 
 
 _init_backend()
+
+# for backward compatibility. This has to happen after _backend is imported.
+from . import backend  # noqa: F401
 
 
 __all__ = [
