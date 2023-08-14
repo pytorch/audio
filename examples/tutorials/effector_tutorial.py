@@ -13,12 +13,9 @@ apply various effects and codecs to waveform tensor.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <7).
-#
-#    There are multiple ways to install FFmpeg libraries.
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
-#    compatible FFmpeg libraries.
+#    This tutorial requires FFmpeg libraries.
+#    Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+#    the detail.
 #
 
 ######################################################################
@@ -42,25 +39,15 @@ print(torchaudio.__version__)
 
 ######################################################################
 #
-try:
-    from torchaudio.io import AudioEffector, CodecConfig
-except ImportError as err:
-    raise RuntimeError(
-        "This tutorial requires nightly build of TorchAudio. "
-        "Please install the nightly versions of PyTorch and torchaudio. "
-        "https://pytorch.org/get-started/locally/"
-    ) from err
+from torchaudio.io import AudioEffector, CodecConfig
 
 import matplotlib.pyplot as plt
 from IPython.display import Audio
 
 ######################################################################
 #
-try:
-    for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
-        print(k, v)
-except Exception:
-    raise RuntimeError("This tutorial requires FFmpeg libraries 4.2>,<5. " "Please install FFmpeg.")
+for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
+    print(k, v)
 
 ######################################################################
 # Usage
