@@ -4,7 +4,7 @@ from typing import BinaryIO, Optional, Tuple, Union
 
 from torch import Tensor
 
-from torchaudio.backend.common import AudioMetaData
+from .common import AudioMetaData
 
 
 class Backend(ABC):

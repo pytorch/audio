@@ -5,10 +5,11 @@ from typing import BinaryIO, Dict, Optional, Tuple, Type, Union
 import torch
 
 from torchaudio._extension import _FFMPEG_EXT, _SOX_INITIALIZED
-from torchaudio.backend import soundfile_backend
-from torchaudio.backend.common import AudioMetaData
+
+from . import soundfile_backend
 
 from .backend import Backend
+from .common import AudioMetaData
 from .ffmpeg import FFmpegBackend
 from .soundfile import SoundfileBackend
 from .sox import SoXBackend

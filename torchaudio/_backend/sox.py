@@ -2,9 +2,9 @@ import os
 from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
-from torchaudio.backend.common import AudioMetaData
 
 from .backend import Backend
+from .common import AudioMetaData
 
 
 class SoXBackend(Backend):
