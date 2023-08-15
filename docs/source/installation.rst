@@ -16,7 +16,7 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
    each of which requires a corresponding PyTorch distribution.
 
 .. note::
-   This software was compiled against an unmodified copies of FFmpeg, with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded from the following locations: `n4.1.8 <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n4.1.8/COPYING.LGPLv2.1>`__), `n5.0.3 <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n5.0.3/COPYING.LGPLv2.1>`__) and `n6.0 <https://github.com/FFmpeg/FFmpeg/releases/tag/n6.0>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n6.0/COPYING.LGPLv2.1>`__).
+   This software was compiled against an unmodified copies of FFmpeg, with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded from the following locations: `n4.1.8 <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.4.4>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n4.4.4/COPYING.LGPLv2.1>`__), `n5.0.3 <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n5.0.3/COPYING.LGPLv2.1>`__) and `n6.0 <https://github.com/FFmpeg/FFmpeg/releases/tag/n6.0>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n6.0/COPYING.LGPLv2.1>`__).
 
 Dependencies
 ------------
@@ -25,8 +25,12 @@ Dependencies
 
   Please refer to the compatibility matrix bellow for supported PyTorch versions.
 
+.. _optional_dependencies:
+
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
+
+.. _ffmpeg:
 
 * `FFmpeg <https://ffmpeg.org>`__
 
@@ -34,8 +38,14 @@ Optional Dependencies
   `I/O functions <./torchaudio.html#i-o>`__.
 
   Starting version 2.1, TorchAudio official binary distributions are compatible with
-  FFmpeg version 6, 5 and 4. At runtime, TorchAudio first looks for FFmpeg 6,
+  FFmpeg version 6, 5 and 4. (>=4.4, <7). At runtime, TorchAudio first looks for FFmpeg 6,
   if not found, then it continues to looks for 5 and move on to 4.
+
+  There are multiple ways to install FFmpeg libraries.
+  Please refer to the official documentation for how to install FFmpeg.
+  If you are using Anaconda Python distribution,
+  ``conda install -c conda-forge 'ffmpeg<7'`` will install
+  compatible FFmpeg libraries.
 
   If you need to specify the version of FFmpeg TorchAudio searches and links, you can
   specify it via the environment variable ``TORCHAUDIO_USE_FFMPEG_VERSION``. For example,
@@ -45,6 +55,11 @@ Optional Dependencies
   If for some reason, this search mechanism is causing an issue, you can disable
   the FFmpeg integration entirely by setting the environment variable
   ``TORCHAUDIO_USE_FFMPEG=0``.
+
+  There are multiple ways to install FFmpeg libraries.
+  If you are using Anaconda Python distribution,
+  ``conda install -c conda-forge 'ffmpeg<7'`` will install
+  compatible FFmpeg libraries.
 
   .. note::
 
@@ -86,6 +101,7 @@ Optional Dependencies
 * `sentencepiece <https://pypi.org/project/sentencepiece/>`__
 
   Required for performing automatic speech recognition with :ref:`Emformer RNN-T<RNNT>`.
+  You can install it by running ``pip install sentencepiece``.
 
 * `deep-phonemizer <https://pypi.org/project/deep-phonemizer/>`__
 
