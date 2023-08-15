@@ -3,10 +3,9 @@ from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
 
-from torchaudio.backend import soundfile_backend
-from torchaudio.backend.common import AudioMetaData
-
+from . import soundfile_backend
 from .backend import Backend
+from .common import AudioMetaData
 
 
 class SoundfileBackend(Backend):

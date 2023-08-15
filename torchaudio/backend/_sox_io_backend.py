@@ -3,8 +3,7 @@ from typing import Optional, Tuple
 
 import torch
 import torchaudio
-
-from .common import AudioMetaData
+from torchaudio import AudioMetaData
 
 
 @torchaudio._extension.fail_if_no_sox
