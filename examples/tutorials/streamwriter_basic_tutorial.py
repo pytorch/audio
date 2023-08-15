@@ -13,12 +13,9 @@ encode and save audio/video data into various formats/destinations.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <7).
-#
-#    There are multiple ways to install FFmpeg libraries.
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c conda-forge 'ffmpeg<7'`` will install
-#    compatible FFmpeg libraries.
+#    This tutorial requires FFmpeg libraries.
+#    Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+#    the detail.
 #
 
 ######################################################################

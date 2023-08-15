@@ -15,8 +15,8 @@ if (APPLE)
   if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
     FetchContent_Declare(
       f4
-      URL ${base_url}/2023-07-06/macos_arm64/4.1.8.tar.gz
-      URL_HASH SHA256=a44b8152b7f204ce5050fc7f6fd2bbbafe7ae4e45f03e135f3b45dd9a08f404e
+      URL ${base_url}/2023-08-14/macos_arm64/4.4.4.tar.gz
+      URL_HASH SHA256=9a593eb241eb8b23bc557856ee6db5d9aecd2d8895c614a949f3a1ad9799c1a1
       )
     FetchContent_Declare(
       f5
@@ -31,8 +31,8 @@ if (APPLE)
   elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
     FetchContent_Declare(
       f4
-      URL ${base_url}/2023-07-06/macos_x86_64/4.1.8.tar.gz
-      URL_HASH SHA256=392d5af0b24535bfc69d6244e7595e5f07117b93d94505d0a4b34c82ae479f48
+      URL ${base_url}/2023-08-14/macos_x86_64/4.4.4.tar.gz
+      URL_HASH SHA256=0935e359c0864969987d908397f9208d6dc4dc0ef8bfe2ec730bb2c44eae89fc
       )
     FetchContent_Declare(
       f5
@@ -58,8 +58,8 @@ elseif (UNIX)
   if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
     FetchContent_Declare(
       f4
-      URL ${base_url}/2023-07-06/linux_aarch64/4.1.8.tar.gz
-      URL_HASH SHA256=aae0b713040e30ceebe0d0bc82353d3d9054055c7af8a4f4abc1766015ab7681
+      URL ${base_url}/2023-08-14/linux_aarch64/4.4.4.tar.gz
+      URL_HASH SHA256=6f00437d13a3b3812ebe81c6e6f3a84a58f260d946a1995df87ba09aae234504
       )
     FetchContent_Declare(
       f5
@@ -74,8 +74,8 @@ elseif (UNIX)
   elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
     FetchContent_Declare(
       f4
-      URL ${base_url}/2023-07-06/linux_x86_64/4.1.8.tar.gz
-      URL_HASH SHA256=52e53b8857739bdd54f9d8541e22569b57f6c6f16504ee83963c2ed3e7061a23
+      URL ${base_url}/2023-08-14/linux_x86_64/4.4.4.tar.gz
+      URL_HASH SHA256=9b87eeba9b6975e25f28ba12163bd713228ed84f4c2b3721bc5ebe92055edb51
       )
     FetchContent_Declare(
       f5
@@ -101,8 +101,8 @@ elseif (UNIX)
 elseif(MSVC)
   FetchContent_Declare(
     f4
-    URL ${base_url}/2023-07-06/windows/4.1.8.tar.gz
-    URL_HASH SHA256=c45cd36e0575490f97ace07365bb67c5e1cbe9f3e6a4272d035c19348df96790
+    URL ${base_url}/2023-08-14/windows/4.4.4.tar.gz
+    URL_HASH SHA256=9f9a65cf03a3e164edca601ba18180a504e44e03fae48ce706ca3120b55a4db5
     )
   FetchContent_Declare(
     f5
