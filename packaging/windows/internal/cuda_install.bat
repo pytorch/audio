@@ -57,7 +57,7 @@ goto cuda_common
 
 :cuda121
 
-set CUDA_INSTALL_EXE=cuda_12.1.0_531.14_windows.exe
+set CUDA_INSTALL_EXE=cuda_12.1.1_531.14_windows.exe
 if not exist "%SRC_DIR%\temp_build\%CUDA_INSTALL_EXE%" (
     curl -k -L "https://ossci-windows.s3.amazonaws.com/%CUDA_INSTALL_EXE%" --output "%SRC_DIR%\temp_build\%CUDA_INSTALL_EXE%"
     if errorlevel 1 exit /b 1
