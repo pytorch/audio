@@ -127,6 +127,22 @@ def _get_pattern():
     return ret
 
 
+def reset_mpl(gallery_conf, fname):
+    from sphinx_gallery.scrapers import _reset_matplotlib
+
+    _reset_matplotlib(gallery_conf, fname)
+    import matplotlib
+
+    matplotlib.rcParams.update(
+        {
+            "image.interpolation": "none",
+            "figure.figsize": (9.6, 4.8),
+            "font.size": 8.0,
+            "axes.axisbelow": True,
+        }
+    )
+
+
 sphinx_gallery_conf = {
     "examples_dirs": [
         "../../examples/tutorials",
@@ -139,6 +155,7 @@ sphinx_gallery_conf = {
     "promote_jupyter_magic": True,
     "first_notebook_cell": None,
     "doc_module": ("torchaudio",),
+    "reset_modules": (reset_mpl, "seaborn"),
 }
 autosummary_generate = True
 

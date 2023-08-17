@@ -534,6 +534,16 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
             if i >= 40:
                 break
 
+    def test_stream_requires_grad_false(self):
+        """Tensors produced by StreamReader are requires_grad=False"""
+        s = StreamReader(self.get_src())
+        s.add_basic_audio_stream(frames_per_chunk=2000)
+        s.add_basic_video_stream(frames_per_chunk=15)
+        s.fill_buffer()
+        audio, video = s.pop_chunks()
+        assert not audio._elem.requires_grad
+        assert not video._elem.requires_grad
+
     @parameterized.expand(["key", "any", "precise"])
     def test_seek(self, mode):
         """Calling `seek` multiple times should not segfault"""

@@ -472,8 +472,9 @@ class TransformsTestBase(TestBaseMixin):
             self.assertFalse(False in torch.eq(f_axis_mean[f_axis_mean != 0], 1))
 
         # Test if iid_masks gives different masking results for different spectrograms across the 0th dimension.
-        print(torch.norm(spec_masked[0] - spec_masked[1]).item())
+        diff = torch.linalg.vector_norm(spec_masked[0] - spec_masked[1]).item()
+        print(diff)
         if iid_masks is True:
-            self.assertTrue(torch.norm(spec_masked[0] - spec_masked[1]).item() > 0)
+            self.assertTrue(diff > 0)
         else:
-            self.assertTrue(torch.norm(spec_masked[0] - spec_masked[1]).item() == 0)
+            self.assertTrue(diff == 0)

@@ -5,8 +5,8 @@ from typing import Tuple, Union
 
 import torchaudio
 from torch import Tensor
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
+from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_tar
 
 URL = "aew"

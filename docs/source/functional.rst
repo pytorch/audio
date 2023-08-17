@@ -32,7 +32,17 @@ Utility
    preemphasis
    deemphasis
    speed
+   frechet_distance
+
+Forced Alignment
+----------------
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
    forced_align
+   merge_tokens
+   TokenSpan
 
 
 Filtering

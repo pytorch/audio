@@ -2,13 +2,13 @@ import logging
 import os
 import sys
 
-from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
+from torchaudio._internal.module_utils import eval_env, fail_with_message, is_module_available, no_op
 
 try:
     from .fb import _init_ffmpeg
 except ImportError:
     from .utils import _init_ffmpeg
-from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _init_dll_path, _init_sox, _load_lib
+from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _fail_since_no_sox, _init_dll_path, _init_sox, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -51,20 +51,40 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
 
 
-# Similar to libtorchaudio, sox-related features should be importable when present.
-#
-# Note: This will be change in the future when sox is dynamically linked.
-# At that point, this initialization should handle the case where
-# sox integration is built but libsox is not found.
+# Initialize libsox-related features
 _SOX_INITIALIZED = False
-if is_module_available("torchaudio.lib._torchaudio_sox"):
-    _init_sox()
-    _SOX_INITIALIZED = True
+_USE_SOX = False if os.name == "nt" else eval_env("TORCHAUDIO_USE_SOX", True)
+_SOX_MODULE_AVAILABLE = is_module_available("torchaudio.lib._torchaudio_sox")
+if _USE_SOX and _SOX_MODULE_AVAILABLE:
+    try:
+        _init_sox()
+        _SOX_INITIALIZED = True
+    except Exception:
+        # The initialization of sox extension will fail if supported sox
+        # libraries are not found in the system.
+        # Since the rest of the torchaudio works without it, we do not report the
+        # error here.
+        # The error will be raised when user code attempts to use these features.
+        _LG.debug("Failed to initialize sox extension", exc_info=True)
+
+
+if os.name == "nt":
+    fail_if_no_sox = fail_with_message("requires sox extension, which is not supported on Windows.")
+elif not _USE_SOX:
+    fail_if_no_sox = fail_with_message("requires sox extension, but it is disabled. (TORCHAUDIO_USE_SOX=0)")
+elif not _SOX_MODULE_AVAILABLE:
+    fail_if_no_sox = fail_with_message(
+        "requires sox extension, but TorchAudio is not compiled with it. "
+        "Please build TorchAudio with libsox support. (BUILD_SOX=1)"
+    )
+else:
+    fail_if_no_sox = no_op if _SOX_INITIALIZED else _fail_since_no_sox
 
 
 # Initialize FFmpeg-related features
 _FFMPEG_EXT = None
-if _IS_TORCHAUDIO_EXT_AVAILABLE:
+_USE_FFMPEG = eval_env("TORCHAUDIO_USE_FFMPEG", True)
+if _USE_FFMPEG and _IS_TORCHAUDIO_EXT_AVAILABLE:
     try:
         _FFMPEG_EXT = _init_ffmpeg()
     except Exception:
@@ -76,15 +96,11 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
         _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
 
 
-fail_if_no_sox = (
-    no_op
-    if _SOX_INITIALIZED
-    else fail_with_message(
-        "requires sox extension, but TorchAudio is not compiled with it. Please build TorchAudio with libsox support."
-    )
-)
+if _USE_FFMPEG:
+    fail_if_no_ffmpeg = _fail_since_no_ffmpeg if _FFMPEG_EXT is None else no_op
+else:
+    fail_if_no_ffmpeg = fail_with_message("requires ffmpeg extension, but it is disabled. (TORCHAUDIO_USE_FFMPEG=0)")
 
-fail_if_no_ffmpeg = _fail_since_no_ffmpeg if _FFMPEG_EXT is None else no_op
 
 fail_if_no_rir = (
     no_op

@@ -14,12 +14,9 @@ libavfilter provides.
 #
 # .. note::
 #
-#    This tutorial requires FFmpeg libraries (>=4.1, <4.4).
-#
-#    There are multiple ways to install FFmpeg libraries.
-#    If you are using Anaconda Python distribution,
-#    ``conda install -c anaconda 'ffmpeg<4.4'`` will install
-#    the required libraries.
+#    This tutorial requires FFmpeg libraries.
+#    Please refer to :ref:`FFmpeg dependency <ffmpeg_dependency>` for
+#    the detail.
 #
 
 ######################################################################
@@ -592,7 +589,6 @@ for i, vid in enumerate(vids2):
         if i == 0 and j == 0:
             ax.set_ylabel("Stream 2")
 plt.tight_layout()
-plt.show(block=False)
 
 ######################################################################
 #

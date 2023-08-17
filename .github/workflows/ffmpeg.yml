@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build
@@ -46,7 +46,7 @@ jobs:
       repository: pytorch/audio
       runner: "linux.t4g.2xlarge"
       no-sudo: true
-      docker-image: quay.io/pypa/manylinux2014_aarch64
+      docker-image: pytorch/manylinuxaarch64-builder:cpu-aarch64
       script: |
         export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
         export FFMPEG_ROOT="${PWD}/ffmpeg"
@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
         runner: ["macos-m1-12", "macos-12"]
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
@@ -85,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.1.8", "5.0.3", "6.0"]
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
       job-name: Build

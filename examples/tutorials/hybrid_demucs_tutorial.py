@@ -162,11 +162,10 @@ def separate_sources(
 def plot_spectrogram(stft, title="Spectrogram"):
     magnitude = stft.abs()
     spectrogram = 20 * torch.log10(magnitude + 1e-8).numpy()
-    figure, axis = plt.subplots(1, 1)
-    img = axis.imshow(spectrogram, cmap="viridis", vmin=-60, vmax=0, origin="lower", aspect="auto")
-    figure.suptitle(title)
-    plt.colorbar(img, ax=axis)
-    plt.show()
+    _, axis = plt.subplots(1, 1)
+    axis.imshow(spectrogram, cmap="viridis", vmin=-60, vmax=0, origin="lower", aspect="auto")
+    axis.set_title(title)
+    plt.tight_layout()
 
 
 ######################################################################
@@ -252,7 +251,7 @@ def output_results(original_source: torch.Tensor, predicted_source: torch.Tensor
         "SDR score is:",
         separation.bss_eval_sources(original_source.detach().numpy(), predicted_source.detach().numpy())[0].mean(),
     )
-    plot_spectrogram(stft(predicted_source)[0], f"Spectrogram {source}")
+    plot_spectrogram(stft(predicted_source)[0], f"Spectrogram - {source}")
     return Audio(predicted_source, rate=sample_rate)
 
 
@@ -294,7 +293,7 @@ mix_spec = mixture[:, frame_start:frame_end].cpu()
 #
 
 # Mixture Clip
-plot_spectrogram(stft(mix_spec)[0], "Spectrogram Mixture")
+plot_spectrogram(stft(mix_spec)[0], "Spectrogram - Mixture")
 Audio(mix_spec, rate=sample_rate)
 
 ######################################################################

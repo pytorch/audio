@@ -105,7 +105,6 @@ def plot_sweep(
     axis.yaxis.grid(True, alpha=0.67)
     figure.suptitle(f"{title} (sample rate: {sample_rate} Hz)")
     plt.colorbar(cax)
-    plt.show(block=True)
 
 
 ######################################################################

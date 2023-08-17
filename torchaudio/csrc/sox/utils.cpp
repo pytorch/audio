@@ -222,7 +222,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
     case Encoding::PCM_SIGNED:
       switch (bits_per_sample) {
         case BitDepth::NOT_PROVIDED:
-          return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
+          return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
         case BitDepth::B8:
           TORCH_CHECK(
               false, format, " does not support 8-bit signed PCM encoding.");

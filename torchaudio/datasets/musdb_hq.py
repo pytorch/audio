@@ -4,8 +4,8 @@ from typing import List, Optional, Tuple, Union
 
 import torch
 import torchaudio
-from torch.hub import download_url_to_file
 from torch.utils.data import Dataset
+from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_zip
 
 _URL = "https://zenodo.org/record/3338373/files/musdb18hq.zip"

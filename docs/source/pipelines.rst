@@ -27,7 +27,7 @@ RNN-T Streaming/Non-Streaming ASR
 ---------------------------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``RNNTBundle`` defines ASR pipelines and consists of three steps: feature extraction, inference, and de-tokenization.
 
@@ -47,7 +47,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.RNNTBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -61,7 +61,7 @@ wav2vec 2.0 / HuBERT / WavLM - SSL
 ----------------------------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``Wav2Vec2Bundle`` instantiates models that generate acoustic features that can be used for downstream inference and fine-tuning.
 
@@ -75,7 +75,7 @@ Interface
    Wav2Vec2Bundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -100,7 +100,7 @@ wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``Wav2Vec2ASRBundle`` instantiates models that generate probability distribution over pre-defined labels, that can be used for ASR.
 
@@ -118,7 +118,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.Wav2Vec2ASRBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -142,6 +142,38 @@ Pretrained Models
    HUBERT_ASR_LARGE
    HUBERT_ASR_XLARGE
 
+wav2vec 2.0 / HuBERT - Forced Alignment
+---------------------------------------
+
+Interface
+~~~~~~~~~
+
+``Wav2Vec2FABundle`` bundles pre-trained model and its associated dictionary. Additionally, it supports appending ``star`` token dimension.
+
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2fabundle.png
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   Wav2Vec2FABundle
+   Wav2Vec2FABundle.Tokenizer
+   Wav2Vec2FABundle.Aligner
+
+.. rubric:: Tutorials using ``Wav2Vec2FABundle``
+
+.. minigallery:: torchaudio.pipelines.Wav2Vec2FABundle
+
+Pertrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   MMS_FA
 
 .. _Tacotron2:
    
@@ -157,7 +189,7 @@ Tacotron2 Text-To-Speech
 Similarly ``Vocoder`` can be an algorithm without learning parameters, like `Griffin-Lim`, or a neural-network-based model like `Waveglow`.
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -173,7 +205,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.Tacotron2TTSBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -189,7 +221,7 @@ Source Separation
 -----------------
 
 Interface
-^^^^^^^^^
+~~~~~~~~~
 
 ``SourceSeparationBundle`` instantiates source separation models which take single channel audio and generates multi-channel audio.
 
@@ -207,7 +239,7 @@ Interface
 .. minigallery:: torchaudio.pipelines.SourceSeparationBundle
 
 Pretrained Models
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 .. autosummary::
    :toctree: generated
@@ -217,3 +249,53 @@ Pretrained Models
    CONVTASNET_BASE_LIBRI2MIX
    HDEMUCS_HIGH_MUSDB_PLUS
    HDEMUCS_HIGH_MUSDB
+
+Squim Objective
+---------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimObjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **objecive** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimObjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_OBJECTIVE
+
+Squim Subjective
+----------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimSubjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **subjective** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimSubjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_SUBJECTIVE

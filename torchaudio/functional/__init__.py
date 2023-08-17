@@ -1,3 +1,4 @@
+from ._alignment import forced_align, merge_tokens, TokenSpan
 from .filtering import (
     allpass_biquad,
     band_biquad,
@@ -35,7 +36,7 @@ from .functional import (
     detect_pitch_frequency,
     edit_distance,
     fftconvolve,
-    forced_align,
+    frechet_distance,
     griffinlim,
     inverse_spectrogram,
     linear_fbanks,
@@ -94,6 +95,8 @@ __all__ = [
     "filtfilt",
     "flanger",
     "forced_align",
+    "merge_tokens",
+    "TokenSpan",
     "gain",
     "highpass_biquad",
     "lfilter",
@@ -120,4 +123,5 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
+    "frechet_distance",
 ]

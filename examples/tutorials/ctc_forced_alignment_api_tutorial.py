@@ -2,23 +2,30 @@
 CTC forced alignment API tutorial
 =================================
 
-**Author**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__
+**Author**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__, `Moto Hira <moto@meta.com>`__
 
+The forced alignment is a process to align transcript with speech.
+This tutorial shows how to align transcripts to speech using
+:py:func:`torchaudio.functional.forced_align` which was developed along the work of
+`Scaling Speech Technology to 1,000+ Languages
+<https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__.
 
-This tutorial shows how to align transcripts to speech with
-``torchaudio``'s CTC forced alignment API proposed in the paper
-`“Scaling Speech Technology to 1,000+
-Languages” <https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__,
-and one advanced usage, i.e. dealing with transcription errors with a <star> token.
+:py:func:`~torchaudio.functional.forced_align` has custom CPU and CUDA
+implementations which are more performant than the vanilla Python
+implementation above, and are more accurate.
+It can also handle missing transcript with special ``<star>`` token.
 
-Though there’s some overlap in visualization
-diagrams, the scope here is different from the `“Forced Alignment with
-Wav2Vec2” <https://pytorch.org/audio/stable/tutorials/forced_alignment_tutorial.html>`__
-tutorial, which focuses on a step-by-step demonstration of the forced
-alignment generation algorithm (without using an API) described in the
-`paper <https://arxiv.org/abs/2007.09127>`__ with a Wav2Vec2 model.
-
+There is also a high-level API, :py:class:`torchaudio.pipelines.Wav2Vec2FABundle`,
+which wraps the pre/post-processing explained in this tutorial and makes it easy
+to run forced-alignments.
+`Forced alignment for multilingual data
+<./forced_alignment_for_multilingual_data_tutorial.html>`__ uses this API to
+illustrate how to align non-English transcripts.
 """
+
+######################################################################
+# Preparation
+# -----------
 
 import torch
 import torchaudio
@@ -26,324 +33,210 @@ import torchaudio
 print(torch.__version__)
 print(torchaudio.__version__)
 
+######################################################################
+#
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
-
-try:
-    from torchaudio.functional import forced_align
-except ModuleNotFoundError:
-    print(
-        "Failed to import the forced alignment API. "
-        "Please install torchaudio nightly builds. "
-        "Please refer to https://pytorch.org/get-started/locally "
-        "for instructions to install a nightly build."
-    )
-    raise
-
 ######################################################################
-# Basic usages
-# ------------
 #
-# In this section, we cover the following content:
-#
-# 1. Generate frame-wise class probabilites from audio waveform from a CTC
-#    acoustic model.
-# 2. Compute frame-level alignments using TorchAudio’s forced alignment
-#    API.
-# 3. Obtain token-level alignments from frame-level alignments.
-# 4. Obtain word-level alignments from token-level alignments.
-#
-
-
-######################################################################
-# Preparation
-# ~~~~~~~~~~~
-#
-# First we import the necessary packages, and fetch data that we work on.
-#
-
-# %matplotlib inline
-from dataclasses import dataclass
 
 import IPython
-import matplotlib
 import matplotlib.pyplot as plt
 
-matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
+import torchaudio.functional as F
 
-torch.random.manual_seed(0)
+######################################################################
+# First we prepare the speech data and the transcript we area going
+# to use.
+#
 
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-sample_rate = 16000
+waveform, _ = torchaudio.load(SPEECH_FILE)
+TRANSCRIPT = "i had that curiosity beside me at this moment".split()
 
 
 ######################################################################
-# Generate frame-wise class posteriors from a CTC acoustic model
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Generating emissions
+# ~~~~~~~~~~~~~~~~~~~~
 #
-# The first step is to generate the class probabilities (i.e. posteriors)
-# of each audio frame using a CTC model.
-# Here we use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
+# :py:func:`~torchaudio.functional.forced_align` takes emission and
+# token sequences and outputs timestaps of the tokens and their scores.
+#
+# Emission reperesents the frame-wise probability distribution over
+# tokens, and it can be obtained by passing waveform to an acoustic
+# model.
+#
+# Tokens are numerical expression of transcripts. There are many ways to
+# tokenize transcripts, but here, we simply map alphabets into integer,
+# which is how labels were constructed when the acoustice model we are
+# going to use was trained.
+#
+# We will use a pre-trained Wav2Vec2 model,
+# :py:data:`torchaudio.pipelines.MMS_FA`, to obtain emission and tokenize
+# the transcript.
 #
 
-bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
-model = bundle.get_model().to(device)
-labels = bundle.get_labels()
+bundle = torchaudio.pipelines.MMS_FA
+
+model = bundle.get_model(with_star=False).to(device)
 with torch.inference_mode():
-    waveform, _ = torchaudio.load(SPEECH_FILE)
-    emissions, _ = model(waveform.to(device))
-    emissions = torch.log_softmax(emissions, dim=-1)
-
-emission = emissions.cpu().detach()
-dictionary = {c: i for i, c in enumerate(labels)}
-
-print(dictionary)
+    emission, _ = model(waveform.to(device))
 
 
 ######################################################################
-# Visualization
-# ^^^^^^^^^^^^^
 #
+def plot_emission(emission):
+    fig, ax = plt.subplots()
+    ax.imshow(emission.cpu().T)
+    ax.set_title("Frame-wise class probabilities")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Labels")
+    fig.tight_layout()
 
-plt.imshow(emission[0].T)
-plt.colorbar()
-plt.title("Frame-wise class probabilities")
-plt.xlabel("Time")
-plt.ylabel("Labels")
-plt.show()
 
+plot_emission(emission[0])
+
+######################################################################
+# Tokenize the transcript
+# ~~~~~~~~~~~~~~~~~~~~~~~
+#
+# We create a dictionary, which maps each label into token.
+
+LABELS = bundle.get_labels(star=None)
+DICTIONARY = bundle.get_dict(star=None)
+for k, v in DICTIONARY.items():
+    print(f"{k}: {v}")
+
+######################################################################
+# converting transcript to tokens is as simple as
+
+tokenized_transcript = [DICTIONARY[c] for word in TRANSCRIPT for c in word]
+
+for t in tokenized_transcript:
+    print(t, end=" ")
+print()
 
 ######################################################################
 # Computing frame-level alignments
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# --------------------------------
 #
-# Then we call TorchAudio’s forced alignment API to compute the
-# frame-level alignment between each audio frame and each token in the
-# transcript. We first explain the inputs and outputs of the API
-# ``functional.forced_align``. Note that this API works on both CPU and
-# GPU. In the current tutorial we demonstrate it on CPU.
-#
-# **Inputs**:
-#
-# ``emission``: a 2D tensor of size :math:`T \times N`, where :math:`T` is
-# the number of frames (after sub-sampling by the acoustic model, if any),
-# and :math:`N` is the vocabulary size.
-#
-# ``targets``: a 1D tensor vector of size :math:`M`, where :math:`M` is
-# the length of the transcript, and each element is a token ID looked up
-# from the vocabulary. For example, the ``targets`` tensor repsenting the
-# transcript “i had…” is :math:`[5, 18, 4, 16, ...]`.
-#
-# ``input lengths``: :math:`T`.
-#
-# ``target lengths``: :math:`M`.
-#
-# **Outputs**:
-#
-# ``frame_alignment``: a 1D tensor of size :math:`T` storing the aligned
-# token index (looked up from the vocabulary) of each frame, e.g. for the
-# segment corresponding to “i had” in the given example , the
-# frame_alignment is
-# :math:`[...0, 0, 5, 0, 0, 18, 18, 4, 0, 0, 0, 16,...]`, where :math:`0`
-# represents the blank symbol.
-#
-# ``frame_scores``: a 1D tensor of size :math:`T` storing the confidence
-# score (0 to 1) for each each frame. For each frame, the score should be
-# close to one if the alignment quality is good.
-#
-# From the outputs ``frame_alignment`` and ``frame_scores``, we generate a
-# list called ``frames`` storing information of all frames aligned to
-# non-blank tokens. Each element contains 1) token_index: the aligned
-# token’s index in the transcript 2) time_index: the current frame’s index
-# in the input audio (or more precisely, the row dimension of the emission
-# matrix) 3) the confidence scores of the current frame.
-#
-# For the given example, the first few elements of the list ``frames``
-# corresponding to “i had” looks as the following:
-#
-# ``Frame(token_index=0, time_index=32, score=0.9994410872459412)``
-#
-# ``Frame(token_index=1, time_index=35, score=0.9980823993682861)``
-#
-# ``Frame(token_index=1, time_index=36, score=0.9295750260353088)``
-#
-# ``Frame(token_index=2, time_index=37, score=0.9997448325157166)``
-#
-# ``Frame(token_index=3, time_index=41, score=0.9991760849952698)``
-#
-# ``...``
-#
-# The interpretation is:
-#
-# The token with index :math:`0` in the transcript, i.e. “i”, is aligned
-# to the :math:`32`\ th audio frame, with confidence :math:`0.9994`. The
-# token with index :math:`1` in the transcript, i.e. “h”, is aligned to
-# the :math:`35`\ th and :math:`36`\ th audio frames, with confidence
-# :math:`0.9981` and :math:`0.9296` respectively. The token with index
-# :math:`2` in the transcript, i.e. “a”, is aligned to the :math:`35`\ th
-# and :math:`36`\ th audio frames, with confidence :math:`0.9997`. The
-# token with index :math:`3` in the transcript, i.e. “d”, is aligned to
-# the :math:`41`\ th audio frame, with confidence :math:`0.9992`.
-#
-# From such information stored in the ``frames`` list, we’ll compute
-# token-level and word-level alignments easily.
+# Now we call TorchAudio’s forced alignment API to compute the
+# frame-level alignment. For the detail of function signature, please
+# refer to :py:func:`~torchaudio.functional.forced_align`.
 #
 
 
-@dataclass
-class Frame:
-    # This is the index of each token in the transcript,
-    # i.e. the current frame aligns to the N-th character from the transcript.
-    token_index: int
-    time_index: int
-    score: float
+def align(emission, tokens):
+    targets = torch.tensor([tokens], dtype=torch.int32, device=device)
+    alignments, scores = F.forced_align(emission, targets, blank=0)
+
+    alignments, scores = alignments[0], scores[0]  # remove batch dimension for simplicity
+    scores = scores.exp()  # convert back to probability
+    return alignments, scores
 
 
-def compute_alignments(transcript, dictionary, emission):
-    frames = []
-    tokens = [dictionary[c] for c in transcript.replace(" ", "")]
-
-    targets = torch.tensor(tokens, dtype=torch.int32).unsqueeze(0)
-    input_lengths = torch.tensor([emission.shape[1]])
-    target_lengths = torch.tensor([targets.shape[1]])
-
-    # This is the key step, where we call the forced alignment API functional.forced_align to compute alignments.
-    frame_alignment, frame_scores = forced_align(emission, targets, input_lengths, target_lengths, 0)
-
-    assert frame_alignment.shape[1] == input_lengths[0].item()
-    assert targets.shape[1] == target_lengths[0].item()
-
-    token_index = -1
-    prev_hyp = 0
-    for i in range(frame_alignment.shape[1]):
-        if frame_alignment[0][i].item() == 0:
-            prev_hyp = 0
-            continue
-
-        if frame_alignment[0][i].item() != prev_hyp:
-            token_index += 1
-        frames.append(Frame(token_index, i, frame_scores[0][i].exp().item()))
-        prev_hyp = frame_alignment[0][i].item()
-    return frames, frame_alignment, frame_scores
-
-
-transcript = "I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT"
-frames, frame_alignment, frame_scores = compute_alignments(transcript, dictionary, emission)
-
+aligned_tokens, alignment_scores = align(emission, tokenized_transcript)
 
 ######################################################################
-# Obtain token-level alignments and confidence scores
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
+# Now let's look at the output.
 
+for i, (ali, score) in enumerate(zip(aligned_tokens, alignment_scores)):
+    print(f"{i:3d}:\t{ali:2d} [{LABELS[ali]}], {score:.2f}")
 
 ######################################################################
-# The frame-level alignments contains repetations for the same labels.
-# Another format “token-level alignment”, which specifies the aligned
-# frame ranges for each transcript token, contains the same information,
-# while being more convenient to apply to some downstream tasks
-# (e.g. computing word-level alignments).
 #
-# Now we demonstrate how to obtain token-level alignments and confidence
-# scores by simply merging frame-level alignments and averaging
-# frame-level confidence scores.
+# .. note::
+#
+#    The alignment is expressed in the frame cordinate of the emission,
+#    which is different from the original waveform.
+#
+# It contains blank tokens and repeated tokens. The following is the
+# interpretation of the non-blank tokens.
+#
+# .. code-block::
+#
+#    31:     0 [-], 1.00
+#    32:     2 [i], 1.00  "i" starts and ends
+#    33:     0 [-], 1.00
+#    34:     0 [-], 1.00
+#    35:    15 [h], 1.00  "h" starts
+#    36:    15 [h], 0.93  "h" ends
+#    37:     1 [a], 1.00  "a" starts and ends
+#    38:     0 [-], 0.96
+#    39:     0 [-], 1.00
+#    40:     0 [-], 1.00
+#    41:    13 [d], 1.00  "d" starts and ends
+#    42:     0 [-], 1.00
+#
+# .. note::
+#
+#    When same token occured after blank tokens, it is not treated as
+#    a repeat, but as a new occurrence.
+#
+#    .. code-block::
+#
+#       a a a b -> a b
+#       a - - b -> a b
+#       a a - b -> a b
+#       a - a b -> a a b
+#         ^^^       ^^^
 #
 
+######################################################################
+# Obtain token-level alignment
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# Next step is to resolve the repetation, so that each alignment does
+# not depend on previous alignments.
+# :py:func:`torchaudio.functional.merge_tokens` computes the
+# :py:class:`~torchaudio.functional.TokenSpan` object, which represents
+# which token from the transcript is present at what time span.
 
-# Merge the labels
-@dataclass
-class Segment:
-    label: str
-    start: int
-    end: int
-    score: float
+######################################################################
+#
 
-    def __repr__(self):
-        return f"{self.label}\t({self.score:4.2f}): [{self.start:5d}, {self.end:5d})"
+token_spans = F.merge_tokens(aligned_tokens, alignment_scores)
 
-    @property
-    def length(self):
-        return self.end - self.start
-
-
-def merge_repeats(frames, transcript):
-    transcript_nospace = transcript.replace(" ", "")
-    i1, i2 = 0, 0
-    segments = []
-    while i1 < len(frames):
-        while i2 < len(frames) and frames[i1].token_index == frames[i2].token_index:
-            i2 += 1
-        score = sum(frames[k].score for k in range(i1, i2)) / (i2 - i1)
-        segments.append(
-            Segment(
-                transcript_nospace[frames[i1].token_index],
-                frames[i1].time_index,
-                frames[i2 - 1].time_index + 1,
-                score,
-            )
-        )
-        i1 = i2
-    return segments
-
-
-segments = merge_repeats(frames, transcript)
-for seg in segments:
-    print(seg)
+print("Token\tTime\tScore")
+for s in token_spans:
+    print(f"{LABELS[s.token]}\t[{s.start:3d}, {s.end:3d})\t{s.score:.2f}")
 
 
 ######################################################################
 # Visualization
-# ^^^^^^^^^^^^^
+# ~~~~~~~~~~~~~
 #
+def plot_scores(spans, scores):
+    fig, ax = plt.subplots()
+    ax.set_title("frame-level and token-level confidence scores")
+    span_xs, span_hs, span_ws = [], [], []
+    frame_xs, frame_hs = [], []
+    for span in spans:
+        if LABELS[span.token] != "|":
+            span_xs.append((span.end + span.start) / 2 + 0.4)
+            span_hs.append(span.score)
+            span_ws.append(span.end - span.start)
+            ax.annotate(LABELS[span.token], (span.start + 0.8, -0.07), weight="bold")
+            for t in range(span.start, span.end):
+                frame_xs.append(t + 1)
+                frame_hs.append(scores[t].item())
+    ax.bar(span_xs, span_hs, width=span_ws, color="gray", alpha=0.5, edgecolor="black")
+    ax.bar(frame_xs, frame_hs, width=0.5, alpha=0.5)
+
+    ax.set_ylim(-0.1, 1.1)
+    ax.grid(True, axis="y")
+    fig.tight_layout()
 
 
-def plot_label_prob(segments, transcript):
-    fig, ax2 = plt.subplots(figsize=(16, 4))
-
-    ax2.set_title("frame-level and token-level confidence scores")
-    xs, hs, ws = [], [], []
-    for seg in segments:
-        if seg.label != "|":
-            xs.append((seg.end + seg.start) / 2 + 0.4)
-            hs.append(seg.score)
-            ws.append(seg.end - seg.start)
-            ax2.annotate(seg.label, (seg.start + 0.8, -0.07), weight="bold")
-    ax2.bar(xs, hs, width=ws, color="gray", alpha=0.5, edgecolor="black")
-
-    xs, hs = [], []
-    for p in frames:
-        label = transcript[p.token_index]
-        if label != "|":
-            xs.append(p.time_index + 1)
-            hs.append(p.score)
-
-    ax2.bar(xs, hs, width=0.5, alpha=0.5)
-    ax2.axhline(0, color="black")
-    ax2.set_ylim(-0.1, 1.1)
-
-
-plot_label_prob(segments, transcript)
-plt.tight_layout()
-plt.show()
+plot_scores(token_spans, alignment_scores)
 
 
 ######################################################################
-# From the visualized scores, we can see that, for tokens spanning over
-# more multiple frames, e.g. “T” in “THAT, the token-level confidence
-# score is the average of frame-level confidence scores. To make this
-# clearer, we don’t plot confidence scores for blank frames, which was
-# plotted in the”Label probability with and without repeatation” figure in
-# the previous tutorial `“Forced Alignment with
-# Wav2Vec2” <https://pytorch.org/audio/stable/tutorials/forced_alignment_tutorial.html>`__.
-#
 # Obtain word-level alignments and confidence scores
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# --------------------------------------------------
 #
-
-
-######################################################################
 # Now let’s merge the token-level alignments and confidence scores to get
 # word-level alignments and confidence scores. Then, finally, we verify
 # the quality of word alignments by 1) plotting the word-level alignments
@@ -352,198 +245,208 @@ plt.show()
 
 
 # Obtain word alignments from token alignments
-def merge_words(transcript, segments, separator=" "):
-    words = []
-    i1, i2, i3 = 0, 0, 0
-    while i3 < len(transcript):
-        if i3 == len(transcript) - 1 or transcript[i3] == separator:
-            if i1 != i2:
-                if i3 == len(transcript) - 1:
-                    i2 += 1
-                if separator == "|":
-                    # s is the number of separators (counted as a valid modeling unit) we've seen
-                    s = len(words)
-                else:
-                    s = 0
-                segs = segments[i1 + s : i2 + s]
-                word = "".join([seg.label for seg in segs])
-                score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
-                words.append(Segment(word, segments[i1 + s].start, segments[i2 + s - 1].end, score))
-            i1 = i2
-        else:
-            i2 += 1
-        i3 += 1
-    return words
+def unflatten(list_, lengths):
+    assert len(list_) == sum(lengths)
+    i = 0
+    ret = []
+    for l in lengths:
+        ret.append(list_[i : i + l])
+        i += l
+    return ret
 
 
-word_segments = merge_words(transcript, segments, "|")
+word_spans = unflatten(token_spans, [len(word) for word in TRANSCRIPT])
 
 
 ######################################################################
 # Visualization
-# ^^^^^^^^^^^^^
+# ~~~~~~~~~~~~~
 #
 
-
-def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
-    fig, ax2 = plt.subplots(figsize=(64, 12))
-    plt.rcParams.update({"font.size": 30})
-
-    # The original waveform
-    ratio = waveform.size(1) / input_lengths
-    ax2.plot(waveform)
-    ax2.set_ylim(-1.0 * scale, 1.0 * scale)
-    ax2.set_xlim(0, waveform.size(-1))
-
-    for word in word_segments:
-        x0 = ratio * word.start
-        x1 = ratio * word.end
-        ax2.axvspan(x0, x1, alpha=0.1, color="red")
-        ax2.annotate(f"{word.score:.2f}", (x0, 0.8 * scale))
-
-    for seg in segments:
-        if seg.label != "|":
-            ax2.annotate(seg.label, (seg.start * ratio, 0.9 * scale))
-
-    xticks = ax2.get_xticks()
-    plt.xticks(xticks, xticks / sample_rate, fontsize=50)
-    ax2.set_xlabel("time [second]", fontsize=40)
-    ax2.set_yticks([])
+# Compute average score weighted by the span length
+def _score(spans):
+    return sum(s.score * len(s) for s in spans) / sum(len(s) for s in spans)
 
 
-plot_alignments(
-    segments,
-    word_segments,
-    waveform,
-    emission.shape[1],
-    1,
-)
-plt.show()
+def plot_alignments(waveform, token_spans, emission, transcript, sample_rate=bundle.sample_rate):
+    ratio = waveform.size(1) / emission.size(1) / sample_rate
+
+    fig, axes = plt.subplots(2, 1)
+    axes[0].imshow(emission[0].detach().cpu().T, aspect="auto")
+    axes[0].set_title("Emission")
+    axes[0].set_xticks([])
+
+    axes[1].specgram(waveform[0], Fs=sample_rate)
+    for t_spans, chars in zip(token_spans, transcript):
+        t0, t1 = t_spans[0].start + 0.1, t_spans[-1].end - 0.1
+        axes[0].axvspan(t0 - 0.5, t1 - 0.5, facecolor="None", hatch="/", edgecolor="white")
+        axes[1].axvspan(ratio * t0, ratio * t1, facecolor="None", hatch="/", edgecolor="white")
+        axes[1].annotate(f"{_score(t_spans):.2f}", (ratio * t0, sample_rate * 0.51), annotation_clip=False)
+
+        for span, char in zip(t_spans, chars):
+            t0 = span.start * ratio
+            axes[1].annotate(char, (t0, sample_rate * 0.55), annotation_clip=False)
+
+    axes[1].set_xlabel("time [second]")
+    axes[1].set_xlim([0, None])
+    fig.tight_layout()
+
+
+plot_alignments(waveform, word_spans, emission, TRANSCRIPT)
 
 
 ######################################################################
-
-
-# A trick to embed the resulting audio to the generated file.
-# `IPython.display.Audio` has to be the last call in a cell,
-# and there should be only one call par cell.
-def display_segment(i, waveform, word_segments, frame_alignment):
-    ratio = waveform.size(1) / frame_alignment.size(1)
-    word = word_segments[i]
-    x0 = int(ratio * word.start)
-    x1 = int(ratio * word.end)
-    print(f"{word.label} ({word.score:.2f}): {x0 / sample_rate:.3f} - {x1 / sample_rate:.3f} sec")
+def preview_word(waveform, spans, num_frames, transcript, sample_rate=bundle.sample_rate):
+    ratio = waveform.size(1) / num_frames
+    x0 = int(ratio * spans[0].start)
+    x1 = int(ratio * spans[-1].end)
+    print(f"{transcript} ({_score(spans):.2f}): {x0 / sample_rate:.3f} - {x1 / sample_rate:.3f} sec")
     segment = waveform[:, x0:x1]
     return IPython.display.Audio(segment.numpy(), rate=sample_rate)
 
 
+num_frames = emission.size(1)
+
+######################################################################
+
 # Generate the audio for each segment
-print(transcript)
+print(TRANSCRIPT)
 IPython.display.Audio(SPEECH_FILE)
 
 ######################################################################
 #
 
-display_segment(0, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[0], num_frames, TRANSCRIPT[0])
 
 ######################################################################
 #
 
-display_segment(1, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[1], num_frames, TRANSCRIPT[1])
 
 ######################################################################
 #
 
-display_segment(2, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[2], num_frames, TRANSCRIPT[2])
 
 ######################################################################
 #
 
-display_segment(3, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[3], num_frames, TRANSCRIPT[3])
 
 ######################################################################
 #
 
-display_segment(4, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[4], num_frames, TRANSCRIPT[4])
 
 ######################################################################
 #
 
-display_segment(5, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[5], num_frames, TRANSCRIPT[5])
 
 ######################################################################
 #
 
-display_segment(6, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[6], num_frames, TRANSCRIPT[6])
 
 ######################################################################
 #
 
-display_segment(7, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[7], num_frames, TRANSCRIPT[7])
 
 ######################################################################
 #
 
-display_segment(8, waveform, word_segments, frame_alignment)
+preview_word(waveform, word_spans[8], num_frames, TRANSCRIPT[8])
 
 
 ######################################################################
-# Advanced usage: Dealing with missing transcripts using the <star> token
-# ---------------------------------------------------------------------------
+# Advanced: Handling transcripts with ``<star>`` token
+# ----------------------------------------------------
 #
 # Now let’s look at when the transcript is partially missing, how can we
-# improve alignment quality using the <star> token, which is capable of modeling
+# improve alignment quality using the ``<star>`` token, which is capable of modeling
 # any token.
 #
 # Here we use the same English example as used above. But we remove the
-# beginning text “i had that curiosity beside me at” from the transcript.
+# beginning text ``“i had that curiosity beside me at”`` from the transcript.
 # Aligning audio with such transcript results in wrong alignments of the
 # existing word “this”. However, this issue can be mitigated by using the
-# <star> token to model the missing text.
+# ``<star>`` token to model the missing text.
 #
 
-# Reload the emission tensor in order to add the extra dimension corresponding to the <star> token.
-with torch.inference_mode():
-    waveform, _ = torchaudio.load(SPEECH_FILE)
-    emissions, _ = model(waveform.to(device))
-    emissions = torch.log_softmax(emissions, dim=-1)
+######################################################################
+# First, we extend the dictionary to include the ``<star>`` token.
 
-    # Append the extra dimension corresponding to the <star> token
-    extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
-    emissions = torch.cat((emissions.cpu(), extra_dim), 2)
-    emission = emissions.detach()
-
-# Extend the dictionary to include the <star> token.
-dictionary["*"] = 29
-
-assert len(dictionary) == emission.shape[2]
-
-
-def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
-    frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
-    segments = merge_repeats(frames, transcript)
-    word_segments = merge_words(transcript, segments, "|")
-    plot_alignments(segments, word_segments, waveform, emission.shape[1], 1)
-    plt.show()
-    return word_segments, frame_alignment
-
-
-# original:
-word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
+DICTIONARY["*"] = len(DICTIONARY)
 
 ######################################################################
+# Next, we extend the emission tensor with the extra dimension
+# corresponding to the ``<star>`` token.
+#
 
-# Demonstrate the effect of <star> token for dealing with deletion errors
-# ("i had that curiosity beside me at" missing from the transcript):
-transcript = "THIS|MOMENT"
-word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
+star_dim = torch.zeros((1, emission.size(1), 1), device=emission.device, dtype=emission.dtype)
+emission = torch.cat((emission, star_dim), 2)
+
+assert len(DICTIONARY) == emission.shape[2]
+
+plot_emission(emission[0])
 
 ######################################################################
+# The following function combines all the processes, and compute
+# word segments from emission in one-go.
 
-# Replacing the missing transcript with the <star> token:
-transcript = "*|THIS|MOMENT"
-word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
 
+def compute_alignments(emission, transcript, dictionary):
+    tokens = [dictionary[char] for word in transcript for char in word]
+    alignment, scores = align(emission, tokens)
+    token_spans = F.merge_tokens(alignment, scores)
+    word_spans = unflatten(token_spans, [len(word) for word in transcript])
+    return word_spans
+
+
+######################################################################
+# **Original**
+
+word_spans = compute_alignments(emission, TRANSCRIPT, DICTIONARY)
+plot_alignments(waveform, word_spans, emission, TRANSCRIPT)
+
+######################################################################
+# **With <star> token**
+#
+# Now we replace the first part of the transcript with the ``<star>`` token.
+
+transcript = "* this moment".split()
+word_spans = compute_alignments(emission, transcript, DICTIONARY)
+plot_alignments(waveform, word_spans, emission, transcript)
+
+######################################################################
+#
+
+preview_word(waveform, word_spans[0], num_frames, transcript[0])
+
+######################################################################
+#
+
+preview_word(waveform, word_spans[1], num_frames, transcript[1])
+
+######################################################################
+#
+
+preview_word(waveform, word_spans[2], num_frames, transcript[2])
+
+######################################################################
+#
+
+######################################################################
+# **Without <star> token**
+#
+# As a comparison, the following aligns the partial transcript
+# without using ``<star>`` token.
+# It demonstrates the effect of ``<star>`` token for dealing with deletion errors.
+
+transcript = "this moment".split()
+word_spans = compute_alignments(emission, transcript, DICTIONARY)
+plot_alignments(waveform, word_spans, emission, transcript)
 
 ######################################################################
 # Conclusion
@@ -551,7 +454,7 @@ word_segments, frame_alignment = compute_and_plot_alignments(transcript, diction
 #
 # In this tutorial, we looked at how to use torchaudio’s forced alignment
 # API to align and segment speech files, and demonstrated one advanced usage:
-# How introducing a <star> token could improve alignment accuracy when
+# How introducing a ``<star>`` token could improve alignment accuracy when
 # transcription errors exist.
 #
 
@@ -561,7 +464,6 @@ word_segments, frame_alignment = compute_and_plot_alignments(transcript, diction
 # ---------------
 #
 # Thanks to `Vineel Pratap <vineelkpratap@meta.com>`__ and `Zhaoheng
-# Ni <zni@meta.com>`__ for working on the forced aligner API, and `Moto
-# Hira <moto@meta.com>`__ for providing alignment merging and
-# visualization utilities.
+# Ni <zni@meta.com>`__ for developing and open-sourcing the
+# forced aligner API.
 #

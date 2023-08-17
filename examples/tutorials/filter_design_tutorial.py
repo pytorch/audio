@@ -89,7 +89,7 @@ def plot_sinc_ir(irs, cutoff):
     num_filts, window_size = irs.shape
     half = window_size // 2
 
-    fig, axes = plt.subplots(num_filts, 1, sharex=True, figsize=(6.4, 4.8 * 1.5))
+    fig, axes = plt.subplots(num_filts, 1, sharex=True, figsize=(9.6, 8))
     t = torch.linspace(-half, half - 1, window_size)
     for ax, ir, coff, color in zip(axes, irs, cutoff, plt.cm.tab10.colors):
         ax.plot(t, ir, linewidth=1.2, color=color, zorder=4, label=f"Cutoff: {coff}")
@@ -100,7 +100,7 @@ def plot_sinc_ir(irs, cutoff):
         "(Frequencies are relative to Nyquist frequency)"
     )
     axes[-1].set_xticks([i * half // 4 for i in range(-4, 5)])
-    plt.tight_layout()
+    fig.tight_layout()
 
 
 ######################################################################
@@ -130,7 +130,7 @@ def plot_sinc_fr(frs, cutoff, band=False):
     num_filts, num_fft = frs.shape
     num_ticks = num_filts + 1 if band else num_filts
 
-    fig, axes = plt.subplots(num_filts, 1, sharex=True, sharey=True, figsize=(6.4, 4.8 * 1.5))
+    fig, axes = plt.subplots(num_filts, 1, sharex=True, sharey=True, figsize=(9.6, 8))
     for ax, fr, coff, color in zip(axes, frs, cutoff, plt.cm.tab10.colors):
         ax.grid(True)
         ax.semilogy(fr, color=color, zorder=4, label=f"Cutoff: {coff}")
@@ -146,7 +146,7 @@ def plot_sinc_fr(frs, cutoff, band=False):
         "Frequency response of sinc low-pass filter for different cut-off frequencies\n"
         "(Frequencies are relative to Nyquist frequency)"
     )
-    plt.tight_layout()
+    fig.tight_layout()
 
 
 ######################################################################
@@ -275,7 +275,7 @@ def plot_ir(magnitudes, ir, num_fft=2048):
         axes[i].grid(True)
     axes[1].set(title="Frequency Response")
     axes[2].set(title="Frequency Response (log-scale)", xlabel="Frequency")
-    axes[2].legend(loc="lower right")
+    axes[2].legend(loc="center right")
     fig.tight_layout()
 
 

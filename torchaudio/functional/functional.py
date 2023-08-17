@@ -9,7 +9,6 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._extension import fail_if_no_align
 from torchaudio._internal.module_utils import deprecated
 
 from .filtering import highpass_biquad, treble_biquad
@@ -52,7 +51,6 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
-    "forced_align",
 ]
 
 
@@ -372,9 +370,17 @@ def amplitude_to_DB(
 
     Args:
 
-        x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take
-          the form `(..., freq, time)`. Batched inputs should include a channel dimension and
-          have the form `(batch, channel, freq, time)`.
+        x (Tensor): Input spectrogram(s) before being converted to decibel scale.
+            The expected shapes are ``(freq, time)``, ``(channel, freq, time)`` or
+            ``(..., batch, channel, freq, time)``.
+
+            .. note::
+
+               When ``top_db`` is specified, cut-off values are computed for each audio
+               in the batch. Therefore if the input shape is 4D (or larger), different
+               cut-off values are used for audio data in the batch.
+               If the input shape is 2D or 3D, a single cutoff value is used.
+
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
@@ -549,7 +555,7 @@ def melscale_fbanks(
         meaning number of frequencies to highlight/apply to x the number of filterbanks.
         Each column is a filterbank so that assuming there is a matrix A of
         size (..., ``n_freqs``), the applied result would be
-        ``A * melscale_fbanks(A.size(-1), ...)``.
+        ``A @ melscale_fbanks(A.size(-1), ...)``.
 
     """
 
@@ -1038,8 +1044,8 @@ def _compute_nccf(waveform: Tensor, sample_rate: int, frame_time: float, freq_lo
 
         output_frames = (
             (s1 * s2).sum(-1)
-            / (EPSILON + torch.norm(s1, p=2, dim=-1)).pow(2)
-            / (EPSILON + torch.norm(s2, p=2, dim=-1)).pow(2)
+            / (EPSILON + torch.linalg.vector_norm(s1, ord=2, dim=-1)).pow(2)
+            / (EPSILON + torch.linalg.vector_norm(s2, ord=2, dim=-1)).pow(2)
         )
 
         output_lag.append(output_frames.unsqueeze(-1))
@@ -1290,7 +1296,7 @@ def spectral_centroid(
 
 
 @torchaudio._extension.fail_if_no_sox
-@deprecated("Please migrate to torchaudio.io.AudioEffector.", remove=False)
+@deprecated("Please migrate to :py:class:`torchaudio.io.AudioEffector`.", remove=False)
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1304,12 +1310,6 @@ def apply_codec(
     Apply codecs as a form of augmentation.
 
     .. devices:: CPU
-
-    .. warning::
-
-       This function has been deprecated.
-       Please migrate to :py:class:`torchaudio.io.AudioEffector`, which works on all platforms,
-       and supports streaming processing.
 
     Args:
         waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
@@ -2495,52 +2495,39 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
 
 
-@fail_if_no_align
-def forced_align(
-    log_probs: torch.Tensor,
-    targets: torch.Tensor,
-    input_lengths: torch.Tensor,
-    target_lengths: torch.Tensor,
-    blank: int = 0,
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    r"""Computes forced alignment given the emissions from a CTC-trained model and a target label.
+def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):
+    r"""Computes the Fréchet distance between two multivariate normal distributions :cite:`dowson1982frechet`.
 
-    .. devices:: CPU CUDA
+    Concretely, for multivariate Gaussians :math:`X(\mu_X, \Sigma_X)`
+    and :math:`Y(\mu_Y, \Sigma_Y)`, the function computes and returns :math:`F` as
 
-    .. properties:: TorchScript
+    .. math::
+        F(X, Y) = || \mu_X - \mu_Y ||_2^2
+        + \text{Tr}\left( \Sigma_X + \Sigma_Y - 2 \sqrt{\Sigma_X \Sigma_Y} \right)
 
     Args:
-        log_probs (torch.Tensor): log probability of CTC emission output.
-            Tensor of shape `(B, T, C)`. where `B` is the batch size, `T` is the input length,
-            `C` is the number of characters in alphabet including blank.
-        targets (torch.Tensor): Target sequence. Tensor of shape `(B, L)`,
-            where `L` is the target length.
-        input_lengths (torch.Tensor): Lengths of the inputs (max value must each be <= `T`). 1-D Tensor of shape `(B,)`.
-        target_lengths (torch.Tensor): Lengths of the targets. 1-D Tensor of shape `(B,)`.
-        blank_id (int, optional): The index of blank symbol in CTC emission. (Default: 0)
+        mu_x (torch.Tensor): mean :math:`\mu_X` of multivariate Gaussian :math:`X`, with shape `(N,)`.
+        sigma_x (torch.Tensor): covariance matrix :math:`\Sigma_X` of :math:`X`, with shape `(N, N)`.
+        mu_y (torch.Tensor): mean :math:`\mu_Y` of multivariate Gaussian :math:`Y`, with shape `(N,)`.
+        sigma_y (torch.Tensor): covariance matrix :math:`\Sigma_Y` of :math:`Y`, with shape `(N, N)`.
 
     Returns:
-        Tuple(torch.Tensor, torch.Tensor):
-            torch.Tensor: Label for each time step in the alignment path computed using forced alignment.
-
-            torch.Tensor: Log probability scores of the labels for each time step.
-
-    Note:
-        The sequence length of `log_probs` must satisfy:
-
-
-        .. math::
-            L_{\text{log\_probs}} \ge L_{\text{label}} + N_{\text{repeat}}
-
-        where :math:`N_{\text{repeat}}` is the number of consecutively repeated tokens.
-        For example, in str `"aabbc"`, the number of repeats are `2`.
-
-    Note:
-        The current version only supports ``batch_size==1``.
+        torch.Tensor: the Fréchet distance between :math:`X` and :math:`Y`.
     """
-    if blank in targets:
-        raise ValueError(f"targets Tensor shouldn't contain blank index. Found {targets}.")
-    if torch.max(targets) >= log_probs.shape[-1]:
-        raise ValueError("targets values must be less than the CTC dimension")
-    paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
-    return paths, scores
+    if len(mu_x.size()) != 1:
+        raise ValueError(f"Input mu_x must be one-dimensional; got dimension {len(mu_x.size())}.")
+    if len(sigma_x.size()) != 2:
+        raise ValueError(f"Input sigma_x must be two-dimensional; got dimension {len(sigma_x.size())}.")
+    if sigma_x.size(0) != sigma_x.size(1) != mu_x.size(0):
+        raise ValueError("Each of sigma_x's dimensions must match mu_x's size.")
+    if mu_x.size() != mu_y.size():
+        raise ValueError(f"Inputs mu_x and mu_y must have the same shape; got {mu_x.size()} and {mu_y.size()}.")
+    if sigma_x.size() != sigma_y.size():
+        raise ValueError(
+            f"Inputs sigma_x and sigma_y must have the same shape; got {sigma_x.size()} and {sigma_y.size()}."
+        )
+
+    a = (mu_x - mu_y).square().sum()
+    b = sigma_x.trace() + sigma_y.trace()
+    c = torch.linalg.eigvals(sigma_x @ sigma_y).sqrt().real.sum()
+    return a + b - 2 * c

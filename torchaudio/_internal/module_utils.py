@@ -1,7 +1,27 @@
 import importlib.util
+import os
 import warnings
 from functools import wraps
 from typing import Optional
+
+
+def eval_env(var, default):
+    """Check if environment varable has True-y value"""
+    if var not in os.environ:
+        return default
+
+    val = os.environ.get(var, "0")
+    trues = ["1", "true", "TRUE", "on", "ON", "yes", "YES"]
+    falses = ["0", "false", "FALSE", "off", "OFF", "no", "NO"]
+    if val in trues:
+        return True
+    if val not in falses:
+        # fmt: off
+        raise RuntimeError(
+            f"Unexpected environment variable value `{var}={val}`. "
+            f"Expected one of {trues + falses}")
+        # fmt: on
+    return False
 
 
 def is_module_available(*modules: str) -> bool:
@@ -57,6 +77,18 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
                 message += f' It will be removed from {"future" if version is None else version} release. '
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
+
+        message = "This function has been deprecated. "
+        if remove:
+            message += f'It will be removed from {"future" if version is None else version} release. '
+
+        wrapped.__doc__ = f"""DEPRECATED: {func.__doc__}
+
+    .. warning::
+
+       {message}
+       {direction}
+        """
 
         return wrapped
 

@@ -5,6 +5,14 @@ from .deepspeech import DeepSpeech
 from .emformer import Emformer
 from .rnnt import emformer_rnnt_base, emformer_rnnt_model, RNNT
 from .rnnt_decoder import Hypothesis, RNNTBeamSearch
+from .squim import (
+    squim_objective_base,
+    squim_objective_model,
+    squim_subjective_base,
+    squim_subjective_model,
+    SquimObjective,
+    SquimSubjective,
+)
 from .tacotron2 import Tacotron2
 from .wav2letter import Wav2Letter
 from .wav2vec2 import (
@@ -68,4 +76,10 @@ __all__ = [
     "hdemucs_low",
     "hdemucs_medium",
     "hdemucs_high",
+    "squim_objective_base",
+    "squim_objective_model",
+    "squim_subjective_base",
+    "squim_subjective_model",
+    "SquimObjective",
+    "SquimSubjective",
 ]

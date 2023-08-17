@@ -1,12 +1,12 @@
 """Defines utilities for switching audio backends"""
-import os
 import warnings
 from typing import List, Optional
 
 import torchaudio
+from torchaudio._backend import soundfile_backend
 from torchaudio._internal import module_utils as _mod_utils
 
-from . import no_backend, soundfile_backend, sox_io_backend
+from . import _no_backend as no_backend, _sox_io_backend as sox_io_backend
 
 __all__ = [
     "list_audio_backends",
@@ -15,19 +15,12 @@ __all__ = [
 ]
 
 
-def _is_backend_dispatcher_enabled() -> bool:
-    return os.getenv("TORCHAUDIO_USE_BACKEND_DISPATCHER", default="1") == "1"
-
-
 def list_audio_backends() -> List[str]:
     """List available backends
 
     Returns:
         List[str]: The list of available backends.
     """
-    if _is_backend_dispatcher_enabled():
-        warnings.warn("list_audio_backend's return value is irrelevant when the I/O backend dispatcher is enabled.")
-
     backends = []
     if _mod_utils.is_module_available("soundfile"):
         backends.append("soundfile")
@@ -44,10 +37,6 @@ def set_audio_backend(backend: Optional[str]):
             One of ``"sox_io"`` or ``"soundfile"`` based on availability
             of the system. If ``None`` is provided the  current backend is unassigned.
     """
-    if _is_backend_dispatcher_enabled():
-        warnings.warn("set_audio_backend is a no-op when the I/O backend dispatcher is enabled.")
-        return
-
     if backend is not None and backend not in list_audio_backends():
         raise RuntimeError(f'Backend "{backend}" is not one of ' f"available backends: {list_audio_backends()}.")
 
@@ -64,14 +53,19 @@ def set_audio_backend(backend: Optional[str]):
         setattr(torchaudio, func, getattr(module, func))
 
 
-def _init_audio_backend():
+def _init_backend():
+    warnings.warn(
+        "TorchAudio's global backend is now deprecated. "
+        "Please enable distpatcher by setting `TORCHAUDIO_USE_BACKEND_DISPATCHER=1`, "
+        "and specify backend when calling load/info/save function.",
+        stacklevel=3,
+    )
     backends = list_audio_backends()
     if "sox_io" in backends:
         set_audio_backend("sox_io")
     elif "soundfile" in backends:
         set_audio_backend("soundfile")
     else:
-        warnings.warn("No audio backend is available.")
         set_audio_backend(None)
 
 
@@ -81,9 +75,6 @@ def get_audio_backend() -> Optional[str]:
     Returns:
         Optional[str]: The name of the current backend or ``None`` if no backend is assigned.
     """
-    if _is_backend_dispatcher_enabled():
-        warnings.warn("get_audio_backend's return value is irrelevant when the I/O backend dispatcher is enabled.")
-
     if torchaudio.load == no_backend.load:
         return None
     if torchaudio.load == sox_io_backend.load:

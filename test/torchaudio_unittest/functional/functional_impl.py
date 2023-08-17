@@ -1220,6 +1220,100 @@ class Functional(TestBaseMixin):
         with self.assertRaisesRegex(RuntimeError, r"blank must be within \[0, num classes\)"):
             hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
 
+    def _assert_tokens(self, first, second):
+        assert len(first) == len(second)
+
+        for f, s in zip(first, second):
+            self.assertEqual(f.token, s.token)
+            self.assertEqual(f.score, s.score)
+            self.assertEqual(f.start, s.start)
+            self.assertEqual(f.end, s.end)
+
+    @parameterized.expand(
+        [
+            ([], [], []),
+            ([F.TokenSpan(1, 0, 1, 1.0)], [1], [1.0]),
+            ([F.TokenSpan(1, 0, 2, 0.5)], [1, 1], [0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 3, 0.6)], [1, 1, 1], [0.5, 0.6, 0.7]),
+            ([F.TokenSpan(1, 0, 1, 0.8), F.TokenSpan(2, 1, 2, 0.9)], [1, 2], [0.8, 0.9]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 1, 3, 0.5)], [1, 2, 2], [1.0, 0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 1, 0.8), F.TokenSpan(1, 2, 3, 1.0)], [1, 0, 1], [0.8, 0.9, 1.0]),
+            ([F.TokenSpan(1, 0, 1, 0.8), F.TokenSpan(2, 2, 3, 1.0)], [1, 0, 2], [0.8, 0.9, 1.0]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(1, 2, 4, 0.5)], [1, 0, 1, 1], [1.0, 0.1, 0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 2, 4, 0.5)], [1, 0, 2, 2], [1.0, 0.1, 0.4, 0.6]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(1, 3, 4, 0.4)], [1, 0, 0, 1], [1.0, 0.9, 0.7, 0.4]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 3, 4, 0.4)], [1, 0, 0, 2], [1.0, 0.9, 0.7, 0.4]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(1, 3, 5, 0.5)], [1, 0, 0, 1, 1], [1.0, 0.9, 0.8, 0.6, 0.4]),
+            ([F.TokenSpan(1, 0, 1, 1.0), F.TokenSpan(2, 3, 5, 0.5)], [1, 0, 0, 2, 2], [1.0, 0.9, 0.8, 0.6, 0.4]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 2, 3, 0.5)], [1, 1, 2], [1.0, 0.8, 0.5]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 3, 4, 0.7)], [1, 1, 0, 1], [1.0, 0.8, 0.1, 0.7]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 3, 4, 0.7)], [1, 1, 0, 2], [1.0, 0.8, 0.1, 0.7]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 3, 5, 0.4)], [1, 1, 0, 1, 1], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 3, 5, 0.4)], [1, 1, 0, 2, 2], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 4, 5, 0.3)], [1, 1, 0, 0, 1], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            ([F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 4, 5, 0.3)], [1, 1, 0, 0, 2], [1.0, 0.8, 0.1, 0.5, 0.3]),
+            (
+                [F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(1, 4, 6, 0.2)],
+                [1, 1, 0, 0, 1, 1],
+                [1.0, 0.8, 0.6, 0.5, 0.3, 0.1],
+            ),
+            (
+                [F.TokenSpan(1, 0, 2, 0.9), F.TokenSpan(2, 4, 6, 0.2)],
+                [1, 1, 0, 0, 2, 2],
+                [1.0, 0.8, 0.6, 0.5, 0.3, 0.1],
+            ),
+        ]
+    )
+    def test_merge_repeated_tokens(self, expected, tokens, scores):
+        scores_ = torch.tensor(scores, dtype=torch.float32, device=self.device)
+        tokens_ = torch.tensor(tokens, dtype=torch.int64, device=self.device)
+        spans = F.merge_tokens(tokens_, scores_, blank=0)
+        print(tokens_, scores_)
+        self._assert_tokens(spans, expected)
+
+        # Append blanks at the beginning and at the end.
+        for num_prefix, num_suffix in itertools.product([0, 1, 2], repeat=2):
+            tokens_ = ([0] * num_prefix) + tokens + ([0] * num_suffix)
+            scores_ = ([0.1] * num_prefix) + scores + ([0.1] * num_suffix)
+            tokens_ = torch.tensor(tokens_, dtype=torch.int64, device=self.device)
+            scores_ = torch.tensor(scores_, dtype=torch.float32, device=self.device)
+            expected_ = [F.TokenSpan(s.token, s.start + num_prefix, s.end + num_prefix, s.score) for s in expected]
+            print(tokens_, scores_)
+            spans = F.merge_tokens(tokens_, scores_, blank=0)
+            self._assert_tokens(spans, expected_)
+
+    def test_frechet_distance_univariate(self):
+        r"""Check that Frechet distance is computed correctly for simple one-dimensional case."""
+        mu_x = torch.rand((1,), device=self.device)
+        sigma_x = torch.rand((1, 1), device=self.device)
+
+        mu_y = torch.rand((1,), device=self.device)
+        sigma_y = torch.rand((1, 1), device=self.device)
+
+        # Matrix square root reduces to scalar square root.
+        expected = (mu_x - mu_y) ** 2 + sigma_x + sigma_y - 2 * torch.sqrt(sigma_x * sigma_y)
+        expected = expected.item()
+        actual = F.frechet_distance(mu_x, sigma_x, mu_y, sigma_y)
+
+        self.assertEqual(expected, actual)
+
+    def test_frechet_distance_diagonal_covariance(self):
+        r"""Check that Frechet distance is computed correctly for case where covariance matrices are diagonal."""
+        N = 15
+        mu_x = torch.rand((N,), device=self.device)
+        sigma_x = torch.diag(torch.rand((N,), device=self.device))
+
+        mu_y = torch.rand((N,), device=self.device)
+        sigma_y = torch.diag(torch.rand((N,), device=self.device))
+
+        expected = (
+            torch.sum((mu_x - mu_y) ** 2) + torch.sum(sigma_x + sigma_y) - 2 * torch.sum(torch.sqrt(sigma_x * sigma_y))
+        )
+        expected = expected.item()
+        actual = F.frechet_distance(mu_x, sigma_x, mu_y, sigma_y)
+
+        self.assertEqual(expected, actual)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):

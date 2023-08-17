@@ -1,3 +1,5 @@
+.. _enabling_hw_decoder:
+
 Enabling GPU video decoder/encoder
 ==================================
 
@@ -7,7 +9,7 @@ Using NVIDIA's GPU decoder and encoder, it is also possible to pass around CUDA 
 
 This improves the video throughput significantly. However, please note that not all the video formats are supported by hardware acceleration.
 
-This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see `Hardware-Accelerated Video Decoding and Encoding <./hw_acceleration_tutorial.html>`_
+This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see :ref:`NVDEC tutoial <nvdec_tutorial>` and :ref:`NVENC tutorial <nvenc_tutorial>`.
 
 Overview
 --------
@@ -23,16 +25,16 @@ To use NVENC/NVDEC with TorchAudio, the following items are required.
 
 3. PyTorch / TorchAudio with CUDA support.
 
-TorchAudio’s official binary distributions are compiled to work with FFmpeg 4 libraries, and they contain the logic required for hardware-based decoding/encoding.
+TorchAudio’s official binary distributions are compiled to work with FFmpeg libraries, and they contain the logic to use hardware decoding/encoding.
 
-In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. If you would like to use FFmpeg 5, then you need to build TorchAudio with it.
+In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. You can also use FFmpeg 5 or 6.
 
 The following procedure was tested on Ubuntu.
 
 † For details on NVDEC/NVENC and FFmpeg, please refer to the following articles.
 
-- https://docs.nvidia.com/video-technologies/video-codec-sdk/nvdec-video-decoder-api-prog-guide/
-- https://docs.nvidia.com/video-technologies/video-codec-sdk/ffmpeg-with-nvidia-gpu/#compiling-ffmpeg
+- https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/
+- https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg
 - https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/
 
 Check the GPU and CUDA version
@@ -154,7 +156,7 @@ which we use later for verifying the installation.
 Build FFmpeg with NVDEC/NVENC support
 -------------------------------------
 
-Next we download the source code of FFmpeg 4. We use 4.4.2 here. Any version later than 4.1 should work with TorchAudio binary distributions. If you want to use FFmpeg 5, then you need to build TorchAudio after building FFmpeg.
+Next we download the source code of FFmpeg 4. We use 4.4.2 here.
 
 .. code-block:: bash
 
@@ -379,7 +381,7 @@ The following command fetches video from remote server, decode with NVDEC (cuvid
         -b:v 5M test.mp4
 
 Note that there is ``Stream #0:0 -> #0:0 (h264 (h264_cuvid) -> h264 (h264_nvenc))``, which means that video is decoded with ``h264_cuvid`` decoder and ``h264_nvenc`` encoder.
-         
+
 .. code-block::
 
    Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4':
@@ -463,33 +465,9 @@ It is often the case where there are multiple FFmpeg installations in the system
    ['h264_nvenc', 'nvenc', 'nvenc_h264', 'nvenc_hevc', 'hevc_nvenc']
 
 
-Using the hardware decoder
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the hardware decoder and encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.
 
-For the detail on the performance of GPU decoder and encoder please see `Hardware-Accelerated Video Decoding and Encoding <./hw_acceleration_tutorial.html>`_
-
-
-.. code-block:: python
-
-   from torchaudio.io import StreamReader
-
-   src = "https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
-
-   s = StreamReader(src)
-   s.add_video_stream(
-       5,
-       decoder="h264_cuvid",
-       hw_accel="cuda:0",
-       decoder_option={
-           "resize": "360x240",
-       },
-   )
-   s.fill_buffer()
-   chunk, = s.pop_chunks()
-   print(' - Chunk:', chunk.shape, chunk.device, chunk.dtype)
-
-.. code-block:: text
-
-   - Chunk: torch.Size([5, 3, 240, 360]) cuda:0 torch.uint8
+For the detail on the performance of GPU decoder and encoder please see :ref:`NVDEC tutoial <nvdec_tutorial>` and :ref:`NVENC tutorial <nvenc_tutorial>`.

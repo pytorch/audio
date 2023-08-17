@@ -383,6 +383,14 @@ class Autograd(TestBaseMixin):
         coeff = 0.9
         self.assert_grad(F.deemphasis, (waveform, coeff))
 
+    def test_frechet_distance(self):
+        N = 16
+        mu_x = torch.rand((N,))
+        sigma_x = torch.rand((N, N))
+        mu_y = torch.rand((N,))
+        sigma_y = torch.rand((N, N))
+        self.assert_grad(F.frechet_distance, (mu_x, sigma_x, mu_y, sigma_y))
+
 
 class AutogradFloat32(TestBaseMixin):
     def assert_grad(

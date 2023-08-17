@@ -5,12 +5,13 @@ import tarfile
 from functools import partial
 
 from parameterized import parameterized
+from torchaudio._backend.ffmpeg import _parse_save_args
 from torchaudio._backend.utils import get_load_func
 from torchaudio._internal import module_utils as _mod_utils
-from torchaudio.io._compat import _parse_save_args
 
 from torchaudio_unittest.backend.dispatcher.sox.common import name_func
 from torchaudio_unittest.common_utils import (
+    disabledInCI,
     get_asset_path,
     get_wav_data,
     HttpServerMixin,
@@ -535,6 +536,7 @@ class Unseekable:
         return self.fileobj.read(n)
 
 
+@disabledInCI
 @skipIfNoFFmpeg
 @skipIfNoExec("sox")
 @skipIfNoModule("requests")

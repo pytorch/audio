@@ -10,6 +10,7 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     skipIfNoExec,
     skipIfNoSox,
+    skipIfNoSoxDecoder,
     sox_utils,
     TempDirMixin,
 )
@@ -196,6 +197,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == bits_per_sample
         assert info.encoding == get_encoding("amb", dtype)
 
+    @skipIfNoSoxDecoder("amr-nb")
     def test_amr_nb(self):
         """`sox_io_backend.info` can check amr-nb file correctly"""
         duration = 1
@@ -275,6 +277,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
 
 
 @skipIfNoSox
+@skipIfNoSoxDecoder("opus")
 class TestInfoOpus(PytorchTestCase):
     @parameterized.expand(
         list(
@@ -302,17 +305,15 @@ class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """MP3 file without extension can be loaded
 
-        Originally, we added `format` argument for this case, but now we use FFmpeg
-        for MP3 decoding, which works even without `format` argument.
         https://github.com/pytorch/audio/issues/1040
 
         The file was generated with the following command
             ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
         """
         path = get_asset_path("mp3_without_ext")
-        sinfo = sox_io_backend.info(path)
+        sinfo = sox_io_backend.info(path, format="mp3")
         assert sinfo.sample_rate == 16000
-        assert sinfo.num_frames == 80000
+        assert sinfo.num_frames == 81216
         assert sinfo.num_channels == 1
         assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
         assert sinfo.encoding == "MP3"
