@@ -2,6 +2,28 @@
 # libtorchaudio
 ################################################################################
 
+if(USE_ROCM)
+  list (APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
+  FIND_PACKAGE(HIP REQUIRED)
+  MESSAGE(STATUS "hip found ${ROCM_FOUND}")
+
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/third_party/hipify_torch/cmake")
+  include(Hipify)
+
+  set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE})
+  set(CMAKE_CXX_LINKER ${HIP_HIPCC_EXECUTABLE})
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  list( APPEND CMAKE_INSTALL_RPATH "/opt/rocm/llvm/lib" )
+  set(OPENMP_LIBRARIES "/opt/rocm/llvm/lib/")
+  set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+  set(OpenMP_CXX_FLAGS "-fopenmp=libomp")
+  #set(OpenMP_CXX_LIB_NAMES "omp")
+  set(OpenMP_omp_LIBRARY omp)
+  find_package(OpenMP REQUIRED)
+
+endif()
+
+
 set(
   sources
   lfilter.cpp
@@ -40,16 +62,37 @@ if(BUILD_RNNT)
       rnnt/gpu/compute.cu
       )
   endif()
+
   if (USE_ROCM)
     hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc/rnnt/gpu HIP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc/rnnt/hip)
+    if ( NOT HIP_ADD_LIBRARY_FOUND )
+      list(APPEND CMAKE_MODULE_PATH /opt/rocm/hip/cmake)
+      find_package(HIP REQUIRED)
+    endif()
+
     list(
       APPEND
-      sources
+      sources 
       rnnt/hip/compute_alphas.hip
       rnnt/hip/compute_betas.hip
       rnnt/hip/compute.hip
       )
   endif()
+endif()
+
+if(USE_ROCM)
+  list(
+    APPEND
+    additional_libs 
+    hip::host
+    hip::device
+    /opt/rocm/llvm/lib/libomp.so
+    )
+  list(
+    APPEND
+    compile_definitions 
+    USE_ROCM
+  )
 endif()
 
 if(BUILD_RIR)
@@ -72,14 +115,6 @@ if(BUILD_ALIGN)
       forced_align/gpu/compute.cu
     )
   endif()
-  if (USE_ROCM)
-    hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc/forced_align/gpu HIP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc/forced_align/hip)
-    list(
-      APPEND
-      sources
-      forced_align/hip/compute.hip
-    )
-  endif()
 endif()
 
 if(USE_CUDA)
@@ -93,26 +128,6 @@ if(USE_CUDA)
     additional_libs
     cuda_deps
     )
-endif()
-
-if(USE_ROCM)
-  hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc HIP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/torchaudio/csrc)
-  list(
-    APPEND
-    sources
-    iir_hip.hip
-  )
-  list(
-    APPEND
-    additional_libs
-    hip::host
-    hip::device
-    )
-  list(
-    APPEND
-    compile_definitions
-    USE_ROCM
-  )
 endif()
 
 if(OpenMP_CXX_FOUND)
