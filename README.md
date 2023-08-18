@@ -32,35 +32,6 @@ Installation
 
 Please refer to https://pytorch.org/audio/main/installation.html for installation and build process of TorchAudio.
 
-Quick Usage
------------
-
-```python
-import torchaudio
-
-waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file
-torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file
-```
-
-Backend Dispatch
-----------------
-
-By default in OSX and Linux, torchaudio uses SoX as a backend to load and save files.
-The backend can be changed to [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
-using the following. See [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
-for installation instructions.
-
-```python
-import torchaudio
-torchaudio.set_audio_backend("soundfile")  # switch backend
-
-waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file, as usual
-torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file, as usual
-```
-
-**Note**
-- SoundFile currently does not support mp3.
-- "soundfile" backend is not supported by TorchScript.
 
 API Reference
 -------------
