@@ -2,7 +2,11 @@
 
 #ifdef USE_CUDA
 
+#ifdef __HIP_PLATFORM_AMD__
+#include <torchaudio/csrc/rnnt/hip/math_hip.cuh>
+#else
 #include <torchaudio/csrc/rnnt/gpu/math.cuh>
+#endif
 
 namespace torchaudio {
 namespace rnnt {
@@ -39,7 +43,11 @@ __global__ void ReduceMax2D(
 
   CAST_DTYPE shf;
   for (int stride = (WARP_SIZE >> 1); stride > 0; stride >>= 1) {
+#ifdef __HIP_PLATFORM_AMD__
+    shf = __shfl_down(val, stride);
+#else
     shf = __shfl_down_sync(0xFFFFFFFF, val, stride);
+#endif
     if (threadIdx.x < stride && threadIdx.x + stride < dim) {
       if (shf > val) {
         val = shf;
@@ -81,7 +89,11 @@ __global__ void ReduceLogSumExpGivenMax2D(
 
   CAST_DTYPE shf;
   for (int stride = (WARP_SIZE >> 1); stride > 0; stride >>= 1) {
+#ifdef __HIP_PLATFORM_AMD__
+    shf = __shfl_down(val, stride);
+#else
     shf = __shfl_down_sync(0xFFFFFFFF, val, stride);
+#endif
     if (threadIdx.x < stride && threadIdx.x + stride < dim) {
       val = val + shf;
     }
