@@ -335,6 +335,7 @@ def plot_alignments(waveform, token_spans, emission, transcript, sample_rate=bun
 #
 plot_alignments(waveform, word_spans, emission, TRANSCRIPT)
 
+
 ######################################################################
 #
 # Inconsistent treatment of ``blank`` token
@@ -347,18 +348,17 @@ plot_alignments(waveform, word_spans, emission, TRANSCRIPT)
 # This is easy to see when we plot the scores. The following figure
 # shows word regions and non-word regions, with the frame-level scores
 # of non-blank tokens.
-
 def plot_scores(word_spans, scores):
     fig, ax = plt.subplots()
     span_xs, span_hs = [], []
-    ax.axvspan(word_spans[0][0].start -0.05, word_spans[-1][-1].end + 0.05, facecolor="paleturquoise", edgecolor="none", zorder=-1)
+    ax.axvspan(word_spans[0][0].start - 0.05, word_spans[-1][-1].end + 0.05, facecolor="paleturquoise", edgecolor="none", zorder=-1)
     for t_span in word_spans:
         for span in t_span:
             for t in range(span.start, span.end):
                 span_xs.append(t + 0.5)
                 span_hs.append(scores[t].item())
             ax.annotate(LABELS[span.token], (span.start, -0.07))
-        ax.axvspan(t_span[0].start -0.05, t_span[-1].end + 0.05, facecolor="mistyrose", edgecolor="none", zorder=-1)
+        ax.axvspan(t_span[0].start - 0.05, t_span[-1].end + 0.05, facecolor="mistyrose", edgecolor="none", zorder=-1)
     ax.bar(span_xs, span_hs, color="lightsalmon", edgecolor="coral")
     ax.set_title("Frame-level scores and word segments")
     ax.set_ylim(-0.1, None)
@@ -388,7 +388,7 @@ plot_scores(word_spans, alignment_scores)
 # there is still some activities in multiple frequency buckets.
 #
 # Would it be more accurate if that frame was included in the word?
-# 
+#
 # Unfortunately, CTC does not provide a comprehensive solution to this.
 # Models trained with CTC are known to exhibit "peaky" response,
 # that is, they tend to spike for an aoccurance of a label, but the
