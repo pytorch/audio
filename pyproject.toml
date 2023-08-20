@@ -8,3 +8,6 @@ line-length = 120
 target-version = ["py38"]
 
 [tool.ufmt]
+excludes = [
+    "examples/tutorials/",
+]

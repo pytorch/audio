@@ -19,7 +19,10 @@ jobs:
 
         echo '::group::Setup environment'
         eval "$("$(which conda)" shell.bash hook)"
-        pip install --progress-bar=off pre-commit
+        # libcst does not have 3.11 pre-built binaries yet. Use python 3.10
+        conda create -y --name env python=3.10
+        conda activate env
+        pip3 install --progress-bar=off pre-commit
         echo '::endgroup::'
 
         set +e
