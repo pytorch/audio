@@ -274,7 +274,6 @@ PYBIND11_MODULE(TORCHAUDIO_FFMPEG_EXT_NAME, m) {
           "frame_rate", [](const OutputStreamInfo& o) -> double {
             if (o.frame_rate.den == 0) {
               TORCH_WARN(
-                  o.frame_rate.den,
                   "Invalid frame rate is found: ",
                   o.frame_rate.num,
                   "/",
