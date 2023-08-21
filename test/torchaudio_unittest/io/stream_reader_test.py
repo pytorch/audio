@@ -259,6 +259,23 @@ class StreamReaderInterfaceTest(_MediaSourceMixin, TempDirMixin, TorchaudioTestC
         s.add_video_stream(-1, filter_desc="fps=10")
         s.add_video_stream(-1, filter_desc="format=rgb24")
         s.add_video_stream(-1, filter_desc="scale=w=160:h=90")
+
+        # Note:
+        # Somehow only FFmpeg 5 reports invalid video frame rate. (24576/0)
+        # FFmpeg 4 and 6 work fine.
+        # Perhaps this is a regression in FFmpeg or it could actually originate
+        # from other libraries.
+        # It consistently fails with FFmpeg installed via conda, so we change
+        # the value based on FFmpeg version.
+        ver = torchaudio.utils.ffmpeg_utils.get_versions()["libavutil"]
+        print(ver)
+        major, minor, _ = ver
+        if major == 57:
+            video_frame_rate = -1
+        else:
+            video_frame_rate = 30000 / 1001
+        print(video_frame_rate)
+
         expected = [
             OutputAudioStream(
                 source_index=4,
