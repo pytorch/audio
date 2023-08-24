@@ -115,6 +115,12 @@ def _main():
     with open("README.md") as f:
         long_description = f.read()
 
+    # ROCm build of torchaudio needs libomp.so to be packaged with the wheel
+    # to avoid import-time error due to missing dependency
+    if torch.hip is not None:
+        import shutil
+        shutil.copy("/opt/rocm/llvm/lib/libomp.so", "./torchaudio/lib/")
+
     setup(
         name="torchaudio",
         version=version,
@@ -154,6 +160,7 @@ def _main():
         },
         install_requires=[pytorch_package_dep],
         zip_safe=False,
+        package_data={"torchaudio": ['lib/*.so']},
     )
 
 
