@@ -119,6 +119,7 @@ def _main():
     # to avoid import-time error due to missing dependency
     if torch.version.hip is not None:
         import shutil
+
         shutil.copy("/opt/rocm/llvm/lib/libomp.so", "./torchaudio/lib/")
 
     setup(
@@ -160,7 +161,7 @@ def _main():
         },
         install_requires=[pytorch_package_dep],
         zip_safe=False,
-        package_data={"torchaudio": ['lib/*.so']},
+        package_data={"torchaudio": ["lib/*.so"]},
     )
 
 
