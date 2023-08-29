@@ -117,7 +117,7 @@ def _main():
 
     # ROCm build of torchaudio needs libomp.so to be packaged with the wheel
     # to avoid import-time error due to missing dependency
-    if torch.hip is not None:
+    if torch.version.hip is not None:
         import shutil
         shutil.copy("/opt/rocm/llvm/lib/libomp.so", "./torchaudio/lib/")
 
