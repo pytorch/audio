@@ -241,7 +241,6 @@ def _parse_save_args(
             sample_fmt = _get_flac_sample_fmt(bps)
         if _type("ogg"):
             sample_fmt = _get_flac_sample_fmt(bps)
-    print(ext, format, encoding, bps, "===>", muxer, encoder, sample_fmt)
     return muxer, encoder, sample_fmt
 
 
