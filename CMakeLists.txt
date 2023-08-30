@@ -76,11 +76,6 @@ if(USE_ROCM)
   if(NOT PYTORCH_FOUND_HIP)
     set(USE_ROCM OFF)
   endif()
-
-  if(CMAKE_VERSION VERSION_LESS 3.21.0)
-    message("Need at least CMake 3.21.0 to compile ROCm support.")
-    set(USE_ROCM OFF)
-  endif()
 endif()
 
 if(USE_CUDA)
@@ -95,11 +90,6 @@ if(USE_CUDA)
   )
 endif()
 
-if(USE_ROCM)
-  enable_language(HIP)
-endif()
-
-find_package(Torch REQUIRED)
 include(cmake/TorchAudioHelper.cmake)
 
 # https://github.com/pytorch/pytorch/issues/54174
