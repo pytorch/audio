@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@Fix-Linux-arm64-Chown-Step
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -39,13 +39,12 @@ jobs:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@Fix-Linux-arm64-Chown-Step
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
       runner: linux.arm64.2xlarge
-      no-sudo: false
       docker-image: pytorch/manylinuxaarch64-builder:cpu-aarch64
       script: |
         export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
