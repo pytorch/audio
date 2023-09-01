@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Usage:
-# TEST_INFRA_BRANCH=release/2.1 RELEASE_BRANCH=release/2.1 RELEASE_VERSION=2.1.0 cut_release.sh
+# Usage (run from root of project):
+# TEST_INFRA_BRANCH=release/2.1 RELEASE_BRANCH=release/2.1 RELEASE_VERSION=2.1.0 packaging/cut_release.sh
 #
 # TEST_INFRA_BRANCH: The release branch of test-infra that houses all reusable
 # workflows
