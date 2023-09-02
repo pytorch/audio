@@ -110,27 +110,6 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Python Prototype API Reference
-   :hidden:
-
-   prototype
-   prototype.datasets
-   prototype.functional
-   prototype.models
-   prototype.pipelines
-   prototype.transforms
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C++ Prototype API Reference
-   :hidden:
-
-   libtorchaudio
-   libtorchaudio.stream_reader
-   libtorchaudio.stream_writer
-
-.. toctree::
-   :maxdepth: 1
    :caption: PyTorch Libraries
    :hidden:
 
@@ -258,34 +237,6 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_feature_augmentation_tutorial.png
    :link: tutorials/audio_feature_augmentation_tutorial.html
    :tags: Preprocessing
-
-.. customcarditem::
-   :header: Generating waveforms with oscillator
-   :card_description:
-   :image: _images/sphx_glr_oscillator_tutorial_003.png
-   :link: tutorials/oscillator_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Additive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
-   :link: tutorials/additive_synthesis_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Designing digital filters
-   :card_description:
-   :image: _images/sphx_glr_filter_design_tutorial_001.png
-   :link: tutorials/filter_design_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Subtractive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_subtractive_synthesis_tutorial_002.png
-   :link: tutorials/subtractive_synthesis_tutorial.html
-   :tags: DSP
 
 .. customcarditem::
    :header: Audio dataset
