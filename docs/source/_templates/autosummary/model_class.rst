@@ -56,19 +56,6 @@
         ],
     }
 -%}
-{%- set prototype_factory = {
-    "torchaudio.models.Wav2Vec2Model": [
-        "emformer_hubert_model",
-        "emformer_hubert_base",
-        "conformer_wav2vec2_model",
-        "conformer_wav2vec2_base",
-    ],
-    "torchaudio.models.RNNT": [
-        "conformer_rnnt_model",
-        "conformer_rnnt_base",
-    ],
-}
--%}
 {%- set utils={
         "torchaudio.models.Wav2Vec2Model": [
             "~torchaudio.models.wav2vec2.utils.import_fairseq_model",
@@ -139,25 +126,6 @@ Factory Functions
 
 {% for item in factory[fullname] %}
    {{["~torchaudio.models", item] | join('.')}}
-{%- endfor %}
-
-{%- endif %}
-
-.. PROTOTYPE FACTORY FUNCTIONS
-
-{%- if prototype_factory[fullname] %}
-
-Prototype Factory Functions
-===========================
-
-.. currentmodule:: torchaudio.prototype.models
-
-.. autosummary::
-   :toctree: ../generated
-   :nosignatures:
-
-{% for item in prototype_factory[fullname] %}
-   {{["~torchaudio.prototype.models", item] | join('.')}}
 {%- endfor %}
 
 {%- endif %}
