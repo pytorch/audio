@@ -3,11 +3,6 @@
 # New things should be added to `torchaudio._backend`.
 # Only things related to backward compatibility should be placed here.
 
-from .utils import _init_backend, get_audio_backend, list_audio_backends, set_audio_backend
-
-
-__all__ = ["_init_backend", "get_audio_backend", "list_audio_backends", "set_audio_backend"]
-
 
 def __getattr__(name: str):
     if name == "common":

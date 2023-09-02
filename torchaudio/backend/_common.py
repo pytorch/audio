@@ -7,7 +7,7 @@ def __getattr__(name: str):
             "`torchaudio.AudioMetaData`. Please update the import path.",
             stacklevel=2,
         )
-        from torchaudio._backend.common import AudioMetaData
+        from torchaudio import AudioMetaData
 
         return AudioMetaData
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
