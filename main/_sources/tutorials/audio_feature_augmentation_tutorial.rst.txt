@@ -47,8 +47,8 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    2.1.0.dev20230901
-    2.2.0.dev20230902
+    2.2.0.dev20231003
+    2.2.0.dev20231004
 
 
 
@@ -136,7 +136,7 @@ which is licensed under Creative Commos BY 4.0.
 
  .. code-block:: none
 
-      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 80.7MB/s]
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 72.3MB/s]
 
 
 
@@ -264,7 +264,7 @@ Time and Frequency Masking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.667 seconds)
+   **Total running time of the script:** ( 0 minutes  2.232 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.io._stream_writer &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
+  <title>torchaudio.io._stream_writer &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
     </div>
     
 
@@ -426,6 +426,7 @@
               
   <h1>Source code for torchaudio.io._stream_writer</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -559,7 +560,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Encode and write audio/video streams chunk by chunk</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        dst (str or file-like object): The destination where the encoded data are written.</span>
+<span class="sd">        dst (str, path-like or file-like object): The destination where the encoded data are written.</span>
 <span class="sd">            If string-type, it must be a resource indicator that FFmpeg can</span>
 <span class="sd">            handle. The supported value depends on the FFmpeg found in the system.</span>
 
@@ -611,16 +612,14 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">],</span>
+        <span class="n">dst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">],</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">_StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">_StreamWriterFileObj</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`dst` must be either a string or a file-like object.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">_StreamWriter</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">),</span> <span class="nb">format</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="StreamWriter.add_audio_stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.add_audio_stream">[docs]</a>    <span class="nd">@_format_common_args</span>

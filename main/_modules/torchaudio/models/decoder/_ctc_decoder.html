@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models.decoder._ctc_decoder &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
+  <title>torchaudio.models.decoder._ctc_decoder &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
     </div>
     
 
@@ -688,10 +688,102 @@
                 <span class="n">timesteps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">(</span><span class="n">timesteps</span><span class="p">)</span>
 
+<div class="viewcode-block" id="CTCDecoder.decode_begin"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.decode_begin">[docs]</a>    <span class="k">def</span> <span class="nf">decode_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the internal state of the decoder.</span>
+
+<span class="sd">        See :py:meth:`decode_step` for the usage.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           This method is required only when performing online decoding.</span>
+<span class="sd">           It is not necessary when performing batch decoding with :py:meth:`__call__`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">decode_begin</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CTCDecoder.decode_end"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.decode_end">[docs]</a>    <span class="k">def</span> <span class="nf">decode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finalize the internal state of the decoder.</span>
+
+<span class="sd">        See :py:meth:`decode_step` for the usage.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           This method is required only when performing online decoding.</span>
+<span class="sd">           It is not necessary when performing batch decoding with :py:meth:`__call__`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">decode_end</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CTCDecoder.decode_step"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.decode_step">[docs]</a>    <span class="k">def</span> <span class="nf">decode_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emissions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform incremental decoding on top of the curent internal state.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           This method is required only when performing online decoding.</span>
+<span class="sd">           It is not necessary when performing batch decoding with :py:meth:`__call__`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            emissions (torch.FloatTensor): CPU tensor of shape `(frame, num_tokens)` storing sequences of</span>
+<span class="sd">                probability distribution over labels; output of acoustic model.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; decoder = torchaudio.models.decoder.ctc_decoder(...)</span>
+<span class="sd">            &gt;&gt;&gt; decoder.decode_begin()</span>
+<span class="sd">            &gt;&gt;&gt; decoder.decode_step(emission1)</span>
+<span class="sd">            &gt;&gt;&gt; decoder.decode_step(emission2)</span>
+<span class="sd">            &gt;&gt;&gt; decoder.decode_end()</span>
+<span class="sd">            &gt;&gt;&gt; result = decoder.get_final_hypothesis()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">emissions</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;emissions must be float32.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_cpu</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;emissions must be a CPU tensor.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;emissions must be contiguous.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">emissions</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;emissions must be 2D. Found </span><span class="si">{</span><span class="n">emissions</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">T</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">emissions</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">decode_step</span><span class="p">(</span><span class="n">emissions</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">(),</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_to_hypo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CTCHypothesis</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">CTCHypothesis</span><span class="p">(</span>
+                <span class="n">tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_tokens</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">tokens</span><span class="p">),</span>
+                <span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">word_dict</span><span class="o">.</span><span class="n">get_entry</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">words</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">],</span>
+                <span class="n">score</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+                <span class="n">timesteps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_timesteps</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">tokens</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="CTCDecoder.get_final_hypothesis"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.get_final_hypothesis">[docs]</a>    <span class="k">def</span> <span class="nf">get_final_hypothesis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CTCHypothesis</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the final hypothesis</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[CTCHypothesis]:</span>
+<span class="sd">                List of sorted best hypotheses.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           This method is required only when performing online decoding.</span>
+<span class="sd">           It is not necessary when performing batch decoding with :py:meth:`__call__`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">get_all_final_hypothesis</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_hypo</span><span class="p">(</span><span class="n">results</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbest</span><span class="p">])</span></div>
+
 <div class="viewcode-block" id="CTCDecoder.__call__"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">emissions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">CTCHypothesis</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs batched offline decoding.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           This method performs offline decoding in one go. To perform incremental decoding,</span>
+<span class="sd">           please refer to :py:meth:`decode_step`.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            emissions (torch.FloatTensor): CPU tensor of shape `(batch, frame, num_tokens)` storing sequences of</span>
 <span class="sd">                probability distribution over labels; output of acoustic model.</span>
@@ -706,13 +798,16 @@
         <span class="k">if</span> <span class="n">emissions</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;emissions must be float32.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_cuda</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_cpu</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;emissions must be a CPU tensor.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">emissions</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;emissions must be contiguous.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lengths</span><span class="o">.</span><span class="n">is_cuda</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">emissions</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;emissions must be 3D. Found </span><span class="si">{</span><span class="n">emissions</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lengths</span><span class="o">.</span><span class="n">is_cpu</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;lengths must be a CPU tensor.&quot;</span><span class="p">)</span>
 
         <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">emissions</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -725,20 +820,7 @@
         <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
             <span class="n">emissions_ptr</span> <span class="o">=</span> <span class="n">emissions</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span> <span class="o">+</span> <span class="n">float_bytes</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">emissions</span><span class="o">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">emissions_ptr</span><span class="p">,</span> <span class="n">lengths</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">N</span><span class="p">)</span>
-
-            <span class="n">nbest_results</span> <span class="o">=</span> <span class="n">results</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbest</span><span class="p">]</span>
-            <span class="n">hypos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">CTCHypothesis</span><span class="p">(</span>
-                        <span class="n">tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_tokens</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">tokens</span><span class="p">),</span>
-                        <span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">word_dict</span><span class="o">.</span><span class="n">get_entry</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">words</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">],</span>
-                        <span class="n">score</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
-                        <span class="n">timesteps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_timesteps</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">tokens</span><span class="p">),</span>
-                    <span class="p">)</span>
-                    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">nbest_results</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-
+            <span class="n">hypos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_hypo</span><span class="p">(</span><span class="n">results</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbest</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">hypos</span></div>
 
 <div class="viewcode-block" id="CTCDecoder.idxs_to_tokens"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.idxs_to_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">idxs_to_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>

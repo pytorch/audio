@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
+  <title>torchaudio &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
     </div>
     
 
@@ -446,6 +446,9 @@ it easy to handle audio data.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.save.html#torchaudio.save" title="torchaudio.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a></p></td>
 <td><p>Save audio data to file.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.list_audio_backends.html#torchaudio.list_audio_backends" title="torchaudio.list_audio_backends"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_audio_backends</span></code></a></p></td>
+<td><p>List available backends</p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -519,37 +522,16 @@ please refer to <a class="reference external" href="https://github.com/pytorch/a
 <li><p>In 2.0, audio I/O backend dispatcher was introduced.
 Users can opt-in to using dispatcher by setting the environment variable
 <code class="docutils literal notranslate"><span class="pre">TORCHAUDIO_USE_BACKEND_DISPATCHER=1</span></code>.</p></li>
-<li><p>In 2.1, the disptcher becomes the default mechanism for I/O.
-Those who need to keep using the previous mechanism (global backend) can do
-so by setting <code class="docutils literal notranslate"><span class="pre">TORCHAUDIO_USE_BACKEND_DISPATCHER=0</span></code>.</p></li>
-<li><p>In 2.2, the legacy global backend mechanism will be removed.
-Utility functions <a class="reference internal" href="generated/torchaudio.get_audio_backend.html#torchaudio.get_audio_backend" title="torchaudio.get_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_backend()</span></code></a> and <a class="reference internal" href="generated/torchaudio.set_audio_backend.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code></a>
-become no-op.</p></li>
+<li><p>In 2.1, the disptcher became the default mechanism for I/O.</p></li>
+<li><p>In 2.2, the legacy global backend mechanism is removed.
+Utility functions <code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_backend()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code>
+became no-op.</p></li>
 </ul>
-<p>Furthermore, we are removing file-like object support from libsox backend, as this
+<p>Furthermore, we removed file-like object support from libsox backend, as this
 is better supported by FFmpeg backend and makes the build process simpler.
 Therefore, beginning with 2.1, FFmpeg and Soundfile are the sole backends that support
 file-like objects.</p>
 </section>
-</section>
-<section id="backend-utilities">
-<h2>Backend Utilities<a class="headerlink" href="#backend-utilities" title="Permalink to this heading">¶</a></h2>
-<p>The following functions are effective only when backend dispatcher is disabled.</p>
-<p>Note that the changes in 2.1 marks <a class="reference internal" href="generated/torchaudio.get_audio_backend.html#torchaudio.get_audio_backend" title="torchaudio.get_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_audio_backend()</span></code></a> and
-<a class="reference internal" href="generated/torchaudio.set_audio_backend.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code></a> deprecated.</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.list_audio_backends.html#torchaudio.list_audio_backends" title="torchaudio.list_audio_backends"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_audio_backends</span></code></a></p></td>
-<td><p>List available backends</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.get_audio_backend.html#torchaudio.get_audio_backend" title="torchaudio.get_audio_backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_audio_backend</span></code></a></p></td>
-<td><p>DEPRECATED: Get the name of the current global backend</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.set_audio_backend.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_audio_backend</span></code></a></p></td>
-<td><p>DEPRECATED: Set the global backend.</p></td>
-</tr>
-</tbody>
-</table>
 </section>
 </section>
 
@@ -604,7 +586,6 @@ file-like objects.</p>
 <li><a class="reference internal" href="#dispatcher-migration">Dispatcher Migration</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#backend-utilities">Backend Utilities</a></li>
 </ul>
 </li>
 </ul>

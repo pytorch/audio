@@ -1,0 +1,6 @@
+﻿torchaudio.list\_audio\_backends
+================================
+
+.. currentmodule:: torchaudio
+
+.. autofunction:: list_audio_backends

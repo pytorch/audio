@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio._backend &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
+  <title>torchaudio._backend &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
+      <a href="../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
     </div>
     
 
@@ -427,17 +427,25 @@
   <h1>Source code for torchaudio._backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal.module_utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
-<span class="c1"># TODO: Once legacy global backend is removed, move this to torchaudio.__init__</span>
-<span class="k">def</span> <span class="nf">_init_backend</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AudioMetaData&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;load&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;info&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;save&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;list_audio_backends&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_audio_backend&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;set_audio_backend&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_info_func</span><span class="p">()</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_load_func</span><span class="p">()</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_save_func</span><span class="p">()</span>
+
+<span class="n">info</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_info_func</span><span class="p">()</span>
+<span class="n">load</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_load_func</span><span class="p">()</span>
+<span class="n">save</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_save_func</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="list_audio_backends"><a class="viewcode-back" href="../../generated/torchaudio.list_audio_backends.html#torchaudio.list_audio_backends">[docs]</a><span class="k">def</span> <span class="nf">list_audio_backends</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -451,13 +459,12 @@
 <span class="sd">        - Dispatcher mode: ``&quot;ffmpeg&quot;``, ``&quot;sox&quot;`` and ``&quot;soundfile&quot;``.</span>
 <span class="sd">        - Legacy backend mode: ``&quot;sox_io&quot;``, ``&quot;soundfile&quot;``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">get_available_backends</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
 <span class="c1"># Temporary until global backend is removed</span>
-<div class="viewcode-block" id="get_audio_backend"><a class="viewcode-back" href="../../generated/torchaudio.get_audio_backend.html#torchaudio.get_audio_backend">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;With dispatcher enabled, this function is no-op. You can remove the function call.&quot;</span><span class="p">)</span>
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;With dispatcher enabled, this function is no-op. You can remove the function call.&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_audio_backend</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the name of the current global backend</span>
 
@@ -466,11 +473,11 @@
 <span class="sd">            If dispatcher mode is enabled, returns ``None`` otherwise,</span>
 <span class="sd">            the name of current backend or ``None`` (no backend is set).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="c1"># Temporary until global backend is removed</span>
-<div class="viewcode-block" id="set_audio_backend"><a class="viewcode-back" href="../../generated/torchaudio.set_audio_backend.html#torchaudio.set_audio_backend">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;With dispatcher enabled, this function is no-op. You can remove the function call.&quot;</span><span class="p">)</span>
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;With dispatcher enabled, this function is no-op. You can remove the function call.&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">set_audio_backend</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>  <span class="c1"># noqa</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the global backend.</span>
 
@@ -481,7 +488,7 @@
 <span class="sd">            One of ``&quot;sox_io&quot;`` or ``&quot;soundfile&quot;`` based on availability</span>
 <span class="sd">            of the system. If ``None`` is provided the  current backend is unassigned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+    <span class="k">pass</span>
 </pre></div>
 
              </article>

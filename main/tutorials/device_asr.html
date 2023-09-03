@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Device ASR with Emformer RNN-T &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
+  <title>Device ASR with Emformer RNN-T &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
     </div>
     
 
@@ -465,7 +465,7 @@ on laptop.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial requires FFmpeg libraries.
-Please refer to <span class="xref std std-ref">FFmpeg dependency</span> for
+Please refer to <a class="reference internal" href="../installation.html#ffmpeg-dependency"><span class="std std-ref">FFmpeg dependency</span></a> for
 the detail.</p>
 </div>
 <div class="admonition note">
@@ -618,16 +618,15 @@ this increases the CPU consumption.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">beam_width</span> <span class="o">=</span> <span class="n">beam_width</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform streaming inference&quot;&quot;&quot;</span>
         <span class="n">features</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
-        <span class="n">hypos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span>
-            <span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_width</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span>
+            <span class="n">features</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_width</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">transcript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lstrip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">transcript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">lstrip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">transcript</span>
 </pre></div>
 </div>
@@ -695,7 +694,7 @@ so we put them in a function and invoke it within
             <span class="n">chunk</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
             <span class="n">segment</span> <span class="o">=</span> <span class="n">cacher</span><span class="p">(</span><span class="n">chunk</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
             <span class="n">transcript</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 

@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Device AV-ASR with Emformer RNN-T &mdash; Torchaudio 2.2.0.dev20230902 documentation</title>
+  <title>Device AV-ASR with Emformer RNN-T &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20230902 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
     </div>
     
 
@@ -479,17 +479,11 @@ install the other libraries mentioned.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>We do not have any pre-trained models available at this time. The
-following recipe uses placedholders for the sentencepiece model path
-<code class="docutils literal notranslate"><span class="pre">spm_model_path</span></code> and the pretrained model path <code class="docutils literal notranslate"><span class="pre">avsr_model_path</span></code>.</p>
-<p>If you are interested in the training recipe for real-time AV-ASR
-models (AV-ASR), it can be found at <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">real-time
-AV-ASR</a>
-recipe.</p>
+<p>To run this tutorial, please make sure you are in the <cite>tutorial</cite> folder.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To run this tutorial, please make sure you are in the <cite>tutorial</cite> folder.</p>
+<p>We tested the tutorial on torchaudio version 2.0.2 on Macbook Pro (M1 Pro).</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">spm</span>
@@ -631,7 +625,6 @@ is to crop the face region from the aligned face image.</p>
             <span class="p">),</span>
             <span class="n">FunctionalModule</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/generated/torch.stack.html#torch.stack" title="torch.stack" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></a><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
             <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">255.0</span><span class="p">),</span>
-            <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">44</span><span class="p">),</span>
             <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Grayscale</span><span class="p">(),</span>
             <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="mf">0.421</span><span class="p">,</span> <span class="mf">0.165</span><span class="p">),</span>
         <span class="p">)</span>
@@ -657,32 +650,7 @@ TorchAudio library, which incorporates an encoder (Emformer), a
 predictor, and a joint network. The architecture of the proposed AV-ASR
 model is illustrated as follows.</p>
 <img alt="https://download.pytorch.org/torchaudio/doc-assets/avsr/architecture.png" src="https://download.pytorch.org/torchaudio/doc-assets/avsr/architecture.png" />
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">avsr.models.fusion</span> <span class="kn">import</span> <span class="n">fusion_module</span>
-<span class="kn">from</span> <span class="nn">avsr.models.resnet</span> <span class="kn">import</span> <span class="n">video_resnet</span>
-<span class="kn">from</span> <span class="nn">avsr.models.resnet1d</span> <span class="kn">import</span> <span class="n">audio_resnet</span>
-
-
-<span class="k">class</span> <span class="nc">AVSR</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">audio_frontend</span><span class="p">,</span>
-        <span class="n">video_frontend</span><span class="p">,</span>
-        <span class="n">fusion</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">audio_frontend</span> <span class="o">=</span> <span class="n">audio_frontend</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">video_frontend</span> <span class="o">=</span> <span class="n">video_frontend</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fusion</span> <span class="o">=</span> <span class="n">fusion</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span> <span class="n">video</span><span class="p">):</span>
-        <span class="n">audio_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_frontend</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>
-        <span class="n">video_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_frontend</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fusion</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.cat.html#torch.cat" title="torch.cat" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cat</span></a><span class="p">([</span><span class="n">video_features</span><span class="p">,</span> <span class="n">audio_features</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
-
-
-<span class="k">class</span> <span class="nc">SentencePieceTokenProcessor</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SentencePieceTokenProcessor</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sp_model</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sp_model</span> <span class="o">=</span> <span class="n">sp_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">post_process_remove_list</span> <span class="o">=</span> <span class="p">{</span>
@@ -712,32 +680,19 @@ model is illustrated as follows.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span> <span class="o">=</span> <span class="n">token_processor</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span> <span class="n">video</span><span class="p">):</span>
         <span class="n">audio</span><span class="p">,</span> <span class="n">video</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">video</span><span class="p">)</span>
         <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">audio</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">video</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
         <span class="n">length</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="n">feats</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">hypos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">feats</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">transcript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypothesis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lstrip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">feats</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span><span class="p">)</span>
+        <span class="n">transcript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_processor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypotheses</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">lstrip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">transcript</span>
 
 
-<span class="k">def</span> <span class="nf">_get_inference_pipeline</span><span class="p">(</span><span class="n">avsr_model_config</span><span class="p">,</span> <span class="n">avsr_model_path</span><span class="p">,</span> <span class="n">spm_model_path</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">AVSR</span><span class="p">(</span>
-        <span class="n">audio_frontend</span><span class="o">=</span><span class="n">audio_resnet</span><span class="p">(),</span>
-        <span class="n">video_frontend</span><span class="o">=</span><span class="n">video_resnet</span><span class="p">(),</span>
-        <span class="n">fusion</span><span class="o">=</span><span class="n">fusion_module</span><span class="p">(</span>
-            <span class="mi">1024</span><span class="p">,</span>
-            <span class="n">avsr_model_config</span><span class="p">[</span><span class="s2">&quot;transformer_ffn_dim&quot;</span><span class="p">],</span>
-            <span class="n">avsr_model_config</span><span class="p">[</span><span class="s2">&quot;input_dim&quot;</span><span class="p">],</span>
-            <span class="n">avsr_model_config</span><span class="p">[</span><span class="s2">&quot;transformer_dropout&quot;</span><span class="p">],</span>
-        <span class="p">),</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">emformer_rnnt_model</span><span class="p">(</span><span class="o">**</span><span class="n">avsr_model_config</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="n">ckpt</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="torch.load" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">load</span></a><span class="p">(</span><span class="n">avsr_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">storage</span><span class="p">)[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">]</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">ckpt</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_inference_pipeline</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">spm_model_path</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.jit.load.html#torch.jit.load" title="torch.jit.load" class="sphx-glr-backref-module-torch-jit sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span></a><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
     <span class="n">sp_model</span> <span class="o">=</span> <span class="n">spm</span><span class="o">.</span><span class="n">SentencePieceProcessor</span><span class="p">(</span><span class="n">model_file</span><span class="o">=</span><span class="n">spm_model_path</span><span class="p">)</span>
@@ -763,34 +718,15 @@ model is illustrated as follows.</p>
 <li><p>Run inference.</p></li>
 <li><p>Clean up</p></li>
 </ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building pipeline...&quot;</span><span class="p">)</span>
-    <span class="n">spm_model_path</span> <span class="o">=</span> <span class="s2">&quot;../avsr/spm_unigram_1023.model&quot;</span>
-    <span class="n">avsr_model_path</span> <span class="o">=</span> <span class="s2">&quot;../avsr/online_avsr_model.pth&quot;</span>
-    <span class="n">avsr_model_config</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;input_dim&quot;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-        <span class="s2">&quot;encoding_dim&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="s2">&quot;segment_length&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
-        <span class="s2">&quot;right_context_length&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-        <span class="s2">&quot;time_reduction_input_dim&quot;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span>
-        <span class="s2">&quot;time_reduction_stride&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_num_heads&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_ffn_dim&quot;</span><span class="p">:</span> <span class="mi">3072</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_num_layers&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_dropout&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_activation&quot;</span><span class="p">:</span> <span class="s2">&quot;gelu&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_left_context_length&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_max_memory_size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_weight_init_scale_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;depthwise&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;transformer_tanh_on_mem&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;symbol_embedding_dim&quot;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-        <span class="s2">&quot;num_lstm_layers&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s2">&quot;lstm_layer_norm&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;lstm_layer_norm_epsilon&quot;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
-        <span class="s2">&quot;lstm_dropout&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
-        <span class="s2">&quot;num_symbols&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-    <span class="p">}</span>
-    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">_get_inference_pipeline</span><span class="p">(</span><span class="n">avsr_model_config</span><span class="p">,</span> <span class="n">avsr_model_path</span><span class="p">,</span> <span class="n">spm_model_path</span><span class="p">)</span>
+    <span class="n">model_path</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/device_avsr_model.pt&quot;</span><span class="p">)</span>
+    <span class="n">spm_model_path</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/spm_unigram_1023.model&quot;</span><span class="p">)</span>
+
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">_get_inference_pipeline</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">spm_model_path</span><span class="p">)</span>
 
     <span class="n">BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">32</span>
     <span class="n">segment_length</span> <span class="o">=</span> <span class="mi">8</span>
@@ -819,7 +755,7 @@ model is illustrated as follows.</p>
             <span class="n">video</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.cat.html#torch.cat" title="torch.cat" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cat</span></a><span class="p">(</span><span class="n">video_chunks</span><span class="p">)</span>
             <span class="n">audio</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.cat.html#torch.cat" title="torch.cat" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cat</span></a><span class="p">(</span><span class="n">audio_chunks</span><span class="p">)</span>
             <span class="n">video</span><span class="p">,</span> <span class="n">audio</span> <span class="o">=</span> <span class="n">cacher</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="n">audio</span><span class="p">)</span>
-            <span class="n">pipeline</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">hypothesis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="n">pipeline</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">hypotheses</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
             <span class="n">transcript</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">video</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">transcript</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">num_video_frames</span> <span class="o">=</span> <span class="mi">0</span>

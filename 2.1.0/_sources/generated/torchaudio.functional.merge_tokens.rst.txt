@@ -1,0 +1,6 @@
+﻿torchaudio.functional.merge\_tokens
+===================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: merge_tokens

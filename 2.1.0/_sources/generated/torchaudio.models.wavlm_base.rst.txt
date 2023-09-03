@@ -1,0 +1,6 @@
+torchaudio.models.wavlm\_base
+=============================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: wavlm_base

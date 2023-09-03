@@ -216,7 +216,7 @@ This is the same process as
 `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-222
+.. GENERATED FROM PYTHON SOURCE LINES 190-221
 
 .. code-block:: default
 
@@ -239,21 +239,20 @@ This is the same process as
             self.beam_width = beam_width
 
             self.state = None
-            self.hypothesis = None
+            self.hypotheses = None
 
         def infer(self, segment: torch.Tensor) -> str:
             """Perform streaming inference"""
             features, length = self.feature_extractor(segment)
-            hypos, self.state = self.decoder.infer(
-                features, length, self.beam_width, state=self.state, hypothesis=self.hypothesis
+            self.hypotheses, self.state = self.decoder.infer(
+                features, length, self.beam_width, state=self.state, hypothesis=self.hypotheses
             )
-            self.hypothesis = hypos[0]
-            transcript = self.token_processor(self.hypothesis[0], lstrip=False)
+            transcript = self.token_processor(self.hypotheses[0][0], lstrip=False)
             return transcript
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-248
+.. GENERATED FROM PYTHON SOURCE LINES 223-247
 
 .. code-block:: default
 
@@ -282,7 +281,7 @@ This is the same process as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 249-269
+.. GENERATED FROM PYTHON SOURCE LINES 248-268
 
 5. The main process
 -------------------
@@ -305,7 +304,7 @@ The execution flow of the main process is as follows:
    `__name__ == "__main__"` guard.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-313
+.. GENERATED FROM PYTHON SOURCE LINES 268-312
 
 .. code-block:: default
 
@@ -334,7 +333,7 @@ The execution flow of the main process is as follows:
                 chunk = q.get()
                 segment = cacher(chunk[:, 0])
                 transcript = pipeline.infer(segment)
-                print(transcript, end="", flush=True)
+                print(transcript, end="\r", flush=True)
 
         import torch.multiprocessing as mp
 
@@ -354,7 +353,7 @@ The execution flow of the main process is as follows:
         )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 314-327
+.. GENERATED FROM PYTHON SOURCE LINES 313-326
 
 .. code::
 
@@ -370,7 +369,7 @@ The execution flow of the main process is as follows:
    hello world
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 330-332
+.. GENERATED FROM PYTHON SOURCE LINES 329-331
 
 Tag: :obj:`torchaudio.io`
 

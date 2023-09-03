@@ -46,20 +46,13 @@ attention due to its robustness against noise.
 
 .. note::
 
-   We do not have any pre-trained models available at this time. The
-   following recipe uses placedholders for the sentencepiece model path
-   ``spm_model_path`` and the pretrained model path ``avsr_model_path``.
-
-   If you are interested in the training recipe for real-time AV-ASR
-   models (AV-ASR), it can be found at `real-time
-   AV-ASR <https://github.com/pytorch/audio/tree/main/examples/avsr>`__
-   recipe.
+   To run this tutorial, please make sure you are in the `tutorial` folder.
 
 .. note::
 
-   To run this tutorial, please make sure you are in the `tutorial` folder.
+   We tested the tutorial on torchaudio version 2.0.2 on Macbook Pro (M1 Pro).
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-51
+.. GENERATED FROM PYTHON SOURCE LINES 37-45
 
 .. code-block:: default
 
@@ -71,7 +64,8 @@ attention due to its robustness against noise.
     import torchvision
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-65
+
+.. GENERATED FROM PYTHON SOURCE LINES 46-59
 
 Overview
 --------
@@ -87,7 +81,7 @@ pre-processed video stream into our end-to-end model for inference.
 .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/overview.png
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-78
+.. GENERATED FROM PYTHON SOURCE LINES 62-72
 
 1. Data acquisition
 -------------------
@@ -100,7 +94,7 @@ class, please refer to the
 `tutorial <./streamreader_basic_tutorial.html>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-120
+.. GENERATED FROM PYTHON SOURCE LINES 72-114
 
 .. code-block:: default
 
@@ -147,7 +141,7 @@ class, please refer to the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-146
+.. GENERATED FROM PYTHON SOURCE LINES 115-140
 
 2. Pre-processing
 -----------------
@@ -175,7 +169,7 @@ is to crop the face region from the aligned face image.
      - 3. Cropped
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-190
+.. GENERATED FROM PYTHON SOURCE LINES 140-183
 
 .. code-block:: default
 
@@ -208,7 +202,6 @@ is to crop the face region from the aligned face image.
                 ),
                 FunctionalModule(lambda x: torch.stack(x)),
                 torchvision.transforms.Normalize(0.0, 255.0),
-                torchvision.transforms.CenterCrop(44),
                 torchvision.transforms.Grayscale(),
                 torchvision.transforms.Normalize(0.421, 0.165),
             )
@@ -224,7 +217,7 @@ is to crop the face region from the aligned face image.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-205
+.. GENERATED FROM PYTHON SOURCE LINES 184-198
 
 3. Building inference pipeline
 ------------------------------
@@ -241,34 +234,10 @@ model is illustrated as follows.
 .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/architecture.png
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-302
+.. GENERATED FROM PYTHON SOURCE LINES 198-258
 
 .. code-block:: default
 
-
-    from avsr.models.fusion import fusion_module
-    from avsr.models.resnet import video_resnet
-    from avsr.models.resnet1d import audio_resnet
-
-
-    class AVSR(torch.nn.Module):
-        def __init__(
-            self,
-            audio_frontend,
-            video_frontend,
-            fusion,
-            model,
-        ):
-            super().__init__()
-            self.audio_frontend = audio_frontend
-            self.video_frontend = video_frontend
-            self.fusion = fusion
-            self.model = model
-
-        def forward(self, audio, video):
-            audio_features = self.audio_frontend(audio)
-            video_features = self.video_frontend(video)
-            return self.fusion(torch.cat([video_features, audio_features], dim=-1))
 
 
     class SentencePieceTokenProcessor:
@@ -301,32 +270,19 @@ model is illustrated as follows.
             self.token_processor = token_processor
 
             self.state = None
-            self.hypothesis = None
+            self.hypotheses = None
 
         def forward(self, audio, video):
             audio, video = self.preprocessor(audio, video)
             feats = self.model(audio.unsqueeze(0), video.unsqueeze(0))
             length = torch.tensor([feats.size(1)], device=audio.device)
-            hypos, self.state = self.decoder.infer(feats, length, 10, state=self.state, hypothesis=self.hypothesis)
-            self.hypothesis = hypos[0]
-            transcript = self.token_processor(self.hypothesis[0], lstrip=False)
+            self.hypotheses, self.state = self.decoder.infer(feats, length, 10, state=self.state, hypothesis=self.hypotheses)
+            transcript = self.token_processor(self.hypotheses[0][0], lstrip=False)
             return transcript
 
 
-    def _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path):
-        model = AVSR(
-            audio_frontend=audio_resnet(),
-            video_frontend=video_resnet(),
-            fusion=fusion_module(
-                1024,
-                avsr_model_config["transformer_ffn_dim"],
-                avsr_model_config["input_dim"],
-                avsr_model_config["transformer_dropout"],
-            ),
-            model=torchaudio.models.emformer_rnnt_model(**avsr_model_config),
-        )
-        ckpt = torch.load(avsr_model_path, map_location=lambda storage, loc: storage)["state_dict"]
-        model.load_state_dict(ckpt)
+    def _get_inference_pipeline(model_path, spm_model_path):
+        model = torch.jit.load(model_path)
         model.eval()
 
         sp_model = spm.SentencePieceProcessor(model_file=spm_model_path)
@@ -343,7 +299,7 @@ model is illustrated as follows.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-313
+.. GENERATED FROM PYTHON SOURCE LINES 259-269
 
 4. The main process
 -------------------
@@ -356,40 +312,20 @@ The execution flow of the main process is as follows:
 4. Clean up
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 313-392
+.. GENERATED FROM PYTHON SOURCE LINES 269-328
 
 .. code-block:: default
 
 
+    from torchaudio.utils import download_asset
+
 
     def main(device, src, option=None):
         print("Building pipeline...")
-        spm_model_path = "../avsr/spm_unigram_1023.model"
-        avsr_model_path = "../avsr/online_avsr_model.pth"
-        avsr_model_config = {
-            "input_dim": 512,
-            "encoding_dim": 1024,
-            "segment_length": 32,
-            "right_context_length": 4,
-            "time_reduction_input_dim": 768,
-            "time_reduction_stride": 1,
-            "transformer_num_heads": 12,
-            "transformer_ffn_dim": 3072,
-            "transformer_num_layers": 20,
-            "transformer_dropout": 0.1,
-            "transformer_activation": "gelu",
-            "transformer_left_context_length": 30,
-            "transformer_max_memory_size": 0,
-            "transformer_weight_init_scale_strategy": "depthwise",
-            "transformer_tanh_on_mem": True,
-            "symbol_embedding_dim": 512,
-            "num_lstm_layers": 3,
-            "lstm_layer_norm": True,
-            "lstm_layer_norm_epsilon": 0.001,
-            "lstm_dropout": 0.3,
-            "num_symbols": 1024,
-        }
-        pipeline = _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path)
+        model_path = download_asset("tutorial-assets/device_avsr_model.pt")
+        spm_model_path = download_asset("tutorial-assets/spm_unigram_1023.model")
+
+        pipeline = _get_inference_pipeline(model_path, spm_model_path)
 
         BUFFER_SIZE = 32
         segment_length = 8
@@ -418,7 +354,7 @@ The execution flow of the main process is as follows:
                 video = torch.cat(video_chunks)
                 audio = torch.cat(audio_chunks)
                 video, audio = cacher(video, audio)
-                pipeline.state, pipeline.hypothesis = None, None
+                pipeline.state, pipeline.hypotheses = None, None
                 transcript = pipeline(audio, video.float())
                 print(transcript, end="", flush=True)
                 num_video_frames = 0
@@ -440,7 +376,7 @@ The execution flow of the main process is as follows:
         )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 393-403
+.. GENERATED FROM PYTHON SOURCE LINES 329-339
 
 .. code::
 
@@ -453,7 +389,7 @@ The execution flow of the main process is as follows:
    hello world
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 406-408
+.. GENERATED FROM PYTHON SOURCE LINES 342-344
 
 Tag: :obj:`torchaudio.io`
 
