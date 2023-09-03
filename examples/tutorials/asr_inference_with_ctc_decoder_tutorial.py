@@ -387,6 +387,47 @@ print(f"WER: {beam_search_wer}")
 # and “shoktd”.
 #
 
+######################################################################
+# Incremental decoding
+# ~~~~~~~~~~~~~~~~~~~~
+#
+# If the input speech is long, one can decode the emission in
+# incremental manner.
+#
+# You need to first initialize the internal state of the decoder with
+# :py:meth:`~torchaudio.models.decoder.CTCDecoder.decode_begin`.
+
+beam_search_decoder.decode_begin()
+
+######################################################################
+# Then, you can pass emissions to
+# :py:meth:`~torchaudio.models.decoder.CTCDecoder.decode_begin`.
+# Here we use the same emission but pass it to the decoder one frame
+# at a time.
+
+for t in range(emission.size(1)):
+    beam_search_decoder.decode_step(emission[0, t:t + 1, :])
+
+######################################################################
+# Finally, finalize the internal state of the decoder, and retrieve the
+# result.
+
+beam_search_decoder.decode_end()
+beam_search_result_inc = beam_search_decoder.get_final_hypothesis()
+
+######################################################################
+# The result of incremental decoding is identical to batch decoding.
+#
+beam_search_transcript_inc = " ".join(beam_search_result_inc[0].words).strip()
+beam_search_wer_inc = torchaudio.functional.edit_distance(
+    actual_transcript, beam_search_result_inc[0].words) / len(actual_transcript)
+
+print(f"Transcript: {beam_search_transcript_inc}")
+print(f"WER: {beam_search_wer_inc}")
+
+assert beam_search_result[0][0].words == beam_search_result_inc[0].words
+assert beam_search_result[0][0].score == beam_search_result_inc[0].score
+torch.testing.assert_close(beam_search_result[0][0].timesteps, beam_search_result_inc[0].timesteps)
 
 ######################################################################
 # Timestep Alignments
