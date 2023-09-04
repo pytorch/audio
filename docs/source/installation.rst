@@ -30,7 +30,7 @@ Dependencies
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. _ffmpeg:
+.. _ffmpeg_dependency:
 
 * `FFmpeg <https://ffmpeg.org>`__
 
