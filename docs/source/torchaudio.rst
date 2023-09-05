@@ -17,6 +17,7 @@ it easy to handle audio data.
    info
    load
    save
+   list_audio_backends
 
 .. _backend:
 
@@ -91,30 +92,12 @@ please refer to https://github.com/pytorch/audio/issues/2950
 * In 2.0, audio I/O backend dispatcher was introduced.
   Users can opt-in to using dispatcher by setting the environment variable
   ``TORCHAUDIO_USE_BACKEND_DISPATCHER=1``.
-* In 2.1, the disptcher becomes the default mechanism for I/O.
-  Those who need to keep using the previous mechanism (global backend) can do
-  so by setting ``TORCHAUDIO_USE_BACKEND_DISPATCHER=0``.
-* In 2.2, the legacy global backend mechanism will be removed.
+* In 2.1, the disptcher became the default mechanism for I/O.
+* In 2.2, the legacy global backend mechanism is removed.
   Utility functions :py:func:`get_audio_backend` and :py:func:`set_audio_backend`
-  become no-op.
+  became no-op.
 
-Furthermore, we are removing file-like object support from libsox backend, as this
+Furthermore, we removed file-like object support from libsox backend, as this
 is better supported by FFmpeg backend and makes the build process simpler.
 Therefore, beginning with 2.1, FFmpeg and Soundfile are the sole backends that support
 file-like objects.
-
-Backend Utilities
------------------
-
-The following functions are effective only when backend dispatcher is disabled.
-
-Note that the changes in 2.1 marks :py:func:`get_audio_backend` and
-:py:func:`set_audio_backend` deprecated.
-
-.. autosummary::
-   :toctree: generated
-   :nosignatures:
-
-   list_audio_backends
-   get_audio_backend
-   set_audio_backend
