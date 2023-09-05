@@ -258,15 +258,14 @@ class InferencePipeline(torch.nn.Module):
         self.token_processor = token_processor
 
         self.state = None
-        self.hypothesis = None
+        self.hypotheses = None
 
     def forward(self, audio, video):
         audio, video = self.preprocessor(audio, video)
         feats = self.model(audio.unsqueeze(0), video.unsqueeze(0))
         length = torch.tensor([feats.size(1)], device=audio.device)
-        hypos, self.state = self.decoder.infer(feats, length, 10, state=self.state, hypothesis=self.hypothesis)
-        self.hypothesis = hypos[0]
-        transcript = self.token_processor(self.hypothesis[0], lstrip=False)
+        self.hypotheses, self.state = self.decoder.infer(feats, length, 10, state=self.state, hypothesis=self.hypotheses)
+        transcript = self.token_processor(self.hypotheses[0][0], lstrip=False)
         return transcript
 
 
@@ -370,7 +369,7 @@ def main(device, src, option=None):
             video, audio = cacher(video, audio)
             pipeline.state, pipeline.hypothesis = None, None
             transcript = pipeline(audio, video.float())
-            print(transcript, end="", flush=True)
+            print(transcript, end="\r", flush=True)
             num_video_frames = 0
             video_chunks = []
             audio_chunks = []

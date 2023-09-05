@@ -206,16 +206,15 @@ class Pipeline:
         self.beam_width = beam_width
 
         self.state = None
-        self.hypothesis = None
+        self.hypotheses = None
 
     def infer(self, segment: torch.Tensor) -> str:
         """Perform streaming inference"""
         features, length = self.feature_extractor(segment)
-        hypos, self.state = self.decoder.infer(
-            features, length, self.beam_width, state=self.state, hypothesis=self.hypothesis
+        self.hypotheses, self.state = self.decoder.infer(
+            features, length, self.beam_width, state=self.state, hypothesis=self.hypotheses
         )
-        self.hypothesis = hypos[0]
-        transcript = self.token_processor(self.hypothesis[0], lstrip=False)
+        transcript = self.token_processor(self.hypotheses[0][0], lstrip=False)
         return transcript
 
 
@@ -291,7 +290,7 @@ def main(device, src, bundle):
             chunk = q.get()
             segment = cacher(chunk[:, 0])
             transcript = pipeline.infer(segment)
-            print(transcript, end="", flush=True)
+            print(transcript, end="\r", flush=True)
 
     import torch.multiprocessing as mp
 

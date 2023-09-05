@@ -131,22 +131,10 @@ class IntWorkspace {
           ComputeSizeForBetaCounters(options_) * sizeof(int));
     }
 #endif // USE_CUDA
-#ifdef USE_ROCM
-    if (data_ != nullptr && options_.device_ == GPU) {
-      hipMemset(
-          GetPointerToAlphaCounters(),
-          0,
-          ComputeSizeForAlphaCounters(options_) * sizeof(int));
-      hipMemset(
-          GetPointerToBetaCounters(),
-          0,
-          ComputeSizeForBetaCounters(options_) * sizeof(int));
-    }
-#endif // USE_ROCM
   }
 
   static int ComputeSizeForAlphaCounters(const Options& options) { // B * U
-#if defined(USE_CUDA) || defined(USE_ROCM)
+#ifdef USE_CUDA
     if (options.device_ == GPU) {
       return options.BU();
     } else {
@@ -157,7 +145,7 @@ class IntWorkspace {
 #endif // USE_CUDA
   }
   static int ComputeSizeForBetaCounters(const Options& options) { // B * U
-#if defined(USE_CUDA) || defined(USE_ROCM)
+#ifdef USE_CUDA
     if (options.device_ == GPU) {
       return options.BU();
     } else {
