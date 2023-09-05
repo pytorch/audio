@@ -1,7 +1,7 @@
 def __getattr__(name: str):
-    import warnings
-
     if name == "AudioMetaData":
+        import warnings
+
         warnings.warn(
             "`torchaudio.backend.common.AudioMetaData` has been moved to "
             "`torchaudio.AudioMetaData`. Please update the import path.",

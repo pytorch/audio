@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Callable, Optional, Tuple, Union
 
 from torch import Tensor
+from torchaudio import AudioMetaData
 
 
 def load(
@@ -20,5 +21,5 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     raise RuntimeError("No audio I/O backend is available.")
 
 
-def info(filepath: str) -> None:
+def info(filepath: str) -> AudioMetaData:
     raise RuntimeError("No audio I/O backend is available.")

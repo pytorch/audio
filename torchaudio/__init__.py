@@ -1,10 +1,16 @@
 # Initialize extension and backend first
-from . import (  # noqa  # usort: skip
-    _extension,
-    _backend,
+from . import _extension  # noqa  # usort: skip
+from ._backend import (  # noqa  # usort: skip
+    AudioMetaData,
+    get_audio_backend,
+    info,
+    list_audio_backends,
+    load,
+    save,
+    set_audio_backend,
 )
+
 from . import (  # noqa: F401
-    backend,  # For BC
     compliance,
     datasets,
     functional,
@@ -16,7 +22,9 @@ from . import (  # noqa: F401
     transforms,
     utils,
 )
-from ._backend import AudioMetaData, get_audio_backend, info, list_audio_backends, load, save, set_audio_backend
+
+# For BC
+from . import backend  # noqa # usort: skip
 
 try:
     from .version import __version__, git_version  # noqa: F401
