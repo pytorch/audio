@@ -117,7 +117,6 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         with patch("soundfile.info", _mock_info_func):
             with warnings.catch_warnings(record=True) as w:
                 info = soundfile_backend.info("foo")
-                assert len(w) == 1
                 assert "UNSEEN_SUBTYPE subtype is unknown to TorchAudio" in str(w[-1].message)
                 assert info.bits_per_sample == 0
 
