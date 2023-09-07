@@ -80,7 +80,6 @@ class AVConformerRNNTModule(LightningModule):
             betas=(0.9, 0.98),
         )
 
-
     def _step(self, batch, _, step_type):
         if batch is None:
             return None
