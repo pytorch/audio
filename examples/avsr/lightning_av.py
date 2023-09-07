@@ -80,7 +80,6 @@ class AVConformerRNNTModule(LightningModule):
             betas=(0.9, 0.98),
         )
 
-        self.automatic_optimization = False
 
     def _step(self, batch, _, step_type):
         if batch is None:
@@ -128,20 +127,10 @@ class AVConformerRNNTModule(LightningModule):
         return post_process_hypos(hypotheses, self.sp_model)[0][0]
 
     def training_step(self, batch, batch_idx):
-        opt = self.optimizers()
-        opt.zero_grad()
         loss = self._step(batch, batch_idx, "train")
         batch_size = batch.videos.size(0)
         batch_sizes = self.all_gather(batch_size)
-
         loss *= batch_sizes.size(0) / batch_sizes.sum()  # world size / batch size
-        self.manual_backward(loss)
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10)
-        opt.step()
-
-        sch = self.lr_schedulers()
-        sch.step()
-
         self.log("monitoring_step", torch.tensor(self.global_step, dtype=torch.float32))
 
         return loss
