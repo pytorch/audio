@@ -36,6 +36,7 @@ def get_trainer(args):
         strategy=DDPStrategy(find_unused_parameters=False),
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
+        gradient_clip_val=10.0,
     )
 
 
