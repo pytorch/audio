@@ -110,9 +110,37 @@ def _frac_delay(delay: torch.Tensor, delay_i: torch.Tensor, delay_filter_length:
     return torch.special.sinc(n - delay) * _hann(n - delay, 2 * pad)
 
 
+def _adjust_coefficient(coefficient: Union[float, torch.Tensor]) -> torch.Tensor:
+    """Validates and converts absorption or scattering parameters to a tensor with appropriate shape"""
+    num_wall = 6
+    if isinstance(coefficient, float):
+        absorption = torch.ones(1, num_wall) * coefficient
+    elif isinstance(absorption, Tensor) and absorption.ndim == 1:
+        if absorption.shape[0] != num_wall:
+            raise ValueError(
+                "The shape of absorption must be `(6,)` if it is a 1D Tensor." f"Found the shape {absorption.shape}."
+            )
+        absorption = absorption.unsqueeze(0)
+    elif isinstance(absorption, Tensor) and absorption.ndim == 2:
+        if absorption.shape != (7, num_wall):
+            raise ValueError(
+                "The shape of coefficient must be `(7, 6)` if it is a 2D Tensor."
+                f"Found the shape of room is 3 and shape of absorption is {coefficient.shape}."
+            )
+        absorption = absorption
+    else:
+        absorption = absorption
+    return absorption
+
+
 def _validate_inputs(
-    room: torch.Tensor, source: torch.Tensor, mic_array: torch.Tensor, absorption: Union[float, torch.Tensor]
-) -> torch.Tensor:
+    room: torch.Tensor,
+    source: torch.Tensor,
+    mic_array: torch.Tensor,
+    absorption: Union[float, torch.Tensor],
+    scattering: Optional[Union[float, torch.Tensor]] = None,
+
+) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     """Validate dimensions of input arguments, and normalize different kinds of absorption into the same dimension.
 
     Args:
@@ -127,9 +155,13 @@ def _validate_inputs(
             absorption coefficients of ``"west"``, ``"east"``, ``"south"``, ``"north"``, ``"floor"``,
             and ``"ceiling"``, respectively.
             If ``absorption`` is a 2D Tensor, the shape must be `(7, 6)`, where 7 represents the number of octave bands.
+        scattering(float or torch.Tensor or None, optional): The scattering coefficients of wall materials.
+            (Default: None).  The shape and type of this parameter is the same as for ``absorption``.
 
     Returns:
         (torch.Tensor): The absorption Tensor. The shape is `(1, 6)` for single octave band case,
+            or `(7, 6)` for multi octave band case.
+        (torch.Tensor or None): The scattering Tensor. The shape is `(1, 6)` for single octave band case,
             or `(7, 6)` for multi octave band case.
     """
     if room.ndim != 1:
@@ -137,31 +169,16 @@ def _validate_inputs(
     D = room.shape[0]
     if D != 3:
         raise ValueError(f"room must be a 3D room. Found {room.shape}.")
-    num_wall = 6
     if source.shape[0] != D:
         raise ValueError(f"The shape of source must be `(3,)`. Found {source.shape}")
     if mic_array.ndim != 2:
         raise ValueError(f"mic_array must be a 2D Tensor. Found {mic_array.shape}.")
     if mic_array.shape[1] != D:
         raise ValueError(f"The second dimension of mic_array must be 3. Found {mic_array.shape}.")
-    if isinstance(absorption, float):
-        absorption = torch.ones(1, num_wall) * absorption
-    elif isinstance(absorption, Tensor) and absorption.ndim == 1:
-        if absorption.shape[0] != num_wall:
-            raise ValueError(
-                "The shape of absorption must be `(6,)` if it is a 1D Tensor." f"Found the shape {absorption.shape}."
-            )
-        absorption = absorption.unsqueeze(0)
-    elif isinstance(absorption, Tensor) and absorption.ndim == 2:
-        if absorption.shape != (7, num_wall):
-            raise ValueError(
-                "The shape of absorption must be `(7, 6)` if it is a 2D Tensor."
-                f"Found the shape of room is {D} and shape of absorption is {absorption.shape}."
-            )
-        absorption = absorption
-    else:
-        absorption = absorption
-    return absorption
+    absorption = _adjust_coefficient(absorption)
+    if scattering is not None:
+        scattering = _adjust_coefficient(scattering)
+    return absorption, scattering
 
 
 def simulate_rir_ism(
@@ -220,7 +237,7 @@ def simulate_rir_ism(
         of octave bands are fixed to ``[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]``.
         Users need to tune the values of ``absorption`` to the corresponding frequencies.
     """
-    absorption = _validate_inputs(room, source, mic_array, absorption)
+    absorption, _ = _validate_inputs(room, source, mic_array, absorption)
     img_location, att = _compute_image_sources(room, source, max_order, absorption)
 
     # compute distances between image sources and microphones
@@ -261,3 +278,92 @@ def simulate_rir_ism(
             rir = rir[..., :output_length]
 
     return rir
+
+
+def ray_tracing(
+    room: torch.Tensor,
+    source: torch.Tensor,
+    mic_array: torch.Tensor,
+    num_rays: int,
+    absorption: Union[float, torch.Tensor] = 0.0,
+    scattering: Union[float, torch.Tensor] = 0.0,
+    mic_radius: float = 0.5,
+    sound_speed: float = 343.0,
+    energy_thres: float = 1e-7,
+    time_thres: float = 10.0,
+    hist_bin_size: float = 0.004,
+) -> torch.Tensor:
+    r"""Compute energy histogram via ray tracing.
+
+    The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.
+
+    ``num_rays`` rays are casted uniformly in all directions from the source; when a ray intersects a wall,
+    it is reflected and part of its energy is absorbed. It is also scattered (sent directly to the microphone(s))
+    according to the ``scattering`` coefficient. When a ray is close to the microphone, its current energy is
+    recorded in the output histogram for that given time slot.
+
+    .. devices:: CPU
+
+    .. properties:: TorchScript
+
+    Args:
+        room (torch.Tensor): Room coordinates. The shape of `room` must be `(3,)` which represents
+            three dimensions of the room.
+        source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(3,)`.
+        mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, 3)`.
+        absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.
+            (Default: ``0.0``).
+            If the dtype is ``float``, the absorption coefficient is identical to all walls and
+            all frequencies.
+            If ``absorption`` is a 1D Tensor, the shape must be `(4,)` if the room is a 2D room,
+            representing absorption coefficients of ``"west"``, ``"east"``, ``"south"``, and
+            ``"north"`` walls, respectively.
+            Or the shape must be `(6,)` if the room is a 3D room, representing absorption coefficients
+            of ``"west"``, ``"east"``, ``"south"``, ``"north"``, ``"floor"``, and ``"ceiling"``, respectively.
+            If ``absorption`` is a 2D Tensor, the shape must be `(num_bands, 4)` if the room is a 2D room,
+            or `(num_bands, 6)` if the room is a 3D room. ``num_bands`` is the number of frequency bands (usually 7),
+            but you can choose other values.
+        scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials.
+            (Default: ``0.0``).  The shape and type of this parameter is the same as for ``absorption``.
+        mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5)
+        sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343.0``)
+        energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``).
+            The initial energy of each ray is ``2 / num_rays``.
+        time_thres (float, optional):  The maximal duration (in seconds) for which rays are traced. (Default: 10.0)
+        hist_bin_size (float, optional): The size (in seconds) of each bin in the output histogram. (Default: 0.004)
+    Returns:
+        (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded. Each bin corresponds
+            to a given time slot. The shape is `(channel, num_bands, num_bins)`
+            where ``num_bins = ceil(time_thres / hist_bin_size)``. If both ``absorption`` and ``scattering``
+            are floats, then ``num_bands == 1``.
+    """
+    if time_thres < hist_bin_size:
+        raise ValueError(f"time_thres={time_thres} must be at least greater than hist_bin_size={hist_bin_size}.")
+    absorption, scattering = _validate_inputs(room, source, mic_array, absorption, scattering)
+
+    # Bring absorption and scattering to the same shape
+    if absorption.shape[0] == 1 and scattering.shape[0] > 1:
+        absorption = absorption.expand(scattering.shape)
+    if scattering.shape[0] == 1 and absorption.shape[0] > 1:
+        scattering = scattering.expand(absorption.shape)
+    if absorption.shape != scattering.shape:
+        raise ValueError(
+            "absorption and scattering must have the same number of bands and walls. "
+            f"Inferred shapes are {absorption.shape}  and {scattering.shape}"
+        )
+
+    histograms = torch.ops.torchaudio.ray_tracing(
+        room,
+        source,
+        mic_array,
+        num_rays,
+        absorption,
+        scattering,
+        mic_radius,
+        sound_speed,
+        energy_thres,
+        time_thres,
+        hist_bin_size,
+    )
+
+    return histograms
