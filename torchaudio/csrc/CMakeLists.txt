@@ -42,7 +42,7 @@ if(BUILD_RNNT)
 endif()
 
 if(BUILD_RIR)
-  list(APPEND sources rir.cpp)
+  list(APPEND sources rir.cpp ray_tracing.cpp)
   list(APPEND compile_definitions INCLUDE_RIR)
 endif()
 
