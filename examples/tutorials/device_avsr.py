@@ -172,7 +172,6 @@ class Preprocessing(torch.nn.Module):
             ),
             FunctionalModule(lambda x: torch.stack(x)),
             torchvision.transforms.Normalize(0.0, 255.0),
-            torchvision.transforms.CenterCrop(44),
             torchvision.transforms.Grayscale(),
             torchvision.transforms.Normalize(0.421, 0.165),
         )
@@ -204,7 +203,7 @@ class Preprocessing(torch.nn.Module):
 #
 
 from avsr.models.fusion import fusion_module
-from avsr.models.resnet import video_resnet
+from avsr.models.linear import video_linear
 from avsr.models.resnet1d import audio_resnet
 
 
@@ -260,6 +259,7 @@ class InferencePipeline(torch.nn.Module):
         self.state = None
         self.hypotheses = None
 
+
     def forward(self, audio, video):
         audio, video = self.preprocessor(audio, video)
         feats = self.model(audio.unsqueeze(0), video.unsqueeze(0))
@@ -272,7 +272,7 @@ class InferencePipeline(torch.nn.Module):
 def _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path):
     model = AVSR(
         audio_frontend=audio_resnet(),
-        video_frontend=video_resnet(),
+        video_frontend=video_linear(),
         fusion=fusion_module(
             1024,
             avsr_model_config["transformer_ffn_dim"],
@@ -315,16 +315,17 @@ def main(device, src, option=None):
     print("Building pipeline...")
     spm_model_path = "../avsr/spm_unigram_1023.model"
     avsr_model_path = "../avsr/online_avsr_model.pth"
+
     avsr_model_config = {
         "input_dim": 512,
         "encoding_dim": 1024,
         "segment_length": 32,
         "right_context_length": 4,
-        "time_reduction_input_dim": 768,
+        "time_reduction_input_dim": 256,
         "time_reduction_stride": 1,
-        "transformer_num_heads": 12,
-        "transformer_ffn_dim": 3072,
-        "transformer_num_layers": 20,
+        "transformer_num_heads": 4,
+        "transformer_ffn_dim": 1024,
+        "transformer_num_layers": 12,
         "transformer_dropout": 0.1,
         "transformer_activation": "gelu",
         "transformer_left_context_length": 30,
