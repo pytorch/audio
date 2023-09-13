@@ -91,7 +91,7 @@ jobs:
         mv docs/build/html /artifacts/
 
   commit:
-    if: (github.repository == 'pytorch/audio') && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/') )
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       # Required for `git push`
       # Note:
