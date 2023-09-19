@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import BinaryIO, Dict, Optional, Union
 
 import torch
@@ -132,7 +133,7 @@ class StreamWriter:
     """Encode and write audio/video streams chunk by chunk
 
     Args:
-        dst (str or file-like object): The destination where the encoded data are written.
+        dst (str, path-like or file-like object): The destination where the encoded data are written.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. The supported value depends on the FFmpeg found in the system.
 
@@ -184,16 +185,14 @@ class StreamWriter:
 
     def __init__(
         self,
-        dst: Union[str, BinaryIO],
+        dst: Union[str, Path, BinaryIO],
         format: Optional[str] = None,
         buffer_size: int = 4096,
     ):
-        if isinstance(dst, str):
-            self._s = _StreamWriter(dst, format)
-        elif hasattr(dst, "write"):
+        if hasattr(dst, "write"):
             self._s = _StreamWriterFileObj(dst, format, buffer_size)
         else:
-            raise ValueError("`dst` must be either a string or a file-like object.")
+            self._s = _StreamWriter(str(dst), format)
         self._is_open = False
 
     @_format_common_args
