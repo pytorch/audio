@@ -22,6 +22,13 @@ if [[ "${CUDA_TESTS_ONLY}" = "1" ]]; then
   args+=('-k' 'cuda or gpu')
 fi
 
-cd test
-pytest "${args[@]}" torchaudio_unittest
-coverage html
+(
+    cd build/temp*/test/cpp
+    ctest
+)
+
+(
+    cd test
+    pytest "${args[@]}" torchaudio_unittest
+    coverage html
+)
