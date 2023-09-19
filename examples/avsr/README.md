@@ -12,8 +12,6 @@
 
 This directory contains the training recipe for real-time audio, visual, and audio-visual speech recognition (ASR, VSR, AV-ASR) models, which is an extension of [Auto-AVSR](https://arxiv.org/abs/2303.14307).
 
-Please refer to [this tutorial](https://pytorch.org/audio/main/tutorials/device_avsr.html) for real-time AV-ASR inference from microphone and camera.
-
 ## Preparation
 
 1. Install PyTorch (pytorch, torchvision, torchaudio) from [source](https://pytorch.org/get-started/), along with all necessary packages:
