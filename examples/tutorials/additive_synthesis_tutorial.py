@@ -86,12 +86,12 @@ NUM_FRAMES = int(DURATION * SAMPLE_RATE)
 
 
 def plot(freq, amp, waveform, sample_rate, zoom=None, vol=0.1):
-    t = torch.arange(waveform.size(0)) / sample_rate
+    t = (torch.arange(waveform.size(0)) / sample_rate).numpy()
 
     fig, axes = plt.subplots(4, 1, sharex=True)
-    axes[0].plot(t, freq)
+    axes[0].plot(t, freq.numpy())
     axes[0].set(title=f"Oscillator bank (bank size: {amp.size(-1)})", ylabel="Frequency [Hz]", ylim=[-0.03, None])
-    axes[1].plot(t, amp)
+    axes[1].plot(t, amp.numpy())
     axes[1].set(ylabel="Amplitude", ylim=[-0.03 if torch.all(amp >= 0.0) else None, None])
     axes[2].plot(t, waveform)
     axes[2].set(ylabel="Waveform")
