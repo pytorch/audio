@@ -269,8 +269,8 @@ def _get_inference_pipeline(avsr_model_path, spm_model_path):
 
 from torchaudio._internal import download_url_to_file
 _SPM_CHECKSUM = "856dfe3dc9c9192d9f84b6860c39ac6fb26af76aea998b2bab3c00321dbde1b1"
-_SPM_URL = "https://www.doc.ic.ac.uk/~pm4115/torchaudio_tutorial/spm_unigram_1023.model"
-_AVSR_MODEL_URL = "http://www.doc.ic.ac.uk/~pm4115/torchaudio_tutorial/device_avsr_model.pt"
+_SPM_URL = "https://download.pytorch.org/torchaudio/tutorial-assets/spm_unigram_1023.model"
+_AVSR_MODEL_URL = "https://download.pytorch.org/torchaudio/tutorial-assets/device_avsr_model.pt"
 
 
 def main(device, src, option=None):
