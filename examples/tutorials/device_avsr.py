@@ -27,18 +27,11 @@ attention due to its robustness against noise.
 
 .. note::
 
-   We do not have any pre-trained models available at this time. The
-   following recipe uses placedholders for the sentencepiece model path
-   ``spm_model_path`` and the pretrained model path ``avsr_model_path``.
-
-   If you are interested in the training recipe for real-time AV-ASR
-   models (AV-ASR), it can be found at `real-time
-   AV-ASR <https://github.com/pytorch/audio/tree/main/examples/avsr>`__
-   recipe.
+   To run this tutorial, please make sure you are in the `tutorial` folder.
 
 .. note::
 
-   To run this tutorial, please make sure you are in the `tutorial` folder.
+   We tested the tutorial on torchaudio version 2.0.2 on Macbook Pro (M1 Pro).
 
 """
 
@@ -47,6 +40,7 @@ import sentencepiece as spm
 import torch
 import torchaudio
 import torchvision
+
 
 ######################################################################
 # Overview
@@ -202,30 +196,6 @@ class Preprocessing(torch.nn.Module):
 # .. image:: https://download.pytorch.org/torchaudio/doc-assets/avsr/architecture.png
 #
 
-from avsr.models.fusion import fusion_module
-from avsr.models.linear import video_linear
-from avsr.models.resnet1d import audio_resnet
-
-
-class AVSR(torch.nn.Module):
-    def __init__(
-        self,
-        audio_frontend,
-        video_frontend,
-        fusion,
-        model,
-    ):
-        super().__init__()
-        self.audio_frontend = audio_frontend
-        self.video_frontend = video_frontend
-        self.fusion = fusion
-        self.model = model
-
-    def forward(self, audio, video):
-        audio_features = self.audio_frontend(audio)
-        video_features = self.video_frontend(video)
-        return self.fusion(torch.cat([video_features, audio_features], dim=-1))
-
 
 class SentencePieceTokenProcessor:
     def __init__(self, sp_model):
@@ -259,7 +229,6 @@ class InferencePipeline(torch.nn.Module):
         self.state = None
         self.hypotheses = None
 
-
     def forward(self, audio, video):
         audio, video = self.preprocessor(audio, video)
         feats = self.model(audio.unsqueeze(0), video.unsqueeze(0))
@@ -269,20 +238,8 @@ class InferencePipeline(torch.nn.Module):
         return transcript
 
 
-def _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path):
-    model = AVSR(
-        audio_frontend=audio_resnet(),
-        video_frontend=video_linear(),
-        fusion=fusion_module(
-            1024,
-            avsr_model_config["transformer_ffn_dim"],
-            avsr_model_config["input_dim"],
-            avsr_model_config["transformer_dropout"],
-        ),
-        model=torchaudio.models.emformer_rnnt_model(**avsr_model_config),
-    )
-    ckpt = torch.load(avsr_model_path, map_location=lambda storage, loc: storage)["state_dict"]
-    model.load_state_dict(ckpt)
+def _get_inference_pipeline(avsr_model_path, spm_model_path):
+    model = torch.jit.load(avsr_model_path)
     model.eval()
 
     sp_model = spm.SentencePieceProcessor(model_file=spm_model_path)
@@ -310,36 +267,20 @@ def _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path):
 # 4. Clean up
 #
 
+from torchaudio._internal import download_url_to_file
+_SPM_CHECKSUM = "856dfe3dc9c9192d9f84b6860c39ac6fb26af76aea998b2bab3c00321dbde1b1"
+_SPM_URL = "https://www.doc.ic.ac.uk/~pm4115/torchaudio_tutorial/spm_unigram_1023.model"
+_AVSR_MODEL_URL = "http://www.doc.ic.ac.uk/~pm4115/torchaudio_tutorial/device_avsr_model.pt"
+
 
 def main(device, src, option=None):
     print("Building pipeline...")
     spm_model_path = "../avsr/spm_unigram_1023.model"
-    avsr_model_path = "../avsr/online_avsr_model.pth"
+    avsr_model_path = "../avsr/device_avsr_model.pth"
+    download_url_to_file(_SPM_URL, spm_model_path, hash_prefix=_SPM_CHECKSUM)
+    download_url_to_file(_AVSR_MODEL_URL, avsr_model_path)
 
-    avsr_model_config = {
-        "input_dim": 512,
-        "encoding_dim": 1024,
-        "segment_length": 32,
-        "right_context_length": 4,
-        "time_reduction_input_dim": 256,
-        "time_reduction_stride": 1,
-        "transformer_num_heads": 4,
-        "transformer_ffn_dim": 1024,
-        "transformer_num_layers": 12,
-        "transformer_dropout": 0.1,
-        "transformer_activation": "gelu",
-        "transformer_left_context_length": 30,
-        "transformer_max_memory_size": 0,
-        "transformer_weight_init_scale_strategy": "depthwise",
-        "transformer_tanh_on_mem": True,
-        "symbol_embedding_dim": 512,
-        "num_lstm_layers": 3,
-        "lstm_layer_norm": True,
-        "lstm_layer_norm_epsilon": 0.001,
-        "lstm_dropout": 0.3,
-        "num_symbols": 1024,
-    }
-    pipeline = _get_inference_pipeline(avsr_model_config, avsr_model_path, spm_model_path)
+    pipeline = _get_inference_pipeline(avsr_model_path, spm_model_path)
 
     BUFFER_SIZE = 32
     segment_length = 8
@@ -368,9 +309,9 @@ def main(device, src, option=None):
             video = torch.cat(video_chunks)
             audio = torch.cat(audio_chunks)
             video, audio = cacher(video, audio)
-            pipeline.state, pipeline.hypothesis = None, None
+            pipeline.state, pipeline.hypotheses = None, None
             transcript = pipeline(audio, video.float())
-            print(transcript, end="\r", flush=True)
+            print(transcript, end="", flush=True)
             num_video_frames = 0
             video_chunks = []
             audio_chunks = []
