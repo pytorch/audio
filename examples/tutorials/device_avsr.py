@@ -238,8 +238,8 @@ class InferencePipeline(torch.nn.Module):
         return transcript
 
 
-def _get_inference_pipeline(avsr_model_path, spm_model_path):
-    model = torch.jit.load(avsr_model_path)
+def _get_inference_pipeline(model_path, spm_model_path):
+    model = torch.jit.load(model_path)
     model.eval()
 
     sp_model = spm.SentencePieceProcessor(model_file=spm_model_path)
@@ -267,20 +267,15 @@ def _get_inference_pipeline(avsr_model_path, spm_model_path):
 # 4. Clean up
 #
 
-from torchaudio._internal import download_url_to_file
-_SPM_CHECKSUM = "856dfe3dc9c9192d9f84b6860c39ac6fb26af76aea998b2bab3c00321dbde1b1"
-_SPM_URL = "https://download.pytorch.org/torchaudio/tutorial-assets/spm_unigram_1023.model"
-_AVSR_MODEL_URL = "https://download.pytorch.org/torchaudio/tutorial-assets/device_avsr_model.pt"
+from torchaudio.utils import download_asset
 
 
 def main(device, src, option=None):
     print("Building pipeline...")
-    spm_model_path = "../avsr/spm_unigram_1023.model"
-    avsr_model_path = "../avsr/device_avsr_model.pth"
-    download_url_to_file(_SPM_URL, spm_model_path, hash_prefix=_SPM_CHECKSUM)
-    download_url_to_file(_AVSR_MODEL_URL, avsr_model_path)
+    model_path = download_asset("tutorial-assets/device_avsr_model.pt")
+    spm_model_path = download_asset("tutorial-assets/spm_unigram_1023.model")
 
-    pipeline = _get_inference_pipeline(avsr_model_path, spm_model_path)
+    pipeline = _get_inference_pipeline(model_path, spm_model_path)
 
     BUFFER_SIZE = 32
     segment_length = 8
