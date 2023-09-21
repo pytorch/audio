@@ -1,3 +1,6 @@
+import math
+
+import numpy as np
 import torch
 import torchaudio.prototype.functional as F
 
@@ -9,11 +12,62 @@ if _mod_utils.is_module_available("pyroomacoustics"):
     import pyroomacoustics as pra
 
 
+def _pra_ray_tracing(
+    room_dim,
+    absorption,
+    scattering,
+    num_bands,
+    mic_array,
+    source,
+    num_rays,
+    energy_thres,
+    time_thres,
+    hist_bin_size,
+    mic_radius,
+    sound_speed,
+):
+    walls = ["west", "east", "south", "north", "floor", "ceiling"]
+    absorption = absorption.T.tolist()
+    scattering = scattering.T.tolist()
+    freqs = 125 * 2 ** np.arange(num_bands)
+
+    room = pra.ShoeBox(
+        room_dim.tolist(),
+        ray_tracing=True,
+        materials={
+            wall: pra.Material(
+                energy_absorption={"coeffs": absorp, "center_freqs": freqs},
+                scattering={"coeffs": scat, "center_freqs": freqs},
+            )
+            for wall, absorp, scat in zip(walls, absorption, scattering)
+        },
+        air_absorption=False,
+        max_order=0,  # Make sure PRA doesn't use the hybrid method (we just want ray tracing)
+    )
+    room.add_microphone_array(mic_array.T.tolist())
+    room.add_source(source.tolist())
+    room.set_ray_tracing(
+        n_rays=num_rays,
+        energy_thres=energy_thres,
+        time_thres=time_thres,
+        hist_bin_size=hist_bin_size,
+        receiver_radius=mic_radius,
+    )
+    room.set_sound_speed(sound_speed)
+    room.compute_rir()
+    hist_pra = np.array(room.rt_histograms, dtype=np.float32)[:, 0, 0]
+
+    # PRA continues the simulation beyond time threshold, but torchaudio does not.
+    num_bins = math.ceil(time_thres / hist_bin_size)
+    return hist_pra[:, :, :num_bins]
+
+
 @skipIfNoModule("pyroomacoustics")
 @skipIfNoRIR
 class CompatibilityTest(PytorchTestCase):
 
-    dtype = torch.float64
+    # pyroomacoustics uses float for internal implementations.
+    dtype = torch.float32
     device = torch.device("cpu")
 
     @parameterized.expand([(1,), (4,)])
@@ -91,3 +145,53 @@ class CompatibilityTest(PytorchTestCase):
             expected[i, 0 : room.rir[i][0].shape[0]] = torch.from_numpy(room.rir[i][0])
         actual = F.simulate_rir_ism(room_dim, source, mic_array, max_order, absorption)
         self.assertEqual(expected, actual, atol=1e-3, rtol=1e-3)
+
+    @parameterized.expand(
+        [
+            ([20, 25, 30], [1, 10, 5], [[8, 8, 22]], 130),
+        ]
+    )
+    def test_ray_tracing_same_results_as_pyroomacoustics(self, room, source, mic_array, num_rays):
+        num_bands = 6
+        energy_thres = 1e-7
+        time_thres = 10.0
+        hist_bin_size = 0.004
+        mic_radius = 0.5
+        sound_speed = 343.0
+
+        absorption = torch.full((num_bands, 6), 0.1, dtype=self.dtype)
+        scattering = torch.full((num_bands, 6), 0.4, dtype=self.dtype)
+        room = torch.tensor(room, dtype=self.dtype)
+        source = torch.tensor(source, dtype=self.dtype)
+        mic_array = torch.tensor(mic_array, dtype=self.dtype)
+
+        hist_pra = _pra_ray_tracing(
+            room,
+            absorption,
+            scattering,
+            num_bands,
+            mic_array,
+            source,
+            num_rays,
+            energy_thres,
+            time_thres,
+            hist_bin_size,
+            mic_radius,
+            sound_speed,
+        )
+
+        hist = F.ray_tracing(
+            room=room,
+            source=source,
+            mic_array=mic_array,
+            num_rays=num_rays,
+            absorption=absorption,
+            scattering=scattering,
+            sound_speed=sound_speed,
+            mic_radius=mic_radius,
+            energy_thres=energy_thres,
+            time_thres=time_thres,
+            hist_bin_size=hist_bin_size,
+        )
+
+        self.assertEqual(hist, hist_pra, atol=0.001, rtol=0.001)

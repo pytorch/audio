@@ -35,4 +35,5 @@ Room Impulse Response Simulation
    :toctree: generated
    :nosignatures:
 
+   ray_tracing
    simulate_rir_ism

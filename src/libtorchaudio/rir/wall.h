@@ -18,7 +18,6 @@ struct Wall {
   const torch::Tensor origin;
   const torch::Tensor normal;
   const torch::Tensor scattering;
-
   const torch::Tensor reflection;
 
   Wall(
@@ -26,8 +25,8 @@ struct Wall {
       const torch::ArrayRef<scalar_t>& normal,
       const torch::Tensor& absorption,
       const torch::Tensor& scattering)
-      : origin(torch::tensor(origin)),
-        normal(torch::tensor(normal)),
+      : origin(torch::tensor(origin).to(scattering.dtype())),
+        normal(torch::tensor(normal).to(scattering.dtype())),
         scattering(scattering),
         reflection(1. - absorption) {}
 };
@@ -136,7 +135,6 @@ std::tuple<torch::Tensor, int, scalar_t> find_collision_wall(
   for (unsigned int i = 0; i < 3; ++i) {
     auto dir0 = SCALAR(direction[i]);
     auto abs_dir0 = std::abs(dir0);
-
     // If the ray is almost parallel to a plane, then we delegate the
     // computation to the other planes.
     if (abs_dir0 < EPS) {
@@ -147,6 +145,10 @@ std::tuple<torch::Tensor, int, scalar_t> find_collision_wall(
     scalar_t distance = (dir0 < 0.)
         ? SCALAR(origin[i]) // Going towards origin
         : SCALAR(room[i] - origin[i]); // Going away from origin
+    // sometimes origin is slightly outside of room
+    if (distance < 0) {
+      distance = 0.;
+    }
     auto ratio = distance / abs_dir0;
     int i_increment = dir0 > 0.;
 
