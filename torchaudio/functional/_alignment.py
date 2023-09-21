@@ -115,17 +115,14 @@ def merge_tokens(tokens: Tensor, scores: Tensor, blank: int = 0) -> List[TokenSp
     if len(tokens) != len(scores):
         raise ValueError("`tokens` and `scores` must be the same length.")
 
-    t_prev = blank
-    i = start = -1
-    spans = []
-    for t, token in enumerate(tokens):
-        if token != t_prev:
-            if t_prev != blank:
-                spans.append(TokenSpan(t_prev.item(), start, t, scores[start:t].mean().item()))
-            if token != blank:
-                i += 1
-                start = t
-            t_prev = token
-    if t_prev != blank:
-        spans.append(TokenSpan(t_prev.item(), start, len(tokens), scores[start:].mean().item()))
+    diff = torch.diff(
+        tokens, prepend=torch.tensor([-1], device=tokens.device), append=torch.tensor([-1], device=tokens.device)
+    )
+    changes_wo_blank = torch.nonzero((diff != 0)).squeeze().tolist()
+    tokens = tokens.tolist()
+    spans = [
+        TokenSpan(token=token, start=start, end=end, score=scores[start:end].mean().item())
+        for start, end in zip(changes_wo_blank[:-1], changes_wo_blank[1:])
+        if (token := tokens[start]) != blank
+    ]
     return spans
