@@ -47,7 +47,6 @@ printf "* Installing fsspec\n"
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
 
 printf "* Installing torchaudio\n"
-export BUILD_CPP_TEST=1
 "$root_dir/packaging/vc_env_helper.bat" python setup.py install
 
 # 3. Install Test tools
