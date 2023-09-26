@@ -17,7 +17,6 @@ __all__ = [
     "conformer_rnnt_model",
     "conformer_rnnt_biasing",
     "conformer_rnnt_biasing_base",
-    "conv_tasnet_base",
     "ConvEmformer",
     "conformer_wav2vec2_model",
     "conformer_wav2vec2_base",
