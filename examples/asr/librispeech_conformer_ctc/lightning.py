@@ -5,10 +5,13 @@ from typing import List, Tuple
 
 import sentencepiece as spm
 import torch
-import torchaudio
+from bpe_graph_compiler import BpeCtcTrainingGraphCompiler
+
+# from torchaudio.models import Conformer
+from ctc_model import conformer_ctc_model
+from loss import MaximumLikelihoodLoss
 from pytorch_lightning import LightningModule
-from torchaudio.models import Hypothesis, RNNTBeamSearch
-from torchaudio.prototype.models import conformer_rnnt_model
+from torchaudio.models import Hypothesis
 
 
 logger = logging.getLogger()
@@ -75,11 +78,32 @@ def post_process_hypos(
     return nbest_batch
 
 
-def conformer_rnnt_customized():
-    return conformer_rnnt_model(
+class GreedyCTCDecoder(torch.nn.Module):
+    def __init__(self, labels, blank=0):
+        super().__init__()
+        self.labels = labels
+        self.blank = blank
+
+    def forward(self, emission: torch.Tensor) -> List[str]:
+        """Given a sequence emission over labels, get the best path
+        Args:
+          emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.
+
+        Returns:
+          List[str]: The resulting transcript
+        """
+        indices = torch.argmax(emission, dim=-1)  # [num_seq,]
+        indices = torch.unique_consecutive(indices, dim=-1)
+        indices = [i for i in indices if i != self.blank]
+        joined = "".join([self.labels[i.item()] for i in indices])
+        return joined.replace("|", " ").strip().split()
+
+
+def conformer_ctc_customized():
+    return conformer_ctc_model(
         input_dim=80,
         encoding_dim=512,
-        time_reduction_stride=4,
+        time_reduction_stride=1,
         conformer_input_dim=512,
         conformer_ffn_dim=2048,
         conformer_num_layers=12,
@@ -87,19 +111,12 @@ def conformer_rnnt_customized():
         conformer_depthwise_conv_kernel_size=31,
         conformer_dropout=0.1,
         num_symbols=1024,
-        symbol_embedding_dim=1024,
-        num_lstm_layers=2,
-        lstm_hidden_dim=512,
-        lstm_layer_norm=True,
-        lstm_layer_norm_epsilon=1e-5,
-        lstm_dropout=0.3,
-        joiner_activation="tanh",
         subsampling_type="conv",
     )
 
 
-class ConformerRNNTModule(LightningModule):
-    def __init__(self, sp_model):
+class ConformerCTCModule(LightningModule):
+    def __init__(self, sp_model, inference_args=None):
         super().__init__()
 
         self.sp_model = sp_model
@@ -113,27 +130,47 @@ class ConformerRNNTModule(LightningModule):
 
         # ``conformer_rnnt_base`` hardcodes a specific Conformer RNN-T configuration.
         # For greater customizability, please refer to ``conformer_rnnt_model``.
-        # self.model = conformer_rnnt_base()
-        self.model = conformer_rnnt_customized()
-        self.loss = torchaudio.transforms.RNNTLoss(reduction="sum")
-        self.optimizer = torch.optim.Adam(
-            self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9, weight_decay=1e-3
-        )
+        # self.model = conformer_ctc_model_base()
+        self.model = conformer_ctc_customized()
+
+        # Option 1:
+        # self.loss = torch.nn.CTCLoss(blank=self.blank_idx, reduction="sum")
+
+        # Option 2:
+        # graph_compiler = BpeCtcTrainingGraphCompiler(
+        #     bpe_model_path="./spm_unigram_1023.model",
+        #     device=self.device,  # torch.device("cuda", self.global_rank),
+        #     topo_type="ctc",
+        # )
+        # self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=4)
+        self.loss = None
+
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=8e-4, betas=(0.9, 0.98), eps=1e-9)
         self.warmup_lr_scheduler = WarmupLR(self.optimizer, 40, 120, 0.96)
+
+        if inference_args:
+            tokens = {i: sp_model.id_to_piece(i) for i in range(sp_model.vocab_size())}
+            greedy_decoder = GreedyCTCDecoder(
+                labels=tokens,
+                blank=self.blank_idx,
+            )
+            self.decoder = greedy_decoder
+
+    def initialize_loss_func(self, topo_type="ctc", subsampling_factor=4):
+        graph_compiler = BpeCtcTrainingGraphCompiler(
+            bpe_model_path="./spm_unigram_1023.model",
+            device=self.device,  # torch.device("cuda", self.global_rank),
+            topo_type=topo_type,
+        )
+        self.loss = MaximumLikelihoodLoss(graph_compiler, subsampling_factor=subsampling_factor)
 
     def _step(self, batch, _, step_type):
         if batch is None:
             return None
 
-        prepended_targets = batch.targets.new_empty([batch.targets.size(0), batch.targets.size(1) + 1])
-        prepended_targets[:, 1:] = batch.targets
-        prepended_targets[:, 0] = self.blank_idx
-        prepended_target_lengths = batch.target_lengths + 1
-        output, src_lengths, _, _ = self.model(
+        output, src_lengths = self.model(
             batch.features,
             batch.feature_lengths,
-            prepended_targets,
-            prepended_target_lengths,
         )
         loss = self.loss(output, batch.targets, src_lengths, batch.target_lengths)
         self.log(f"Losses/{step_type}_loss", loss, on_step=True, on_epoch=True)
@@ -147,9 +184,16 @@ class ConformerRNNTModule(LightningModule):
         )
 
     def forward(self, batch: Batch):
-        decoder = RNNTBeamSearch(self.model, self.blank_idx)
-        hypotheses = decoder(batch.features.to(self.device), batch.feature_lengths.to(self.device), 20)
-        return post_process_hypos(hypotheses, self.sp_model)[0][0]
+        with torch.inference_mode():
+            output, src_lengths = self.model(
+                batch.features.to(self.device),
+                batch.feature_lengths.to(self.device),
+            )
+        emission = output.cpu()
+        beam_search_result = self.decoder(emission)
+        # beam_search_transcript = " ".join(beam_search_result[0][0].words).strip()  # assuming batch_size=1
+        beam_search_transcript = " ".join(beam_search_result).strip()
+        return beam_search_transcript
 
     def training_step(self, batch: Batch, batch_idx):
         """Custom training step.
@@ -171,7 +215,14 @@ class ConformerRNNTModule(LightningModule):
         Doing so allows us to account for the variability in batch sizes that
         variable-length sequential data yield.
         """
-        loss = self._step(batch, batch_idx, "train")
+        try:
+            loss = self._step(batch, batch_idx, "train")
+        except BaseException:
+            loss = 0
+            for _model_param_name, model_param_value in self.model.named_parameters():  # encoder_output_layer.
+                loss += model_param_value.abs().sum()
+            loss = loss * 1e-5
+            logger.info(f"[{self.global_rank}] batch {batch_idx} is bad")
         batch_size = batch.features.size(0)
         batch_sizes = self.all_gather(batch_size)
         self.log("Gathered batch size", batch_sizes.sum(), on_step=True, on_epoch=True)

@@ -3,11 +3,16 @@ from argparse import ArgumentParser
 
 import sentencepiece as spm
 
-from lightning import ConformerRNNTModule
+from lightning import ConformerCTCModule
 from pytorch_lightning import seed_everything, Trainer
-from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from pytorch_lightning.callbacks import Callback, LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.strategies import DDPStrategy
 from transforms import get_data_module
+
+
+class MyFitStartCallback(Callback):
+    def on_fit_start(self, trainer, pl_module):
+        pl_module.initialize_loss_func(topo_type="ctc", subsampling_factor=4)
 
 
 def run_train(args):
@@ -34,6 +39,7 @@ def run_train(args):
         checkpoint,
         train_checkpoint,
         lr_monitor,
+        MyFitStartCallback(),
     ]
     trainer = Trainer(
         default_root_dir=args.exp_dir,
@@ -45,16 +51,12 @@ def run_train(args):
         callbacks=callbacks,
         reload_dataloaders_every_n_epochs=1,
         gradient_clip_val=10.0,
+        accumulate_grad_batches=3,
     )
 
     sp_model = spm.SentencePieceProcessor(model_file=str(args.sp_model_path))
-    model = ConformerRNNTModule(sp_model)
-    data_module = get_data_module(
-        args.librispeech_path,
-        args.global_stats_path,
-        str(args.sp_model_path),
-        args.musan_path,
-    )
+    model = ConformerCTCModule(sp_model)
+    data_module = get_data_module(str(args.librispeech_path), str(args.global_stats_path), str(args.sp_model_path))
     trainer.fit(model, data_module, ckpt_path=args.checkpoint_path)
 
 
@@ -83,13 +85,6 @@ def cli_main():
         type=pathlib.Path,
         help="Path to LibriSpeech datasets.",
         required=True,
-    )
-    parser.add_argument(
-        "--musan-path",
-        type=pathlib.Path,
-        help="Path to MUSAN dataset for addtive noise.",
-        default=None,
-        required=False,
     )
     parser.add_argument(
         "--sp-model-path",
