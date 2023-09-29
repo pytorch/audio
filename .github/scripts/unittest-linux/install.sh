@@ -62,6 +62,7 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install --quiet -y ninja cmake
 
 printf "* Installing torchaudio\n"
+export BUILD_CPP_TEST=1
 python setup.py install
 
 # 3. Install Test tools

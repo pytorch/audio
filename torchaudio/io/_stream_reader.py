@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import BinaryIO, Dict, Iterator, Optional, Tuple, TypeVar, Union
 
 import torch
@@ -446,7 +447,7 @@ class StreamReader:
     For the detailed usage of this class, please refer to the tutorial.
 
     Args:
-        src (str, file-like object): The media source.
+        src (str, path-like or file-like object): The media source.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. This includes a file path, URL, device identifier or
             filter expression. The supported value depends on the FFmpeg found
@@ -512,17 +513,15 @@ class StreamReader:
 
     def __init__(
         self,
-        src: Union[str, BinaryIO],
+        src: Union[str, Path, BinaryIO],
         format: Optional[str] = None,
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
     ):
-        if isinstance(src, str):
-            self._be = _StreamReader(src, format, option)
-        elif hasattr(src, "read"):
+        if hasattr(src, "read"):
             self._be = _StreamReaderFileObj(src, format, option, buffer_size)
         else:
-            raise ValueError("`src` must be either a string or file-like object.")
+            self._be = _StreamReader(str(src), format, option)
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i

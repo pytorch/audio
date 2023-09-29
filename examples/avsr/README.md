@@ -12,8 +12,6 @@
 
 This directory contains the training recipe for real-time audio, visual, and audio-visual speech recognition (ASR, VSR, AV-ASR) models, which is an extension of [Auto-AVSR](https://arxiv.org/abs/2303.14307).
 
-Please refer to [this tutorial](https://pytorch.org/audio/main/tutorials/device_avsr.html) for real-time AV-ASR inference from microphone and camera.
-
 ## Preparation
 
 1. Install PyTorch (pytorch, torchvision, torchaudio) from [source](https://pytorch.org/get-started/), along with all necessary packages:
@@ -61,7 +59,7 @@ python eval.py --modality=[modality] \
 - `mode`: Type of the mode. Valid values are: `online` and `offline`.
 - `root-dir`: Path to the root directory where all preprocessed files will be stored.
 - `sp-model-path`: Path to the sentencepiece model. Default: `./spm_unigram_1023.model`.
-- `checkpoint-path`: Path to a pretraned model.
+- `checkpoint-path`: Path to a pre-trained model.
 
 ## Results
 

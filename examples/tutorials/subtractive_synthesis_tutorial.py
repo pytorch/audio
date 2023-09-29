@@ -227,7 +227,7 @@ def plot_waveform(magnitudes, filtered, sample_rate):
 
     _, ax = plt.subplots(1, 1, sharex=True)
     ax.vlines(offsets, 0, nyquist, color="gray", linestyle="--", linewidth=0.8)
-    ax.plot(mag_x.T, mag_y.T, color="gray", linewidth=0.8)
+    ax.plot(mag_x.T.numpy(), mag_y.T.numpy(), color="gray", linewidth=0.8)
     ax.specgram(filtered, Fs=sample_rate)
     return Audio(filtered, rate=sample_rate)
 
