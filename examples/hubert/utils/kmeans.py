@@ -135,7 +135,7 @@ def learn_kmeans(
     _LG.info("Finished training the KMeans clustering model successfully")
 
 
-class ApplyKmeans(object):
+class ApplyKmeans:
     def __init__(self, km_path, device):
         import joblib
 
