@@ -59,7 +59,7 @@ python eval.py --modality=[modality] \
 - `mode`: Type of the mode. Valid values are: `online` and `offline`.
 - `root-dir`: Path to the root directory where all preprocessed files will be stored.
 - `sp-model-path`: Path to the sentencepiece model. Default: `./spm_unigram_1023.model`.
-- `checkpoint-path`: Path to a pretraned model.
+- `checkpoint-path`: Path to a pre-trained model.
 
 ## Results
 
