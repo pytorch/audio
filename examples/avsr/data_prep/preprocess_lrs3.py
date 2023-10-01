@@ -65,7 +65,7 @@ seg_duration = args.seg_duration
 dataset = args.dataset
 
 args.data_dir = os.path.normpath(args.data_dir)
-vid_dataloader = AVSRDataLoader(modality="video", detector=args.detector, resize=(96, 96))
+vid_dataloader = AVSRDataLoader(modality="visual", detector=args.detector, resize=(96, 96))
 aud_dataloader = AVSRDataLoader(modality="audio")
 # Step 2, extract mouth patches from segments.
 seg_vid_len = seg_duration * 25

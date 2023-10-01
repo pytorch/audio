@@ -12,7 +12,7 @@ import torchvision
 class AVSRDataLoader:
     def __init__(self, modality, detector="retinaface", resize=None):
         self.modality = modality
-        if modality == "video":
+        if modality == "visual":
             if detector == "retinaface":
                 from detectors.retinaface.detector import LandmarksDetector
                 from detectors.retinaface.video_process import VideoProcess
@@ -31,7 +31,7 @@ class AVSRDataLoader:
             audio, sample_rate = self.load_audio(data_filename)
             audio = self.audio_process(audio, sample_rate)
             return audio
-        if self.modality == "video":
+        if self.modality == "visual":
             video = self.load_video(data_filename)
             landmarks = self.landmarks_detector(video)
             video = self.video_process(video, landmarks)
