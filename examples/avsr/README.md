@@ -38,7 +38,7 @@ python train.py --exp-dir=[exp_dir] \
 ```
 
 - `exp-dir` and `exp-name`: The directory where the checkpoints will be saved, will be stored at the location `[exp_dir]`/`[exp_name]`.
-- `modality`: Type of the input modality. Valid values are: `video`, `audio`, and `audiovisual`.
+- `modality`: Type of the input modality. Valid values are: `visual`, `audio`, and `audiovisual`.
 - `mode`: Type of the mode. Valid values are: `online` and `offline`.
 - `root-dir`: Path to the root directory where all preprocessed files will be stored.
 - `sp-model-path`: Path to the sentencepiece model. Default: `./spm_unigram_1023.model`, which can be produced using `train_spm.py`.
@@ -55,7 +55,7 @@ python eval.py --modality=[modality] \
                --checkpoint-path=[checkpoint_path]
 ```
 
-- `modality`: Type of the input modality. Valid values are: `video`, `audio`, and `audiovisual`.
+- `modality`: Type of the input modality. Valid values are: `visual`, `audio`, and `audiovisual`.
 - `mode`: Type of the mode. Valid values are: `online` and `offline`.
 - `root-dir`: Path to the root directory where all preprocessed files will be stored.
 - `sp-model-path`: Path to the sentencepiece model. Default: `./spm_unigram_1023.model`.
