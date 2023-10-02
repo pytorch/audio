@@ -76,7 +76,7 @@ scalar_t cosine(const Wall<scalar_t>& wall, const torch::Tensor& dir) {
 
 /// 2D room
 template <typename T>
-const std::vector<Wall<T>> make_room(
+const std::array<Wall<T>, 4> make_room(
     const T w,
     const T l,
     const torch::Tensor& abs,
@@ -111,7 +111,7 @@ const std::vector<Wall<T>> make_room(
 
 /// 3D room
 template <typename T>
-const std::vector<Wall<T>> make_room(
+const std::array<Wall<T>, 6> make_room(
     const T w,
     const T l,
     const T h,
