@@ -124,8 +124,8 @@ const std::array<Wall<T>, 6> make_room(
       Wall<T>({w, 0, 0}, {1, 0, 0}, SLICE(abs, 1), SLICE(scat, 1)), // East
       Wall<T>({0, 0, 0}, {0, -1, 0}, SLICE(abs, 2), SLICE(scat, 2)), // South
       Wall<T>({w, l, 0}, {0, 1, 0}, SLICE(abs, 3), SLICE(scat, 3)), // North
-      Wall<T>({w, 0, 0}, {0, 0, -1}, SLICE(abs, 4), SLICE(scat, 3)), // Floor
-      Wall<T>({w, 0, h}, {0, 0, 1}, SLICE(abs, 5), SLICE(scat, 3)) // Ceiling
+      Wall<T>({w, 0, 0}, {0, 0, -1}, SLICE(abs, 4), SLICE(scat, 4)), // Floor
+      Wall<T>({w, 0, h}, {0, 0, 1}, SLICE(abs, 5), SLICE(scat, 5)) // Ceiling
   };
 #undef SLICE
 }

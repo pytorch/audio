@@ -331,7 +331,7 @@ torch::Tensor ray_tracing(
       return AT_DISPATCH_FLOATING_TYPES(
           room.scalar_type(), "ray_tracing_2d", [&] {
             RayTracer<scalar_t, 2> rt(
-                room, mic_array, absorption, scattering, mic_radius);
+                room, absorption, scattering, mic_array, mic_radius);
             return rt.compute_histograms(
                 source,
                 num_rays,
@@ -345,7 +345,7 @@ torch::Tensor ray_tracing(
       return AT_DISPATCH_FLOATING_TYPES(
           room.scalar_type(), "ray_tracing_3d", [&] {
             RayTracer<scalar_t, 3> rt(
-                room, mic_array, absorption, scattering, mic_radius);
+                room, absorption, scattering, mic_array, mic_radius);
             return rt.compute_histograms(
                 source,
                 num_rays,
