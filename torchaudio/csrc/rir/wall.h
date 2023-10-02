@@ -74,41 +74,6 @@ scalar_t cosine(const Wall<scalar_t>& wall, const torch::Tensor& dir) {
 ///   `find_collision_wall` will search in the order x, y, z and
 ///   wall pairs must be distibguishable on these axis.
 
-/// 2D room
-template <typename T>
-const std::array<Wall<T>, 4> make_room(
-    const T w,
-    const T l,
-    const torch::Tensor& abs,
-    const torch::Tensor& scat) {
-  //
-  //                          (0, 1)
-  //            0:West          ^
-  //            (0, l)          |  3:North
-  // (-1, 0)  <--  + ---------- +  (w, l)
-  //               |            |
-  //               |            |
-  //       (0, 0)  + -----------+ --> (1, 0)
-  //       2:South |            (w, 0)
-  //               v            1:East
-  //              (0, -1)
-  //
-  //  y
-  //  ^
-  //  |
-  //  +-- > x
-  //
-  using namespace torch::indexing;
-#define SLICE(x, i) x.index({Slice(), i})
-  return {
-      Wall<T>({0, l}, {-1, 0}, SLICE(abs, 0), SLICE(scat, 0)), // West
-      Wall<T>({w, 0}, {1, 0}, SLICE(abs, 1), SLICE(scat, 1)), // East
-      Wall<T>({0, 0}, {0, -1}, SLICE(abs, 2), SLICE(scat, 2)), // South
-      Wall<T>({w, l}, {0, 1}, SLICE(abs, 3), SLICE(scat, 3)) // North
-  };
-#undef SLICE
-}
-
 /// 3D room
 template <typename T>
 const std::array<Wall<T>, 6> make_room(
@@ -137,7 +102,7 @@ const std::array<Wall<T>, 6> make_room(
 /// so that it does hit one of the walls.
 /// See also:
 /// https://github.com/LCAV/pyroomacoustics/blob/df8af24c88a87b5d51c6123087cd3cd2d361286a/pyroomacoustics/libroom_src/room.cpp#L609-L716
-template <typename scalar_t, unsigned int Dim>
+template <typename scalar_t>
 std::tuple<torch::Tensor, int, scalar_t> find_collision_wall(
     const torch::Tensor& room,
     const torch::Tensor& origin,
@@ -147,22 +112,16 @@ std::tuple<torch::Tensor, int, scalar_t> find_collision_wall(
 #define INSIDE(x, y) (BOOL(-EPS < (x)) && BOOL((x) < (y + EPS)))
 
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
-      Dim == room.size(0),
-      "Expected room to be ",
-      Dim,
-      " dimension, but received ",
+      3 == room.size(0),
+      "Expected room to be 3 dimension, but received ",
       room.sizes());
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
-      Dim == origin.size(0),
-      "Expected origin to be ",
-      Dim,
-      " dimension, but received ",
+      3 == origin.size(0),
+      "Expected origin to be 3 dimension, but received ",
       origin.sizes());
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
-      Dim == direction.size(0),
-      "Expected direction to be ",
-      Dim,
-      " dimension, but received ",
+      3 == direction.size(0),
+      "Expected direction to be 3 dimension, but received ",
       direction.sizes());
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
       BOOL(room > 0), "Room size should be greater than zero. Found: ", room);
@@ -174,7 +133,7 @@ std::tuple<torch::Tensor, int, scalar_t> find_collision_wall(
       room);
 
   // i is the coordinate in the collision is searched.
-  for (unsigned int i = 0; i < Dim; ++i) {
+  for (unsigned int i = 0; i < 3; ++i) {
     auto dir0 = SCALAR(direction[i]);
     auto abs_dir0 = std::abs(dir0);
 

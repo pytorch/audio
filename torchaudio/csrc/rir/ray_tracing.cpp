@@ -45,22 +45,15 @@ const int ISM_ORDER = 10;
 #define MAX(x) (VAL((x).max()))
 #define IN_RANGE(x, y) ((-EPS < (x)) && ((x) < (y) + EPS))
 
-template <typename scalar_t, unsigned int D>
-const std::array<Wall<scalar_t>, D * 2> make_walls(
+template <typename scalar_t>
+const std::array<Wall<scalar_t>, 6> make_walls(
     const torch::Tensor& room,
     const torch::Tensor& absorption,
     const torch::Tensor& scattering) {
-  if constexpr (D == 2) {
-    auto w = room.index({0}).item<scalar_t>();
-    auto l = room.index({1}).item<scalar_t>();
-    return make_room<scalar_t>(w, l, absorption, scattering);
-  }
-  if constexpr (D == 3) {
-    auto w = room.index({0}).item<scalar_t>();
-    auto l = room.index({1}).item<scalar_t>();
-    auto h = room.index({2}).item<scalar_t>();
-    return make_room<scalar_t>(w, l, h, absorption, scattering);
-  }
+  auto w = room.index({0}).item<scalar_t>();
+  auto l = room.index({1}).item<scalar_t>();
+  auto h = room.index({2}).item<scalar_t>();
+  return make_room<scalar_t>(w, l, h, absorption, scattering);
 }
 
 inline double get_energy_coeff(
@@ -73,7 +66,7 @@ inline double get_energy_coeff(
 
 /// RayTracer class helper for ray tracing.
 /// For attribute description, Python wrapper.
-template <typename scalar_t, unsigned int D>
+template <typename scalar_t>
 class RayTracer {
   // Provided parameters
   const torch::Tensor& room;
@@ -84,7 +77,7 @@ class RayTracer {
   const int num_bands;
   const double mic_radius_sq;
   const bool do_scattering; // Whether scattering is needed (scattering != 0)
-  const std::array<Wall<scalar_t>, D * 2> walls; // The walls of the room
+  const std::array<Wall<scalar_t>, 6> walls; // The walls of the room
 
   // Runtime value caches
   // Updated at the beginning of the simulation
@@ -106,7 +99,7 @@ class RayTracer {
         num_bands(absorption.size(0)),
         mic_radius_sq(mic_radius * mic_radius),
         do_scattering(MAX(scattering) > 0.),
-        walls(make_walls<scalar_t, D>(room, absorption, scattering)) {}
+        walls(make_walls<scalar_t>(room, absorption, scattering)) {}
 
   // The main (and only) public entry point of this class. The histograms Tensor
   // reference is passed along and modified in the subsequent private method
@@ -134,38 +127,28 @@ class RayTracer {
     // TODO: the for loop can be parallelized over num_rays by creating
     // `num_threads` histograms and then sum-reducing them into a single
     // histogram.
-    static_assert(D == 2 || D == 3, "Only 2D and 3D are supported.");
-    if constexpr (D == 2) {
-      scalar_t delta = 2. * M_PI / num_rays;
-      for (int i = 0; i < num_rays; ++i) {
-        scalar_t phi = i * delta;
-        auto dir = torch::tensor({cos(phi), sin(phi)}, room.scalar_type());
-        simul_ray(energies, origin, dir, histograms);
-      }
-    } else {
-      scalar_t delta = 2. / num_rays;
-      scalar_t increment = M_PI * (3. - std::sqrt(5.)); // phi increment
+    scalar_t delta = 2. / num_rays;
+    scalar_t increment = M_PI * (3. - std::sqrt(5.)); // phi increment
 
-      for (auto i = 0; i < num_rays; ++i) {
-        auto z = (i * delta - 1) + delta / 2.;
-        auto rho = std::sqrt(1. - z * z);
+    for (auto i = 0; i < num_rays; ++i) {
+      auto z = (i * delta - 1) + delta / 2.;
+      auto rho = std::sqrt(1. - z * z);
 
-        scalar_t phi = i * increment;
+      scalar_t phi = i * increment;
 
-        auto x = cos(phi) * rho;
-        auto y = sin(phi) * rho;
+      auto x = cos(phi) * rho;
+      auto y = sin(phi) * rho;
 
-        auto azimuth = atan2(y, x);
-        auto colatitude = atan2(std::sqrt(x * x + y * y), z);
+      auto azimuth = atan2(y, x);
+      auto colatitude = atan2(std::sqrt(x * x + y * y), z);
 
-        auto dir = torch::tensor(
-            {sin(colatitude) * cos(azimuth),
-             sin(colatitude) * sin(azimuth),
-             cos(colatitude)},
-            room.scalar_type());
+      auto dir = torch::tensor(
+          {sin(colatitude) * cos(azimuth),
+           sin(colatitude) * sin(azimuth),
+           cos(colatitude)},
+          room.scalar_type());
 
-        simul_ray(energies, origin, dir, histograms);
-      }
+      simul_ray(energies, origin, dir, histograms);
     }
     return histograms.transpose(1, 2); // (num_mics, num_bands, num_bins)
   }
@@ -200,7 +183,7 @@ class RayTracer {
     while (true) {
       // Find the next hit point
       auto [hit_point, next_wall_index, hit_distance] =
-          find_collision_wall<scalar_t, D>(room, origin, dir);
+          find_collision_wall<scalar_t>(room, origin, dir);
 
       auto& wall = walls[next_wall_index];
 
@@ -326,38 +309,11 @@ torch::Tensor ray_tracing(
     double hist_bin_size) {
   // TODO: Raise this to Python layer
   auto num_bins = (int)ceil(time_thres / hist_bin_size);
-  switch (room.size(0)) {
-    case 2: {
-      return AT_DISPATCH_FLOATING_TYPES(
-          room.scalar_type(), "ray_tracing_2d", [&] {
-            RayTracer<scalar_t, 2> rt(
-                room, absorption, scattering, mic_array, mic_radius);
-            return rt.compute_histograms(
-                source,
-                num_rays,
-                time_thres,
-                energy_thres,
-                sound_speed,
-                num_bins);
-          });
-    }
-    case 3: {
-      return AT_DISPATCH_FLOATING_TYPES(
-          room.scalar_type(), "ray_tracing_3d", [&] {
-            RayTracer<scalar_t, 3> rt(
-                room, absorption, scattering, mic_array, mic_radius);
-            return rt.compute_histograms(
-                source,
-                num_rays,
-                time_thres,
-                energy_thres,
-                sound_speed,
-                num_bins);
-          });
-    }
-    default:
-      TORCH_CHECK(false, "Only 2D and 3D are supported.");
-  }
+  return AT_DISPATCH_FLOATING_TYPES(room.scalar_type(), "ray_tracing_3d", [&] {
+    RayTracer<scalar_t> rt(room, absorption, scattering, mic_array, mic_radius);
+    return rt.compute_histograms(
+        source, num_rays, time_thres, energy_thres, sound_speed, num_bins);
+  });
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
