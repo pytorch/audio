@@ -62,9 +62,7 @@ def _get_librispeech_metadata(
             fileid_text, transcript = line.strip().split(" ", 1)
             if fileid_audio == fileid_text:
                 # get utterance biasing list
-                for word in transcript.split():
-                    if word in blist and word not in uttblist:
-                        uttblist.append(word)
+                uttblist += list(set(transcript.split()).intersection(blist))
                 break
         else:
             # Translation not found
