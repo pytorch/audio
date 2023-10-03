@@ -59,6 +59,7 @@ def parse_args():
         "--modality",
         type=str,
         help="Modality",
+        choices=["audio", "video", "audiovisual"],
         required=True,
     )
     parser.add_argument(
