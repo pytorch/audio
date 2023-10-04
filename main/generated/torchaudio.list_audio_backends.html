@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.list_audio_backends &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.list_audio_backends &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -335,9 +335,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -435,16 +435,12 @@
 <h1>torchaudio.list_audio_backends<a class="headerlink" href="#torchaudio-list-audio-backends" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="torchaudio.list_audio_backends">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.</span></span><span class="sig-name descname"><span class="pre">list_audio_backends</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.11)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/_backend.html#list_audio_backends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">torchaudio.</span></span><span class="sig-name descname"><span class="pre">list_audio_backends</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/_backend.html#list_audio_backends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available backends</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>The list of available backends.</p>
-<p>The possible values are;</p>
-<ul class="simple">
-<li><p>Dispatcher mode: <code class="docutils literal notranslate"><span class="pre">&quot;ffmpeg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sox&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code>.</p></li>
-<li><p>Legacy backend mode: <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code>.</p></li>
-</ul>
+<p>The possible values are; <code class="docutils literal notranslate"><span class="pre">&quot;ffmpeg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sox&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code>.</p>
 </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

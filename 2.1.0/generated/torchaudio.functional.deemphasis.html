@@ -372,7 +372,7 @@
         
       <li>torchaudio.functional.deemphasis &gt;</li>
       
-      <li>Old version (stable)</li>
+      <li>Current (stable)</li>
       
     
     
@@ -415,7 +415,7 @@
 <h1>torchaudio.functional.deemphasis<a class="headerlink" href="#torchaudio-functional-deemphasis" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="torchaudio.functional.deemphasis">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></span><span class="sig-name descname"><span class="pre">deemphasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.97</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/functional/functional.html#deemphasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.deemphasis" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></span><span class="sig-name descname"><span class="pre">deemphasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.97</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.1)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/functional/functional.html#deemphasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.deemphasis" title="Permalink to this definition">¶</a></dt>
 <dd><p>De-emphasizes a waveform along its last dimension.
 Inverse of <a class="reference internal" href="torchaudio.functional.preemphasis.html#torchaudio.functional.preemphasis" title="torchaudio.functional.preemphasis"><code class="xref py py-meth docutils literal notranslate"><span class="pre">preemphasis()</span></code></a>. Concretely, for each signal
 <span class="math">\(x\)</span> in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, computes output <span class="math">\(y\)</span> as</p>
@@ -428,8 +428,8 @@ Inverse of <a class="reference internal" href="torchaudio.functional.preemphasis
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Waveform, with shape <cite>(…, N)</cite>.</p></li>
-<li><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – De-emphasis coefficient. Typically between 0.0 and 1.0.
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.1)"><em>torch.Tensor</em></a>) – Waveform, with shape <cite>(…, N)</cite>.</p></li>
+<li><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – De-emphasis coefficient. Typically between 0.0 and 1.0.
 (Default: 0.97)</p></li>
 </ul>
 </dd>
@@ -437,7 +437,7 @@ Inverse of <a class="reference internal" href="torchaudio.functional.preemphasis
 <dd class="field-even"><p>De-emphasized waveform, with shape <cite>(…, N)</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.1)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>

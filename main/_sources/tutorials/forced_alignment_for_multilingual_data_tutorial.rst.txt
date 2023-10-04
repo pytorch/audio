@@ -55,8 +55,8 @@ model, tokenizer and aligner, to perform the forced alignment with less code.
 
  .. code-block:: none
 
-    2.2.0.dev20231003
-    2.2.0.dev20231004
+    2.2.0.dev20231112
+    2.2.0.dev20231113
     cuda
 
 
@@ -2039,7 +2039,7 @@ forced aligner API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.579 seconds)
+   **Total running time of the script:** ( 0 minutes  3.932 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_for_multilingual_data_tutorial.py:

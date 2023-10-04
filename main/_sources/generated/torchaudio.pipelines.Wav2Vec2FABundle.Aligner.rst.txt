@@ -15,16 +15,3 @@ __call__
 .. container:: py attribute
 
    .. automethod:: torchaudio.pipelines.Wav2Vec2FABundle.Aligner.__call__
-
-Support Structures
-------------------
-
-
-
-Token
-~~~~~
-
-.. container:: py attribute
-
-   .. autoclass:: torchaudio.pipelines.Wav2Vec2FABundle.Aligner.Token
-      :members:

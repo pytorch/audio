@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.utils.sox_utils &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.utils.sox_utils &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -332,9 +332,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -433,9 +433,10 @@
 
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
+<span class="n">sox_ext</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">lazy_import_sox_ext</span><span class="p">()</span>
 
-<div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_seed">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+<div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_seed">[docs]</a><span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set libsox&#39;s PRNG</span>
 
 <span class="sd">    Args:</span>
@@ -444,11 +445,10 @@
 <span class="sd">    See Also:</span>
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span></div>
+    <span class="n">sox_ext</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_verbosity"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_verbosity">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">set_verbosity</span><span class="p">(</span><span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="set_verbosity"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_verbosity">[docs]</a><span class="k">def</span> <span class="nf">set_verbosity</span><span class="p">(</span><span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set libsox&#39;s verbosity</span>
 
 <span class="sd">    Args:</span>
@@ -462,11 +462,10 @@
 <span class="sd">    See Also:</span>
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span></div>
+    <span class="n">sox_ext</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_buffer_size"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_buffer_size">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">set_buffer_size</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="set_buffer_size"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_buffer_size">[docs]</a><span class="k">def</span> <span class="nf">set_buffer_size</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set buffer size for sox effect chain</span>
 
 <span class="sd">    Args:</span>
@@ -475,11 +474,10 @@
 <span class="sd">    See Also:</span>
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">set_buffer_size</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span></div>
+    <span class="n">sox_ext</span><span class="o">.</span><span class="n">set_buffer_size</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_use_threads"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_use_threads">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">set_use_threads</span><span class="p">(</span><span class="n">use_threads</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<div class="viewcode-block" id="set_use_threads"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_use_threads">[docs]</a><span class="k">def</span> <span class="nf">set_use_threads</span><span class="p">(</span><span class="n">use_threads</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set multithread option for sox effect chain</span>
 
 <span class="sd">    Args:</span>
@@ -489,47 +487,43 @@
 <span class="sd">    See Also:</span>
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">set_use_threads</span><span class="p">(</span><span class="n">use_threads</span><span class="p">)</span></div>
+    <span class="n">sox_ext</span><span class="o">.</span><span class="n">set_use_threads</span><span class="p">(</span><span class="n">use_threads</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="list_effects"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.list_effects">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">list_effects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="list_effects"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.list_effects">[docs]</a><span class="k">def</span> <span class="nf">list_effects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;List the available sox effect names</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, str]: Mapping from ``effect name`` to ``usage``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">list_effects</span><span class="p">())</span></div>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sox_ext</span><span class="o">.</span><span class="n">list_effects</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="list_read_formats"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.list_read_formats">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">list_read_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="list_read_formats"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.list_read_formats">[docs]</a><span class="k">def</span> <span class="nf">list_read_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;List the supported audio formats for read</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        List[str]: List of supported audio formats</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">list_read_formats</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">sox_ext</span><span class="o">.</span><span class="n">list_read_formats</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="list_write_formats"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.list_write_formats">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">list_write_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="list_write_formats"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.list_write_formats">[docs]</a><span class="k">def</span> <span class="nf">list_write_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;List the supported audio formats for write</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        List[str]: List of supported audio formats</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">list_write_formats</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">sox_ext</span><span class="o">.</span><span class="n">list_write_formats</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_buffer_size"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.get_buffer_size">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="k">def</span> <span class="nf">get_buffer_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="get_buffer_size"><a class="viewcode-back" href="../../../generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.get_buffer_size">[docs]</a><span class="k">def</span> <span class="nf">get_buffer_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get buffer size for sox effect chain</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        int: size in bytes of buffers used for processing audio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">get_buffer_size</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">sox_ext</span><span class="o">.</span><span class="n">get_buffer_size</span><span class="p">()</span></div>
 </pre></div>
 
              </article>

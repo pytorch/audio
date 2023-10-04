@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Text-to-Speech with Tacotron2 &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>Text-to-Speech with Tacotron2 &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -335,9 +335,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -508,8 +508,8 @@ pip3<span class="w"> </span>install<span class="w"> </span>deep_phonemizer
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.2.0.dev20231003
-2.2.0.dev20231004
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.2.0.dev20231112
+2.2.0.dev20231113
 cuda
 </pre></div>
 </div>
@@ -607,36 +607,36 @@ fetched.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/63.6M [00:00&lt;?, ?B/s]
-  0%|          | 48.0k/63.6M [00:00&lt;04:02, 275kB/s]
-  0%|          | 272k/63.6M [00:00&lt;01:04, 1.03MB/s]
-  1%|          | 568k/63.6M [00:00&lt;00:43, 1.53MB/s]
-  2%|2         | 1.57M/63.6M [00:00&lt;00:16, 3.99MB/s]
-  5%|5         | 3.44M/63.6M [00:00&lt;00:08, 7.62MB/s]
- 10%|9         | 6.17M/63.6M [00:00&lt;00:04, 12.3MB/s]
- 13%|#2        | 8.16M/63.6M [00:00&lt;00:04, 13.2MB/s]
- 17%|#7        | 11.0M/63.6M [00:01&lt;00:03, 16.1MB/s]
- 21%|##        | 13.1M/63.6M [00:01&lt;00:03, 16.0MB/s]
- 25%|##4       | 15.9M/63.6M [00:01&lt;00:02, 19.0MB/s]
- 28%|##7       | 17.8M/63.6M [00:01&lt;00:02, 18.6MB/s]
- 31%|###1      | 19.9M/63.6M [00:01&lt;00:02, 17.7MB/s]
- 36%|###5      | 22.9M/63.6M [00:01&lt;00:02, 20.7MB/s]
- 39%|###9      | 24.9M/63.6M [00:01&lt;00:02, 20.2MB/s]
- 43%|####2     | 27.1M/63.6M [00:01&lt;00:02, 19.1MB/s]
- 47%|####7     | 30.2M/63.6M [00:02&lt;00:01, 22.0MB/s]
- 51%|#####     | 32.4M/63.6M [00:02&lt;00:01, 21.4MB/s]
- 55%|#####4    | 34.7M/63.6M [00:02&lt;00:01, 20.4MB/s]
- 60%|#####9    | 38.0M/63.6M [00:02&lt;00:01, 23.3MB/s]
- 63%|######3   | 40.2M/63.6M [00:02&lt;00:01, 22.6MB/s]
- 67%|######7   | 42.7M/63.6M [00:02&lt;00:01, 21.4MB/s]
- 72%|#######1  | 45.6M/63.6M [00:02&lt;00:00, 23.9MB/s]
- 76%|#######5  | 48.2M/63.6M [00:02&lt;00:00, 24.5MB/s]
- 79%|#######9  | 50.5M/63.6M [00:03&lt;00:00, 23.8MB/s]
- 84%|########3 | 53.2M/63.6M [00:03&lt;00:00, 22.9MB/s]
- 89%|########8 | 56.4M/63.6M [00:03&lt;00:00, 25.5MB/s]
- 93%|#########2| 59.0M/63.6M [00:03&lt;00:00, 26.1MB/s]
- 97%|#########6| 61.6M/63.6M [00:03&lt;00:00, 25.3MB/s]
-100%|##########| 63.6M/63.6M [00:03&lt;00:00, 18.9MB/s]
-/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:282: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  0%|          | 48.0k/63.6M [00:00&lt;04:06, 271kB/s]
+  0%|          | 232k/63.6M [00:00&lt;01:17, 858kB/s]
+  1%|          | 576k/63.6M [00:00&lt;00:41, 1.58MB/s]
+  2%|2         | 1.32M/63.6M [00:00&lt;00:20, 3.22MB/s]
+  5%|5         | 3.23M/63.6M [00:00&lt;00:08, 7.21MB/s]
+  8%|8         | 5.27M/63.6M [00:00&lt;00:06, 10.1MB/s]
+ 12%|#2        | 7.92M/63.6M [00:00&lt;00:04, 13.3MB/s]
+ 16%|#5        | 9.98M/63.6M [00:01&lt;00:03, 14.3MB/s]
+ 20%|##        | 12.8M/63.6M [00:01&lt;00:03, 16.3MB/s]
+ 23%|##3       | 14.8M/63.6M [00:01&lt;00:03, 16.2MB/s]
+ 28%|##7       | 17.6M/63.6M [00:01&lt;00:02, 17.8MB/s]
+ 31%|###       | 19.6M/63.6M [00:01&lt;00:02, 17.1MB/s]
+ 35%|###5      | 22.5M/63.6M [00:01&lt;00:02, 18.7MB/s]
+ 39%|###8      | 24.5M/63.6M [00:01&lt;00:02, 17.9MB/s]
+ 43%|####3     | 27.5M/63.6M [00:02&lt;00:01, 19.3MB/s]
+ 46%|####6     | 29.5M/63.6M [00:02&lt;00:01, 18.3MB/s]
+ 51%|#####1    | 32.7M/63.6M [00:02&lt;00:01, 19.9MB/s]
+ 55%|#####4    | 34.8M/63.6M [00:02&lt;00:01, 18.9MB/s]
+ 60%|#####9    | 38.0M/63.6M [00:02&lt;00:01, 22.3MB/s]
+ 63%|######3   | 40.2M/63.6M [00:02&lt;00:01, 19.1MB/s]
+ 68%|######8   | 43.3M/63.6M [00:02&lt;00:00, 22.3MB/s]
+ 72%|#######1  | 45.6M/63.6M [00:03&lt;00:00, 19.2MB/s]
+ 77%|#######6  | 48.8M/63.6M [00:03&lt;00:00, 22.3MB/s]
+ 80%|########  | 51.1M/63.6M [00:03&lt;00:00, 19.5MB/s]
+ 85%|########5 | 54.2M/63.6M [00:03&lt;00:00, 22.5MB/s]
+ 89%|########8 | 56.5M/63.6M [00:03&lt;00:00, 21.1MB/s]
+ 92%|#########2| 58.7M/63.6M [00:03&lt;00:00, 20.1MB/s]
+ 97%|#########7| 61.8M/63.6M [00:03&lt;00:00, 23.2MB/s]
+100%|##########| 63.6M/63.6M [00:03&lt;00:00, 17.3MB/s]
+/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
          20, 11, 79, 77, 59, 37,  2]])
@@ -682,24 +682,24 @@ models and processors together so that it is easy to create the pipeline.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:282: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+<img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 14%|#3        | 14.8M/107M [00:00&lt;00:01, 57.0MB/s]
- 19%|#8        | 20.2M/107M [00:00&lt;00:01, 46.0MB/s]
- 29%|##8       | 30.8M/107M [00:00&lt;00:01, 62.9MB/s]
- 35%|###4      | 37.5M/107M [00:00&lt;00:01, 53.9MB/s]
- 45%|####4     | 48.0M/107M [00:00&lt;00:00, 64.3MB/s]
- 59%|#####9    | 63.7M/107M [00:01&lt;00:00, 72.7MB/s]
- 66%|######5   | 70.9M/107M [00:01&lt;00:00, 57.5MB/s]
- 73%|#######3  | 78.8M/107M [00:01&lt;00:00, 44.1MB/s]
- 78%|#######7  | 83.6M/107M [00:01&lt;00:00, 39.8MB/s]
- 89%|########9 | 95.7M/107M [00:02&lt;00:00, 42.7MB/s]
- 93%|#########3| 100M/107M [00:02&lt;00:00, 34.6MB/s]
-100%|#########9| 107M/107M [00:02&lt;00:00, 23.9MB/s]
-100%|##########| 107M/107M [00:02&lt;00:00, 40.0MB/s]
+ 14%|#3        | 14.8M/107M [00:00&lt;00:00, 107MB/s]
+ 23%|##3       | 25.0M/107M [00:00&lt;00:00, 92.4MB/s]
+ 31%|###1      | 33.7M/107M [00:00&lt;00:01, 59.2MB/s]
+ 44%|####3     | 46.8M/107M [00:00&lt;00:01, 54.1MB/s]
+ 49%|####8     | 52.5M/107M [00:00&lt;00:01, 52.8MB/s]
+ 59%|#####9    | 63.7M/107M [00:01&lt;00:00, 49.7MB/s]
+ 64%|######3   | 68.7M/107M [00:01&lt;00:00, 47.3MB/s]
+ 73%|#######3  | 78.8M/107M [00:01&lt;00:00, 52.6MB/s]
+ 78%|#######8  | 83.9M/107M [00:01&lt;00:00, 43.0MB/s]
+ 89%|########9 | 95.7M/107M [00:01&lt;00:00, 53.1MB/s]
+ 94%|#########4| 101M/107M [00:02&lt;00:00, 47.0MB/s]
+100%|#########9| 107M/107M [00:02&lt;00:00, 39.0MB/s]
+100%|##########| 107M/107M [00:02&lt;00:00, 49.7MB/s]
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">Tacotron2.infer</span></code> method perfoms multinomial sampling,
@@ -748,13 +748,13 @@ WaveRNN model from the same bundle.</p>
     <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lengths</span></a> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec_lengths</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:282: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 Downloading: &quot;https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
 
   0%|          | 0.00/16.7M [00:00&lt;?, ?B/s]
- 89%|########8 | 14.8M/16.7M [00:00&lt;00:00, 98.4MB/s]
-100%|##########| 16.7M/16.7M [00:00&lt;00:00, 64.8MB/s]
+ 88%|########8 | 14.7M/16.7M [00:00&lt;00:00, 154MB/s]
+100%|##########| 16.7M/16.7M [00:00&lt;00:00, 51.1MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <span class="n">sample_rate</span><span class="p">):</span>
@@ -801,24 +801,22 @@ method and pass the spectrogram.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lengths</span></a> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec_lengths</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:282: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 14%|#3        | 14.8M/107M [00:00&lt;00:01, 57.8MB/s]
- 19%|#8        | 20.3M/107M [00:00&lt;00:01, 50.9MB/s]
- 29%|##9       | 31.7M/107M [00:00&lt;00:01, 54.0MB/s]
- 34%|###4      | 36.7M/107M [00:00&lt;00:01, 41.3MB/s]
- 44%|####3     | 46.8M/107M [00:00&lt;00:01, 49.5MB/s]
- 48%|####8     | 51.7M/107M [00:01&lt;00:01, 39.1MB/s]
- 52%|#####1    | 55.7M/107M [00:01&lt;00:01, 34.5MB/s]
- 60%|#####9    | 64.0M/107M [00:01&lt;00:01, 41.9MB/s]
- 74%|#######4  | 79.7M/107M [00:01&lt;00:00, 60.8MB/s]
- 80%|#######9  | 85.9M/107M [00:01&lt;00:00, 42.2MB/s]
- 88%|########8 | 94.8M/107M [00:02&lt;00:00, 47.5MB/s]
- 93%|#########3| 100M/107M [00:02&lt;00:00, 37.8MB/s]
-100%|##########| 107M/107M [00:02&lt;00:00, 45.2MB/s]
+ 15%|#4        | 16.0M/107M [00:00&lt;00:00, 128MB/s]
+ 28%|##7       | 29.9M/107M [00:00&lt;00:00, 137MB/s]
+ 40%|####      | 43.1M/107M [00:00&lt;00:00, 98.4MB/s]
+ 50%|####9     | 53.4M/107M [00:00&lt;00:00, 57.2MB/s]
+ 57%|#####6    | 60.8M/107M [00:00&lt;00:00, 59.6MB/s]
+ 63%|######3   | 67.8M/107M [00:01&lt;00:00, 52.5MB/s]
+ 74%|#######4  | 79.7M/107M [00:01&lt;00:00, 52.6MB/s]
+ 79%|#######9  | 85.3M/107M [00:01&lt;00:00, 30.0MB/s]
+ 89%|########9 | 96.1M/107M [00:01&lt;00:00, 40.6MB/s]
+ 99%|#########9| 107M/107M [00:02&lt;00:00, 49.0MB/s]
+100%|##########| 107M/107M [00:02&lt;00:00, 54.1MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
@@ -870,7 +868,7 @@ Downloading: &quot;https://github.com/NVIDIA/DeepLearningExamples/zipball/torchh
   warnings.warn(
 /root/.cache/torch/hub/NVIDIA_DeepLearningExamples_torchhub/PyTorch/Classification/ConvNets/image_classification/models/efficientnet.py:17: UserWarning: pytorch_quantization module not found, quantization will not be available
   warnings.warn(
-/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/utils/weight_norm.py:30: UserWarning: torch.nn.utils.weight_norm is deprecated in favor of torch.nn.utils.parametrizations.weight_norm.
+/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/utils/weight_norm.py:28: UserWarning: torch.nn.utils.weight_norm is deprecated in favor of torch.nn.utils.parametrizations.weight_norm.
   warnings.warn(&quot;torch.nn.utils.weight_norm is deprecated in favor of torch.nn.utils.parametrizations.weight_norm.&quot;)
 Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth&quot; to /root/.cache/torch/hub/checkpoints/nvidia_waveglowpyt_fp32_20190306.pth
 </pre></div>
@@ -887,7 +885,7 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  5.650 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  58.905 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9772cbd0af96f57f17a2da758b365a43/tacotron2_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tacotron2_pipeline_tutorial.py</span></code></a></p>

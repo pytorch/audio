@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.functional &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.functional.functional &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -332,9 +332,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -1722,8 +1722,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">specgram</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">specgram</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
-<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Please migrate to :py:class:`torchaudio.io.AudioEffector`.&quot;</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Please migrate to :py:class:`torchaudio.io.AudioEffector`.&quot;</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">apply_codec</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1756,11 +1755,13 @@
 <span class="sd">        Tensor: Resulting Tensor.</span>
 <span class="sd">        If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">torchaudio.backend</span> <span class="kn">import</span> <span class="n">_sox_io_backend</span>
+
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+        <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
             <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span>
         <span class="p">)</span>
-        <span class="n">augmented</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+        <span class="n">augmented</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">_sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sr</span> <span class="o">!=</span> <span class="n">sample_rate</span><span class="p">:</span>
         <span class="n">augmented</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">augmented</span></div>
@@ -1798,7 +1799,8 @@
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">resampling_method</span><span class="si">}</span><span class="s1">&quot; resampling method name is being deprecated and replaced by &#39;</span>
             <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">method_map</span><span class="p">[</span><span class="n">resampling_method</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; in the next release. &#39;</span>
-            <span class="s2">&quot;The default behavior remains unchanged.&quot;</span>
+            <span class="s2">&quot;The default behavior remains unchanged.&quot;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">resampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sinc_interp_hann&quot;</span><span class="p">,</span> <span class="s2">&quot;sinc_interp_kaiser&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid resampling method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resampling_method</span><span class="p">))</span>

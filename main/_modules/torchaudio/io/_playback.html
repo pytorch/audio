@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.io._playback &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.io._playback &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -332,9 +332,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -442,8 +442,7 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="play_audio"><a class="viewcode-back" href="../../../generated/torchaudio.io.play_audio.html#torchaudio.io.play_audio">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_ffmpeg</span>
-<span class="k">def</span> <span class="nf">play_audio</span><span class="p">(</span>
+<div class="viewcode-block" id="play_audio"><a class="viewcode-back" href="../../../generated/torchaudio.io.play_audio.html#torchaudio.io.play_audio">[docs]</a><span class="k">def</span> <span class="nf">play_audio</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -484,7 +483,9 @@
     <span class="n">time</span><span class="p">,</span> <span class="n">num_channels</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">num_channels</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Expected up to 2 channels, got </span><span class="si">{</span><span class="n">num_channels</span><span class="si">}</span><span class="s2"> channels instead. Only the first 2 channels will be played.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected up to 2 channels, got </span><span class="si">{</span><span class="n">num_channels</span><span class="si">}</span><span class="s2"> channels instead. &quot;</span>
+            <span class="s2">&quot;Only the first 2 channels will be played.&quot;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># Write to speaker device</span>

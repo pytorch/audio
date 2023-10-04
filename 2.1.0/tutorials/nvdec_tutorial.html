@@ -370,7 +370,7 @@
         
       <li>Accelerated video decoding with NVDEC &gt;</li>
       
-      <li>Old version (stable)</li>
+      <li>Current (stable)</li>
       
     
     
@@ -456,7 +456,7 @@ for how to build FFmpeg with HW acceleration.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.1
 2.1.0
 </pre></div>
 </div>
@@ -529,9 +529,7 @@ _CudaDeviceProperties(name=&#39;NVIDIA A10G&#39;, major=8, minor=6, total_memory
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/31.8M [00:00&lt;?, ?B/s]
- 49%|####9     | 15.7M/31.8M [00:00&lt;00:00, 115MB/s]
- 84%|########3 | 26.6M/31.8M [00:00&lt;00:00, 86.1MB/s]
-100%|##########| 31.8M/31.8M [00:00&lt;00:00, 62.3MB/s]
+100%|##########| 31.8M/31.8M [00:00&lt;00:00, 423MB/s]
 </pre></div>
 </div>
 </section>
@@ -564,7 +562,7 @@ CPU tensors are created.</p>
 <p>By specifying <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option, you can convert the decoded frames
 to CUDA tensor.
 <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option takes string values and pass it
-to <a class="reference external" href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code></a>.</p>
+to <a class="reference external" href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="(in PyTorch v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> option and
@@ -764,7 +762,7 @@ generated using the following command.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/232k [00:00&lt;?, ?B/s]
-100%|##########| 232k/232k [00:00&lt;00:00, 92.5MB/s]
+100%|##########| 232k/232k [00:00&lt;00:00, 120MB/s]
 </pre></div>
 </div>
 <p>The following function decodes video and
@@ -906,23 +904,23 @@ cases with different number of threads.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/1.06M [00:00&lt;?, ?B/s]
-100%|##########| 1.06M/1.06M [00:00&lt;00:00, 159MB/s]
+100%|##########| 1.06M/1.06M [00:00&lt;00:00, 238MB/s]
 Testing: testsrc2_qvga.h264.mp4
 * Software decoding (num_threads=1)
  - Shape: torch.Size([5, 3, 240, 320])
- - Processed 900 frames in 0.49 seconds. (1831.54 fps)
+ - Processed 900 frames in 0.48 seconds. (1866.15 fps)
 * Software decoding (num_threads=4)
  - Shape: torch.Size([5, 3, 240, 320])
- - Processed 900 frames in 0.33 seconds. (2728.81 fps)
+ - Processed 900 frames in 0.29 seconds. (3065.56 fps)
 * Software decoding (num_threads=8)
  - Shape: torch.Size([5, 3, 240, 320])
- - Processed 900 frames in 0.31 seconds. (2889.38 fps)
+ - Processed 900 frames in 0.31 seconds. (2880.67 fps)
 * Software decoding (num_threads=16)
  - Shape: torch.Size([5, 3, 240, 320])
- - Processed 895 frames in 0.32 seconds. (2796.26 fps)
+ - Processed 895 frames in 0.32 seconds. (2787.33 fps)
 * Hardware decoding
  - Shape: torch.Size([5, 3, 240, 320])
- - Processed 900 frames in 2.03 seconds. (444.08 fps)
+ - Processed 900 frames in 2.02 seconds. (445.41 fps)
 </pre></div>
 </div>
 </section>
@@ -933,24 +931,23 @@ Testing: testsrc2_qvga.h264.mp4
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/3.59M [00:00&lt;?, ?B/s]
- 57%|#####7    | 2.05M/3.59M [00:00&lt;00:00, 7.63MB/s]
-100%|##########| 3.59M/3.59M [00:00&lt;00:00, 13.0MB/s]
+100%|##########| 3.59M/3.59M [00:00&lt;00:00, 402MB/s]
 Testing: testsrc2_vga.h264.mp4
 * Software decoding (num_threads=1)
  - Shape: torch.Size([5, 3, 480, 640])
- - Processed 900 frames in 1.27 seconds. (707.08 fps)
+ - Processed 900 frames in 1.23 seconds. (734.11 fps)
 * Software decoding (num_threads=4)
  - Shape: torch.Size([5, 3, 480, 640])
- - Processed 900 frames in 0.68 seconds. (1324.89 fps)
+ - Processed 900 frames in 0.61 seconds. (1467.81 fps)
 * Software decoding (num_threads=8)
  - Shape: torch.Size([5, 3, 480, 640])
- - Processed 900 frames in 0.66 seconds. (1354.73 fps)
+ - Processed 900 frames in 0.67 seconds. (1349.29 fps)
 * Software decoding (num_threads=16)
  - Shape: torch.Size([5, 3, 480, 640])
- - Processed 895 frames in 0.64 seconds. (1403.33 fps)
+ - Processed 895 frames in 0.69 seconds. (1298.35 fps)
 * Hardware decoding
  - Shape: torch.Size([5, 3, 480, 640])
- - Processed 900 frames in 0.35 seconds. (2566.50 fps)
+ - Processed 900 frames in 0.35 seconds. (2566.12 fps)
 </pre></div>
 </div>
 </section>
@@ -961,24 +958,23 @@ Testing: testsrc2_vga.h264.mp4
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/9.22M [00:00&lt;?, ?B/s]
- 97%|#########6| 8.93M/9.22M [00:00&lt;00:00, 64.5MB/s]
-100%|##########| 9.22M/9.22M [00:00&lt;00:00, 65.4MB/s]
+100%|##########| 9.22M/9.22M [00:00&lt;00:00, 489MB/s]
 Testing: testsrc2_xga.h264.mp4
 * Software decoding (num_threads=1)
  - Shape: torch.Size([5, 3, 768, 1024])
- - Processed 900 frames in 2.60 seconds. (345.91 fps)
+ - Processed 900 frames in 2.72 seconds. (330.36 fps)
 * Software decoding (num_threads=4)
  - Shape: torch.Size([5, 3, 768, 1024])
- - Processed 900 frames in 1.19 seconds. (755.79 fps)
+ - Processed 900 frames in 1.30 seconds. (690.70 fps)
 * Software decoding (num_threads=8)
  - Shape: torch.Size([5, 3, 768, 1024])
- - Processed 900 frames in 1.10 seconds. (820.78 fps)
+ - Processed 900 frames in 1.18 seconds. (760.67 fps)
 * Software decoding (num_threads=16)
  - Shape: torch.Size([5, 3, 768, 1024])
- - Processed 895 frames in 1.10 seconds. (812.72 fps)
+ - Processed 895 frames in 1.16 seconds. (772.86 fps)
 * Hardware decoding
  - Shape: torch.Size([5, 3, 768, 1024])
- - Processed 900 frames in 0.62 seconds. (1451.11 fps)
+ - Processed 900 frames in 0.62 seconds. (1444.41 fps)
 </pre></div>
 </div>
 </section>
@@ -1033,7 +1029,7 @@ We will compare the following pipelines.</p>
 <ol class="arabic simple">
 <li><p>Decode video using software decoder and read the frames as
 PyTorch Tensor. Resize the tensor using
-<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="(in PyTorch v2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate()</span></code></a>, then send
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="(in PyTorch v2.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate()</span></code></a>, then send
 the resulting tensor to CUDA device.</p></li>
 <li><p>Decode video using software decoder, resize the frame with
 FFmpeg’s filter graph, read the resized frames as PyTorch tensor,
@@ -1047,7 +1043,7 @@ raw frames before converting them to Tensors.</p>
 <p>The pipeline 3 has the minimum amount of data transfer from CPU to
 CUDA, which significantly contribute to performant data loading.</p>
 <p>The following function implements the pipeline 1. It uses PyTorch’s
-<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="(in PyTorch v2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate()</span></code></a>.
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html#torch.nn.functional.interpolate" title="(in PyTorch v2.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate()</span></code></a>.
 We use <code class="docutils literal notranslate"><span class="pre">bincubic</span></code> mode, as we saw that the resulting frames are
 closest to NVDEC resizing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_decode_then_resize</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src</span></a><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;bicubic&quot;</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
@@ -1134,13 +1130,13 @@ performed by NVDEC and the resulting tensor is placed on CUDA memory.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: testsrc2_qvga.h264.mp4
 * Software decoding with PyTorch interpolate
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 0.62 seconds. (1455.77 fps)
+ - Processed 900 frames in 0.66 seconds. (1369.15 fps)
 * Software decoding with FFmpeg scale
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 0.40 seconds. (2262.51 fps)
+ - Processed 900 frames in 0.35 seconds. (2539.40 fps)
 * Hardware decoding with resize
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 2.01 seconds. (447.03 fps)
+ - Processed 900 frames in 2.02 seconds. (444.75 fps)
 </pre></div>
 </div>
 </section>
@@ -1152,13 +1148,13 @@ performed by NVDEC and the resulting tensor is placed on CUDA memory.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: testsrc2_vga.h264.mp4
 * Software decoding with PyTorch interpolate
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 1.38 seconds. (654.51 fps)
+ - Processed 900 frames in 1.49 seconds. (603.84 fps)
 * Software decoding with FFmpeg scale
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 0.64 seconds. (1414.49 fps)
+ - Processed 900 frames in 0.58 seconds. (1556.54 fps)
 * Hardware decoding with resize
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 0.35 seconds. (2575.12 fps)
+ - Processed 900 frames in 0.35 seconds. (2571.51 fps)
 </pre></div>
 </div>
 </section>
@@ -1170,13 +1166,13 @@ performed by NVDEC and the resulting tensor is placed on CUDA memory.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: testsrc2_xga.h264.mp4
 * Software decoding with PyTorch interpolate
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 2.96 seconds. (304.40 fps)
+ - Processed 900 frames in 2.91 seconds. (309.72 fps)
 * Software decoding with FFmpeg scale
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 1.06 seconds. (847.09 fps)
+ - Processed 900 frames in 0.97 seconds. (924.73 fps)
 * Hardware decoding with resize
  - Shape: torch.Size([5, 3, 224, 224])
- - Processed 900 frames in 0.62 seconds. (1454.93 fps)
+ - Processed 900 frames in 0.62 seconds. (1455.58 fps)
 </pre></div>
 </div>
 </section>
@@ -1217,7 +1213,7 @@ before copying frame data to PyTorch tensor, the number of pixels
 manipulated and copied are smaller than the case where applying
 resizing after frames are converted to Tensor.</p>
 <p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.981 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  30.258 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-nvdec-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/2c0cb1d7d79d5a5622253c098a75dbf0/nvdec_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">nvdec_tutorial.py</span></code></a></p>

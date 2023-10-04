@@ -1,0 +1,1240 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Enabling GPU video decoder/encoder &mdash; Torchaudio 2.1.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Audio I/O" href="tutorials/audio_io_tutorial.html" />
+    <link rel="prev" title="Building on Jetson" href="build.jetson.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../versions.html"><span style="font-size:110%">2.1.1 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>Enabling GPU video decoder/encoder &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/build.ffmpeg.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <section id="enabling-gpu-video-decoder-encoder">
+<span id="enabling-hw-decoder"></span><h1>Enabling GPU video decoder/encoder<a class="headerlink" href="#enabling-gpu-video-decoder-encoder" title="Permalink to this heading">¶</a></h1>
+<p>TorchAudio can make use of hardware-based video decoding and encoding supported by underlying FFmpeg libraries that are linked at runtime.</p>
+<p>Using NVIDIA’s GPU decoder and encoder, it is also possible to pass around CUDA Tensor directly, that is decode video into CUDA tensor or encode video from CUDA tensor, without moving data from/to CPU.</p>
+<p>This improves the video throughput significantly. However, please note that not all the video formats are supported by hardware acceleration.</p>
+<p>This page goes through how to build FFmpeg with hardware acceleration. For the detail on the performance of GPU decoder and encoder please see <a class="reference internal" href="tutorials/nvdec_tutorial.html#nvdec-tutorial"><span class="std std-ref">NVDEC tutoial</span></a> and <a class="reference internal" href="tutorials/nvenc_tutorial.html#nvenc-tutorial"><span class="std std-ref">NVENC tutorial</span></a>.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<p>Using them in TorchAduio requires additional FFmpeg configuration.</p>
+<p>In the following, we look into how to enable GPU video decoding with <a class="reference external" href="https://developer.nvidia.com/nvidia-video-codec-sdk">NVIDIA’s Video codec SDK</a>.
+To use NVENC/NVDEC with TorchAudio, the following items are required.</p>
+<ol class="arabic simple">
+<li><p>NVIDIA GPU with hardware video decoder/encoder.</p></li>
+<li><p>FFmpeg libraries compiled with NVDEC/NVENC support. †</p></li>
+<li><p>PyTorch / TorchAudio with CUDA support.</p></li>
+</ol>
+<p>TorchAudio’s official binary distributions are compiled to work with FFmpeg libraries, and they contain the logic to use hardware decoding/encoding.</p>
+<p>In the following, we build FFmpeg 4 libraries with NVDEC/NVENC support. You can also use FFmpeg 5 or 6.</p>
+<p>The following procedure was tested on Ubuntu.</p>
+<p>† For details on NVDEC/NVENC and FFmpeg, please refer to the following articles.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/">https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/nvdec-video-decoder-api-prog-guide/</a></p></li>
+<li><p><a class="reference external" href="https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg">https://docs.nvidia.com/video-technologies/video-codec-sdk/11.1/ffmpeg-with-nvidia-gpu/index.html#compiling-ffmpeg</a></p></li>
+<li><p><a class="reference external" href="https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/">https://developer.nvidia.com/blog/nvidia-ffmpeg-transcoding-guide/</a></p></li>
+</ul>
+</section>
+<section id="check-the-gpu-and-cuda-version">
+<h2>Check the GPU and CUDA version<a class="headerlink" href="#check-the-gpu-and-cuda-version" title="Permalink to this heading">¶</a></h2>
+<p>First, check the available GPU. Here, we have Tesla T4 with CUDA Toolkit 11.2 installed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nvidia-smi
+
+Fri Oct  7 13:01:26 2022
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 460.32.03    Driver Version: 460.32.03    CUDA Version: 11.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:00:04.0 Off |                    0 |
+| N/A   56C    P8    10W /  70W |      0MiB / 15109MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+</pre></div>
+</div>
+</section>
+<section id="checking-the-compute-capability">
+<h2>Checking the compute capability<a class="headerlink" href="#checking-the-compute-capability" title="Permalink to this heading">¶</a></h2>
+<p>Later, we need the version of compute capability supported by this GPU. The following page lists the GPUs and corresponding compute capabilities. The compute capability of T4 is <code class="docutils literal notranslate"><span class="pre">7.5</span></code>.</p>
+<p><a class="reference external" href="https://developer.nvidia.com/cuda-gpus">https://developer.nvidia.com/cuda-gpus</a></p>
+</section>
+<section id="install-nvidia-video-codec-headers">
+<h2>Install NVIDIA Video Codec Headers<a class="headerlink" href="#install-nvidia-video-codec-headers" title="Permalink to this heading">¶</a></h2>
+<p>To build FFmpeg with NVDEC/NVENC, we first need to install the headers that FFmpeg uses to interact with Video Codec SDK.</p>
+<p>Since we have CUDA 11 working in the system, we use one of <code class="docutils literal notranslate"><span class="pre">n11</span></code> tag.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+<span class="nb">cd</span><span class="w"> </span>nv-codec-headers
+git<span class="w"> </span>checkout<span class="w"> </span>n11.0.10.1
+sudo<span class="w"> </span>make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>The location of installation can be changed with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">PREFIX=&lt;DESIRED_DIRECTORY&gt;</span> <span class="pre">install</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Cloning into &#39;nv-codec-headers&#39;...
+remote: Enumerating objects: 819, done.
+remote: Counting objects: 100% (819/819), done.
+remote: Compressing objects: 100% (697/697), done.
+remote: Total 819 (delta 439), reused 0 (delta 0)
+Receiving objects: 100% (819/819), 156.42 KiB | 410.00 KiB/s, done.
+Resolving deltas: 100% (439/439), done.
+Note: checking out &#39;n11.0.10.1&#39;.
+
+You are in &#39;detached HEAD&#39; state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b &lt;new-branch-name&gt;
+
+HEAD is now at 315ad74 add cuMemcpy
+sed &#39;s#@@PREFIX@@#/usr/local#&#39; ffnvcodec.pc.in &gt; ffnvcodec.pc
+install -m 0755 -d &#39;/usr/local/include/ffnvcodec&#39;
+install -m 0644 include/ffnvcodec/*.h &#39;/usr/local/include/ffnvcodec&#39;
+install -m 0755 -d &#39;/usr/local/lib/pkgconfig&#39;
+install -m 0644 ffnvcodec.pc &#39;/usr/local/lib/pkgconfig&#39;
+</pre></div>
+</div>
+</section>
+<section id="install-ffmpeg-dependencies">
+<h2>Install FFmpeg dependencies<a class="headerlink" href="#install-ffmpeg-dependencies" title="Permalink to this heading">¶</a></h2>
+<p>Next, we install tools and libraries required during the FFmpeg build.
+The minimum requirement is <a class="reference external" href="https://yasm.tortall.net/">Yasm</a>.
+Here we additionally install H264 video codec and HTTPS protocol,
+which we use later for verifying the installation.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>-qq<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>-qq<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>yasm<span class="w"> </span>libx264-dev<span class="w"> </span>libgnutls28-dev
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>... Omitted for brevity ...
+
+STRIP   install-libavutil-shared
+Setting up libx264-dev:amd64 (2:0.152.2854+gite9a5903-2) ...
+Setting up yasm (1.3.0-2build1) ...
+Setting up libunbound2:amd64 (1.6.7-1ubuntu2.5) ...
+Setting up libp11-kit-dev:amd64 (0.23.9-2ubuntu0.1) ...
+Setting up libtasn1-6-dev:amd64 (4.13-2) ...
+Setting up libtasn1-doc (4.13-2) ...
+Setting up libgnutlsxx28:amd64 (3.5.18-1ubuntu1.6) ...
+Setting up libgnutls-dane0:amd64 (3.5.18-1ubuntu1.6) ...
+Setting up libgnutls-openssl27:amd64 (3.5.18-1ubuntu1.6) ...
+Setting up libgmpxx4ldbl:amd64 (2:6.1.2+dfsg-2) ...
+Setting up libidn2-dev:amd64 (2.0.4-1.1ubuntu0.2) ...
+Setting up libidn2-0-dev (2.0.4-1.1ubuntu0.2) ...
+Setting up libgmp-dev:amd64 (2:6.1.2+dfsg-2) ...
+Setting up nettle-dev:amd64 (3.4.1-0ubuntu0.18.04.1) ...
+Setting up libgnutls28-dev:amd64 (3.5.18-1ubuntu1.6) ...
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+Processing triggers for libc-bin (2.27-3ubuntu1.6) ...
+</pre></div>
+</div>
+</section>
+<section id="build-ffmpeg-with-nvdec-nvenc-support">
+<h2>Build FFmpeg with NVDEC/NVENC support<a class="headerlink" href="#build-ffmpeg-with-nvdec-nvenc-support" title="Permalink to this heading">¶</a></h2>
+<p>Next we download the source code of FFmpeg 4. We use 4.4.2 here.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>-q<span class="w"> </span>https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.4.2.tar.gz
+tar<span class="w"> </span>-xf<span class="w"> </span>n4.4.2.tar.gz
+<span class="nb">cd</span><span class="w"> </span>FFmpeg-n4.4.2
+</pre></div>
+</div>
+<p>Next we configure FFmpeg build. Note the following:</p>
+<ol class="arabic simple">
+<li><p>We provide flags like <code class="docutils literal notranslate"><span class="pre">-I/usr/local/cuda/include</span></code>, <code class="docutils literal notranslate"><span class="pre">-L/usr/local/cuda/lib64</span></code> to let the build process know where the CUDA libraries are found.</p></li>
+<li><p>We provide flags like <code class="docutils literal notranslate"><span class="pre">--enable-nvdec</span></code> and <code class="docutils literal notranslate"><span class="pre">--enable-nvenc</span></code> to enable NVDEC/NVENC.</p></li>
+<li><p>We also provide NVCC flags with compute capability <code class="docutils literal notranslate"><span class="pre">75</span></code>, which corresponds to <code class="docutils literal notranslate"><span class="pre">7.5</span></code> of T4. †</p></li>
+<li><p>We install the library in <code class="docutils literal notranslate"><span class="pre">/usr/lib/</span></code>.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>† The configuration script verifies NVCC by compiling a sample code. By default it uses old compute capability such as <code class="docutils literal notranslate"><span class="pre">30</span></code>, which is no longer supported by CUDA 11. So it is required to set a correct compute capability.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">prefix</span><span class="o">=</span>/usr/
+<span class="nv">ccap</span><span class="o">=</span><span class="m">75</span>
+
+./configure<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prefix<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--extra-cflags<span class="o">=</span><span class="s1">&#39;-I/usr/local/cuda/include&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--extra-ldflags<span class="o">=</span><span class="s1">&#39;-L/usr/local/cuda/lib64&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--nvccflags<span class="o">=</span><span class="s2">&quot;-gencode arch=compute_</span><span class="si">${</span><span class="nv">ccap</span><span class="si">}</span><span class="s2">,code=sm_</span><span class="si">${</span><span class="nv">ccap</span><span class="si">}</span><span class="s2"> -O2&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--disable-doc<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-decoder<span class="o">=</span>aac<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-decoder<span class="o">=</span>h264<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-decoder<span class="o">=</span>h264_cuvid<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-decoder<span class="o">=</span>rawvideo<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-indev<span class="o">=</span>lavfi<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-encoder<span class="o">=</span>libx264<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-encoder<span class="o">=</span>h264_nvenc<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-demuxer<span class="o">=</span>mov<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-muxer<span class="o">=</span>mp4<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-filter<span class="o">=</span>scale<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-filter<span class="o">=</span>testsrc2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-protocol<span class="o">=</span>file<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-protocol<span class="o">=</span>https<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-gnutls<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-shared<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-gpl<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-nonfree<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-cuda-nvcc<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-libx264<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-nvenc<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-cuvid<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-nvdec
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>install prefix            /usr/
+source path               .
+C compiler                gcc
+C library                 glibc
+ARCH                      x86 (generic)
+big-endian                no
+runtime cpu detection     yes
+standalone assembly       yes
+x86 assembler             yasm
+MMX enabled               yes
+MMXEXT enabled            yes
+3DNow! enabled            yes
+3DNow! extended enabled   yes
+SSE enabled               yes
+SSSE3 enabled             yes
+AESNI enabled             yes
+AVX enabled               yes
+AVX2 enabled              yes
+AVX-512 enabled           yes
+XOP enabled               yes
+FMA3 enabled              yes
+FMA4 enabled              yes
+i686 features enabled     yes
+CMOV is fast              yes
+EBX available             yes
+EBP available             yes
+debug symbols             yes
+strip symbols             yes
+optimize for size         no
+optimizations             yes
+static                    no
+shared                    yes
+postprocessing support    no
+network support           yes
+threading support         pthreads
+safe bitstream reader     yes
+texi2html enabled         no
+perl enabled              yes
+pod2man enabled           yes
+makeinfo enabled          no
+makeinfo supports HTML    no
+
+External libraries:
+alsa                    libx264                 lzma
+bzlib                   libxcb                  zlib
+gnutls                  libxcb_shape
+iconv                   libxcb_xfixes
+
+External libraries providing hardware acceleration:
+cuda                    cuvid                   nvenc
+cuda_llvm               ffnvcodec               v4l2_m2m
+cuda_nvcc               nvdec
+
+Libraries:
+avcodec                 avformat                swscale
+avdevice                avutil
+avfilter                swresample
+
+Programs:
+ffmpeg                  ffprobe
+
+Enabled decoders:
+aac                     hevc                    rawvideo
+av1                     mjpeg                   vc1
+h263                    mpeg1video              vp8
+h264                    mpeg2video              vp9
+h264_cuvid              mpeg4
+
+Enabled encoders:
+h264_nvenc              libx264
+
+Enabled hwaccels:
+av1_nvdec               mpeg1_nvdec             vp8_nvdec
+h264_nvdec              mpeg2_nvdec             vp9_nvdec
+hevc_nvdec              mpeg4_nvdec             wmv3_nvdec
+mjpeg_nvdec             vc1_nvdec
+
+Enabled parsers:
+h263                    mpeg4video              vp9
+
+Enabled demuxers:
+mov
+
+Enabled muxers:
+mov                     mp4
+
+Enabled protocols:
+file                    tcp
+https                   tls
+
+Enabled filters:
+aformat                 hflip                   transpose
+anull                   null                    trim
+atrim                   scale                   vflip
+format                  testsrc2
+
+Enabled bsfs:
+aac_adtstoasc           null                    vp9_superframe_split
+h264_mp4toannexb        vp9_superframe
+
+Enabled indevs:
+lavfi
+
+Enabled outdevs:
+
+License: nonfree and unredistributable
+</pre></div>
+</div>
+<p>Now we build and install</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+make<span class="w"> </span>-j
+sudo<span class="w"> </span>make<span class="w"> </span>install
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>... Omitted for brevity ...
+
+INSTALL libavdevice/libavdevice.so
+INSTALL libavfilter/libavfilter.so
+INSTALL libavformat/libavformat.so
+INSTALL libavcodec/libavcodec.so
+INSTALL libswresample/libswresample.so
+INSTALL libswscale/libswscale.so
+INSTALL libavutil/libavutil.so
+INSTALL install-progs-yes
+INSTALL ffmpeg
+INSTALL ffprobe
+</pre></div>
+</div>
+</section>
+<section id="checking-the-intallation">
+<h2>Checking the intallation<a class="headerlink" href="#checking-the-intallation" title="Permalink to this heading">¶</a></h2>
+<p>To verify that the FFmpeg we built have CUDA support, we can check the list of available decoders and encoders.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ffprobe<span class="w"> </span>-hide_banner<span class="w"> </span>-decoders<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>h264
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>VFS..D h264                 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+V..... h264_cuvid           Nvidia CUVID H264 decoder (codec h264)
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-encoders<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">264</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>V..... libx264              libx264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (codec h264)
+V....D h264_nvenc           NVIDIA NVENC H.264 encoder (codec h264)
+</pre></div>
+</div>
+<p>The following command fetches video from remote server, decode with NVDEC (cuvid) and re-encode with NVENC. If this command does not work, then there is an issue with FFmpeg installation, and TorchAudio would not be able to use them either.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">src</span><span class="o">=</span><span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+
+$<span class="w"> </span>ffmpeg<span class="w"> </span>-hide_banner<span class="w"> </span>-y<span class="w"> </span>-vsync<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-hwaccel<span class="w"> </span>cuvid<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-hwaccel_output_format<span class="w"> </span>cuda<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-c:v<span class="w"> </span>h264_cuvid<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-resize<span class="w"> </span>360x240<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-i<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">src</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-c:a<span class="w"> </span>copy<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-c:v<span class="w"> </span>h264_nvenc<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-b:v<span class="w"> </span>5M<span class="w"> </span>test.mp4
+</pre></div>
+</div>
+<p>Note that there is <code class="docutils literal notranslate"><span class="pre">Stream</span> <span class="pre">#0:0</span> <span class="pre">-&gt;</span> <span class="pre">#0:0</span> <span class="pre">(h264</span> <span class="pre">(h264_cuvid)</span> <span class="pre">-&gt;</span> <span class="pre">h264</span> <span class="pre">(h264_nvenc))</span></code>, which means that video is decoded with <code class="docutils literal notranslate"><span class="pre">h264_cuvid</span></code> decoder and <code class="docutils literal notranslate"><span class="pre">h264_nvenc</span></code> encoder.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Input #0, mov,mp4,m4a,3gp,3g2,mj2, from &#39;https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&#39;:
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 512
+    compatible_brands: mp42iso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:03:26.04, start: 0.000000, bitrate: 1294 kb/s
+  Stream #0:0(eng): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709), 960x540 [SAR 1:1 DAR 16:9], 1156 kb/s, 29.97 fps, 29.97 tbr, 30k tbn, 59.94 tbc (default)
+    Metadata:
+      handler_name    : ?Mainconcept Video Media Handler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : #Mainconcept MP4 Sound Media Handler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -&gt; #0:0 (h264 (h264_cuvid) -&gt; h264 (h264_nvenc))
+  Stream #0:1 -&gt; #0:1 (copy)
+Press [q] to stop, [?] for help
+Output #0, mp4, to &#39;test.mp4&#39;:
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 512
+    compatible_brands: mp42iso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #0:0(eng): Video: h264 (Main) (avc1 / 0x31637661), cuda(tv, bt709, progressive), 360x240 [SAR 1:1 DAR 3:2], q=2-31, 5000 kb/s, 29.97 fps, 30k tbn (default)
+    Metadata:
+      handler_name    : ?Mainconcept Video Media Handler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc58.134.100 h264_nvenc
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/5000000 buffer size: 10000000 vbv_delay: N/A
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : #Mainconcept MP4 Sound Media Handler
+      vendor_id       : [0][0][0][0]
+frame= 6175 fps=1712 q=11.0 Lsize=   37935kB time=00:03:26.01 bitrate=1508.5kbits/s speed=57.1x
+video:34502kB audio:3234kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.526932%
+</pre></div>
+</div>
+</section>
+<section id="using-the-gpu-decoder-encoder-from-torchaudio">
+<h2>Using the GPU decoder/encoder from TorchAudio<a class="headerlink" href="#using-the-gpu-decoder-encoder-from-torchaudio" title="Permalink to this heading">¶</a></h2>
+<section id="checking-the-installation">
+<h3>Checking the installation<a class="headerlink" href="#checking-the-installation" title="Permalink to this heading">¶</a></h3>
+<p>Once the FFmpeg is properly working with hardware acceleration, we need to check if TorchAudio can pick it up correctly.</p>
+<p>There are utility functions to query the capability of FFmpeg in <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#module-torchaudio.utils.ffmpeg_utils" title="torchaudio.utils.ffmpeg_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.utils.ffmpeg_utils</span></code></a>.</p>
+<p>You can first use <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="torchaudio.utils.ffmpeg_utils.get_video_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_decoders()</span></code></a> and <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_encoders" title="torchaudio.utils.ffmpeg_utils.get_video_encoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_encoders()</span></code></a> to check if GPU decoders and encoders (such as <code class="docutils literal notranslate"><span class="pre">h264_cuvid</span></code> and <code class="docutils literal notranslate"><span class="pre">h264_nvenc</span></code>) are listed.</p>
+<p>It is often the case where there are multiple FFmpeg installations in the system, and TorchAudio is loading one different than expected. In such cases, use of <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> to check the installation does not help. You can use functions like <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_build_config" title="torchaudio.utils.ffmpeg_utils.get_build_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_build_config()</span></code></a> and <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_versions" title="torchaudio.utils.ffmpeg_utils.get_versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_versions()</span></code></a> to get information about FFmpeg libraries TorchAudio loaded.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">ffmpeg_utils</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Library versions:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_versions</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Build config:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_build_config</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Decoders:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_video_decoders</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;cuvid&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Encoders:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_video_encoders</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;nvenc&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Library versions:
+{&#39;libavutil&#39;: (56, 31, 100), &#39;libavcodec&#39;: (58, 54, 100), &#39;libavformat&#39;: (58, 29, 100), &#39;libavfilter&#39;: (7, 57, 100), &#39;libavdevice&#39;: (58, 8, 100)}
+
+Build config:
+--prefix=/usr --extra-version=0ubuntu0.1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --enable-avresample --disable-filter=resample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libaom --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libcodec2 --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libjack --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librsvg --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-lv2 --enable-omx --enable-openal --enable-opencl --enable-opengl --enable-sdl2 --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-nvenc --enable-chromaprint --enable-frei0r --enable-libx264 --enable-shared
+
+Decoders:
+[&#39;h264_cuvid&#39;, &#39;hevc_cuvid&#39;, &#39;mjpeg_cuvid&#39;, &#39;mpeg1_cuvid&#39;, &#39;mpeg2_cuvid&#39;, &#39;mpeg4_cuvid&#39;, &#39;vc1_cuvid&#39;, &#39;vp8_cuvid&#39;, &#39;vp9_cuvid&#39;]
+
+Encoders:
+[&#39;h264_nvenc&#39;, &#39;nvenc&#39;, &#39;nvenc_h264&#39;, &#39;nvenc_hevc&#39;, &#39;hevc_nvenc&#39;]
+</pre></div>
+</div>
+</section>
+<section id="using-the-hardware-decoder-and-encoder">
+<h3>Using the hardware decoder and encoder<a class="headerlink" href="#using-the-hardware-decoder-and-encoder" title="Permalink to this heading">¶</a></h3>
+<p>Once the installation and the runtime linking work fine, then you can test the GPU decoding with the following.</p>
+<p>For the detail on the performance of GPU decoder and encoder please see <a class="reference internal" href="tutorials/nvdec_tutorial.html#nvdec-tutorial"><span class="std std-ref">NVDEC tutoial</span></a> and <a class="reference internal" href="tutorials/nvenc_tutorial.html#nvenc-tutorial"><span class="std std-ref">NVENC tutorial</span></a>.</p>
+</section>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorials/audio_io_tutorial.html" class="btn btn-neutral float-right" title="Audio I/O" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="build.jetson.html" class="btn btn-neutral" title="Building on Jetson" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2023, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Enabling GPU video decoder/encoder</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#check-the-gpu-and-cuda-version">Check the GPU and CUDA version</a></li>
+<li><a class="reference internal" href="#checking-the-compute-capability">Checking the compute capability</a></li>
+<li><a class="reference internal" href="#install-nvidia-video-codec-headers">Install NVIDIA Video Codec Headers</a></li>
+<li><a class="reference internal" href="#install-ffmpeg-dependencies">Install FFmpeg dependencies</a></li>
+<li><a class="reference internal" href="#build-ffmpeg-with-nvdec-nvenc-support">Build FFmpeg with NVDEC/NVENC support</a></li>
+<li><a class="reference internal" href="#checking-the-intallation">Checking the intallation</a></li>
+<li><a class="reference internal" href="#using-the-gpu-decoder-encoder-from-torchaudio">Using the GPU decoder/encoder from TorchAudio</a><ul>
+<li><a class="reference internal" href="#checking-the-installation">Checking the installation</a></li>
+<li><a class="reference internal" href="#using-the-hardware-decoder-and-encoder">Using the hardware decoder and encoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

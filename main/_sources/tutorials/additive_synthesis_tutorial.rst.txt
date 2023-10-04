@@ -58,8 +58,8 @@ Subtractive synthesis creates timbre by applying filters.
 
  .. code-block:: none
 
-    2.2.0.dev20231003
-    2.2.0.dev20231004
+    2.2.0.dev20231112
+    2.2.0.dev20231113
 
 
 
@@ -274,7 +274,7 @@ Now synthesize a waveform
 
  .. code-block:: none
 
-    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/src/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -324,7 +324,7 @@ time-varying tone based on sawtooth wave.
 
  .. code-block:: none
 
-    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/src/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -406,7 +406,7 @@ only odd-integer harmonics.
 
  .. code-block:: none
 
-    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/src/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -487,7 +487,7 @@ also only contains odd-integer harmonics.
 
  .. code-block:: none
 
-    /pytorch/audio/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
+    /pytorch/audio/src/torchaudio/prototype/functional/_dsp.py:63: UserWarning: Some frequencies are above nyquist frequency. Setting the corresponding amplitude to zero. This might cause numerically unstable gradient.
       warnings.warn(
 
 
@@ -626,7 +626,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.718 seconds)
+   **Total running time of the script:** ( 0 minutes  4.750 seconds)
 
 
 .. _sphx_glr_download_tutorials_additive_synthesis_tutorial.py:

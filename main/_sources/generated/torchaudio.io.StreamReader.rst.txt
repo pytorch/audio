@@ -151,41 +151,41 @@ Support Structures
 ChunkTensor
 ~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.ChunkTensor()
+.. autoclass:: torio.io._streaming_media_decoder.ChunkTensor()
    :members:
 
 SourceStream
 ~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.SourceStream()
+.. autoclass:: torio.io._streaming_media_decoder.SourceStream()
    :members:
 
 SourceAudioStream
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.SourceAudioStream()
+.. autoclass:: torio.io._streaming_media_decoder.SourceAudioStream()
    :members:
 
 SourceVideoStream
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.SourceVideoStream()
+.. autoclass:: torio.io._streaming_media_decoder.SourceVideoStream()
    :members:
 
 OutputStream
 ~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.OutputStream()
+.. autoclass:: torio.io._streaming_media_decoder.OutputStream()
    :members:
 
 OutputAudioStream
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.OutputAudioStream()
+.. autoclass:: torio.io._streaming_media_decoder.OutputAudioStream()
    :members:
 
 OutputVideoStream
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.io._stream_reader.OutputVideoStream()
+.. autoclass:: torio.io._streaming_media_decoder.OutputVideoStream()
    :members:

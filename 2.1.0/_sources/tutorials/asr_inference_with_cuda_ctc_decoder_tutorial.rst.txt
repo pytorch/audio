@@ -79,7 +79,7 @@ working with
 
  .. code-block:: none
 
-    2.1.0
+    2.1.1
     2.1.0
 
 
@@ -140,7 +140,7 @@ In this tutorial, we only use CTC head of the model.
 
  .. code-block:: none
 
-      0%|          | 0.00/269M [00:00<?, ?B/s]      7%|7         | 20.1M/269M [00:00<00:01, 144MB/s]     13%|#2        | 33.9M/269M [00:00<00:03, 69.4MB/s]     19%|#8        | 49.9M/269M [00:00<00:04, 49.1MB/s]     23%|##2       | 61.3M/269M [00:01<00:03, 60.2MB/s]     28%|##7       | 74.9M/269M [00:01<00:03, 55.9MB/s]     31%|###       | 83.4M/269M [00:01<00:03, 61.3MB/s]     37%|###7      | 99.9M/269M [00:01<00:02, 60.0MB/s]     40%|###9      | 108M/269M [00:01<00:02, 57.8MB/s]      42%|####2     | 114M/269M [00:01<00:02, 57.5MB/s]     46%|####6     | 125M/269M [00:02<00:04, 37.5MB/s]     54%|#####3    | 145M/269M [00:02<00:02, 50.6MB/s]     56%|#####6    | 151M/269M [00:03<00:03, 37.7MB/s]     63%|######3   | 170M/269M [00:03<00:01, 57.4MB/s]     66%|######6   | 179M/269M [00:03<00:02, 33.8MB/s]     69%|######8   | 185M/269M [00:04<00:02, 36.6MB/s]     72%|#######1  | 193M/269M [00:04<00:02, 36.6MB/s]     74%|#######4  | 200M/269M [00:04<00:02, 30.9MB/s]     81%|########1 | 219M/269M [00:04<00:00, 52.6MB/s]     85%|########4 | 228M/269M [00:05<00:01, 39.8MB/s]     92%|#########2| 249M/269M [00:05<00:00, 61.5MB/s]     96%|#########6| 259M/269M [00:05<00:00, 48.8MB/s]    100%|##########| 269M/269M [00:05<00:00, 49.9MB/s]
+      0%|          | 0.00/269M [00:00<?, ?B/s]     13%|#2        | 34.6M/269M [00:00<00:00, 363MB/s]     27%|##6       | 71.7M/269M [00:00<00:00, 378MB/s]     40%|####      | 109M/269M [00:00<00:00, 382MB/s]      54%|#####4    | 146M/269M [00:00<00:00, 387MB/s]     68%|######7   | 183M/269M [00:00<00:00, 384MB/s]     82%|########2 | 221M/269M [00:00<00:00, 388MB/s]     96%|#########5| 258M/269M [00:00<00:00, 384MB/s]    100%|##########| 269M/269M [00:00<00:00, 385MB/s]
 
 
 
@@ -169,7 +169,7 @@ We will load a sample from the LibriSpeech test-other dataset.
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 46.7MB/s]
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 144MB/s]
 
 
 .. raw:: html
@@ -247,7 +247,7 @@ index, or as a list of tokens, each mapping to a unique index.
 
  .. code-block:: none
 
-      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 61.7MB/s]
+      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 146MB/s]
     ['<blk>', '<sos/eos>', '<unk>', 'S', '▁THE', '▁A', 'T', '▁AND', 'ED', '▁OF', '▁TO', 'E', 'D', 'N', 'ING', '▁IN', 'Y', 'M', 'C', '▁I', 'A', 'P', '▁HE', 'R', 'O', 'L', 'RE', 'I', 'U', 'ER', '▁IT', 'LY', '▁THAT', '▁WAS', '▁', '▁S', 'AR', '▁BE', 'F', '▁C', 'IN', 'B', '▁FOR', 'OR', 'LE', "'", '▁HIS', '▁YOU', 'AL', '▁RE', 'V', '▁B', 'G', 'RI', '▁E', '▁WITH', '▁T', '▁AS', 'LL', '▁P', '▁HER', 'ST', '▁HAD', '▁SO', '▁F', 'W', 'CE', '▁IS', 'ND', '▁NOT', 'TH', '▁BUT', 'EN', '▁SHE', '▁ON', 'VE', 'ON', 'SE', '▁DE', 'UR', '▁G', 'CH', 'K', 'TER', '▁AT', 'IT', '▁ME', 'RO', 'NE', 'RA', 'ES', 'IL', 'NG', 'IC', '▁NO', '▁HIM', 'ENT', 'IR', '▁WE', 'H', '▁DO', '▁ALL', '▁HAVE', 'LO', '▁BY', '▁MY', '▁MO', '▁THIS', 'LA', '▁ST', '▁WHICH', '▁CON', '▁THEY', 'CK', 'TE', '▁SAID', '▁FROM', '▁GO', '▁WHO', '▁TH', '▁OR', '▁D', '▁W', 'VER', 'LI', '▁SE', '▁ONE', '▁CA', '▁AN', '▁LA', '▁WERE', 'EL', '▁HA', '▁MAN', '▁FA', '▁EX', 'AD', '▁SU', 'RY', '▁MI', 'AT', '▁BO', '▁WHEN', 'AN', 'THER', 'PP', 'ATION', '▁FI', '▁WOULD', '▁PRO', 'OW', 'ET', '▁O', '▁THERE', '▁HO', 'ION', '▁WHAT', '▁FE', '▁PA', 'US', 'MENT', '▁MA', 'UT', '▁OUT', '▁THEIR', '▁IF', '▁LI', '▁K', '▁WILL', '▁ARE', 'ID', '▁RO', 'DE', 'TION', '▁WA', 'PE', '▁UP', '▁SP', '▁PO', 'IGHT', '▁UN', 'RU', '▁LO', 'AS', 'OL', '▁LE', '▁BEEN', '▁SH', '▁RA', '▁SEE', 'KE', 'UL', 'TED', '▁SA', 'UN', 'UND', 'ANT', '▁NE', 'IS', '▁THEM', 'CI', 'GE', '▁COULD', '▁DIS', 'OM', 'ISH', 'HE', 'EST', '▁SOME', 'ENCE', 'ITY', 'IVE', '▁US', '▁MORE', '▁EN', 'ARD', 'ATE', '▁YOUR', '▁INTO', '▁KNOW', '▁CO', 'ANCE', '▁TIME', '▁WI', '▁YE', 'AGE', '▁NOW', 'TI', 'FF', 'ABLE', '▁VERY', '▁LIKE', 'AM', 'HI', 'Z', '▁OTHER', '▁THAN', '▁LITTLE', '▁DID', '▁LOOK', 'TY', 'ERS', '▁CAN', '▁CHA', '▁AR', 'X', 'FUL', 'UGH', '▁BA', '▁DAY', '▁ABOUT', 'TEN', 'IM', '▁ANY', '▁PRE', '▁OVER', 'IES', 'NESS', 'ME', 'BLE', '▁M', 'ROW', '▁HAS', '▁GREAT', '▁VI', 'TA', '▁AFTER', 'PER', '▁AGAIN', 'HO', 'SH', '▁UPON', '▁DI', '▁HAND', '▁COM', 'IST', 'TURE', '▁STA', '▁THEN', '▁SHOULD', '▁GA', 'OUS', 'OUR', '▁WELL', '▁ONLY', 'MAN', '▁GOOD', '▁TWO', '▁MAR', '▁SAY', '▁HU', 'TING', '▁OUR', 'RESS', '▁DOWN', 'IOUS', '▁BEFORE', '▁DA', '▁NA', 'QUI', '▁MADE', '▁EVERY', '▁OLD', '▁EVEN', 'IG', '▁COME', '▁GRA', '▁RI', '▁LONG', 'OT', 'SIDE', 'WARD', '▁FO', '▁WHERE', 'MO', 'LESS', '▁SC', '▁MUST', '▁NEVER', '▁HOW', '▁CAME', '▁SUCH', '▁RU', '▁TAKE', '▁WO', '▁CAR', 'UM', 'AK', '▁THINK', '▁MUCH', '▁MISTER', '▁MAY', '▁JO', '▁WAY', '▁COMP', '▁THOUGHT', '▁STO', '▁MEN', '▁BACK', '▁DON', 'J', '▁LET', '▁TRA', '▁FIRST', '▁JUST', '▁VA', '▁OWN', '▁PLA', '▁MAKE', 'ATED', '▁HIMSELF', '▁WENT', '▁PI', 'GG', 'RING', '▁DU', '▁MIGHT', '▁PART', '▁GIVE', '▁IMP', '▁BU', '▁PER', '▁PLACE', '▁HOUSE', '▁THROUGH', 'IAN', '▁SW', '▁UNDER', 'QUE', '▁AWAY', '▁LOVE', 'QUA', '▁LIFE', '▁GET', '▁WITHOUT', '▁PASS', '▁TURN', 'IGN', '▁HEAD', '▁MOST', '▁THOSE', '▁SHALL', '▁EYES', '▁COL', '▁STILL', '▁NIGHT', '▁NOTHING', 'ITION', 'HA', '▁TELL', '▁WORK', '▁LAST', '▁NEW', '▁FACE', '▁HI', '▁WORD', '▁FOUND', '▁COUNT', '▁OB', '▁WHILE', '▁SHA', '▁MEAN', '▁SAW', '▁PEOPLE', '▁FRIEND', '▁THREE', '▁ROOM', '▁SAME', '▁THOUGH', '▁RIGHT', '▁CHILD', '▁FATHER', '▁ANOTHER', '▁HEART', '▁WANT', '▁TOOK', 'OOK', '▁LIGHT', '▁MISSUS', '▁OPEN', '▁JU', '▁ASKED', 'PORT', '▁LEFT', '▁JA', '▁WORLD', '▁HOME', '▁WHY', '▁ALWAYS', '▁ANSWER', '▁SEEMED', '▁SOMETHING', '▁GIRL', '▁BECAUSE', '▁NAME', '▁TOLD', '▁NI', '▁HIGH', 'IZE', '▁WOMAN', '▁FOLLOW', '▁RETURN', '▁KNEW', '▁EACH', '▁KIND', '▁JE', '▁ACT', '▁LU', '▁CERTAIN', '▁YEARS', '▁QUITE', '▁APPEAR', '▁BETTER', '▁HALF', '▁PRESENT', '▁PRINCE', 'SHIP', '▁ALSO', '▁BEGAN', '▁HAVING', '▁ENOUGH', '▁PERSON', '▁LADY', '▁WHITE', '▁COURSE', '▁VOICE', '▁SPEAK', '▁POWER', '▁MORNING', '▁BETWEEN', '▁AMONG', '▁KEEP', '▁WALK', '▁MATTER', '▁TEA', '▁BELIEVE', '▁SMALL', '▁TALK', '▁FELT', '▁HORSE', '▁MYSELF', '▁SIX', '▁HOWEVER', '▁FULL', '▁HERSELF', '▁POINT', '▁STOOD', '▁HUNDRED', '▁ALMOST', '▁SINCE', '▁LARGE', '▁LEAVE', '▁PERHAPS', '▁DARK', '▁SUDDEN', '▁REPLIED', '▁ANYTHING', '▁WONDER', '▁UNTIL', 'Q']
 
 
@@ -486,7 +486,7 @@ of 3 provides the same output as beam size 10.
 
  .. code-block:: none
 
-    beam size 1  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -1.35; 0.0009 secs)
+    beam size 1  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -1.35; 0.0010 secs)
     beam size 2  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.21; 0.0009 secs)
     beam size 3  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0009 secs)
     beam size 10 : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0010 secs)
@@ -535,7 +535,7 @@ We recommend to set blank_skip_threshold=0.95 for cuda beam search decoder.
 
     blank_skip_threshold 0.25: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: -0.01; 0.0009 secs)
     blank_skip_threshold 0.95: i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0010 secs)
-    blank_skip_threshold 1.0: i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.21; 0.0043 secs)
+    blank_skip_threshold 1.0: i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.21; 0.0044 secs)
 
 
 
@@ -564,7 +564,7 @@ From the above table, CUDA decoder could give a slight improvement in WER and a 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.577 seconds)
+   **Total running time of the script:** ( 0 minutes  2.060 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_cuda_ctc_decoder_tutorial.py:

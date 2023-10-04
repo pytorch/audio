@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.functional._rir &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.prototype.functional._rir &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -332,9 +332,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -560,20 +560,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_walls</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">coeffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be non-negative. Found: </span><span class="si">{</span><span class="n">coeffs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_walls</span><span class="p">),</span> <span class="n">coeffs</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">coeffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be non-negative. Found: </span><span class="si">{</span><span class="n">coeffs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">!=</span> <span class="n">num_walls</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The shape of `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be (</span><span class="si">{</span><span class="n">num_walls</span><span class="si">}</span><span class="s2">,) when it is a 1D Tensor.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The shape of `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be (</span><span class="si">{</span><span class="n">num_walls</span><span class="si">}</span><span class="s2">,) when it is a 1D Tensor. &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;Found the shape </span><span class="si">{</span><span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">num_walls</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">num_walls</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The shape of `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be (7, </span><span class="si">{</span><span class="n">num_walls</span><span class="si">}</span><span class="s2">) when it is a 2D Tensor.&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Found the shape </span><span class="si">{</span><span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The shape of `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be (NUM_BANDS, </span><span class="si">{</span><span class="n">num_walls</span><span class="si">}</span><span class="s2">) when it &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;is a 2D Tensor. Found: </span><span class="si">{</span><span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">coeffs</span>
     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be float or Tensor.&quot;</span><span class="p">)</span>
@@ -596,7 +600,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">source</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`source` must be 1D Tensor with 3 elements. Found </span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mic_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">mic_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mic_array must be a 2D Tensor with shape (num_channels, 3). Found </span><span class="si">{</span><span class="n">mic_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`mic_array` must be a 2D Tensor with shape (num_channels, 3). Found </span><span class="si">{</span><span class="n">mic_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="simulate_rir_ism"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.simulate_rir_ism.html#torchaudio.prototype.functional.simulate_rir_ism">[docs]</a><span class="k">def</span> <span class="nf">simulate_rir_ism</span><span class="p">(</span>
@@ -697,6 +701,109 @@
             <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">output_length</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">rir</span></div>
+
+
+<div class="viewcode-block" id="ray_tracing"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.ray_tracing.html#torchaudio.prototype.functional.ray_tracing">[docs]</a><span class="k">def</span> <span class="nf">ray_tracing</span><span class="p">(</span>
+    <span class="n">room</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">mic_array</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">num_rays</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">absorption</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">scattering</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">mic_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">sound_speed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">343.0</span><span class="p">,</span>
+    <span class="n">energy_thres</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">time_thres</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">hist_bin_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.004</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute energy histogram via ray tracing.</span>
+
+<span class="sd">    The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.</span>
+
+<span class="sd">    ``num_rays`` rays are casted uniformly in all directions from the source;</span>
+<span class="sd">    when a ray intersects a wall, it is reflected and part of its energy is absorbed.</span>
+<span class="sd">    It is also scattered (sent directly to the microphone(s)) according to the ``scattering``</span>
+<span class="sd">    coefficient.</span>
+<span class="sd">    When a ray is close to the microphone, its current energy is recorded in the output</span>
+<span class="sd">    histogram for that given time slot.</span>
+
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        room (torch.Tensor): Room coordinates. The shape of `room` must be `(3,)` which represents</span>
+<span class="sd">            three dimensions of the room.</span>
+<span class="sd">        source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(3,)`.</span>
+<span class="sd">        mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, 3)`.</span>
+<span class="sd">        absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.</span>
+<span class="sd">            (Default: ``0.0``).</span>
+<span class="sd">            If the type is ``float``, the absorption coefficient is identical to all walls and</span>
+<span class="sd">            all frequencies.</span>
+<span class="sd">            If ``absorption`` is a 1D Tensor, the shape must be `(6,)`, representing absorption</span>
+<span class="sd">            coefficients of ``&quot;west&quot;``, ``&quot;east&quot;``, ``&quot;south&quot;``, ``&quot;north&quot;``, ``&quot;floor&quot;``, and</span>
+<span class="sd">            ``&quot;ceiling&quot;``, respectively.</span>
+<span class="sd">            If ``absorption`` is a 2D Tensor, the shape must be  `(num_bands, 6)`.</span>
+<span class="sd">            ``num_bands`` is the number of frequency bands (usually 7).</span>
+<span class="sd">        scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials. (Default: ``0.0``)</span>
+<span class="sd">            The shape and type of this parameter is the same as for ``absorption``.</span>
+<span class="sd">        mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5)</span>
+<span class="sd">        sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343.0``)</span>
+<span class="sd">        energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``)</span>
+<span class="sd">            The initial energy of each ray is ``2 / num_rays``.</span>
+<span class="sd">        time_thres (float, optional): The maximal duration for which rays are traced. (Unit: seconds) (Default: 10.0)</span>
+<span class="sd">        hist_bin_size (float, optional): The size of each bin in the output histogram. (Unit: seconds) (Default: 0.004)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded.</span>
+<span class="sd">            Each bin corresponds to a given time slot.</span>
+<span class="sd">            The shape is `(channel, num_bands, num_bins)`, where</span>
+<span class="sd">            ``num_bins = ceil(time_thres / hist_bin_size)``.</span>
+<span class="sd">            If both ``absorption`` and ``scattering`` are floats, then ``num_bands == 1``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">time_thres</span> <span class="o">&lt;</span> <span class="n">hist_bin_size</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`time_thres` must be greater than `hist_bin_size`. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: hist_bin_size=</span><span class="si">{</span><span class="n">hist_bin_size</span><span class="si">}</span><span class="s2">, time_thres=</span><span class="si">{</span><span class="n">time_thres</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">room</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">source</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">mic_array</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;dtype of `room`, `source` and `mic_array` must match. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: `room` (</span><span class="si">{</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">), `source` (</span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">) and &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;`mic_array` (</span><span class="si">{</span><span class="n">mic_array</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">_validate_inputs</span><span class="p">(</span><span class="n">room</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">mic_array</span><span class="p">)</span>
+    <span class="n">absorption</span> <span class="o">=</span> <span class="n">_adjust_coeff</span><span class="p">(</span><span class="n">absorption</span><span class="p">,</span> <span class="s2">&quot;absorption&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">scattering</span> <span class="o">=</span> <span class="n">_adjust_coeff</span><span class="p">(</span><span class="n">scattering</span><span class="p">,</span> <span class="s2">&quot;scattering&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># Bring absorption and scattering to the same shape</span>
+    <span class="k">if</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">absorption</span> <span class="o">=</span> <span class="n">absorption</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">scattering</span> <span class="o">=</span> <span class="n">scattering</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`absorption` and `scattering` must be broadcastable to the same number of bands and walls. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Inferred shapes absorption=</span><span class="si">{</span><span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and scattering=</span><span class="si">{</span><span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">histograms</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ray_tracing</span><span class="p">(</span>
+        <span class="n">room</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">,</span>
+        <span class="n">mic_array</span><span class="p">,</span>
+        <span class="n">num_rays</span><span class="p">,</span>
+        <span class="n">absorption</span><span class="p">,</span>
+        <span class="n">scattering</span><span class="p">,</span>
+        <span class="n">mic_radius</span><span class="p">,</span>
+        <span class="n">sound_speed</span><span class="p">,</span>
+        <span class="n">energy_thres</span><span class="p">,</span>
+        <span class="n">time_thres</span><span class="p">,</span>
+        <span class="n">hist_bin_size</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">histograms</span></div>
 </pre></div>
 
              </article>

@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models.conv_tasnet_base &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.models.conv_tasnet_base &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -335,9 +335,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -437,13 +437,13 @@
 <h1>torchaudio.models.conv_tasnet_base<a class="headerlink" href="#torchaudio-models-conv-tasnet-base" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="torchaudio.models.conv_tasnet_base">
-<span class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></span><span class="sig-name descname"><span class="pre">conv_tasnet_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_sources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.conv_tasnet.ConvTasNet"><span class="pre">ConvTasNet</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/conv_tasnet.html#conv_tasnet_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.conv_tasnet_base" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">torchaudio.models.</span></span><span class="sig-name descname"><span class="pre">conv_tasnet_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_sources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.conv_tasnet.ConvTasNet"><span class="pre">ConvTasNet</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/conv_tasnet.html#conv_tasnet_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.conv_tasnet_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds non-causal version of <a class="reference internal" href="torchaudio.models.ConvTasNet.html#torchaudio.models.ConvTasNet" title="torchaudio.models.ConvTasNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConvTasNet</span></code></a>.</p>
 <p>The parameter settings follow the ones with the highest Si-SNR metirc score in the paper,
 except the mask activation function is changed from “sigmoid” to “relu” for performance improvement.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_sources</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Number of sources in the output.
+<dd class="field-odd"><p><strong>num_sources</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>optional</em>) – Number of sources in the output.
 (Default: 2)</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

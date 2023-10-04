@@ -71,7 +71,7 @@ Steps:
 
  .. code-block:: none
 
-    2.1.0
+    2.1.1
     2.1.0
 
 
@@ -156,8 +156,8 @@ which was generated with:
 
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 170MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 80.4MB/s]
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 245MB/s]
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 333MB/s]
 
 
 
@@ -367,7 +367,7 @@ We also evaluate the intelligibility of the speech with the Short-Time Objective
 
  .. code-block:: none
 
-    SDR score: 4.140362181778016
+    SDR score: 4.140362181778018
     Si-SNR score: 4.104058905536078
     PESQ score: 2.0084526538848877
     STOI score: 0.7724339398714715
@@ -664,10 +664,10 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    SDR score: 17.94623444750873
+    SDR score: 17.946234447508765
     Si-SNR score: 12.215202612266587
     PESQ score: 3.3447437286376953
-    STOI score: 0.8712864479161745
+    STOI score: 0.8712864479161743
 
 
 .. raw:: html
@@ -786,7 +786,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    SDR score: 11.880210635280262
+    SDR score: 11.880210635280273
     Si-SNR score: 10.714419996128061
     PESQ score: 3.083890914916992
     STOI score: 0.8261544910053075
@@ -833,7 +833,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    SDR score: 15.424590276934119
+    SDR score: 15.424590276934103
     Si-SNR score: 13.035440892133451
     PESQ score: 3.487997531890869
     STOI score: 0.8798278461896808
@@ -855,7 +855,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.175 seconds)
+   **Total running time of the script:** ( 0 minutes  1.840 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

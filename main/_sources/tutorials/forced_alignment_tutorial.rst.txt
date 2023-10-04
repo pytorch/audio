@@ -72,8 +72,8 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
  .. code-block:: none
 
-    2.2.0.dev20231003
-    2.2.0.dev20231004
+    2.2.0.dev20231112
+    2.2.0.dev20231113
     cuda
 
 
@@ -1300,7 +1300,7 @@ perform CTC segmentation for forced alignment.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.706 seconds)
+   **Total running time of the script:** ( 0 minutes  1.735 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_tutorial.py:

@@ -370,7 +370,7 @@
         
       <li>StreamWriter Basic Usage &gt;</li>
       
-      <li>Old version (stable)</li>
+      <li>Current (stable)</li>
       
     
     
@@ -475,7 +475,7 @@ following command</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.0
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.1.1
 2.1.0
 FFmpeg library versions
   libavcodec: (60, 3, 100)
@@ -575,7 +575,7 @@ are three necessary steps</p>
 <section id="file-like-objects">
 <h3>File-like objects<a class="headerlink" href="#file-like-objects" title="Permalink to this heading">¶</a></h3>
 <p>You can also pass a file-lie object. A file-like object must implement
-<code class="docutils literal notranslate"><span class="pre">write</span></code> method conforming to <a class="reference external" href="https://docs.python.org/3/library/io.html#io.RawIOBase.write" title="(in Python v3.11)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">io.RawIOBase.write</span></code></a>.</p>
+<code class="docutils literal notranslate"><span class="pre">write</span></code> method conforming to <a class="reference external" href="https://docs.python.org/3/library/io.html#io.RawIOBase.write" title="(in Python v3.12)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">io.RawIOBase.write</span></code></a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open the local file as fileobj</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;audio.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
     <span class="n">StreamWriter</span><span class="p">(</span><span class="n">dst</span><span class="o">=</span><span class="n">dst</span><span class="p">)</span>
@@ -932,7 +932,7 @@ We process one second of audio and video frames at a time.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/examples/tutorials/streamwriter_basic_tutorial.py:566: MatplotlibDeprecationWarning: The tostring_rgb function was deprecated in Matplotlib 3.8 and will be removed two minor releases later. Use buffer_rgba instead.
   frame = torch.frombuffer(fig.canvas.tostring_rgb(), dtype=torch.uint8)
-/pytorch/audio/examples/tutorials/streamwriter_basic_tutorial.py:566: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /opt/conda/conda-bld/pytorch_1694734249565/work/torch/csrc/utils/tensor_new.cpp:1508.)
+/pytorch/audio/examples/tutorials/streamwriter_basic_tutorial.py:566: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /opt/conda/conda-bld/pytorch_1699449181202/work/torch/csrc/utils/tensor_new.cpp:1508.)
   frame = torch.frombuffer(fig.canvas.tostring_rgb(), dtype=torch.uint8)
 </pre></div>
 </div>
@@ -954,7 +954,7 @@ We process one second of audio and video frames at a time.</p>
 observed that the sound of “s” (curio<strong>si</strong>ty, be<strong>si</strong>des, thi<strong>s</strong>) has
 more energy allocated on higher frequency side (right side of the video).</p>
 <p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.946 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.083 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamwriter-basic-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d8d57badf5e878c5beb8d32b0aefc7dd/streamwriter_basic_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamwriter_basic_tutorial.py</span></code></a></p>

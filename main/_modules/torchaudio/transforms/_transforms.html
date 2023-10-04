@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.transforms._transforms &mdash; Torchaudio 2.2.0.dev20231004 documentation</title>
+  <title>torchaudio.transforms._transforms &mdash; Torchaudio 2.2.0.dev20231113 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231004 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231113 &#x25BC</span></a>
     </div>
     
 
@@ -332,9 +332,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.html">libtorchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_reader.html">torchaudio::io::StreamReader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../libtorchaudio.stream_writer.html">torchaudio::io::StreamWriter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -1447,31 +1447,27 @@
 <span class="sd">    Proposed in *SpecAugment* :cite:`specaugment`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)</span>
+<span class="sd">        hop_length (int or None, optional): Length of hop between STFT windows.</span>
+<span class="sd">            (Default: ``n_fft // 2``, where ``n_fft == (n_freq - 1) * 2``)</span>
 <span class="sd">        n_freq (int, optional): number of filter banks from stft. (Default: ``201``)</span>
 <span class="sd">        fixed_rate (float or None, optional): rate to speed up or slow down by.</span>
 <span class="sd">            If None is provided, rate must be passed to the forward method. (Default: ``None``)</span>
 
+<span class="sd">    .. note::</span>
+
+<span class="sd">       The expected input is raw, complex-valued spectrogram.</span>
+
 <span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; spectrogram = torchaudio.transforms.Spectrogram()</span>
+<span class="sd">        &gt;&gt;&gt; spectrogram = torchaudio.transforms.Spectrogram(power=None)</span>
 <span class="sd">        &gt;&gt;&gt; stretch = torchaudio.transforms.TimeStretch()</span>
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; original = spectrogram(waveform)</span>
-<span class="sd">        &gt;&gt;&gt; streched_1_2 = stretch(original, 1.2)</span>
-<span class="sd">        &gt;&gt;&gt; streched_0_9 = stretch(original, 0.9)</span>
+<span class="sd">        &gt;&gt;&gt; stretched_1_2 = stretch(original, 1.2)</span>
+<span class="sd">        &gt;&gt;&gt; stretched_0_9 = stretch(original, 0.9)</span>
 
-<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png</span>
+<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch.png</span>
 <span class="sd">           :width: 600</span>
-<span class="sd">           :alt: Spectrogram streched by 1.2</span>
-
-<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png</span>
-<span class="sd">           :width: 600</span>
-<span class="sd">           :alt: The original spectrogram</span>
-
-<span class="sd">        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png</span>
-<span class="sd">           :width: 600</span>
-<span class="sd">           :alt: Spectrogram streched by 0.9</span>
-
+<span class="sd">           :alt: The visualization of stretched spectrograms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fixed_rate&quot;</span><span class="p">]</span>
 
@@ -1494,9 +1490,16 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor:</span>
-<span class="sd">                Stretched spectrogram. The resulting tensor is of the same dtype as the input</span>
-<span class="sd">                spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.</span>
+<span class="sd">                Stretched spectrogram. The resulting tensor is of the corresponding complex dtype</span>
+<span class="sd">                as the input spectrogram, and the number of frames is changed to ``ceil(num_frame / rate)``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_complex</span><span class="p">(</span><span class="n">complex_specgrams</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The input to TimeStretch must be complex type. &quot;</span>
+                <span class="s2">&quot;Providing non-complex tensor produces invalid results.&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">overriding_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If no fixed_rate is specified, must pass a valid rate to the forward method.&quot;</span><span class="p">)</span>
