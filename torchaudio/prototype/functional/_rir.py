@@ -110,11 +110,10 @@ def _frac_delay(delay: torch.Tensor, delay_i: torch.Tensor, delay_filter_length:
     return torch.special.sinc(n - delay) * _hann(n - delay, 2 * pad)
 
 
-def _adjust_coeff(dim: int, coeffs: Union[float, torch.Tensor], name: str) -> torch.Tensor:
+def _adjust_coeff(coeffs: Union[float, torch.Tensor], name: str) -> torch.Tensor:
     """Validates and converts absorption or scattering parameters to a tensor with appropriate shape
 
     Args:
-        dim (int): The dimension of the simulation. 2 or 3.
         coeff (float or torch.Tensor): The absorption coefficients of wall materials.
 
             If the dtype is ``float``, the absorption coefficient is identical for all walls and
@@ -129,10 +128,10 @@ def _adjust_coeff(dim: int, coeffs: Union[float, torch.Tensor], name: str) -> to
 
     Returns:
         (torch.Tensor): The expanded coefficient.
-            The shape is `(1, 2*dim)` for single octave band case, and
-            `(7, 2*dim)` for multi octave band case.
+            The shape is `(1, 6)` for single octave band case, and
+            `(7, 6)` for multi octave band case.
     """
-    num_walls = 2 * dim
+    num_walls = 6
     if isinstance(coeffs, float):
         return torch.full((1, num_walls), coeffs)
     if isinstance(coeffs, Tensor):
@@ -154,7 +153,6 @@ def _adjust_coeff(dim: int, coeffs: Union[float, torch.Tensor], name: str) -> to
 
 
 def _validate_inputs(
-    dim: int,
     room: torch.Tensor,
     source: torch.Tensor,
     mic_array: torch.Tensor,
@@ -162,17 +160,16 @@ def _validate_inputs(
     """Validate dimensions of input arguments, and normalize different kinds of absorption into the same dimension.
 
     Args:
-        dim (int): The dimension of the simulation. 2 or 3.
         room (torch.Tensor): The size of the room. width, length (and height)
         source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(dim,)`.
         mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, dim)`.
     """
-    if not (room.ndim == 1 and room.numel() == dim):
-        raise ValueError(f"`room` must be a 1D Tensor with {dim} elements. Found {room.shape}.")
-    if not (source.ndim == 1 and source.numel() == dim):
-        raise ValueError(f"`source` must be 1D Tensor with {dim} elements. Found {source.shape}.")
-    if not (mic_array.ndim == 2 and mic_array.shape[1] == dim):
-        raise ValueError(f"mic_array must be a 2D Tensor with shape (num_channels, {dim}). Found {mic_array.shape}.")
+    if not (room.ndim == 1 and room.numel() == 3):
+        raise ValueError(f"`room` must be a 1D Tensor with 3 elements. Found {room.shape}.")
+    if not (source.ndim == 1 and source.numel() == 3):
+        raise ValueError(f"`source` must be 1D Tensor with 3 elements. Found {source.shape}.")
+    if not (mic_array.ndim == 2 and mic_array.shape[1] == 3):
+        raise ValueError(f"mic_array must be a 2D Tensor with shape (num_channels, 3). Found {mic_array.shape}.")
 
 
 def simulate_rir_ism(
@@ -231,8 +228,8 @@ def simulate_rir_ism(
         of octave bands are fixed to ``[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]``.
         Users need to tune the values of ``absorption`` to the corresponding frequencies.
     """
-    _validate_inputs(3, room, source, mic_array)
-    absorption = _adjust_coeff(3, absorption, "absorption")
+    _validate_inputs(room, source, mic_array)
+    absorption = _adjust_coeff(absorption, "absorption")
     img_location, att = _compute_image_sources(room, source, max_order, absorption)
 
     # compute distances between image sources and microphones
