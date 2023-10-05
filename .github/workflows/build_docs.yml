@@ -1,40 +1,42 @@
 name: Build documentation
 
+# Documentation is deployed in the following ways
+# 1. Each time a commit is pushed to main branch
+# 2. Nightly (so that docs are updated even when there is no commit to main branch on the day)
+# 3. Manual trigger for release
+#    Because release requires changing the version number, which is used as a directory name,
+#    automating release doc deployment is tricky.
+#    There is no reliable way to know if there should have been a minor version bump.
+#
 on:
   pull_request:
   push:
     branches:
       - main
-      - release/*
-    tags:
-      - v[0-9]+.[0-9]+.[0-9]
-      - v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
   build:
-    strategy:
-      matrix:
-        python_version: ["3.10"]
-        cuda_arch_version: ["11.8"]
-      fail-fast: false
+    # Do not use matrix here to parameterize Python/CUDA versions.
+    # This job is required to pass for each PR.
+    # The name of the required job is sensitive to matrix parameter.
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build doc
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
-      gpu-arch-version: ${{ matrix.cuda_arch_version }}
+      gpu-arch-version: "11.8"
       timeout: 120
       upload-artifact: docs
 
       script: |
         set -ex
         # Set up Environment Variables
-        export PYTHON_VERSION="${{ matrix.python_version }}"
-        export CU_VERSION="${{ matrix.cuda_arch_version }}"
+        export PYTHON_VERSION="3.10"
+        export CU_VERSION="11.8"
         export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
 
         # Set CHANNEL
@@ -91,7 +93,7 @@ jobs:
         mv docs/build/html /artifacts/
 
   commit-main:
-    if: ${{ (github.repository == 'pytorch/audio') && (github.ref_name == 'main') }}
+    if: github.ref_name == 'main'
     permissions:
       # Required for `git push`
       # Note:
