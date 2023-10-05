@@ -130,3 +130,45 @@ jobs:
 
         git commit --amend -m "auto-generating sphinx docs" || true
         git push -f
+
+  # Push for release
+  # Make sure that version.txt is updated first (alpha suffix is removed)
+  commit-release:
+    if: startsWith(github.ref_name, 'release/') && ( github.event_name == 'workflow_dispatch' )
+    permissions:
+      # Required for `git push`
+      # Note:
+      #   This is not effective from fork.
+      #   When you debug this, make sure to make a branch on pytorch and
+      #   make PR from there.
+      contents: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+        fetch-depth: 5
+    - uses: actions/download-artifact@v3
+      with:
+        name: docs
+    - name: Update doc
+      run: |
+        set -x
+
+        git config user.name "pytorchbot"
+        git config user.email "soumith+bot@pytorch.org"
+        # When `git clone`, `gh-pages` branch is fetched by default.
+        # The size of gh-pages grows significantly, so we use ammend and force push
+        # We add a new commit once a week
+        if [ "$(date +%d)" = "1" ]; then
+           git commit --allow-empty -m "placeholder"
+        fi
+
+        dirname="$(cat version.txt)"
+        rm -rf "${dirname}"
+        mv html "${dirname}"
+        git add --all "${dirname}" || true
+
+        git commit --amend -m "auto-generating sphinx docs" || true
+        git push -f
