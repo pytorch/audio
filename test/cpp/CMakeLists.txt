@@ -22,6 +22,6 @@ target_link_libraries(
 target_include_directories(
   wall_collision
   PRIVATE
-  "${PROJECT_SOURCE_DIR}"
+  "${PROJECT_SOURCE_DIR}/src"
 )
 add_test(NAME wall_collision_test COMMAND wall_collision)

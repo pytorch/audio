@@ -32,7 +32,7 @@ def _get_version(sha):
 
 def _make_version_file(version, sha):
     sha = "Unknown" if sha is None else sha
-    version_path = ROOT_DIR / "torchaudio" / "version.py"
+    version_path = ROOT_DIR / "src" / "torchaudio" / "version.py"
     with open(version_path, "w") as f:
         f.write(f"__version__ = '{version}'\n")
         f.write(f"git_version = '{sha}'\n")
@@ -50,7 +50,7 @@ class clean(distutils.command.clean.clean):
         distutils.command.clean.clean.run(self)
 
         # Remove torchaudio extension
-        for path in (ROOT_DIR / "torchaudio").glob("**/*.so"):
+        for path in (ROOT_DIR / "src").glob("**/*.so"):
             print(f"removing '{path}'")
             path.unlink()
         # Remove build directory
@@ -64,13 +64,7 @@ class clean(distutils.command.clean.clean):
 
 
 def _get_packages(branch_name, tag):
-    exclude = [
-        "build*",
-        "test*",
-        "torchaudio.csrc*",
-        "third_party*",
-        "tools*",
-    ]
+    exclude = []
     exclude_prototype = False
     if branch_name is not None and branch_name.startswith("release/"):
         exclude_prototype = True
@@ -79,7 +73,7 @@ def _get_packages(branch_name, tag):
     if exclude_prototype:
         print("Excluding torchaudio.prototype from the package.")
         exclude.append("torchaudio.prototype*")
-    return find_packages(exclude=exclude)
+    return find_packages(where="src", exclude=exclude)
 
 
 def _parse_url(path):
@@ -147,6 +141,7 @@ def _main():
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
         ],
         packages=_get_packages(branch, tag),
+        package_dir={"": "src"},
         ext_modules=setup_helpers.get_ext_modules(),
         cmdclass={
             "build_ext": setup_helpers.CMakeBuild,
