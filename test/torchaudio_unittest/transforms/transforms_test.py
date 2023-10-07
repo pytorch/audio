@@ -251,6 +251,13 @@ class Tester(common_utils.TorchaudioTestCase):
         # we expect the downsampled signal to have half as many samples
         self.assertTrue(down_sampled.size(-1) == waveform.size(-1) // 2)
 
+    def test_to_mono(self):
+        channel = 3
+        wave_channels_first = common_utils.get_whitenoise(n_channels=3)
+        wave_not_channels_first = common_utils.get_whitenoise(n_channels=3, channels_first=False)
+        
+        pass
+
     def test_compute_deltas(self):
         channel = 13
         n_mfcc = channel * 3

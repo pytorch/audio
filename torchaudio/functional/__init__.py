@@ -60,6 +60,7 @@ from .functional import (
     spectral_centroid,
     spectrogram,
     speed,
+    to_mono,
 )
 
 __all__ = [
@@ -121,6 +122,7 @@ __all__ = [
     "convolve",
     "add_noise",
     "speed",
+    "to_mono",
     "preemphasis",
     "deemphasis",
     "frechet_distance",
