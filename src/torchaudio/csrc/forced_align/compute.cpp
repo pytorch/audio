@@ -1,5 +1,5 @@
+#include <libtorchaudio/forced_align/compute.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/forced_align/compute.h>
 
 std::tuple<torch::Tensor, torch::Tensor> forced_align(
     const torch::Tensor& logProbs,

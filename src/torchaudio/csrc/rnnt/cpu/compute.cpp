@@ -1,5 +1,5 @@
+#include <libtorchaudio/rnnt/cpu/cpu_transducer.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/rnnt/cpu/cpu_transducer.h>
 
 namespace torchaudio {
 namespace rnnt {

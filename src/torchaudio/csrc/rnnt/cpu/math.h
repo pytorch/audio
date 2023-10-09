@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torchaudio/csrc/rnnt/macros.h>
+#include <libtorchaudio/rnnt/macros.h>
 
 namespace torchaudio {
 namespace rnnt {

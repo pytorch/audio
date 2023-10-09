@@ -1,5 +1,5 @@
+#include <libtorchaudio/sox/utils.h>
 #include <torch/extension.h>
-#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio {
 namespace sox {

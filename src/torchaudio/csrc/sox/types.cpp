@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/sox/types.h>
+#include <libtorchaudio/sox/types.h>
 
 namespace torchaudio::sox {
 

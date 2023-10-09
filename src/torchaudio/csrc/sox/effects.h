@@ -1,8 +1,8 @@
 #ifndef TORCHAUDIO_SOX_EFFECTS_H
 #define TORCHAUDIO_SOX_EFFECTS_H
 
+#include <libtorchaudio/sox/utils.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio::sox {
 

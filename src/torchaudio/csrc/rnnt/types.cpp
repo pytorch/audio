@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/rnnt/types.h>
+#include <libtorchaudio/rnnt/types.h>
 
 namespace torchaudio {
 namespace rnnt {

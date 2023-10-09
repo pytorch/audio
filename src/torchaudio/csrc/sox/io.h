@@ -1,8 +1,8 @@
 #ifndef TORCHAUDIO_SOX_IO_H
 #define TORCHAUDIO_SOX_IO_H
 
+#include <libtorchaudio/sox/utils.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio::sox {
 

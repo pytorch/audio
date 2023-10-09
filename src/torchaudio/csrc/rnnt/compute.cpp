@@ -1,5 +1,5 @@
+#include <libtorchaudio/rnnt/compute.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/rnnt/compute.h>
 
 std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss(
     torch::Tensor& logits,

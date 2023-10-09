@@ -3,7 +3,7 @@
 #include <cstring>
 #include <vector>
 
-#include <torchaudio/csrc/rnnt/options.h>
+#include <libtorchaudio/rnnt/options.h>
 
 namespace torchaudio {
 namespace rnnt {

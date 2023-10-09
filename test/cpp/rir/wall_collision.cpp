@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <torchaudio/csrc/rir/wall.h>
+#include <libtorchaudio/rir/wall.h>
 
 using namespace torchaudio::rir;
 

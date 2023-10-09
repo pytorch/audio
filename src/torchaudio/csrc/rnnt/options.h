@@ -6,8 +6,8 @@
 #include <cuda_runtime.h>
 #endif // USE_CUDA
 
-#include <torchaudio/csrc/rnnt/macros.h>
-#include <torchaudio/csrc/rnnt/types.h>
+#include <libtorchaudio/rnnt/macros.h>
+#include <libtorchaudio/rnnt/types.h>
 
 namespace torchaudio {
 namespace rnnt {

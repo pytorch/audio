@@ -1,7 +1,7 @@
 #pragma once
 
-#include <torchaudio/csrc/rnnt/cpu/cpu_kernels.h>
-#include <torchaudio/csrc/rnnt/workspace.h>
+#include <libtorchaudio/rnnt/cpu/cpu_kernels.h>
+#include <libtorchaudio/rnnt/workspace.h>
 
 namespace torchaudio {
 namespace rnnt {

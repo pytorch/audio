@@ -1,5 +1,5 @@
-#include <torchaudio/csrc/sox/effects_chain.h>
-#include <torchaudio/csrc/sox/utils.h>
+#include <libtorchaudio/sox/effects_chain.h>
+#include <libtorchaudio/sox/utils.h>
 #include "c10/util/Exception.h"
 
 using namespace torch::indexing;

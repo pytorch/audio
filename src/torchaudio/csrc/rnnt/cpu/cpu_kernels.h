@@ -1,8 +1,8 @@
 #pragma once
 
-#include <torchaudio/csrc/rnnt/cpu/math.h>
-#include <torchaudio/csrc/rnnt/options.h>
-#include <torchaudio/csrc/rnnt/types.h>
+#include <libtorchaudio/rnnt/cpu/math.h>
+#include <libtorchaudio/rnnt/options.h>
+#include <libtorchaudio/rnnt/types.h>
 
 #include <cstring>
 #include <limits>

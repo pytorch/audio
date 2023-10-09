@@ -24,9 +24,9 @@ SOFTWARE.
 // Ray tracing implementation. This is heavily based on PyRoomAcoustics:
 // https://github.com/LCAV/pyroomacoustics
 //
+#include <libtorchaudio/rir/wall.h>
 #include <torch/script.h>
 #include <torch/torch.h>
-#include <torchaudio/csrc/rir/wall.h>
 #include <cmath>
 
 namespace torchaudio {

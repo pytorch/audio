@@ -1,5 +1,5 @@
 #include <ATen/DynamicLibrary.h>
-#include <torchaudio/csrc/utils.h>
+#include <libtorchaudio/utils.h>
 
 #ifdef USE_CUDA
 #include <cuda.h>

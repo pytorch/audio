@@ -1,5 +1,5 @@
+#include <libtorchaudio/utils.h>
 #include <torch/extension.h>
-#include <torchaudio/csrc/utils.h>
 
 namespace torchaudio {
 namespace {

@@ -4,9 +4,9 @@
 
 #include <cassert>
 
-#include <torchaudio/csrc/rnnt/gpu/kernel_utils.h>
-#include <torchaudio/csrc/rnnt/gpu/kernels.h>
-#include <torchaudio/csrc/rnnt/gpu/math.cuh>
+#include <libtorchaudio/rnnt/gpu/kernel_utils.h>
+#include <libtorchaudio/rnnt/gpu/kernels.h>
+#include <libtorchaudio/rnnt/gpu/math.cuh>
 
 namespace torchaudio {
 namespace rnnt {

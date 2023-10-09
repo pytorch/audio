@@ -4,7 +4,7 @@
 #include "c10/util/Half.h"
 #endif // USE_C10_HALF
 
-#include <torchaudio/csrc/rnnt/macros.h>
+#include <libtorchaudio/rnnt/macros.h>
 
 namespace torchaudio {
 namespace rnnt {

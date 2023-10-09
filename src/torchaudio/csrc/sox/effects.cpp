@@ -1,7 +1,7 @@
+#include <libtorchaudio/sox/effects.h>
+#include <libtorchaudio/sox/effects_chain.h>
+#include <libtorchaudio/sox/utils.h>
 #include <sox.h>
-#include <torchaudio/csrc/sox/effects.h>
-#include <torchaudio/csrc/sox/effects_chain.h>
-#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio::sox {
 namespace {

@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/rnnt/macros.h>
+#include <libtorchaudio/rnnt/macros.h>
 
 const char* ToString(level_t level) {
   switch (level) {

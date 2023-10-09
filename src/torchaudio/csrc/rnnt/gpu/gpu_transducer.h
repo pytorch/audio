@@ -2,9 +2,9 @@
 
 #ifdef USE_CUDA
 
-#include <torchaudio/csrc/rnnt/workspace.h>
-#include <torchaudio/csrc/rnnt/gpu/gpu_kernel_utils.cuh>
-#include <torchaudio/csrc/rnnt/gpu/gpu_kernels.cuh>
+#include <libtorchaudio/rnnt/workspace.h>
+#include <libtorchaudio/rnnt/gpu/gpu_kernel_utils.cuh>
+#include <libtorchaudio/rnnt/gpu/gpu_kernels.cuh>
 
 namespace torchaudio {
 namespace rnnt {
