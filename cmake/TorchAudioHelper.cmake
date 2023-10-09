@@ -16,7 +16,7 @@ endif()
 
 function (torchaudio_library name source include_dirs link_libraries compile_defs)
   add_library(${name} SHARED ${source})
-  target_include_directories(${name} PRIVATE "${PROJECT_SOURCE_DIR};${include_dirs}")
+  target_include_directories(${name} PRIVATE "${PROJECT_SOURCE_DIR}/src;${include_dirs}")
   target_link_libraries(${name} ${link_libraries})
   target_compile_definitions(${name} PRIVATE ${compile_defs})
   set_target_properties(${name} PROPERTIES PREFIX "")
@@ -45,7 +45,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     target_include_directories(
       ${name}
       PRIVATE
-      ${PROJECT_SOURCE_DIR}
+      ${PROJECT_SOURCE_DIR}/src
       ${Python_INCLUDE_DIR}
       "${TORCH_INSTALL_PREFIX}/include"
       ${include_dirs})
