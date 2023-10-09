@@ -10,6 +10,7 @@ from torch.utils._pytree import tree_map
 
 if torchaudio._extension._FFMPEG_EXT is not None:
     _StreamReader = torchaudio._extension._FFMPEG_EXT.StreamReader
+    _StreamReaderBytes = torchaudio._extension._FFMPEG_EXT.StreamReaderBytes
     _StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj
 
 
@@ -447,11 +448,13 @@ class StreamReader:
     For the detailed usage of this class, please refer to the tutorial.
 
     Args:
-        src (str, path-like or file-like object): The media source.
+        src (str, path-like, bytes or file-like object): The media source.
             If string-type, it must be a resource indicator that FFmpeg can
             handle. This includes a file path, URL, device identifier or
             filter expression. The supported value depends on the FFmpeg found
             in the system.
+
+            If bytes, it must be an encoded media data in contiguous memory.
 
             If file-like object, it must support `read` method with the signature
             `read(size: int) -> bytes`.
@@ -518,7 +521,10 @@ class StreamReader:
         option: Optional[Dict[str, str]] = None,
         buffer_size: int = 4096,
     ):
-        if hasattr(src, "read"):
+        self.src = src
+        if isinstance(src, bytes):
+            self._be = _StreamReaderBytes(src, format, option, buffer_size)
+        elif hasattr(src, "read"):
             self._be = _StreamReaderFileObj(src, format, option, buffer_size)
         else:
             self._be = _StreamReader(str(src), format, option)
