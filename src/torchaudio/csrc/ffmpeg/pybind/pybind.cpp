@@ -186,6 +186,61 @@ struct StreamWriterFileObj : private FileObj, public StreamWriterCustomIO {
             py::hasattr(fileobj, "seek") ? &seek_func : nullptr) {}
 };
 
+//////////////////////////////////////////////////////////////////////////////
+// StreamReader/Writer Bytes
+//////////////////////////////////////////////////////////////////////////////
+struct BytesWrapper {
+  std::string_view src;
+  size_t index = 0;
+};
+
+static int read_bytes(void* opaque, uint8_t* buf, int buf_size) {
+  BytesWrapper* wrapper = static_cast<BytesWrapper*>(opaque);
+
+  auto num_read = FFMIN(wrapper->src.size() - wrapper->index, buf_size);
+  if (num_read == 0) {
+    return AVERROR_EOF;
+  }
+  auto head = wrapper->src.data() + wrapper->index;
+  memcpy(buf, head, num_read);
+  wrapper->index += num_read;
+  return num_read;
+}
+
+static int64_t seek_bytes(void* opaque, int64_t offset, int whence) {
+  BytesWrapper* wrapper = static_cast<BytesWrapper*>(opaque);
+  if (whence == AVSEEK_SIZE) {
+    return wrapper->src.size();
+  }
+
+  if (whence == SEEK_SET) {
+    wrapper->index = offset;
+  } else if (whence == SEEK_CUR) {
+    wrapper->index += offset;
+  } else if (whence == SEEK_END) {
+    wrapper->index = wrapper->src.size() + offset;
+  } else {
+    TORCH_INTERNAL_ASSERT(false, "Unexpected whence value: ", whence);
+  }
+  return static_cast<int64_t>(wrapper->index);
+}
+
+struct StreamReaderBytes : private BytesWrapper, public StreamReaderCustomIO {
+  StreamReaderBytes(
+      std::string_view src,
+      const c10::optional<std::string>& format,
+      const c10::optional<std::map<std::string, std::string>>& option,
+      int64_t buffer_size)
+      : BytesWrapper{src},
+        StreamReaderCustomIO(
+            this,
+            format,
+            buffer_size,
+            read_bytes,
+            seek_bytes,
+            option) {}
+};
+
 #ifndef TORCHAUDIO_FFMPEG_EXT_NAME
 #error TORCHAUDIO_FFMPEG_EXT_NAME must be defined.
 #endif
@@ -353,6 +408,31 @@ PYBIND11_MODULE(TORCHAUDIO_FFMPEG_EXT_NAME, m) {
       .def("fill_buffer", &StreamReaderFileObj::fill_buffer)
       .def("is_buffer_ready", &StreamReaderFileObj::is_buffer_ready)
       .def("pop_chunks", &StreamReaderFileObj::pop_chunks);
+  py::class_<StreamReaderBytes>(m, "StreamReaderBytes", py::module_local())
+      .def(py::init<
+           std::string_view,
+           const c10::optional<std::string>&,
+           const c10::optional<OptionDict>&,
+           int64_t>())
+      .def("num_src_streams", &StreamReaderBytes::num_src_streams)
+      .def("num_out_streams", &StreamReaderBytes::num_out_streams)
+      .def("find_best_audio_stream", &StreamReaderBytes::find_best_audio_stream)
+      .def("find_best_video_stream", &StreamReaderBytes::find_best_video_stream)
+      .def("get_metadata", &StreamReaderBytes::get_metadata)
+      .def("get_src_stream_info", &StreamReaderBytes::get_src_stream_info)
+      .def("get_out_stream_info", &StreamReaderBytes::get_out_stream_info)
+      .def("seek", &StreamReaderBytes::seek)
+      .def("add_audio_stream", &StreamReaderBytes::add_audio_stream)
+      .def("add_video_stream", &StreamReaderBytes::add_video_stream)
+      .def("remove_stream", &StreamReaderBytes::remove_stream)
+      .def(
+          "process_packet",
+          py::overload_cast<const c10::optional<double>&, const double>(
+              &StreamReader::process_packet))
+      .def("process_all_packets", &StreamReaderBytes::process_all_packets)
+      .def("fill_buffer", &StreamReaderBytes::fill_buffer)
+      .def("is_buffer_ready", &StreamReaderBytes::is_buffer_ready)
+      .def("pop_chunks", &StreamReaderBytes::pop_chunks);
 }
 
 } // namespace
