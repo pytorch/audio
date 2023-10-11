@@ -119,7 +119,7 @@ ENV/
 
 # Generated Files
 test/assets/sinewave.wav
-torchaudio/version.py
+src/torchaudio/version.py
 gen.yml
 
 # Examples
