@@ -6,8 +6,9 @@ from typing import Dict, List, Tuple
 
 import torchaudio
 
+ffmpeg_ext = torchaudio._extension.lazy_import_ffmpeg_ext()
 
-@torchaudio._extension.fail_if_no_ffmpeg
+
 def get_versions() -> Dict[str, Tuple[int]]:
     """Get the versions of FFmpeg libraries
 
@@ -15,19 +16,17 @@ def get_versions() -> Dict[str, Tuple[int]]:
         dict: mapping from library names to version string,
             i.e. `"libavutil": (56, 22, 100)`.
     """
-    return torchaudio._extension._FFMPEG_EXT.get_versions()
+    return ffmpeg_ext.get_versions()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_log_level() -> int:
     """Get the log level of FFmpeg.
 
     See :py:func:`set_log_level` for the detailo.
     """
-    return torchaudio._extension._FFMPEG_EXT.get_log_level()
+    return ffmpeg_ext.get_log_level()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def set_log_level(level: int):
     """Set the log level of FFmpeg (libavformat etc)
 
@@ -61,10 +60,9 @@ def set_log_level(level: int):
                   Extremely verbose debugging, useful for libav* development.
 
     """
-    torchaudio._extension._FFMPEG_EXT.set_log_level(level)
+    ffmpeg_ext.set_log_level(level)
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_demuxers() -> Dict[str, str]:
     """Get the available demuxers.
 
@@ -79,10 +77,9 @@ def get_demuxers() -> Dict[str, str]:
         ... aax: CRI AAX
         ... ac3: raw AC-3
     """
-    return torchaudio._extension._FFMPEG_EXT.get_demuxers()
+    return ffmpeg_ext.get_demuxers()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_muxers() -> Dict[str, str]:
     """Get the available muxers.
 
@@ -98,10 +95,9 @@ def get_muxers() -> Dict[str, str]:
         ... adx: CRI ADX
         ... aiff: Audio IFF
     """
-    return torchaudio._extension._FFMPEG_EXT.get_muxers()
+    return ffmpeg_ext.get_muxers()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_audio_decoders() -> Dict[str, str]:
     """Get the available audio decoders.
 
@@ -117,10 +113,9 @@ def get_audio_decoders() -> Dict[str, str]:
         ... adx: CRI ADX
         ... aiff: Audio IFF
     """
-    return torchaudio._extension._FFMPEG_EXT.get_audio_decoders()
+    return ffmpeg_ext.get_audio_decoders()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_audio_encoders() -> Dict[str, str]:
     """Get the available audio encoders.
 
@@ -137,10 +132,9 @@ def get_audio_encoders() -> Dict[str, str]:
         ... ac3_fixed: ATSC A/52A (AC-3)
         ... alac: ALAC (Apple Lossless Audio Codec)
     """
-    return torchaudio._extension._FFMPEG_EXT.get_audio_encoders()
+    return ffmpeg_ext.get_audio_encoders()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_video_decoders() -> Dict[str, str]:
     """Get the available video decoders.
 
@@ -157,10 +151,9 @@ def get_video_decoders() -> Dict[str, str]:
         ... amv: AMV Video
         ... anm: Deluxe Paint Animation
     """
-    return torchaudio._extension._FFMPEG_EXT.get_video_decoders()
+    return ffmpeg_ext.get_video_decoders()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_video_encoders() -> Dict[str, str]:
     """Get the available video encoders.
 
@@ -178,10 +171,9 @@ def get_video_encoders() -> Dict[str, str]:
         ... asv1: ASUS V1
         ... asv2: ASUS V2
     """
-    return torchaudio._extension._FFMPEG_EXT.get_video_encoders()
+    return ffmpeg_ext.get_video_encoders()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_input_devices() -> Dict[str, str]:
     """Get the available input devices.
 
@@ -194,10 +186,9 @@ def get_input_devices() -> Dict[str, str]:
         ... avfoundation: AVFoundation input device
         ... lavfi: Libavfilter virtual input device
     """
-    return torchaudio._extension._FFMPEG_EXT.get_input_devices()
+    return ffmpeg_ext.get_input_devices()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_output_devices() -> Dict[str, str]:
     """Get the available output devices.
 
@@ -209,10 +200,9 @@ def get_output_devices() -> Dict[str, str]:
         >>>     print(f"{k}: {v}")
         ... audiotoolbox: AudioToolbox output device
     """
-    return torchaudio._extension._FFMPEG_EXT.get_output_devices()
+    return ffmpeg_ext.get_output_devices()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_input_protocols() -> List[str]:
     """Get the supported input protocols.
 
@@ -223,10 +213,9 @@ def get_input_protocols() -> List[str]:
         >>> print(get_input_protocols())
         ... ['file', 'ftp', 'hls', 'http','https', 'pipe', 'rtmp', 'tcp', 'tls', 'udp', 'unix']
     """
-    return torchaudio._extension._FFMPEG_EXT.get_input_protocols()
+    return ffmpeg_ext.get_input_protocols()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_output_protocols() -> List[str]:
     """Get the supported output protocols.
 
@@ -237,10 +226,9 @@ def get_output_protocols() -> List[str]:
         >>> print(get_output_protocols())
         ... ['file', 'ftp', 'http', 'https', 'md5', 'pipe', 'prompeg', 'rtmp', 'tee', 'tcp', 'tls', 'udp', 'unix']
     """
-    return torchaudio._extension._FFMPEG_EXT.get_output_protocols()
+    return ffmpeg_ext.get_output_protocols()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def get_build_config() -> str:
     """Get the FFmpeg build configuration
 
@@ -251,10 +239,9 @@ def get_build_config() -> str:
         >>> print(get_build_config())
         --prefix=/Users/runner/miniforge3 --cc=arm64-apple-darwin20.0.0-clang --enable-gpl --enable-hardcoded-tables --enable-libfreetype --enable-libopenh264 --enable-neon --enable-libx264 --enable-libx265 --enable-libaom --enable-libsvtav1 --enable-libxml2 --enable-libvpx --enable-pic --enable-pthreads --enable-shared --disable-static --enable-version3 --enable-zlib --enable-libmp3lame --pkg-config=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/pkg-config --enable-cross-compile --arch=arm64 --target-os=darwin --cross-prefix=arm64-apple-darwin20.0.0- --host-cc=/Users/runner/miniforge3/conda-bld/ffmpeg_1646229390493/_build_env/bin/x86_64-apple-darwin13.4.0-clang  # noqa
     """
-    return torchaudio._extension._FFMPEG_EXT.get_build_config()
+    return ffmpeg_ext.get_build_config()
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def clear_cuda_context_cache():
     """Clear the CUDA context used by CUDA Hardware accelerated video decoding"""
-    torchaudio._extension._FFMPEG_EXT.clear_cuda_context_cache()
+    ffmpeg_ext.clear_cuda_context_cache()

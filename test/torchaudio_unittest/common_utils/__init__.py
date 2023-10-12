@@ -3,7 +3,6 @@ from .backend_utils import set_audio_backend
 from .case_utils import (
     disabledInCI,
     HttpServerMixin,
-    is_ffmpeg_available,
     PytorchTestCase,
     skipIfCudaSmallMemory,
     skipIfNoAudioDevice,
@@ -44,7 +43,6 @@ __all__ = [
     "TestBaseMixin",
     "PytorchTestCase",
     "TorchaudioTestCase",
-    "is_ffmpeg_available",
     "skipIfNoAudioDevice",
     "skipIfNoCtcDecoder",
     "skipIfNoCuCtcDecoder",

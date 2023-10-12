@@ -3,13 +3,22 @@ import io
 import torch
 import torchaudio
 from parameterized import parameterized, parameterized_class
+
+from torchaudio.io import StreamReader, StreamWriter
+from torchaudio.io._stream_reader import (
+    ChunkTensor,
+    OutputAudioStream,
+    OutputVideoStream,
+    SourceAudioStream,
+    SourceStream,
+    SourceVideoStream,
+)
 from torchaudio_unittest.common_utils import (
     disabledInCI,
     get_asset_path,
     get_image,
     get_sinusoid,
     get_wav_data,
-    is_ffmpeg_available,
     nested_params,
     rgb_to_gray,
     rgb_to_yuv_ccir,
@@ -20,18 +29,6 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
 )
-
-
-if is_ffmpeg_available():
-    from torchaudio.io import StreamReader, StreamWriter
-    from torchaudio.io._stream_reader import (
-        ChunkTensor,
-        OutputAudioStream,
-        OutputVideoStream,
-        SourceAudioStream,
-        SourceStream,
-        SourceVideoStream,
-    )
 
 
 @skipIfNoFFmpeg

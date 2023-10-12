@@ -5,10 +5,11 @@ import torch
 import torchaudio
 
 from parameterized import parameterized, parameterized_class
+
+from torchaudio.io import CodecConfig, StreamReader, StreamWriter
 from torchaudio_unittest.common_utils import (
     get_asset_path,
     get_sinusoid,
-    is_ffmpeg_available,
     nested_params,
     rgb_to_yuv_ccir,
     skipIfNoFFmpeg,
@@ -18,9 +19,6 @@ from torchaudio_unittest.common_utils import (
 )
 
 from .common import lt42
-
-if is_ffmpeg_available():
-    from torchaudio.io import CodecConfig, StreamReader, StreamWriter
 
 
 def get_audio_chunk(fmt, sample_rate, num_channels):
