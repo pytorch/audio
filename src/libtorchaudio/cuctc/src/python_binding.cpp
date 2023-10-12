@@ -70,13 +70,7 @@ ctc_prefix_decoder_batch_wrapper(
   std::vector<int> len_data(batch_size * beam);
   std::vector<float> score(batch_size * beam);
   cu_ctc::ctc_beam_search_decoder_batch_gpu(
-      inter_data,
-      (float*)pp,
-      blid,
-      spid,
-      list_data.data(),
-      len_data.data(),
-      score.data());
+      inter_data, blid, spid, list_data.data(), len_data.data(), score.data());
   SCORE_TYPE score_hyps{};
   score_hyps.reserve(batch_size);
   for (int b = 0; b < batch_size; b++) {

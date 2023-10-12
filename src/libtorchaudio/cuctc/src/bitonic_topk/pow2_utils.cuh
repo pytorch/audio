@@ -24,7 +24,7 @@ constexpr __device__ IntType log2(IntType num, IntType ret = IntType(0)) {
  */
 template <auto Value_>
 struct Pow2 {
-  typedef decltype(Value_) Type;
+  using Type = decltype(Value_);
   static constexpr Type Value = Value_;
   static constexpr Type Log2 = log2(Value);
   static constexpr Type Mask = Value - 1;
