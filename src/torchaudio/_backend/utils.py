@@ -4,7 +4,7 @@ from typing import BinaryIO, Dict, Optional, Tuple, Type, Union
 
 import torch
 
-from torchaudio._extension import _FFMPEG_EXT, _SOX_INITIALIZED
+from torchaudio._extension import _SOX_INITIALIZED, lazy_import_ffmpeg_ext
 
 from . import soundfile_backend
 
@@ -18,7 +18,7 @@ from .sox import SoXBackend
 @lru_cache(None)
 def get_available_backends() -> Dict[str, Type[Backend]]:
     backend_specs: Dict[str, Type[Backend]] = {}
-    if _FFMPEG_EXT is not None:
+    if lazy_import_ffmpeg_ext().is_available():
         backend_specs["ffmpeg"] = FFmpegBackend
     if _SOX_INITIALIZED:
         backend_specs["sox"] = SoXBackend

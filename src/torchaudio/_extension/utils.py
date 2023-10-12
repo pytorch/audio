@@ -5,17 +5,14 @@ They should not depend on external state.
 Anything that depends on external state should happen in __init__.py
 """
 
-
 import importlib
 import logging
 import os
-import platform
-import warnings
+import types
 from functools import wraps
 from pathlib import Path
 
 import torch
-import torchaudio
 
 _LG = logging.getLogger(__name__)
 _LIB_DIR = Path(__file__).parent.parent / "lib"
@@ -62,7 +59,6 @@ def _load_lib(lib: str) -> bool:
     if not path.exists():
         return False
     torch.ops.load_library(path)
-    torch.classes.load_library(path)
     return True
 
 
@@ -78,92 +74,96 @@ def _init_sox():
     atexit.register(torch.ops.torchaudio.sox_effects_shutdown_sox_effects)
 
 
-def _try_access_avutil(ffmpeg_ver):
-    libname_template = {
-        "Linux": "libavutil.so.{ver}",
-        "Darwin": "libavutil.{ver}.dylib",
-        "Windows": "avutil-{ver}.dll",
-    }[platform.system()]
-    avutil_ver = {"6": 58, "5": 57, "4": 56}[ffmpeg_ver]
-    libavutil = libname_template.format(ver=avutil_ver)
-    torchaudio.lib._torchaudio.find_avutil(libavutil)
-
-
-def _find_versionsed_ffmpeg_extension(ffmpeg_ver: str):
-    _LG.debug("Attempting to load FFmpeg version %s.", ffmpeg_ver)
-
-    library = f"libtorchaudio_ffmpeg{ffmpeg_ver}"
-    extension = f"_torchaudio_ffmpeg{ffmpeg_ver}"
-
-    if not _get_lib_path(extension).exists():
-        raise RuntimeError(f"FFmpeg {ffmpeg_ver} extension is not available.")
-
-    if ffmpeg_ver:
-        # A simple check for FFmpeg availability.
-        # This is not technically sufficient as other libraries could be missing,
-        # but usually this is sufficient.
-        #
-        # Note: the reason why this check is performed is because I don't know
-        # if the next `_load_lib` (which calls `ctypes.CDLL` under the hood),
-        # could leak handle to shared libraries of dependencies, in case it fails.
-        #
-        # i.e. If the `ctypes.CDLL("foo")` fails because one of `foo`'s dependency
-        # does not exist while `foo` and some other dependencies exist, is it guaranteed
-        # that none-of them are kept in memory after the failure??
-        _try_access_avutil(ffmpeg_ver)
-
-    _load_lib(library)
-
-    _LG.debug("Found FFmpeg version %s.", ffmpeg_ver)
-    return importlib.import_module(f"torchaudio.lib.{extension}")
-
-
 _FFMPEG_VERS = ["6", "5", "4", ""]
 
 
-def _find_ffmpeg_extension(ffmpeg_vers, show_error):
-    logger = _LG.error if show_error else _LG.debug
+def _find_versionsed_ffmpeg_extension(version: str):
+    _LG.debug("Attempting to load FFmpeg%s", version)
+
+    ext = f"torchaudio.lib._torchaudio_ffmpeg{version}"
+    lib = f"libtorchaudio_ffmpeg{version}"
+
+    if not importlib.util.find_spec(ext):
+        raise RuntimeError(f"FFmpeg{version} extension is not available.")
+
+    _load_lib(lib)
+    return importlib.import_module(ext)
+
+
+def _find_ffmpeg_extension(ffmpeg_vers):
     for ffmpeg_ver in ffmpeg_vers:
         try:
             return _find_versionsed_ffmpeg_extension(ffmpeg_ver)
         except Exception:
-            logger("Failed to load FFmpeg %s extension.", ffmpeg_ver, exc_info=True)
+            _LG.debug("Failed to load FFmpeg%s extension.", ffmpeg_ver, exc_info=True)
             continue
-    raise ImportError(f"Failed to intialize FFmpeg extension. Tried versions: {ffmpeg_vers}")
+    raise ImportError(
+        f"Failed to intialize FFmpeg extension. Tried versions: {ffmpeg_vers}. "
+        "Enable DEBUG logging to see more details about the error."
+    )
 
 
-def _find_available_ffmpeg_ext():
-    ffmpeg_vers = ["6", "5", "4", ""]
-    return [v for v in ffmpeg_vers if _get_lib_path(f"_torchaudio_ffmpeg{v}").exists()]
-
-
-def _init_ffmpeg(show_error=False):
-    ffmpeg_vers = _find_available_ffmpeg_ext()
-    if not ffmpeg_vers:
-        raise RuntimeError(
-            # fmt: off
-            "TorchAudio is not built with FFmpeg integration. "
-            "Please build torchaudio with USE_FFMPEG=1."
-            # fmt: on
-        )
-
+def _get_ffmpeg_versions():
+    ffmpeg_vers = _FFMPEG_VERS
     # User override
-    if ffmpeg_ver := os.environ.get("TORCHAUDIO_USE_FFMPEG_VERSION"):
-        if ffmpeg_vers == [""]:
-            warnings.warn("TorchAudio is built in single FFmpeg mode. TORCHAUDIO_USE_FFMPEG_VERSION is ignored.")
-        else:
-            if ffmpeg_ver not in ffmpeg_vers:
-                raise ValueError(
-                    f"The FFmpeg version {ffmpeg_ver} (read from TORCHAUDIO_USE_FFMPEG_VERSION) "
-                    f"is not available. Available versions are {[v for v in ffmpeg_vers if v]}"
-                )
-            ffmpeg_vers = [ffmpeg_ver]
+    if (ffmpeg_ver := os.environ.get("TORCHAUDIO_USE_FFMPEG_VERSION")) is not None:
+        if ffmpeg_ver not in ffmpeg_vers:
+            raise ValueError(
+                f"The FFmpeg version '{ffmpeg_ver}' (read from TORCHAUDIO_USE_FFMPEG_VERSION) "
+                f"is not one of supported values. Possible values are {ffmpeg_vers}"
+            )
+        ffmpeg_vers = [ffmpeg_ver]
+    return ffmpeg_vers
 
-    ext = _find_ffmpeg_extension(ffmpeg_vers, show_error)
+
+def _init_ffmpeg():
+    ffmpeg_vers = _get_ffmpeg_versions()
+    ext = _find_ffmpeg_extension(ffmpeg_vers)
     ext.init()
     if ext.get_log_level() > 8:
         ext.set_log_level(8)
     return ext
+
+
+class _LazyImporter(types.ModuleType):
+    """Lazily import module/extension."""
+
+    def __init__(self, name, import_func):
+        super().__init__(name)
+        self.import_func = import_func
+        self.module = None
+
+    # Note:
+    # Python caches what was retrieved with `__getattr__`, so this method will not be
+    # called again for the same item.
+    def __getattr__(self, item):
+        self._import_once()
+        return getattr(self.module, item)
+
+    def __repr__(self):
+        if self.module is None:
+            return f"<module '{self.__module__}.{self.__class__.__name__}(\"{self.name}\")'>"
+        return repr(self.module)
+
+    def __dir__(self):
+        self._import_once()
+        return dir(self.module)
+
+    def _import_once(self):
+        if self.module is None:
+            self.module = self.import_func()
+            # Note:
+            # By attaching the module attributes to self,
+            # module attributes are directly accessible.
+            # This allows to avoid calling __getattr__ for every attribute access.
+            self.__dict__.update(self.module.__dict__)
+
+    def is_available(self):
+        try:
+            self._import_once()
+        except Exception:
+            return False
+        return True
 
 
 def _init_dll_path():
@@ -182,6 +182,8 @@ def _init_dll_path():
 
 
 def _check_cuda_version():
+    import torchaudio.lib._torchaudio
+
     version = torchaudio.lib._torchaudio.cuda_version()
     if version is not None and torch.version.cuda is not None:
         version_str = str(version)
@@ -208,25 +210,6 @@ def _fail_since_no_sox(func):
         except Exception as err:
             raise RuntimeError(
                 f"{func.__name__} requires sox extension which is not available. "
-                "Please refer to the stacktrace above for how to resolve this."
-            ) from err
-        # This should not happen in normal execution, but just in case.
-        return func(*_args, **_kwargs)
-
-    return wrapped
-
-
-def _fail_since_no_ffmpeg(func):
-    @wraps(func)
-    def wrapped(*_args, **_kwargs):
-        try:
-            # Note:
-            # We run _init_ffmpeg again just to show users the stacktrace.
-            # _init_ffmpeg would not succeed here.
-            _init_ffmpeg(show_error=True)
-        except Exception as err:
-            raise RuntimeError(
-                f"{func.__name__} requires FFmpeg extension which is not available. "
                 "Please refer to the stacktrace above for how to resolve this."
             ) from err
         # This should not happen in normal execution, but just in case.

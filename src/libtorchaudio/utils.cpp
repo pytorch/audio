@@ -31,10 +31,4 @@ c10::optional<int64_t> cuda_version() {
 #endif
 }
 
-int find_avutil(const char* name) {
-  auto lib = at::DynamicLibrary{name};
-  auto avutil_version = (unsigned (*)())(lib.sym("avutil_version"));
-  return static_cast<int>(avutil_version() >> 16);
-}
-
 } // namespace torchaudio

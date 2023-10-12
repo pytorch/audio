@@ -4,11 +4,15 @@ import sys
 
 from torchaudio._internal.module_utils import eval_env, fail_with_message, is_module_available, no_op
 
-try:
-    from .fb import _init_ffmpeg
-except ImportError:
-    from .utils import _init_ffmpeg
-from .utils import _check_cuda_version, _fail_since_no_ffmpeg, _fail_since_no_sox, _init_dll_path, _init_sox, _load_lib
+from .utils import (
+    _check_cuda_version,
+    _fail_since_no_sox,
+    _init_dll_path,
+    _init_ffmpeg,
+    _init_sox,
+    _LazyImporter,
+    _load_lib,
+)
 
 _LG = logging.getLogger(__name__)
 
@@ -19,12 +23,11 @@ _LG = logging.getLogger(__name__)
 # https://github.com/pytorch/builder/blob/e2e4542b8eb0bdf491214451a1a4128bd606cce2/test/smoke_test/smoke_test.py#L80
 __all__ = [
     "fail_if_no_sox",
-    "fail_if_no_ffmpeg",
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_RIR_AVAILABLE",
     "_SOX_INITIALIZED",
-    "_FFMPEG_EXT",
+    "lazy_import_ffmpeg_ext",
 ]
 
 
@@ -81,25 +84,16 @@ else:
     fail_if_no_sox = no_op if _SOX_INITIALIZED else _fail_since_no_sox
 
 
-# Initialize FFmpeg-related features
 _FFMPEG_EXT = None
-_USE_FFMPEG = eval_env("TORCHAUDIO_USE_FFMPEG", True)
-if _USE_FFMPEG and _IS_TORCHAUDIO_EXT_AVAILABLE:
-    try:
-        _FFMPEG_EXT = _init_ffmpeg()
-    except Exception:
-        # The initialization of FFmpeg extension will fail if supported FFmpeg
-        # libraries are not found in the system.
-        # Since the rest of the torchaudio works without it, we do not report the
-        # error here.
-        # The error will be raised when user code attempts to use these features.
-        _LG.debug("Failed to initialize ffmpeg bindings", exc_info=True)
 
 
-if _USE_FFMPEG:
-    fail_if_no_ffmpeg = _fail_since_no_ffmpeg if _FFMPEG_EXT is None else no_op
-else:
-    fail_if_no_ffmpeg = fail_with_message("requires ffmpeg extension, but it is disabled. (TORCHAUDIO_USE_FFMPEG=0)")
+def lazy_import_ffmpeg_ext():
+    """Load FFmpeg integration based on availability in lazy manner"""
+
+    global _FFMPEG_EXT
+    if _FFMPEG_EXT is None:
+        _FFMPEG_EXT = _LazyImporter("_torchaudio_ffmpeg", _init_ffmpeg)
+    return _FFMPEG_EXT
 
 
 fail_if_no_rir = (

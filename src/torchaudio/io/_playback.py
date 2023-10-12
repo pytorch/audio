@@ -15,7 +15,6 @@ dict_format = {
 }
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 def play_audio(
     waveform: torch.Tensor,
     sample_rate: Optional[float],
@@ -57,7 +56,9 @@ def play_audio(
     time, num_channels = waveform.size()
     if num_channels > 2:
         warnings.warn(
-            f"Expected up to 2 channels, got {num_channels} channels instead. Only the first 2 channels will be played."
+            f"Expected up to 2 channels, got {num_channels} channels instead. "
+            "Only the first 2 channels will be played.",
+            stacklevel=2,
         )
 
     # Write to speaker device

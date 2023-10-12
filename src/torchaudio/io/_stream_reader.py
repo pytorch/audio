@@ -9,11 +9,7 @@ import torch
 import torchaudio
 from torch.utils._pytree import tree_map
 
-if torchaudio._extension._FFMPEG_EXT is not None:
-    _StreamReader = torchaudio._extension._FFMPEG_EXT.StreamReader
-    _StreamReaderBytes = torchaudio._extension._FFMPEG_EXT.StreamReaderBytes
-    _StreamReaderFileObj = torchaudio._extension._FFMPEG_EXT.StreamReaderFileObj
-
+ffmpeg_ext = torchaudio._extension.lazy_import_ffmpeg_ext()
 
 __all__ = [
     "StreamReader",
@@ -442,7 +438,6 @@ InputStreamTypes = TypeVar("InputStream", bound=SourceStream)
 OutputStreamTypes = TypeVar("OutputStream", bound=OutputStream)
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 class StreamReader:
     """Fetch and decode audio/video streams chunk by chunk.
 
@@ -524,11 +519,11 @@ class StreamReader:
     ):
         self.src = src
         if isinstance(src, bytes):
-            self._be = _StreamReaderBytes(src, format, option, buffer_size)
+            self._be = ffmpeg_ext.StreamReaderBytes(src, format, option, buffer_size)
         elif hasattr(src, "read"):
-            self._be = _StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = ffmpeg_ext.StreamReaderFileObj(src, format, option, buffer_size)
         else:
-            self._be = _StreamReader(os.path.normpath(src), format, option)
+            self._be = ffmpeg_ext.StreamReader(os.path.normpath(src), format, option)
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i

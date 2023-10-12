@@ -111,10 +111,7 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
-def is_ffmpeg_available():
-    return torchaudio._extension._FFMPEG_EXT is not None
-
-
+_IS_FFMPEG_AVAILABLE = torchaudio._extension.lazy_import_ffmpeg_ext().is_available()
 _IS_CTC_DECODER_AVAILABLE = None
 _IS_CUDA_CTC_DECODER_AVAILABLE = None
 
@@ -260,7 +257,7 @@ skipIfNoQengine = _skipIf(
     key="NO_QUANTIZATION",
 )
 skipIfNoFFmpeg = _skipIf(
-    not is_ffmpeg_available(),
+    not _IS_FFMPEG_AVAILABLE,
     reason="ffmpeg features are not available.",
     key="NO_FFMPEG",
 )
@@ -273,7 +270,7 @@ skipIfPy310 = _skipIf(
     key="ON_PYTHON_310",
 )
 skipIfNoAudioDevice = _skipIf(
-    not torchaudio.utils.ffmpeg_utils.get_output_devices(),
+    not (_IS_FFMPEG_AVAILABLE and torchaudio.utils.ffmpeg_utils.get_output_devices()),
     reason="No output audio device is available.",
     key="NO_AUDIO_OUT_DEVICE",
 )
@@ -291,7 +288,7 @@ disabledInCI = _skipIf(
 
 def skipIfNoHWAccel(name):
     key = "NO_HW_ACCEL"
-    if not is_ffmpeg_available():
+    if not _IS_FFMPEG_AVAILABLE:
         return _skipIf(True, reason="ffmpeg features are not available.", key=key)
     if not torch.cuda.is_available():
         return _skipIf(True, reason="CUDA is not available.", key=key)

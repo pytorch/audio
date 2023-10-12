@@ -5,17 +5,11 @@ from typing import BinaryIO, Dict, Optional, Union
 import torch
 import torchaudio
 
-
-if torchaudio._extension._FFMPEG_EXT is None:
-    ConfigBase = object
-else:
-    ConfigBase = torchaudio._extension._FFMPEG_EXT.CodecConfig
-    _StreamWriter = torchaudio._extension._FFMPEG_EXT.StreamWriter
-    _StreamWriterFileObj = torchaudio._extension._FFMPEG_EXT.StreamWriterFileObj
+ffmpeg_ext = torchaudio._extension.lazy_import_ffmpeg_ext()
 
 
 @dataclass
-class CodecConfig(ConfigBase):
+class CodecConfig:
     """Codec configuration."""
 
     bit_rate: int = -1
@@ -37,8 +31,19 @@ class CodecConfig(ConfigBase):
     max_b_frames: int = -1
     """maximum number of B-frames between non-B-frames."""
 
-    def __post_init__(self):
-        super().__init__(self.bit_rate, self.compression_level, self.qscale, self.gop_size, self.max_b_frames)
+
+def _convert_config(cfg: CodecConfig):
+    if cfg is None:
+        return None
+    # Convert the codecconfig to C++ compatible type.
+    # omitting the return type annotation so as not to access ffmpeg_ext here.
+    return ffmpeg_ext.CodecConfig(
+        cfg.bit_rate,
+        cfg.compression_level,
+        cfg.qscale,
+        cfg.gop_size,
+        cfg.max_b_frames,
+    )
 
 
 def _format_doc(**kwargs):
@@ -128,7 +133,6 @@ _format_common_args = _format_doc(
 )
 
 
-@torchaudio._extension.fail_if_no_ffmpeg
 class StreamWriter:
     """Encode and write audio/video streams chunk by chunk
 
@@ -190,9 +194,9 @@ class StreamWriter:
         buffer_size: int = 4096,
     ):
         if hasattr(dst, "write"):
-            self._s = _StreamWriterFileObj(dst, format, buffer_size)
+            self._s = ffmpeg_ext.StreamWriterFileObj(dst, format, buffer_size)
         else:
-            self._s = _StreamWriter(str(dst), format)
+            self._s = ffmpeg_ext.StreamWriter(str(dst), format)
         self._is_open = False
 
     @_format_common_args
@@ -280,7 +284,7 @@ class StreamWriter:
             encoder_format,
             encoder_sample_rate,
             encoder_num_channels,
-            codec_config,
+            _convert_config(codec_config),
             filter_desc,
         )
 
@@ -376,7 +380,7 @@ class StreamWriter:
             encoder_width,
             encoder_height,
             hw_accel,
-            codec_config,
+            _convert_config(codec_config),
             filter_desc,
         )
 
