@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO, Dict, Iterator, Optional, Tuple, TypeVar, Union
@@ -527,7 +528,7 @@ class StreamReader:
         elif hasattr(src, "read"):
             self._be = _StreamReaderFileObj(src, format, option, buffer_size)
         else:
-            self._be = _StreamReader(str(src), format, option)
+            self._be = _StreamReader(os.path.normpath(src), format, option)
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i
