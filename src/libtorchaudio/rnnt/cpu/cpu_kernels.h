@@ -165,7 +165,6 @@ status_t ComputeLogProbs(
 
 template <typename DTYPE>
 DTYPE ComputeAlphaOneSequence(
-    const Options& options,
     TensorView<const LogProbs<DTYPE>>& logProbs,
     int srcLen,
     int tgtLen,
@@ -198,7 +197,6 @@ DTYPE ComputeAlphaOneSequence(
 
 template <typename DTYPE>
 DTYPE ComputeBetaOneSequence(
-    const Options& options,
     TensorView<const LogProbs<DTYPE>>& logProbs,
     int srcLen,
     int tgtLen,
@@ -240,14 +238,12 @@ DTYPE ComputeAlphaOrBetaOneSequence(
     TensorView<DTYPE>& beta) {
   if (thread & 1) {
     return ComputeAlphaOneSequence<DTYPE>(
-        /*options=*/options,
         /*logProbs=*/logProbs,
         /*srcLen=*/srcLen,
         /*tgtLen=*/tgtLen,
         /*alpha=*/alpha);
   } else {
     return ComputeBetaOneSequence<DTYPE>(
-        /*options=*/options,
         /*logProbs=*/logProbs,
         /*srcLen=*/srcLen,
         /*tgtLen=*/tgtLen,
@@ -488,7 +484,6 @@ void ComputeAlphas(
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) { // use max 2 * B threads.
     ComputeAlphaOneSequence<DTYPE>(
-        options,
         /*logProbs=*/seqlogProbs[i],
         /*srcLen=*/srcLengths[i],
         /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
@@ -524,7 +519,6 @@ void ComputeBetas(
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) {
     ComputeBetaOneSequence<DTYPE>(
-        options,
         /*logProbs=*/seqlogProbs[i],
         /*srcLen=*/srcLengths[i],
         /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.

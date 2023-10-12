@@ -31,8 +31,7 @@ std::vector<std::string> list_write_formats();
 // Utilities for sox_io / sox_effects implementations
 ////////////////////////////////////////////////////////////////////////////////
 
-const std::unordered_set<std::string> UNSUPPORTED_EFFECTS =
-    {"input", "output", "spectrogram", "noiseprof", "noisered", "splice"};
+extern const std::unordered_set<std::string> UNSUPPORTED_EFFECTS;
 
 /// helper class to automatically close sox_format_t*
 struct SoxFormat {

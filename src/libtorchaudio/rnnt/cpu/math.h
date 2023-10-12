@@ -10,18 +10,20 @@ namespace math {
 
 template <typename DTYPE>
 FORCE_INLINE HOST_AND_DEVICE DTYPE max(DTYPE x, DTYPE y) {
-  if (x > y)
+  if (x > y) {
     return x;
-  else
+  } else {
     return y;
+  }
 }
 
 template <typename DTYPE>
 FORCE_INLINE HOST_AND_DEVICE DTYPE min(DTYPE x, DTYPE y) {
-  if (x > y)
+  if (x > y) {
     return y;
-  else
+  } else {
     return x;
+  }
 }
 
 // log_sum_exp

@@ -12,7 +12,7 @@ namespace torchaudio::sox {
 struct SoxEffect {
   explicit SoxEffect(sox_effect_t* se) noexcept;
   SoxEffect(const SoxEffect& other) = delete;
-  SoxEffect(const SoxEffect&& other) = delete;
+  SoxEffect(SoxEffect&& other) = delete;
   auto operator=(const SoxEffect& other) -> SoxEffect& = delete;
   auto operator=(SoxEffect&& other) -> SoxEffect& = delete;
   ~SoxEffect();
@@ -39,7 +39,7 @@ class SoxEffectsChain {
       sox_encodinginfo_t input_encoding,
       sox_encodinginfo_t output_encoding);
   SoxEffectsChain(const SoxEffectsChain& other) = delete;
-  SoxEffectsChain(const SoxEffectsChain&& other) = delete;
+  SoxEffectsChain(SoxEffectsChain&& other) = delete;
   SoxEffectsChain& operator=(const SoxEffectsChain& other) = delete;
   SoxEffectsChain& operator=(SoxEffectsChain&& other) = delete;
   ~SoxEffectsChain();
@@ -51,7 +51,7 @@ class SoxEffectsChain {
   void addInputFile(sox_format_t* sf);
   void addOutputBuffer(std::vector<sox_sample_t>* output_buffer);
   void addOutputFile(sox_format_t* sf);
-  void addEffect(const std::vector<std::string> effect);
+  void addEffect(const std::vector<std::string>& effect);
   int64_t getOutputNumChannels();
   int64_t getOutputSampleRate();
 };

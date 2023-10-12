@@ -5,6 +5,14 @@
 
 namespace torchaudio::sox {
 
+const std::unordered_set<std::string> UNSUPPORTED_EFFECTS{
+    "input",
+    "output",
+    "spectrogram",
+    "noiseprof",
+    "noisered",
+    "splice"};
+
 void set_seed(const int64_t seed) {
   sox_get_globals()->ranqd1 = static_cast<sox_int32_t>(seed);
 }
@@ -46,8 +54,9 @@ std::vector<std::string> list_write_formats() {
   for (const sox_format_tab_t* fns = sox_get_format_fns(); fns->fn; ++fns) {
     const sox_format_handler_t* handler = fns->fn();
     for (const char* const* names = handler->names; *names; ++names) {
-      if (!strchr(*names, '/') && handler->write)
+      if (!strchr(*names, '/') && handler->write) {
         formats.emplace_back(*names);
+      }
     }
   }
   return formats;
@@ -58,8 +67,9 @@ std::vector<std::string> list_read_formats() {
   for (const sox_format_tab_t* fns = sox_get_format_fns(); fns->fn; ++fns) {
     const sox_format_handler_t* handler = fns->fn();
     for (const char* const* names = handler->names; *names; ++names) {
-      if (!strchr(*names, '/') && handler->read)
+      if (!strchr(*names, '/') && handler->read) {
         formats.emplace_back(*names);
+      }
     }
   }
   return formats;
@@ -193,7 +203,7 @@ const std::string get_filetype(const std::string& path) {
 namespace {
 
 std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
-    const std::string format,
+    const std::string& format,
     caffe2::TypeMeta dtype,
     const Encoding& encoding,
     const BitDepth& bits_per_sample) {
@@ -386,12 +396,15 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
 }
 
 unsigned get_precision(const std::string& filetype, caffe2::TypeMeta dtype) {
-  if (filetype == "mp3")
+  if (filetype == "mp3") {
     return SOX_UNSPEC;
-  if (filetype == "flac")
+  }
+  if (filetype == "flac") {
     return 24;
-  if (filetype == "ogg" || filetype == "vorbis")
+  }
+  if (filetype == "ogg" || filetype == "vorbis") {
     return SOX_UNSPEC;
+  }
   if (filetype == "wav" || filetype == "amb") {
     switch (dtype.toScalarType()) {
       case c10::ScalarType::Byte:
@@ -406,8 +419,9 @@ unsigned get_precision(const std::string& filetype, caffe2::TypeMeta dtype) {
         TORCH_CHECK(false, "Unsupported dtype: ", dtype);
     }
   }
-  if (filetype == "sph")
+  if (filetype == "sph") {
     return 32;
+  }
   if (filetype == "amr-nb") {
     return 16;
   }
@@ -432,7 +446,8 @@ sox_signalinfo_t get_signalinfo(
       /*channels=*/
       static_cast<unsigned>(waveform->size(channels_first ? 0 : 1)),
       /*precision=*/get_precision(filetype, waveform->dtype()),
-      /*length=*/static_cast<uint64_t>(waveform->numel())};
+      /*length=*/static_cast<uint64_t>(waveform->numel()),
+      nullptr};
 }
 
 sox_encodinginfo_t get_tensor_encodinginfo(caffe2::TypeMeta dtype) {

@@ -3,7 +3,7 @@
 namespace torchaudio {
 namespace rnnt {
 
-typedef enum {
+enum status_t {
   SUCCESS = 0,
   FAILURE = 1,
   COMPUTE_DENOMINATOR_REDUCE_MAX_FAILED = 2,
@@ -11,13 +11,9 @@ typedef enum {
   COMPUTE_LOG_PROBS_FAILED = 4,
   COMPUTE_ALPHAS_BETAS_COSTS_FAILED = 5,
   COMPUTE_GRADIENTS_FAILED = 6
-} status_t;
+};
 
-typedef enum { UNDEFINED = 0, CPU = 1, GPU = 2 } device_t;
-
-const char* toString(status_t status);
-
-const char* toString(device_t device);
+enum device_t { UNDEFINED = 0, CPU = 1, GPU = 2 };
 
 } // namespace rnnt
 } // namespace torchaudio

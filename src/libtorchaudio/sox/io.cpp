@@ -78,8 +78,9 @@ void save_audio_file(
   validate_input_tensor(tensor);
 
   const auto filetype = [&]() {
-    if (format.has_value())
+    if (format.has_value()) {
       return format.value();
+    }
     return get_filetype(path);
   }();
 

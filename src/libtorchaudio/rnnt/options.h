@@ -1,18 +1,16 @@
 #pragma once
 
-//#include <iostream>
-
 #ifdef USE_CUDA
 #include <cuda_runtime.h>
 #endif // USE_CUDA
 
-#include <libtorchaudio/rnnt/macros.h>
 #include <libtorchaudio/rnnt/types.h>
+#include <ostream>
 
 namespace torchaudio {
 namespace rnnt {
 
-typedef struct Options {
+struct Options {
   // the device to compute transducer loss.
   device_t device_;
 #ifdef USE_CUDA
@@ -78,7 +76,7 @@ typedef struct Options {
 
     return os;
   }
-} Options;
+};
 
 } // namespace rnnt
 } // namespace torchaudio
