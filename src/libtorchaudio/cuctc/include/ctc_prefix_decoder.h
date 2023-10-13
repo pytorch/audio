@@ -52,7 +52,6 @@ std::tuple<size_t, int> calculate_require_buff_and_init_internal_data(
     float threshold);
 int ctc_beam_search_decoder_batch_gpu(
     InternalData* inter_data,
-    float* pp,
     int blid,
     int spid,
     int* clist,

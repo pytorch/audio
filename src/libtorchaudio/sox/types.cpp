@@ -3,26 +3,36 @@
 namespace torchaudio::sox {
 
 Format get_format_from_string(const std::string& format) {
-  if (format == "wav")
+  if (format == "wav") {
     return Format::WAV;
-  if (format == "mp3")
+  }
+  if (format == "mp3") {
     return Format::MP3;
-  if (format == "flac")
+  }
+  if (format == "flac") {
     return Format::FLAC;
-  if (format == "ogg" || format == "vorbis")
+  }
+  if (format == "ogg" || format == "vorbis") {
     return Format::VORBIS;
-  if (format == "amr-nb")
+  }
+  if (format == "amr-nb") {
     return Format::AMR_NB;
-  if (format == "amr-wb")
+  }
+  if (format == "amr-wb") {
     return Format::AMR_WB;
-  if (format == "amb")
+  }
+  if (format == "amb") {
     return Format::AMB;
-  if (format == "sph")
+  }
+  if (format == "sph") {
     return Format::SPHERE;
-  if (format == "htk")
+  }
+  if (format == "htk") {
     return Format::HTK;
-  if (format == "gsm")
+  }
+  if (format == "gsm") {
     return Format::GSM;
+  }
   TORCH_CHECK(false, "Internal Error: unexpected format value: ", format);
 }
 

@@ -15,7 +15,6 @@ set(
   stream_writer/packet_writer.cpp
   stream_writer/stream_writer.cpp
   stream_writer/tensor_converter.cpp
-  compat.cpp
   )
 
 set(

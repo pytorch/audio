@@ -129,14 +129,14 @@ int file_output_flow(
 sox_effect_handler_t* get_tensor_input_handler() {
   static sox_effect_handler_t handler{
       /*name=*/"input_tensor",
-      /*usage=*/NULL,
+      /*usage=*/nullptr,
       /*flags=*/SOX_EFF_MCHAN,
-      /*getopts=*/NULL,
-      /*start=*/NULL,
-      /*flow=*/NULL,
+      /*getopts=*/nullptr,
+      /*start=*/nullptr,
+      /*flow=*/nullptr,
       /*drain=*/tensor_input_drain,
-      /*stop=*/NULL,
-      /*kill=*/NULL,
+      /*stop=*/nullptr,
+      /*kill=*/nullptr,
       /*priv_size=*/sizeof(TensorInputPriv)};
   return &handler;
 }
@@ -144,14 +144,14 @@ sox_effect_handler_t* get_tensor_input_handler() {
 sox_effect_handler_t* get_tensor_output_handler() {
   static sox_effect_handler_t handler{
       /*name=*/"output_tensor",
-      /*usage=*/NULL,
+      /*usage=*/nullptr,
       /*flags=*/SOX_EFF_MCHAN,
-      /*getopts=*/NULL,
-      /*start=*/NULL,
+      /*getopts=*/nullptr,
+      /*start=*/nullptr,
       /*flow=*/tensor_output_flow,
-      /*drain=*/NULL,
-      /*stop=*/NULL,
-      /*kill=*/NULL,
+      /*drain=*/nullptr,
+      /*stop=*/nullptr,
+      /*kill=*/nullptr,
       /*priv_size=*/sizeof(TensorOutputPriv)};
   return &handler;
 }
@@ -159,14 +159,14 @@ sox_effect_handler_t* get_tensor_output_handler() {
 sox_effect_handler_t* get_file_output_handler() {
   static sox_effect_handler_t handler{
       /*name=*/"output_file",
-      /*usage=*/NULL,
+      /*usage=*/nullptr,
       /*flags=*/SOX_EFF_MCHAN,
-      /*getopts=*/NULL,
-      /*start=*/NULL,
+      /*getopts=*/nullptr,
+      /*start=*/nullptr,
       /*flow=*/file_output_flow,
-      /*drain=*/NULL,
-      /*stop=*/NULL,
-      /*kill=*/NULL,
+      /*drain=*/nullptr,
+      /*stop=*/nullptr,
+      /*kill=*/nullptr,
       /*priv_size=*/sizeof(FileOutputPriv)};
   return &handler;
 }
@@ -208,7 +208,7 @@ SoxEffectsChain::~SoxEffectsChain() {
 }
 
 void SoxEffectsChain::run() {
-  sox_flow_effects(sec_, NULL, NULL);
+  sox_flow_effects(sec_, nullptr, nullptr);
 }
 
 void SoxEffectsChain::addInputTensor(
@@ -259,7 +259,7 @@ void SoxEffectsChain::addOutputFile(sox_format_t* sf) {
       sf->filename);
 }
 
-void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
+void SoxEffectsChain::addEffect(const std::vector<std::string>& effect) {
   const auto num_args = effect.size();
   TORCH_CHECK(num_args != 0, "Invalid argument: empty effect.");
   const auto name = effect[0];

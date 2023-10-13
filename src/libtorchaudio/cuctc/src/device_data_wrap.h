@@ -35,9 +35,9 @@ constexpr int MAX_BLOCKS = 800;
 template <typename T>
 class DeviceDataWrap {
  public:
-  DeviceDataWrap() : data_{}, size_in_bytes_{} {};
+  DeviceDataWrap() : data_{}, size_in_bytes_{} {}
   DeviceDataWrap(T* data_ptr, size_t size_in_byte)
-      : data_{data_ptr}, size_in_bytes_{size_in_byte} {};
+      : data_{data_ptr}, size_in_bytes_{size_in_byte} {}
   void print(size_t offset, size_t size_in_element, int eles_per_row = 10)
       const {
     if ((offset + size_in_element) * sizeof(T) > size_in_bytes_) {

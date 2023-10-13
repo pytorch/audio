@@ -72,8 +72,9 @@ std::tuple<size_t, int> calculate_require_buff_and_init_internal_data(
     const std::vector<int>& prob_strides,
     int blid,
     float threshold) {
-  if ((batch_size * beam * seq_len * vocab_size) <= 0)
+  if ((batch_size * beam * seq_len * vocab_size) <= 0) {
     return {0, 0};
+  }
 
   CHECK(prob_sizes.size() == 3, "only support 3D log_prob.");
   CHECK(prob_strides.size() == 3, "only support 3D log_prob. ");
@@ -123,8 +124,9 @@ std::tuple<size_t, int> calculate_require_buff_and_init_internal_data(
   require_size += select_seq_lens_align_size;
 
   require_size += ALIGN_BYTES;
-  if (require_size > buff_size)
+  if (require_size > buff_size) {
     return {require_size, 0};
+  }
 
   char* buff_align_ptr = reinterpret_cast<char*>(align_size(buff_ptr));
 
@@ -291,7 +293,6 @@ void prefixCTC_free(std::uintptr_t inter_data_ptr) {
 
 int ctc_beam_search_decoder_batch_gpu(
     InternalData* inter_data,
-    float* pp,
     int blid,
     int spid,
     int* clist,

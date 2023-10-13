@@ -1,3 +1,4 @@
+#pragma once
 #include <torch/types.h>
 
 #define EPS ((scalar_t)(1e-5))
@@ -77,9 +78,9 @@ scalar_t cosine(const Wall<scalar_t>& wall, const torch::Tensor& dir) {
 /// 3D room
 template <typename T>
 const std::array<Wall<T>, 6> make_room(
-    const T w,
-    const T l,
-    const T h,
+    const T& w,
+    const T& l,
+    const T& h,
     const torch::Tensor& abs,
     const torch::Tensor& scat) {
   using namespace torch::indexing;
