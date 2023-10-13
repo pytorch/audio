@@ -293,6 +293,8 @@ class TestLoad(LoadTestBase):
 class TestLoadParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of frame parameters of `sox_io_backend.load`"""
 
+    _load = partial(get_load_func(), backend="sox")
+
     def _test(self, func, frame_offset, num_frames, channels_first, normalize):
         original = get_wav_data("int16", num_channels=2, normalize=False)
         path = self.get_temp_path("test.wav")
@@ -316,7 +318,7 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
     def test_sox(self, frame_offset, num_frames, channels_first, normalize):
         """The combination of properly changes the output tensor"""
 
-        self._test(torch.ops.torchaudio.sox_io_load_audio_file, frame_offset, num_frames, channels_first, normalize)
+        self._test(self._load, frame_offset, num_frames, channels_first, normalize)
 
 
 @skipIfNoSox

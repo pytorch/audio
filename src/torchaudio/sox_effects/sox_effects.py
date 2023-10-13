@@ -7,6 +7,9 @@ from torchaudio._internal.module_utils import deprecated
 from torchaudio.utils.sox_utils import list_effects
 
 
+sox_ext = torchaudio._extension.lazy_import_sox_ext()
+
+
 @deprecated("Please remove the call. This function is called automatically.")
 def init_sox_effects():
     """Initialize resources required to use sox effects.
@@ -36,7 +39,6 @@ def shutdown_sox_effects():
     pass
 
 
-@torchaudio._extension.fail_if_no_sox
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -50,7 +52,6 @@ def effect_names() -> List[str]:
     return list(list_effects().keys())
 
 
-@torchaudio._extension.fail_if_no_sox
 def apply_effects_tensor(
     tensor: torch.Tensor,
     sample_rate: int,
@@ -152,10 +153,9 @@ def apply_effects_tensor(
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
-    return torch.ops.torchaudio.sox_effects_apply_effects_tensor(tensor, sample_rate, effects, channels_first)
+    return sox_ext.apply_effects_tensor(tensor, sample_rate, effects, channels_first)
 
 
-@torchaudio._extension.fail_if_no_sox
 def apply_effects_file(
     path: str,
     effects: List[List[str]],
@@ -269,4 +269,4 @@ def apply_effects_file(
                 "Please use torchaudio.io.AudioEffector."
             )
         path = os.fspath(path)
-    return torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first, format)
+    return sox_ext.apply_effects_file(path, effects, normalize, channels_first, format)

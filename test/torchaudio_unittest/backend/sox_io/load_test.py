@@ -313,7 +313,7 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
     def test_sox(self, frame_offset, num_frames, channels_first, normalize):
         """The combination of properly changes the output tensor"""
 
-        self._test(torch.ops.torchaudio.sox_io_load_audio_file, frame_offset, num_frames, channels_first, normalize)
+        self._test(sox_io_backend.load, frame_offset, num_frames, channels_first, normalize)
 
 
 @skipIfNoSox

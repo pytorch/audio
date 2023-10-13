@@ -112,6 +112,7 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
 
 
 _IS_FFMPEG_AVAILABLE = torchaudio._extension.lazy_import_ffmpeg_ext().is_available()
+_IS_SOX_AVAILABLE = torchaudio._extension.lazy_import_sox_ext().is_available()
 _IS_CTC_DECODER_AVAILABLE = None
 _IS_CUDA_CTC_DECODER_AVAILABLE = None
 
@@ -209,7 +210,7 @@ skipIfCudaSmallMemory = _skipIf(
     key="CUDA_SMALL_MEMORY",
 )
 skipIfNoSox = _skipIf(
-    not torchaudio._extension._SOX_INITIALIZED,
+    not _IS_SOX_AVAILABLE,
     reason="Sox features are not available.",
     key="NO_SOX",
 )
@@ -217,7 +218,7 @@ skipIfNoSox = _skipIf(
 
 def skipIfNoSoxDecoder(ext):
     return _skipIf(
-        not torchaudio._extension._SOX_INITIALIZED or ext not in torchaudio.utils.sox_utils.list_read_formats(),
+        not _IS_SOX_AVAILABLE or ext not in torchaudio.utils.sox_utils.list_read_formats(),
         f'sox does not handle "{ext}" for read.',
         key="NO_SOX_DECODER",
     )
@@ -225,7 +226,7 @@ def skipIfNoSoxDecoder(ext):
 
 def skipIfNoSoxEncoder(ext):
     return _skipIf(
-        not torchaudio._extension._SOX_INITIALIZED or ext not in torchaudio.utils.sox_utils.list_write_formats(),
+        not _IS_SOX_AVAILABLE or ext not in torchaudio.utils.sox_utils.list_write_formats(),
         f'sox does not handle "{ext}" for write.',
         key="NO_SOX_ENCODER",
     )
