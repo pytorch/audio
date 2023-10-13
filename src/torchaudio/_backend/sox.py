@@ -2,9 +2,12 @@ import os
 from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
+import torchaudio
 
 from .backend import Backend
 from .common import AudioMetaData
+
+sox_ext = torchaudio._extension.lazy_import_sox_ext()
 
 
 class SoXBackend(Backend):
@@ -16,7 +19,7 @@ class SoXBackend(Backend):
                 "Please use an alternative backend that does support reading from file-like objects, e.g. FFmpeg.",
             )
         else:
-            sinfo = torch.ops.torchaudio.sox_io_get_info(uri, format)
+            sinfo = sox_ext.get_info(uri, format)
             if sinfo:
                 return AudioMetaData(*sinfo)
             else:
@@ -38,9 +41,7 @@ class SoXBackend(Backend):
                 "Please use an alternative backend that does support loading from file-like objects, e.g. FFmpeg.",
             )
         else:
-            ret = torch.ops.torchaudio.sox_io_load_audio_file(
-                uri, frame_offset, num_frames, normalize, channels_first, format
-            )
+            ret = sox_ext.load_audio_file(uri, frame_offset, num_frames, normalize, channels_first, format)
             if not ret:
                 raise RuntimeError(f"Failed to load audio from {uri}.")
             return ret
@@ -62,7 +63,7 @@ class SoXBackend(Backend):
                 "Please use an alternative backend that does support writing to file-like objects, e.g. FFmpeg.",
             )
         else:
-            torch.ops.torchaudio.sox_io_save_audio_file(
+            sox_ext.save_audio_file(
                 uri,
                 src,
                 sample_rate,

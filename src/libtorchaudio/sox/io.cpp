@@ -125,11 +125,4 @@ void save_audio_file(
   chain.addOutputFile(sf);
   chain.run();
 }
-
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("torchaudio::sox_io_get_info", &get_info_file);
-  m.def("torchaudio::sox_io_load_audio_file", &load_audio_file);
-  m.def("torchaudio::sox_io_save_audio_file", &save_audio_file);
-}
-
 } // namespace torchaudio::sox

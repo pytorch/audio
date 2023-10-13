@@ -1295,7 +1295,6 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-@torchaudio._extension.fail_if_no_sox
 @deprecated("Please migrate to :py:class:`torchaudio.io.AudioEffector`.", remove=False)
 def apply_codec(
     waveform: Tensor,
@@ -1329,11 +1328,13 @@ def apply_codec(
         Tensor: Resulting Tensor.
         If ``channels_first=True``, it has `(channel, time)` else `(time, channel)`.
     """
+    from torchaudio.backend import _sox_io_backend
+
     with tempfile.NamedTemporaryFile() as f:
-        torchaudio.backend.sox_io_backend.save(
+        torchaudio.backend._sox_io_backend.save(
             f.name, waveform, sample_rate, channels_first, compression, format, encoding, bits_per_sample
         )
-        augmented, sr = torchaudio.backend.sox_io_backend.load(f.name, channels_first=channels_first, format=format)
+        augmented, sr = _sox_io_backend.load(f.name, channels_first=channels_first, format=format)
     if sr != sample_rate:
         augmented = resample(augmented, sr, sample_rate)
     return augmented
@@ -1371,7 +1372,8 @@ def _get_sinc_resample_kernel(
         warnings.warn(
             f'"{resampling_method}" resampling method name is being deprecated and replaced by '
             f'"{method_map[resampling_method]}" in the next release. '
-            "The default behavior remains unchanged."
+            "The default behavior remains unchanged.",
+            stacklevel=3,
         )
     elif resampling_method not in ["sinc_interp_hann", "sinc_interp_kaiser"]:
         raise ValueError("Invalid resampling method: {}".format(resampling_method))

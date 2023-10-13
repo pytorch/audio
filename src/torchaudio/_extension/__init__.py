@@ -2,17 +2,9 @@ import logging
 import os
 import sys
 
-from torchaudio._internal.module_utils import eval_env, fail_with_message, is_module_available, no_op
+from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
 
-from .utils import (
-    _check_cuda_version,
-    _fail_since_no_sox,
-    _init_dll_path,
-    _init_ffmpeg,
-    _init_sox,
-    _LazyImporter,
-    _load_lib,
-)
+from .utils import _check_cuda_version, _init_dll_path, _init_ffmpeg, _init_sox, _LazyImporter, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -22,11 +14,10 @@ _LG = logging.getLogger(__name__)
 # Builder uses it for debugging purpose, so we export it.
 # https://github.com/pytorch/builder/blob/e2e4542b8eb0bdf491214451a1a4128bd606cce2/test/smoke_test/smoke_test.py#L80
 __all__ = [
-    "fail_if_no_sox",
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_RIR_AVAILABLE",
-    "_SOX_INITIALIZED",
+    "lazy_import_sox_ext",
     "lazy_import_ffmpeg_ext",
 ]
 
@@ -54,34 +45,16 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
 
 
-# Initialize libsox-related features
-_SOX_INITIALIZED = False
-_USE_SOX = False if os.name == "nt" else eval_env("TORCHAUDIO_USE_SOX", True)
-_SOX_MODULE_AVAILABLE = is_module_available("torchaudio.lib._torchaudio_sox")
-if _USE_SOX and _SOX_MODULE_AVAILABLE:
-    try:
-        _init_sox()
-        _SOX_INITIALIZED = True
-    except Exception:
-        # The initialization of sox extension will fail if supported sox
-        # libraries are not found in the system.
-        # Since the rest of the torchaudio works without it, we do not report the
-        # error here.
-        # The error will be raised when user code attempts to use these features.
-        _LG.debug("Failed to initialize sox extension", exc_info=True)
+_SOX_EXT = None
 
 
-if os.name == "nt":
-    fail_if_no_sox = fail_with_message("requires sox extension, which is not supported on Windows.")
-elif not _USE_SOX:
-    fail_if_no_sox = fail_with_message("requires sox extension, but it is disabled. (TORCHAUDIO_USE_SOX=0)")
-elif not _SOX_MODULE_AVAILABLE:
-    fail_if_no_sox = fail_with_message(
-        "requires sox extension, but TorchAudio is not compiled with it. "
-        "Please build TorchAudio with libsox support. (BUILD_SOX=1)"
-    )
-else:
-    fail_if_no_sox = no_op if _SOX_INITIALIZED else _fail_since_no_sox
+def lazy_import_sox_ext():
+    """Load SoX integration based on availability in lazy manner"""
+
+    global _SOX_EXT
+    if _SOX_EXT is None:
+        _SOX_EXT = _LazyImporter("_torchaudio_sox", _init_sox)
+    return _SOX_EXT
 
 
 _FFMPEG_EXT = None

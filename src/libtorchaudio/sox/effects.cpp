@@ -130,17 +130,4 @@ auto apply_effects_file(
   return std::tuple<torch::Tensor, int64_t>(
       tensor, chain.getOutputSampleRate());
 }
-
-namespace {
-
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def(
-      "torchaudio::sox_effects_initialize_sox_effects",
-      &initialize_sox_effects);
-  m.def("torchaudio::sox_effects_shutdown_sox_effects", &shutdown_sox_effects);
-  m.def("torchaudio::sox_effects_apply_effects_tensor", &apply_effects_tensor);
-  m.def("torchaudio::sox_effects_apply_effects_file", &apply_effects_file);
-}
-
-} // namespace
 } // namespace torchaudio::sox

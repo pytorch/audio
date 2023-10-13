@@ -5,8 +5,9 @@ import torch
 import torchaudio
 from torchaudio import AudioMetaData
 
+sox_ext = torchaudio._extension.lazy_import_sox_ext()
 
-@torchaudio._extension.fail_if_no_sox
+
 def info(
     filepath: str,
     format: Optional[str] = None,
@@ -29,11 +30,10 @@ def info(
         if hasattr(filepath, "read"):
             raise RuntimeError("sox_io backend does not support file-like object.")
         filepath = os.fspath(filepath)
-    sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
+    sinfo = sox_ext.get_info(filepath, format)
     return AudioMetaData(*sinfo)
 
 
-@torchaudio._extension.fail_if_no_sox
 def load(
     filepath: str,
     frame_offset: int = 0,
@@ -123,12 +123,9 @@ def load(
         if hasattr(filepath, "read"):
             raise RuntimeError("sox_io backend does not support file-like object.")
         filepath = os.fspath(filepath)
-    return torch.ops.torchaudio.sox_io_load_audio_file(
-        filepath, frame_offset, num_frames, normalize, channels_first, format
-    )
+    return sox_ext.load_audio_file(filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
-@torchaudio._extension.fail_if_no_sox
 def save(
     filepath: str,
     src: torch.Tensor,
@@ -285,7 +282,7 @@ def save(
         if hasattr(filepath, "write"):
             raise RuntimeError("sox_io backend does not handle file-like object.")
         filepath = os.fspath(filepath)
-    torch.ops.torchaudio.sox_io_save_audio_file(
+    sox_ext.save_audio_file(
         filepath,
         src,
         sample_rate,

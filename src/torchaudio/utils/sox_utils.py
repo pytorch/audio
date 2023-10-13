@@ -6,8 +6,9 @@ from typing import Dict, List
 
 import torchaudio
 
+sox_ext = torchaudio._extension.lazy_import_sox_ext()
 
-@torchaudio._extension.fail_if_no_sox
+
 def set_seed(seed: int):
     """Set libsox's PRNG
 
@@ -17,10 +18,9 @@ def set_seed(seed: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torchaudio.lib._torchaudio_sox.set_seed(seed)
+    sox_ext.set_seed(seed)
 
 
-@torchaudio._extension.fail_if_no_sox
 def set_verbosity(verbosity: int):
     """Set libsox's verbosity
 
@@ -35,10 +35,9 @@ def set_verbosity(verbosity: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torchaudio.lib._torchaudio_sox.set_verbosity(verbosity)
+    sox_ext.set_verbosity(verbosity)
 
 
-@torchaudio._extension.fail_if_no_sox
 def set_buffer_size(buffer_size: int):
     """Set buffer size for sox effect chain
 
@@ -48,10 +47,9 @@ def set_buffer_size(buffer_size: int):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torchaudio.lib._torchaudio_sox.set_buffer_size(buffer_size)
+    sox_ext.set_buffer_size(buffer_size)
 
 
-@torchaudio._extension.fail_if_no_sox
 def set_use_threads(use_threads: bool):
     """Set multithread option for sox effect chain
 
@@ -62,44 +60,40 @@ def set_use_threads(use_threads: bool):
     See Also:
         http://sox.sourceforge.net/sox.html
     """
-    torchaudio.lib._torchaudio_sox.set_use_threads(use_threads)
+    sox_ext.set_use_threads(use_threads)
 
 
-@torchaudio._extension.fail_if_no_sox
 def list_effects() -> Dict[str, str]:
     """List the available sox effect names
 
     Returns:
         Dict[str, str]: Mapping from ``effect name`` to ``usage``
     """
-    return dict(torchaudio.lib._torchaudio_sox.list_effects())
+    return dict(sox_ext.list_effects())
 
 
-@torchaudio._extension.fail_if_no_sox
 def list_read_formats() -> List[str]:
     """List the supported audio formats for read
 
     Returns:
         List[str]: List of supported audio formats
     """
-    return torchaudio.lib._torchaudio_sox.list_read_formats()
+    return sox_ext.list_read_formats()
 
 
-@torchaudio._extension.fail_if_no_sox
 def list_write_formats() -> List[str]:
     """List the supported audio formats for write
 
     Returns:
         List[str]: List of supported audio formats
     """
-    return torchaudio.lib._torchaudio_sox.list_write_formats()
+    return sox_ext.list_write_formats()
 
 
-@torchaudio._extension.fail_if_no_sox
 def get_buffer_size() -> int:
     """Get buffer size for sox effect chain
 
     Returns:
         int: size in bytes of buffers used for processing audio.
     """
-    return torchaudio.lib._torchaudio_sox.get_buffer_size()
+    return sox_ext.get_buffer_size()
