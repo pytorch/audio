@@ -3,6 +3,8 @@
 
 using namespace torchaudio::rir;
 
+using DTYPE = double;
+
 struct CollisionTestParam {
   // Input
   torch::Tensor origin;
@@ -10,15 +12,15 @@ struct CollisionTestParam {
   // Expected
   torch::Tensor hit_point;
   int next_wall_index;
-  float hit_distance;
+  DTYPE hit_distance;
 };
 
 CollisionTestParam par(
-    torch::ArrayRef<float> origin,
-    torch::ArrayRef<float> direction,
-    torch::ArrayRef<float> hit_point,
+    torch::ArrayRef<DTYPE> origin,
+    torch::ArrayRef<DTYPE> direction,
+    torch::ArrayRef<DTYPE> hit_point,
     int next_wall_index,
-    float hit_distance) {
+    DTYPE hit_distance) {
   auto dir = torch::tensor(direction);
   return {
       torch::tensor(origin),
@@ -50,18 +52,22 @@ TEST_P(Simple3DRoomCollisionTest, CollisionTest3D) {
 
   auto param = GetParam();
   auto [hit_point, next_wall_index, hit_distance] =
-      find_collision_wall<float>(room, param.origin, param.direction);
+      find_collision_wall<DTYPE>(room, param.origin, param.direction);
 
   EXPECT_EQ(param.next_wall_index, next_wall_index);
   EXPECT_FLOAT_EQ(param.hit_distance, hit_distance);
-  EXPECT_TRUE(torch::allclose(
-      param.hit_point, hit_point, /*rtol*/ 1e-05, /*atol*/ 1e-07));
+  EXPECT_NEAR(
+      param.hit_point[0].item<DTYPE>(), hit_point[0].item<DTYPE>(), 1e-5);
+  EXPECT_NEAR(
+      param.hit_point[1].item<DTYPE>(), hit_point[1].item<DTYPE>(), 1e-5);
+  EXPECT_NEAR(
+      param.hit_point[2].item<DTYPE>(), hit_point[2].item<DTYPE>(), 1e-5);
 }
 
 #define ISQRT2 0.70710678118
 
 INSTANTIATE_TEST_CASE_P(
-    Collision3DTests,
+    BasicCollisionTests,
     Simple3DRoomCollisionTest,
     ::testing::Values(
         // From 0
@@ -100,3 +106,13 @@ INSTANTIATE_TEST_CASE_P(
         par({.5, .5, 1}, {0.0, -1., -1.}, {.5, .0, .5}, 2, ISQRT2),
         par({.5, .5, 1}, {0.0, 1.0, -1.}, {.5, 1., .5}, 3, ISQRT2),
         par({.5, .5, 1}, {0.0, 0.0, -1.}, {.5, .5, .0}, 4, 1.0)));
+
+INSTANTIATE_TEST_CASE_P(
+    CornerCollisionTest,
+    Simple3DRoomCollisionTest,
+    ::testing::Values(
+        par({1, 1, 0}, {1., 1., 0.}, {1., 1., 0.}, 1, 0.0),
+        par({1, 1, 0}, {-1., 1., 0.}, {1., 1., 0.}, 3, 0.0),
+        par({1, 1, 1}, {1., 1., 1.}, {1., 1., 1.}, 1, 0.0),
+        par({1, 1, 1}, {-1., 1., 1.}, {1., 1., 1.}, 3, 0.0),
+        par({1, 1, 1}, {-1., -1., 1.}, {1., 1., 1.}, 5, 0.0)));

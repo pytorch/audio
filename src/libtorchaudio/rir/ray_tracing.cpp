@@ -220,9 +220,13 @@ class RayTracer {
           if (NORM(to_mic - dir * impact_distance) < mic_radius + EPS) {
             // The length of this last hop
             auto travel_dist_at_mic = travel_dist + std::abs(impact_distance);
+            auto bin_idx = get_bin_idx(travel_dist_at_mic);
+            if (bin_idx >= histograms.size(1)) {
+              continue;
+            }
             auto coeff = get_energy_coeff(travel_dist_at_mic, mic_radius_sq);
             auto energy = energies / coeff;
-            histograms[mic_idx][get_bin_idx(travel_dist_at_mic)] += energy;
+            histograms[mic_idx][bin_idx] += energy;
           }
         }
       }
@@ -230,7 +234,7 @@ class RayTracer {
       travel_dist += hit_distance;
       energies *= wall.reflection;
 
-      //   Let's shoot the scattered ray induced by the rebound on the wall
+      // Let's shoot the scattered ray induced by the rebound on the wall
       if (do_scattering) {
         scat_ray(histograms, wall, energies, origin, hit_point, travel_dist);
         energies *= (1. - wall.scattering);

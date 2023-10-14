@@ -27,6 +27,7 @@ AVCodecContextPtr alloc_codec_context(
   return AVCodecContextPtr(codec_ctx);
 }
 
+#ifdef USE_CUDA
 const AVCodecHWConfig* get_cuda_config(const AVCodec* codec) {
   for (int i = 0;; ++i) {
     const AVCodecHWConfig* config = avcodec_get_hw_config(codec, i);
@@ -80,6 +81,7 @@ enum AVPixelFormat get_hw_format(
   TORCH_WARN("Failed to get HW surface format.");
   return AV_PIX_FMT_NONE;
 }
+#endif // USE_CUDA
 
 AVBufferRef* get_hw_frames_ctx(AVCodecContext* codec_ctx) {
   AVBufferRef* p = av_hwframe_ctx_alloc(codec_ctx->hw_device_ctx);
