@@ -105,7 +105,7 @@ class DispatcherTest(PytorchTestCase):
             f"torchaudio._backend.utils.{expected_backend.__name__}.save"
         ) as mock_save:
             get_save_func()(filename, src, sample_rate, format=format)
-            mock_save.assert_called_once_with(filename, src, sample_rate, True, format, None, None, 4096)
+            mock_save.assert_called_once_with(filename, src, sample_rate, True, format, None, None, 4096, None)
 
     @parameterized.expand(
         [
@@ -126,4 +126,4 @@ class DispatcherTest(PytorchTestCase):
             f"torchaudio._backend.utils.{expected_backend.__name__}.save"
         ) as mock_save:
             get_save_func()(f, src, sample_rate, format=format, buffer_size=buffer_size)
-            mock_save.assert_called_once_with(f, src, sample_rate, True, format, None, None, buffer_size)
+            mock_save.assert_called_once_with(f, src, sample_rate, True, format, None, None, buffer_size, None)

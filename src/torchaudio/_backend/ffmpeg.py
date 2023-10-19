@@ -228,6 +228,7 @@ def save_audio(
     encoding: Optional[str] = None,
     bits_per_sample: Optional[int] = None,
     buffer_size: int = 4096,
+    compression: Optional[torchaudio.io.CodecConfig] = None,
 ) -> None:
     ext = None
     if hasattr(uri, "write"):
@@ -250,6 +251,7 @@ def save_audio(
         format=_get_sample_format(src.dtype),
         encoder=encoder,
         encoder_format=enc_fmt,
+        codec_config=compression,
     )
     with s.open():
         s.write_audio_chunk(0, src)
@@ -304,7 +306,13 @@ class FFmpegBackend(Backend):
         encoding: Optional[str] = None,
         bits_per_sample: Optional[int] = None,
         buffer_size: int = 4096,
+        compression: Optional[Union[torchaudio.io.CodecConfig, float, int]] = None,
     ) -> None:
+        if not isinstance(compression, (torchaudio.io.CodecConfig, type(None))):
+            raise ValueError(
+                "FFmpeg backend expects non-`None` value for argument `compression` to be of ",
+                f"type `torchaudio.io.CodecConfig`, but received value of type {type(compression)}",
+            )
         save_audio(
             uri,
             src,
@@ -314,6 +322,7 @@ class FFmpegBackend(Backend):
             encoding,
             bits_per_sample,
             buffer_size,
+            compression,
         )
 
     @staticmethod
