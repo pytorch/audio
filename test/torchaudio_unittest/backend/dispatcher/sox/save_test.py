@@ -40,6 +40,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         self,
         format: str,
         *,
+        compression: float = None,
         encoding: str = None,
         bits_per_sample: int = None,
         sample_rate: float = 8000,
@@ -101,13 +102,16 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         # 2.1. Convert the original wav to target format with torchaudio
         data = load_wav(src_path, normalize=False)[0]
         if test_mode == "path":
-            self._save(tgt_path, data, sample_rate, encoding=encoding, bits_per_sample=bits_per_sample)
+            self._save(
+                tgt_path, data, sample_rate, compression=compression, encoding=encoding, bits_per_sample=bits_per_sample
+            )
         elif test_mode == "fileobj":
             with open(tgt_path, "bw") as file_:
                 self._save(
                     file_,
                     data,
                     sample_rate,
+                    compression=compression,
                     format=format,
                     encoding=encoding,
                     bits_per_sample=bits_per_sample,
@@ -118,6 +122,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
                 file_,
                 data,
                 sample_rate,
+                compression=compression,
                 format=format,
                 encoding=encoding,
                 bits_per_sample=bits_per_sample,
@@ -134,7 +139,9 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
 
         # 3.1. Convert the original wav to target format with sox
         sox_encoding = _get_sox_encoding(encoding)
-        sox_utils.convert_audio_file(src_path, sox_path, encoding=sox_encoding, bit_depth=bits_per_sample)
+        sox_utils.convert_audio_file(
+            src_path, sox_path, compression=compression, encoding=sox_encoding, bit_depth=bits_per_sample
+        )
         # 3.2. Convert the target format to wav with sox
         sox_utils.convert_audio_file(sox_path, ref_path, encoding=cmp_encoding, bit_depth=cmp_bit_depth)
         # 3.3. Load with SciPy
@@ -175,15 +182,42 @@ class SaveTest(SaveTestBase):
 
     @nested_params(
         [8, 16, 24],
+        [
+            None,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+        ],
     )
-    def test_save_flac(self, bits_per_sample):
-        self.assert_save_consistency("flac", bits_per_sample=bits_per_sample, test_mode="path")
+    def test_save_flac(self, bits_per_sample, compression_level):
+        self.assert_save_consistency(
+            "flac", compression=compression_level, bits_per_sample=bits_per_sample, test_mode="path"
+        )
 
     def test_save_htk(self):
         self.assert_save_consistency("htk", test_mode="path", num_channels=1)
 
-    def test_save_vorbis(self):
-        self.assert_save_consistency("vorbis", test_mode="path")
+    @nested_params(
+        [
+            None,
+            -1,
+            0,
+            1,
+            2,
+            3,
+            3.6,
+            5,
+            10,
+        ],
+    )
+    def test_save_vorbis(self, quality_level):
+        self.assert_save_consistency("vorbis", compression=quality_level, test_mode="path")
 
     @nested_params(
         [
@@ -254,9 +288,22 @@ class SaveTest(SaveTestBase):
         encoding, bits_per_sample = enc_params
         self.assert_save_consistency("amb", encoding=encoding, bits_per_sample=bits_per_sample, test_mode="path")
 
+    @nested_params(
+        [
+            None,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+        ],
+    )
     @skipIfNoSoxEncoder("amr-nb")
-    def test_save_amr_nb(self):
-        self.assert_save_consistency("amr-nb", num_channels=1, test_mode="path")
+    def test_save_amr_nb(self, bit_rate):
+        self.assert_save_consistency("amr-nb", compression=bit_rate, num_channels=1, test_mode="path")
 
     def test_save_gsm(self):
         self.assert_save_consistency("gsm", num_channels=1, test_mode="path")

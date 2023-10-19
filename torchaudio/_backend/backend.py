@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import BinaryIO, Optional, Tuple, Union
 
 from torch import Tensor
+from torchaudio.io import CodecConfig
 
 from .common import AudioMetaData
 
@@ -37,6 +38,7 @@ class Backend(ABC):
         encoding: Optional[str] = None,
         bits_per_sample: Optional[int] = None,
         buffer_size: int = 4096,
+        compression: Optional[Union[CodecConfig, float, int]] = None,
     ) -> None:
         raise NotImplementedError
 
