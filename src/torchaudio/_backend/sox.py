@@ -56,7 +56,13 @@ class SoXBackend(Backend):
         encoding: Optional[str] = None,
         bits_per_sample: Optional[int] = None,
         buffer_size: int = 4096,
+        compression: Optional[Union[torchaudio.io.CodecConfig, float, int]] = None,
     ) -> None:
+        if not isinstance(compression, (float, int, type(None))):
+            raise ValueError(
+                "SoX backend expects non-`None` value for argument `compression` to be of ",
+                f"type `float` or `int`, but received value of type {type(compression)}",
+            )
         if hasattr(uri, "write"):
             raise ValueError(
                 "SoX backend does not support writing to file-like objects. ",
@@ -68,7 +74,7 @@ class SoXBackend(Backend):
                 src,
                 sample_rate,
                 channels_first,
-                None,
+                compression,
                 format,
                 encoding,
                 bits_per_sample,
