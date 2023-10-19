@@ -63,19 +63,6 @@ class clean(distutils.command.clean.clean):
                 shutil.rmtree(str(path), ignore_errors=True)
 
 
-def _get_packages(branch_name, tag):
-    exclude = []
-    exclude_prototype = False
-    if branch_name is not None and branch_name.startswith("release/"):
-        exclude_prototype = True
-    if tag is not None and re.match(r"v[\d.]+(-rc\d+)?", tag):
-        exclude_prototype = True
-    if exclude_prototype:
-        print("Excluding torchaudio.prototype from the package.")
-        exclude.append("torchaudio.prototype*")
-    return find_packages(where="src", exclude=exclude)
-
-
 def _parse_url(path):
     with open(path, "r") as file_:
         for line in file_:
@@ -140,7 +127,7 @@ def _main():
             "Topic :: Multimedia :: Sound/Audio",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
         ],
-        packages=_get_packages(branch, tag),
+        packages=find_packages(where="src"),
         package_dir={"": "src"},
         ext_modules=setup_helpers.get_ext_modules(),
         cmdclass={
