@@ -2,6 +2,7 @@ import os
 from typing import BinaryIO, Optional, Tuple, Union
 
 import torch
+from torchaudio.io import CodecConfig
 
 from . import soundfile_backend
 from .backend import Backend
@@ -35,7 +36,11 @@ class SoundfileBackend(Backend):
         encoding: Optional[str] = None,
         bits_per_sample: Optional[int] = None,
         buffer_size: int = 4096,
+        compression: Optional[Union[CodecConfig, float, int]] = None,
     ) -> None:
+        if compression:
+            raise ValueError("soundfile backend does not support argument `compression`.")
+
         soundfile_backend.save(
             uri, src, sample_rate, channels_first, format=format, encoding=encoding, bits_per_sample=bits_per_sample
         )

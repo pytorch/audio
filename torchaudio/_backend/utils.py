@@ -5,6 +5,7 @@ from typing import BinaryIO, Dict, Optional, Tuple, Type, Union
 import torch
 
 from torchaudio._extension import _FFMPEG_EXT, _SOX_INITIALIZED
+from torchaudio.io import CodecConfig
 
 from . import soundfile_backend
 
@@ -229,6 +230,7 @@ def get_save_func():
         bits_per_sample: Optional[int] = None,
         buffer_size: int = 4096,
         backend: Optional[str] = None,
+        compression: Optional[Union[CodecConfig, float, int]] = None,
     ):
         """Save audio data to file.
 
@@ -283,8 +285,32 @@ def get_save_func():
 
                 .. seealso::
                    :ref:`backend`
+
+            compression (CodecConfig, float, int, or None, optional):
+                Compression configuration to apply.
+
+                If the selected backend is FFmpeg, an instance of :py:class:`CodecConfig` must be provided.
+
+                Otherwise, if the selected backend is SoX, a float or int value corresponding to option ``-C`` of the
+                ``sox`` command line interface must be provided. For instance:
+
+                ``"mp3"``
+                    Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or
+                    VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.
+
+                ``"flac"``
+                    Whole number from ``0`` to ``8``. ``8`` is default and highest compression.
+
+                ``"ogg"``, ``"vorbis"``
+                    Number from ``-1`` to ``10``; ``-1`` is the highest compression
+                    and lowest quality. Default: ``3``.
+
+                Refer to http://sox.sourceforge.net/soxformat.html for more details.
+
         """
         backend = dispatcher(uri, format, backend)
-        return backend.save(uri, src, sample_rate, channels_first, format, encoding, bits_per_sample, buffer_size)
+        return backend.save(
+            uri, src, sample_rate, channels_first, format, encoding, bits_per_sample, buffer_size, compression
+        )
 
     return save
