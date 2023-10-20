@@ -4,11 +4,13 @@ import pathlib
 import subprocess
 import sys
 from functools import partial
+from typing import Optional
 
 import torch
 from parameterized import parameterized
 from torchaudio._backend.ffmpeg import _parse_save_args
 from torchaudio._backend.utils import get_save_func
+from torchaudio.io import CodecConfig
 
 from torchaudio_unittest.backend.dispatcher.sox.common import get_enc_params, name_func
 from torchaudio_unittest.common_utils import (
@@ -45,6 +47,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         self,
         format: str,
         *,
+        compression: Optional[CodecConfig] = None,
         encoding: str = None,
         bits_per_sample: int = None,
         sample_rate: float = 8000,
@@ -104,7 +107,15 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         data = load_wav(src_path, normalize=False)[0]
         if test_mode == "path":
             ext = format
-            self._save(tgt_path, data, sample_rate, format=format, encoding=encoding, bits_per_sample=bits_per_sample)
+            self._save(
+                tgt_path,
+                data,
+                sample_rate,
+                compression=compression,
+                format=format,
+                encoding=encoding,
+                bits_per_sample=bits_per_sample,
+            )
         elif test_mode == "fileobj":
             ext = None
             with open(tgt_path, "bw") as file_:
@@ -112,6 +123,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
                     file_,
                     data,
                     sample_rate,
+                    compression=compression,
                     format=format,
                     encoding=encoding,
                     bits_per_sample=bits_per_sample,
@@ -123,6 +135,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
                 file_,
                 data,
                 sample_rate,
+                compression=compression,
                 format=format,
                 encoding=encoding,
                 bits_per_sample=bits_per_sample,
@@ -198,11 +211,27 @@ class SaveTest(SaveTestBase):
         # NOTE: Supported sample formats: s16 s32 (24 bits)
         # [8, 16, 24],
         [16, 24],
+        [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+        ],
     )
-    def test_save_flac(self, test_mode, bits_per_sample):
+    def test_save_flac(self, test_mode, bits_per_sample, compression_level):
         # -acodec flac -sample_fmt s16
         # 24 bits needs to be mapped to s32
-        self.assert_save_consistency("flac", bits_per_sample=bits_per_sample, test_mode=test_mode)
+        codec_config = CodecConfig(
+            compression_level=compression_level,
+        )
+        self.assert_save_consistency(
+            "flac", compression=codec_config, bits_per_sample=bits_per_sample, test_mode=test_mode
+        )
 
     # @nested_params(
     #     ["path", "fileobj", "bytesio"],
@@ -212,12 +241,25 @@ class SaveTest(SaveTestBase):
     #     self.assert_save_consistency("htk", test_mode=test_mode, num_channels=1)
 
     @nested_params(
+        [
+            None,
+            -1,
+            0,
+            1,
+            2,
+            3,
+            5,
+            10,
+        ],
         ["path", "fileobj", "bytesio"],
     )
-    def test_save_vorbis(self, test_mode):
+    def test_save_vorbis(self, quality_level, test_mode):
         # NOTE: ffmpeg doesn't recognize extension "vorbis", so we use "ogg"
         # self.assert_save_consistency("vorbis", test_mode=test_mode)
-        self.assert_save_consistency("ogg", test_mode=test_mode)
+        codec_config = CodecConfig(
+            qscale=quality_level,
+        )
+        self.assert_save_consistency("ogg", compression=codec_config, test_mode=test_mode)
 
     # @nested_params(
     #     ["path", "fileobj", "bytesio"],

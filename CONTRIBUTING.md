@@ -38,46 +38,11 @@ to do this once to work on any of Facebook's open source projects.
 
 Complete your CLA here: <https://code.facebook.com/cla>
 
-## Development installation
+## Building torchaudio from source
 
-We recommend using a `conda` environment to contribute efficiently to
-torchaudio.
+Please refer to https://pytorch.org/audio/main/build.html
 
-### Install PyTorch Nightly
-
-```bash
-conda install pytorch -c pytorch-nightly
-```
-
-### Install build/runtime dependencies
-
-```bash
-# Install build-time dependencies
-pip install cmake ninja
-# [optional for ffmpeg]
-conda install ffmpeg
-```
-
-### Install Torchaudio
-
-```bash
-# Build torchaudio
-git clone https://github.com/pytorch/audio.git
-cd audio
-python setup.py develop
-# or, for OSX
-# CC=clang CXX=clang++ python setup.py develop
-```
-
-Some environmnet variables that change the build behavior
-- `BUILD_SOX`: Deteremines whether build and bind libsox in non-Windows environments. (no effect in Windows as libsox integration is not available) Default value is 1 (build and bind). Use 0 for disabling it.
-- `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
-- `BUILD_RNNT`: Determines whether build RNN-T loss function. Default value is 1.
-- `BUILD_CUDA_CTC_DECODER`: Determines whether build decoder features based on CUDA CTC decoder. Default value is 1. (`USE_CUDA` has to be 1.)
-
-Please check the [./tools/setup_helpers/extension.py](./tools/setup_helpers/extension.py) for the up-to-date detail.
-
-### Running Test
+## Running Test
 
 If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
