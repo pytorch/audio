@@ -13,6 +13,7 @@ jobs:
   unittests-windows-cpu:
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@release/2.1
     with:
+      test-infra-ref: release/2.1
       repository: pytorch/audio
       runner: windows.4xlarge
       timeout: 180
