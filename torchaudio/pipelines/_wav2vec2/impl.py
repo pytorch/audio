@@ -1350,7 +1350,7 @@ WAVLM_LARGE = Wav2Vec2Bundle(
         "encoder_ff_interm_features": 4096,
         "encoder_ff_interm_dropout": 0.0,
         "encoder_dropout": 0.1,
-        "encoder_layer_norm_first": False,
+        "encoder_layer_norm_first": True,
         "encoder_layer_drop": 0.05,
         "aux_num_out": None,
     },
