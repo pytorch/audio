@@ -114,7 +114,7 @@ class CMakeBuild(build_ext):
         # `torchaudio.[so|dylib|pyd]`, so we need something `torchaudio.foo`, that is
         # interpreted as `torchaudio/foo.so` then use dirname to get the `torchaudio`
         # directory.
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath("torchaudio.lib")))
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath("foo")))
 
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
