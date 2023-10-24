@@ -4,7 +4,7 @@
 #include <c10/cuda/CUDAStream.h>
 #endif
 
-namespace torchaudio::io {
+namespace torio::io {
 
 namespace {
 
@@ -494,4 +494,4 @@ bool Iterator::operator!=(const int64_t end) const {
   return i < end;
 }
 
-} // namespace torchaudio::io
+} // namespace torio::io

@@ -5,7 +5,7 @@
 #include <libtorio/ffmpeg/stream_reader/typedefs.h>
 #include <vector>
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -386,4 +386,9 @@ class StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
 };
 
 } // namespace io
-} // namespace torchaudio
+} // namespace torio
+
+// For BC
+namespace torchaudio::io {
+using namespace torio::io;
+} // namespace torchaudio::io

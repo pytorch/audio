@@ -7,7 +7,7 @@
 #include <libtorio/ffmpeg/stream_writer/types.h>
 #include <torch/types.h>
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,4 +330,9 @@ class StreamWriterCustomIO : private detail::CustomOutput, public StreamWriter {
 };
 
 } // namespace io
-} // namespace torchaudio
+} // namespace torio
+
+// For BC
+namespace torchaudio::io {
+using namespace torio::io;
+} // namespace torchaudio::io

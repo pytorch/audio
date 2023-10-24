@@ -1,6 +1,6 @@
 #include <libtorio/ffmpeg/stream_reader/buffer/chunked_buffer.h>
 
-namespace torchaudio::io::detail {
+namespace torio::io::detail {
 
 ChunkedBuffer::ChunkedBuffer(
     AVRational time_base,
@@ -126,4 +126,4 @@ void ChunkedBuffer::flush() {
   chunks.clear();
 }
 
-} // namespace torchaudio::io::detail
+} // namespace torio::io::detail

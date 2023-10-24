@@ -1,7 +1,7 @@
 #pragma once
 #include <libtorio/ffmpeg/ffmpeg.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 class PacketWriter {
   AVFormatContext* format_ctx;
   AVStream* stream;
@@ -13,4 +13,4 @@ class PacketWriter {
       const StreamParams& stream_params_);
   void write_packet(const AVPacketPtr& packet);
 };
-} // namespace torchaudio::io
+} // namespace torio::io

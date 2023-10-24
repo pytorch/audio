@@ -1,6 +1,6 @@
 #include <libtorio/ffmpeg/hw_context.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 namespace {
 
 static std::mutex MUTEX;
@@ -37,4 +37,4 @@ void clear_cuda_context_cache() {
   CUDA_CONTEXT_CACHE.clear();
 }
 
-} // namespace torchaudio::io
+} // namespace torio::io

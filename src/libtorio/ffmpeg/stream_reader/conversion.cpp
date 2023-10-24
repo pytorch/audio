@@ -5,7 +5,7 @@
 #include <c10/cuda/CUDAStream.h>
 #endif
 
-namespace torchaudio::io {
+namespace torio::io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Audio
@@ -627,4 +627,4 @@ torch::Tensor YUV444PCudaConverter::convert(const AVFrame* src) {
 
 #endif
 
-} // namespace torchaudio::io
+} // namespace torio::io

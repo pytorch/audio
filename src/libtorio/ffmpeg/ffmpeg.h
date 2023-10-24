@@ -24,7 +24,7 @@ extern "C" {
 
 /// @cond
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 using OptionDict = std::map<std::string, std::string>;
@@ -209,6 +209,6 @@ struct StreamParams {
   int stream_index{};
 };
 } // namespace io
-} // namespace torchaudio
+} // namespace torio
 
 /// @endcond
