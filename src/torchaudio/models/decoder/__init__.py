@@ -43,4 +43,4 @@ def __dir__():
     return sorted(__all__)
 
 
-__all__ = [_CTC_DECODERS, _CUDA_CTC_DECODERS]
+__all__ = _CTC_DECODERS + _CUDA_CTC_DECODERS
