@@ -125,9 +125,9 @@ model implementations and application components.
    :caption: C++ Prototype API Reference
    :hidden:
 
-   libtorchaudio
-   libtorchaudio.stream_reader
-   libtorchaudio.stream_writer
+   libtorio
+   libtorio.stream_reader
+   libtorio.stream_writer
 
 .. toctree::
    :maxdepth: 1
