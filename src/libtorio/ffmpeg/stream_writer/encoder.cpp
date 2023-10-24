@@ -1,6 +1,6 @@
 #include <libtorio/ffmpeg/stream_writer/encoder.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 Encoder::Encoder(
     AVFormatContext* format_ctx,
@@ -59,4 +59,4 @@ void Encoder::encode(AVFrame* frame) {
   }
 }
 
-} // namespace torchaudio::io
+} // namespace torio::io

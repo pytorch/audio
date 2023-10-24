@@ -2,7 +2,7 @@
 #include <libtorio/ffmpeg/ffmpeg.h>
 #include <torch/types.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Audio
@@ -126,4 +126,4 @@ class YUV444PCudaConverter : CudaImageConverterBase {
 };
 
 #endif
-} // namespace torchaudio::io
+} // namespace torio::io

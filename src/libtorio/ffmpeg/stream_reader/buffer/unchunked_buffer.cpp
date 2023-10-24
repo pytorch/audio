@@ -1,6 +1,6 @@
 #include <libtorio/ffmpeg/stream_reader/buffer/unchunked_buffer.h>
 
-namespace torchaudio::io::detail {
+namespace torio::io::detail {
 
 UnchunkedBuffer::UnchunkedBuffer(AVRational time_base) : time_base(time_base){};
 
@@ -30,4 +30,4 @@ void UnchunkedBuffer::flush() {
   chunks.clear();
 }
 
-} // namespace torchaudio::io::detail
+} // namespace torio::io::detail

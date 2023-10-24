@@ -4,7 +4,7 @@
 #include <torch/types.h>
 #include <deque>
 
-namespace torchaudio::io::detail {
+namespace torio::io::detail {
 
 class UnchunkedBuffer {
   // Each AVFrame is converted to a Tensor and stored here.
@@ -20,4 +20,4 @@ class UnchunkedBuffer {
   void flush();
 };
 
-} // namespace torchaudio::io::detail
+} // namespace torio::io::detail

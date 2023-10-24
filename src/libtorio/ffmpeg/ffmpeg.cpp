@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
@@ -146,4 +146,4 @@ void AVCodecParametersDeleter::operator()(AVCodecParameters* codecpar) {
 AVCodecParametersPtr::AVCodecParametersPtr(AVCodecParameters* p)
     : Wrapper<AVCodecParameters, AVCodecParametersDeleter>(p) {}
 
-} // namespace torchaudio::io
+} // namespace torio::io
