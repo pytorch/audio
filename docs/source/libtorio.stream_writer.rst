@@ -2,6 +2,11 @@
    TorchAudio's C++ API is prototype feature.
    API/ABI backward compatibility is not guaranteed.
 
+
+.. note::
+   The top-level namespace has been changed from ``torchaudio`` to ``torio``.
+
+
 torio::io::StreamWriter
 =======================
 
