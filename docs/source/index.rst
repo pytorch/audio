@@ -110,6 +110,14 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
+   :hidden:
+
+   torio
+   torio.io
+   torio.utils
+
+.. toctree::
+   :maxdepth: 1
    :caption: Python Prototype API Reference
    :hidden:
 
