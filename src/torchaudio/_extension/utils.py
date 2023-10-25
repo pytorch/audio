@@ -4,7 +4,6 @@ The implementations here should be stateless.
 They should not depend on external state.
 Anything that depends on external state should happen in __init__.py
 """
-
 import importlib
 import logging
 import os
@@ -104,57 +103,6 @@ def _init_sox():
     for key in keys:
         setattr(ext, key, getattr(torch.ops.torchaudio_sox, key))
 
-    return ext
-
-
-_FFMPEG_VERS = ["6", "5", "4", ""]
-
-
-def _find_versionsed_ffmpeg_extension(version: str):
-    _LG.debug("Attempting to load FFmpeg%s", version)
-
-    ext = f"torchaudio.lib._torio_ffmpeg{version}"
-    lib = f"libtorio_ffmpeg{version}"
-
-    if not importlib.util.find_spec(ext):
-        raise RuntimeError(f"FFmpeg{version} extension is not available.")
-
-    _load_lib(lib)
-    return importlib.import_module(ext)
-
-
-def _find_ffmpeg_extension(ffmpeg_vers):
-    for ffmpeg_ver in ffmpeg_vers:
-        try:
-            return _find_versionsed_ffmpeg_extension(ffmpeg_ver)
-        except Exception:
-            _LG.debug("Failed to load FFmpeg%s extension.", ffmpeg_ver, exc_info=True)
-            continue
-    raise ImportError(
-        f"Failed to intialize FFmpeg extension. Tried versions: {ffmpeg_vers}. "
-        "Enable DEBUG logging to see more details about the error."
-    )
-
-
-def _get_ffmpeg_versions():
-    ffmpeg_vers = _FFMPEG_VERS
-    # User override
-    if (ffmpeg_ver := os.environ.get("TORCHAUDIO_USE_FFMPEG_VERSION")) is not None:
-        if ffmpeg_ver not in ffmpeg_vers:
-            raise ValueError(
-                f"The FFmpeg version '{ffmpeg_ver}' (read from TORCHAUDIO_USE_FFMPEG_VERSION) "
-                f"is not one of supported values. Possible values are {ffmpeg_vers}"
-            )
-        ffmpeg_vers = [ffmpeg_ver]
-    return ffmpeg_vers
-
-
-def _init_ffmpeg():
-    ffmpeg_vers = _get_ffmpeg_versions()
-    ext = _find_ffmpeg_extension(ffmpeg_vers)
-    ext.init()
-    if ext.get_log_level() > 8:
-        ext.set_log_level(8)
     return ext
 
 

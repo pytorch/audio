@@ -73,7 +73,7 @@ Support Structures
 
 {{ item | underline("~") }}
 
-.. autoclass:: torchaudio.io._stream_reader.{{item}}()
+.. autoclass:: torio.io._streaming_media_decoder.{{item}}()
    :members:
 
 {%- endfor %}

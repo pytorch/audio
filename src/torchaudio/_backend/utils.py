@@ -4,8 +4,9 @@ from typing import BinaryIO, Dict, Optional, Tuple, Type, Union
 
 import torch
 
-from torchaudio._extension import lazy_import_ffmpeg_ext, lazy_import_sox_ext
+from torchaudio._extension import lazy_import_sox_ext
 from torchaudio.io import CodecConfig
+from torio._extension import lazy_import_ffmpeg_ext
 
 from . import soundfile_backend
 
