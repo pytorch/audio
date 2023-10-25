@@ -4,7 +4,7 @@
 #include <c10/cuda/CUDAStream.h>
 #endif
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 namespace {
 
@@ -385,4 +385,4 @@ StreamWriterCustomIO::StreamWriterCustomIO(
       StreamWriter(io_ctx, format) {}
 
 } // namespace io
-} // namespace torchaudio
+} // namespace torio

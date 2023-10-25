@@ -3,7 +3,7 @@
 #include <libtorio/ffmpeg/ffmpeg.h>
 #include <iostream>
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 /// Information about source stream found in the input media.
@@ -162,4 +162,4 @@ struct Chunk {
 };
 
 } // namespace io
-} // namespace torchaudio
+} // namespace torio

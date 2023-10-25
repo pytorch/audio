@@ -3,7 +3,7 @@
 #include <libtorio/ffmpeg/stream_writer/stream_writer.h>
 #include <torch/extension.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 namespace {
 
 std::map<std::string, std::tuple<int64_t, int64_t, int64_t>> get_versions() {
@@ -436,4 +436,4 @@ PYBIND11_MODULE(TORCHAUDIO_FFMPEG_EXT_NAME, m) {
 }
 
 } // namespace
-} // namespace torchaudio::io
+} // namespace torio::io

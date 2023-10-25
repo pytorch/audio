@@ -2,7 +2,7 @@
 #include <libtorio/ffmpeg/stream_writer/encode_process.h>
 #include <cmath>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 ////////////////////////////////////////////////////////////////////////////////
 // EncodeProcess Logic Implementation
@@ -973,4 +973,4 @@ EncodeProcess get_video_encode_process(
       std::move(codec_ctx)};
 }
 
-} // namespace torchaudio::io
+} // namespace torio::io

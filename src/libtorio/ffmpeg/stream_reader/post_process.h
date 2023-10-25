@@ -2,7 +2,7 @@
 #include <libtorio/ffmpeg/filter_graph.h>
 #include <libtorio/ffmpeg/stream_reader/typedefs.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 struct IPostDecodeProcess {
   virtual ~IPostDecodeProcess() = default;
@@ -31,4 +31,4 @@ std::unique_ptr<IPostDecodeProcess> get_video_process(
     int num_chunks,
     const torch::Device& device);
 
-} // namespace torchaudio::io
+} // namespace torio::io

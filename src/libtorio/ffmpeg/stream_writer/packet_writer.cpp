@@ -1,6 +1,6 @@
 #include <libtorio/ffmpeg/stream_writer/packet_writer.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 namespace {
 AVStream* add_stream(
     AVFormatContext* format_ctx,
@@ -33,4 +33,4 @@ void PacketWriter::write_packet(const AVPacketPtr& packet) {
   ret = av_interleaved_write_frame(format_ctx, &dst_packet);
   TORCH_CHECK(ret >= 0, "Failed to write packet to destination.");
 }
-} // namespace torchaudio::io
+} // namespace torio::io

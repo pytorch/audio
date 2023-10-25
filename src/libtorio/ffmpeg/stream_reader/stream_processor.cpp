@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string_view>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 namespace {
 AVCodecContextPtr alloc_codec_context(
@@ -394,4 +394,4 @@ c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return post_processes.at(key)->pop_chunk();
 }
 
-} // namespace torchaudio::io
+} // namespace torio::io

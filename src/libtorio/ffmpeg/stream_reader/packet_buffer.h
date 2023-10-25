@@ -1,7 +1,7 @@
 #pragma once
 #include <libtorio/ffmpeg/ffmpeg.h>
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 class PacketBuffer {
  public:
@@ -13,4 +13,4 @@ class PacketBuffer {
   std::deque<AVPacketPtr> packets;
 };
 } // namespace io
-} // namespace torchaudio
+} // namespace torio

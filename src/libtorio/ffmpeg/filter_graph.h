@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libtorio/ffmpeg/ffmpeg.h>
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 /// Used to report the output formats of filter graph.
@@ -85,4 +85,4 @@ class FilterGraph {
 };
 
 } // namespace io
-} // namespace torchaudio
+} // namespace torio

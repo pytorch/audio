@@ -1,5 +1,5 @@
 #pragma once
-namespace torchaudio::io {
+namespace torio::io {
 
 struct CodecConfig {
   int bit_rate = -1;
@@ -16,4 +16,4 @@ struct CodecConfig {
   int gop_size = -1;
   int max_b_frames = -1;
 };
-} // namespace torchaudio::io
+} // namespace torio::io

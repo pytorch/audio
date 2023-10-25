@@ -3,7 +3,7 @@
 #include <libtorio/ffmpeg/stream_reader/conversion.h>
 #include <libtorio/ffmpeg/stream_reader/post_process.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 namespace detail {
 namespace {
 
@@ -617,4 +617,4 @@ std::unique_ptr<IPostDecodeProcess> get_video_process(
   return detail::get_chunked_video_process(
       std::move(filter), frames_per_chunk, num_chunks);
 }
-} // namespace torchaudio::io
+} // namespace torio::io

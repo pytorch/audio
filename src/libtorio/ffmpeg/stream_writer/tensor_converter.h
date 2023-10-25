@@ -3,7 +3,7 @@
 #include <libtorio/ffmpeg/ffmpeg.h>
 #include <torch/types.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 class TensorConverter {
  public:
@@ -92,4 +92,4 @@ class TensorConverter {
   Generator convert(const torch::Tensor& t);
 };
 
-} // namespace torchaudio::io
+} // namespace torio::io

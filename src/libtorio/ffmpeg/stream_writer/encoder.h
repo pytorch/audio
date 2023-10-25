@@ -4,7 +4,7 @@
 #include <libtorio/ffmpeg/filter_graph.h>
 #include <torch/types.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 // Encoder + Muxer
 class Encoder {
@@ -27,4 +27,4 @@ class Encoder {
   void encode(AVFrame* frame);
 };
 
-} // namespace torchaudio::io
+} // namespace torio::io

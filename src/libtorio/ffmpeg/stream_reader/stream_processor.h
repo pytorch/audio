@@ -6,7 +6,7 @@
 #include <torch/types.h>
 #include <map>
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 class StreamProcessor {
@@ -104,4 +104,4 @@ class StreamProcessor {
 };
 
 } // namespace io
-} // namespace torchaudio
+} // namespace torio
