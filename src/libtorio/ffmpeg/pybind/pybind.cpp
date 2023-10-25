@@ -241,11 +241,11 @@ struct StreamReaderBytes : private BytesWrapper, public StreamReaderCustomIO {
             option) {}
 };
 
-#ifndef TORCHAUDIO_FFMPEG_EXT_NAME
-#error TORCHAUDIO_FFMPEG_EXT_NAME must be defined.
+#ifndef TORIO_FFMPEG_EXT_NAME
+#error TORIO_FFMPEG_EXT_NAME must be defined.
 #endif
 
-PYBIND11_MODULE(TORCHAUDIO_FFMPEG_EXT_NAME, m) {
+PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
   m.def("init", []() { avdevice_register_all(); });
   m.def("get_log_level", []() { return av_log_get_level(); });
   m.def("set_log_level", [](int level) { av_log_set_level(level); });
