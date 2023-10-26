@@ -1,4 +1,6 @@
 """Module to change the configuration of FFmpeg libraries (such as libavformat).
+
+It affects functionalities in :py:mod:`torio.io`.
 """
 from typing import Dict, List, Tuple
 
