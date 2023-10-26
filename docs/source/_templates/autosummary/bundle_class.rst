@@ -11,7 +11,6 @@
 {%- elif name == "Wav2Vec2FABundle.Aligner" %}
   {%- set attributes = [] %}
   {%- set methods = ["__call__"] %}
-  {%- set support_classes = ["Token"] %}
 {%- elif name == "Tacotron2TTSBundle.TextProcessor" %}
   {%- set attributes = ["tokens"] %}
   {%- set methods = ["__call__"] %}
