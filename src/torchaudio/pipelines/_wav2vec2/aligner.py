@@ -53,7 +53,7 @@ class IAligner(ABC):
             emission (Tensor): Sequence of token probability distributions in log-domain.
                 Shape: `(time, tokens)`.
             tokens (list of integer sequence): Tokenized transcript.
-                Output from :py:class:`Wav2Vec2FABundle.Tokenizer`.
+                Output from :py:class:`torchaudio.pipelines.Wav2Vec2FABundle.Tokenizer`.
 
         Returns:
             (list of TokenSpan sequence): Tokens with time stamps and scores.

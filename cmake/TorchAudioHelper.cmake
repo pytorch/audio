@@ -43,7 +43,7 @@ endfunction()
 
 function(torio_library name source include_dirs link_libraries compile_defs)
   _library(
-    torio/lib
+    torchaudio/lib
     "${name}"
     "${source}"
     "${include_dirs}"
@@ -104,7 +104,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   endfunction()
   function(torio_extension name sources include_dirs libraries definitions)
     _extension(
-      torio/lib
+      torchaudio/lib
       "${name}"
       "${sources}"
       "${include_dirs}"
