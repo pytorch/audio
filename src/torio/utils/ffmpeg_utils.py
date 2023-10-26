@@ -1,6 +1,4 @@
 """Module to change the configuration of FFmpeg libraries (such as libavformat).
-
-It affects functionalities in :py:mod:`torio.io`.
 """
 from typing import Dict, List, Tuple
 
@@ -22,7 +20,7 @@ def get_versions() -> Dict[str, Tuple[int]]:
 def get_log_level() -> int:
     """Get the log level of FFmpeg.
 
-    See :py:func:`set_log_level` for the detailo.
+    See :py:func:`set_log_level` for the detail.
     """
     return ffmpeg_ext.get_log_level()
 

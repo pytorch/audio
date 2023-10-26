@@ -70,19 +70,19 @@ def get_ext_modules():
             # single version ffmpeg mode
             modules.extend(
                 [
-                    Extension(name="torchaudio.lib.libtorio_ffmpeg", sources=[]),
-                    Extension(name="torchaudio.lib._torio_ffmpeg", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg", sources=[]),
                 ]
             )
         else:
             modules.extend(
                 [
-                    Extension(name="torchaudio.lib.libtorio_ffmpeg4", sources=[]),
-                    Extension(name="torchaudio.lib._torio_ffmpeg4", sources=[]),
-                    Extension(name="torchaudio.lib.libtorio_ffmpeg5", sources=[]),
-                    Extension(name="torchaudio.lib._torio_ffmpeg5", sources=[]),
-                    Extension(name="torchaudio.lib.libtorio_ffmpeg6", sources=[]),
-                    Extension(name="torchaudio.lib._torio_ffmpeg6", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg4", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg4", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg5", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg5", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg6", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg6", sources=[]),
                 ]
             )
     return modules
