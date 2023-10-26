@@ -519,11 +519,11 @@ class StreamingMediaDecoder:
     ):
         self.src = src
         if isinstance(src, bytes):
-            self._be = ffmpeg_ext.StreamReaderBytes(src, format, option, buffer_size)
+            self._be = ffmpeg_ext.StreamingMediaDecoderBytes(src, format, option, buffer_size)
         elif hasattr(src, "read"):
-            self._be = ffmpeg_ext.StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = ffmpeg_ext.StreamingMediaDecoderFileObj(src, format, option, buffer_size)
         else:
-            self._be = ffmpeg_ext.StreamReader(os.path.normpath(src), format, option)
+            self._be = ffmpeg_ext.StreamingMediaDecoder(os.path.normpath(src), format, option)
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i

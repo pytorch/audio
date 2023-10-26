@@ -194,9 +194,9 @@ class StreamingMediaEncoder:
         buffer_size: int = 4096,
     ):
         if hasattr(dst, "write"):
-            self._s = ffmpeg_ext.StreamWriterFileObj(dst, format, buffer_size)
+            self._s = ffmpeg_ext.StreamingMediaEncoderFileObj(dst, format, buffer_size)
         else:
-            self._s = ffmpeg_ext.StreamWriter(str(dst), format)
+            self._s = ffmpeg_ext.StreamingMediaEncoder(str(dst), format)
         self._is_open = False
 
     @_format_common_args

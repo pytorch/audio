@@ -9,13 +9,13 @@ namespace torio {
 namespace io {
 
 //////////////////////////////////////////////////////////////////////////////
-// StreamReader
+// StreamingMediaDecoder
 //////////////////////////////////////////////////////////////////////////////
 
 ///
 /// Fetch and decode audio/video streams chunk by chunk.
 ///
-class StreamReader {
+class StreamingMediaDecoder {
   AVFormatInputContextPtr format_ctx;
   AVPacketPtr packet{alloc_avpacket()};
 
@@ -49,13 +49,13 @@ class StreamReader {
   /// @cond
 
  private:
-  /// Construct StreamReader from already initialized AVFormatContext.
+  /// Construct StreamingMediaDecoder from already initialized AVFormatContext.
   /// This is a low level constructor interact with FFmpeg directly.
   /// One can provide custom AVFormatContext in case the other constructor
   /// does not meet a requirement.
-  /// @param format_ctx An initialized AVFormatContext. StreamReader will
-  /// own the resources and release it at the end.
-  explicit StreamReader(AVFormatContext* format_ctx);
+  /// @param format_ctx An initialized AVFormatContext. StreamingMediaDecoder
+  /// will own the resources and release it at the end.
+  explicit StreamingMediaDecoder(AVFormatContext* format_ctx);
 
  protected:
   /// Concstruct media processor from custom IO.
@@ -64,7 +64,7 @@ class StreamReader {
   /// @param format Specifies format, such as mp4.
   /// @param option Custom option passed when initializing format context
   /// (opening source).
-  explicit StreamReader(
+  explicit StreamingMediaDecoder(
       AVIOContext* io_ctx,
       const c10::optional<std::string>& format = c10::nullopt,
       const c10::optional<OptionDict>& option = c10::nullopt);
@@ -79,7 +79,7 @@ class StreamReader {
   /// avfoundation)
   /// @param option Custom option passed when initializing format context
   /// (opening source).
-  explicit StreamReader(
+  explicit StreamingMediaDecoder(
       const std::string& src,
       const c10::optional<std::string>& format = c10::nullopt,
       const c10::optional<OptionDict>& option = c10::nullopt);
@@ -88,13 +88,13 @@ class StreamReader {
 
   /// @cond
 
-  ~StreamReader() = default;
+  ~StreamingMediaDecoder() = default;
   // Non-copyable
-  StreamReader(const StreamReader&) = delete;
-  StreamReader& operator=(const StreamReader&) = delete;
+  StreamingMediaDecoder(const StreamingMediaDecoder&) = delete;
+  StreamingMediaDecoder& operator=(const StreamingMediaDecoder&) = delete;
   // Movable
-  StreamReader(StreamReader&&) = default;
-  StreamReader& operator=(StreamReader&&) = default;
+  StreamingMediaDecoder(StreamingMediaDecoder&&) = default;
+  StreamingMediaDecoder& operator=(StreamingMediaDecoder&&) = default;
 
   /// @endcond
 
@@ -188,8 +188,8 @@ class StreamReader {
   ///
   ///   In addition to decoder-specific options, you can also pass options
   ///   related to multithreading. They are effective only if the decoder
-  ///   supports them. If neither of them are provided, StreamReader defaults to
-  ///   single thread.
+  ///   supports them. If neither of them are provided, StreamingMediaDecoder
+  ///   defaults to single thread.
   ///    - ``"threads"``: The number of threads or the value ``"0"``
   ///      to let FFmpeg decide based on its heuristics.
   ///    - ``"thread_type"``: Which multithreading method to use.
@@ -217,8 +217,8 @@ class StreamReader {
   /// @parblock
   /// When video is decoded on CUDA hardware, (for example by specifying
   /// `"h264_cuvid"` decoder), passing CUDA device indicator to ``hw_accel``
-  /// (i.e. ``hw_accel="cuda:0"``) will make StreamReader place the resulting
-  /// frames directly on the specified CUDA device as a CUDA tensor.
+  /// (i.e. ``hw_accel="cuda:0"``) will make StreamingMediaDecoder place the
+  /// resulting frames directly on the specified CUDA device as a CUDA tensor.
   ///
   /// If `None`, the chunk will be moved to CPU memory.
   /// @endparblock
@@ -234,7 +234,7 @@ class StreamReader {
   /// @cond
   /// Add a output packet stream.
   /// Allows for passing packets directly from the source stream, bypassing
-  /// the decode path, to ``StreamWriter`` for remuxing.
+  /// the decode path, to ``StreamingMediaEncoder`` for remuxing.
   ///
   /// @param i The index of the source stream.
   void add_packet_stream(int i);
@@ -341,7 +341,7 @@ class StreamReader {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// StreamReaderCustomIO
+// StreamingMediaDecoderCustomIO
 //////////////////////////////////////////////////////////////////////////////
 
 /// @cond
@@ -360,13 +360,14 @@ struct CustomInput {
 /// @endcond
 
 ///
-/// A subclass of StreamReader which works with custom read function.
+/// A subclass of StreamingMediaDecoder which works with custom read function.
 /// Can be used for decoding media from memory or custom object.
 ///
-class StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
+class StreamingMediaDecoderCustomIO : private detail::CustomInput,
+                                      public StreamingMediaDecoder {
  public:
   ///
-  /// Construct StreamReader with custom read and seek functions.
+  /// Construct StreamingMediaDecoder with custom read and seek functions.
   ///
   /// @param opaque Custom data used by ``read_packet`` and ``seek`` functions.
   /// @param format Specify input format.
@@ -376,7 +377,7 @@ class StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
   /// read data from the destination.
   /// @param seek Optional seek function that is used to seek the destination.
   /// @param option Custom option passed when initializing format context.
-  StreamReaderCustomIO(
+  StreamingMediaDecoderCustomIO(
       void* opaque,
       const c10::optional<std::string>& format,
       int buffer_size,
@@ -384,6 +385,10 @@ class StreamReaderCustomIO : private detail::CustomInput, public StreamReader {
       int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr,
       const c10::optional<OptionDict>& option = c10::nullopt);
 };
+
+// For BC
+using StreamReader = StreamingMediaDecoder;
+using StreamReaderCustomIO = StreamingMediaDecoderCustomIO;
 
 } // namespace io
 } // namespace torio
