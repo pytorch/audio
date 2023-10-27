@@ -56,14 +56,14 @@ extensions = [
     "breathe",
 ]
 
-breathe_projects = {"libtorchaudio": "cpp/xml"}
+breathe_projects = {"libtorio": "cpp/xml"}
 
-breathe_default_project = "libtorchaudio"
+breathe_default_project = "libtorio"
 
 breathe_projects_source = {
-    "libtorchaudio": (
-        "../../torchaudio/csrc/ffmpeg/",
-        ["ffmpeg.h"],
+    "libtorio": (
+        "../../src/libtorio/ffmpeg/",
+        ["stream_reader/stream_reader.h", "stream_writer/stream_writer.h"],
     )
 }
 
@@ -384,6 +384,13 @@ def inject_minigalleries(app, what, name, obj, options, lines):
 
 def setup(app):
     app.connect("autodoc-process-docstring", inject_minigalleries)
+
+    from torchaudio.io import StreamReader, StreamWriter
+
+    # need to assign the names here, otherwise autodoc won't document these classes,
+    # and will instead just say 'alias of ...'
+    StreamReader.__name__ = "StreamReader"
+    StreamWriter.__name__ = "StreamWriter"
 
 
 from custom_directives import CustomCardEnd, CustomCardItem, CustomCardStart, SupportedDevices, SupportedProperties

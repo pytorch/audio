@@ -13,14 +13,14 @@ Practically all the code is re-organization of examples;
 
 https://ffmpeg.org/doxygen/4.1/examples.html
 
-## StreamReader Architecture
+## StreamingMediaDecoder Architecture
 
-The top level class is `StreamReader` class. This class handles the input (via `AVFormatContext*`), and manages `StreamProcessor`s for each stream in the input.
+The top level class is `StreamingMediaDecoder` class. This class handles the input (via `AVFormatContext*`), and manages `StreamProcessor`s for each stream in the input.
 
-The `StreamReader` object slices the input data into a series of `AVPacket` objects and it feeds the objects to corresponding `StreamProcessor`s.
+The `StreamingMediaDecoder` object slices the input data into a series of `AVPacket` objects and it feeds the objects to corresponding `StreamProcessor`s.
 
 ```
- StreamReader
+ StreamingMediaDecoder
 ┌─────────────────────────────────────────────────┐
 │                                                 │
 │ AVFormatContext*       ┌──► StreamProcessor[0]  │

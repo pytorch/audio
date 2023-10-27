@@ -30,7 +30,7 @@ void Encoder::encode(AVFrame* frame) {
         // Possible follow up: Add flush_buffer method?
         // An alternative is to use `av_write_frame` functoin, but in that case
         // client code is responsible for ordering packets, which makes it
-        // complicated to use StreamWriter
+        // complicated to use StreamingMediaEncoder
         ret = av_interleaved_write_frame(format_ctx, nullptr);
         TORCH_CHECK(
             ret >= 0, "Failed to flush packet (", av_err2string(ret), ").");

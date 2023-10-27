@@ -22,7 +22,7 @@ def get_versions() -> Dict[str, Tuple[int]]:
 def get_log_level() -> int:
     """Get the log level of FFmpeg.
 
-    See :py:func:`set_log_level` for the detailo.
+    See :py:func:`set_log_level` for the detail.
     """
     return ffmpeg_ext.get_log_level()
 

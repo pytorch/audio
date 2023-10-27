@@ -827,8 +827,8 @@ EncodeProcess get_audio_encode_process(
 
   // 8. encoder
   // Note: get_stream modifies AVFormatContext and adds new stream.
-  // If anything after this throws, it will leave the StreamWriter in an
-  // invalid state.
+  // If anything after this throws, it will leave the StreamingMediaEncoder in
+  // an invalid state.
   Encoder enc{format_ctx, codec_ctx, get_stream(format_ctx, codec_ctx)};
 
   return EncodeProcess{
@@ -925,7 +925,7 @@ EncodeProcess get_video_encode_process(
   open_codec(codec_ctx, encoder_option);
 
   if (ends_with(codec_ctx->codec->name, "_nvenc")) {
-    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReaderCUDA");
+    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamingMediaDecoderCUDA");
   }
 
   // 5. Build filter graph
@@ -961,8 +961,8 @@ EncodeProcess get_video_encode_process(
 
   // 8. encoder
   // Note: get_stream modifies AVFormatContext and adds new stream.
-  // If anything after this throws, it will leave the StreamWriter in an
-  // invalid state.
+  // If anything after this throws, it will leave the StreamingMediaEncoder in
+  // an invalid state.
   Encoder enc{format_ctx, codec_ctx, get_stream(format_ctx, codec_ctx)};
 
   return EncodeProcess{

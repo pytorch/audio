@@ -38,22 +38,23 @@ AVFormatContext* get_output_format_context(
 }
 } // namespace
 
-StreamWriter::StreamWriter(AVFormatContext* p) : format_ctx(p) {
-  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamWriter");
+StreamingMediaEncoder::StreamingMediaEncoder(AVFormatContext* p)
+    : format_ctx(p) {
+  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamingMediaEncoder");
 }
 
-StreamWriter::StreamWriter(
+StreamingMediaEncoder::StreamingMediaEncoder(
     AVIOContext* io_ctx,
     const c10::optional<std::string>& format)
-    : StreamWriter(
+    : StreamingMediaEncoder(
           get_output_format_context("Custom Output Context", format, io_ctx)) {}
 
-StreamWriter::StreamWriter(
+StreamingMediaEncoder::StreamingMediaEncoder(
     const std::string& dst,
     const c10::optional<std::string>& format)
-    : StreamWriter(get_output_format_context(dst, format, nullptr)) {}
+    : StreamingMediaEncoder(get_output_format_context(dst, format, nullptr)) {}
 
-void StreamWriter::add_audio_stream(
+void StreamingMediaEncoder::add_audio_stream(
     int sample_rate,
     int num_channels,
     const std::string& format,
@@ -86,7 +87,7 @@ void StreamWriter::add_audio_stream(
   current_key++;
 }
 
-void StreamWriter::add_video_stream(
+void StreamingMediaEncoder::add_video_stream(
     double frame_rate,
     int width,
     int height,
@@ -125,7 +126,8 @@ void StreamWriter::add_video_stream(
   current_key++;
 }
 
-void StreamWriter::add_packet_stream(const StreamParams& stream_params) {
+void StreamingMediaEncoder::add_packet_stream(
+    const StreamParams& stream_params) {
   packet_writers.emplace(
       std::piecewise_construct,
       std::forward_as_tuple(stream_params.stream_index),
@@ -133,7 +135,7 @@ void StreamWriter::add_packet_stream(const StreamParams& stream_params) {
   current_key++;
 }
 
-void StreamWriter::add_audio_frame_stream(
+void StreamingMediaEncoder::add_audio_frame_stream(
     int sample_rate,
     int num_channels,
     const std::string& format,
@@ -167,7 +169,7 @@ void StreamWriter::add_audio_frame_stream(
   current_key++;
 }
 
-void StreamWriter::add_video_frame_stream(
+void StreamingMediaEncoder::add_video_frame_stream(
     double frame_rate,
     int width,
     int height,
@@ -207,18 +209,18 @@ void StreamWriter::add_video_frame_stream(
   current_key++;
 }
 
-void StreamWriter::set_metadata(const OptionDict& metadata) {
+void StreamingMediaEncoder::set_metadata(const OptionDict& metadata) {
   av_dict_free(&format_ctx->metadata);
   for (auto const& [key, value] : metadata) {
     av_dict_set(&format_ctx->metadata, key.c_str(), value.c_str(), 0);
   }
 }
 
-void StreamWriter::dump_format(int64_t i) {
+void StreamingMediaEncoder::dump_format(int64_t i) {
   av_dump_format(format_ctx, (int)i, format_ctx->url, 1);
 }
 
-void StreamWriter::open(const c10::optional<OptionDict>& option) {
+void StreamingMediaEncoder::open(const c10::optional<OptionDict>& option) {
   TORCH_INTERNAL_ASSERT(
       format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
@@ -257,7 +259,7 @@ void StreamWriter::open(const c10::optional<OptionDict>& option) {
   is_open = true;
 }
 
-void StreamWriter::close() {
+void StreamingMediaEncoder::close() {
   int ret = av_write_trailer(format_ctx);
   if (ret < 0) {
     LOG(WARNING) << "Failed to write trailer. (" << av_err2string(ret) << ").";
@@ -274,7 +276,7 @@ void StreamWriter::close() {
   is_open = false;
 }
 
-void StreamWriter::write_audio_chunk(
+void StreamingMediaEncoder::write_audio_chunk(
     int i,
     const torch::Tensor& waveform,
     const c10::optional<double>& pts) {
@@ -293,7 +295,7 @@ void StreamWriter::write_audio_chunk(
   processes.at(i).process(waveform, pts);
 }
 
-void StreamWriter::write_video_chunk(
+void StreamingMediaEncoder::write_video_chunk(
     int i,
     const torch::Tensor& frames,
     const c10::optional<double>& pts) {
@@ -312,7 +314,7 @@ void StreamWriter::write_video_chunk(
   processes.at(i).process(frames, pts);
 }
 
-void StreamWriter::write_packet(const AVPacketPtr& packet) {
+void StreamingMediaEncoder::write_packet(const AVPacketPtr& packet) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   int src_stream_index = packet->stream_index;
   TORCH_CHECK(
@@ -322,7 +324,7 @@ void StreamWriter::write_packet(const AVPacketPtr& packet) {
   packet_writers.at(src_stream_index).write_packet(packet);
 }
 
-void StreamWriter::write_frame(int i, AVFrame* frame) {
+void StreamingMediaEncoder::write_frame(int i, AVFrame* frame) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(format_ctx->nb_streams),
@@ -333,19 +335,19 @@ void StreamWriter::write_frame(int i, AVFrame* frame) {
   processes.at(i).process_frame(frame);
 }
 
-void StreamWriter::flush() {
+void StreamingMediaEncoder::flush() {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   for (auto& p : processes) {
     p.second.flush();
   }
 }
 
-int StreamWriter::num_output_streams() {
+int StreamingMediaEncoder::num_output_streams() {
   return static_cast<int>(processes.size() + packet_writers.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// StreamWriterCustomIO
+// StreamingMediaEncoderCustomIO
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace detail {
@@ -375,14 +377,14 @@ CustomOutput::CustomOutput(
     : io_ctx(get_io_context(opaque, buffer_size, write_packet, seek)) {}
 } // namespace detail
 
-StreamWriterCustomIO::StreamWriterCustomIO(
+StreamingMediaEncoderCustomIO::StreamingMediaEncoderCustomIO(
     void* opaque,
     const c10::optional<std::string>& format,
     int buffer_size,
     int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
     int64_t (*seek)(void* opaque, int64_t offset, int whence))
     : CustomOutput(opaque, buffer_size, write_packet, seek),
-      StreamWriter(io_ctx, format) {}
+      StreamingMediaEncoder(io_ctx, format) {}
 
 } // namespace io
 } // namespace torio
