@@ -331,3 +331,14 @@ In BibTeX format:
       journal={arXiv preprint arXiv:2110.15018},
       year={2021}
     }
+
+.. code-block:: bibtex
+
+   @misc{hwang2023torchaudio,
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
+      year={2023},
+      eprint={2310.17864},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS}
+   }
