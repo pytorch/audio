@@ -70,6 +70,18 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
         result = T.Vad(sample_rate)(data)
         self.assert_sox_effect(result, path, ["vad"])
 
+    @parameterized.expand(
+        [
+            (torch.zeros(32000), torch.zeros(0), 16000),
+            (torch.zeros(1, 32000), torch.zeros(1, 0), 32000),
+            (torch.zeros(2, 44100), torch.zeros(2, 0), 32000),
+            (torch.zeros(2, 2, 44100), torch.zeros(2, 2, 0), 32000),
+        ]
+    )
+    def test_vad_on_zero_audio(self, inpt: torch.Tensor, expected_output: torch.Tensor, sample_rate: int):
+        result = T.Vad(sample_rate)(inpt)
+        self.assertEqual(result, expected_output)
+
     def test_vad_warning(self):
         """vad should throw a warning if input dimension is greater than 2"""
         sample_rate = 41100
