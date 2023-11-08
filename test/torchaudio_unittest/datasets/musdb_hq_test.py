@@ -86,7 +86,6 @@ def get_mock_dataset(dataset_dir):
 
 class TestMusDB_HQ(TempDirMixin, TorchaudioTestCase):
     root_dir = None
-    backend = "default"
 
     train_all_samples = {}
     train_only_samples = {}

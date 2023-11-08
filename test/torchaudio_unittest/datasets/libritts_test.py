@@ -41,7 +41,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     data = []
