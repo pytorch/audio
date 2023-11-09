@@ -103,6 +103,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - uses: actions/checkout@v4
+      with:
+        path: src
     - uses: actions/checkout@v3
       with:
         ref: gh-pages
@@ -123,7 +126,7 @@ jobs:
            git commit --allow-empty -m "placeholder"
         fi
 
-        dirname="$(cat version.txt)"
+        dirname="$(cat src/version.txt)"
         rm -rf "${dirname}"
         mv html "${dirname}"
         git add --all "${dirname}" || true
