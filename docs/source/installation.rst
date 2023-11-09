@@ -127,6 +127,9 @@ Please refer to the following table for the matching versions.
    * - ``PyTorch``
      - ``TorchAudio``
      - ``Python``
+   * - ``2.1.0``
+     - ``2.1.0``
+     - ``>=3.8``, ``<=3.11``
    * - ``2.0.1``
      - ``2.0.2``
      - ``>=3.8``, ``<=3.11``
