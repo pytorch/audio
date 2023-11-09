@@ -123,7 +123,7 @@ jobs:
            git commit --allow-empty -m "placeholder"
         fi
 
-        dirname=2.1.0
+        dirname="$(cat version.txt)"
         rm -rf "${dirname}"
         mv html "${dirname}"
         git add --all "${dirname}" || true
