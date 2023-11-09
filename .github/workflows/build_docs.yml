@@ -151,6 +151,9 @@ jobs:
       with:
         ref: gh-pages
         fetch-depth: 5
+    - uses: actions/checkout@v4
+      with:
+        path: _src
     - uses: actions/download-artifact@v3
       with:
         name: docs
@@ -167,7 +170,7 @@ jobs:
            git commit --allow-empty -m "placeholder"
         fi
 
-        dirname="$(cat version.txt)"
+        dirname="$(cat _src/version.txt)"
         rm -rf "${dirname}"
         mv html "${dirname}"
         git add --all "${dirname}" || true
