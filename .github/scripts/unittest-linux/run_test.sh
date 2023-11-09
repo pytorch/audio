@@ -12,6 +12,7 @@ env | grep TORCHAUDIO || true
 export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
 declare -a args=(
+    '--continue-on-collection-errors'
     '-v'
     '--cov=torchaudio'
     "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
