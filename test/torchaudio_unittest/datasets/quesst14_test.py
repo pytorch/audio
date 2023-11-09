@@ -104,7 +104,6 @@ def get_mock_dataset(dataset_dir):
 
 class TestQuesst14(TempDirMixin, TorchaudioTestCase):
     root_dir = None
-    backend = "default"
 
     utterances = {}
     dev_samples = {}

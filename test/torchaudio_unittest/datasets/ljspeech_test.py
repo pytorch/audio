@@ -45,7 +45,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     data, _transcripts, _normalized_transcript = [], [], []

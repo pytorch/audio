@@ -135,8 +135,6 @@ def speed(path):
 
 @skipIfNoSox
 class TestProcessPoolExecutor(TempDirMixin, PytorchTestCase):
-    backend = "sox_io"
-
     def setUp(self):
         sample_rate = 16000
         self.flist = []

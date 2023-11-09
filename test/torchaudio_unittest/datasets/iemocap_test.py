@@ -91,7 +91,6 @@ def get_mock_dataset(dataset_dir: str):
 
 class TestIemocap(TempDirMixin, TorchaudioTestCase):
     root_dir = None
-    backend = "default"
 
     all_samples = []
     script_samples = []

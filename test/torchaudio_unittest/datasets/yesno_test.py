@@ -23,7 +23,6 @@ def get_mock_data(root_dir, labels):
 
 
 class TestYesNo(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     data = []

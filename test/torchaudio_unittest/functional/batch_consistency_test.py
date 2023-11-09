@@ -25,8 +25,6 @@ def _name_from_args(func, _, params):
 class TestFunctional(common_utils.TorchaudioTestCase):
     """Test functions defined in `functional` module"""
 
-    backend = "default"
-
     def assert_batch_consistency(self, functional, inputs, atol=1e-6, rtol=1e-5, seed=42):
         n = inputs[0].size(0)
         for i in range(1, len(inputs)):

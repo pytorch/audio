@@ -95,7 +95,6 @@ def get_mock_dataset(dataset_dir):
 
 
 class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples = []
