@@ -8,7 +8,6 @@ from torchaudio_unittest import common_utils
 
 
 class Tester(common_utils.TorchaudioTestCase):
-    backend = "default"
 
     # create a sinewave signal for testing
     sample_rate = 16000

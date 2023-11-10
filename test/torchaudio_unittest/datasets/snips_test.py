@@ -82,7 +82,6 @@ def get_mock_datasets(dataset_dir):
 
 class TestSnips(TempDirMixin, TorchaudioTestCase):
     root_dir = None
-    backend = "default"
 
     train_samples = {}
     valid_samples = {}

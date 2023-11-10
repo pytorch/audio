@@ -57,7 +57,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestVCTK(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples = []

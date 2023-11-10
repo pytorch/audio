@@ -142,7 +142,6 @@ class BaseTestCommonVoice(TempDirMixin):
 
 
 class TestCommonVoiceEN(BaseTestCommonVoice, TorchaudioTestCase):
-    backend = "default"
     root_dir = None
 
     @classmethod
@@ -160,7 +159,6 @@ class TestCommonVoiceEN(BaseTestCommonVoice, TorchaudioTestCase):
 
 
 class TestCommonVoiceFR(BaseTestCommonVoice, TorchaudioTestCase):
-    backend = "default"
     root_dir = None
 
     @classmethod

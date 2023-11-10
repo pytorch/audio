@@ -49,7 +49,6 @@ def get_mock_dataset(root_dir):
 
 
 class LibriSpeechTestMixin(TempDirMixin):
-    backend = "default"
 
     root_dir = None
     samples = []

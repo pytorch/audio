@@ -54,7 +54,6 @@ def _mock_dataset(root_dir, num_speaker):
 
 
 class TestWSJ0Mix2(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
     root_dir = None
     expected = None
 
@@ -78,7 +77,6 @@ class TestWSJ0Mix2(TempDirMixin, TorchaudioTestCase):
 
 
 class TestWSJ0Mix3(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
     root_dir = None
     expected = None
 

@@ -128,7 +128,6 @@ def get_mock_veri_dataset(root_dir: str, meta_file: str):
 
 class TestVoxCeleb1Identification(TempDirMixin, TorchaudioTestCase):
     root_dir = None
-    backend = "default"
 
     meta_file = "iden_list.txt"
     train_samples = {}
@@ -166,7 +165,6 @@ class TestVoxCeleb1Identification(TempDirMixin, TorchaudioTestCase):
 
 class TestVoxCeleb1Verification(TempDirMixin, TorchaudioTestCase):
     root_dir = None
-    backend = "default"
 
     meta_file = "veri_test.txt"
     train_samples = {}

@@ -10,8 +10,6 @@ from torchaudio_unittest import common_utils
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for classes defined in `transforms` module"""
 
-    backend = "default"
-
     def assert_batch_consistency(self, transform, batch, *args, atol=1e-8, rtol=1e-5, seed=42, **kwargs):
         n = batch.size(0)
 

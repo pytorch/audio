@@ -24,8 +24,6 @@ class TestFunctionalFloat64(Functional, PytorchTestCase):
 
 @skipIfNoSox
 class TestApplyCodec(TorchaudioTestCase):
-    backend = "sox_io"
-
     def _smoke_test(self, format, compression, check_num_frames):
         """
         The purpose of this test suite is to verify that apply_codec functionalities do not exhibit

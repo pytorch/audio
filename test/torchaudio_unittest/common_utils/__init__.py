@@ -1,5 +1,4 @@
 from .autograd_utils import use_deterministic_algorithms
-from .backend_utils import set_audio_backend
 from .case_utils import (
     disabledInCI,
     HttpServerMixin,
@@ -37,7 +36,6 @@ __all__ = [
     "get_whitenoise",
     "get_sinusoid",
     "get_spectrogram",
-    "set_audio_backend",
     "TempDirMixin",
     "HttpServerMixin",
     "TestBaseMixin",
