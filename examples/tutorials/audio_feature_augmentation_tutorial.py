@@ -25,6 +25,7 @@ print(torchaudio.__version__)
 
 import librosa
 import matplotlib.pyplot as plt
+from IPython.display import Audio
 from torchaudio.utils import download_asset
 
 ######################################################################
@@ -69,11 +70,6 @@ def get_spectrogram(
     return spectrogram(waveform)
 
 
-def plot_spec(ax, spec, title, ylabel="freq_bin"):
-    ax.set_title(title)
-    ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
-
-
 ######################################################################
 # SpecAugment
 # -----------
@@ -98,11 +94,15 @@ stretch = T.TimeStretch()
 spec_12 = stretch(spec, overriding_rate=1.2)
 spec_09 = stretch(spec, overriding_rate=0.9)
 
+
 ######################################################################
-#
-
-
+# Visualization
+# ~~~~~~~~~~~~~
 def plot():
+    def plot_spec(ax, spec, title):
+        ax.set_title(title)
+        ax.imshow(librosa.amplitude_to_db(spec), origin="lower", aspect="auto")
+
     fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
     plot_spec(axes[0], torch.abs(spec_12[0]), title="Stretched x1.2")
     plot_spec(axes[1], torch.abs(spec[0]), title="Original")
@@ -111,6 +111,30 @@ def plot():
 
 
 plot()
+
+
+######################################################################
+# Audio Samples
+# ~~~~~~~~~~~~~
+def preview(spec, rate=16000):
+    ispec = T.InverseSpectrogram()
+    waveform = ispec(spec)
+
+    return Audio(waveform[0].numpy().T, rate=rate)
+
+
+preview(spec)
+
+
+######################################################################
+#
+preview(spec_12)
+
+
+######################################################################
+#
+preview(spec_09)
+
 
 ######################################################################
 # Time and Frequency Masking
@@ -131,6 +155,10 @@ freq_masked = freq_masking(spec)
 
 
 def plot():
+    def plot_spec(ax, spec, title):
+        ax.set_title(title)
+        ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
+
     fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
     plot_spec(axes[0], spec[0], title="Original")
     plot_spec(axes[1], time_masked[0], title="Masked along time axis")
