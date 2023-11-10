@@ -1066,6 +1066,13 @@ class TimeStretch(torch.nn.Module):
                 Stretched spectrogram. The resulting tensor is of the corresponding complex dtype
                 as the input spectrogram, and the number of frames is changed to ``ceil(num_frame / rate)``.
         """
+        if not torch.is_complex(complex_specgrams):
+            warnings.warn(
+                "The input to TimeStretch must be complex type. "
+                "Providing non-complex tensor produces invalid results.",
+                stacklevel=4,
+            )
+
         if overriding_rate is None:
             if self.fixed_rate is None:
                 raise ValueError("If no fixed_rate is specified, must pass a valid rate to the forward method.")
