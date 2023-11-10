@@ -1020,31 +1020,27 @@ class TimeStretch(torch.nn.Module):
     Proposed in *SpecAugment* :cite:`specaugment`.
 
     Args:
-        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
+        hop_length (int or None, optional): Length of hop between STFT windows.
+            (Default: ``n_fft // 2``, where ``n_fft == (n_freq - 1) * 2``)
         n_freq (int, optional): number of filter banks from stft. (Default: ``201``)
         fixed_rate (float or None, optional): rate to speed up or slow down by.
             If None is provided, rate must be passed to the forward method. (Default: ``None``)
 
+    .. note::
+
+       The expected input is raw, complex-valued spectrogram.
+
     Example
-        >>> spectrogram = torchaudio.transforms.Spectrogram()
+        >>> spectrogram = torchaudio.transforms.Spectrogram(power=None)
         >>> stretch = torchaudio.transforms.TimeStretch()
         >>>
         >>> original = spectrogram(waveform)
-        >>> streched_1_2 = stretch(original, 1.2)
-        >>> streched_0_9 = stretch(original, 0.9)
+        >>> stretched_1_2 = stretch(original, 1.2)
+        >>> stretched_0_9 = stretch(original, 0.9)
 
-        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_1.png
+        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch.png
            :width: 600
-           :alt: Spectrogram streched by 1.2
-
-        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_2.png
-           :width: 600
-           :alt: The original spectrogram
-
-        .. image:: https://download.pytorch.org/torchaudio/doc-assets/specaugment_time_stretch_3.png
-           :width: 600
-           :alt: Spectrogram streched by 0.9
-
+           :alt: The visualization of stretched spectrograms.
     """
     __constants__ = ["fixed_rate"]
 
@@ -1067,8 +1063,8 @@ class TimeStretch(torch.nn.Module):
 
         Returns:
             Tensor:
-                Stretched spectrogram. The resulting tensor is of the same dtype as the input
-                spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
+                Stretched spectrogram. The resulting tensor is of the corresponding complex dtype
+                as the input spectrogram, and the number of frames is changed to ``ceil(num_frame / rate)``.
         """
         if overriding_rate is None:
             if self.fixed_rate is None:
