@@ -2,6 +2,10 @@ name: 📚 Documentation
 description: Report an issue related to https://pytorch.org/audio/stable/index.html
 
 body:
+- type: markdown
+  attributes:
+    value: >
+      <strong>PLEASE NOTE THAT THE TORCHAUDIO REPOSITORY IS NO LONGER ACTIVELY MONITORED.</strong> You will not likely get a response. For open discussions, visit https://discuss.pytorch.org/.
 - type: textarea
   attributes:
     label: 📚 The doc issue
