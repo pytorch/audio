@@ -5,7 +5,7 @@ body:
 - type: markdown
   attributes:
     value: >
-      <strong>PLEASE NOTE THAT THE TORCHAUDIO REPOSITORY IS NO LONGER ACTIVELY MONITORED.</strong> You will not likely get a response. For open discussions, visit https://discuss.pytorch.org/.
+      <strong>PLEASE NOTE THAT THE TORCHAUDIO REPOSITORY IS NO LONGER ACTIVELY MONITORED.</strong> You may not get a response. For open discussions, visit https://discuss.pytorch.org/.
 - type: textarea
   attributes:
     label: 🚀 The feature
