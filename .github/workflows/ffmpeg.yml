@@ -17,8 +17,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+=======
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@release/2.2
+>>>>>>> 66437b4b ([RELEASE-ONLY CHANGES] Branch Cut for Release 2.2.0)
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -38,8 +43,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+=======
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@release/2.2
+>>>>>>> 66437b4b ([RELEASE-ONLY CHANGES] Branch Cut for Release 2.2.0)
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -61,9 +71,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
         runner: ["macos-m1-stable", "macos-12"]
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+=======
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
+        runner: ["macos-m1-12", "macos-12"]
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@release/2.2
+>>>>>>> 66437b4b ([RELEASE-ONLY CHANGES] Branch Cut for Release 2.2.0)
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -84,8 +100,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
+=======
+        ffmpeg_version: ["4.4.4", "5.0.3", "6.0"]
+    uses: pytorch/test-infra/.github/workflows/windows_job.yml@release/2.2
+>>>>>>> 66437b4b ([RELEASE-ONLY CHANGES] Branch Cut for Release 2.2.0)
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
