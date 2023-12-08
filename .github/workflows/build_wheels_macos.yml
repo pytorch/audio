@@ -38,7 +38,7 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/build_wheels_macos.yml@release/2.2
     with:
       repository: ${{ matrix.repository }}
-      ref: nightly
+      ref: ""
       test-infra-repository: pytorch/test-infra
       test-infra-ref: release/2.2
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
