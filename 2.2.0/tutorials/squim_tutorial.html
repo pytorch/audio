@@ -588,7 +588,7 @@ plot data, pystoi, pesq for computing reference metrics.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/156k [00:00&lt;?, ?B/s]
-100%|##########| 156k/156k [00:00&lt;00:00, 86.1MB/s]
+100%|##########| 156k/156k [00:00&lt;00:00, 1.83MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_SPEECH</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_SPEECH</span></a><span class="p">)</span>
@@ -700,8 +700,9 @@ Resample the waveforms if necessary.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/squim_objective_dns2020.pth&quot; to /root/.cache/torch/hub/checkpoints/squim_objective_dns2020.pth
 
   0%|          | 0.00/28.2M [00:00&lt;?, ?B/s]
- 56%|#####6    | 15.8M/28.2M [00:00&lt;00:00, 166MB/s]
-100%|##########| 28.2M/28.2M [00:00&lt;00:00, 149MB/s]
+ 37%|###6      | 10.4M/28.2M [00:00&lt;00:00, 109MB/s]
+ 73%|#######3  | 20.7M/28.2M [00:00&lt;00:00, 107MB/s]
+100%|##########| 28.2M/28.2M [00:00&lt;00:00, 126MB/s]
 </pre></div>
 </div>
 <p>Compare model outputs with ground truths for distorted speech with 20dB
@@ -774,14 +775,15 @@ SI-SDR: -5.016279220581055
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/torchaudio/models/squim_subjective_bvcc_daps.pth&quot; to /root/.cache/torch/hub/checkpoints/squim_subjective_bvcc_daps.pth
 
   0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 12%|#1        | 42.5M/360M [00:00&lt;00:00, 445MB/s]
- 26%|##5       | 92.3M/360M [00:00&lt;00:00, 491MB/s]
- 39%|###8      | 139M/360M [00:00&lt;00:00, 421MB/s]
- 52%|#####1    | 186M/360M [00:00&lt;00:00, 447MB/s]
- 65%|######5   | 235M/360M [00:00&lt;00:00, 469MB/s]
- 79%|#######9  | 285M/360M [00:00&lt;00:00, 488MB/s]
- 92%|#########2| 332M/360M [00:00&lt;00:00, 478MB/s]
-100%|##########| 360M/360M [00:00&lt;00:00, 473MB/s]
+ 12%|#1        | 41.8M/360M [00:00&lt;00:00, 438MB/s]
+ 23%|##3       | 83.5M/360M [00:00&lt;00:00, 354MB/s]
+ 33%|###2      | 118M/360M [00:00&lt;00:00, 346MB/s]
+ 44%|####4     | 160M/360M [00:00&lt;00:00, 378MB/s]
+ 57%|#####7    | 206M/360M [00:00&lt;00:00, 415MB/s]
+ 68%|######8   | 246M/360M [00:00&lt;00:00, 412MB/s]
+ 79%|#######9  | 286M/360M [00:00&lt;00:00, 397MB/s]
+ 90%|######### | 324M/360M [00:00&lt;00:00, 395MB/s]
+100%|##########| 360M/360M [00:01&lt;00:00, 372MB/s]
 </pre></div>
 </div>
 <p>Load a non-matching reference (NMR)</p>
@@ -833,7 +835,7 @@ Acoustics, Speech and Signal Processing (ICASSP), pp. 911-915. IEEE,
 where y axis represents the estimated MOS metric score, and x axis
 represents the corresponding ground truth.</p>
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png"><img alt="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" class="align-center" src="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" style="width: 500px;" /></a>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.131 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.527 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-squim-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c943e35bc7cad6e8d9b1df2a7034a8fc/squim_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">squim_tutorial.py</span></code></a></p>
@@ -870,7 +872,7 @@ represents the corresponding ground truth.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Torchaudio Contributors.
+        &copy; Copyright 2024, Torchaudio Contributors.
 
     </p>
   </div>

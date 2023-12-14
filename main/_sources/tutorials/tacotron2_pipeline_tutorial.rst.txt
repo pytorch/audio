@@ -102,8 +102,8 @@ encoding.
 
  .. code-block:: none
 
-    2.2.0.dev20231213
-    2.2.0.dev20231214
+    2.3.0.dev20240129
+    2.2.0.dev20240130
     cuda
 
 
@@ -299,8 +299,8 @@ fetched.
 
  .. code-block:: none
 
-      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 56.0k/63.6M [00:00<03:30, 317kB/s]      0%|          | 256k/63.6M [00:00<01:23, 795kB/s]       1%|1         | 952k/63.6M [00:00<00:29, 2.23MB/s]      5%|5         | 3.25M/63.6M [00:00<00:09, 6.65MB/s]     13%|#3        | 8.45M/63.6M [00:00<00:03, 15.1MB/s]     22%|##1       | 13.7M/63.6M [00:01<00:02, 20.3MB/s]     30%|###       | 19.2M/63.6M [00:01<00:01, 24.0MB/s]     39%|###9      | 25.0M/63.6M [00:01<00:01, 26.9MB/s]     43%|####3     | 27.5M/63.6M [00:01<00:01, 26.9MB/s]     49%|####8     | 31.1M/63.6M [00:01<00:01, 24.8MB/s]     56%|#####6    | 35.7M/63.6M [00:01<00:01, 25.3MB/s]     64%|######3   | 40.5M/63.6M [00:02<00:00, 26.1MB/s]     72%|#######1  | 45.7M/63.6M [00:02<00:00, 27.2MB/s]     80%|########  | 51.0M/63.6M [00:02<00:00, 28.4MB/s]     89%|########9 | 56.7M/63.6M [00:02<00:00, 29.8MB/s]     97%|#########7| 61.9M/63.6M [00:02<00:00, 34.5MB/s]    100%|##########| 63.6M/63.6M [00:02<00:00, 23.6MB/s]
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 128k/63.6M [00:00<01:32, 724kB/s]      1%|          | 384k/63.6M [00:00<00:57, 1.15MB/s]      2%|1         | 1.25M/63.6M [00:00<00:22, 2.95MB/s]      7%|7         | 4.50M/63.6M [00:00<00:06, 9.23MB/s]     15%|#5        | 9.75M/63.6M [00:00<00:03, 16.9MB/s]     24%|##4       | 15.4M/63.6M [00:01<00:02, 22.2MB/s]     32%|###1      | 20.1M/63.6M [00:01<00:01, 28.1MB/s]     38%|###7      | 24.0M/63.6M [00:01<00:01, 26.6MB/s]     44%|####3     | 27.9M/63.6M [00:01<00:01, 29.7MB/s]     52%|#####1    | 32.9M/63.6M [00:01<00:01, 30.0MB/s]     58%|#####7    | 36.8M/63.6M [00:01<00:00, 32.1MB/s]     65%|######5   | 41.4M/63.6M [00:01<00:00, 31.1MB/s]     71%|#######   | 45.0M/63.6M [00:02<00:00, 32.1MB/s]     79%|#######8  | 50.1M/63.6M [00:02<00:00, 32.2MB/s]     84%|########4 | 53.8M/63.6M [00:02<00:00, 33.0MB/s]     92%|#########1| 58.4M/63.6M [00:02<00:00, 31.7MB/s]     98%|#########7| 62.2M/63.6M [00:02<00:00, 33.2MB/s]    100%|##########| 63.6M/63.6M [00:02<00:00, 26.1MB/s]
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
              20, 11, 79, 77, 59, 37,  2]])
@@ -392,10 +392,10 @@ For the available bundles, and its usage, please refer to
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     41%|####1     | 44.5M/107M [00:00<00:00, 467MB/s]     83%|########2 | 89.1M/107M [00:00<00:00, 387MB/s]    100%|##########| 107M/107M [00:00<00:00, 411MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     37%|###6      | 39.6M/107M [00:00<00:00, 415MB/s]     74%|#######3  | 79.2M/107M [00:00<00:00, 362MB/s]    100%|##########| 107M/107M [00:00<00:00, 374MB/s] 
 
 
 
@@ -493,10 +493,10 @@ WaveRNN model from the same bundle.
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     Downloading: "https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
-      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 347MB/s]
+      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 383MB/s]
 
 
 
@@ -581,10 +581,10 @@ method and pass the spectrogram.
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]      9%|8         | 9.48M/107M [00:00<00:01, 98.8MB/s]     18%|#7        | 18.9M/107M [00:00<00:00, 93.8MB/s]     53%|#####2    | 56.5M/107M [00:00<00:00, 225MB/s]      77%|#######6  | 82.5M/107M [00:00<00:00, 243MB/s]    100%|##########| 107M/107M [00:00<00:00, 237MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     23%|##2       | 24.4M/107M [00:00<00:00, 253MB/s]     45%|####5     | 48.6M/107M [00:00<00:00, 225MB/s]     75%|#######4  | 80.5M/107M [00:00<00:00, 271MB/s]     99%|#########9| 107M/107M [00:00<00:00, 258MB/s]     100%|##########| 107M/107M [00:00<00:00, 255MB/s]
 
 
 
@@ -666,7 +666,7 @@ module.
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/hub.py:294: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/hub.py:293: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
       warnings.warn(
     Downloading: "https://github.com/NVIDIA/DeepLearningExamples/zipball/torchhub" to /root/.cache/torch/hub/torchhub.zip
     /root/.cache/torch/hub/NVIDIA_DeepLearningExamples_torchhub/PyTorch/Classification/ConvNets/image_classification/models/common.py:13: UserWarning: pytorch_quantization module not found, quantization will not be available
@@ -712,7 +712,7 @@ module.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  0.867 seconds)
+   **Total running time of the script:** ( 1 minutes  50.902 seconds)
 
 
 .. _sphx_glr_download_tutorials_tacotron2_pipeline_tutorial.py:

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Torchaudio 2.2.0.dev20231214 documentation</title>
+  <title>Index &mdash; Torchaudio 2.2.0.dev20240130 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20231214 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20240130 &#x25BC</span></a>
     </div>
     
 
@@ -320,6 +320,11 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torio.utils.html">torio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
@@ -528,22 +533,22 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_audio_stream">add_audio_stream() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_audio_stream">add_audio_stream() (torio.io.StreamingMediaDecoder method)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.add_audio_stream">(torchaudio.io.StreamWriter method)</a>
+        <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.add_audio_stream">(torio.io.StreamingMediaEncoder method)</a>
 </li>
       </ul></li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_audio_stream">add_basic_audio_stream() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_basic_audio_stream">add_basic_audio_stream() (torio.io.StreamingMediaDecoder method)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_video_stream">add_basic_video_stream() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_basic_video_stream">add_basic_video_stream() (torio.io.StreamingMediaDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.functional.add_noise.html#torchaudio.functional.add_noise">add_noise() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_video_stream">add_video_stream() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_video_stream">add_video_stream() (torio.io.StreamingMediaDecoder method)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.add_video_stream">(torchaudio.io.StreamWriter method)</a>
+        <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.add_video_stream">(torio.io.StreamingMediaEncoder method)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.transforms.AddNoise.html#torchaudio.transforms.AddNoise">AddNoise (class in torchaudio.transforms)</a>
@@ -598,13 +603,13 @@
 </li>
       <li><a href="generated/torchaudio.functional.biquad.html#torchaudio.functional.biquad">biquad() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig.bit_rate">bit_rate (torchaudio.io.CodecConfig attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.bit_rate">bit_rate (torio.io._streaming_media_decoder.SourceStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.bit_rate">(torio.io._streaming_media_decoder.SourceStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.CodecConfig.bit_rate">(torio.io.CodecConfig attribute)</a>
 </li>
       </ul></li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.bits_per_sample">bits_per_sample (torio.io._streaming_media_decoder.SourceStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.bits_per_sample">bits_per_sample (torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -622,27 +627,31 @@
 </li>
       <li><a href="generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram">ChromaSpectrogram (class in torchaudio.prototype.transforms)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.ChunkTensor">ChunkTensor (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.ChunkTensor">ChunkTensor (class in torio.io._streaming_media_decoder)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.clear_cuda_context_cache">clear_cuda_context_cache() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.clear_cuda_context_cache">(in module torio.utils.ffmpeg_utils)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.close">close() (torchaudio.io.StreamWriter method)</a>
+      </ul></li>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.close">close() (torio.io.StreamingMediaEncoder method)</a>
 </li>
       <li><a href="generated/torchaudio.datasets.CMUARCTIC.html#torchaudio.datasets.CMUARCTIC">CMUARCTIC (class in torchaudio.datasets)</a>
 </li>
       <li><a href="generated/torchaudio.datasets.CMUDict.html#torchaudio.datasets.CMUDict">CMUDict (class in torchaudio.datasets)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.codec">codec (torio.io._streaming_media_decoder.SourceStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.codec">codec (torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.codec_long_name">codec_long_name (torio.io._streaming_media_decoder.SourceStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.codec_long_name">codec_long_name (torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig">CodecConfig (class in torchaudio.io)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.CodecConfig">CodecConfig (class in torio.io)</a>
 </li>
       <li><a href="generated/torchaudio.datasets.COMMONVOICE.html#torchaudio.datasets.COMMONVOICE">COMMONVOICE (class in torchaudio.datasets)</a>
 </li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLMState.compare">compare() (torchaudio.models.decoder.CTCDecoderLMState method)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig.compression_level">compression_level (torchaudio.io.CodecConfig attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.CodecConfig.compression_level">compression_level (torio.io.CodecConfig attribute)</a>
 </li>
       <li><a href="generated/torchaudio.functional.compute_deltas.html#torchaudio.functional.compute_deltas">compute_deltas() (in module torchaudio.functional)</a>
 </li>
@@ -726,9 +735,9 @@
 </li>
       <li><a href="generated/torchaudio.models.DeepSpeech.html#torchaudio.models.DeepSpeech">DeepSpeech (class in torchaudio.models)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.default_audio_stream">default_audio_stream (torchaudio.io.StreamReader property)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.default_audio_stream">default_audio_stream (torio.io.StreamingMediaDecoder property)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.default_video_stream">default_video_stream (torchaudio.io.StreamReader property)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.default_video_stream">default_video_stream (torio.io.StreamingMediaDecoder property)</a>
 </li>
       <li><a href="generated/torchaudio.functional.detect_pitch_frequency.html#torchaudio.functional.detect_pitch_frequency">detect_pitch_frequency() (in module torchaudio.functional)</a>
 </li>
@@ -790,9 +799,9 @@
 </li>
       <li><a href="generated/torchaudio.functional.fftconvolve.html#torchaudio.functional.fftconvolve">fftconvolve() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.fill_buffer">fill_buffer() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.fill_buffer">fill_buffer() (torio.io.StreamingMediaDecoder method)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputStream.filter_description">filter_description (torio.io._streaming_media_decoder.OutputStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputStream.filter_description">filter_description (torio.io._streaming_media_decoder.OutputStream attribute)</a>
 </li>
       <li><a href="generated/torchaudio.prototype.functional.filter_waveform.html#torchaudio.prototype.functional.filter_waveform">filter_waveform() (in module torchaudio.prototype.functional)</a>
 </li>
@@ -804,14 +813,14 @@
 </li>
       <li><a href="generated/torchaudio.datasets.FluentSpeechCommands.html#torchaudio.datasets.FluentSpeechCommands">FluentSpeechCommands (class in torchaudio.datasets)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.flush">flush() (torchaudio.io.StreamWriter method)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.flush">flush() (torio.io.StreamingMediaEncoder method)</a>
 </li>
       <li><a href="generated/torchaudio.functional.forced_align.html#torchaudio.functional.forced_align">forced_align() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputStream.format">format (torio.io._streaming_media_decoder.OutputStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputStream.format">format (torio.io._streaming_media_decoder.OutputStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.format">(torio.io._streaming_media_decoder.SourceStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.format">(torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.models.Conformer.html#torchaudio.models.Conformer.forward">forward() (torchaudio.models.Conformer method)</a>
@@ -930,10 +939,10 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputVideoStream.frame_rate">frame_rate (torio.io._streaming_media_decoder.OutputVideoStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputVideoStream.frame_rate">frame_rate (torio.io._streaming_media_decoder.OutputVideoStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceVideoStream.frame_rate">(torio.io._streaming_media_decoder.SourceVideoStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceVideoStream.frame_rate">(torio.io._streaming_media_decoder.SourceVideoStream attribute)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.functional.frechet_distance.html#torchaudio.functional.frechet_distance">frechet_distance() (in module torchaudio.functional)</a>
@@ -953,17 +962,33 @@
       <li><a href="generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_aligner">get_aligner() (torchaudio.pipelines.Wav2Vec2FABundle method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders">get_audio_decoders() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_audio_decoders">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_encoders">get_audio_encoders() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_audio_encoders">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.get_buffer_size">get_buffer_size() (in module torchaudio.utils.sox_utils)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_build_config">get_build_config() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_build_config">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_decoder">get_decoder() (torchaudio.pipelines.RNNTBundle method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_demuxers">get_demuxers() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_demuxers">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_dict">get_dict() (torchaudio.pipelines.Wav2Vec2FABundle method)</a>
 </li>
       <li><a href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_feature_extractor">get_feature_extractor() (torchaudio.pipelines.RNNTBundle method)</a>
@@ -971,11 +996,19 @@
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoder.get_final_hypothesis">get_final_hypothesis() (torchaudio.models.decoder.CTCDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_devices">get_input_devices() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_input_devices">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle.get_input_processor">get_input_processor() (torchaudio.prototype.pipelines.VGGishBundle method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_protocols">get_input_protocols() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_input_protocols">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">get_labels() (torchaudio.pipelines.Wav2Vec2ASRBundle method)</a>
 
       <ul>
@@ -983,7 +1016,11 @@
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_log_level">get_log_level() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_log_level">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform">get_mel_transform() (torchaudio.prototype.pipelines.HiFiGANVocoderBundle method)</a>
 </li>
       <li><a href="generated/torchaudio.datasets.FluentSpeechCommands.html#torchaudio.datasets.FluentSpeechCommands.get_metadata">get_metadata() (torchaudio.datasets.FluentSpeechCommands method)</a>
@@ -1005,9 +1042,9 @@
 </li>
         <li><a href="generated/torchaudio.datasets.VoxCeleb1Verification.html#torchaudio.datasets.VoxCeleb1Verification.get_metadata">(torchaudio.datasets.VoxCeleb1Verification method)</a>
 </li>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_metadata">(torchaudio.io.StreamReader method)</a>
-</li>
         <li><a href="generated/torchaudio.prototype.datasets.Musan.html#torchaudio.prototype.datasets.Musan.get_metadata">(torchaudio.prototype.datasets.Musan method)</a>
+</li>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_metadata">(torio.io.StreamingMediaDecoder method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1029,14 +1066,26 @@
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_muxers">get_muxers() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_muxers">(in module torio.utils.ffmpeg_utils)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info">get_out_stream_info() (torchaudio.io.StreamReader method)</a>
+      </ul></li>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_out_stream_info">get_out_stream_info() (torio.io.StreamingMediaDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_devices">get_output_devices() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_output_devices">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_protocols">get_output_protocols() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_output_protocols">(in module torio.utils.ffmpeg_utils)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info">get_src_stream_info() (torchaudio.io.StreamReader method)</a>
+      </ul></li>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_src_stream_info">get_src_stream_info() (torio.io.StreamingMediaDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.get_streaming_feature_extractor">get_streaming_feature_extractor() (torchaudio.pipelines.RNNTBundle method)</a>
 </li>
@@ -1049,18 +1098,30 @@
       <li><a href="generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_tokenizer">get_tokenizer() (torchaudio.pipelines.Wav2Vec2FABundle method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_versions">get_versions() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_versions">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders">get_video_decoders() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_video_decoders">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_encoders">get_video_encoders() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.get_video_encoders">(in module torio.utils.ffmpeg_utils)</a>
 </li>
+      </ul></li>
       <li><a href="generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder">get_vocoder() (torchaudio.pipelines.Tacotron2TTSBundle method)</a>
 
       <ul>
         <li><a href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_vocoder">(torchaudio.prototype.pipelines.HiFiGANVocoderBundle method)</a>
 </li>
       </ul></li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig.gop_size">gop_size (torchaudio.io.CodecConfig attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.CodecConfig.gop_size">gop_size (torio.io.CodecConfig attribute)</a>
 </li>
       <li><a href="generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim">GriffinLim (class in torchaudio.transforms)</a>
 </li>
@@ -1086,10 +1147,10 @@
 </li>
       <li><a href="generated/torchaudio.models.hdemucs_medium.html#torchaudio.models.hdemucs_medium">hdemucs_medium() (in module torchaudio.models)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputVideoStream.height">height (torio.io._streaming_media_decoder.OutputVideoStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputVideoStream.height">height (torio.io._streaming_media_decoder.OutputVideoStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceVideoStream.height">(torio.io._streaming_media_decoder.SourceVideoStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceVideoStream.height">(torio.io._streaming_media_decoder.SourceVideoStream attribute)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.prototype.models.hifigan_vocoder.html#torchaudio.prototype.models.hifigan_vocoder">hifigan_vocoder() (in module torchaudio.prototype.models)</a>
@@ -1180,7 +1241,7 @@
 </li>
       <li><a href="generated/torchaudio.transforms.InverseSpectrogram.html#torchaudio.transforms.InverseSpectrogram">InverseSpectrogram (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.is_buffer_ready">is_buffer_ready() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.is_buffer_ready">is_buffer_ready() (torio.io.StreamingMediaDecoder method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1240,12 +1301,12 @@
 </li>
       <li><a href="generated/torchaudio.functional.mask_along_axis_iid.html#torchaudio.functional.mask_along_axis_iid">mask_along_axis_iid() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig.max_b_frames">max_b_frames (torchaudio.io.CodecConfig attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.CodecConfig.max_b_frames">max_b_frames (torio.io.CodecConfig attribute)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputStream.media_type">media_type (torio.io._streaming_media_decoder.OutputStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputStream.media_type">media_type (torio.io._streaming_media_decoder.OutputStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.media_type">(torio.io._streaming_media_decoder.SourceStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.media_type">(torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.transforms.MelScale.html#torchaudio.transforms.MelScale">MelScale (class in torchaudio.transforms)</a>
@@ -1256,7 +1317,7 @@
 </li>
       <li><a href="generated/torchaudio.functional.merge_tokens.html#torchaudio.functional.merge_tokens">merge_tokens() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.metadata">metadata (torio.io._streaming_media_decoder.SourceStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.metadata">metadata (torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
       <li><a href="generated/torchaudio.transforms.MFCC.html#torchaudio.transforms.MFCC">MFCC (class in torchaudio.transforms)</a>
 </li>
@@ -1304,6 +1365,14 @@
 </li>
         <li><a href="generated/torchaudio.utils.sox_utils.html#module-torchaudio.utils.sox_utils">torchaudio.utils.sox_utils</a>
 </li>
+        <li><a href="torio.html#module-torio">torio</a>
+</li>
+        <li><a href="torio.io.html#module-torio.io">torio.io</a>
+</li>
+        <li><a href="torio.utils.html#module-torio.utils">torio.utils</a>
+</li>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#module-torio.utils.ffmpeg_utils">torio.utils.ffmpeg_utils</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1335,19 +1404,19 @@
 </li>
       <li><a href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.n_mels">n_mels (torchaudio.pipelines.RNNTBundle property)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputAudioStream.num_channels">num_channels (torio.io._streaming_media_decoder.OutputAudioStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputAudioStream.num_channels">num_channels (torio.io._streaming_media_decoder.OutputAudioStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceAudioStream.num_channels">(torio.io._streaming_media_decoder.SourceAudioStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceAudioStream.num_channels">(torio.io._streaming_media_decoder.SourceAudioStream attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream.num_frames">num_frames (torio.io._streaming_media_decoder.SourceStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream.num_frames">num_frames (torio.io._streaming_media_decoder.SourceStream attribute)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.num_out_streams">num_out_streams (torchaudio.io.StreamReader property)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.num_out_streams">num_out_streams (torio.io.StreamingMediaDecoder property)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.num_src_streams">num_src_streams (torchaudio.io.StreamReader property)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.num_src_streams">num_src_streams (torio.io.StreamingMediaDecoder property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1355,17 +1424,17 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.open">open() (torchaudio.io.StreamWriter method)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.open">open() (torio.io.StreamingMediaEncoder method)</a>
 </li>
       <li><a href="generated/torchaudio.prototype.functional.oscillator_bank.html#torchaudio.prototype.functional.oscillator_bank">oscillator_bank() (in module torchaudio.prototype.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputAudioStream">OutputAudioStream (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputAudioStream">OutputAudioStream (class in torio.io._streaming_media_decoder)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputStream">OutputStream (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputStream">OutputStream (class in torio.io._streaming_media_decoder)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputVideoStream">OutputVideoStream (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputVideoStream">OutputVideoStream (class in torio.io._streaming_media_decoder)</a>
 </li>
       <li><a href="generated/torchaudio.functional.overdrive.html#torchaudio.functional.overdrive">overdrive() (in module torchaudio.functional)</a>
 </li>
@@ -1387,7 +1456,7 @@
 </li>
       <li><a href="generated/torchaudio.io.play_audio.html#torchaudio.io.play_audio">play_audio (class in torchaudio.io)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.pop_chunks">pop_chunks() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.pop_chunks">pop_chunks() (torio.io.StreamingMediaDecoder method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1397,15 +1466,15 @@
 </li>
       <li><a href="generated/torchaudio.functional.preemphasis.html#torchaudio.functional.preemphasis">preemphasis() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.process_all_packets">process_all_packets() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.process_all_packets">process_all_packets() (torio.io.StreamingMediaDecoder method)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.process_packet">process_packet() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.process_packet">process_packet() (torio.io.StreamingMediaDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD">PSD (class in torchaudio.transforms)</a>
 </li>
       <li><a href="generated/torchaudio.functional.psd.html#torchaudio.functional.psd">psd() (in module torchaudio.functional)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.ChunkTensor.pts">pts (torio.io._streaming_media_decoder.ChunkTensor attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.ChunkTensor.pts">pts (torio.io._streaming_media_decoder.ChunkTensor attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1413,7 +1482,7 @@
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.CodecConfig.qscale">qscale (torchaudio.io.CodecConfig attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.CodecConfig.qscale">qscale (torio.io.CodecConfig attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1437,7 +1506,7 @@
 </li>
       <li><a href="kaldi_io.html#torchaudio.kaldi_io.read_vec_int_ark">read_vec_int_ark() (in module torchaudio.kaldi_io)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.remove_stream">remove_stream() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.remove_stream">remove_stream() (torio.io.StreamingMediaDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.transforms.Resample.html#torchaudio.transforms.Resample">Resample (class in torchaudio.transforms)</a>
 </li>
@@ -1492,9 +1561,9 @@
 </li>
         <li><a href="generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle.sample_rate">(torchaudio.prototype.pipelines.VGGishBundle property)</a>
 </li>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputAudioStream.sample_rate">(torio.io._streaming_media_decoder.OutputAudioStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputAudioStream.sample_rate">(torio.io._streaming_media_decoder.OutputAudioStream attribute)</a>
 </li>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceAudioStream.sample_rate">(torio.io._streaming_media_decoder.SourceAudioStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceAudioStream.sample_rate">(torio.io._streaming_media_decoder.SourceAudioStream attribute)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.save.html#torchaudio.save">save() (in module torchaudio)</a>
@@ -1509,15 +1578,19 @@
       </ul></li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCDecoderLM.score">score() (torchaudio.models.decoder.CTCDecoderLM method)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.seek">seek() (torchaudio.io.StreamReader method)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.seek">seek() (torio.io.StreamingMediaDecoder method)</a>
 </li>
       <li><a href="generated/torchaudio.pipelines.RNNTBundle.html#torchaudio.pipelines.RNNTBundle.segment_length">segment_length (torchaudio.pipelines.RNNTBundle property)</a>
 </li>
       <li><a href="generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_buffer_size">set_buffer_size() (in module torchaudio.utils.sox_utils)</a>
 </li>
       <li><a href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.set_log_level">set_log_level() (in module torchaudio.utils.ffmpeg_utils)</a>
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#torio.utils.ffmpeg_utils.set_log_level">(in module torio.utils.ffmpeg_utils)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.set_metadata">set_metadata() (torchaudio.io.StreamWriter method)</a>
+      </ul></li>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.set_metadata">set_metadata() (torio.io.StreamingMediaEncoder method)</a>
 </li>
       <li><a href="generated/torchaudio.utils.sox_utils.html#torchaudio.utils.sox_utils.set_seed">set_seed() (in module torchaudio.utils.sox_utils)</a>
 </li>
@@ -1539,15 +1612,15 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputStream.source_index">source_index (torio.io._streaming_media_decoder.OutputStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputStream.source_index">source_index (torio.io._streaming_media_decoder.OutputStream attribute)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceAudioStream">SourceAudioStream (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceAudioStream">SourceAudioStream (class in torio.io._streaming_media_decoder)</a>
 </li>
       <li><a href="generated/torchaudio.pipelines.SourceSeparationBundle.html#torchaudio.pipelines.SourceSeparationBundle">SourceSeparationBundle (class in torchaudio.pipelines)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceStream">SourceStream (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceStream">SourceStream (class in torio.io._streaming_media_decoder)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceVideoStream">SourceVideoStream (class in torio.io._streaming_media_decoder)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceVideoStream">SourceVideoStream (class in torio.io._streaming_media_decoder)</a>
 </li>
       <li><a href="generated/torchaudio.functional.spectral_centroid.html#torchaudio.functional.spectral_centroid">spectral_centroid() (in module torchaudio.functional)</a>
 </li>
@@ -1596,12 +1669,16 @@
       <li><a href="generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.stream">stream() (torchaudio.io.AudioEffector method)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.stream">(torchaudio.io.StreamReader method)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.stream">(torio.io.StreamingMediaDecoder method)</a>
 </li>
       </ul></li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader">StreamReader (class in torchaudio.io)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder">StreamingMediaDecoder (class in torio.io)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter">StreamWriter (class in torchaudio.io)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder">StreamingMediaEncoder (class in torio.io)</a>
+</li>
+      <li><a href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader">StreamReader (in module torchaudio.io)</a>
+</li>
+      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter">StreamWriter (in module torchaudio.io)</a>
 </li>
       <li><a href="generated/torchaudio.datasets.CMUDict.html#torchaudio.datasets.CMUDict.symbols">symbols (torchaudio.datasets.CMUDict property)</a>
 </li>
@@ -1775,6 +1852,36 @@
         <li><a href="generated/torchaudio.utils.sox_utils.html#module-torchaudio.utils.sox_utils">module</a>
 </li>
       </ul></li>
+      <li>
+    torio
+
+      <ul>
+        <li><a href="torio.html#module-torio">module</a>
+</li>
+      </ul></li>
+      <li>
+    torio.io
+
+      <ul>
+        <li><a href="torio.io.html#module-torio.io">module</a>
+</li>
+      </ul></li>
+      <li>
+    torio.utils
+
+      <ul>
+        <li><a href="torio.utils.html#module-torio.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    torio.utils.ffmpeg_utils
+
+      <ul>
+        <li><a href="generated/torio.utils.ffmpeg_utils.html#module-torio.utils.ffmpeg_utils">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libtorio.stream_reader.html#_CPPv4N5torio2io5ChunkE">torio::io::Chunk (C++ struct)</a>
 </li>
       <li><a href="libtorio.stream_reader.html#_CPPv4N5torio2io5Chunk6framesE">torio::io::Chunk::frames (C++ member)</a>
@@ -1783,8 +1890,6 @@
 </li>
       <li><a href="libtorio.stream_reader.html#_CPPv4N5torio2io16OutputStreamInfoE">torio::io::OutputStreamInfo (C++ struct)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libtorio.stream_reader.html#_CPPv4N5torio2io16OutputStreamInfo18filter_descriptionE">torio::io::OutputStreamInfo::filter_description (C++ member)</a>
 </li>
       <li><a href="libtorio.stream_reader.html#_CPPv4N5torio2io16OutputStreamInfo6formatE">torio::io::OutputStreamInfo::format (C++ member)</a>
@@ -2021,10 +2126,10 @@
 </li>
       <li><a href="generated/torchaudio.models.wavlm_model.html#torchaudio.models.wavlm_model">wavlm_model() (in module torchaudio.models)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.OutputVideoStream.width">width (torio.io._streaming_media_decoder.OutputVideoStream attribute)</a>
+      <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.OutputVideoStream.width">width (torio.io._streaming_media_decoder.OutputVideoStream attribute)</a>
 
       <ul>
-        <li><a href="generated/torchaudio.io.StreamReader.html#torio.io._streaming_media_decoder.SourceVideoStream.width">(torio.io._streaming_media_decoder.SourceVideoStream attribute)</a>
+        <li><a href="generated/torio.io.StreamingMediaDecoder.html#torio.io._streaming_media_decoder.SourceVideoStream.width">(torio.io._streaming_media_decoder.SourceVideoStream attribute)</a>
 </li>
       </ul></li>
       <li><a href="generated/torchaudio.models.decoder.CTCDecoder.html#torchaudio.models.decoder.CTCHypothesis.words">words (torchaudio.models.decoder.CTCHypothesis attribute)</a>
@@ -2033,9 +2138,9 @@
         <li><a href="generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis.words">(torchaudio.models.decoder.CUCTCHypothesis attribute)</a>
 </li>
       </ul></li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_audio_chunk">write_audio_chunk() (torchaudio.io.StreamWriter method)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.write_audio_chunk">write_audio_chunk() (torio.io.StreamingMediaEncoder method)</a>
 </li>
-      <li><a href="generated/torchaudio.io.StreamWriter.html#torchaudio.io.StreamWriter.write_video_chunk">write_video_chunk() (torchaudio.io.StreamWriter method)</a>
+      <li><a href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder.write_video_chunk">write_video_chunk() (torio.io.StreamingMediaEncoder method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2064,7 +2169,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Torchaudio Contributors.
+        &copy; Copyright 2024, Torchaudio Contributors.
 
     </p>
   </div>

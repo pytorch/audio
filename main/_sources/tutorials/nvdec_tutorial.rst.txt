@@ -59,8 +59,8 @@ with TorchAudio, and how it improves the performance of video decoding.
 
  .. code-block:: none
 
-    2.2.0.dev20231213
-    2.2.0.dev20231214
+    2.3.0.dev20240129
+    2.2.0.dev20240130
 
 
 
@@ -219,7 +219,7 @@ We will use the following video which has the following properties;
 
  .. code-block:: none
 
-      0%|          | 0.00/31.8M [00:00<?, ?B/s]     52%|#####1    | 16.4M/31.8M [00:00<00:00, 69.2MB/s]     98%|#########8| 31.2M/31.8M [00:00<00:00, 85.4MB/s]    100%|##########| 31.8M/31.8M [00:00<00:00, 83.1MB/s]
+      0%|          | 0.00/31.8M [00:00<?, ?B/s]     28%|##7       | 8.75M/31.8M [00:00<00:00, 91.0MB/s]     55%|#####5    | 17.5M/31.8M [00:00<00:00, 39.1MB/s]     98%|#########8| 31.2M/31.8M [00:00<00:00, 60.9MB/s]    100%|##########| 31.8M/31.8M [00:00<00:00, 58.5MB/s]
 
 
 
@@ -668,7 +668,7 @@ generated using the following command.
 
  .. code-block:: none
 
-      0%|          | 0.00/232k [00:00<?, ?B/s]    100%|##########| 232k/232k [00:00<00:00, 44.1MB/s]
+      0%|          | 0.00/232k [00:00<?, ?B/s]    100%|##########| 232k/232k [00:00<00:00, 67.6MB/s]
 
 
 
@@ -957,23 +957,23 @@ QVGA
 
  .. code-block:: none
 
-      0%|          | 0.00/1.06M [00:00<?, ?B/s]    100%|##########| 1.06M/1.06M [00:00<00:00, 317MB/s]
+      0%|          | 0.00/1.06M [00:00<?, ?B/s]    100%|##########| 1.06M/1.06M [00:00<00:00, 262MB/s]
     Testing: testsrc2_qvga.h264.mp4
     * Software decoding (num_threads=1)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 0.50 seconds. (1783.75 fps)
+     - Processed 900 frames in 0.49 seconds. (1853.61 fps)
     * Software decoding (num_threads=4)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 0.35 seconds. (2541.45 fps)
+     - Processed 900 frames in 0.33 seconds. (2694.79 fps)
     * Software decoding (num_threads=8)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 0.33 seconds. (2700.28 fps)
+     - Processed 900 frames in 0.32 seconds. (2834.98 fps)
     * Software decoding (num_threads=16)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 895 frames in 0.33 seconds. (2738.28 fps)
+     - Processed 895 frames in 0.35 seconds. (2547.91 fps)
     * Hardware decoding
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 2.02 seconds. (445.90 fps)
+     - Processed 900 frames in 2.03 seconds. (443.63 fps)
 
 
 
@@ -999,23 +999,23 @@ VGA
 
  .. code-block:: none
 
-      0%|          | 0.00/3.59M [00:00<?, ?B/s]    100%|##########| 3.59M/3.59M [00:00<00:00, 335MB/s]
+      0%|          | 0.00/3.59M [00:00<?, ?B/s]    100%|##########| 3.59M/3.59M [00:00<00:00, 365MB/s]
     Testing: testsrc2_vga.h264.mp4
     * Software decoding (num_threads=1)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 1.20 seconds. (748.77 fps)
+     - Processed 900 frames in 1.23 seconds. (731.86 fps)
     * Software decoding (num_threads=4)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 0.61 seconds. (1487.18 fps)
+     - Processed 900 frames in 0.63 seconds. (1437.38 fps)
     * Software decoding (num_threads=8)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 0.71 seconds. (1269.04 fps)
+     - Processed 900 frames in 0.63 seconds. (1427.04 fps)
     * Software decoding (num_threads=16)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 895 frames in 0.69 seconds. (1298.91 fps)
+     - Processed 895 frames in 0.62 seconds. (1434.38 fps)
     * Hardware decoding
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 0.35 seconds. (2564.14 fps)
+     - Processed 900 frames in 0.35 seconds. (2565.40 fps)
 
 
 
@@ -1042,23 +1042,23 @@ XGA
 
  .. code-block:: none
 
-      0%|          | 0.00/9.22M [00:00<?, ?B/s]     95%|#########5| 8.80M/9.22M [00:00<00:00, 92.2MB/s]    100%|##########| 9.22M/9.22M [00:00<00:00, 87.6MB/s]
+      0%|          | 0.00/9.22M [00:00<?, ?B/s]    100%|##########| 9.22M/9.22M [00:00<00:00, 341MB/s]
     Testing: testsrc2_xga.h264.mp4
     * Software decoding (num_threads=1)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 2.71 seconds. (332.28 fps)
+     - Processed 900 frames in 2.62 seconds. (343.61 fps)
     * Software decoding (num_threads=4)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 1.19 seconds. (757.65 fps)
+     - Processed 900 frames in 1.16 seconds. (774.21 fps)
     * Software decoding (num_threads=8)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 1.20 seconds. (747.50 fps)
+     - Processed 900 frames in 1.12 seconds. (801.23 fps)
     * Software decoding (num_threads=16)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 895 frames in 1.19 seconds. (754.88 fps)
+     - Processed 895 frames in 1.15 seconds. (779.64 fps)
     * Hardware decoding
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 0.62 seconds. (1450.35 fps)
+     - Processed 900 frames in 0.62 seconds. (1449.87 fps)
 
 
 
@@ -1332,13 +1332,13 @@ QVGA
     Testing: testsrc2_qvga.h264.mp4
     * Software decoding with PyTorch interpolate
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.59 seconds. (1515.75 fps)
+     - Processed 900 frames in 0.69 seconds. (1308.47 fps)
     * Software decoding with FFmpeg scale
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.39 seconds. (2293.45 fps)
+     - Processed 900 frames in 0.43 seconds. (2105.46 fps)
     * Hardware decoding with resize
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.27 seconds. (3287.47 fps)
+     - Processed 900 frames in 1.84 seconds. (490.06 fps)
 
 
 
@@ -1366,13 +1366,13 @@ VGA
     Testing: testsrc2_vga.h264.mp4
     * Software decoding with PyTorch interpolate
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 1.40 seconds. (641.65 fps)
+     - Processed 900 frames in 1.47 seconds. (611.82 fps)
     * Software decoding with FFmpeg scale
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.66 seconds. (1367.38 fps)
+     - Processed 900 frames in 0.62 seconds. (1454.93 fps)
     * Hardware decoding with resize
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.35 seconds. (2570.07 fps)
+     - Processed 900 frames in 0.35 seconds. (2569.03 fps)
 
 
 
@@ -1400,13 +1400,13 @@ XGA
     Testing: testsrc2_xga.h264.mp4
     * Software decoding with PyTorch interpolate
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 3.19 seconds. (281.71 fps)
+     - Processed 900 frames in 2.80 seconds. (321.45 fps)
     * Software decoding with FFmpeg scale
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.99 seconds. (912.29 fps)
+     - Processed 900 frames in 1.10 seconds. (817.59 fps)
     * Hardware decoding with resize
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.62 seconds. (1455.06 fps)
+     - Processed 900 frames in 0.62 seconds. (1454.21 fps)
 
 
 
@@ -1480,7 +1480,7 @@ Tag: :obj:`torchaudio.io`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  29.476 seconds)
+   **Total running time of the script:** ( 0 minutes  30.786 seconds)
 
 
 .. _sphx_glr_download_tutorials_nvdec_tutorial.py:

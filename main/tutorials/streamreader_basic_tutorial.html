@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StreamReader Basic Usages &mdash; Torchaudio 2.2.0.dev20231214 documentation</title>
+  <title>StreamReader Basic Usages &mdash; Torchaudio 2.2.0.dev20240130 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20231214 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20240130 &#x25BC</span></a>
     </div>
     
 
@@ -323,6 +323,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../torio.utils.html">torio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
@@ -513,8 +518,8 @@ please file a feature request.</p>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.2.0.dev20231213
-2.2.0.dev20231214
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.3.0.dev20240129
+2.2.0.dev20240130
 </pre></div>
 </div>
 </section>
@@ -636,14 +641,14 @@ $ sox original.wav -r 16000 raw.s2
 <p>Once the media is opened, we can inspect the streams and configure
 the output streams.</p>
 <p>You can check the number of source streams with
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.num_src_streams" title="torchaudio.io.StreamReader.num_src_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_src_streams</span></code></a>.</p>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">num_src_streams</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The number of streams is NOT the number of channels.
 Each audio stream can contain an arbitrary number of channels.</p>
 </div>
 <p>To check the metadata of source stream you can use
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_src_stream_info" title="torchaudio.io.StreamReader.get_src_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_src_stream_info()</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_src_stream_info()</span></code>
 method and provide the index of the source stream.</p>
 <p>This method returns
 <code class="xref py py-class docutils literal notranslate"><span class="pre">SourceStream</span></code>. If a source
@@ -715,15 +720,15 @@ to the same source stream, you can duplicate the source stream.</p>
 clear which stream should be used.</p>
 <p>FFmpeg implements some heuristics to determine the default stream.
 The resulting stream index is exposed via</p>
-<p><a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.default_audio_stream" title="torchaudio.io.StreamReader.default_audio_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code></a> and
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.default_video_stream" title="torchaudio.io.StreamReader.default_video_stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code></a>.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_audio_stream</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">default_video_stream</span></code>.</p>
 </section>
 <section id="id1">
 <h3>Configuring output streams<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p>Once you know which source stream you want to use, then you can
 configure output streams with
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_audio_stream" title="torchaudio.io.StreamReader.add_basic_audio_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_audio_stream()</span></code></a> and
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.add_basic_video_stream" title="torchaudio.io.StreamReader.add_basic_video_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_video_stream()</span></code></a>.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_audio_stream()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">add_basic_video_stream()</span></code>.</p>
 <p>These methods provide a simple way to change the basic property of
 media to match the application’s requirements.</p>
 <p>The arguments common to both methods are;</p>
@@ -799,16 +804,16 @@ frames. No interpolation is performed.</p></li>
 </div>
 <p>You can check the resulting output streams in a similar manner as
 checking the source streams.
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.num_out_streams" title="torchaudio.io.StreamReader.num_out_streams"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_out_streams</span></code></a> reports
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">num_out_streams</span></code> reports
 the number of configured output streams, and
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.get_out_stream_info" title="torchaudio.io.StreamReader.get_out_stream_info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_out_stream_info()</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_out_stream_info()</span></code>
 fetches the information about the output streams.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p>If you want to remove an output stream, you can do so with
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.remove_stream" title="torchaudio.io.StreamReader.remove_stream"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_stream()</span></code></a> method.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_stream()</span></code> method.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Removes the first output stream.</span>
 <span class="n">streamer</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -821,9 +826,9 @@ fetches the information about the output streams.</p>
 fetching and decoding the source data, and passing the resulting
 audio / video data to client code.</p>
 <p>There are low-level methods that performs these operations.
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.is_buffer_ready" title="torchaudio.io.StreamReader.is_buffer_ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_buffer_ready()</span></code></a>,
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.process_packet" title="torchaudio.io.StreamReader.process_packet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_packet()</span></code></a> and
-<a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader.pop_chunks" title="torchaudio.io.StreamReader.pop_chunks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pop_chunks()</span></code></a>.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">is_buffer_ready()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">process_packet()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">pop_chunks()</span></code>.</p>
 <p>In this tutorial, we will use the high-level API, iterator protocol.
 It is as simple as a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -988,7 +993,7 @@ torch.Size([3, 1, 320, 320])
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_streamreader_basic_tutorial_001.png" srcset="../_images/sphx_glr_streamreader_basic_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.644 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.500 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-basic-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/dc81b404e96c6cb650e0c5a8115bc1f1/streamreader_basic_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_basic_tutorial.py</span></code></a></p>
@@ -1026,7 +1031,7 @@ torch.Size([3, 1, 320, 320])
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Torchaudio Contributors.
+        &copy; Copyright 2024, Torchaudio Contributors.
 
     </p>
   </div>

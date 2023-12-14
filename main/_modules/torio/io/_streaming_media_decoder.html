@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torio.io._streaming_media_decoder &mdash; Torchaudio 2.2.0.dev20231214 documentation</title>
+  <title>torio.io._streaming_media_decoder &mdash; Torchaudio 2.2.0.dev20240130 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231214 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20240130 &#x25BC</span></a>
     </div>
     
 
@@ -320,6 +320,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.utils.html">torio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
@@ -443,7 +448,7 @@
 <span class="p">]</span>
 
 
-<div class="viewcode-block" id="SourceStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.SourceStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="SourceStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.SourceStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SourceStream</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of a source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.</span>
 
@@ -500,7 +505,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata attached to the source stream.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="SourceAudioStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.SourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="SourceAudioStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.SourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SourceAudioStream</span><span class="p">(</span><span class="n">SourceStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of an audio source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.</span>
 
@@ -516,7 +521,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of channels.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="SourceVideoStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.SourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="SourceVideoStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.SourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SourceVideoStream</span><span class="p">(</span><span class="n">SourceStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of a video source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.</span>
 
@@ -575,7 +580,7 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="OutputStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.OutputStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="OutputStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.OutputStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">OutputStream</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Output stream configured on :class:`StreamingMediaDecoder`,</span>
 <span class="sd">    returned by :meth:`~torio.io.StreamingMediaDecoder.get_out_stream_info`.</span>
@@ -603,7 +608,7 @@
 <span class="sd">       Channels are grouped together instead of interspersed in memory.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="OutputAudioStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.OutputAudioStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="OutputAudioStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.OutputAudioStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">OutputAudioStream</span><span class="p">(</span><span class="n">OutputStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about an audio output stream configured with</span>
 <span class="sd">    :meth:`~torio.io.StreamingMediaDecoder.add_audio_stream` or</span>
@@ -619,7 +624,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of channels.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="OutputVideoStream"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.OutputVideoStream">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="OutputVideoStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.OutputVideoStream">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">OutputVideoStream</span><span class="p">(</span><span class="n">OutputStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about a video output stream configured with</span>
 <span class="sd">    :meth:`~torio.io.StreamingMediaDecoder.add_video_stream` or</span>
@@ -709,7 +714,7 @@
         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">tree_map</span><span class="p">(</span><span class="n">unwrap</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span> <span class="o">**</span><span class="n">tree_map</span><span class="p">(</span><span class="n">unwrap</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="ChunkTensor"><a class="viewcode-back" href="../../../generated/torchaudio.io.StreamReader.html#torchaudio.io.ChunkTensor">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="ChunkTensor"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.ChunkTensor">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ChunkTensor</span><span class="p">(</span><span class="n">ChunkTensorBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decoded media frames with metadata.</span>
 
@@ -865,7 +870,7 @@
 <span class="n">OutputStreamTypes</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;OutputStream&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">OutputStream</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">StreamingMediaDecoder</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder">[docs]</a><span class="k">class</span> <span class="nc">StreamingMediaDecoder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch and decode audio/video streams chunk by chunk.</span>
 
 <span class="sd">    For the detailed usage of this class, please refer to the tutorial.</span>
@@ -989,15 +994,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_video_stream</span>
 
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.get_metadata"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of the source media.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InputStreamTypes</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InputStreamTypes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of source stream</span>
 
 <span class="sd">        Args:</span>
@@ -1011,9 +1016,9 @@
 <span class="sd">                :class:`~torio.io._stream_reader.SourceVideoStream` is returned.</span>
 <span class="sd">                Otherwise :class:`~torio.io._stream_reader.SourceStream` class is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
 
-    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputStreamTypes</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputStreamTypes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of output stream</span>
 
 <span class="sd">        Args:</span>
@@ -1027,9 +1032,9 @@
 <span class="sd">                :class:`~torio.io._stream_reader.OutputVideoStream` is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="n">info</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;precise&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.seek"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;precise&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Seek the stream to the given timestamp [second]</span>
 
 <span class="sd">        Args:</span>
@@ -1056,9 +1061,9 @@
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The value of mode must be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">modes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">. Found: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">modes</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">modes</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span></div>
 
-    <span class="nd">@_format_audio_args</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.add_basic_audio_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_basic_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
     <span class="k">def</span> <span class="nf">add_basic_audio_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1112,9 +1117,9 @@
             <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span>
             <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span>
             <span class="n">filter_desc</span><span class="o">=</span><span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">),</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="nd">@_format_video_args</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.add_basic_video_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_basic_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
     <span class="k">def</span> <span class="nf">add_basic_video_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1167,9 +1172,9 @@
             <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span>
             <span class="n">filter_desc</span><span class="o">=</span><span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
             <span class="n">hw_accel</span><span class="o">=</span><span class="n">hw_accel</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="nd">@_format_audio_args</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.add_audio_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
     <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1209,9 +1214,9 @@
             <span class="n">filter_desc</span><span class="p">,</span>
             <span class="n">decoder</span><span class="p">,</span>
             <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="nd">@_format_video_args</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.add_video_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
     <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1254,17 +1259,17 @@
             <span class="n">decoder</span><span class="p">,</span>
             <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
             <span class="n">hw_accel</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">remove_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.remove_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.remove_stream">[docs]</a>    <span class="k">def</span> <span class="nf">remove_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove an output stream.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            i (int): Index of the output stream to be removed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">process_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.process_packet"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.process_packet">[docs]</a>    <span class="k">def</span> <span class="nf">process_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the source media and process one packet.</span>
 
 <span class="sd">        If a packet is read successfully, then the data in the packet will</span>
@@ -1321,17 +1326,17 @@
 <span class="sd">                flushed the pending frames. The caller should stop calling</span>
 <span class="sd">                this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_packet</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_packet</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.process_all_packets"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.process_all_packets">[docs]</a>    <span class="k">def</span> <span class="nf">process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Process packets until it reaches EOF.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.is_buffer_ready"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.is_buffer_ready">[docs]</a>    <span class="k">def</span> <span class="nf">is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if all the output streams have at least one chunk filled.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">]]:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.pop_chunks"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pop one chunk from all the output stream buffers.</span>
 
 <span class="sd">        Returns:</span>
@@ -1345,9 +1350,9 @@
                 <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChunkTensor</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">pts</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
 
-    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.fill_buffer"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep processing packets until all buffers have at least one chunk</span>
 
 <span class="sd">        Arguments:</span>
@@ -1368,9 +1373,9 @@
 <span class="sd">                flushed the pending frames. The caller should stop calling</span>
 <span class="sd">                this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
+<div class="viewcode-block" id="StreamingMediaDecoder.stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">],</span> <span class="o">...</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterator that generates output tensors</span>
@@ -1402,7 +1407,7 @@
             <span class="n">chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">):</span>
                 <span class="k">return</span>
-            <span class="k">yield</span> <span class="n">chunks</span>
+            <span class="k">yield</span> <span class="n">chunks</span></div></div>
 </pre></div>
 
              </article>
@@ -1419,7 +1424,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Torchaudio Contributors.
+        &copy; Copyright 2024, Torchaudio Contributors.
 
     </p>
   </div>

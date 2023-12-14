@@ -46,8 +46,8 @@ This tutorial shows how to use torchaudio's resampling API.
 
  .. code-block:: none
 
-    2.2.0.dev20231213
-    2.2.0.dev20231214
+    2.3.0.dev20240129
+    2.2.0.dev20240130
 
 
 
@@ -152,6 +152,19 @@ First, we import the modules and define the helper functions.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/audio_resampling_tutorial.py:32: DeprecationWarning: 
+    Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+    (to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+    but was not found to be installed on your system.
+    If this would cause problems for you,
+    please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+        
+      import pandas as pd
 
 
 
@@ -657,7 +670,7 @@ in ``torchaudio``.
 
  .. code-block:: none
 
-    torchaudio: 2.2.0.dev20231214
+    torchaudio: 2.2.0.dev20240130
     librosa: 0.10.0
     resampy: 0.2.2
 
@@ -906,10 +919,10 @@ Downsample (48 -> 44.1 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.87        0.37
-    sinc (width 16)      NaN        0.73        0.33
-    kaiser_best        79.69        1.28        0.38
-    kaiser_fast         7.88        0.93        0.34
+    sinc (width 64)      NaN        0.92        0.39
+    sinc (width 16)      NaN        0.79        0.35
+    kaiser_best        79.98        1.31        0.38
+    kaiser_fast         7.92        0.99        0.35
 
 
 
@@ -941,10 +954,10 @@ Downsample (16 -> 8 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        1.25        1.10
-    sinc (width 16)      NaN        0.50        0.36
-    kaiser_best        11.23        1.33        1.14
-    kaiser_fast         3.12        0.57        0.40
+    sinc (width 64)      NaN        1.32        1.11
+    sinc (width 16)      NaN        0.53        0.38
+    kaiser_best        11.29        1.36        1.15
+    kaiser_fast         3.14        0.60        0.41
 
 
 
@@ -976,10 +989,10 @@ Upsample (44.1 -> 48 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.86        0.36
-    sinc (width 16)      NaN        0.69        0.32
-    kaiser_best        32.62        1.09        0.38
-    kaiser_fast         7.85        0.91        0.33
+    sinc (width 64)      NaN        0.91        0.38
+    sinc (width 16)      NaN        0.72        0.35
+    kaiser_best        32.90        1.14        0.39
+    kaiser_fast         7.84        0.96        0.36
 
 
 
@@ -1011,10 +1024,10 @@ Upsample (8 -> 16 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.65        0.42
-    sinc (width 16)      NaN        0.36        0.21
-    kaiser_best        11.13        0.68        0.44
-    kaiser_fast         2.96        0.39        0.21
+    sinc (width 64)      NaN        0.67        0.43
+    sinc (width 16)      NaN        0.38        0.21
+    kaiser_best        11.21        0.68        0.45
+    kaiser_fast         2.97        0.41        0.22
 
 
 
@@ -1039,7 +1052,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.289 seconds)
+   **Total running time of the script:** ( 0 minutes  3.314 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:

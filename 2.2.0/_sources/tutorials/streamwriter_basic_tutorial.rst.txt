@@ -859,7 +859,7 @@ We process one second of audio and video frames at a time.
 
     /pytorch/audio/examples/tutorials/streamwriter_basic_tutorial.py:566: MatplotlibDeprecationWarning: The tostring_rgb function was deprecated in Matplotlib 3.8 and will be removed two minor releases later. Use buffer_rgba instead.
       frame = torch.frombuffer(fig.canvas.tostring_rgb(), dtype=torch.uint8)
-    /pytorch/audio/examples/tutorials/streamwriter_basic_tutorial.py:566: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /opt/conda/conda-bld/pytorch_1701991865097/work/torch/csrc/utils/tensor_new.cpp:1521.)
+    /pytorch/audio/examples/tutorials/streamwriter_basic_tutorial.py:566: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /opt/conda/conda-bld/pytorch_1704987280714/work/torch/csrc/utils/tensor_new.cpp:1521.)
       frame = torch.frombuffer(fig.canvas.tostring_rgb(), dtype=torch.uint8)
 
 
@@ -911,7 +911,7 @@ Tag: :obj:`torchaudio.io`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.011 seconds)
+   **Total running time of the script:** ( 0 minutes  6.918 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamwriter_basic_tutorial.py:
