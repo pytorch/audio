@@ -110,6 +110,7 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
+   :hidden:
 
    torio
    torio.io
