@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Torchaudio Documentation &mdash; Torchaudio 2.2.0.dev20231214 documentation</title>
+  <title>Torchaudio Documentation &mdash; Torchaudio 2.2.0.dev20240125 documentation</title>
   
 
   
@@ -223,7 +223,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20231214 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.2.0.dev20240125 &#x25BC</span></a>
     </div>
     
 
@@ -322,6 +322,11 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torio.utils.html">torio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
@@ -434,6 +439,8 @@
 <p>Torchaudio is a library for audio and signal processing with PyTorch.
 It provides I/O, signal and data processing functions, datasets,
 model implementations and application components.</p>
+<div class="toctree-wrapper compound">
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
@@ -900,6 +907,10 @@ model implementations and application components.</p>
 <h2>Citing torchaudio<a class="headerlink" href="#citing-torchaudio" title="Permalink to this heading">¶</a></h2>
 <p>If you find torchaudio useful, please cite the following paper:</p>
 <ul class="simple">
+<li><p>Hwang, J., Hira, M., Chen, C., Zhang, X., Ni, Z., Sun, G., Ma, P., Huang, R., Pratap, V.,
+Zhang, Y., Kumar, A., Yu, C.-Y., Zhu, C., Liu, C., Kahn, J., Ravanelli, M., Sun, P.,
+Watanabe, S., Shi, Y., Tao, T., Scheibler, R., Cornell, S., Kim, S., &amp; Petridis, S. (2023).
+TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch. arXiv preprint arXiv:2310.17864</p></li>
 <li><p>Yang, Y.-Y., Hira, M., Ni, Z., Chourdia, A., Astafurov, A., Chen, C., Yeh, C.-F., Puhrsch, C.,
 Pollack, D., Genzel, D., Greenberg, D., Yang, E. Z., Lian, J., Mahadeokar, J., Hwang, J.,
 Chen, J., Goldsborough, P., Roy, P., Narenthiran, S., Watanabe, S., Chintala, S.,
@@ -907,6 +918,16 @@ Quenneville-Bélair, V, &amp; Shi, Y. (2021).
 TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXiv:2110.15018.</p></li>
 </ul>
 <p>In BibTeX format:</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@misc</span><span class="p">{</span><span class="nl">hwang2023torchaudio</span><span class="p">,</span>
+<span class="w">   </span><span class="na">title</span><span class="p">=</span><span class="s">{TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}</span><span class="p">,</span>
+<span class="w">   </span><span class="na">author</span><span class="p">=</span><span class="s">{Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis}</span><span class="p">,</span>
+<span class="w">   </span><span class="na">year</span><span class="p">=</span><span class="s">{2023}</span><span class="p">,</span>
+<span class="w">   </span><span class="na">eprint</span><span class="p">=</span><span class="s">{2310.17864}</span><span class="p">,</span>
+<span class="w">   </span><span class="na">archivePrefix</span><span class="p">=</span><span class="s">{arXiv}</span><span class="p">,</span>
+<span class="w">   </span><span class="na">primaryClass</span><span class="p">=</span><span class="s">{eess.AS}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@article</span><span class="p">{</span><span class="nl">yang2021torchaudio</span><span class="p">,</span>
 <span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{TorchAudio: Building Blocks for Audio and Speech Processing}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Yao-Yuan Yang and Moto Hira and Zhaoheng Ni and</span>
@@ -919,16 +940,6 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
 <span class="s">          Vincent Quenneville-Bélair and Yangyang Shi}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">journal</span><span class="p">=</span><span class="s">{arXiv preprint arXiv:2110.15018}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2021}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@misc</span><span class="p">{</span><span class="nl">hwang2023torchaudio</span><span class="p">,</span>
-<span class="w">   </span><span class="na">title</span><span class="p">=</span><span class="s">{TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}</span><span class="p">,</span>
-<span class="w">   </span><span class="na">author</span><span class="p">=</span><span class="s">{Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis}</span><span class="p">,</span>
-<span class="w">   </span><span class="na">year</span><span class="p">=</span><span class="s">{2023}</span><span class="p">,</span>
-<span class="w">   </span><span class="na">eprint</span><span class="p">=</span><span class="s">{2310.17864}</span><span class="p">,</span>
-<span class="w">   </span><span class="na">archivePrefix</span><span class="p">=</span><span class="s">{arXiv}</span><span class="p">,</span>
-<span class="w">   </span><span class="na">primaryClass</span><span class="p">=</span><span class="s">{eess.AS}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -957,7 +968,7 @@ TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXi
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Torchaudio Contributors.
+        &copy; Copyright 2024, Torchaudio Contributors.
 
     </p>
   </div>

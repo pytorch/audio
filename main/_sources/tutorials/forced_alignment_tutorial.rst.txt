@@ -72,8 +72,8 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
  .. code-block:: none
 
-    2.2.0.dev20231213
-    2.2.0.dev20231214
+    2.3.0.dev20240124
+    2.2.0.dev20240125
     cuda
 
 

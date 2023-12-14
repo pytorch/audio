@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torio.utils.ffmpeg_utils &mdash; Torchaudio 2.2.0.dev20231214 documentation</title>
+  <title>torio.utils.ffmpeg_utils &mdash; Torchaudio 2.2.0.dev20240125 documentation</title>
   
 
   
@@ -221,7 +221,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20231214 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.2.0.dev20240125 &#x25BC</span></a>
     </div>
     
 
@@ -320,6 +320,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.utils.html">torio.utils</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
 <ul>
@@ -436,7 +441,7 @@
 <span class="n">ffmpeg_ext</span> <span class="o">=</span> <span class="n">torio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">lazy_import_ffmpeg_ext</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="get_versions"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_versions">[docs]</a><span class="k">def</span> <span class="nf">get_versions</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<div class="viewcode-block" id="get_versions"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_versions">[docs]</a><span class="k">def</span> <span class="nf">get_versions</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the versions of FFmpeg libraries</span>
 
 <span class="sd">    Returns:</span>
@@ -446,7 +451,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_versions</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_log_level"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_log_level">[docs]</a><span class="k">def</span> <span class="nf">get_log_level</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="get_log_level"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_log_level">[docs]</a><span class="k">def</span> <span class="nf">get_log_level</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the log level of FFmpeg.</span>
 
 <span class="sd">    See :py:func:`set_log_level` for the detail.</span>
@@ -454,7 +459,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_log_level</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="set_log_level"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.set_log_level">[docs]</a><span class="k">def</span> <span class="nf">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="set_log_level"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.set_log_level">[docs]</a><span class="k">def</span> <span class="nf">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the log level of FFmpeg (libavformat etc)</span>
 
 <span class="sd">    Arguments:</span>
@@ -490,7 +495,7 @@
     <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_demuxers"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_demuxers">[docs]</a><span class="k">def</span> <span class="nf">get_demuxers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_demuxers"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_demuxers">[docs]</a><span class="k">def</span> <span class="nf">get_demuxers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available demuxers.</span>
 
 <span class="sd">    Returns:</span>
@@ -507,7 +512,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_demuxers</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_muxers"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_muxers">[docs]</a><span class="k">def</span> <span class="nf">get_muxers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_muxers"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_muxers">[docs]</a><span class="k">def</span> <span class="nf">get_muxers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available muxers.</span>
 
 <span class="sd">    Returns:</span>
@@ -525,7 +530,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_muxers</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_audio_decoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders">[docs]</a><span class="k">def</span> <span class="nf">get_audio_decoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_audio_decoders"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_decoders">[docs]</a><span class="k">def</span> <span class="nf">get_audio_decoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available audio decoders.</span>
 
 <span class="sd">    Returns:</span>
@@ -543,7 +548,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_audio_decoders</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_audio_encoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_encoders">[docs]</a><span class="k">def</span> <span class="nf">get_audio_encoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_audio_encoders"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_audio_encoders">[docs]</a><span class="k">def</span> <span class="nf">get_audio_encoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available audio encoders.</span>
 
 <span class="sd">    Returns:</span>
@@ -562,7 +567,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_audio_encoders</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_video_decoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders">[docs]</a><span class="k">def</span> <span class="nf">get_video_decoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_video_decoders"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders">[docs]</a><span class="k">def</span> <span class="nf">get_video_decoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available video decoders.</span>
 
 <span class="sd">    Returns:</span>
@@ -581,7 +586,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_video_decoders</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_video_encoders"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_encoders">[docs]</a><span class="k">def</span> <span class="nf">get_video_encoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_video_encoders"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_encoders">[docs]</a><span class="k">def</span> <span class="nf">get_video_encoders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available video encoders.</span>
 
 <span class="sd">    Returns:</span>
@@ -601,7 +606,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_video_encoders</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_input_devices"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_devices">[docs]</a><span class="k">def</span> <span class="nf">get_input_devices</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_input_devices"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_devices">[docs]</a><span class="k">def</span> <span class="nf">get_input_devices</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available input devices.</span>
 
 <span class="sd">    Returns:</span>
@@ -616,7 +621,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_input_devices</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_output_devices"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_devices">[docs]</a><span class="k">def</span> <span class="nf">get_output_devices</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_output_devices"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_devices">[docs]</a><span class="k">def</span> <span class="nf">get_output_devices</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the available output devices.</span>
 
 <span class="sd">    Returns:</span>
@@ -630,7 +635,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_output_devices</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_input_protocols"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_protocols">[docs]</a><span class="k">def</span> <span class="nf">get_input_protocols</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_input_protocols"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_input_protocols">[docs]</a><span class="k">def</span> <span class="nf">get_input_protocols</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the supported input protocols.</span>
 
 <span class="sd">    Returns:</span>
@@ -643,7 +648,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_input_protocols</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_output_protocols"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_protocols">[docs]</a><span class="k">def</span> <span class="nf">get_output_protocols</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_output_protocols"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_output_protocols">[docs]</a><span class="k">def</span> <span class="nf">get_output_protocols</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the supported output protocols.</span>
 
 <span class="sd">    Returns:</span>
@@ -656,7 +661,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_output_protocols</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_build_config"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_build_config">[docs]</a><span class="k">def</span> <span class="nf">get_build_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="get_build_config"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_build_config">[docs]</a><span class="k">def</span> <span class="nf">get_build_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the FFmpeg build configuration</span>
 
 <span class="sd">    Returns:</span>
@@ -669,7 +674,7 @@
     <span class="k">return</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">get_build_config</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="clear_cuda_context_cache"><a class="viewcode-back" href="../../../generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.clear_cuda_context_cache">[docs]</a><span class="k">def</span> <span class="nf">clear_cuda_context_cache</span><span class="p">():</span>
+<div class="viewcode-block" id="clear_cuda_context_cache"><a class="viewcode-back" href="../../../generated/torio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.clear_cuda_context_cache">[docs]</a><span class="k">def</span> <span class="nf">clear_cuda_context_cache</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear the CUDA context used by CUDA Hardware accelerated video decoding&quot;&quot;&quot;</span>
     <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">clear_cuda_context_cache</span><span class="p">()</span></div>
 </pre></div>
@@ -688,7 +693,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Torchaudio Contributors.
+        &copy; Copyright 2024, Torchaudio Contributors.
 
     </p>
   </div>

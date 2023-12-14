@@ -58,8 +58,8 @@ They can be serialized using TorchScript.
 
  .. code-block:: none
 
-    2.2.0.dev20231213
-    2.2.0.dev20231214
+    2.3.0.dev20240124
+    2.2.0.dev20240125
 
 
 
@@ -910,7 +910,7 @@ Pitch
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.351 seconds)
+   **Total running time of the script:** ( 0 minutes  9.705 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:
