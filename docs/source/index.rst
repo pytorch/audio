@@ -372,14 +372,29 @@ Citing torchaudio
 
 If you find torchaudio useful, please cite the following paper:
 
+-  Hwang, J., Hira, M., Chen, C., Zhang, X., Ni, Z., Sun, G., Ma, P., Huang, R., Pratap, V.,
+   Zhang, Y., Kumar, A., Yu, C.-Y., Zhu, C., Liu, C., Kahn, J., Ravanelli, M., Sun, P.,
+   Watanabe, S., Shi, Y., Tao, T., Scheibler, R., Cornell, S., Kim, S., & Petridis, S. (2023).
+   TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch. arXiv preprint arXiv:2310.17864
+
 - Yang, Y.-Y., Hira, M., Ni, Z., Chourdia, A., Astafurov, A., Chen, C., Yeh, C.-F., Puhrsch, C.,
   Pollack, D., Genzel, D., Greenberg, D., Yang, E. Z., Lian, J., Mahadeokar, J., Hwang, J.,
   Chen, J., Goldsborough, P., Roy, P., Narenthiran, S., Watanabe, S., Chintala, S.,
   Quenneville-Bélair, V, & Shi, Y. (2021).
   TorchAudio: Building Blocks for Audio and Speech Processing. arXiv preprint arXiv:2110.15018.
 
-
 In BibTeX format:
+
+.. code-block:: bibtex
+
+   @misc{hwang2023torchaudio,
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
+      year={2023},
+      eprint={2310.17864},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS}
+   }
 
 .. code-block:: bibtex
 
@@ -396,14 +411,3 @@ In BibTeX format:
       journal={arXiv preprint arXiv:2110.15018},
       year={2021}
     }
-
-.. code-block:: bibtex
-
-   @misc{hwang2023torchaudio,
-      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
-      author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
-      year={2023},
-      eprint={2310.17864},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS}
-   }
