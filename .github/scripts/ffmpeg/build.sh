@@ -22,7 +22,11 @@ if [[ "$OSTYPE" == "msys" ]]; then
 fi
 ffmpeg_version="${FFMPEG_VERSION:-4.1.8}"
 
-archive="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${ffmpeg_version}.tar.gz"
+if [[ "${ffmpeg_version}" == "master" ]]; then
+    archive="https://github.com/FFmpeg/FFmpeg/archive/master.tar.gz"
+else
+    archive="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${ffmpeg_version}.tar.gz"
+fi
 
 build_dir=$(mktemp -d -t ffmpeg-build.XXXXXXXXXX)
 cleanup() {
@@ -88,7 +92,7 @@ if [[ "$(uname)" == Darwin ]]; then
         avformat=libavformat.59
         avdevice=libavdevice.59
         avfilter=libavfilter.8
-    elif [[ ${major_ver} == 6 ]]; then
+    elif [[ ${ffmpeg_version} == master || ${major_ver} == 6 ]]; then
         avutil=libavutil.58
         avcodec=libavcodec.60
         avformat=libavformat.60
