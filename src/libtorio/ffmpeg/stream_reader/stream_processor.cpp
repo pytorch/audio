@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string_view>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 namespace {
 AVCodecContextPtr alloc_codec_context(
@@ -169,7 +169,7 @@ AVCodecContextPtr get_codec_ctx(
     codec_ctx->hw_frames_ctx = get_hw_frames_ctx(codec_ctx);
   }
   if (ends_with(codec_ctx->codec->name, "_cuvid")) {
-    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReaderCUDA");
+    C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamingMediaDecoderCUDA");
   }
   return codec_ctx;
 }
@@ -197,7 +197,7 @@ KeyType StreamProcessor::add_stream(
   // has decoder set without HW accel, it will cause seg fault.
   // i.e.
   // The following should be rejected here.
-  // reader = StreamReader(...)
+  // reader = StreamingMediaDecoder(...)
   // reader.add_video_stream(..., decoder="h264_cuvid")
   // reader.add_video_stream(..., decoder="h264_cuvid", hw_accel="cuda")
   // TODO:
@@ -394,4 +394,4 @@ c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return post_processes.at(key)->pop_chunk();
 }
 
-} // namespace torchaudio::io
+} // namespace torio::io

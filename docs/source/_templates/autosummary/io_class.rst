@@ -14,6 +14,8 @@
 
 .. autoclass:: {{ fullname }}
 
+{%- if name not in ["StreamReader", "StreamWriter"] %}
+
 {%- if attributes %}
 
 Properties
@@ -54,37 +56,4 @@ Methods
 {%- endfor %}
 {%- endif %}
 
-
-{%- if name in ["StreamReader", "StreamWriter"] %}
-
-Support Structures
-------------------
-
-{%- if name == "StreamReader" %}
-{%- for item in [
-    "ChunkTensor",
-    "SourceStream",
-    "SourceAudioStream",
-    "SourceVideoStream",
-    "OutputStream",
-    "OutputAudioStream",
-    "OutputVideoStream",
-] %}
-
-{{ item | underline("~") }}
-
-.. autoclass:: torchaudio.io._stream_reader.{{item}}()
-   :members:
-
-{%- endfor %}
-
-{%- elif name == "StreamWriter" %}
-
-CodecConfig
-~~~~~~~~~~~
-
-.. autoclass:: torchaudio.io::CodecConfig
-   :members:
-
-{%- endif %}
 {%- endif %}

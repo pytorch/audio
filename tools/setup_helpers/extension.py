@@ -70,19 +70,19 @@ def get_ext_modules():
             # single version ffmpeg mode
             modules.extend(
                 [
-                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg", sources=[]),
-                    Extension(name="torchaudio.lib._torchaudio_ffmpeg", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg", sources=[]),
                 ]
             )
         else:
             modules.extend(
                 [
-                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg4", sources=[]),
-                    Extension(name="torchaudio.lib._torchaudio_ffmpeg4", sources=[]),
-                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg5", sources=[]),
-                    Extension(name="torchaudio.lib._torchaudio_ffmpeg5", sources=[]),
-                    Extension(name="torchaudio.lib.libtorchaudio_ffmpeg6", sources=[]),
-                    Extension(name="torchaudio.lib._torchaudio_ffmpeg6", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg4", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg4", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg5", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg5", sources=[]),
+                    Extension(name="torio.lib.libtorio_ffmpeg6", sources=[]),
+                    Extension(name="torio.lib._torio_ffmpeg6", sources=[]),
                 ]
             )
     return modules
@@ -114,7 +114,7 @@ class CMakeBuild(build_ext):
         # `torchaudio.[so|dylib|pyd]`, so we need something `torchaudio.foo`, that is
         # interpreted as `torchaudio/foo.so` then use dirname to get the `torchaudio`
         # directory.
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath("torchaudio.lib")))
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath("foo")))
 
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
@@ -135,6 +135,7 @@ class CMakeBuild(build_ext):
             f"-DBUILD_ALIGN:BOOL={'ON' if _BUILD_ALIGN else 'OFF'}",
             f"-DBUILD_CUDA_CTC_DECODER:BOOL={'ON' if _BUILD_CUDA_CTC_DECODER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
+            "-DBUILD_TORIO_PYTHON_EXTENSION:BOOL=ON",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",

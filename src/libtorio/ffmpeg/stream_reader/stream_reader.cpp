@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <thread>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 using KeyType = StreamProcessor::KeyType;
 
@@ -50,8 +50,9 @@ AVFormatContext* get_input_format_context(
 }
 } // namespace
 
-StreamReader::StreamReader(AVFormatContext* p) : format_ctx(p) {
-  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamReader");
+StreamingMediaDecoder::StreamingMediaDecoder(AVFormatContext* p)
+    : format_ctx(p) {
+  C10_LOG_API_USAGE_ONCE("torchaudio.io.StreamingMediaDecoder");
   int ret = avformat_find_stream_info(format_ctx, nullptr);
   TORCH_CHECK(
       ret >= 0, "Failed to find stream information: ", av_err2string(ret));
@@ -69,21 +70,22 @@ StreamReader::StreamReader(AVFormatContext* p) : format_ctx(p) {
   }
 }
 
-StreamReader::StreamReader(
+StreamingMediaDecoder::StreamingMediaDecoder(
     AVIOContext* io_ctx,
     const c10::optional<std::string>& format,
     const c10::optional<OptionDict>& option)
-    : StreamReader(get_input_format_context(
+    : StreamingMediaDecoder(get_input_format_context(
           "Custom Input Context",
           format,
           option,
           io_ctx)) {}
 
-StreamReader::StreamReader(
+StreamingMediaDecoder::StreamingMediaDecoder(
     const std::string& src,
     const c10::optional<std::string>& format,
     const c10::optional<OptionDict>& option)
-    : StreamReader(get_input_format_context(src, format, option, nullptr)) {}
+    : StreamingMediaDecoder(
+          get_input_format_context(src, format, option, nullptr)) {}
 
 //////////////////////////////////////////////////////////////////////////////
 // Helper methods
@@ -116,7 +118,7 @@ void validate_src_stream_type(
 ////////////////////////////////////////////////////////////////////////////////
 // Query methods
 ////////////////////////////////////////////////////////////////////////////////
-int64_t StreamReader::num_src_streams() const {
+int64_t StreamingMediaDecoder::num_src_streams() const {
   return format_ctx->nb_streams;
 }
 
@@ -131,11 +133,11 @@ OptionDict parse_metadata(const AVDictionary* metadata) {
 }
 } // namespace
 
-OptionDict StreamReader::get_metadata() const {
+OptionDict StreamingMediaDecoder::get_metadata() const {
   return parse_metadata(format_ctx->metadata);
 }
 
-SrcStreamInfo StreamReader::get_src_stream_info(int i) const {
+SrcStreamInfo StreamingMediaDecoder::get_src_stream_info(int i) const {
   validate_src_stream_index(format_ctx, i);
 
   AVStream* stream = format_ctx->streams[i];
@@ -186,7 +188,7 @@ AVCodecParameters* get_codecpar() {
 }
 } // namespace
 
-StreamParams StreamReader::get_src_stream_params(int i) {
+StreamParams StreamingMediaDecoder::get_src_stream_params(int i) {
   validate_src_stream_index(format_ctx, i);
   AVStream* stream = format_ctx->streams[i];
 
@@ -200,11 +202,11 @@ StreamParams StreamReader::get_src_stream_params(int i) {
   return {std::move(codec_params), stream->time_base, i};
 }
 
-int64_t StreamReader::num_out_streams() const {
+int64_t StreamingMediaDecoder::num_out_streams() const {
   return static_cast<int64_t>(stream_indices.size());
 }
 
-OutputStreamInfo StreamReader::get_out_stream_info(int i) const {
+OutputStreamInfo StreamingMediaDecoder::get_out_stream_info(int i) const {
   TORCH_CHECK(
       i >= 0 && static_cast<size_t>(i) < stream_indices.size(),
       "Output stream index out of range");
@@ -232,17 +234,17 @@ OutputStreamInfo StreamReader::get_out_stream_info(int i) const {
   return ret;
 }
 
-int64_t StreamReader::find_best_audio_stream() const {
+int64_t StreamingMediaDecoder::find_best_audio_stream() const {
   return av_find_best_stream(
       format_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
 }
 
-int64_t StreamReader::find_best_video_stream() const {
+int64_t StreamingMediaDecoder::find_best_video_stream() const {
   return av_find_best_stream(
       format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
 }
 
-bool StreamReader::is_buffer_ready() const {
+bool StreamingMediaDecoder::is_buffer_ready() const {
   if (processors.empty()) {
     // If no decoding output streams exist, then determine overall readiness
     // from the readiness of packet buffer.
@@ -262,7 +264,7 @@ bool StreamReader::is_buffer_ready() const {
 ////////////////////////////////////////////////////////////////////////////////
 // Configure methods
 ////////////////////////////////////////////////////////////////////////////////
-void StreamReader::seek(double timestamp_s, int64_t mode) {
+void StreamingMediaDecoder::seek(double timestamp_s, int64_t mode) {
   TORCH_CHECK(timestamp_s >= 0, "timestamp must be non-negative.");
   TORCH_CHECK(
       format_ctx->nb_streams > 0,
@@ -302,7 +304,7 @@ void StreamReader::seek(double timestamp_s, int64_t mode) {
   }
 }
 
-void StreamReader::add_audio_stream(
+void StreamingMediaDecoder::add_audio_stream(
     int64_t i,
     int64_t frames_per_chunk,
     int64_t num_chunks,
@@ -320,7 +322,7 @@ void StreamReader::add_audio_stream(
       torch::Device(torch::DeviceType::CPU));
 }
 
-void StreamReader::add_video_stream(
+void StreamingMediaDecoder::add_video_stream(
     int64_t i,
     int64_t frames_per_chunk,
     int64_t num_chunks,
@@ -355,7 +357,7 @@ void StreamReader::add_video_stream(
       device);
 }
 
-void StreamReader::add_packet_stream(int i) {
+void StreamingMediaDecoder::add_packet_stream(int i) {
   validate_src_stream_index(format_ctx, i);
   if (!packet_buffer) {
     packet_buffer = std::make_unique<PacketBuffer>();
@@ -363,7 +365,7 @@ void StreamReader::add_packet_stream(int i) {
   packet_stream_indices.emplace(i);
 }
 
-void StreamReader::add_stream(
+void StreamingMediaDecoder::add_stream(
     int i,
     AVMediaType media_type,
     int frames_per_chunk,
@@ -414,7 +416,7 @@ void StreamReader::add_stream(
   stream_indices.push_back(std::make_pair<>(i, key));
 }
 
-void StreamReader::remove_stream(int64_t i) {
+void StreamingMediaDecoder::remove_stream(int64_t i) {
   TORCH_CHECK(
       i >= 0 && static_cast<size_t>(i) < stream_indices.size(),
       "Output stream index out of range");
@@ -444,7 +446,7 @@ void StreamReader::remove_stream(int64_t i) {
 // 0: caller should keep calling this function
 // 1: It's done, caller should stop calling
 // <0: Some error happened
-int StreamReader::process_packet() {
+int StreamingMediaDecoder::process_packet() {
   int ret = av_read_frame(format_ctx, packet);
   if (ret == AVERROR_EOF) {
     ret = drain();
@@ -475,7 +477,9 @@ int StreamReader::process_packet() {
 // it keeps retrying until timeout happens,
 //
 // timeout and backoff is given in millisecond
-int StreamReader::process_packet_block(double timeout, double backoff) {
+int StreamingMediaDecoder::process_packet_block(
+    double timeout,
+    double backoff) {
   auto dead_line = [&]() {
     // If timeout < 0, then it repeats forever
     if (timeout < 0) {
@@ -505,14 +509,14 @@ int StreamReader::process_packet_block(double timeout, double backoff) {
   }
 }
 
-void StreamReader::process_all_packets() {
+void StreamingMediaDecoder::process_all_packets() {
   int64_t ret = 0;
   do {
     ret = process_packet();
   } while (!ret);
 }
 
-int StreamReader::process_packet(
+int StreamingMediaDecoder::process_packet(
     const c10::optional<double>& timeout,
     const double backoff) {
   int code = [&]() -> int {
@@ -526,7 +530,7 @@ int StreamReader::process_packet(
   return code;
 }
 
-int StreamReader::fill_buffer(
+int StreamingMediaDecoder::fill_buffer(
     const c10::optional<double>& timeout,
     const double backoff) {
   while (!is_buffer_ready()) {
@@ -539,7 +543,7 @@ int StreamReader::fill_buffer(
 }
 
 // <0: Some error happened.
-int StreamReader::drain() {
+int StreamingMediaDecoder::drain() {
   int ret = 0, tmp = 0;
   for (auto& p : processors) {
     if (p) {
@@ -552,7 +556,7 @@ int StreamReader::drain() {
   return ret;
 }
 
-std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
+std::vector<c10::optional<Chunk>> StreamingMediaDecoder::pop_chunks() {
   std::vector<c10::optional<Chunk>> ret;
   ret.reserve(static_cast<size_t>(num_out_streams()));
   for (auto& i : stream_indices) {
@@ -561,12 +565,12 @@ std::vector<c10::optional<Chunk>> StreamReader::pop_chunks() {
   return ret;
 }
 
-std::vector<AVPacketPtr> StreamReader::pop_packets() {
+std::vector<AVPacketPtr> StreamingMediaDecoder::pop_packets() {
   return packet_buffer->pop_packets();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// StreamReaderCustomIO
+// StreamingMediaDecoderCustomIO
 //////////////////////////////////////////////////////////////////////////////
 
 namespace detail {
@@ -596,7 +600,7 @@ CustomInput::CustomInput(
     : io_ctx(get_io_context(opaque, buffer_size, read_packet, seek)) {}
 } // namespace detail
 
-StreamReaderCustomIO::StreamReaderCustomIO(
+StreamingMediaDecoderCustomIO::StreamingMediaDecoderCustomIO(
     void* opaque,
     const c10::optional<std::string>& format,
     int buffer_size,
@@ -604,6 +608,6 @@ StreamReaderCustomIO::StreamReaderCustomIO(
     int64_t (*seek)(void* opaque, int64_t offset, int whence),
     const c10::optional<OptionDict>& option)
     : CustomInput(opaque, buffer_size, read_packet, seek),
-      StreamReader(io_ctx, format, option) {}
+      StreamingMediaDecoder(io_ctx, format, option) {}
 
-} // namespace torchaudio::io
+} // namespace torio::io

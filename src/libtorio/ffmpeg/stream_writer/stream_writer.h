@@ -7,17 +7,17 @@
 #include <libtorio/ffmpeg/stream_writer/types.h>
 #include <torch/types.h>
 
-namespace torchaudio {
+namespace torio {
 namespace io {
 
 ////////////////////////////////////////////////////////////////////////////////
-// StreamWriter
+// StreamingMediaEncoder
 ////////////////////////////////////////////////////////////////////////////////
 
 ///
 /// Encode and write audio/video streams chunk by chunk
 ///
-class StreamWriter {
+class StreamingMediaEncoder {
   AVFormatOutputContextPtr format_ctx;
   std::map<int, EncodeProcess> processes;
   std::map<int, PacketWriter> packet_writers;
@@ -29,32 +29,32 @@ class StreamWriter {
   /// @cond
 
  private:
-  explicit StreamWriter(AVFormatContext*);
+  explicit StreamingMediaEncoder(AVFormatContext*);
 
  protected:
-  /// Construct StreamWriter from custom IO
+  /// Construct StreamingMediaEncoder from custom IO
   ///
   /// @param io_ctx Custom IO.
   /// @param format Specify output format.
-  explicit StreamWriter(
+  explicit StreamingMediaEncoder(
       AVIOContext* io_ctx,
       const c10::optional<std::string>& format = c10::nullopt);
 
   /// @endcond
 
  public:
-  /// Construct StreamWriter from destination URI
+  /// Construct StreamingMediaEncoder from destination URI
   ///
   /// @param dst Destination where encoded data are written.
   /// @param format Specify output format. If not provided, it is guessed from
   /// ``dst``.
-  explicit StreamWriter(
+  explicit StreamingMediaEncoder(
       const std::string& dst,
       const c10::optional<std::string>& format = c10::nullopt);
 
   // Non-copyable
-  StreamWriter(const StreamWriter&) = delete;
-  StreamWriter& operator=(const StreamWriter&) = delete;
+  StreamingMediaEncoder(const StreamingMediaEncoder&) = delete;
+  StreamingMediaEncoder& operator=(const StreamingMediaEncoder&) = delete;
 
   //////////////////////////////////////////////////////////////////////////////
   // Query methods
@@ -149,7 +149,7 @@ class StreamWriter {
   /// @parblock
   /// When video is encoded on CUDA hardware, for example
   /// `encoder="h264_nvenc"`, passing CUDA device indicator to `hw_accel`
-  /// (i.e. `hw_accel="cuda:0"`) will make StreamWriter expect video
+  /// (i.e. `hw_accel="cuda:0"`) will make StreamingMediaEncoder expect video
   /// chunk to be a CUDA Tensor. Passing CPU Tensor will result in an error.
   ///
   /// If `None`, the video chunk Tensor has to be a CPU Tensor.
@@ -207,10 +207,10 @@ class StreamWriter {
       const c10::optional<std::string>& filter_desc = c10::nullopt);
 
   /// Add packet stream. Intended to be used in conjunction with
-  /// ``StreamReader`` to perform packet passthrough.
+  /// ``StreamingMediaDecoder`` to perform packet passthrough.
   /// @param stream_params Stream parameters returned by
-  /// ``StreamReader::get_src_stream_params()`` for the packet stream to pass
-  /// through.
+  /// ``StreamingMediaDecoder::get_src_stream_params()`` for the packet stream
+  /// to pass through.
   void add_packet_stream(const StreamParams& stream_params);
 
   /// @endcond
@@ -276,7 +276,7 @@ class StreamWriter {
   /// @param frame Frame to write.
   void write_frame(int i, AVFrame* frame);
   /// Write packet.
-  /// @param packet Packet to write, passed from ``StreamReader``.
+  /// @param packet Packet to write, passed from ``StreamingMediaDecoder``.
   void write_packet(const AVPacketPtr& packet);
   /// @endcond
 
@@ -288,7 +288,7 @@ class StreamWriter {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// StreamWriterCustomIO
+// StreamingMediaEncoderCustomIO
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @cond
@@ -307,12 +307,14 @@ struct CustomOutput {
 /// @endcond
 
 ///
-/// A subclass of StreamReader which works with custom read function.
+/// A subclass of StreamingMediaDecoder which works with custom read function.
 /// Can be used for encoding media into memory or custom object.
 ///
-class StreamWriterCustomIO : private detail::CustomOutput, public StreamWriter {
+class StreamingMediaEncoderCustomIO : private detail::CustomOutput,
+                                      public StreamingMediaEncoder {
  public:
-  /// Construct StreamWriterCustomIO with custom write and seek functions.
+  /// Construct StreamingMediaEncoderCustomIO with custom write and seek
+  /// functions.
   ///
   /// @param opaque Custom data used by ``write_packet`` and ``seek`` functions.
   /// @param format Specify output format.
@@ -321,7 +323,7 @@ class StreamWriterCustomIO : private detail::CustomOutput, public StreamWriter {
   /// @param write_packet Custom write function that is called from FFmpeg to
   /// actually write data to the custom destination.
   /// @param seek Optional seek function that is used to seek the destination.
-  StreamWriterCustomIO(
+  StreamingMediaEncoderCustomIO(
       void* opaque,
       const c10::optional<std::string>& format,
       int buffer_size,
@@ -329,5 +331,14 @@ class StreamWriterCustomIO : private detail::CustomOutput, public StreamWriter {
       int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr);
 };
 
+// For BC
+using StreamWriter = StreamingMediaEncoder;
+using StreamWriterCustomIO = StreamingMediaEncoderCustomIO;
+
 } // namespace io
-} // namespace torchaudio
+} // namespace torio
+
+// For BC
+namespace torchaudio::io {
+using namespace torio::io;
+} // namespace torchaudio::io

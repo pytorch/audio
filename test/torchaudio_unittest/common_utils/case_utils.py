@@ -10,11 +10,10 @@ from itertools import zip_longest
 
 import torch
 import torchaudio
+import torio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import eval_env, is_module_available
 from torchaudio.utils.ffmpeg_utils import get_video_decoders, get_video_encoders
-
-from .backend_utils import set_audio_backend
 
 
 class TempDirMixin:
@@ -87,15 +86,13 @@ class HttpServerMixin(TempDirMixin):
 
 
 class TestBaseMixin:
-    """Mixin to provide consistent way to define device/dtype/backend aware TestCase"""
+    """Mixin to provide consistent way to define device/dtype aware TestCase"""
 
     dtype = None
     device = None
-    backend = None
 
     def setUp(self):
         super().setUp()
-        set_audio_backend(self.backend)
         torch.random.manual_seed(2434)
 
     @property
@@ -111,7 +108,7 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
-_IS_FFMPEG_AVAILABLE = torchaudio._extension.lazy_import_ffmpeg_ext().is_available()
+_IS_FFMPEG_AVAILABLE = torio._extension.lazy_import_ffmpeg_ext().is_available()
 _IS_SOX_AVAILABLE = torchaudio._extension.lazy_import_sox_ext().is_available()
 _IS_CTC_DECODER_AVAILABLE = None
 _IS_CUDA_CTC_DECODER_AVAILABLE = None

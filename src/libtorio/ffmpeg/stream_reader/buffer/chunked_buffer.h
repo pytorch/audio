@@ -2,7 +2,7 @@
 #include <libtorio/ffmpeg/ffmpeg.h>
 #include <libtorio/ffmpeg/stream_reader/typedefs.h>
 
-namespace torchaudio::io::detail {
+namespace torio::io::detail {
 
 class ChunkedBuffer {
   // Each AVFrame is converted to a Tensor and stored here.
@@ -30,4 +30,4 @@ class ChunkedBuffer {
   void push_frame(torch::Tensor frame, int64_t pts_);
 };
 
-} // namespace torchaudio::io::detail
+} // namespace torio::io::detail

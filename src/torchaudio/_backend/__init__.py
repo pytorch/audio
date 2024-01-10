@@ -27,10 +27,7 @@ def list_audio_backends() -> List[str]:
     Returns:
         list of str: The list of available backends.
 
-        The possible values are;
-
-        - Dispatcher mode: ``"ffmpeg"``, ``"sox"`` and ``"soundfile"``.
-        - Legacy backend mode: ``"sox_io"``, ``"soundfile"``.
+        The possible values are; ``"ffmpeg"``, ``"sox"`` and ``"soundfile"``.
     """
 
     return list(utils.get_available_backends().keys())

@@ -65,7 +65,6 @@ def get_mock_dataset(root_dir: str, num_speaker: int):
 
 
 class TestLibriMix(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples_2spk = []

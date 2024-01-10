@@ -56,14 +56,14 @@ extensions = [
     "breathe",
 ]
 
-breathe_projects = {"libtorchaudio": "cpp/xml"}
+breathe_projects = {"libtorio": "cpp/xml"}
 
-breathe_default_project = "libtorchaudio"
+breathe_default_project = "libtorio"
 
 breathe_projects_source = {
-    "libtorchaudio": (
-        "../../torchaudio/csrc/ffmpeg/",
-        ["ffmpeg.h"],
+    "libtorio": (
+        "../../src/libtorio/ffmpeg/",
+        ["stream_reader/stream_reader.h", "stream_writer/stream_writer.h"],
     )
 }
 

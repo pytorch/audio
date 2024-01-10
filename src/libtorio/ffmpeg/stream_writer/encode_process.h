@@ -6,7 +6,7 @@
 #include <libtorio/ffmpeg/stream_writer/types.h>
 #include <torch/types.h>
 
-namespace torchaudio::io {
+namespace torio::io {
 
 class EncodeProcess {
   TensorConverter converter;
@@ -64,4 +64,4 @@ EncodeProcess get_video_encode_process(
     const c10::optional<std::string>& filter_desc,
     bool disable_converter = false);
 
-}; // namespace torchaudio::io
+}; // namespace torio::io

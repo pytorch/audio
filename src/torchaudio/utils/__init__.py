@@ -1,4 +1,6 @@
-from . import ffmpeg_utils, sox_utils
+from torio.utils import ffmpeg_utils
+
+from . import sox_utils
 from .download import download_asset
 
 

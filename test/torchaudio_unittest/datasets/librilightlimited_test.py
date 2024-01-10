@@ -69,7 +69,6 @@ def get_mock_datasets(root_dir):
 
 
 class TestLibriLightLimited(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples_10min = []

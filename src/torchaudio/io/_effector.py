@@ -4,8 +4,8 @@ from typing import Iterator, List, Optional
 import torch
 from torch import Tensor
 
-from ._stream_reader import _get_afilter_desc, StreamReader
-from ._stream_writer import CodecConfig, StreamWriter
+from torio.io._streaming_media_decoder import _get_afilter_desc, StreamingMediaDecoder as StreamReader
+from torio.io._streaming_media_encoder import CodecConfig, StreamingMediaEncoder as StreamWriter
 
 
 class _StreamingIOBuffer:

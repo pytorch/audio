@@ -6,19 +6,19 @@ from pathlib import Path
 from typing import BinaryIO, Dict, Iterator, Optional, Tuple, TypeVar, Union
 
 import torch
-import torchaudio
+import torio
 from torch.utils._pytree import tree_map
 
-ffmpeg_ext = torchaudio._extension.lazy_import_ffmpeg_ext()
+ffmpeg_ext = torio._extension.lazy_import_ffmpeg_ext()
 
 __all__ = [
-    "StreamReader",
+    "StreamingMediaDecoder",
 ]
 
 
 @dataclass
 class SourceStream:
-    """The metadata of a source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
+    """The metadata of a source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.
 
     This class is used when representing streams of media type other than `audio` or `video`.
 
@@ -75,7 +75,7 @@ class SourceStream:
 
 @dataclass
 class SourceAudioStream(SourceStream):
-    """The metadata of an audio source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
+    """The metadata of an audio source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.
 
     This class is used when representing audio stream.
 
@@ -91,7 +91,7 @@ class SourceAudioStream(SourceStream):
 
 @dataclass
 class SourceVideoStream(SourceStream):
-    """The metadata of a video source stream, returned by :meth:`~torchaudio.io.StreamReader.get_src_stream_info`.
+    """The metadata of a video source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.
 
     This class is used when representing video stream.
 
@@ -150,8 +150,8 @@ def _parse_si(i):
 
 @dataclass
 class OutputStream:
-    """Output stream configured on :class:`StreamReader`,
-    returned by :meth:`~torchaudio.io.StreamReader.get_out_stream_info`.
+    """Output stream configured on :class:`StreamingMediaDecoder`,
+    returned by :meth:`~torio.io.StreamingMediaDecoder.get_out_stream_info`.
     """
 
     source_index: int
@@ -179,8 +179,8 @@ class OutputStream:
 @dataclass
 class OutputAudioStream(OutputStream):
     """Information about an audio output stream configured with
-    :meth:`~torchaudio.io.StreamReader.add_audio_stream` or
-    :meth:`~torchaudio.io.StreamReader.add_basic_audio_stream`.
+    :meth:`~torio.io.StreamingMediaDecoder.add_audio_stream` or
+    :meth:`~torio.io.StreamingMediaDecoder.add_basic_audio_stream`.
 
     In addition to the attributes reported by :class:`OutputStream`,
     the following attributes are reported.
@@ -195,8 +195,8 @@ class OutputAudioStream(OutputStream):
 @dataclass
 class OutputVideoStream(OutputStream):
     """Information about a video output stream configured with
-    :meth:`~torchaudio.io.StreamReader.add_video_stream` or
-    :meth:`~torchaudio.io.StreamReader.add_basic_video_stream`.
+    :meth:`~torio.io.StreamingMediaDecoder.add_video_stream` or
+    :meth:`~torio.io.StreamingMediaDecoder.add_basic_video_stream`.
 
     In addition to the attributes reported by :class:`OutputStream`,
     the following attributes are reported.
@@ -295,7 +295,7 @@ class ChunkTensor(ChunkTensorBase):
 
     Example:
         >>> # Define input streams
-        >>> reader = StreamReader(...)
+        >>> reader = StreamingMediaDecoder(...)
         >>> reader.add_audio_stream(frames_per_chunk=4000, sample_rate=8000)
         >>> reader.add_video_stream(frames_per_chunk=7, frame_rate=28)
         >>> # Decode the streams and fetch frames
@@ -370,8 +370,8 @@ _decoder = """The name of the decoder to be used.
                 When provided, use the specified decoder instead of the default one.
 
                 To list the available decoders, please use
-                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_decoders` for audio, and
-                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_decoders` for video.
+                :py:func:`~torio.utils.ffmpeg_utils.get_audio_decoders` for audio, and
+                :py:func:`~torio.utils.ffmpeg_utils.get_video_decoders` for video.
 
                 Default: ``None``."""
 
@@ -385,7 +385,7 @@ _decoder_option = """Options passed to decoder.
 
                 In addition to decoder-specific options, you can also pass options related
                 to multithreading. They are effective only if the decoder support them.
-                If neither of them are provided, StreamReader defaults to single thread.
+                If neither of them are provided, StreamingMediaDecoder defaults to single thread.
 
                 ``"threads"``: The number of threads (in str).
                 Providing the value ``"0"`` will let FFmpeg decides based on its heuristics.
@@ -408,7 +408,7 @@ _hw_accel = """Enable hardware acceleration.
 
                 When video is decoded on CUDA hardware, for example
                 `decoder="h264_cuvid"`, passing CUDA device indicator to `hw_accel`
-                (i.e. `hw_accel="cuda:0"`) will make StreamReader place the resulting
+                (i.e. `hw_accel="cuda:0"`) will make StreamingMediaDecoder place the resulting
                 frames directly on the specified CUDA device as CUDA tensor.
 
                 If `None`, the frame will be moved to CPU memory.
@@ -438,7 +438,7 @@ InputStreamTypes = TypeVar("InputStream", bound=SourceStream)
 OutputStreamTypes = TypeVar("OutputStream", bound=OutputStream)
 
 
-class StreamReader:
+class StreamingMediaDecoder:
     """Fetch and decode audio/video streams chunk by chunk.
 
     For the detailed usage of this class, please refer to the tutorial.
@@ -486,7 +486,7 @@ class StreamReader:
 
                https://ffmpeg.org/ffmpeg-formats.html#Demuxers
 
-               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_demuxers` to list the
+               Please use :py:func:`~torio.utils.ffmpeg_utils.get_demuxers` to list the
                demultiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
@@ -494,7 +494,7 @@ class StreamReader:
 
                https://ffmpeg.org/ffmpeg-devices.html#Input-Devices
 
-               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_input_devices` to list
+               Please use :py:func:`~torio.utils.ffmpeg_utils.get_input_devices` to list
                the input devices available in the current environment.
 
         option (dict of str to str, optional):
@@ -519,11 +519,11 @@ class StreamReader:
     ):
         self.src = src
         if isinstance(src, bytes):
-            self._be = ffmpeg_ext.StreamReaderBytes(src, format, option, buffer_size)
+            self._be = ffmpeg_ext.StreamingMediaDecoderBytes(src, format, option, buffer_size)
         elif hasattr(src, "read"):
-            self._be = ffmpeg_ext.StreamReaderFileObj(src, format, option, buffer_size)
+            self._be = ffmpeg_ext.StreamingMediaDecoderFileObj(src, format, option, buffer_size)
         else:
-            self._be = ffmpeg_ext.StreamReader(os.path.normpath(src), format, option)
+            self._be = ffmpeg_ext.StreamingMediaDecoder(os.path.normpath(src), format, option)
 
         i = self._be.find_best_audio_stream()
         self._default_audio_stream = None if i < 0 else i
@@ -579,10 +579,10 @@ class StreamReader:
             InputStreamTypes:
                 Information about the source stream.
                 If the source stream is audio type, then
-                :class:`~torchaudio.io._stream_reader.SourceAudioStream` is returned.
+                :class:`~torio.io._stream_reader.SourceAudioStream` is returned.
                 If it is video type, then
-                :class:`~torchaudio.io._stream_reader.SourceVideoStream` is returned.
-                Otherwise :class:`~torchaudio.io._stream_reader.SourceStream` class is returned.
+                :class:`~torio.io._stream_reader.SourceVideoStream` is returned.
+                Otherwise :class:`~torio.io._stream_reader.SourceStream` class is returned.
         """
         return _parse_si(self._be.get_src_stream_info(i))
 
@@ -595,9 +595,9 @@ class StreamReader:
             OutputStreamTypes
                 Information about the output stream.
                 If the output stream is audio type, then
-                :class:`~torchaudio.io._stream_reader.OutputAudioStream` is returned.
+                :class:`~torio.io._stream_reader.OutputAudioStream` is returned.
                 If it is video type, then
-                :class:`~torchaudio.io._stream_reader.OutputVideoStream` is returned.
+                :class:`~torio.io._stream_reader.OutputVideoStream` is returned.
         """
         info = self._be.get_out_stream_info(i)
         return _parse_oi(info)
@@ -925,10 +925,10 @@ class StreamReader:
 
         Arguments:
             timeout (float or None, optional): See
-                :py:func:`~StreamReader.process_packet`. (Default: ``None``)
+                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``None``)
 
             backoff (float, optional): See
-                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
+                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``10.0``)
 
         Returns:
             int:
@@ -950,10 +950,10 @@ class StreamReader:
 
         Arguments:
             timeout (float or None, optional): See
-                :py:func:`~StreamReader.process_packet`. (Default: ``None``)
+                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``None``)
 
             backoff (float, optional): See
-                :py:func:`~StreamReader.process_packet`. (Default: ``10.0``)
+                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``10.0``)
 
         Returns:
             Iterator[Tuple[Optional[ChunkTensor], ...]]:

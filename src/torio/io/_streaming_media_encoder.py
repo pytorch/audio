@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import BinaryIO, Dict, Optional, Union
 
 import torch
-import torchaudio
+import torio
 
-ffmpeg_ext = torchaudio._extension.lazy_import_ffmpeg_ext()
+ffmpeg_ext = torio._extension.lazy_import_ffmpeg_ext()
 
 
 @dataclass
@@ -58,8 +58,8 @@ _encoder = """The name of the encoder to be used.
                 When provided, use the specified encoder instead of the default one.
 
                 To list the available encoders, please use
-                :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_encoders` for audio, and
-                :py:func:`~torchaudio.utils.ffmpeg_utils.get_video_encoders` for video.
+                :py:func:`~torio.utils.ffmpeg_utils.get_audio_encoders` for audio, and
+                :py:func:`~torio.utils.ffmpeg_utils.get_video_encoders` for video.
 
                 Default: ``None``."""
 
@@ -133,7 +133,7 @@ _format_common_args = _format_doc(
 )
 
 
-class StreamWriter:
+class StreamingMediaEncoder:
     """Encode and write audio/video streams chunk by chunk
 
     Args:
@@ -169,7 +169,7 @@ class StreamWriter:
 
                https://ffmpeg.org/ffmpeg-formats.html#Muxers
 
-               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_muxers` to list the
+               Please use :py:func:`~torio.utils.ffmpeg_utils.get_muxers` to list the
                multiplexers available in the current environment.
 
                For device access, the available values vary based on hardware (AV device) and
@@ -178,7 +178,7 @@ class StreamWriter:
 
                https://ffmpeg.org/ffmpeg-devices.html#Output-Devices
 
-               Please use :py:func:`~torchaudio.utils.ffmpeg_utils.get_output_devices` to list
+               Please use :py:func:`~torio.utils.ffmpeg_utils.get_output_devices` to list
                the output devices available in the current environment.
 
         buffer_size (int):
@@ -194,9 +194,9 @@ class StreamWriter:
         buffer_size: int = 4096,
     ):
         if hasattr(dst, "write"):
-            self._s = ffmpeg_ext.StreamWriterFileObj(dst, format, buffer_size)
+            self._s = ffmpeg_ext.StreamingMediaEncoderFileObj(dst, format, buffer_size)
         else:
-            self._s = ffmpeg_ext.StreamWriter(str(dst), format)
+            self._s = ffmpeg_ext.StreamingMediaEncoder(str(dst), format)
         self._is_open = False
 
     @_format_common_args
@@ -362,7 +362,7 @@ class StreamWriter:
 
                 When video is encoded on CUDA hardware, for example
                 `encoder="h264_nvenc"`, passing CUDA device indicator to `hw_accel`
-                (i.e. `hw_accel="cuda:0"`) will make StreamWriter expect video
+                (i.e. `hw_accel="cuda:0"`) will make StreamingMediaEncoder expect video
                 chunk to be CUDA Tensor. Passing CPU Tensor will result in an error.
 
                 If `None`, the video chunk Tensor has to be CPU Tensor.
@@ -396,10 +396,10 @@ class StreamWriter:
         """[debug] Print the registered stream information to stdout."""
         self._s.dump_format(i)
 
-    def open(self, option: Optional[Dict[str, str]] = None) -> "StreamWriter":
+    def open(self, option: Optional[Dict[str, str]] = None) -> "StreamingMediaEncoder":
         """Open the output file / device and write the header.
 
-        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        :py:class:`StreamingMediaEncoder` is also a context manager and therefore supports the
         ``with`` statement.
         This method returns the instance on which the method is called (i.e. `self`),
         so that it can be used in `with` statement.
@@ -410,23 +410,23 @@ class StreamWriter:
             option (dict or None, optional): Private options for protocol, device and muxer. See example.
 
         Example - Protocol option
-            >>> s = StreamWriter(dst="rtmp://localhost:1234/live/app", format="flv")
+            >>> s = StreamingMediaEncoder(dst="rtmp://localhost:1234/live/app", format="flv")
             >>> s.add_video_stream(...)
-            >>> # Passing protocol option `listen=1` makes StreamWriter act as RTMP server.
+            >>> # Passing protocol option `listen=1` makes StreamingMediaEncoder act as RTMP server.
             >>> with s.open(option={"listen": "1"}) as f:
             >>>     f.write_video_chunk(...)
 
         Example - Device option
-            >>> s = StreamWriter("-", format="sdl")
+            >>> s = StreamingMediaEncoder("-", format="sdl")
             >>> s.add_video_stream(..., encoder_format="rgb24")
             >>> # Open SDL video player with fullscreen
             >>> with s.open(option={"window_fullscreen": "1"}):
             >>>     f.write_video_chunk(...)
 
         Example - Muxer option
-            >>> s = StreamWriter("foo.flac")
+            >>> s = StreamingMediaEncoder("foo.flac")
             >>> s.add_audio_stream(...)
-            >>> s.set_metadata({"artist": "torchaudio contributors"})
+            >>> s.set_metadata({"artist": "torio contributors"})
             >>> # FLAC muxer has a private option to not write the header.
             >>> # The resulting file does not contain the above metadata.
             >>> with s.open(option={"write_header": "false"}) as f:
@@ -440,12 +440,12 @@ class StreamWriter:
     def close(self):
         """Close the output
 
-        :py:class:`StreamWriter` is also a context manager and therefore supports the
+        :py:class:`StreamingMediaEncoder` is also a context manager and therefore supports the
         ``with`` statement.
         It is recommended to use context manager, as the file is closed automatically
         when exiting from ``with`` clause.
 
-        See :py:meth:`StreamWriter.open` for more detail.
+        See :py:meth:`StreamingMediaEncoder.open` for more detail.
         """
         if self._is_open:
             self._s.close()

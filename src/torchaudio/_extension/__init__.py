@@ -4,7 +4,7 @@ import sys
 
 from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
 
-from .utils import _check_cuda_version, _init_dll_path, _init_ffmpeg, _init_sox, _LazyImporter, _load_lib
+from .utils import _check_cuda_version, _init_dll_path, _init_sox, _LazyImporter, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -18,7 +18,6 @@ __all__ = [
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
     "_IS_RIR_AVAILABLE",
     "lazy_import_sox_ext",
-    "lazy_import_ffmpeg_ext",
 ]
 
 
@@ -55,18 +54,6 @@ def lazy_import_sox_ext():
     if _SOX_EXT is None:
         _SOX_EXT = _LazyImporter("_torchaudio_sox", _init_sox)
     return _SOX_EXT
-
-
-_FFMPEG_EXT = None
-
-
-def lazy_import_ffmpeg_ext():
-    """Load FFmpeg integration based on availability in lazy manner"""
-
-    global _FFMPEG_EXT
-    if _FFMPEG_EXT is None:
-        _FFMPEG_EXT = _LazyImporter("_torchaudio_ffmpeg", _init_ffmpeg)
-    return _FFMPEG_EXT
 
 
 fail_if_no_rir = (

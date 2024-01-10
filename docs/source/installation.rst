@@ -48,13 +48,13 @@ Optional Dependencies
   compatible FFmpeg libraries.
 
   If you need to specify the version of FFmpeg TorchAudio searches and links, you can
-  specify it via the environment variable ``TORCHAUDIO_USE_FFMPEG_VERSION``. For example,
-  by setting ``TORCHAUDIO_USE_FFMPEG_VERSION=5``, TorchAudio will only look for FFmpeg
+  specify it via the environment variable ``TORIO_USE_FFMPEG_VERSION``. For example,
+  by setting ``TORIO_USE_FFMPEG_VERSION=5``, TorchAudio will only look for FFmpeg
   5.
 
   If for some reason, this search mechanism is causing an issue, you can disable
   the FFmpeg integration entirely by setting the environment variable
-  ``TORCHAUDIO_USE_FFMPEG=0``.
+  ``TORIO_USE_FFMPEG=0``.
 
   There are multiple ways to install FFmpeg libraries.
   If you are using Anaconda Python distribution,
@@ -127,6 +127,9 @@ Please refer to the following table for the matching versions.
    * - ``PyTorch``
      - ``TorchAudio``
      - ``Python``
+   * - ``2.1.0``
+     - ``2.1.0``
+     - ``>=3.8``, ``<=3.11``
    * - ``2.0.1``
      - ``2.0.2``
      - ``>=3.8``, ``<=3.11``

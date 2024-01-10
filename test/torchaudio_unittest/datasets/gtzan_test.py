@@ -37,7 +37,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestGTZAN(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples = []

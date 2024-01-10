@@ -5,14 +5,6 @@ import torchaudio
 from parameterized import parameterized, parameterized_class
 
 from torchaudio.io import StreamReader, StreamWriter
-from torchaudio.io._stream_reader import (
-    ChunkTensor,
-    OutputAudioStream,
-    OutputVideoStream,
-    SourceAudioStream,
-    SourceStream,
-    SourceVideoStream,
-)
 from torchaudio_unittest.common_utils import (
     disabledInCI,
     get_asset_path,
@@ -28,6 +20,14 @@ from torchaudio_unittest.common_utils import (
     skipIfNoHWAccel,
     TempDirMixin,
     TorchaudioTestCase,
+)
+from torio.io._streaming_media_decoder import (
+    ChunkTensor,
+    OutputAudioStream,
+    OutputVideoStream,
+    SourceAudioStream,
+    SourceStream,
+    SourceVideoStream,
 )
 
 

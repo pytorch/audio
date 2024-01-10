@@ -29,65 +29,65 @@ if (USE_CUDA)
 endif()
 
 if (TARGET ffmpeg)
-  torchaudio_library(
-    libtorchaudio_ffmpeg
+  torio_library(
+    libtorio_ffmpeg
     "${sources}"
     ""
     "torch;ffmpeg;${additional_lib}"
     ""
     )
-  if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-    torchaudio_extension(
-      _torchaudio_ffmpeg
+  if (BUILD_TORIO_PYTHON_EXTENSION)
+    torio_extension(
+      _torio_ffmpeg
       "${ext_sources}"
       ""
-      "libtorchaudio_ffmpeg"
-      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg"
+      "libtorio_ffmpeg"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg"
       )
   endif()
 else()
-  torchaudio_library(
-    libtorchaudio_ffmpeg4
+  torio_library(
+    libtorio_ffmpeg4
     "${sources}"
     ""
     "torch;ffmpeg4;${additional_lib}"
     ""
     )
-  torchaudio_library(
-    libtorchaudio_ffmpeg5
+  torio_library(
+    libtorio_ffmpeg5
     "${sources}"
     ""
     "torch;ffmpeg5;${additional_lib}"
     ""
     )
-  torchaudio_library(
-    libtorchaudio_ffmpeg6
+  torio_library(
+    libtorio_ffmpeg6
     "${sources}"
     ""
     "torch;ffmpeg6;${additional_lib}"
     ""
     )
-  if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-    torchaudio_extension(
-      _torchaudio_ffmpeg4
+  if (BUILD_TORIO_PYTHON_EXTENSION)
+    torio_extension(
+      _torio_ffmpeg4
       "${ext_sources}"
       ""
-      "libtorchaudio_ffmpeg4"
-      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg4"
+      "libtorio_ffmpeg4"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg4"
       )
-    torchaudio_extension(
-      _torchaudio_ffmpeg5
+    torio_extension(
+      _torio_ffmpeg5
       "${ext_sources}"
       ""
-      "libtorchaudio_ffmpeg5"
-      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg5"
+      "libtorio_ffmpeg5"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg5"
       )
-    torchaudio_extension(
-      _torchaudio_ffmpeg6
+    torio_extension(
+      _torio_ffmpeg6
       "${ext_sources}"
       ""
-      "libtorchaudio_ffmpeg6"
-      "TORCHAUDIO_FFMPEG_EXT_NAME=_torchaudio_ffmpeg6"
+      "libtorio_ffmpeg6"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg6"
       )
   endif ()
 endif()
