@@ -8,6 +8,7 @@ Audio Resampling
 This tutorial shows how to use torchaudio's resampling API.
 """
 
+# %%
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -16,7 +17,7 @@ import torchaudio.transforms as T
 print(torch.__version__)
 print(torchaudio.__version__)
 
-######################################################################
+# %%
 # Preparation
 # -----------
 #
@@ -26,15 +27,10 @@ print(torchaudio.__version__)
 import math
 import timeit
 
-import librosa
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-import pandas as pd
-import resampy
 from IPython.display import Audio
 
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
 
 DEFAULT_OFFSET = 201
 
@@ -107,7 +103,7 @@ def plot_sweep(
     plt.colorbar(cax)
 
 
-######################################################################
+# %%
 # Resampling Overview
 # -------------------
 #
@@ -151,7 +147,7 @@ waveform = get_sine_sweep(sample_rate)
 plot_sweep(waveform, sample_rate, title="Original Waveform")
 Audio(waveform.numpy()[0], rate=sample_rate)
 
-######################################################################
+# %%
 #
 # Now we resample (downsample) it.
 #
@@ -168,7 +164,7 @@ resampled_waveform = resampler(waveform)
 plot_sweep(resampled_waveform, resample_rate, title="Resampled Waveform")
 Audio(resampled_waveform.numpy()[0], rate=resample_rate)
 
-######################################################################
+# %%
 # Controling resampling quality with parameters
 # ---------------------------------------------
 #
@@ -190,13 +186,13 @@ resample_rate = 32000
 resampled_waveform = F.resample(waveform, sample_rate, resample_rate, lowpass_filter_width=6)
 plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=6")
 
-######################################################################
+# %%
 #
 
 resampled_waveform = F.resample(waveform, sample_rate, resample_rate, lowpass_filter_width=128)
 plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=128")
 
-######################################################################
+# %%
 # Rolloff
 # ~~~~~~~
 #
@@ -216,14 +212,14 @@ resample_rate = 32000
 resampled_waveform = F.resample(waveform, sample_rate, resample_rate, rolloff=0.99)
 plot_sweep(resampled_waveform, resample_rate, title="rolloff=0.99")
 
-######################################################################
+# %%
 #
 
 resampled_waveform = F.resample(waveform, sample_rate, resample_rate, rolloff=0.8)
 plot_sweep(resampled_waveform, resample_rate, title="rolloff=0.8")
 
 
-######################################################################
+# %%
 # Window function
 # ~~~~~~~~~~~~~~~
 #
@@ -242,14 +238,14 @@ resample_rate = 32000
 resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interp_hann")
 plot_sweep(resampled_waveform, resample_rate, title="Hann Window Default")
 
-######################################################################
+# %%
 #
 
 resampled_waveform = F.resample(waveform, sample_rate, resample_rate, resampling_method="sinc_interp_kaiser")
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
-######################################################################
+# %%
 # Comparison against librosa
 # --------------------------
 #
@@ -260,7 +256,7 @@ plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 sample_rate = 48000
 resample_rate = 32000
 
-######################################################################
+# %%
 # kaiser_best
 # ~~~~~~~~~~~
 #
@@ -275,7 +271,7 @@ resampled_waveform = F.resample(
 )
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
 
-######################################################################
+# %%
 #
 
 librosa_resampled_waveform = torch.from_numpy(
@@ -283,13 +279,13 @@ librosa_resampled_waveform = torch.from_numpy(
 ).unsqueeze(0)
 plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)")
 
-######################################################################
+# %%
 #
 
 mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
 print("torchaudio and librosa kaiser best MSE:", mse)
 
-######################################################################
+# %%
 # kaiser_fast
 # ~~~~~~~~~~~
 #
@@ -304,7 +300,7 @@ resampled_waveform = F.resample(
 )
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
 
-######################################################################
+# %%
 #
 
 librosa_resampled_waveform = torch.from_numpy(
@@ -312,13 +308,13 @@ librosa_resampled_waveform = torch.from_numpy(
 ).unsqueeze(0)
 plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)")
 
-######################################################################
+# %%
 #
 
 mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
 print("torchaudio and librosa kaiser fast MSE:", mse)
 
-######################################################################
+# %%
 # Performance Benchmarking
 # ------------------------
 #
@@ -334,7 +330,7 @@ print(f"torchaudio: {torchaudio.__version__}")
 print(f"librosa: {librosa.__version__}")
 print(f"resampy: {resampy.__version__}")
 
-######################################################################
+# %%
 #
 
 
@@ -370,7 +366,7 @@ torchaudio.functional.resample(
     )
 
 
-######################################################################
+# %%
 #
 
 
@@ -409,7 +405,7 @@ resampler.to(waveform.device)
     )
 
 
-######################################################################
+# %%
 #
 
 
@@ -440,7 +436,7 @@ librosa.resample(
     )
 
 
-######################################################################
+# %%
 #
 
 
@@ -492,7 +488,7 @@ def benchmark(sample_rate, resample_rate):
     return df
 
 
-######################################################################
+# %%
 #
 def plot(df):
     print(df.round(2))
@@ -504,7 +500,7 @@ def plot(df):
         ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")
 
 
-######################################################################
+# %%
 #
 # Downsample (48 -> 44.1 kHz)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -512,7 +508,7 @@ def plot(df):
 df = benchmark(48_000, 44_100)
 plot(df)
 
-######################################################################
+# %%
 #
 # Downsample (16 -> 8 kHz)
 # ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -520,7 +516,7 @@ plot(df)
 df = benchmark(16_000, 8_000)
 plot(df)
 
-######################################################################
+# %%
 #
 # Upsample (44.1 -> 48 kHz)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -528,7 +524,7 @@ plot(df)
 df = benchmark(44_100, 48_000)
 plot(df)
 
-######################################################################
+# %%
 #
 # Upsample (8 -> 16 kHz)
 # ~~~~~~~~~~~~~~~~~~~~~~
@@ -536,7 +532,7 @@ plot(df)
 df = benchmark(8_000, 16_000)
 plot(df)
 
-######################################################################
+# %%
 #
 # Summary
 # ~~~~~~~
