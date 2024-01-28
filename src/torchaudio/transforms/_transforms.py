@@ -621,6 +621,59 @@ class MelSpectrogram(torch.nn.Module):
         return mel_specgram
 
 
+class VQT(torch.nn.Module):
+    r"""Create variable Q-transform for a raw audio signal.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Sources
+        * https://librosa.org/doc/main/_modules/librosa/core/constantq.html
+        * https://www.aes.org/e-lib/online/browse.cfm?elib=17112
+        * https://newt.phys.unsw.edu.au/jw/notes.html
+
+    Args:
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
+        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``)
+        n_bins (int, optional): Number of VQT frequency bins, starting at ``f_min``. (Default: ``84``)
+        gamma (float, optional): Offset that controls VQT filter lengths. Larger values 
+            increase the time resolution at lower frequencies. (Default: ``0``)
+        bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.VQT(sample_rate)
+        >>> vqt_specgram = transform(waveform)  # (channel, n_bins, time)
+    """
+    __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_mels", "f_min"]
+
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        hop_length: int = 400,
+        f_min: float = 32.703,
+        n_bins: int = 84,
+        gamma: float = 0.,
+        bins_per_octave: int = 12,
+    ) -> None:
+        super(VQT, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.VQT")
+
+        pass
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: VQT spectrogram of size (..., ``n_bins``, time).
+        """
+        pass
+
+
 class MFCC(torch.nn.Module):
     r"""Create the Mel-frequency cepstrum coefficients from an audio signal.
 
