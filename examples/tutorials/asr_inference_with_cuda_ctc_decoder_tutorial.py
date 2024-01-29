@@ -20,7 +20,7 @@ model from `Next-gen Kaldi <https://nadirapovey.com/next-gen-kaldi-what-is-it>`_
 # with next possible characters, and maintaining only the hypotheses with the
 # highest scores at each time step.
 #
-# The underlying implementation uses cuda to acclerate the whole decoding process
+# The underlying implementation uses cuda to accelerate the whole decoding process
 #  A mathematical formula for the decoder can be
 # found in the `paper <https://arxiv.org/pdf/1408.2873.pdf>`__, and
 # a more detailed algorithm can be found in this `blog
@@ -201,7 +201,7 @@ print(f"WER: {beam_search_wer}")
 # Beam Search Decoder Parameters
 # ------------------------------
 #
-# In this section, we go a little bit more in depth about some different
+# In this section, we go a little bit more in-depth about some different
 # parameters and tradeoffs. For the full list of customizable parameters,
 # please refer to the
 # :py:func:`documentation <torchaudio.models.decoder.cuda_ctc_decoder>`.
@@ -246,7 +246,7 @@ for i in range(10):
 # hypotheses to hold after each decoding step. Using larger beam sizes
 # allows for exploring a larger range of possible hypotheses which can
 # produce hypotheses with higher scores, but it does not provide additional gains beyond a certain point.
-# We recommend to set beam_size=10 for cuda beam search decoder.
+# We recommend setting beam_size=10 for cuda beam search decoder.
 #
 # In the example below, we see improvement in decoding quality as we
 # increase beam size from 1 to 3, but notice how using a beam size
@@ -269,12 +269,12 @@ for beam_size in beam_sizes:
 # blank skip threshold
 # ~~~~~~~~~~~~~~~~~~~~
 #
-# The ``blank_skip_threshold`` parameter is used to prune the frames which have large blank probability.
-# Pruning these frames with a good blank_skip_threshold could speed up decoding
-# process a lot while no accuracy drop.
+# The ``blank_skip_threshold`` parameter is used to prune the frames with a larger blank probability than ``blank_skip_threshold``.
+# Pruning these frames with a good blank_skip_threshold could speed up the decoding
+# process a lot with no accuracy drop.
 # Since the rule of CTC, we would keep at least one blank frame between two non-blank frames
-# to avoid mistakenly merge two consecutive identical symbols.
-# We recommend to set blank_skip_threshold=0.95 for cuda beam search decoder.
+# to avoid mistakenly merging two consecutive identical symbols.
+# We recommend setting blank_skip_threshold=0.95 for cuda beam search decoder.
 #
 
 blank_skip_probs = [0.25, 0.95, 1.0]
