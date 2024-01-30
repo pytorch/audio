@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.filter\_waveform
+================================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: filter_waveform

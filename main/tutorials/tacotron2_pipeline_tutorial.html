@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Text-to-Speech with Tacotron2 &mdash; Torchaudio 2.2.0.dev20240130 documentation</title>
+  <title>Text-to-Speech with Tacotron2 &mdash; Torchaudio 2.2.0.dev20240418 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20240130 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20240418 &#x25BC</span></a>
     </div>
     
 
@@ -476,12 +476,12 @@ pretrained Tacotron2 in torchaudio.</p>
 tutorial, we will use English characters and phonemes as the symbols.</p>
 </li>
 <li><p>Spectrogram generation</p>
-<p>From the encoded text, a spectrogram is generated. We use <code class="docutils literal notranslate"><span class="pre">Tacotron2</span></code>
+<p>From the encoded text, a spectrogram is generated. We use the <code class="docutils literal notranslate"><span class="pre">Tacotron2</span></code>
 model for this.</p>
 </li>
 <li><p>Time-domain conversion</p>
 <p>The last step is converting the spectrogram into the waveform. The
-process to generate speech from spectrogram is also called Vocoder.
+process to generate speech from spectrogram is also called a Vocoder.
 In this tutorial, three different vocoders are used,
 <a class="reference internal" href="../generated/torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaveRNN</span></code></a>,
 <a class="reference internal" href="../generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim" title="torchaudio.transforms.GriffinLim"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriffinLim</span></code></a>, and
@@ -513,8 +513,8 @@ pip3<span class="w"> </span>install<span class="w"> </span>deep_phonemizer
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">device</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.3.0.dev20240129
-2.2.0.dev20240130
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.4.0.dev20240416
+2.2.0.dev20240418
 cuda
 </pre></div>
 </div>
@@ -530,14 +530,12 @@ cuda
 <p>In this section, we will go through how the character-based encoding
 works.</p>
 <p>Since the pre-trained Tacotron2 model expects specific set of symbol
-tables, the same functionalities available in <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>. This
-section is more for the explanation of the basis of encoding.</p>
-<p>Firstly, we define the set of symbols. For example, we can use
+tables, the same functionalities is available in <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>. However,
+we will first manually implement the encoding to aid in understanding.</p>
+<p>First, we define the set of symbols
 <code class="docutils literal notranslate"><span class="pre">'_-!\'(),.:;?</span> <span class="pre">abcdefghijklmnopqrstuvwxyz'</span></code>. Then, we will map the
 each character of the input text into the index of the corresponding
-symbol in the table.</p>
-<p>The following is an example of such processing. In the example, symbols
-that are not in the table are ignored.</p>
+symbol in the table. Symbols that are not in the table are ignored.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">symbols</span></a> <span class="o">=</span> <span class="s2">&quot;_-!&#39;(),.:;? abcdefghijklmnopqrstuvwxyz&quot;</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">look_up</span></a> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">symbols</span></a><span class="p">)}</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">symbols</span></a> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#set" title="builtins.set" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">symbols</span></a><span class="p">)</span>
@@ -556,8 +554,8 @@ that are not in the table are ignored.</p>
 </pre></div>
 </div>
 <p>As mentioned in the above, the symbol table and indices must match
-what the pretrained Tacotron2 model expects. <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides the
-transform along with the pretrained model. For example, you can
+what the pretrained Tacotron2 model expects. <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides the same
+transform along with the pretrained model. You can
 instantiate and use such transform as follow.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">processor</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_CHAR_LJSPEECH</span><span class="o">.</span><span class="n">get_text_processor</span><span class="p">()</span>
 
@@ -573,11 +571,11 @@ instantiate and use such transform as follow.</p>
 tensor([28], dtype=torch.int32)
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">processor</span></code> object takes either a text or list of texts as inputs.
+<p>Note: The output of our manual encoding and the <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> <code class="docutils literal notranslate"><span class="pre">text_processor</span></code> output matches (meaning we correctly re-implemented what the library does internally). It takes either a text or list of texts as inputs.
 When a list of texts are provided, the returned <code class="docutils literal notranslate"><span class="pre">lengths</span></code> variable
 represents the valid length of each processed tokens in the output
 batch.</p>
-<p>The intermediate representation can be retrieved as follow.</p>
+<p>The intermediate representation can be retrieved as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">processed</span></a><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lengths</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
 </pre></div>
 </div>
@@ -590,7 +588,7 @@ batch.</p>
 <p>Phoneme-based encoding is similar to character-based encoding, but it
 uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
 model.</p>
-<p>The detail of the G2P model is out of scope of this tutorial, we will
+<p>The detail of the G2P model is out of the scope of this tutorial, we will
 just look at what the conversion looks like.</p>
 <p>Similar to the case of character-based encoding, the encoding process is
 expected to match what a pretrained Tacotron2 model is trained on.
@@ -612,25 +610,25 @@ fetched.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/63.6M [00:00&lt;?, ?B/s]
-  0%|          | 128k/63.6M [00:00&lt;01:32, 724kB/s]
+  0%|          | 128k/63.6M [00:00&lt;01:31, 728kB/s]
   1%|          | 384k/63.6M [00:00&lt;00:57, 1.15MB/s]
-  2%|1         | 1.25M/63.6M [00:00&lt;00:22, 2.95MB/s]
-  7%|7         | 4.50M/63.6M [00:00&lt;00:06, 9.23MB/s]
- 15%|#5        | 9.75M/63.6M [00:00&lt;00:03, 16.9MB/s]
- 24%|##4       | 15.4M/63.6M [00:01&lt;00:02, 22.2MB/s]
- 32%|###1      | 20.1M/63.6M [00:01&lt;00:01, 28.1MB/s]
- 38%|###7      | 24.0M/63.6M [00:01&lt;00:01, 26.6MB/s]
- 44%|####3     | 27.9M/63.6M [00:01&lt;00:01, 29.7MB/s]
- 52%|#####1    | 32.9M/63.6M [00:01&lt;00:01, 30.0MB/s]
- 58%|#####7    | 36.8M/63.6M [00:01&lt;00:00, 32.1MB/s]
- 65%|######5   | 41.4M/63.6M [00:01&lt;00:00, 31.1MB/s]
- 71%|#######   | 45.0M/63.6M [00:02&lt;00:00, 32.1MB/s]
- 79%|#######8  | 50.1M/63.6M [00:02&lt;00:00, 32.2MB/s]
- 84%|########4 | 53.8M/63.6M [00:02&lt;00:00, 33.0MB/s]
- 92%|#########1| 58.4M/63.6M [00:02&lt;00:00, 31.7MB/s]
- 98%|#########7| 62.2M/63.6M [00:02&lt;00:00, 33.2MB/s]
-100%|##########| 63.6M/63.6M [00:02&lt;00:00, 26.1MB/s]
-/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  2%|1         | 1.12M/63.6M [00:00&lt;00:24, 2.65MB/s]
+  7%|7         | 4.50M/63.6M [00:00&lt;00:06, 9.41MB/s]
+ 16%|#6        | 10.2M/63.6M [00:00&lt;00:02, 21.6MB/s]
+ 21%|##1       | 13.4M/63.6M [00:00&lt;00:02, 20.7MB/s]
+ 28%|##8       | 18.0M/63.6M [00:01&lt;00:01, 27.3MB/s]
+ 35%|###4      | 22.1M/63.6M [00:01&lt;00:01, 26.6MB/s]
+ 41%|####      | 25.9M/63.6M [00:01&lt;00:01, 29.5MB/s]
+ 49%|####8     | 31.0M/63.6M [00:01&lt;00:01, 30.2MB/s]
+ 54%|#####3    | 34.1M/63.6M [00:01&lt;00:01, 25.8MB/s]
+ 59%|#####8    | 37.2M/63.6M [00:01&lt;00:01, 27.1MB/s]
+ 66%|######5   | 41.9M/63.6M [00:01&lt;00:00, 27.7MB/s]
+ 72%|#######1  | 45.6M/63.6M [00:02&lt;00:00, 30.1MB/s]
+ 77%|#######6  | 48.8M/63.6M [00:02&lt;00:00, 25.7MB/s]
+ 84%|########3 | 53.4M/63.6M [00:02&lt;00:00, 26.1MB/s]
+ 93%|#########3| 59.2M/63.6M [00:02&lt;00:00, 28.8MB/s]
+100%|##########| 63.6M/63.6M [00:02&lt;00:00, 24.5MB/s]
+/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
          20, 11, 79, 77, 59, 37,  2]])
@@ -653,7 +651,7 @@ character-based encoding.</p>
 <p><code class="docutils literal notranslate"><span class="pre">Tacotron2</span></code> is the model we use to generate spectrogram from the
 encoded text. For the detail of the model, please refer to <a class="reference external" href="https://arxiv.org/abs/1712.05884">the
 paper</a>.</p>
-<p>It is easy to instantiate a Tacotron2 model with pretrained weight,
+<p>It is easy to instantiate a Tacotron2 model with pretrained weights,
 however, note that the input to Tacotron2 models need to be processed
 by the matching text processor.</p>
 <p><a class="reference internal" href="../generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle" title="torchaudio.pipelines.Tacotron2TTSBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.pipelines.Tacotron2TTSBundle</span></code></a> bundles the matching
@@ -676,18 +674,19 @@ models and processors together so that it is easy to create the pipeline.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+<img src="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" srcset="../_images/sphx_glr_tacotron2_pipeline_tutorial_001.png" alt="tacotron2 pipeline tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 37%|###6      | 39.6M/107M [00:00&lt;00:00, 415MB/s]
- 74%|#######3  | 79.2M/107M [00:00&lt;00:00, 362MB/s]
-100%|##########| 107M/107M [00:00&lt;00:00, 374MB/s]
+ 19%|#9        | 20.5M/107M [00:00&lt;00:00, 215MB/s]
+ 50%|#####     | 53.8M/107M [00:00&lt;00:00, 293MB/s]
+ 80%|########  | 86.5M/107M [00:00&lt;00:00, 315MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 312MB/s]
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">Tacotron2.infer</span></code> method perfoms multinomial sampling,
-therefor, the process of generating the spectrogram incurs randomness.</p>
+therefore, the process of generating the spectrogram incurs randomness.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">():</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
@@ -709,11 +708,11 @@ torch.Size([80, 185])
 <section id="waveform-generation">
 <h2>Waveform Generation<a class="headerlink" href="#waveform-generation" title="Permalink to this heading">¶</a></h2>
 <p>Once the spectrogram is generated, the last process is to recover the
-waveform from the spectrogram.</p>
+waveform from the spectrogram using a vocoder.</p>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides vocoders based on <code class="docutils literal notranslate"><span class="pre">GriffinLim</span></code> and
 <code class="docutils literal notranslate"><span class="pre">WaveRNN</span></code>.</p>
-<section id="wavernn">
-<h3>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this heading">¶</a></h3>
+<section id="wavernn-vocoder">
+<h3>WaveRNN Vocoder<a class="headerlink" href="#wavernn-vocoder" title="Permalink to this heading">¶</a></h3>
 <p>Continuing from the previous section, we can instantiate the matching
 WaveRNN model from the same bundle.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_WAVERNN_PHONE_LJSPEECH</span>
@@ -732,12 +731,12 @@ WaveRNN model from the same bundle.</p>
     <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lengths</span></a> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec_lengths</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 Downloading: &quot;https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
 
   0%|          | 0.00/16.7M [00:00&lt;?, ?B/s]
-100%|##########| 16.7M/16.7M [00:00&lt;00:00, 383MB/s]
+100%|##########| 16.7M/16.7M [00:00&lt;00:00, 314MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <span class="n">sample_rate</span><span class="p">):</span>
@@ -764,10 +763,10 @@ Downloading: &quot;https://download.pytorch.org/torchaudio/models/wavernn_10k_ep
 </div>
 <br />
 <br /></section>
-<section id="griffin-lim">
-<h3>Griffin-Lim<a class="headerlink" href="#griffin-lim" title="Permalink to this heading">¶</a></h3>
+<section id="griffin-lim-vocoder">
+<h3>Griffin-Lim Vocoder<a class="headerlink" href="#griffin-lim-vocoder" title="Permalink to this heading">¶</a></h3>
 <p>Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
-the vocode object with
+the vocoder object with
 <a class="reference internal" href="../generated/torchaudio.pipelines.Tacotron2TTSBundle.html#torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder" title="torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_vocoder()</span></code></a>
 method and pass the spectrogram.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH</span>
@@ -784,16 +783,15 @@ method and pass the spectrogram.</p>
 <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lengths</span></a> <span class="o">=</span> <span class="n">vocoder</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec_lengths</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f&quot;enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}&quot;)
 Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth&quot; to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
 
   0%|          | 0.00/107M [00:00&lt;?, ?B/s]
- 23%|##2       | 24.4M/107M [00:00&lt;00:00, 253MB/s]
- 45%|####5     | 48.6M/107M [00:00&lt;00:00, 225MB/s]
- 75%|#######4  | 80.5M/107M [00:00&lt;00:00, 271MB/s]
- 99%|#########9| 107M/107M [00:00&lt;00:00, 258MB/s]
-100%|##########| 107M/107M [00:00&lt;00:00, 255MB/s]
+ 28%|##7       | 30.0M/107M [00:00&lt;00:00, 314MB/s]
+ 56%|#####5    | 60.0M/107M [00:00&lt;00:00, 287MB/s]
+ 82%|########1 | 87.6M/107M [00:00&lt;00:00, 265MB/s]
+100%|##########| 107M/107M [00:00&lt;00:00, 282MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveforms</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spec</span></a><span class="p">,</span> <span class="n">vocoder</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
@@ -809,8 +807,8 @@ Downloading: &quot;https://download.pytorch.org/torchaudio/models/tacotron2_engl
 </div>
 <br />
 <br /></section>
-<section id="waveglow">
-<h3>Waveglow<a class="headerlink" href="#waveglow" title="Permalink to this heading">¶</a></h3>
+<section id="waveglow-vocoder">
+<h3>Waveglow Vocoder<a class="headerlink" href="#waveglow-vocoder" title="Permalink to this heading">¶</a></h3>
 <p>Waveglow is a vocoder published by Nvidia. The pretrained weights are
 published on Torch Hub. One can instantiate the model using <code class="docutils literal notranslate"><span class="pre">torch.hub</span></code>
 module.</p>
@@ -862,7 +860,7 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  50.902 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  1.150 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-tacotron2-pipeline-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9772cbd0af96f57f17a2da758b365a43/tacotron2_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tacotron2_pipeline_tutorial.py</span></code></a></p>
@@ -931,9 +929,9 @@ Downloading: &quot;https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/
 </li>
 <li><a class="reference internal" href="#spectrogram-generation">Spectrogram Generation</a></li>
 <li><a class="reference internal" href="#waveform-generation">Waveform Generation</a><ul>
-<li><a class="reference internal" href="#wavernn">WaveRNN</a></li>
-<li><a class="reference internal" href="#griffin-lim">Griffin-Lim</a></li>
-<li><a class="reference internal" href="#waveglow">Waveglow</a></li>
+<li><a class="reference internal" href="#wavernn-vocoder">WaveRNN Vocoder</a></li>
+<li><a class="reference internal" href="#griffin-lim-vocoder">Griffin-Lim Vocoder</a></li>
+<li><a class="reference internal" href="#waveglow-vocoder">Waveglow Vocoder</a></li>
 </ul>
 </li>
 </ul>

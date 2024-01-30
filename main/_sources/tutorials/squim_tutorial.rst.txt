@@ -97,8 +97,8 @@ through MOS using non-matching references.” Interspeech, 2022.
 
  .. code-block:: none
 
-    2.3.0.dev20240129
-    2.2.0.dev20240130
+    2.4.0.dev20240416
+    2.2.0.dev20240418
 
 
 
@@ -225,7 +225,7 @@ plot data, pystoi, pesq for computing reference metrics.
 
  .. code-block:: none
 
-      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 74.1MB/s]
+      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 92.1MB/s]
 
 
 
@@ -575,7 +575,7 @@ Get the pre-trained ``SquimObjective``\ model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/squim_objective_dns2020.pth" to /root/.cache/torch/hub/checkpoints/squim_objective_dns2020.pth
-      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 351MB/s]
+      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 388MB/s]
 
 
 
@@ -667,7 +667,7 @@ SNR
 
     STOI: 0.5743248462677002
     PESQ: 1.1112866401672363
-    SI-SDR: -6.248741149902344
+    SI-SDR: -6.248741626739502
 
     Reference metrics for distorted speech at -5dB are
 
@@ -706,7 +706,7 @@ Get the pre-trained ``SquimSubjective`` model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/squim_subjective_bvcc_daps.pth" to /root/.cache/torch/hub/checkpoints/squim_subjective_bvcc_daps.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      3%|3         | 11.4M/360M [00:00<00:03, 119MB/s]      7%|6         | 24.4M/360M [00:00<00:02, 129MB/s]     17%|#7        | 61.9M/360M [00:00<00:01, 248MB/s]     26%|##6       | 94.0M/360M [00:00<00:00, 283MB/s]     36%|###5      | 128M/360M [00:00<00:00, 309MB/s]      46%|####6     | 166M/360M [00:00<00:00, 338MB/s]     58%|#####8    | 210M/360M [00:00<00:00, 380MB/s]     68%|######8   | 246M/360M [00:00<00:00, 345MB/s]     79%|#######9  | 285M/360M [00:00<00:00, 363MB/s]     90%|######### | 326M/360M [00:01<00:00, 381MB/s]    100%|##########| 360M/360M [00:01<00:00, 336MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]      2%|1         | 6.38M/360M [00:00<00:05, 62.1MB/s]      5%|4         | 16.5M/360M [00:00<00:07, 50.7MB/s]      7%|7         | 26.4M/360M [00:00<00:05, 67.4MB/s]      9%|9         | 33.6M/360M [00:00<00:08, 39.9MB/s]     13%|#3        | 47.6M/360M [00:01<00:07, 46.3MB/s]     15%|#4        | 52.9M/360M [00:01<00:08, 39.2MB/s]     16%|#5        | 57.2M/360M [00:01<00:08, 38.9MB/s]     18%|#8        | 65.6M/360M [00:01<00:07, 39.2MB/s]     21%|##        | 74.0M/360M [00:01<00:06, 45.4MB/s]     22%|##2       | 80.4M/360M [00:01<00:06, 44.3MB/s]     24%|##3       | 84.9M/360M [00:02<00:07, 39.8MB/s]     27%|##7       | 98.4M/360M [00:02<00:05, 49.2MB/s]     32%|###1      | 114M/360M [00:02<00:03, 66.9MB/s]      34%|###3      | 121M/360M [00:02<00:04, 59.4MB/s]     36%|###6      | 131M/360M [00:02<00:04, 54.9MB/s]     41%|####      | 146M/360M [00:02<00:03, 63.7MB/s]     42%|####2     | 152M/360M [00:03<00:03, 54.8MB/s]     45%|####5     | 162M/360M [00:03<00:03, 58.3MB/s]     47%|####6     | 168M/360M [00:03<00:04, 43.2MB/s]     50%|####9     | 180M/360M [00:03<00:03, 49.9MB/s]     51%|#####1    | 185M/360M [00:03<00:04, 45.2MB/s]     54%|#####4    | 195M/360M [00:04<00:03, 53.3MB/s]     56%|#####5    | 200M/360M [00:04<00:03, 44.9MB/s]     59%|#####9    | 213M/360M [00:04<00:02, 54.2MB/s]     64%|######3   | 229M/360M [00:04<00:01, 76.3MB/s]     66%|######6   | 238M/360M [00:04<00:01, 67.4MB/s]     68%|######8   | 246M/360M [00:04<00:02, 58.6MB/s]     70%|#######   | 252M/360M [00:05<00:01, 57.7MB/s]     73%|#######2  | 262M/360M [00:05<00:01, 57.7MB/s]     77%|#######7  | 279M/360M [00:05<00:01, 63.0MB/s]     79%|#######9  | 285M/360M [00:05<00:01, 54.5MB/s]     81%|########  | 290M/360M [00:05<00:01, 52.1MB/s]     82%|########1 | 295M/360M [00:06<00:02, 27.4MB/s]     86%|########6 | 311M/360M [00:06<00:01, 42.6MB/s]     91%|######### | 328M/360M [00:06<00:00, 46.6MB/s]     95%|#########5| 342M/360M [00:07<00:00, 54.3MB/s]     97%|#########6| 349M/360M [00:07<00:00, 44.5MB/s]    100%|#########9| 359M/360M [00:07<00:00, 49.9MB/s]    100%|##########| 360M/360M [00:07<00:00, 50.5MB/s]
 
 
 
@@ -757,7 +757,7 @@ Compute MOS metric for distorted speech with 20dB SNR
 
  .. code-block:: none
 
-    Estimated MOS for distorted speech at 20dB is MOS: 4.309268474578857
+    Estimated MOS for distorted speech at 20dB is MOS: 4.309267997741699
 
 
 
@@ -784,7 +784,7 @@ Compute MOS metric for distorted speech with -5dB SNR
 
  .. code-block:: none
 
-    Estimated MOS for distorted speech at -5dB is MOS: 3.2918038368225098
+    Estimated MOS for distorted speech at -5dB is MOS: 3.291804075241089
 
 
 
@@ -833,7 +833,7 @@ represents the corresponding ground truth.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.677 seconds)
+   **Total running time of the script:** ( 0 minutes  13.297 seconds)
 
 
 .. _sphx_glr_download_tutorials_squim_tutorial.py:

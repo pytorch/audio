@@ -1,0 +1,6 @@
+torchaudio.prototype.models.conformer\_rnnt\_base
+=================================================
+
+.. currentmodule:: torchaudio.prototype.models
+
+.. autofunction:: conformer_rnnt_base

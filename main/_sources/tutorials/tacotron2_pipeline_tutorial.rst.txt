@@ -41,13 +41,13 @@ The text-to-speech pipeline goes as follows:
 
 2. Spectrogram generation
 
-   From the encoded text, a spectrogram is generated. We use ``Tacotron2``
+   From the encoded text, a spectrogram is generated. We use the ``Tacotron2``
    model for this.
 
 3. Time-domain conversion
 
    The last step is converting the spectrogram into the waveform. The
-   process to generate speech from spectrogram is also called Vocoder.
+   process to generate speech from spectrogram is also called a Vocoder.
    In this tutorial, three different vocoders are used,
    :py:class:`~torchaudio.models.WaveRNN`,
    :py:class:`~torchaudio.transforms.GriffinLim`, and
@@ -102,8 +102,8 @@ encoding.
 
  .. code-block:: none
 
-    2.3.0.dev20240129
-    2.2.0.dev20240130
+    2.4.0.dev20240416
+    2.2.0.dev20240418
     cuda
 
 
@@ -131,7 +131,7 @@ Text Processing
 ---------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-104
+.. GENERATED FROM PYTHON SOURCE LINES 86-100
 
 Character-based encoding
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,19 +140,15 @@ In this section, we will go through how the character-based encoding
 works.
 
 Since the pre-trained Tacotron2 model expects specific set of symbol
-tables, the same functionalities available in ``torchaudio``. This
-section is more for the explanation of the basis of encoding.
+tables, the same functionalities is available in ``torchaudio``. However,
+we will first manually implement the encoding to aid in understanding.
 
-Firstly, we define the set of symbols. For example, we can use
+First, we define the set of symbols
 ``'_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'``. Then, we will map the
 each character of the input text into the index of the corresponding
-symbol in the table.
+symbol in the table. Symbols that are not in the table are ignored.
 
-The following is an example of such processing. In the example, symbols
-that are not in the table are ignored.
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 104-119
+.. GENERATED FROM PYTHON SOURCE LINES 100-115
 
 .. code-block:: default
 
@@ -184,15 +180,15 @@ that are not in the table are ignored.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-125
+.. GENERATED FROM PYTHON SOURCE LINES 116-121
 
 As mentioned in the above, the symbol table and indices must match
-what the pretrained Tacotron2 model expects. ``torchaudio`` provides the
-transform along with the pretrained model. For example, you can
+what the pretrained Tacotron2 model expects. ``torchaudio`` provides the same
+transform along with the pretrained model. You can
 instantiate and use such transform as follow.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-135
+.. GENERATED FROM PYTHON SOURCE LINES 121-131
 
 .. code-block:: default
 
@@ -221,17 +217,17 @@ instantiate and use such transform as follow.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-143
+.. GENERATED FROM PYTHON SOURCE LINES 132-139
 
-The ``processor`` object takes either a text or list of texts as inputs.
+Note: The output of our manual encoding and the ``torchaudio`` ``text_processor`` output matches (meaning we correctly re-implemented what the library does internally). It takes either a text or list of texts as inputs.
 When a list of texts are provided, the returned ``lengths`` variable
 represents the valid length of each processed tokens in the output
 batch.
 
-The intermediate representation can be retrieved as follow.
+The intermediate representation can be retrieved as follows:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-147
+.. GENERATED FROM PYTHON SOURCE LINES 139-143
 
 .. code-block:: default
 
@@ -252,7 +248,7 @@ The intermediate representation can be retrieved as follow.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-167
+.. GENERATED FROM PYTHON SOURCE LINES 144-163
 
 Phoneme-based encoding
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -261,7 +257,7 @@ Phoneme-based encoding is similar to character-based encoding, but it
 uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
 model.
 
-The detail of the G2P model is out of scope of this tutorial, we will
+The detail of the G2P model is out of the scope of this tutorial, we will
 just look at what the conversion looks like.
 
 Similar to the case of character-based encoding, the encoding process is
@@ -274,7 +270,7 @@ the pretrained weights published by the author of ``DeepPhonemizer`` is
 fetched.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-180
+.. GENERATED FROM PYTHON SOURCE LINES 163-176
 
 .. code-block:: default
 
@@ -299,8 +295,8 @@ fetched.
 
  .. code-block:: none
 
-      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 128k/63.6M [00:00<01:32, 724kB/s]      1%|          | 384k/63.6M [00:00<00:57, 1.15MB/s]      2%|1         | 1.25M/63.6M [00:00<00:22, 2.95MB/s]      7%|7         | 4.50M/63.6M [00:00<00:06, 9.23MB/s]     15%|#5        | 9.75M/63.6M [00:00<00:03, 16.9MB/s]     24%|##4       | 15.4M/63.6M [00:01<00:02, 22.2MB/s]     32%|###1      | 20.1M/63.6M [00:01<00:01, 28.1MB/s]     38%|###7      | 24.0M/63.6M [00:01<00:01, 26.6MB/s]     44%|####3     | 27.9M/63.6M [00:01<00:01, 29.7MB/s]     52%|#####1    | 32.9M/63.6M [00:01<00:01, 30.0MB/s]     58%|#####7    | 36.8M/63.6M [00:01<00:00, 32.1MB/s]     65%|######5   | 41.4M/63.6M [00:01<00:00, 31.1MB/s]     71%|#######   | 45.0M/63.6M [00:02<00:00, 32.1MB/s]     79%|#######8  | 50.1M/63.6M [00:02<00:00, 32.2MB/s]     84%|########4 | 53.8M/63.6M [00:02<00:00, 33.0MB/s]     92%|#########1| 58.4M/63.6M [00:02<00:00, 31.7MB/s]     98%|#########7| 62.2M/63.6M [00:02<00:00, 33.2MB/s]    100%|##########| 63.6M/63.6M [00:02<00:00, 26.1MB/s]
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+      0%|          | 0.00/63.6M [00:00<?, ?B/s]      0%|          | 128k/63.6M [00:00<01:31, 728kB/s]      1%|          | 384k/63.6M [00:00<00:57, 1.15MB/s]      2%|1         | 1.12M/63.6M [00:00<00:24, 2.65MB/s]      7%|7         | 4.50M/63.6M [00:00<00:06, 9.41MB/s]     16%|#6        | 10.2M/63.6M [00:00<00:02, 21.6MB/s]     21%|##1       | 13.4M/63.6M [00:00<00:02, 20.7MB/s]     28%|##8       | 18.0M/63.6M [00:01<00:01, 27.3MB/s]     35%|###4      | 22.1M/63.6M [00:01<00:01, 26.6MB/s]     41%|####      | 25.9M/63.6M [00:01<00:01, 29.5MB/s]     49%|####8     | 31.0M/63.6M [00:01<00:01, 30.2MB/s]     54%|#####3    | 34.1M/63.6M [00:01<00:01, 25.8MB/s]     59%|#####8    | 37.2M/63.6M [00:01<00:01, 27.1MB/s]     66%|######5   | 41.9M/63.6M [00:01<00:00, 27.7MB/s]     72%|#######1  | 45.6M/63.6M [00:02<00:00, 30.1MB/s]     77%|#######6  | 48.8M/63.6M [00:02<00:00, 25.7MB/s]     84%|########3 | 53.4M/63.6M [00:02<00:00, 26.1MB/s]     93%|#########3| 59.2M/63.6M [00:02<00:00, 28.8MB/s]    100%|##########| 63.6M/63.6M [00:02<00:00, 24.5MB/s]
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     tensor([[54, 20, 65, 69, 11, 92, 44, 65, 38,  2, 11, 81, 40, 64, 79, 81, 11, 81,
              20, 11, 79, 77, 59, 37,  2]])
@@ -309,7 +305,7 @@ fetched.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-186
+.. GENERATED FROM PYTHON SOURCE LINES 177-182
 
 Notice that the encoded values are different from the example of
 character-based encoding.
@@ -317,7 +313,7 @@ character-based encoding.
 The intermediate representation looks like the following.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-190
+.. GENERATED FROM PYTHON SOURCE LINES 182-186
 
 .. code-block:: default
 
@@ -338,7 +334,7 @@ The intermediate representation looks like the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-208
+.. GENERATED FROM PYTHON SOURCE LINES 187-204
 
 Spectrogram Generation
 ----------------------
@@ -347,7 +343,7 @@ Spectrogram Generation
 encoded text. For the detail of the model, please refer to `the
 paper <https://arxiv.org/abs/1712.05884>`__.
 
-It is easy to instantiate a Tacotron2 model with pretrained weight,
+It is easy to instantiate a Tacotron2 model with pretrained weights,
 however, note that the input to Tacotron2 models need to be processed
 by the matching text processor.
 
@@ -358,7 +354,7 @@ For the available bundles, and its usage, please refer to
 :py:class:`~torchaudio.pipelines.Tacotron2TTSBundle`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-225
+.. GENERATED FROM PYTHON SOURCE LINES 204-221
 
 .. code-block:: default
 
@@ -392,21 +388,21 @@ For the available bundles, and its usage, please refer to
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_wavernn_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     37%|###6      | 39.6M/107M [00:00<00:00, 415MB/s]     74%|#######3  | 79.2M/107M [00:00<00:00, 362MB/s]    100%|##########| 107M/107M [00:00<00:00, 374MB/s] 
+      0%|          | 0.00/107M [00:00<?, ?B/s]     19%|#9        | 20.5M/107M [00:00<00:00, 215MB/s]     50%|#####     | 53.8M/107M [00:00<00:00, 293MB/s]     80%|########  | 86.5M/107M [00:00<00:00, 315MB/s]    100%|##########| 107M/107M [00:00<00:00, 312MB/s] 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-229
+.. GENERATED FROM PYTHON SOURCE LINES 222-225
 
 Note that ``Tacotron2.infer`` method perfoms multinomial sampling,
-therefor, the process of generating the spectrogram incurs randomness.
+therefore, the process of generating the spectrogram incurs randomness.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-243
+.. GENERATED FROM PYTHON SOURCE LINES 225-239
 
 .. code-block:: default
 
@@ -444,28 +440,28 @@ therefor, the process of generating the spectrogram incurs randomness.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-253
+.. GENERATED FROM PYTHON SOURCE LINES 240-249
 
 Waveform Generation
 -------------------
 
 Once the spectrogram is generated, the last process is to recover the
-waveform from the spectrogram.
+waveform from the spectrogram using a vocoder.
 
 ``torchaudio`` provides vocoders based on ``GriffinLim`` and
 ``WaveRNN``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 256-262
+.. GENERATED FROM PYTHON SOURCE LINES 252-258
 
-WaveRNN
-~~~~~~~
+WaveRNN Vocoder
+~~~~~~~~~~~~~~~
 
 Continuing from the previous section, we can instantiate the matching
 WaveRNN model from the same bundle.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-278
+.. GENERATED FROM PYTHON SOURCE LINES 258-274
 
 .. code-block:: default
 
@@ -493,15 +489,15 @@ WaveRNN model from the same bundle.
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     Downloading: "https://download.pytorch.org/torchaudio/models/wavernn_10k_epochs_8bits_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/wavernn_10k_epochs_8bits_ljspeech.pth
-      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 383MB/s]
+      0%|          | 0.00/16.7M [00:00<?, ?B/s]    100%|##########| 16.7M/16.7M [00:00<00:00, 314MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 280-296
+.. GENERATED FROM PYTHON SOURCE LINES 276-292
 
 .. code-block:: default
 
@@ -544,18 +540,18 @@ WaveRNN model from the same bundle.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-305
+.. GENERATED FROM PYTHON SOURCE LINES 293-301
 
-Griffin-Lim
-~~~~~~~~~~~
+Griffin-Lim Vocoder
+~~~~~~~~~~~~~~~~~~~
 
 Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
-the vocode object with
+the vocoder object with
 :py:func:`~torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder`
 method and pass the spectrogram.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-319
+.. GENERATED FROM PYTHON SOURCE LINES 301-315
 
 .. code-block:: default
 
@@ -581,15 +577,15 @@ method and pass the spectrogram.
 
  .. code-block:: none
 
-    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:292: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+    /pytorch/audio/ci_env/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
       warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
     Downloading: "https://download.pytorch.org/torchaudio/models/tacotron2_english_phonemes_1500_epochs_ljspeech.pth" to /root/.cache/torch/hub/checkpoints/tacotron2_english_phonemes_1500_epochs_ljspeech.pth
-      0%|          | 0.00/107M [00:00<?, ?B/s]     23%|##2       | 24.4M/107M [00:00<00:00, 253MB/s]     45%|####5     | 48.6M/107M [00:00<00:00, 225MB/s]     75%|#######4  | 80.5M/107M [00:00<00:00, 271MB/s]     99%|#########9| 107M/107M [00:00<00:00, 258MB/s]     100%|##########| 107M/107M [00:00<00:00, 255MB/s]
+      0%|          | 0.00/107M [00:00<?, ?B/s]     28%|##7       | 30.0M/107M [00:00<00:00, 314MB/s]     56%|#####5    | 60.0M/107M [00:00<00:00, 287MB/s]     82%|########1 | 87.6M/107M [00:00<00:00, 265MB/s]    100%|##########| 107M/107M [00:00<00:00, 282MB/s] 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 321-325
+.. GENERATED FROM PYTHON SOURCE LINES 317-321
 
 .. code-block:: default
 
@@ -620,17 +616,17 @@ method and pass the spectrogram.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 326-333
+.. GENERATED FROM PYTHON SOURCE LINES 322-329
 
-Waveglow
-~~~~~~~~
+Waveglow Vocoder
+~~~~~~~~~~~~~~~~
 
 Waveglow is a vocoder published by Nvidia. The pretrained weights are
 published on Torch Hub. One can instantiate the model using ``torch.hub``
 module.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 333-357
+.. GENERATED FROM PYTHON SOURCE LINES 329-353
 
 .. code-block:: default
 
@@ -680,7 +676,7 @@ module.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 359-361
+.. GENERATED FROM PYTHON SOURCE LINES 355-357
 
 .. code-block:: default
 
@@ -712,7 +708,7 @@ module.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  50.902 seconds)
+   **Total running time of the script:** ( 1 minutes  1.150 seconds)
 
 
 .. _sphx_glr_download_tutorials_tacotron2_pipeline_tutorial.py:

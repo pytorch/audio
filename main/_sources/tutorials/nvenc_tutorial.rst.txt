@@ -80,8 +80,8 @@ with TorchAudio, and how it improves the performance of video encoding.
 
  .. code-block:: none
 
-    2.3.0.dev20240129
-    2.2.0.dev20240130
+    2.4.0.dev20240416
+    2.2.0.dev20240418
 
 
 
@@ -461,19 +461,19 @@ change.
 
     Testing resolution: 640x360
     * Software Encoder (num_threads=1)
-     - Processed 120 frames in 0.63 seconds. (189.82 fps)
+     - Processed 120 frames in 0.65 seconds. (185.43 fps)
      - Encoded data size: 381331 bytes
     * Software Encoder (num_threads=4)
-     - Processed 120 frames in 0.24 seconds. (498.10 fps)
+     - Processed 120 frames in 0.23 seconds. (520.62 fps)
      - Encoded data size: 381307 bytes
     * Software Encoder (num_threads=8)
-     - Processed 120 frames in 0.18 seconds. (663.25 fps)
+     - Processed 120 frames in 0.19 seconds. (642.21 fps)
      - Encoded data size: 390689 bytes
     * Hardware Encoder 
-     - Processed 120 frames in 0.05 seconds. (2261.80 fps)
+     - Processed 120 frames in 0.05 seconds. (2235.79 fps)
      - Encoded data size: 1262979 bytes
     * Hardware Encoder (CUDA frames)
-     - Processed 120 frames in 0.05 seconds. (2596.61 fps)
+     - Processed 120 frames in 0.05 seconds. (2614.14 fps)
      - Encoded data size: 1262979 bytes
 
 
@@ -502,19 +502,19 @@ change.
 
     Testing resolution: 1280x720
     * Software Encoder (num_threads=1)
-     - Processed 120 frames in 2.26 seconds. (53.11 fps)
+     - Processed 120 frames in 2.21 seconds. (54.19 fps)
      - Encoded data size: 1335451 bytes
     * Software Encoder (num_threads=4)
-     - Processed 120 frames in 0.83 seconds. (145.20 fps)
+     - Processed 120 frames in 0.78 seconds. (154.30 fps)
      - Encoded data size: 1336418 bytes
     * Software Encoder (num_threads=8)
-     - Processed 120 frames in 0.69 seconds. (174.66 fps)
+     - Processed 120 frames in 0.59 seconds. (205.13 fps)
      - Encoded data size: 1344063 bytes
     * Hardware Encoder 
-     - Processed 120 frames in 0.26 seconds. (467.14 fps)
+     - Processed 120 frames in 0.18 seconds. (670.81 fps)
      - Encoded data size: 1358969 bytes
     * Hardware Encoder (CUDA frames)
-     - Processed 120 frames in 0.15 seconds. (802.96 fps)
+     - Processed 120 frames in 0.15 seconds. (803.66 fps)
      - Encoded data size: 1358969 bytes
 
 
@@ -543,19 +543,19 @@ change.
 
     Testing resolution: 1920x1080
     * Software Encoder (num_threads=1)
-     - Processed 120 frames in 4.65 seconds. (25.81 fps)
+     - Processed 120 frames in 4.54 seconds. (26.41 fps)
      - Encoded data size: 2678241 bytes
     * Software Encoder (num_threads=4)
-     - Processed 120 frames in 1.68 seconds. (71.48 fps)
+     - Processed 120 frames in 1.54 seconds. (77.80 fps)
      - Encoded data size: 2682028 bytes
     * Software Encoder (num_threads=8)
-     - Processed 120 frames in 1.49 seconds. (80.31 fps)
+     - Processed 120 frames in 1.42 seconds. (84.70 fps)
      - Encoded data size: 2685086 bytes
     * Hardware Encoder 
-     - Processed 120 frames in 0.56 seconds. (213.53 fps)
+     - Processed 120 frames in 0.39 seconds. (309.56 fps)
      - Encoded data size: 1705900 bytes
     * Hardware Encoder (CUDA frames)
-     - Processed 120 frames in 0.32 seconds. (371.21 fps)
+     - Processed 120 frames in 0.32 seconds. (371.31 fps)
      - Encoded data size: 1705900 bytes
 
 
@@ -709,7 +709,7 @@ Tag: :obj:`torchaudio.io`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.769 seconds)
+   **Total running time of the script:** ( 0 minutes  20.889 seconds)
 
 
 .. _sphx_glr_download_tutorials_nvenc_tutorial.py:
