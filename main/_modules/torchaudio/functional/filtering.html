@@ -1430,7 +1430,8 @@
 
 
 <div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../generated/torchaudio.functional.lfilter.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation, using differentiable implementation</span>
+<span class="sd">    developed independently by *Yu et al.* :cite:`ismir_YuF23` and *Forgione et al.* :cite:`forgione2021dynonet`.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
 

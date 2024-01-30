@@ -140,7 +140,7 @@ In this tutorial, we only use CTC head of the model.
 
  .. code-block:: none
 
-      0%|          | 0.00/269M [00:00<?, ?B/s]     14%|#4        | 37.9M/269M [00:00<00:00, 397MB/s]     32%|###2      | 87.2M/269M [00:00<00:00, 468MB/s]     51%|#####     | 137M/269M [00:00<00:00, 490MB/s]      69%|######9   | 186M/269M [00:00<00:00, 502MB/s]     88%|########7 | 236M/269M [00:00<00:00, 509MB/s]    100%|##########| 269M/269M [00:00<00:00, 498MB/s]
+      0%|          | 0.00/269M [00:00<?, ?B/s]      4%|3         | 10.1M/269M [00:00<00:03, 78.9MB/s]      9%|9         | 25.0M/269M [00:00<00:05, 49.1MB/s]     18%|#8        | 49.6M/269M [00:00<00:02, 96.3MB/s]     23%|##3       | 63.0M/269M [00:00<00:03, 67.8MB/s]     28%|##7       | 74.9M/269M [00:01<00:03, 56.8MB/s]     31%|###       | 83.4M/269M [00:01<00:03, 59.6MB/s]     37%|###7      | 99.9M/269M [00:01<00:03, 48.1MB/s]     39%|###9      | 106M/269M [00:02<00:05, 33.3MB/s]      46%|####5     | 123M/269M [00:02<00:03, 48.0MB/s]     48%|####8     | 130M/269M [00:02<00:03, 37.5MB/s]     54%|#####3    | 145M/269M [00:02<00:02, 51.5MB/s]     57%|#####6    | 153M/269M [00:03<00:03, 35.0MB/s]     63%|######3   | 170M/269M [00:03<00:02, 49.3MB/s]     66%|######6   | 178M/269M [00:04<00:03, 26.8MB/s]     72%|#######1  | 194M/269M [00:04<00:02, 37.6MB/s]     75%|#######4  | 201M/269M [00:05<00:02, 30.5MB/s]     77%|#######6  | 207M/269M [00:05<00:02, 31.4MB/s]     82%|########2 | 222M/269M [00:05<00:01, 45.5MB/s]     85%|########5 | 230M/269M [00:05<00:01, 33.0MB/s]     88%|########7 | 236M/269M [00:05<00:00, 35.8MB/s]     93%|#########2| 250M/269M [00:06<00:00, 33.8MB/s]     97%|#########7| 262M/269M [00:06<00:00, 44.9MB/s]    100%|#########9| 269M/269M [00:06<00:00, 34.9MB/s]    100%|##########| 269M/269M [00:06<00:00, 41.1MB/s]
 
 
 
@@ -169,7 +169,7 @@ We will load a sample from the LibriSpeech test-other dataset.
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 134MB/s]
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 83.3MB/s]
 
 
 .. raw:: html
@@ -247,7 +247,7 @@ index, or as a list of tokens, each mapping to a unique index.
 
  .. code-block:: none
 
-      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 111MB/s]
+      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 63.9MB/s]
     ['<blk>', '<sos/eos>', '<unk>', 'S', '▁THE', '▁A', 'T', '▁AND', 'ED', '▁OF', '▁TO', 'E', 'D', 'N', 'ING', '▁IN', 'Y', 'M', 'C', '▁I', 'A', 'P', '▁HE', 'R', 'O', 'L', 'RE', 'I', 'U', 'ER', '▁IT', 'LY', '▁THAT', '▁WAS', '▁', '▁S', 'AR', '▁BE', 'F', '▁C', 'IN', 'B', '▁FOR', 'OR', 'LE', "'", '▁HIS', '▁YOU', 'AL', '▁RE', 'V', '▁B', 'G', 'RI', '▁E', '▁WITH', '▁T', '▁AS', 'LL', '▁P', '▁HER', 'ST', '▁HAD', '▁SO', '▁F', 'W', 'CE', '▁IS', 'ND', '▁NOT', 'TH', '▁BUT', 'EN', '▁SHE', '▁ON', 'VE', 'ON', 'SE', '▁DE', 'UR', '▁G', 'CH', 'K', 'TER', '▁AT', 'IT', '▁ME', 'RO', 'NE', 'RA', 'ES', 'IL', 'NG', 'IC', '▁NO', '▁HIM', 'ENT', 'IR', '▁WE', 'H', '▁DO', '▁ALL', '▁HAVE', 'LO', '▁BY', '▁MY', '▁MO', '▁THIS', 'LA', '▁ST', '▁WHICH', '▁CON', '▁THEY', 'CK', 'TE', '▁SAID', '▁FROM', '▁GO', '▁WHO', '▁TH', '▁OR', '▁D', '▁W', 'VER', 'LI', '▁SE', '▁ONE', '▁CA', '▁AN', '▁LA', '▁WERE', 'EL', '▁HA', '▁MAN', '▁FA', '▁EX', 'AD', '▁SU', 'RY', '▁MI', 'AT', '▁BO', '▁WHEN', 'AN', 'THER', 'PP', 'ATION', '▁FI', '▁WOULD', '▁PRO', 'OW', 'ET', '▁O', '▁THERE', '▁HO', 'ION', '▁WHAT', '▁FE', '▁PA', 'US', 'MENT', '▁MA', 'UT', '▁OUT', '▁THEIR', '▁IF', '▁LI', '▁K', '▁WILL', '▁ARE', 'ID', '▁RO', 'DE', 'TION', '▁WA', 'PE', '▁UP', '▁SP', '▁PO', 'IGHT', '▁UN', 'RU', '▁LO', 'AS', 'OL', '▁LE', '▁BEEN', '▁SH', '▁RA', '▁SEE', 'KE', 'UL', 'TED', '▁SA', 'UN', 'UND', 'ANT', '▁NE', 'IS', '▁THEM', 'CI', 'GE', '▁COULD', '▁DIS', 'OM', 'ISH', 'HE', 'EST', '▁SOME', 'ENCE', 'ITY', 'IVE', '▁US', '▁MORE', '▁EN', 'ARD', 'ATE', '▁YOUR', '▁INTO', '▁KNOW', '▁CO', 'ANCE', '▁TIME', '▁WI', '▁YE', 'AGE', '▁NOW', 'TI', 'FF', 'ABLE', '▁VERY', '▁LIKE', 'AM', 'HI', 'Z', '▁OTHER', '▁THAN', '▁LITTLE', '▁DID', '▁LOOK', 'TY', 'ERS', '▁CAN', '▁CHA', '▁AR', 'X', 'FUL', 'UGH', '▁BA', '▁DAY', '▁ABOUT', 'TEN', 'IM', '▁ANY', '▁PRE', '▁OVER', 'IES', 'NESS', 'ME', 'BLE', '▁M', 'ROW', '▁HAS', '▁GREAT', '▁VI', 'TA', '▁AFTER', 'PER', '▁AGAIN', 'HO', 'SH', '▁UPON', '▁DI', '▁HAND', '▁COM', 'IST', 'TURE', '▁STA', '▁THEN', '▁SHOULD', '▁GA', 'OUS', 'OUR', '▁WELL', '▁ONLY', 'MAN', '▁GOOD', '▁TWO', '▁MAR', '▁SAY', '▁HU', 'TING', '▁OUR', 'RESS', '▁DOWN', 'IOUS', '▁BEFORE', '▁DA', '▁NA', 'QUI', '▁MADE', '▁EVERY', '▁OLD', '▁EVEN', 'IG', '▁COME', '▁GRA', '▁RI', '▁LONG', 'OT', 'SIDE', 'WARD', '▁FO', '▁WHERE', 'MO', 'LESS', '▁SC', '▁MUST', '▁NEVER', '▁HOW', '▁CAME', '▁SUCH', '▁RU', '▁TAKE', '▁WO', '▁CAR', 'UM', 'AK', '▁THINK', '▁MUCH', '▁MISTER', '▁MAY', '▁JO', '▁WAY', '▁COMP', '▁THOUGHT', '▁STO', '▁MEN', '▁BACK', '▁DON', 'J', '▁LET', '▁TRA', '▁FIRST', '▁JUST', '▁VA', '▁OWN', '▁PLA', '▁MAKE', 'ATED', '▁HIMSELF', '▁WENT', '▁PI', 'GG', 'RING', '▁DU', '▁MIGHT', '▁PART', '▁GIVE', '▁IMP', '▁BU', '▁PER', '▁PLACE', '▁HOUSE', '▁THROUGH', 'IAN', '▁SW', '▁UNDER', 'QUE', '▁AWAY', '▁LOVE', 'QUA', '▁LIFE', '▁GET', '▁WITHOUT', '▁PASS', '▁TURN', 'IGN', '▁HEAD', '▁MOST', '▁THOSE', '▁SHALL', '▁EYES', '▁COL', '▁STILL', '▁NIGHT', '▁NOTHING', 'ITION', 'HA', '▁TELL', '▁WORK', '▁LAST', '▁NEW', '▁FACE', '▁HI', '▁WORD', '▁FOUND', '▁COUNT', '▁OB', '▁WHILE', '▁SHA', '▁MEAN', '▁SAW', '▁PEOPLE', '▁FRIEND', '▁THREE', '▁ROOM', '▁SAME', '▁THOUGH', '▁RIGHT', '▁CHILD', '▁FATHER', '▁ANOTHER', '▁HEART', '▁WANT', '▁TOOK', 'OOK', '▁LIGHT', '▁MISSUS', '▁OPEN', '▁JU', '▁ASKED', 'PORT', '▁LEFT', '▁JA', '▁WORLD', '▁HOME', '▁WHY', '▁ALWAYS', '▁ANSWER', '▁SEEMED', '▁SOMETHING', '▁GIRL', '▁BECAUSE', '▁NAME', '▁TOLD', '▁NI', '▁HIGH', 'IZE', '▁WOMAN', '▁FOLLOW', '▁RETURN', '▁KNEW', '▁EACH', '▁KIND', '▁JE', '▁ACT', '▁LU', '▁CERTAIN', '▁YEARS', '▁QUITE', '▁APPEAR', '▁BETTER', '▁HALF', '▁PRESENT', '▁PRINCE', 'SHIP', '▁ALSO', '▁BEGAN', '▁HAVING', '▁ENOUGH', '▁PERSON', '▁LADY', '▁WHITE', '▁COURSE', '▁VOICE', '▁SPEAK', '▁POWER', '▁MORNING', '▁BETWEEN', '▁AMONG', '▁KEEP', '▁WALK', '▁MATTER', '▁TEA', '▁BELIEVE', '▁SMALL', '▁TALK', '▁FELT', '▁HORSE', '▁MYSELF', '▁SIX', '▁HOWEVER', '▁FULL', '▁HERSELF', '▁POINT', '▁STOOD', '▁HUNDRED', '▁ALMOST', '▁SINCE', '▁LARGE', '▁LEAVE', '▁PERHAPS', '▁DARK', '▁SUDDEN', '▁REPLIED', '▁ANYTHING', '▁WONDER', '▁UNTIL', 'Q']
 
 
@@ -564,7 +564,7 @@ From the above table, CUDA decoder could give a slight improvement in WER and a 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.896 seconds)
+   **Total running time of the script:** ( 0 minutes  8.752 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_cuda_ctc_decoder_tutorial.py:

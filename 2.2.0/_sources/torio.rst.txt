@@ -5,7 +5,7 @@ torio
 
 .. currentmodule:: torio.io
 
-``torio`` is an alternative top-level module for I/O features. The is the extraction of the core implementation of I/O feature of ``torchaudio``.
+``torio`` is an alternative top-level module for I/O features. It is the extraction of the core implementation of I/O feature of ``torchaudio``.
 
 If you want to use the multimedia processing features, but do not want to depend on the entire ``torchaudio`` package, you can use ``torio``.
 
