@@ -97,8 +97,8 @@ through MOS using non-matching references.” Interspeech, 2022.
 
  .. code-block:: none
 
-    2.3.0.dev20240129
-    2.2.0.dev20240130
+    2.4.0.dev20240326
+    2.2.0.dev20240327
 
 
 
@@ -225,7 +225,7 @@ plot data, pystoi, pesq for computing reference metrics.
 
  .. code-block:: none
 
-      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 74.1MB/s]
+      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 80.0MB/s]
 
 
 
@@ -575,7 +575,7 @@ Get the pre-trained ``SquimObjective``\ model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/squim_objective_dns2020.pth" to /root/.cache/torch/hub/checkpoints/squim_objective_dns2020.pth
-      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 351MB/s]
+      0%|          | 0.00/28.2M [00:00<?, ?B/s]     99%|#########8| 27.9M/28.2M [00:00<00:00, 291MB/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 285MB/s]
 
 
 
@@ -667,7 +667,7 @@ SNR
 
     STOI: 0.5743248462677002
     PESQ: 1.1112866401672363
-    SI-SDR: -6.248741149902344
+    SI-SDR: -6.248741626739502
 
     Reference metrics for distorted speech at -5dB are
 
@@ -706,7 +706,7 @@ Get the pre-trained ``SquimSubjective`` model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/squim_subjective_bvcc_daps.pth" to /root/.cache/torch/hub/checkpoints/squim_subjective_bvcc_daps.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      3%|3         | 11.4M/360M [00:00<00:03, 119MB/s]      7%|6         | 24.4M/360M [00:00<00:02, 129MB/s]     17%|#7        | 61.9M/360M [00:00<00:01, 248MB/s]     26%|##6       | 94.0M/360M [00:00<00:00, 283MB/s]     36%|###5      | 128M/360M [00:00<00:00, 309MB/s]      46%|####6     | 166M/360M [00:00<00:00, 338MB/s]     58%|#####8    | 210M/360M [00:00<00:00, 380MB/s]     68%|######8   | 246M/360M [00:00<00:00, 345MB/s]     79%|#######9  | 285M/360M [00:00<00:00, 363MB/s]     90%|######### | 326M/360M [00:01<00:00, 381MB/s]    100%|##########| 360M/360M [00:01<00:00, 336MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]      5%|5         | 18.5M/360M [00:00<00:01, 194MB/s]     12%|#1        | 42.1M/360M [00:00<00:01, 225MB/s]     18%|#7        | 63.6M/360M [00:00<00:01, 222MB/s]     24%|##4       | 86.9M/360M [00:00<00:01, 230MB/s]     30%|###       | 109M/360M [00:00<00:01, 209MB/s]      36%|###5      | 129M/360M [00:00<00:01, 201MB/s]     41%|####1     | 148M/360M [00:00<00:01, 195MB/s]     46%|####6     | 167M/360M [00:00<00:01, 178MB/s]     51%|#####1    | 185M/360M [00:01<00:01, 121MB/s]     55%|#####5    | 199M/360M [00:01<00:01, 97.5MB/s]     58%|#####8    | 210M/360M [00:01<00:01, 92.8MB/s]     63%|######3   | 227M/360M [00:01<00:01, 110MB/s]      67%|######6   | 240M/360M [00:01<00:01, 114MB/s]     70%|######9   | 252M/360M [00:01<00:01, 113MB/s]     73%|#######3  | 264M/360M [00:01<00:00, 112MB/s]     78%|#######7  | 279M/360M [00:02<00:00, 124MB/s]     81%|########1 | 292M/360M [00:02<00:00, 127MB/s]     87%|########7 | 314M/360M [00:02<00:00, 155MB/s]     91%|#########1| 329M/360M [00:02<00:00, 141MB/s]     95%|#########5| 344M/360M [00:02<00:00, 132MB/s]     99%|#########9| 357M/360M [00:02<00:00, 133MB/s]    100%|##########| 360M/360M [00:02<00:00, 141MB/s]
 
 
 
@@ -757,7 +757,7 @@ Compute MOS metric for distorted speech with 20dB SNR
 
  .. code-block:: none
 
-    Estimated MOS for distorted speech at 20dB is MOS: 4.309268474578857
+    Estimated MOS for distorted speech at 20dB is MOS: 4.309267997741699
 
 
 
@@ -784,7 +784,7 @@ Compute MOS metric for distorted speech with -5dB SNR
 
  .. code-block:: none
 
-    Estimated MOS for distorted speech at -5dB is MOS: 3.2918038368225098
+    Estimated MOS for distorted speech at -5dB is MOS: 3.291804075241089
 
 
 
@@ -833,7 +833,7 @@ represents the corresponding ground truth.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.677 seconds)
+   **Total running time of the script:** ( 0 minutes  8.170 seconds)
 
 
 .. _sphx_glr_download_tutorials_squim_tutorial.py:
