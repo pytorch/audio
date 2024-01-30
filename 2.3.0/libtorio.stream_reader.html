@@ -1,0 +1,1444 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torio::io::StreamingMediaDecoder &mdash; Torchaudio 2.3.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torio::io::StreamingMediaEncoder" href="libtorio.stream_writer.html" />
+    <link rel="prev" title="libtorio" href="libtorio.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../versions.html"><span style="font-size:110%">2.3.0 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torio.utils.html">torio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.datasets.html">torchaudio.prototype.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="libtorio.html">libtorio</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="libtorio.html">libtorio</a> &gt;</li>
+        
+      <li>torio::io::StreamingMediaDecoder &gt;</li>
+      
+      <li>Current (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/libtorio.stream_reader.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TorchAudio’s C++ API is a prototype feature.
+API/ABI backward compatibility is not guaranteed.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The top-level namespace has been changed from <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> to <code class="docutils literal notranslate"><span class="pre">torio</span></code>.
+<code class="docutils literal notranslate"><span class="pre">StreamReader</span></code> has been renamed to <code class="docutils literal notranslate"><span class="pre">StreamingMediaDecoder</span></code>.</p>
+</div>
+<section id="torio-io-streamingmediadecoder">
+<h1>torio::io::StreamingMediaDecoder<a class="headerlink" href="#torio-io-streamingmediadecoder" title="Permalink to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">StreamingMediaDecoder</span></code> is the implementation used by Python equivalent and provides similar interface.
+When working with custom I/O, such as in-memory data, <code class="docutils literal notranslate"><span class="pre">StreamingMediaDecoderCustomIO</span></code> class can be used.</p>
+<p>Both classes have the same methods defined, so their usages are the same.</p>
+<section id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this heading">¶</a></h2>
+<section id="streamingmediadecoder">
+<h3>StreamingMediaDecoder<a class="headerlink" href="#streamingmediadecoder" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoderE">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Fetch and decode audio/video streams chunk by chunk. </p>
+<p>Subclassed by <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoderCustomIO"><span class="std std-ref">torio::io::StreamingMediaDecoderCustomIO</span></a></p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder21StreamingMediaDecoderERKNSt6stringERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEE">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a54f6f4f241d445522333dd0daf745c4b"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder21StreamingMediaDecoderERKNSt6stringERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct media processor from soruce URI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> – URL of source media, in the format FFmpeg can understand. </p></li>
+<li><p><strong>format</strong> – Specifies format (such as mp4) or device (such as lavfi and avfoundation) </p></li>
+<li><p><strong>option</strong> – Custom option passed when initializing format context (opening source). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="streamingmediadecodercustomio">
+<h3>StreamingMediaDecoderCustomIO<a class="headerlink" href="#streamingmediadecodercustomio" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io29StreamingMediaDecoderCustomIOE">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoderCustomIO"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaDecoderCustomIO</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CustomInput</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><a class="headerlink" href="#_CPPv4N5torio2io29StreamingMediaDecoderCustomIOE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A subclass of <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder"><span class="std std-ref">StreamingMediaDecoder</span></a> which works with custom read function. Can be used for decoding media from memory or custom object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io29StreamingMediaDecoderCustomIO29StreamingMediaDecoderCustomIOEPvRKN3c108optionalINSt6stringEEEiPFiPvP7uint8_tiEPF7int64_tPv7int64_tiERKN3c108optionalI10OptionDictEE">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoderCustomIO_1ad223c75aa1e902640fbf98c040bd22de"></span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io29StreamingMediaDecoderCustomIOE" title="torio::io::StreamingMediaDecoderCustomIO"><span class="n"><span class="pre">StreamingMediaDecoderCustomIO</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaDecoderCustomIO</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">opaque</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">buffer_size</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">read_packet</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opaque</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buf</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">buf_size</span></span><span class="p"><span class="pre">)</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">seek</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opaque</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">whence</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io29StreamingMediaDecoderCustomIO29StreamingMediaDecoderCustomIOEPvRKN3c108optionalINSt6stringEEEiPFiPvP7uint8_tiEPF7int64_tPv7int64_tiERKN3c108optionalI10OptionDictEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder"><span class="std std-ref">StreamingMediaDecoder</span></a> with custom read and seek functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opaque</strong> – Custom data used by <code class="docutils literal notranslate"><span class="pre">read_packet</span></code> and <code class="docutils literal notranslate"><span class="pre">seek</span></code> functions. </p></li>
+<li><p><strong>format</strong> – Specify input format. </p></li>
+<li><p><strong>buffer_size</strong> – The size of the intermediate buffer, which FFmpeg uses to pass data to function read_packet. </p></li>
+<li><p><strong>read_packet</strong> – Custom read function that is called from FFmpeg to read data from the destination. </p></li>
+<li><p><strong>seek</strong> – Optional seek function that is used to seek the destination. </p></li>
+<li><p><strong>option</strong> – Custom option passed when initializing format context. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="query-methods">
+<h2>Query Methods<a class="headerlink" href="#query-methods" title="Permalink to this heading">¶</a></h2>
+<section id="find-best-audio-stream">
+<h3>find_best_audio_stream<a class="headerlink" href="#find-best-audio-stream" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder22find_best_audio_streamEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a01014e8d07967bcd99cf79409bc4026b"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">find_best_audio_stream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder22find_best_audio_streamEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Find a suitable audio stream using heuristics from ffmpeg.</p>
+<p>If successful, the index of the best stream (&gt;=0) is returned. Otherwise a negative value is returned. </p>
+</dd></dl>
+
+</section>
+<section id="find-best-video-stream">
+<h3>find_best_video_stream<a class="headerlink" href="#find-best-video-stream" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder22find_best_video_streamEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a47015d7637b5c24376ba1c9cac442cdb"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">find_best_video_stream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder22find_best_video_streamEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Find a suitable video stream using heuristics from ffmpeg.</p>
+<p>If successful, the index of the best stream (0&gt;=) is returned. otherwise a negative value is returned. </p>
+</dd></dl>
+
+</section>
+<section id="get-metadata">
+<h3>get_metadata<a class="headerlink" href="#get-metadata" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder12get_metadataEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1af0c02f604589f887e6d4581a7f4a3b17"></span><span class="n"><span class="pre">OptionDict</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_metadata</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder12get_metadataEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Fetch metadata of the source media. </p>
+</dd></dl>
+
+</section>
+<section id="num-src-streams">
+<h3>num_src_streams<a class="headerlink" href="#num-src-streams" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder15num_src_streamsEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a6b3e5fd480cc50ee5ec9b389641c4512"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">num_src_streams</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder15num_src_streamsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Fetch the number of source streams found in the input media.</p>
+<p>The source streams include not only audio/video streams but also subtitle and others. </p>
+</dd></dl>
+
+</section>
+<section id="get-src-stream-info">
+<h3>get_src_stream_info<a class="headerlink" href="#get-src-stream-info" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder19get_src_stream_infoEi">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a2949d852664329f6cdc84122ae04c3c3"></span><a class="reference internal" href="#_CPPv4N5torio2io13SrcStreamInfoE" title="torio::io::SrcStreamInfo"><span class="n"><span class="pre">SrcStreamInfo</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_src_stream_info</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder19get_src_stream_infoEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Fetch information about the specified source stream.</p>
+<p>The valid value range is <code class="docutils literal notranslate"><span class="pre">[0,</span> <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1a6b3e5fd480cc50ee5ec9b389641c4512"><span class="std std-ref"><span class="pre">num_src_streams()</span></span></a><span class="pre">)</span></code>. </p>
+</dd></dl>
+
+</section>
+<section id="num-out-streams">
+<h3>num_out_streams<a class="headerlink" href="#num-out-streams" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder15num_out_streamsEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a2675b80361ce5ac9da29bb63105f1135"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">num_out_streams</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder15num_out_streamsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Fetch the number of output streams defined by client code. </p>
+</dd></dl>
+
+</section>
+<section id="get-out-stream-info">
+<h3>get_out_stream_info<a class="headerlink" href="#get-out-stream-info" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder19get_out_stream_infoEi">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a6901f6138d5bc2c7dc0e2919960aa378"></span><a class="reference internal" href="#_CPPv4N5torio2io16OutputStreamInfoE" title="torio::io::OutputStreamInfo"><span class="n"><span class="pre">OutputStreamInfo</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_out_stream_info</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder19get_out_stream_infoEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Fetch information about the specified output stream.</p>
+<p>The valid value range is <code class="docutils literal notranslate"><span class="pre">[0,</span> <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1a2675b80361ce5ac9da29bb63105f1135"><span class="std std-ref"><span class="pre">num_out_streams()</span></span></a><span class="pre">)</span></code>. </p>
+</dd></dl>
+
+</section>
+<section id="is-buffer-ready">
+<h3>is_buffer_ready<a class="headerlink" href="#is-buffer-ready" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5torio2io21StreamingMediaDecoder15is_buffer_readyEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a69a405cbf490b82bc23e7d8dae9991a7"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">is_buffer_ready</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5torio2io21StreamingMediaDecoder15is_buffer_readyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check if all the buffers of the output streams have enough decoded frames. </p>
+</dd></dl>
+
+</section>
+</section>
+<section id="configure-methods">
+<h2>Configure Methods<a class="headerlink" href="#configure-methods" title="Permalink to this heading">¶</a></h2>
+<section id="add-audio-stream">
+<h3>add_audio_stream<a class="headerlink" href="#add-audio-stream" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder16add_audio_streamE7int64_t7int64_t7int64_tRKN3c108optionalINSt6stringEEERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEE">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1ab0ea1a8c8be1299d79119d05b806dcd1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add_audio_stream</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frames_per_chunk</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_chunks</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filter_desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">decoder</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">decoder_option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder16add_audio_streamE7int64_t7int64_t7int64_tRKN3c108optionalINSt6stringEEERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Define an output audio stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> – The index of the source stream.</p></li>
+<li><p><strong>frames_per_chunk</strong> – Number of frames returned as one chunk. <p>If a source stream is exhausted before <code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span></code> frames are buffered, the chunk is returned as-is. Thus the number of frames in the chunk may be smaller than ``<code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span></code>.</p>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables chunking, in which case, method <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1aaddbcb821053bb30f8e106c2e838c8ef"><span class="std std-ref"><span class="pre">pop_chunks()</span></span></a></code> returns all the buffered frames as one chunk. </p>
+</p></li>
+<li><p><strong>num_chunks</strong> – Internal buffer size. <p>When the number of buffered chunks exceeds this number, old chunks are dropped. For example, if <code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span></code> is 5 and <code class="docutils literal notranslate"><span class="pre">buffer_chunk_size</span></code> is 3, then frames older than 15 are dropped.</p>
+<p>Providing <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables this behavior, forcing the retention of all chunks. </p>
+</p></li>
+<li><p><strong>filter_desc</strong> – Description of filter graph applied to the source stream.</p></li>
+<li><p><strong>decoder</strong> – The name of the decoder to be used. When provided, use the specified decoder instead of the default one.</p></li>
+<li><p><strong>decoder_option</strong> – Options passed to decoder. <p>To list decoder options for a decoder, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">decoder=&lt;DECODER&gt;</span></code> command.</p>
+<p>In addition to decoder-specific options, you can also pass options related to multithreading. They are effective only if the decoder supports them. If neither of them are provided, <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder"><span class="std std-ref">StreamingMediaDecoder</span></a> defaults to single thread.<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;threads&quot;</span></code>: The number of threads or the value <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code> to let FFmpeg decide based on its heuristics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;thread_type&quot;</span></code>: Which multithreading method to use. The valid values are <code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>. Note that each decoder supports a different set of methods. If not provided, a default value is used.<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;frame&quot;</span></code>: Decode more than one frame at once. Each thread handles one frame. This will increase decoding delay by one frame per thread</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;slice&quot;</span></code>: Decode more than one part of a single frame at once. </p></li>
+</ul>
+</p></li>
+</ul>
+</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="add-video-stream">
+<h3>add_video_stream<a class="headerlink" href="#add-video-stream" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder16add_video_streamE7int64_t7int64_t7int64_tRKN3c108optionalINSt6stringEEERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEERKN3c108optionalINSt6stringEEE">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1ae233df016f29ac5345b548eff9bb27cb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add_video_stream</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frames_per_chunk</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_chunks</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filter_desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">decoder</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">decoder_option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw_accel</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder16add_video_streamE7int64_t7int64_t7int64_tRKN3c108optionalINSt6stringEEERKN3c108optionalINSt6stringEEERKN3c108optionalI10OptionDictEERKN3c108optionalINSt6stringEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Define an output video stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i, frames_per_chunk, num_chunks, filter_desc, decoder, decoder_option</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1ab0ea1a8c8be1299d79119d05b806dcd1"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>.</p></li>
+<li><p><strong>hw_accel</strong> – Enable hardware acceleration. <p>When video is decoded on CUDA hardware, (for example by specifying <code class="docutils literal notranslate"><span class="pre">&quot;h264_cuvid&quot;</span></code> decoder), passing CUDA device indicator to <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> (i.e. <code class="docutils literal notranslate"><span class="pre">hw_accel=&quot;cuda:0&quot;</span></code>) will make <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder"><span class="std std-ref">StreamingMediaDecoder</span></a> place the resulting frames directly on the specified CUDA device as a CUDA tensor.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the chunk will be moved to CPU memory. </p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="remove-stream">
+<h3>remove_stream<a class="headerlink" href="#remove-stream" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder13remove_streamE7int64_t">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1ab435622f836a58a577a27f0bea8f5819"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">remove_stream</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder13remove_streamE7int64_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Remove an output stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> – The index of the output stream to be removed. The valid value range is <code class="docutils literal notranslate"><span class="pre">[0,</span> <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1a2675b80361ce5ac9da29bb63105f1135"><span class="std std-ref"><span class="pre">num_out_streams()</span></span></a><span class="pre">)</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="stream-methods">
+<h3>Stream Methods<a class="headerlink" href="#stream-methods" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="seek">
+<h3>seek<a class="headerlink" href="#seek" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder4seekEd7int64_t">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1ac00e054c55f2187d7dd6ed9ba21d2228"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">seek</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timestamp</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder4seekEd7int64_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Seek into the given time stamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamp</strong> – Target time stamp in second. </p></li>
+<li><p><strong>mode</strong> – Seek mode.<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: Keyframe mode. Seek into nearest key frame before the given timestamp.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: Any mode. Seek into any frame (including non-key frames) before the given timestamp.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code>: Precise mode. First seek into the nearest key frame before the given timestamp, then decode frames until it reaches the frame closest to the given timestamp. </p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="process-packet">
+<h3>process_packet<a class="headerlink" href="#process-packet" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder14process_packetEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a01fdf9e71bd58aeafcf2aeb4418a817c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">process_packet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder14process_packetEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Demultiplex and process one packet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: A packet was processed successfully and there are still packets left in the stream, so client code can call this method again.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: A packet was processed successfully and it reached EOF. Client code should not call this method again.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;0</span></code>: An error has happened. </p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="process-packet-block">
+<h3>process_packet_block<a class="headerlink" href="#process-packet-block" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder20process_packet_blockEKdKd">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1ab79ca75fbcf46543b5947762d4feba46"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">process_packet_block</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeout</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backoff</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder20process_packet_blockEKdKd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Similar to <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1a01fdf9e71bd58aeafcf2aeb4418a817c"><span class="std std-ref"><span class="pre">process_packet()</span></span></a></code>, but in case it fails due to resource temporarily being unavailable, it automatically retries.</p>
+<p>This behavior is helpful when using device input, such as a microphone, during which the buffer may be busy while sample acquisition is happening.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> – Timeout in milli seconds.<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&gt;=0</span></code>: Keep retrying until the given time passes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;0</span></code>: Keep retrying forever. </p></li>
+</ul>
+</p></li>
+<li><p><strong>backoff</strong> – Time to wait before retrying in milli seconds. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="process-all-packets">
+<h3>process_all_packets<a class="headerlink" href="#process-all-packets" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder19process_all_packetsEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a0f4f370219d1615b3b5222aa5385f42b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">process_all_packets</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder19process_all_packetsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Process packets unitl EOF. </p>
+</dd></dl>
+
+</section>
+<section id="fill-buffer">
+<h3>fill_buffer<a class="headerlink" href="#fill-buffer" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder11fill_bufferERKN3c108optionalIdEEKd">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1a7d5d3a4a154b417b0ed13fd58b341a47"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">fill_buffer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">timeout</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backoff</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10.</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder11fill_bufferERKN3c108optionalIdEEKd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Process packets until all the chunk buffers have at least one chunk</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1ab79ca75fbcf46543b5947762d4feba46"><span class="std std-ref"><span class="pre">process_packet_block()</span></span></a></code> </p></li>
+<li><p><strong>backoff</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaDecoder_1ab79ca75fbcf46543b5947762d4feba46"><span class="std std-ref"><span class="pre">process_packet_block()</span></span></a></code> </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="retrieval-methods">
+<h2>Retrieval Methods<a class="headerlink" href="#retrieval-methods" title="Permalink to this heading">¶</a></h2>
+<section id="pop-chunks">
+<h3>pop_chunks<a class="headerlink" href="#pop-chunks" title="Permalink to this heading">¶</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaDecoder10pop_chunksEv">
+<span class="target" id="classtorio_1_1io_1_1StreamingMediaDecoder_1aaddbcb821053bb30f8e106c2e838c8ef"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5torio2io5ChunkE" title="torio::io::Chunk"><span class="n"><span class="pre">Chunk</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaDecoderE" title="torio::io::StreamingMediaDecoder"><span class="n"><span class="pre">StreamingMediaDecoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">pop_chunks</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaDecoder10pop_chunksEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Pop one chunk from each output stream if it is available. </p>
+</dd></dl>
+
+</section>
+</section>
+<section id="support-structures">
+<h2>Support Structures<a class="headerlink" href="#support-structures" title="Permalink to this heading">¶</a></h2>
+<section id="chunk">
+<h3>Chunk<a class="headerlink" href="#chunk" title="Permalink to this heading">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io5ChunkE">
+<span class="target" id="structtorio_1_1io_1_1Chunk"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Chunk</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io5ChunkE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Stores decoded frames and metadata. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io5Chunk6framesE">
+<span class="target" id="structtorio_1_1io_1_1Chunk_1a6b4f6a8b707901b3b10ef2d7df2e3e4d"></span><span class="n"><span class="pre">torch</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frames</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io5Chunk6framesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Audio/video frames.</p>
+<p>For audio, the shape is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">num_channels]</span></code>, and the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> depends on output stream configurations.</p>
+<p>For video, the shape is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel,</span> <span class="pre">height,</span> <span class="pre">width]</span></code>, and the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> is <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io5Chunk3ptsE">
+<span class="target" id="structtorio_1_1io_1_1Chunk_1a9d15ed58a3e748508e5ac9b2f39f5be5"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pts</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io5Chunk3ptsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Presentation time stamp of the first frame, in second. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</section>
+<section id="srcstreaminfo">
+<h3>SrcStreaminfo<a class="headerlink" href="#srcstreaminfo" title="Permalink to this heading">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfoE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SrcStreamInfo</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Information about source stream found in the input media. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-common-members">COMMON MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo10media_typeE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1ab395c00d4a21aada8eaf9a26219010e6"></span><span class="n"><span class="pre">AVMediaType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">media_type</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo10media_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The stream media type.</p>
+<p>Please see refer to <a class="reference external" href="https://ffmpeg.org/doxygen/4.1/group__lavu__misc.html#ga9a84bba4713dfced21a1a56163be1f48">the FFmpeg documentation</a> for the available values</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Introduce own enum and get rid of FFmpeg dependency </p>
+</dd></dl>
+
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo10codec_nameE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1abacd6778fbed84e9813e2d0d12b2f6e9"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">codec_name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;N/A&quot;</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo10codec_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The name of codec. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo15codec_long_nameE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1a1610ecb097b5769f2355b663956bda75"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">codec_long_name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;N/A&quot;</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo15codec_long_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The name of codec in long, human friendly form. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo8fmt_nameE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1aedaf37cd17c18485f2f2dcc81d8fa1ca"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fmt_name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;N/A&quot;</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo8fmt_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>For audio, it is sample format.</p>
+<p>Commonly found values are;<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;u8&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;u8p&quot;</span></code>: 8-bit unsigned integer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;s16&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;s16p&quot;</span></code>: 16-bit signed integer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;s32&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;s32p&quot;</span></code>: 32-bit signed integer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;s64&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;s64p&quot;</span></code>: 64-bit signed integer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;flt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fltp&quot;</span></code>: 32-bit floating point.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;dbl&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;dblp&quot;</span></code>: 64-bit floating point.</p></li>
+</ul>
+</p>
+<p>For video, it is color channel format.</p>
+<p>Commonly found values include;<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;gray8&quot;</span></code>: grayscale</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;rgb24&quot;</span></code>: RGB</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;bgr24&quot;</span></code>: BGR</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;yuv420p&quot;</span></code>: YUV420p </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo8bit_rateE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1a92f5b3eee0a9191ac9b941813e59a39f"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bit_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo8bit_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Bit rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo10num_framesE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1af63a840ef28286d0c8a72dfa79d2093b"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_frames</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo10num_framesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of frames. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In some formats, the value is not reliable or unavailable. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo15bits_per_sampleE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1abb1dbb8e70a976dd6b8e6960f4f36313"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bits_per_sample</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo15bits_per_sampleE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Bits per sample. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo8metadataE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1a15fb5310df582da99644c0cfe9cda926"></span><span class="n"><span class="pre">OptionDict</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">metadata</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo8metadataE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Metadata</p>
+<p>This method can fetch ID3 tag from MP3.</p>
+<p>Example:</p>
+<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;artist&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2017&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+ </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-audio-specific-members">AUDIO-SPECIFIC MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo11sample_rateE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1a7445147c98842da1e0a17a532a5a1882"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sample_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo11sample_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Sample rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo12num_channelsE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1a0c1c2812bbd202ca42913d6b6b81b597"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_channels</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo12num_channelsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The number of channels. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-video-specific-members">VIDEO-SPECIFIC MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo5widthE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1af513beba4aa8a4d938340b1155436e2d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">width</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo5widthE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Width. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo6heightE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1afbb856b739941b2c7baf41f68d888767"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">height</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo6heightE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Height. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io13SrcStreamInfo10frame_rateE">
+<span class="target" id="structtorio_1_1io_1_1SrcStreamInfo_1acff9793602878574a5b4bcb3e69b9b28"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frame_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5torio2io13SrcStreamInfo10frame_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Frame rate. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</section>
+<section id="outputstreaminfo">
+<h3>OutputStreaminfo<a class="headerlink" href="#outputstreaminfo" title="Permalink to this heading">¶</a></h3>
+<div class="py attribute docutils container">
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfoE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutputStreamInfo</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Information about output stream configured by user code. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-audio-specific-members">AUDIO-SPECIFIC MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo11sample_rateE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1afb5bc0d1918e188b27d8273bd04511c7"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sample_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo11sample_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Sample rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo12num_channelsE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1a5fbe6e8d7efede48e86d5fa52c82f0b0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_channels</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo12num_channelsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The number of channels. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-video-specific-members">VIDEO-SPECIFIC MEMBERS</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo5widthE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1a77441472f664aae0434bc2c332f6790e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">width</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo5widthE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Width. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo6heightE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1a28f3b8e320a2d620b132acf3cff24715"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">height</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo6heightE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Height. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo10frame_rateE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1a27a775f9402919c3e48a3bc63cd19414"></span><span class="n"><span class="pre">AVRational</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frame_rate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo10frame_rateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Frame rate. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo12source_indexE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1af0796c137d1d62d61fb505b7ddc60a50"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">source_index</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo12source_indexE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The index of the input source stream. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo10media_typeE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1abf0481abb45d23afe25806f149fdee44"></span><span class="n"><span class="pre">AVMediaType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">media_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">AVMEDIA_TYPE_UNKNOWN</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo10media_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The stream media type.</p>
+<p>Please see refer to <a class="reference external" href="https://ffmpeg.org/doxygen/4.1/group__lavu__misc.html#ga9a84bba4713dfced21a1a56163be1f48">the FFmpeg documentation</a> for the available values</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Introduce own enum and get rid of FFmpeg dependency </p>
+</dd></dl>
+
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo6formatE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1a41688027e3c680fc3e43f2bc5834d745"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">format</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo6formatE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Media format. AVSampleFormat for audio or AVPixelFormat for video. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5torio2io16OutputStreamInfo18filter_descriptionE">
+<span class="target" id="structtorio_1_1io_1_1OutputStreamInfo_1a7fa46a5796af9b560c93dd3688052b7a"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">filter_description</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5torio2io16OutputStreamInfo18filter_descriptionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Filter graph definition, such as <code class="docutils literal notranslate"><span class="pre">&quot;aresample=16000,aformat=sample_fmts=fltp&quot;</span></code>. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</section>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="libtorio.stream_writer.html" class="btn btn-neutral float-right" title="torio::io::StreamingMediaEncoder" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="libtorio.html" class="btn btn-neutral" title="libtorio" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torio::io::StreamingMediaDecoder</a><ul>
+<li><a class="reference internal" href="#constructors">Constructors</a><ul>
+<li><a class="reference internal" href="#streamingmediadecoder">StreamingMediaDecoder</a></li>
+<li><a class="reference internal" href="#streamingmediadecodercustomio">StreamingMediaDecoderCustomIO</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#query-methods">Query Methods</a><ul>
+<li><a class="reference internal" href="#find-best-audio-stream">find_best_audio_stream</a></li>
+<li><a class="reference internal" href="#find-best-video-stream">find_best_video_stream</a></li>
+<li><a class="reference internal" href="#get-metadata">get_metadata</a></li>
+<li><a class="reference internal" href="#num-src-streams">num_src_streams</a></li>
+<li><a class="reference internal" href="#get-src-stream-info">get_src_stream_info</a></li>
+<li><a class="reference internal" href="#num-out-streams">num_out_streams</a></li>
+<li><a class="reference internal" href="#get-out-stream-info">get_out_stream_info</a></li>
+<li><a class="reference internal" href="#is-buffer-ready">is_buffer_ready</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-methods">Configure Methods</a><ul>
+<li><a class="reference internal" href="#add-audio-stream">add_audio_stream</a></li>
+<li><a class="reference internal" href="#add-video-stream">add_video_stream</a></li>
+<li><a class="reference internal" href="#remove-stream">remove_stream</a></li>
+<li><a class="reference internal" href="#stream-methods">Stream Methods</a></li>
+<li><a class="reference internal" href="#seek">seek</a></li>
+<li><a class="reference internal" href="#process-packet">process_packet</a></li>
+<li><a class="reference internal" href="#process-packet-block">process_packet_block</a></li>
+<li><a class="reference internal" href="#process-all-packets">process_all_packets</a></li>
+<li><a class="reference internal" href="#fill-buffer">fill_buffer</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#retrieval-methods">Retrieval Methods</a><ul>
+<li><a class="reference internal" href="#pop-chunks">pop_chunks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#support-structures">Support Structures</a><ul>
+<li><a class="reference internal" href="#chunk">Chunk</a></li>
+<li><a class="reference internal" href="#srcstreaminfo">SrcStreaminfo</a></li>
+<li><a class="reference internal" href="#outputstreaminfo">OutputStreaminfo</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

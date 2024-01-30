@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StreamingMediaDecoder &mdash; Torchaudio 2.2.0.dev20240130 documentation</title>
+  <title>StreamingMediaDecoder &mdash; Torchaudio 2.2.0.dev20240424 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20240130 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.2.0.dev20240424 &#x25BC</span></a>
     </div>
     
 
@@ -1184,10 +1184,10 @@ The iterator stops if all the output streams are exhausted.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torio.io._streaming_media_decoder.</span></span><span class="sig-name descname"><span class="pre">ChunkTensor</span></span><a class="reference internal" href="../_modules/torio/io/_streaming_media_decoder.html#ChunkTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torio.io._streaming_media_decoder.ChunkTensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decoded media frames with metadata.</p>
 <p>The instance of this class represents the decoded video/audio frames with
-metadata, and the instance itself behave like <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>.</p>
+metadata, and the instance itself behave like <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>.</p>
 <p>Client codes can pass instance of this class as-if it’s
-<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a> class, or call the methods defined on
-<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a> class.</p>
+<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a> class, or call the methods defined on
+<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a> class.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define input streams</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">StreamingMediaDecoder</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>

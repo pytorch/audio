@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.chroma\_filterbank
+==================================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: chroma_filterbank

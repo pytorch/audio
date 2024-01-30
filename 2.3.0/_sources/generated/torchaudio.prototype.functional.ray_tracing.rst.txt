@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.ray\_tracing
+============================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: ray_tracing
