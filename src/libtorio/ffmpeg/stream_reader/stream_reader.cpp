@@ -610,4 +610,53 @@ StreamingMediaDecoderCustomIO::StreamingMediaDecoderCustomIO(
     : CustomInput(opaque, buffer_size, read_packet, seek),
       StreamingMediaDecoder(io_ctx, format, option) {}
 
+namespace {
+static int read_bytes(void* opaque, uint8_t* buf, int buf_size) {
+  BytesWrapper* wrapper = static_cast<BytesWrapper*>(opaque);
+
+  auto num_read = FFMIN(wrapper->src.size() - wrapper->index, buf_size);
+  if (num_read == 0) {
+    return AVERROR_EOF;
+  }
+  auto head = wrapper->src.data() + wrapper->index;
+  memcpy(buf, head, num_read);
+  wrapper->index += num_read;
+  return num_read;
+}
+
+static int64_t seek_bytes(void* opaque, int64_t offset, int whence) {
+  BytesWrapper* wrapper = static_cast<BytesWrapper*>(opaque);
+  if (whence == AVSEEK_SIZE) {
+    return wrapper->src.size();
+  }
+
+  if (whence == SEEK_SET) {
+    wrapper->index = offset;
+  } else if (whence == SEEK_CUR) {
+    wrapper->index += offset;
+  } else if (whence == SEEK_END) {
+    wrapper->index = wrapper->src.size() + offset;
+  } else {
+    TORCH_INTERNAL_ASSERT(false, "Unexpected whence value: ", whence);
+  }
+  return static_cast<int64_t>(wrapper->index);
+}
+} // namespace
+
+//////////////////////////////////////////////////////////////////////////////
+// StreamingMediaDecoder Bytes
+//////////////////////////////////////////////////////////////////////////////
+StreamingMediaDecoderBytes::StreamingMediaDecoderBytes(
+    std::string_view src,
+    const c10::optional<std::string>& format,
+    const c10::optional<std::map<std::string, std::string>>& option,
+    int64_t buffer_size)
+    : BytesWrapper{src},
+      StreamingMediaDecoderCustomIO(
+          this,
+          format,
+          buffer_size,
+          read_bytes,
+          seek_bytes,
+          option) {}
 } // namespace torio::io
