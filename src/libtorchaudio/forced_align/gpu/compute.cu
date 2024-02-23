@@ -160,9 +160,9 @@ void forced_align_impl(
   }
   TORCH_CHECK(
       T >= L + R,
-      "targets length is too long for CTC. Found targets length: ",
+      "targets length is too long for CTC. Found log_probs length: ",
       T,
-      ", log_probs length: ",
+      ", targets length: ",
       L,
       ", and number of repeats: ",
       R);
