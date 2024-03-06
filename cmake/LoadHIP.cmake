@@ -13,9 +13,9 @@ else()
   set(HIP_PATH $ENV{HIP_PATH})
 endif()
 
-if(NOT EXISTS ${HIP_PATH})
-  return()
-endif()
+# if(NOT EXISTS ${HIP_PATH})
+#  return()
+# endif()
 
 # HCC_PATH
 if(NOT DEFINED ENV{HCC_PATH})
@@ -130,6 +130,7 @@ endif()
 
 # Add HIP to the CMAKE Module Path
 set(CMAKE_MODULE_PATH ${HIP_PATH}/cmake ${CMAKE_MODULE_PATH})
+# list(APPEND CMAKE_MODULE_PATH ${ROCM_PATH}/lib/cmake/hip)
 
 # Disable Asserts In Code (Can't use asserts on HIP stack.)
 add_definitions(-DNDEBUG)
