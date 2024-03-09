@@ -129,7 +129,7 @@ class LibriSpeechBiasing(Dataset):
         self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*/*/*" + self._ext_audio))
         self.blist = blist
 
-    def get_metadata(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
+    def get_metadata(self, n: int) -> Tuple[str, int, str, int, int, int]:
         """Get metadata for the n-th sample from the dataset. Returns filepath instead of waveform,
         but otherwise returns the same fields as :py:func:`__getitem__`.
 
