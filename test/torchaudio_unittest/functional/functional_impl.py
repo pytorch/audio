@@ -1,4 +1,5 @@
 """Test definition common to CPU and CUDA"""
+
 import itertools
 import math
 import warnings

@@ -1,4 +1,5 @@
 """Test numerical consistency among single input and batched input."""
+
 import os
 
 import torch

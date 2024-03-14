@@ -2,6 +2,7 @@
 
 For this module to work, you need `fairseq`.
 """
+
 import re
 
 from torch.nn import Module

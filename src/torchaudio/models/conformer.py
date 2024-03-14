@@ -59,9 +59,11 @@ class _ConvolutionModule(torch.nn.Module):
                 groups=num_channels,
                 bias=bias,
             ),
-            torch.nn.GroupNorm(num_groups=1, num_channels=num_channels)
-            if use_group_norm
-            else torch.nn.BatchNorm1d(num_channels),
+            (
+                torch.nn.GroupNorm(num_groups=1, num_channels=num_channels)
+                if use_group_norm
+                else torch.nn.BatchNorm1d(num_channels)
+            ),
             torch.nn.SiLU(),
             torch.nn.Conv1d(
                 num_channels,

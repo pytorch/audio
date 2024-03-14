@@ -3,6 +3,7 @@
 Usage: python tools/release_notes/retrieve_prs.py tags/v0.10.0 \
     18685a517ae68353b05b9a0ede5343df31525c76 --file data.json
 """
+
 import argparse
 import json
 import re

@@ -71,7 +71,6 @@ class _ScaledEmbedding(torch.nn.Module):
 
 
 class _HEncLayer(torch.nn.Module):
-
     r"""Encoder layer. This used both by the time and the frequency branch.
     Args:
         chin (int): number of input channels.
@@ -521,7 +520,6 @@ class HDemucs(torch.nn.Module):
         return out
 
     def forward(self, input: torch.Tensor):
-
         r"""HDemucs forward call
 
         Args:

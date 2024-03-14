@@ -174,7 +174,9 @@ class NumpyTransducerLoss(torch.nn.Module):
 
 
 def compute_with_numpy_transducer(data):
-    costs = NumpyTransducerLoss(blank=data["blank"],)(
+    costs = NumpyTransducerLoss(
+        blank=data["blank"],
+    )(
         logits=data["logits"],
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def collate_wrapper(batch):
     speeches, labels = [], []
-    for (speech, _, label, _, _, _) in batch:
+    for speech, _, label, _, _, _ in batch:
         speeches.append(speech)
         labels.append(label.strip().lower().strip())
     return speeches, labels

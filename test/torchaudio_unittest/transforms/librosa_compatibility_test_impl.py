@@ -33,7 +33,11 @@ class TransformsTestBase(TestBaseMixin):
             y=waveform[0].cpu().numpy(), n_fft=n_fft, hop_length=hop_length, power=power, pad_mode="reflect"
         )[0]
 
-        result = T.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=power,).to(self.device, self.dtype)(
+        result = T.Spectrogram(
+            n_fft=n_fft,
+            hop_length=hop_length,
+            power=power,
+        ).to(self.device, self.dtype)(
             waveform
         )[0]
         self.assertEqual(result, torch.from_numpy(expected), atol=1e-4, rtol=1e-4)
@@ -51,7 +55,12 @@ class TransformsTestBase(TestBaseMixin):
             y=waveform[0].cpu().numpy(), n_fft=n_fft, hop_length=hop_length, power=1, pad_mode="reflect"
         )[0]
 
-        result = T.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=None, return_complex=True,).to(
+        result = T.Spectrogram(
+            n_fft=n_fft,
+            hop_length=hop_length,
+            power=None,
+            return_complex=True,
+        ).to(
             self.device, self.dtype
         )(waveform)[0]
         self.assertEqual(result.abs(), torch.from_numpy(expected), atol=1e-4, rtol=1e-4)
@@ -149,7 +158,11 @@ class TransformsTestBase(TestBaseMixin):
         sample_rate = 16000
         waveform = get_whitenoise(sample_rate=sample_rate, n_channels=1).to(self.device, self.dtype)
 
-        result = T.SpectralCentroid(sample_rate=sample_rate, n_fft=n_fft, hop_length=hop_length,).to(
+        result = T.SpectralCentroid(
+            sample_rate=sample_rate,
+            n_fft=n_fft,
+            hop_length=hop_length,
+        ).to(
             self.device, self.dtype
         )(waveform)
         expected = librosa.feature.spectral_centroid(

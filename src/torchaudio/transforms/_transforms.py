@@ -58,6 +58,7 @@ class Spectrogram(torch.nn.Module):
         >>> spectrogram = transform(waveform)
 
     """
+
     __constants__ = ["n_fft", "win_length", "hop_length", "pad", "power", "normalized"]
 
     def __init__(
@@ -155,6 +156,7 @@ class InverseSpectrogram(torch.nn.Module):
         >>> transform = transforms.InverseSpectrogram(n_fft=512)
         >>> waveform = transform(spectrogram, length)
     """
+
     __constants__ = ["n_fft", "win_length", "hop_length", "pad", "power", "normalized"]
 
     def __init__(
@@ -241,6 +243,7 @@ class GriffinLim(torch.nn.Module):
         >>> transform = transforms.GriffinLim(n_fft=512)
         >>> waveform = transform(spectrogram)
     """
+
     __constants__ = ["n_fft", "n_iter", "win_length", "hop_length", "power", "length", "momentum", "rand_init"]
 
     def __init__(
@@ -318,6 +321,7 @@ class AmplitudeToDB(torch.nn.Module):
         >>> transform = transforms.AmplitudeToDB(stype="amplitude", top_db=80)
         >>> waveform_db = transform(waveform)
     """
+
     __constants__ = ["multiplier", "amin", "ref_value", "db_multiplier"]
 
     def __init__(self, stype: str = "power", top_db: Optional[float] = None) -> None:
@@ -373,6 +377,7 @@ class MelScale(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
+
     __constants__ = ["n_mels", "sample_rate", "f_min", "f_max"]
 
     def __init__(
@@ -443,6 +448,7 @@ class InverseMelScale(torch.nn.Module):
         >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024 // 2 + 1)
         >>> spectrogram = inverse_melscale_transform(mel_spectrogram)
     """
+
     __constants__ = [
         "n_stft",
         "n_mels",
@@ -551,6 +557,7 @@ class MelSpectrogram(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
+
     __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_mels", "f_min"]
 
     def __init__(
@@ -657,6 +664,7 @@ class MFCC(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
+
     __constants__ = ["sample_rate", "n_mfcc", "dct_type", "top_db", "log_mels"]
 
     def __init__(
@@ -747,6 +755,7 @@ class LFCC(torch.nn.Module):
         :py:func:`torchaudio.functional.linear_fbanks` - The function used to
         generate the filter banks.
     """
+
     __constants__ = ["sample_rate", "n_filter", "n_lfcc", "dct_type", "top_db", "log_lf"]
 
     def __init__(
@@ -840,6 +849,7 @@ class MuLawEncoding(torch.nn.Module):
        >>> mulawtrans = transform(waveform)
 
     """
+
     __constants__ = ["quantization_channels"]
 
     def __init__(self, quantization_channels: int = 256) -> None:
@@ -878,6 +888,7 @@ class MuLawDecoding(torch.nn.Module):
         >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
         >>> mulawtrans = transform(waveform)
     """
+
     __constants__ = ["quantization_channels"]
 
     def __init__(self, quantization_channels: int = 256) -> None:
@@ -992,6 +1003,7 @@ class ComputeDeltas(torch.nn.Module):
         win_length (int, optional): The window length used for computing delta. (Default: ``5``)
         mode (str, optional): Mode parameter passed to padding. (Default: ``"replicate"``)
     """
+
     __constants__ = ["win_length"]
 
     def __init__(self, win_length: int = 5, mode: str = "replicate") -> None:
@@ -1042,6 +1054,7 @@ class TimeStretch(torch.nn.Module):
            :width: 600
            :alt: The visualization of stretched spectrograms.
     """
+
     __constants__ = ["fixed_rate"]
 
     def __init__(self, hop_length: Optional[int] = None, n_freq: int = 201, fixed_rate: Optional[float] = None) -> None:
@@ -1175,6 +1188,7 @@ class _AxisMasking(torch.nn.Module):
             This option is applicable only when the dimension of the input tensor is >= 3.
         p (float, optional): maximum proportion of columns that can be masked. (Default: 1.0)
     """
+
     __constants__ = ["mask_param", "axis", "iid_masks", "p"]
 
     def __init__(self, mask_param: int, axis: int, iid_masks: bool, p: float = 1.0) -> None:
@@ -1290,6 +1304,7 @@ class SpecAugment(torch.nn.Module):
         zero_masking (bool, optional): If ``True``, use 0 as the mask value,
             else use mean of the input tensor. (Default: ``False``)
     """
+
     __constants__ = [
         "n_time_masks",
         "time_mask_param",
@@ -1365,6 +1380,7 @@ class Loudness(torch.nn.Module):
     Reference:
         - https://www.itu.int/rec/R-REC-BS.1770-4-201510-I/en
     """
+
     __constants__ = ["sample_rate"]
 
     def __init__(self, sample_rate: int):
@@ -1634,6 +1650,7 @@ class SpectralCentroid(torch.nn.Module):
         >>> transform = transforms.SpectralCentroid(sample_rate)
         >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
+
     __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad"]
 
     def __init__(
@@ -1693,6 +1710,7 @@ class PitchShift(LazyModuleMixin, torch.nn.Module):
         >>> transform = transforms.PitchShift(sample_rate, 4)
         >>> waveform_shift = transform(waveform)  # (channel, time)
     """
+
     __constants__ = ["sample_rate", "n_steps", "bins_per_octave", "n_fft", "win_length", "hop_length"]
 
     kernel: UninitializedParameter
