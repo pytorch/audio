@@ -66,7 +66,7 @@ from pystoi import stoi
 from torchaudio.utils import download_asset
 
 ######################################################################
-# 2.2. Download audio data
+# 2.3. Download audio data
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # The multi-channel audio example is selected from

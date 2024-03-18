@@ -23,12 +23,12 @@ permissions:
 
 jobs:
   generate-matrix:
-    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@release/2.2
+    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@release/2.3
     with:
       package-type: wheel
       os: macos-arm64
       test-infra-repository: pytorch/test-infra
-      test-infra-ref: release/2.2
+      test-infra-ref: release/2.3
   build:
     needs: generate-matrix
     strategy:
@@ -39,12 +39,12 @@ jobs:
             smoke-test-script: test/smoke_test/smoke_test_no_ffmpeg.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_macos.yml@release/2.2
+    uses: pytorch/test-infra/.github/workflows/build_wheels_macos.yml@release/2.3
     with:
       repository: ${{ matrix.repository }}
       ref: ""
       test-infra-repository: pytorch/test-infra
-      test-infra-ref: release/2.2
+      test-infra-ref: release/2.3
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
       runner-type: macos-m1-stable
