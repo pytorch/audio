@@ -250,7 +250,7 @@ plot()
 
 ######################################################################
 # WaveRNN Vocoder
-# ~~~~~~~
+# ~~~~~~~~~~~~~~~
 #
 # Continuing from the previous section, we can instantiate the matching
 # WaveRNN model from the same bundle.
@@ -291,7 +291,7 @@ plot(waveforms, spec, vocoder.sample_rate)
 
 ######################################################################
 # Griffin-Lim Vocoder
-# ~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~
 #
 # Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
 # the vocoder object with
@@ -320,7 +320,7 @@ plot(waveforms, spec, vocoder.sample_rate)
 
 ######################################################################
 # Waveglow Vocoder
-# ~~~~~~~~
+# ~~~~~~~~~~~~~~~~
 #
 # Waveglow is a vocoder published by Nvidia. The pretrained weights are
 # published on Torch Hub. One can instantiate the model using ``torch.hub``
