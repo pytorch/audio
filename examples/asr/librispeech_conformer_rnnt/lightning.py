@@ -99,6 +99,7 @@ class ConformerRNNTModule(LightningModule):
         if batch is None:
             return None
 
+        batch = Batch(batch[0], batch[1], batch[2], batch[3])
         prepended_targets = batch.targets.new_empty([batch.targets.size(0), batch.targets.size(1) + 1])
         prepended_targets[:, 1:] = batch.targets
         prepended_targets[:, 0] = self.blank_idx
@@ -145,6 +146,7 @@ class ConformerRNNTModule(LightningModule):
         Doing so allows us to account for the variability in batch sizes that
         variable-length sequential data yield.
         """
+        batch = Batch(batch[0], batch[1], batch[2], batch[3])
         loss = self._step(batch, batch_idx, "train")
         batch_size = batch.features.size(0)
         batch_sizes = self.all_gather(batch_size)
