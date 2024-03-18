@@ -74,9 +74,11 @@ seg_aud_len = seg_duration * 16000
 label_filename = os.path.join(
     args.root_dir,
     "labels",
-    f"{dataset}_{args.subset}_transcript_lengths_seg{seg_duration}s.csv"
-    if args.groups <= 1
-    else f"{dataset}_{args.subset}_transcript_lengths_seg{seg_duration}s.{args.groups}.{args.job_index}.csv",
+    (
+        f"{dataset}_{args.subset}_transcript_lengths_seg{seg_duration}s.csv"
+        if args.groups <= 1
+        else f"{dataset}_{args.subset}_transcript_lengths_seg{seg_duration}s.{args.groups}.{args.job_index}.csv"
+    ),
 )
 os.makedirs(os.path.dirname(label_filename), exist_ok=True)
 print(f"Directory {os.path.dirname(label_filename)} created")

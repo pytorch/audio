@@ -33,6 +33,7 @@ class BarkScale(torch.nn.Module):
         :py:func:`torchaudio.prototype.functional.barkscale_fbanks` - The function used to
         generate the filter banks.
     """
+
     __constants__ = ["n_barks", "sample_rate", "f_min", "f_max"]
 
     def __init__(
@@ -99,6 +100,7 @@ class InverseBarkScale(torch.nn.Module):
         >>> inverse_barkscale_transform = transforms.InverseBarkScale(n_stft=1024 // 2 + 1)
         >>> spectrogram = inverse_barkscale_transform(mel_spectrogram)
     """
+
     __constants__ = [
         "n_stft",
         "n_barks",
@@ -235,6 +237,7 @@ class BarkSpectrogram(torch.nn.Module):
         :py:func:`torchaudio.functional.melscale_fbanks` - The function used to
         generate the filter banks.
     """
+
     __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_barks", "f_min"]
 
     def __init__(

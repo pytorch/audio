@@ -1,4 +1,5 @@
 """Test suite for compliance with the ITU-R BS.1770-4 recommendation"""
+
 import zipfile
 
 import pytest
