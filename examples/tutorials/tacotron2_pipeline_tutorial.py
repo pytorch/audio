@@ -93,7 +93,7 @@ import matplotlib.pyplot as plt
 # tables, the same functionalities is available in ``torchaudio``. However,
 # we will first manually implement the encoding to aid in understanding.
 #
-# First, we define the set of symbols 
+# First, we define the set of symbols
 # ``'_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'``. Then, we will map the
 # each character of the input text into the index of the corresponding
 # symbol in the table. Symbols that are not in the table are ignored.
