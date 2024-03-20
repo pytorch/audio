@@ -45,7 +45,7 @@ jobs:
       test-infra-ref: release/2.2
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
-      runner-type: macos-m1-12
+      runner-type: macos-m1-stable
       package-name: ${{ matrix.package-name }}
       trigger-event: ${{ github.event_name }}
     secrets:
