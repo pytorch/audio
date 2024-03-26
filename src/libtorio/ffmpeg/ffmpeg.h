@@ -208,6 +208,12 @@ struct StreamParams {
   AVRational time_base{};
   int stream_index{};
 };
+
+struct BytesWrapper {
+  std::string_view src;
+  size_t index = 0;
+};
+
 } // namespace io
 } // namespace torio
 

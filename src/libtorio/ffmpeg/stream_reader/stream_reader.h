@@ -386,6 +386,28 @@ class StreamingMediaDecoderCustomIO : private detail::CustomInput,
       const c10::optional<OptionDict>& option = c10::nullopt);
 };
 
+//////////////////////////////////////////////////////////////////////////////
+// StreamingMediaDecoder Bytes
+//////////////////////////////////////////////////////////////////////////////
+struct StreamingMediaDecoderBytes : private BytesWrapper,
+                                    public StreamingMediaDecoderCustomIO {
+ public:
+  ///
+  /// Construct StreamingMediaDecoder with read and seek functions that read
+  /// from in memory buffer
+  ///
+  /// @param src In memory bytes buffer
+  /// @param format Specify input format.
+  /// @param option Custom option passed when initializing format context.
+  /// @param buffer_size The size of the intermediate buffer, which FFmpeg uses
+  /// to pass data to function read_packet.
+  StreamingMediaDecoderBytes(
+      std::string_view src,
+      const c10::optional<std::string>& format,
+      const c10::optional<std::map<std::string, std::string>>& option,
+      int64_t buffer_size);
+};
+
 // For BC
 using StreamReader = StreamingMediaDecoder;
 using StreamReaderCustomIO = StreamingMediaDecoderCustomIO;
