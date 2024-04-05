@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
+        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "7.0", "master"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
+        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "7.0", "master"]
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
+        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "7.0", "master"]
         runner: ["macos-m1-stable", "macos-12"]
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
+        ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "7.0", "master"]
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
       job-name: Build
