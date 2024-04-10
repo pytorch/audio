@@ -140,11 +140,6 @@ void open_codec(
     av_dict_set(&opts, "threads", "1", 0);
   }
 
-  if (!codec_ctx->channel_layout) {
-    codec_ctx->channel_layout =
-        av_get_default_channel_layout(codec_ctx->channels);
-  }
-
   int ret = avcodec_open2(codec_ctx, codec_ctx->codec, &opts);
   clean_up_dict(opts);
   TORCH_CHECK(
