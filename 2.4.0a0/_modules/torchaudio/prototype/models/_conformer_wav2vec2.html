@@ -1,0 +1,1604 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.prototype.models._conformer_wav2vec2 &mdash; Torchaudio 2.4.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.4.0 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torio.utils.html">torio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../../../index.html">Module code</a> &gt;</li>
+        
+      <li>torchaudio.prototype.models._conformer_wav2vec2 &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torchaudio.prototype.models._conformer_wav2vec2</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">ModuleList</span>
+<span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">Wav2Vec2Model</span>
+<span class="kn">from</span> <span class="nn">torchaudio.models.conformer</span> <span class="kn">import</span> <span class="n">ConformerLayer</span>
+<span class="kn">from</span> <span class="nn">torchaudio.models.rnnt</span> <span class="kn">import</span> <span class="n">_TimeReduction</span>
+<span class="kn">from</span> <span class="nn">torchaudio.models.wav2vec2</span> <span class="kn">import</span> <span class="n">components</span>
+
+
+<span class="k">def</span> <span class="nf">_buffered_arange</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute arange using a buffered tensor across function calls.</span>
+<span class="sd">    Produces same result as torch.arange(end=max).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        max (int): Ending value for arange.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_buffered_arange</span><span class="p">,</span> <span class="s2">&quot;buf&quot;</span><span class="p">):</span>
+        <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">max</span> <span class="o">&gt;</span> <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">numel</span><span class="p">():</span>
+        <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="o">.</span><span class="n">resize_</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">max</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_buffered_arange</span><span class="o">.</span><span class="n">buf</span><span class="p">[:</span><span class="nb">max</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_sample_negatives</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample negative examples from masked input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input (Tensor): Tensor of dimension `(batch, frame, dim)`.</span>
+<span class="sd">        num_negatives (int): Number of negative examples to sample.</span>
+<span class="sd">        cross_sample_negatives (int): Number of negative examples to cross sample.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (Tensor, Tensor):</span>
+<span class="sd">        Tensor</span>
+<span class="sd">            The negative samples.</span>
+<span class="sd">        Tensor</span>
+<span class="sd">            The indices of the negative samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_negatives</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cross_sample_negatives</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+
+    <span class="n">cross_high</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
+    <span class="n">high</span> <span class="o">=</span> <span class="n">T</span>
+
+    <span class="k">assert</span> <span class="n">high</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">num_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">tszs</span> <span class="o">=</span> <span class="n">_buffered_arange</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">num_negatives</span> <span class="o">*</span> <span class="n">T</span><span class="p">))</span>
+        <span class="n">neg_idxs</span><span class="p">[</span><span class="n">neg_idxs</span> <span class="o">&gt;=</span> <span class="n">tszs</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">cross_sample_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">tszs</span> <span class="o">=</span> <span class="n">_buffered_arange</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">cross_neg_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">cross_high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">cross_sample_negatives</span> <span class="o">*</span> <span class="n">T</span><span class="p">))</span>
+        <span class="n">cross_neg_idxs</span><span class="p">[</span><span class="n">cross_neg_idxs</span> <span class="o">&gt;=</span> <span class="n">tszs</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">num_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">neg_idxs</span> <span class="o">+</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">high</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">cross_neg_idxs</span>
+
+    <span class="k">if</span> <span class="n">cross_sample_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_negatives</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">neg_idxs</span><span class="p">,</span> <span class="n">cross_neg_idxs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">negs</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="n">neg_idxs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">negs</span> <span class="o">=</span> <span class="n">negs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">num_negatives</span> <span class="o">+</span> <span class="n">cross_sample_negatives</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># NxBxCxT</span>
+
+    <span class="k">return</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span>
+
+
+<span class="k">class</span> <span class="nc">NegativeSampler</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies preprocessing to input and then computes negative sampling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        preprocessor (nn.Module): Transforms input tensor prior to negative sampling.</span>
+<span class="sd">        num_negatives (int): Number of negative examples to sample.</span>
+<span class="sd">        cross_sample_negatives (int): Number of negative examples to cross sample.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">preprocessor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="n">preprocessor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_negatives</span> <span class="o">=</span> <span class="n">num_negatives</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_sample_negatives</span> <span class="o">=</span> <span class="n">cross_sample_negatives</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            input (Tensor): Tensor of dimension `(B, T, D)`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Tensor, Optional[Tensor]):</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The input tensor after preprocessing, prior to being sampled.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The negative samples.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The indices of the negative samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">preprocessed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span> <span class="o">=</span> <span class="n">_sample_negatives</span><span class="p">(</span><span class="n">preprocessed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_negatives</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_sample_negatives</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">preprocessed</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span>
+
+
+<span class="k">class</span> <span class="nc">FeatureEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Feature Encoder class, consisting of time reduction and linear layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stride (int): Number of frames to merge for the output frame.</span>
+<span class="sd">        input_dim (int): Input dimension of the tensor.</span>
+<span class="sd">        output_dim (int): Output dimension of the tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction_layer</span> <span class="o">=</span> <span class="n">_TimeReduction</span><span class="p">(</span><span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span> <span class="o">*</span> <span class="n">stride</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (Tensor): Feature Tensor representing log Mel Spectrogram output. shape ``(B, T, D)``.</span>
+<span class="sd">            lengths (Tensor or None):</span>
+<span class="sd">                Valid length of each input sample. shape: ``(B, )``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Optional[Tensor]):</span>
+<span class="sd">                Tensor: output sequence after undergoing time reduction and linear projection.</span>
+<span class="sd">                    Shape ``(B, T // stride, D * stride).</span>
+<span class="sd">                Optional[Tensor]: output lengths of shape ``(B,)`` if lengths parameter is provided,</span>
+<span class="sd">                    otherwise `None`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">dummy_lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">B</span><span class="p">,),</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction_layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dummy_lengths</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction_layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span>
+
+
+<span class="k">class</span> <span class="nc">ConformerEncoder</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conformer Encoder class, consisting of feature projection and conformer modules.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        feature_projection (nn.Module):</span>
+<span class="sd">            Projects feature to encoder dimension.</span>
+<span class="sd">        conformer (nn.ModuleList)</span>
+<span class="sd">            List of Conformer layers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">feature_projection</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">conformer</span><span class="p">:</span> <span class="n">ModuleList</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_projection</span> <span class="o">=</span> <span class="n">feature_projection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conformer</span> <span class="o">=</span> <span class="n">conformer</span>
+
+    <span class="k">def</span> <span class="nf">_preprocess</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_projection</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">_get_padding_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span>
+
+    <span class="k">def</span> <span class="nf">_get_intermediate_outputs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">num_layers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">num_layers</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conformer</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`num_layers` must be between [1, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conformer</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+        <span class="n">ret</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conformer</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">num_layers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">num_layers</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``.</span>
+<span class="sd">            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: result after applying conformer encoder to features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conformer</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the list of outputs from the intermediate layers of conformer block in the encoder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            features (Tensor): Tensor of features of shape ``(B, T, D)``.</span>
+<span class="sd">            lengths (Tensor or None, optional): Valid length of each input sample. shape: ``(B, )``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Tensor]:</span>
+<span class="sd">                Features from requested layers. Each Tensor is of shape: `(batch, time frame, feature dimension)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_intermediate_outputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">masks</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">[docs]</a><span class="k">class</span> <span class="nc">ConformerWav2Vec2PretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conformer Wav2Vec2 pre-train model for training from scratch.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        To build the model, please use one of the factory functions,</span>
+<span class="sd">        :py:func:`conformer_wav2vec2_base` or :py:func:`conformer_wav2vec2_large`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        wav2vec2 (nn.Module):</span>
+<span class="sd">            Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.</span>
+<span class="sd">        mask_generator (nn.Module):</span>
+<span class="sd">            Mask generator that generates the mask for masked prediction during training.</span>
+<span class="sd">        negative_sampler (nn.Module):</span>
+<span class="sd">            Negative sampler to apply after masking.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">wav2vec2</span><span class="p">:</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+        <span class="n">negative_sampler</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">wav2vec2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span> <span class="o">=</span> <span class="n">mask_generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">negative_sampler</span>
+
+<div class="viewcode-block" id="ConformerWav2Vec2PretrainModel.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.html#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">audio_lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            features (Tensor):</span>
+<span class="sd">                Tensor of audio features of shape `(batch, frame, dim)`.</span>
+<span class="sd">            audio_lengths (Tensor or None, optional):</span>
+<span class="sd">                Tensor of valid length of each valid auidio in the batch.</span>
+<span class="sd">                shape: `(batch, )` (Default: ``None``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Optional[Tensor], Tensor, Tensor, Tensor, Tensor):</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The masked sequences of probability distribution of shape `(batch, frame dim)`.</span>
+<span class="sd">            Tensor or None</span>
+<span class="sd">                If ``lengths`` argument was provided, a Tensor of shape `(batch, )` representing</span>
+<span class="sd">                valid length in time axis is returns.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The mask indices.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The targets, prior to negative sampling.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The negative samples.</span>
+<span class="sd">            Tensor</span>
+<span class="sd">                The indices of the negative samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">audio_lengths</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">padding_mask</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">_get_padding_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">padding_mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Unmasked feature is used to generate positive and negative samples.</span>
+        <span class="n">unmasked_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="c1"># Apply masking to x before passing it to Conformer layers.</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">mask_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
+        <span class="c1"># Select the frames from masked indices for negative sampling.</span>
+        <span class="n">unmasked_x</span> <span class="o">=</span> <span class="n">unmasked_x</span><span class="p">[</span><span class="n">mask_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">targets</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span><span class="p">(</span><span class="n">unmasked_x</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">feature_projection</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">conformer_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav2vec2</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">conformer</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">conformer_layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">mask_idxs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">negs</span><span class="p">,</span> <span class="n">neg_idxs</span></div></div>
+
+
+<span class="c1">################################################################################</span>
+<span class="k">def</span> <span class="nf">_get_conformer_feature_extractor</span><span class="p">(</span>
+    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureEncoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct Feature Extractor</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dim (int): Input dimension of features.</span>
+<span class="sd">        output_dim (int): Output dimension after feature extraction.</span>
+<span class="sd">        stride (int): Stride used in Time Reduction layer of feature extractor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        FeatureEncoder: The resulting feature extraction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">FeatureEncoder</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">,</span> <span class="n">stride</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_conformer_encoder</span><span class="p">(</span>
+    <span class="n">in_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">dropout_input</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ff_interm_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">depthwise_conv_kernel_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">convolution_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">use_group_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerEncoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct Conformer Encoder</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_features (int): The number of input features.</span>
+<span class="sd">        embed_dim (int): The dimension of the embedding in the feature projection.</span>
+<span class="sd">        dropout_input (float): The dropout probability applied after the input feature</span>
+<span class="sd">            is projected to ``embed_dim``.</span>
+<span class="sd">        num_layers (int): Number of Conformer layers in the encoder.</span>
+<span class="sd">        num_heads (int): Number of heads in each Conformer layer.</span>
+<span class="sd">        ff_interm_features (int): Hidden layer dimension of the feedforward network in</span>
+<span class="sd">            each Conformer layer.</span>
+<span class="sd">        dropout (float): Dropout probability in each Conformer layer.</span>
+<span class="sd">        depthwise_conv_kernel_size (int or List[int]): List of kernel sizes corresponding</span>
+<span class="sd">            to each of the  Conformer layers.If int is provided, all layers will have the</span>
+<span class="sd">            same kernel size.</span>
+<span class="sd">        convolution_first (bool): Whether to apply the convolution module ahead of the</span>
+<span class="sd">            attention module in each Conformer layer.</span>
+<span class="sd">        use_group_norm (bool): Whether to use ``GroupNorm`` rather than ``BatchNorm1d`` in</span>
+<span class="sd">            the convolution module in each Conformer layer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerEncoder:</span>
+<span class="sd">            The resulting conformer encoder module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feature_projection</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">FeatureProjection</span><span class="p">(</span><span class="n">in_features</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">dropout_input</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">depthwise_conv_kernel_size</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">depthwise_conv_kernel_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">depthwise_conv_kernel_size</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_layers</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">depthwise_conv_kernel_size</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_layers</span>
+
+    <span class="n">conformer_layers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">):</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">ConformerLayer</span><span class="p">(</span>
+            <span class="n">input_dim</span><span class="o">=</span><span class="n">embed_dim</span><span class="p">,</span>
+            <span class="n">ffn_dim</span><span class="o">=</span><span class="n">ff_interm_features</span><span class="p">,</span>
+            <span class="n">num_attention_heads</span><span class="o">=</span><span class="n">num_heads</span><span class="p">,</span>
+            <span class="n">depthwise_conv_kernel_size</span><span class="o">=</span><span class="n">depthwise_conv_kernel_size</span><span class="p">[</span><span class="n">l</span><span class="p">],</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+            <span class="n">use_group_norm</span><span class="o">=</span><span class="n">use_group_norm</span><span class="p">,</span>
+            <span class="n">convolution_first</span><span class="o">=</span><span class="n">convolution_first</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">conformer_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ConformerEncoder</span><span class="p">(</span><span class="n">feature_projection</span><span class="p">,</span> <span class="n">ModuleList</span><span class="p">(</span><span class="n">conformer_layers</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_get_conformer_negativer_sampler</span><span class="p">(</span>
+    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NegativeSampler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build custom NegativeSampler module, including linear layer and negative sampling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dim (int): Dimension of input after feature extraction.</span>
+<span class="sd">        output_dim (int): Dimension of embedding for use in negative sampling. Same as the</span>
+<span class="sd">            embedding in the feature projection.</span>
+<span class="sd">        num_negatives (int): Number of negatives to sample.</span>
+<span class="sd">        cross_sample_negatives (int): Number of cross sampled negatives.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        NegativeSampler:</span>
+<span class="sd">            The resulting negative sampler module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">NegativeSampler</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">num_negatives</span><span class="p">,</span> <span class="n">cross_sample_negatives</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_model.html#torchaudio.prototype.models.conformer_wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_model</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">extractor_stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_depthwise_conv_kernel_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_convolution_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">encoder_use_group_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2Model</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int): Input dimension of the features.</span>
+<span class="sd">        extractor_output_dim (int): Output dimension after feature extraction.</span>
+<span class="sd">        extractor_stride (int): Stride used in time reduction layer of feature extraction.</span>
+<span class="sd">        encoder_embed_dim (int): The dimension of the embedding in the feature projection.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to ``embed_dim``</span>
+<span class="sd">        encoder_num_layers (int): Number of Conformer layers in the encoder.</span>
+<span class="sd">        encoder_num_heads (int): Number of heads in each Conformer layer.</span>
+<span class="sd">        encoder_ff_interm_features (int):</span>
+<span class="sd">            Hidden layer dimension of the feedforward network in each Conformer layer.</span>
+<span class="sd">        encoder_depthwise_conv_kernel_size (int or List[int]):</span>
+<span class="sd">            List of kernel sizes corresponding to each of the Conformer layers.</span>
+<span class="sd">            If int is provided, all layers will have the same kernel size.</span>
+<span class="sd">        encoder_dropout (float): Dropout probability in each Conformer layer.</span>
+<span class="sd">        encoder_convolution_first (bool):</span>
+<span class="sd">            Whether to apply the convolution module ahead of the attention module</span>
+<span class="sd">            in each Conformer layer.</span>
+<span class="sd">        encoder_use_group_norm (bool):</span>
+<span class="sd">            Whether to use ``GroupNorm`` rather than ``BatchNorm1d`` in the convolution</span>
+<span class="sd">            module in each Conformer layer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">            The resulting wav2vec2 model with a conformer encoder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">_get_conformer_feature_extractor</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">_get_conformer_encoder</span><span class="p">(</span>
+        <span class="n">in_features</span><span class="o">=</span><span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">embed_dim</span><span class="o">=</span><span class="n">encoder_embed_dim</span><span class="p">,</span>
+        <span class="n">dropout_input</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="o">=</span><span class="n">encoder_num_layers</span><span class="p">,</span>
+        <span class="n">num_heads</span><span class="o">=</span><span class="n">encoder_num_heads</span><span class="p">,</span>
+        <span class="n">ff_interm_features</span><span class="o">=</span><span class="n">encoder_ff_interm_features</span><span class="p">,</span>
+        <span class="n">depthwise_conv_kernel_size</span><span class="o">=</span><span class="n">encoder_depthwise_conv_kernel_size</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="o">=</span><span class="n">encoder_dropout</span><span class="p">,</span>
+        <span class="n">convolution_first</span><span class="o">=</span><span class="n">encoder_convolution_first</span><span class="p">,</span>
+        <span class="n">use_group_norm</span><span class="o">=</span><span class="n">encoder_use_group_norm</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_base</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build Conformer Wav2Vec2 Model with &quot;small&quot; architecture from</span>
+<span class="sd">    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int, optional): Input dimension of feature extractor. (Default: 64)</span>
+<span class="sd">        extractor_output_dim (int, optional): Output dimension of feature extractor. (Default: 256)</span>
+<span class="sd">        encoder_projection_dropout (float, optional):</span>
+<span class="sd">            Dropout probability applied after feature projection. (Default: 0.0)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Wav2Vec2Model:</span>
+<span class="sd">            The resulting wav2vec2 model with a conformer encoder and ``base`` configuration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">conformer_wav2vec2_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="o">=</span><span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="o">=</span><span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">*</span> <span class="mi">11</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_model.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">extractor_stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_num_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_ff_interm_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_depthwise_conv_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">encoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">encoder_convolution_first</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">encoder_use_group_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">mask_prob</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_selection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mask_other</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">no_mask_overlap</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">mask_min_space</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">mask_channel_prob</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_channel_selection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mask_channel_other</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mask_channel_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">no_mask_channel_overlap</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">mask_channel_min_space</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a custom Conformer Wav2Vec2 Model for pre-training</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int): Input dimension of the features.</span>
+<span class="sd">        extractor_output_dim (int): Output dimension after feature extraction.</span>
+<span class="sd">        extractor_stride (int):</span>
+<span class="sd">            Stride used in time reduction layer of feature extraction.</span>
+<span class="sd">        encoder_embed_dim (int):</span>
+<span class="sd">            The dimension of the embedding in the feature projection.</span>
+<span class="sd">        encoder_projection_dropout (float):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to</span>
+<span class="sd">            ``embed_dim``</span>
+<span class="sd">        encoder_num_layers (int):</span>
+<span class="sd">            Number of Conformer layers in the encoder.</span>
+<span class="sd">        encoder_num_heads (int):</span>
+<span class="sd">            Number of heads in each Conformer layer.</span>
+<span class="sd">        encoder_ff_interm_features (int):</span>
+<span class="sd">            Hidden layer dimension of the feedforward network in each Conformer layer.</span>
+<span class="sd">        encoder_depthwise_conv_kernel_size (int or List[int]):</span>
+<span class="sd">            List of kernel sizes corresponding to each of the Conformer layers.</span>
+<span class="sd">            If int is provided, all layers will have the same kernel size.</span>
+<span class="sd">        encoder_dropout (float):</span>
+<span class="sd">            Dropout probability in each Conformer layer.</span>
+<span class="sd">        encoder_convolution_first (bool):</span>
+<span class="sd">            Whether to apply the convolution module ahead of the attention module</span>
+<span class="sd">            in each Conformer layer.</span>
+<span class="sd">        encoder_use_group_norm (bool):</span>
+<span class="sd">            Whether to use ``GroupNorm`` rather than ``BatchNorm1d`` in the convolution</span>
+<span class="sd">            module in each Conformer layer.</span>
+<span class="sd">        mask_prob (float):</span>
+<span class="sd">            Probability for each token to be chosen as start of the span to be masked.</span>
+<span class="sd">        mask_selection (str)</span>
+<span class="sd">            How to choose the mask length. Options: [``static``, ``uniform``, ``normal``, ``poisson``].</span>
+<span class="sd">        mask_other (float):</span>
+<span class="sd">            Secondary mask argument (used for more complex distributions).</span>
+<span class="sd">        mask_length (int):</span>
+<span class="sd">            The lengths of the mask.</span>
+<span class="sd">        no_mask_overlap (bool):</span>
+<span class="sd">            Whether to allow masks to overlap.</span>
+<span class="sd">        mask_min_space (int):</span>
+<span class="sd">            Minimum space between spans (if no overlap is enabled).</span>
+<span class="sd">        mask_channel_prob: (float):</span>
+<span class="sd">            The probability of replacing a feature with 0.</span>
+<span class="sd">        mask_channel_selection (str):</span>
+<span class="sd">            How to choose the mask length for channel masking.</span>
+<span class="sd">            Options: [``static``, ``uniform``, ``normal``, ``poisson``].</span>
+<span class="sd">        mask_channel_other (float):</span>
+<span class="sd">            Secondary mask argument for channel masking (used for more complex distributions).</span>
+<span class="sd">        mask_channel_length (int):</span>
+<span class="sd">            Minimum space between spans (if no overlap is enabled) for channel masking.</span>
+<span class="sd">        no_mask_channel_overlap (bool):</span>
+<span class="sd">            Whether to allow channel masks to overlap.</span>
+<span class="sd">        mask_channel_min_space (int):</span>
+<span class="sd">            Minimum space between spans for channel masking (if no overlap is enabled).</span>
+<span class="sd">        num_negatives (int):</span>
+<span class="sd">            Number of negatives to sample.</span>
+<span class="sd">        cross_sample_negatives (int):</span>
+<span class="sd">            Number of cross sampled negatives.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerWav2Vec2PretrainModel:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wav2vec2</span> <span class="o">=</span> <span class="n">conformer_wav2vec2_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">mask_generator</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">MaskGenerator</span><span class="p">(</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">mask_prob</span><span class="p">,</span>
+        <span class="n">mask_selection</span><span class="p">,</span>
+        <span class="n">mask_other</span><span class="p">,</span>
+        <span class="n">mask_length</span><span class="p">,</span>
+        <span class="n">no_mask_overlap</span><span class="p">,</span>
+        <span class="n">mask_min_space</span><span class="p">,</span>
+        <span class="n">mask_channel_prob</span><span class="p">,</span>
+        <span class="n">mask_channel_selection</span><span class="p">,</span>
+        <span class="n">mask_channel_other</span><span class="p">,</span>
+        <span class="n">mask_channel_length</span><span class="p">,</span>
+        <span class="n">no_mask_channel_overlap</span><span class="p">,</span>
+        <span class="n">mask_channel_min_space</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">_get_conformer_negativer_sampler</span><span class="p">(</span>
+        <span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">(</span>
+        <span class="n">wav2vec2</span><span class="o">=</span><span class="n">wav2vec2</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="o">=</span><span class="n">mask_generator</span><span class="p">,</span>
+        <span class="n">negative_sampler</span><span class="o">=</span><span class="n">negative_sampler</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_base.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_base</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">mask_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">mask_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;small&quot; architecture from</span>
+<span class="sd">    *Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)</span>
+<span class="sd">        extractor_output_dim (int, optional): Output dimension after feature extraction. (Default: 256)</span>
+<span class="sd">        encoder_projection_dropout (float, optional):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to</span>
+<span class="sd">            ``embed_dim``. (Default: 0.0)</span>
+<span class="sd">        mask_prob (float, optional):</span>
+<span class="sd">            Probability for each token to be chosen as start of the span to be masked. (Default: 0.3)</span>
+<span class="sd">        mask_length (int, optional):</span>
+<span class="sd">            The lengths of the mask. (Default: 3)</span>
+<span class="sd">        num_negatives (int, optional):</span>
+<span class="sd">            Number of sampled negatives. (Default: 0)</span>
+<span class="sd">        cross_sample_negatives (int, optional):</span>
+<span class="sd">            Number of cross sampled negatives. (Default: 0)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerWav2Vec2PretrainModel:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="o">=</span><span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="o">=</span><span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">*</span> <span class="mi">11</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mask_prob</span><span class="o">=</span><span class="n">mask_prob</span><span class="p">,</span>
+        <span class="n">mask_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_other</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mask_length</span><span class="o">=</span><span class="n">mask_length</span><span class="p">,</span>
+        <span class="n">no_mask_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_min_space</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_prob</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_channel_other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">no_mask_channel_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_channel_min_space</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="o">=</span><span class="n">num_negatives</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="o">=</span><span class="n">cross_sample_negatives</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="conformer_wav2vec2_pretrain_large"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_wav2vec2_pretrain_large.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">conformer_wav2vec2_pretrain_large</span><span class="p">(</span>
+    <span class="n">extractor_input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">extractor_output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">mask_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">mask_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">cross_sample_negatives</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConformerWav2Vec2PretrainModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build Conformer Wav2Vec2 Model for pre-training with &quot;large&quot; architecture from</span>
+<span class="sd">    *Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks* :cite:`9746490`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        extractor_input_dim (int, optional): Input dimension of the features. (Default: 64)</span>
+<span class="sd">        extractor_output_dim (int, optional): Output dimension after feature extraction. (Default: 256)</span>
+<span class="sd">        encoder_projection_dropout (float, optional):</span>
+<span class="sd">            The dropout probability applied after the input feature is projected to</span>
+<span class="sd">            ``embed_dim``. (Default: 0.0)</span>
+<span class="sd">        mask_prob (float, optional):</span>
+<span class="sd">            Probability for each token to be chosen as start of the span to be masked. (Default: 0.3)</span>
+<span class="sd">        mask_length (int, optional):</span>
+<span class="sd">            The lengths of the mask. (Default: 3)</span>
+<span class="sd">        num_negatives (int, optional):</span>
+<span class="sd">            Number of sampled negatives. (Default: 0)</span>
+<span class="sd">        cross_sample_negatives (int, optional):</span>
+<span class="sd">            Number of cross sampled negatives. (Default: 0)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ConformerWav2Vec2PretrainModel:</span>
+<span class="sd">            The resulting model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">conformer_wav2vec2_pretrain_model</span><span class="p">(</span>
+        <span class="n">extractor_input_dim</span><span class="o">=</span><span class="n">extractor_input_dim</span><span class="p">,</span>
+        <span class="n">extractor_output_dim</span><span class="o">=</span><span class="n">extractor_output_dim</span><span class="p">,</span>
+        <span class="n">extractor_stride</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">encoder_embed_dim</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
+        <span class="n">encoder_projection_dropout</span><span class="o">=</span><span class="n">encoder_projection_dropout</span><span class="p">,</span>
+        <span class="n">encoder_num_layers</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_num_heads</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">encoder_ff_interm_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+        <span class="n">encoder_depthwise_conv_kernel_size</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">*</span> <span class="mi">11</span><span class="p">,</span>
+        <span class="n">encoder_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">encoder_convolution_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoder_use_group_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mask_prob</span><span class="o">=</span><span class="n">mask_prob</span><span class="p">,</span>
+        <span class="n">mask_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_other</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mask_length</span><span class="o">=</span><span class="n">mask_length</span><span class="p">,</span>
+        <span class="n">no_mask_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_min_space</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_prob</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_selection</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">mask_channel_other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">mask_channel_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">no_mask_channel_overlap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mask_channel_min_space</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">num_negatives</span><span class="o">=</span><span class="n">num_negatives</span><span class="p">,</span>
+        <span class="n">cross_sample_negatives</span><span class="o">=</span><span class="n">cross_sample_negatives</span><span class="p">,</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+         <script src="../../../../_static/jquery.js"></script>
+         <script src="../../../../_static/underscore.js"></script>
+         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../../../../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../../../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

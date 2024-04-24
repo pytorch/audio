@@ -1,0 +1,6 @@
+﻿torchaudio.functional.mu\_law\_decoding
+=======================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: mu_law_decoding

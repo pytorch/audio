@@ -1,0 +1,6 @@
+torchaudio.prototype.models.conformer\_wav2vec2\_model
+======================================================
+
+.. currentmodule:: torchaudio.prototype.models
+
+.. autofunction:: conformer_wav2vec2_model

@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.sinc\_impulse\_response
+=======================================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: sinc_impulse_response
