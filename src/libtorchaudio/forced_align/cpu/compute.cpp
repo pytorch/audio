@@ -28,12 +28,12 @@ void forced_align_impl(
                                  .device(logProbs.device())
                                  .dtype(logProbs.dtype()))
                              .fill_(kNegInfinity);
-  torch::Tensor backPtr = torch::empty({T, S}, torch::kInt8).fill_(-1);
+  // Instead of backPtr, we will store the best previous index in the alphas tensor.
+  // The last column of the alphas tensor will be used to store this information.
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
   auto paths_a = paths.accessor<target_t, 2>();
   auto alphas_a = alphas.accessor<scalar_t, 2>();
-  auto backPtr_a = backPtr.accessor<int8_t, 2>();
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
@@ -80,7 +80,7 @@ void forced_align_impl(
     if (start == 0) {
       alphas_a[curIdxOffset][0] =
           alphas_a[prevIdxOffset][0] + logProbs_a[batchIndex][t][blank];
-      backPtr_a[t][0] = 0;
+      alphas_a[curIdxOffset][S - 1] = 0; // Store the best previous index
       startloop += 1;
     }
 
@@ -102,24 +102,24 @@ void forced_align_impl(
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        backPtr_a[t][i] = 2;
+        alphas_a[curIdxOffset][S - 1] = i - 2; // Store the best previous index
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
-        backPtr_a[t][i] = 1;
+        alphas_a[curIdxOffset][S - 1] = i - 1; // Store the best previous index
       } else {
         result = x0;
-        backPtr_a[t][i] = 0;
+        alphas_a[curIdxOffset][S - 1] = i; // Store the best previous index
       }
       alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     }
   }
   auto idx1 = (T - 1) % 2;
-  auto ltrIdx = alphas_a[idx1][S - 1] > alphas_a[idx1][S - 2] ? S - 1 : S - 2;
+  auto ltrIdx = alphas_a[idx1][S - 1]; 
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
-    ltrIdx -= backPtr_a[t][ltrIdx];
+    ltrIdx = alphas_a[(t) % 2][S - 1]; // Retrieve the best previous index
   }
 }
 
