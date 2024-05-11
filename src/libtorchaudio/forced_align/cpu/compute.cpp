@@ -82,9 +82,6 @@ void forced_align_impl(
     if (start == 0) {
       alphas_a[curIdxOffset][0] =
           alphas_a[prevIdxOffset][0] + logProbs_a[batchIndex][t][blank];
-      // Set backPtr bits for t and 0
-      // backPtrBit0[t * S + 0] = false;
-      // backPtrBit1[t * S + 0] = false;
       startloop += 1;
     }
 
@@ -104,19 +101,14 @@ void forced_align_impl(
         x2 = alphas_a[prevIdxOffset][i - 2];
       }
       scalar_t result = 0.0;
-      // Update backPtr bits based on the maximum value
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        // backPtrBit0[t * S + i] = false;
         backPtrBit1[t * S + i] = true;
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
         backPtrBit0[t * S + i] = true;
-        // backPtrBit1[t * S + i] = false;
       } else {
         result = x0;
-        // backPtrBit0[t * S + i] = false;
-        // backPtrBit1[t * S + i] = false;
       }
       alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     }
@@ -128,10 +120,10 @@ void forced_align_impl(
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
     // Calculate backPtr value from bits
-    int backPtrValue = (backPtrBit1[t * S + ltrIdx] << 1) | backPtrBit0[t * S + ltrIdx];
-    ltrIdx -= backPtrValue;
+    ltrIdx -= (backPtrBit1[t * S + ltrIdx] << 1) | backPtrBit0[t * S + ltrIdx];
   }
 }
+
 std::tuple<torch::Tensor, torch::Tensor> compute(
     const torch::Tensor& logProbs,
     const torch::Tensor& targets,
