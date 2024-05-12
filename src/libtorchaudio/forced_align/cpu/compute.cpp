@@ -29,8 +29,8 @@ void forced_align_impl(
                                  .dtype(logProbs.dtype()))
                              .fill_(kNegInfinity);
   // Replace backPtr tensor with two std::vector<bool>
-  std::vector<bool> backPtrBit0(T * S, false);
-  std::vector<bool> backPtrBit1(T * S, false);
+  std::vector<bool> backPtrBit0((T-1) * S, false);
+  std::vector<bool> backPtrBit1((T-1) * S, false);
 
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
@@ -103,10 +103,10 @@ void forced_align_impl(
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        backPtrBit1[t * S + i] = true;
+        backPtrBit1[(t-1) * S + i] = true;
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
-        backPtrBit0[t * S + i] = true;
+        backPtrBit0[(t-1) * S + i] = true;
       } else {
         result = x0;
       }
@@ -120,7 +120,7 @@ void forced_align_impl(
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
     // Calculate backPtr value from bits
-    ltrIdx -= (backPtrBit1[t * S + ltrIdx] << 1) | backPtrBit0[t * S + ltrIdx];
+    ltrIdx -= (backPtrBit1[(t-1) * S + ltrIdx] << 1) | backPtrBit0[(t-1) * S + ltrIdx];
   }
 }
 
