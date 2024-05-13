@@ -240,7 +240,7 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 
 ######################################################################
 # For regular audio formats and still image formats, such as `WAV`
-# and `JPEG`, the number of souorce streams is 1.
+# and `JPEG`, the number of source streams is 1.
 #
 
 streamer = StreamReader(AUDIO_URL)
