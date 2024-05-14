@@ -16,7 +16,7 @@ class UnchunkedBuffer {
   explicit UnchunkedBuffer(AVRational time_base);
   bool is_ready() const;
   void push_frame(torch::Tensor frame, int64_t pts_);
-  c10::optional<Chunk> pop_chunk();
+  std::optional<Chunk> pop_chunk();
   void flush();
 };
 

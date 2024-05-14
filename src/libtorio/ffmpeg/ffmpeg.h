@@ -77,7 +77,7 @@ class Wrapper {
 // IIRC-semantic. Instead we provide helper functions.
 
 // Convert standard dict to FFmpeg native type
-AVDictionary* get_option_dict(const c10::optional<OptionDict>& option);
+AVDictionary* get_option_dict(const std::optional<OptionDict>& option);
 
 // Clean up the dict after use. If there is an unsed key, throw runtime error
 void clean_up_dict(AVDictionary* p);

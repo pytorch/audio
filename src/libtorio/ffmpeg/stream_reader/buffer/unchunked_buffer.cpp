@@ -15,7 +15,7 @@ void UnchunkedBuffer::push_frame(torch::Tensor frame, int64_t pts_) {
   chunks.push_back(frame);
 }
 
-c10::optional<Chunk> UnchunkedBuffer::pop_chunk() {
+std::optional<Chunk> UnchunkedBuffer::pop_chunk() {
   if (chunks.size() == 0) {
     return {};
   }

@@ -10,7 +10,7 @@ namespace torio::io {
 ////////////////////////////////////////////////////////////////////////////////
 // AVDictionary
 ////////////////////////////////////////////////////////////////////////////////
-AVDictionary* get_option_dict(const c10::optional<OptionDict>& option) {
+AVDictionary* get_option_dict(const std::optional<OptionDict>& option) {
   AVDictionary* opt = nullptr;
   if (option) {
     for (auto const& [key, value] : option.value()) {

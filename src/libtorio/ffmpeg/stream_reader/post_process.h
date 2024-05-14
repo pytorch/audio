@@ -8,7 +8,7 @@ struct IPostDecodeProcess {
   virtual ~IPostDecodeProcess() = default;
 
   virtual int process_frame(AVFrame* frame) = 0;
-  virtual c10::optional<Chunk> pop_chunk() = 0;
+  virtual std::optional<Chunk> pop_chunk() = 0;
   virtual bool is_buffer_ready() const = 0;
   virtual const std::string& get_filter_desc() const = 0;
   virtual FilterGraphOutputInfo get_filter_output_info() const = 0;

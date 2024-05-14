@@ -144,7 +144,7 @@ struct ProcessImpl : public IPostDecodeProcess {
     return ret;
   }
 
-  c10::optional<Chunk> pop_chunk() override {
+  std::optional<Chunk> pop_chunk() override {
     return buffer.pop_chunk();
   }
 };
