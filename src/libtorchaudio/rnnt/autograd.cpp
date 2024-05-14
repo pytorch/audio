@@ -42,7 +42,7 @@ class RNNTLossFunction : public torch::autograd::Function<RNNTLossFunction> {
   }
 };
 
-std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss_autograd(
+std::tuple<torch::Tensor, std::optional<torch::Tensor>> rnnt_loss_autograd(
     torch::Tensor& logits,
     const torch::Tensor& targets,
     const torch::Tensor& logit_lengths,
