@@ -10,7 +10,7 @@ struct CodecConfig {
   // https://trac.ffmpeg.org/wiki/Encode/MP3
   // This should be set like
   // https://github.com/FFmpeg/FFmpeg/blob/n4.3.2/fftools/ffmpeg_opt.c#L1550
-  const c10::optional<int> qscale = -1;
+  const std::optional<int> qscale = -1;
 
   // video
   int gop_size = -1;

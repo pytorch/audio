@@ -15,8 +15,8 @@ using KeyType = StreamProcessor::KeyType;
 namespace {
 AVFormatContext* get_input_format_context(
     const std::string& src,
-    const c10::optional<std::string>& format,
-    const c10::optional<OptionDict>& option,
+    const std::optional<std::string>& format,
+    const std::optional<OptionDict>& option,
     AVIOContext* io_ctx) {
   AVFormatContext* p = avformat_alloc_context();
   TORCH_CHECK(p, "Failed to allocate AVFormatContext.");
@@ -72,8 +72,8 @@ StreamingMediaDecoder::StreamingMediaDecoder(AVFormatContext* p)
 
 StreamingMediaDecoder::StreamingMediaDecoder(
     AVIOContext* io_ctx,
-    const c10::optional<std::string>& format,
-    const c10::optional<OptionDict>& option)
+    const std::optional<std::string>& format,
+    const std::optional<OptionDict>& option)
     : StreamingMediaDecoder(get_input_format_context(
           "Custom Input Context",
           format,
@@ -82,8 +82,8 @@ StreamingMediaDecoder::StreamingMediaDecoder(
 
 StreamingMediaDecoder::StreamingMediaDecoder(
     const std::string& src,
-    const c10::optional<std::string>& format,
-    const c10::optional<OptionDict>& option)
+    const std::optional<std::string>& format,
+    const std::optional<OptionDict>& option)
     : StreamingMediaDecoder(
           get_input_format_context(src, format, option, nullptr)) {}
 
@@ -308,9 +308,9 @@ void StreamingMediaDecoder::add_audio_stream(
     int64_t i,
     int64_t frames_per_chunk,
     int64_t num_chunks,
-    const c10::optional<std::string>& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<OptionDict>& decoder_option) {
+    const std::optional<std::string>& filter_desc,
+    const std::optional<std::string>& decoder,
+    const std::optional<OptionDict>& decoder_option) {
   add_stream(
       static_cast<int>(i),
       AVMEDIA_TYPE_AUDIO,
@@ -326,10 +326,10 @@ void StreamingMediaDecoder::add_video_stream(
     int64_t i,
     int64_t frames_per_chunk,
     int64_t num_chunks,
-    const c10::optional<std::string>& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<OptionDict>& decoder_option,
-    const c10::optional<std::string>& hw_accel) {
+    const std::optional<std::string>& filter_desc,
+    const std::optional<std::string>& decoder,
+    const std::optional<OptionDict>& decoder_option,
+    const std::optional<std::string>& hw_accel) {
   const torch::Device device = [&]() {
     if (!hw_accel) {
       return torch::Device{c10::DeviceType::CPU};
@@ -371,8 +371,8 @@ void StreamingMediaDecoder::add_stream(
     int frames_per_chunk,
     int num_chunks,
     const std::string& filter_desc,
-    const c10::optional<std::string>& decoder,
-    const c10::optional<OptionDict>& decoder_option,
+    const std::optional<std::string>& decoder,
+    const std::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
   validate_src_stream_type(format_ctx, i, media_type);
 
@@ -517,7 +517,7 @@ void StreamingMediaDecoder::process_all_packets() {
 }
 
 int StreamingMediaDecoder::process_packet(
-    const c10::optional<double>& timeout,
+    const std::optional<double>& timeout,
     const double backoff) {
   int code = [&]() -> int {
     if (timeout.has_value()) {
@@ -531,7 +531,7 @@ int StreamingMediaDecoder::process_packet(
 }
 
 int StreamingMediaDecoder::fill_buffer(
-    const c10::optional<double>& timeout,
+    const std::optional<double>& timeout,
     const double backoff) {
   while (!is_buffer_ready()) {
     int code = process_packet(timeout, backoff);
@@ -556,8 +556,8 @@ int StreamingMediaDecoder::drain() {
   return ret;
 }
 
-std::vector<c10::optional<Chunk>> StreamingMediaDecoder::pop_chunks() {
-  std::vector<c10::optional<Chunk>> ret;
+std::vector<std::optional<Chunk>> StreamingMediaDecoder::pop_chunks() {
+  std::vector<std::optional<Chunk>> ret;
   ret.reserve(static_cast<size_t>(num_out_streams()));
   for (auto& i : stream_indices) {
     ret.emplace_back(processors[i.first]->pop_chunk(i.second));
@@ -602,11 +602,11 @@ CustomInput::CustomInput(
 
 StreamingMediaDecoderCustomIO::StreamingMediaDecoderCustomIO(
     void* opaque,
-    const c10::optional<std::string>& format,
+    const std::optional<std::string>& format,
     int buffer_size,
     int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
     int64_t (*seek)(void* opaque, int64_t offset, int whence),
-    const c10::optional<OptionDict>& option)
+    const std::optional<OptionDict>& option)
     : CustomInput(opaque, buffer_size, read_packet, seek),
       StreamingMediaDecoder(io_ctx, format, option) {}
 
