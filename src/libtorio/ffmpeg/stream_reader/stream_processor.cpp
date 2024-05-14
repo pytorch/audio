@@ -8,7 +8,7 @@ namespace torio::io {
 namespace {
 AVCodecContextPtr alloc_codec_context(
     enum AVCodecID codec_id,
-    const c10::optional<std::string>& decoder_name) {
+    const std::optional<std::string>& decoder_name) {
   const AVCodec* codec = [&]() {
     if (decoder_name) {
       const AVCodec* c =
@@ -132,7 +132,7 @@ void configure_codec_context(
 
 void open_codec(
     AVCodecContext* codec_ctx,
-    const c10::optional<OptionDict>& decoder_option) {
+    const std::optional<OptionDict>& decoder_option) {
   AVDictionary* opts = get_option_dict(decoder_option);
 
   // Default to single thread execution.
@@ -158,8 +158,8 @@ bool ends_with(std::string_view str, std::string_view suffix) {
 
 AVCodecContextPtr get_codec_ctx(
     const AVCodecParameters* params,
-    const c10::optional<std::string>& decoder_name,
-    const c10::optional<OptionDict>& decoder_option,
+    const std::optional<std::string>& decoder_name,
+    const std::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
   AVCodecContextPtr codec_ctx =
       alloc_codec_context(params->codec_id, decoder_name);
@@ -266,8 +266,8 @@ void StreamProcessor::set_discard_timestamp(int64_t timestamp) {
 
 void StreamProcessor::set_decoder(
     const AVCodecParameters* codecpar,
-    const c10::optional<std::string>& decoder_name,
-    const c10::optional<OptionDict>& decoder_option,
+    const std::optional<std::string>& decoder_name,
+    const std::optional<OptionDict>& decoder_option,
     const torch::Device& device) {
   TORCH_INTERNAL_ASSERT_DEBUG_ONLY(!codec_ctx, "Decoder has already been set.");
   codec_ctx = get_codec_ctx(codecpar, decoder_name, decoder_option, device);
@@ -390,7 +390,7 @@ int StreamProcessor::send_frame(AVFrame* frame_) {
 ////////////////////////////////////////////////////////////////////////////////
 // Retrieval
 ////////////////////////////////////////////////////////////////////////////////
-c10::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
+std::optional<Chunk> StreamProcessor::pop_chunk(KeyType key) {
   return post_processes.at(key)->pop_chunk();
 }
 
