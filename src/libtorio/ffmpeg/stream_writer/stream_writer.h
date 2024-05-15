@@ -38,7 +38,7 @@ class StreamingMediaEncoder {
   /// @param format Specify output format.
   explicit StreamingMediaEncoder(
       AVIOContext* io_ctx,
-      const c10::optional<std::string>& format = c10::nullopt);
+      const std::optional<std::string>& format = c10::nullopt);
 
   /// @endcond
 
@@ -50,7 +50,7 @@ class StreamingMediaEncoder {
   /// ``dst``.
   explicit StreamingMediaEncoder(
       const std::string& dst,
-      const c10::optional<std::string>& format = c10::nullopt);
+      const std::optional<std::string>& format = c10::nullopt);
 
   // Non-copyable
   StreamingMediaEncoder(const StreamingMediaEncoder&) = delete;
@@ -113,13 +113,13 @@ class StreamingMediaEncoder {
       int sample_rate,
       int num_channels,
       const std::string& format,
-      const c10::optional<std::string>& encoder = c10::nullopt,
-      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
-      const c10::optional<std::string>& encoder_format = c10::nullopt,
-      const c10::optional<int>& encoder_sample_rate = c10::nullopt,
-      const c10::optional<int>& encoder_num_channels = c10::nullopt,
-      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
-      const c10::optional<std::string>& filter_desc = c10::nullopt);
+      const std::optional<std::string>& encoder = c10::nullopt,
+      const std::optional<OptionDict>& encoder_option = c10::nullopt,
+      const std::optional<std::string>& encoder_format = c10::nullopt,
+      const std::optional<int>& encoder_sample_rate = c10::nullopt,
+      const std::optional<int>& encoder_num_channels = c10::nullopt,
+      const std::optional<CodecConfig>& codec_config = c10::nullopt,
+      const std::optional<std::string>& filter_desc = c10::nullopt);
 
   /// Add an output video stream.
   ///
@@ -161,15 +161,15 @@ class StreamingMediaEncoder {
       int width,
       int height,
       const std::string& format,
-      const c10::optional<std::string>& encoder = c10::nullopt,
-      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
-      const c10::optional<std::string>& encoder_format = c10::nullopt,
-      const c10::optional<double>& encoder_frame_rate = c10::nullopt,
-      const c10::optional<int>& encoder_width = c10::nullopt,
-      const c10::optional<int>& encoder_height = c10::nullopt,
-      const c10::optional<std::string>& hw_accel = c10::nullopt,
-      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
-      const c10::optional<std::string>& filter_desc = c10::nullopt);
+      const std::optional<std::string>& encoder = c10::nullopt,
+      const std::optional<OptionDict>& encoder_option = c10::nullopt,
+      const std::optional<std::string>& encoder_format = c10::nullopt,
+      const std::optional<double>& encoder_frame_rate = c10::nullopt,
+      const std::optional<int>& encoder_width = c10::nullopt,
+      const std::optional<int>& encoder_height = c10::nullopt,
+      const std::optional<std::string>& hw_accel = c10::nullopt,
+      const std::optional<CodecConfig>& codec_config = c10::nullopt,
+      const std::optional<std::string>& filter_desc = c10::nullopt);
   /// @cond
   /// Add output audio frame stream.
   /// Allows for writing frames rather than tensors via `write_frame`.
@@ -179,13 +179,13 @@ class StreamingMediaEncoder {
       int sample_rate,
       int num_channels,
       const std::string& format,
-      const c10::optional<std::string>& encoder = c10::nullopt,
-      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
-      const c10::optional<std::string>& encoder_format = c10::nullopt,
-      const c10::optional<int>& encoder_sample_rate = c10::nullopt,
-      const c10::optional<int>& encoder_num_channels = c10::nullopt,
-      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
-      const c10::optional<std::string>& filter_desc = c10::nullopt);
+      const std::optional<std::string>& encoder = c10::nullopt,
+      const std::optional<OptionDict>& encoder_option = c10::nullopt,
+      const std::optional<std::string>& encoder_format = c10::nullopt,
+      const std::optional<int>& encoder_sample_rate = c10::nullopt,
+      const std::optional<int>& encoder_num_channels = c10::nullopt,
+      const std::optional<CodecConfig>& codec_config = c10::nullopt,
+      const std::optional<std::string>& filter_desc = c10::nullopt);
 
   /// Add output video frame stream.
   /// Allows for writing frames rather than tensors via `write_frame`.
@@ -196,15 +196,15 @@ class StreamingMediaEncoder {
       int width,
       int height,
       const std::string& format,
-      const c10::optional<std::string>& encoder = c10::nullopt,
-      const c10::optional<OptionDict>& encoder_option = c10::nullopt,
-      const c10::optional<std::string>& encoder_format = c10::nullopt,
-      const c10::optional<double>& encoder_frame_rate = c10::nullopt,
-      const c10::optional<int>& encoder_width = c10::nullopt,
-      const c10::optional<int>& encoder_height = c10::nullopt,
-      const c10::optional<std::string>& hw_accel = c10::nullopt,
-      const c10::optional<CodecConfig>& codec_config = c10::nullopt,
-      const c10::optional<std::string>& filter_desc = c10::nullopt);
+      const std::optional<std::string>& encoder = c10::nullopt,
+      const std::optional<OptionDict>& encoder_option = c10::nullopt,
+      const std::optional<std::string>& encoder_format = c10::nullopt,
+      const std::optional<double>& encoder_frame_rate = c10::nullopt,
+      const std::optional<int>& encoder_width = c10::nullopt,
+      const std::optional<int>& encoder_height = c10::nullopt,
+      const std::optional<std::string>& hw_accel = c10::nullopt,
+      const std::optional<CodecConfig>& codec_config = c10::nullopt,
+      const std::optional<std::string>& filter_desc = c10::nullopt);
 
   /// Add packet stream. Intended to be used in conjunction with
   /// ``StreamingMediaDecoder`` to perform packet passthrough.
@@ -226,7 +226,7 @@ class StreamingMediaEncoder {
   /// Open the output file / device and write the header.
   ///
   /// @param opt Private options for protocol, device and muxer.
-  void open(const c10::optional<OptionDict>& opt = c10::nullopt);
+  void open(const std::optional<OptionDict>& opt = c10::nullopt);
   /// Close the output file / device and finalize metadata.
   void close();
 
@@ -248,7 +248,7 @@ class StreamingMediaEncoder {
   void write_audio_chunk(
       int i,
       const torch::Tensor& frames,
-      const c10::optional<double>& pts = c10::nullopt);
+      const std::optional<double>& pts = c10::nullopt);
   /// Write video data
   /// @param i Stream index.
   /// @param frames Video/image tensor. Shape: ``(time, channel, height,
@@ -269,7 +269,7 @@ class StreamingMediaEncoder {
   void write_video_chunk(
       int i,
       const torch::Tensor& frames,
-      const c10::optional<double>& pts = c10::nullopt);
+      const std::optional<double>& pts = c10::nullopt);
   /// @cond
   /// Write frame to stream.
   /// @param i Stream index.
@@ -325,7 +325,7 @@ class StreamingMediaEncoderCustomIO : private detail::CustomOutput,
   /// @param seek Optional seek function that is used to seek the destination.
   StreamingMediaEncoderCustomIO(
       void* opaque,
-      const c10::optional<std::string>& format,
+      const std::optional<std::string>& format,
       int buffer_size,
       int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
       int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr);

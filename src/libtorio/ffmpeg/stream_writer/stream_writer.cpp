@@ -10,7 +10,7 @@ namespace {
 
 AVFormatContext* get_output_format_context(
     const std::string& dst,
-    const c10::optional<std::string>& format,
+    const std::optional<std::string>& format,
     AVIOContext* io_ctx) {
   if (io_ctx) {
     TORCH_CHECK(
@@ -45,26 +45,26 @@ StreamingMediaEncoder::StreamingMediaEncoder(AVFormatContext* p)
 
 StreamingMediaEncoder::StreamingMediaEncoder(
     AVIOContext* io_ctx,
-    const c10::optional<std::string>& format)
+    const std::optional<std::string>& format)
     : StreamingMediaEncoder(
           get_output_format_context("Custom Output Context", format, io_ctx)) {}
 
 StreamingMediaEncoder::StreamingMediaEncoder(
     const std::string& dst,
-    const c10::optional<std::string>& format)
+    const std::optional<std::string>& format)
     : StreamingMediaEncoder(get_output_format_context(dst, format, nullptr)) {}
 
 void StreamingMediaEncoder::add_audio_stream(
     int sample_rate,
     int num_channels,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<int>& encoder_sample_rate,
-    const c10::optional<int>& encoder_num_channels,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc) {
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<int>& encoder_sample_rate,
+    const std::optional<int>& encoder_num_channels,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
       format_ctx->nb_streams == num_output_streams(),
@@ -92,15 +92,15 @@ void StreamingMediaEncoder::add_video_stream(
     int width,
     int height,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<double>& encoder_frame_rate,
-    const c10::optional<int>& encoder_width,
-    const c10::optional<int>& encoder_height,
-    const c10::optional<std::string>& hw_accel,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc) {
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<double>& encoder_frame_rate,
+    const std::optional<int>& encoder_width,
+    const std::optional<int>& encoder_height,
+    const std::optional<std::string>& hw_accel,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
       format_ctx->nb_streams == num_output_streams(),
@@ -139,13 +139,13 @@ void StreamingMediaEncoder::add_audio_frame_stream(
     int sample_rate,
     int num_channels,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<int>& encoder_sample_rate,
-    const c10::optional<int>& encoder_num_channels,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc) {
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<int>& encoder_sample_rate,
+    const std::optional<int>& encoder_num_channels,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
       format_ctx->nb_streams == num_output_streams(),
@@ -174,15 +174,15 @@ void StreamingMediaEncoder::add_video_frame_stream(
     int width,
     int height,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<double>& encoder_frame_rate,
-    const c10::optional<int>& encoder_width,
-    const c10::optional<int>& encoder_height,
-    const c10::optional<std::string>& hw_accel,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc) {
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<double>& encoder_frame_rate,
+    const std::optional<int>& encoder_width,
+    const std::optional<int>& encoder_height,
+    const std::optional<std::string>& hw_accel,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc) {
   TORCH_CHECK(!is_open, "Output is already opened. Cannot add a new stream.");
   TORCH_INTERNAL_ASSERT(
       format_ctx->nb_streams == num_output_streams(),
@@ -220,7 +220,7 @@ void StreamingMediaEncoder::dump_format(int64_t i) {
   av_dump_format(format_ctx, (int)i, format_ctx->url, 1);
 }
 
-void StreamingMediaEncoder::open(const c10::optional<OptionDict>& option) {
+void StreamingMediaEncoder::open(const std::optional<OptionDict>& option) {
   TORCH_INTERNAL_ASSERT(
       format_ctx->nb_streams == num_output_streams(),
       "The number of encode process and the number of output streams do not match.");
@@ -279,7 +279,7 @@ void StreamingMediaEncoder::close() {
 void StreamingMediaEncoder::write_audio_chunk(
     int i,
     const torch::Tensor& waveform,
-    const c10::optional<double>& pts) {
+    const std::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(format_ctx->nb_streams),
@@ -298,7 +298,7 @@ void StreamingMediaEncoder::write_audio_chunk(
 void StreamingMediaEncoder::write_video_chunk(
     int i,
     const torch::Tensor& frames,
-    const c10::optional<double>& pts) {
+    const std::optional<double>& pts) {
   TORCH_CHECK(is_open, "Output is not opened. Did you call `open` method?");
   TORCH_CHECK(
       0 <= i && i < static_cast<int>(format_ctx->nb_streams),
@@ -379,7 +379,7 @@ CustomOutput::CustomOutput(
 
 StreamingMediaEncoderCustomIO::StreamingMediaEncoderCustomIO(
     void* opaque,
-    const c10::optional<std::string>& format,
+    const std::optional<std::string>& format,
     int buffer_size,
     int (*write_packet)(void* opaque, uint8_t* buf, int buf_size),
     int64_t (*seek)(void* opaque, int64_t offset, int whence))

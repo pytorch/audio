@@ -160,8 +160,8 @@ struct StreamingMediaDecoderFileObj : private FileObj,
                                       public StreamingMediaDecoderCustomIO {
   StreamingMediaDecoderFileObj(
       py::object fileobj,
-      const c10::optional<std::string>& format,
-      const c10::optional<std::map<std::string, std::string>>& option,
+      const std::optional<std::string>& format,
+      const std::optional<std::map<std::string, std::string>>& option,
       int buffer_size)
       : FileObj{fileobj, buffer_size},
         StreamingMediaDecoderCustomIO(
@@ -177,7 +177,7 @@ struct StreamingMediaEncoderFileObj : private FileObj,
                                       public StreamingMediaEncoderCustomIO {
   StreamingMediaEncoderFileObj(
       py::object fileobj,
-      const c10::optional<std::string>& format,
+      const std::optional<std::string>& format,
       int buffer_size)
       : FileObj{fileobj, buffer_size},
         StreamingMediaEncoderCustomIO(
@@ -231,8 +231,8 @@ struct StreamingMediaDecoderBytes : private BytesWrapper,
                                     public StreamingMediaDecoderCustomIO {
   StreamingMediaDecoderBytes(
       std::string_view src,
-      const c10::optional<std::string>& format,
-      const c10::optional<std::map<std::string, std::string>>& option,
+      const std::optional<std::string>& format,
+      const std::optional<std::map<std::string, std::string>>& option,
       int64_t buffer_size)
       : BytesWrapper{src},
         StreamingMediaDecoderCustomIO(
@@ -278,10 +278,10 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       .def_readwrite("frames", &Chunk::frames)
       .def_readwrite("pts", &Chunk::pts);
   py::class_<CodecConfig>(m, "CodecConfig", py::module_local())
-      .def(py::init<int, int, const c10::optional<int>&, int, int>());
+      .def(py::init<int, int, const std::optional<int>&, int, int>());
   py::class_<StreamingMediaEncoder>(
       m, "StreamingMediaEncoder", py::module_local())
-      .def(py::init<const std::string&, const c10::optional<std::string>&>())
+      .def(py::init<const std::string&, const std::optional<std::string>&>())
       .def("set_metadata", &StreamingMediaEncoder::set_metadata)
       .def("add_audio_stream", &StreamingMediaEncoder::add_audio_stream)
       .def("add_video_stream", &StreamingMediaEncoder::add_video_stream)
@@ -293,7 +293,7 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       .def("close", &StreamingMediaEncoder::close);
   py::class_<StreamingMediaEncoderFileObj>(
       m, "StreamingMediaEncoderFileObj", py::module_local())
-      .def(py::init<py::object, const c10::optional<std::string>&, int64_t>())
+      .def(py::init<py::object, const std::optional<std::string>&, int64_t>())
       .def("set_metadata", &StreamingMediaEncoderFileObj::set_metadata)
       .def("add_audio_stream", &StreamingMediaEncoderFileObj::add_audio_stream)
       .def("add_video_stream", &StreamingMediaEncoderFileObj::add_video_stream)
@@ -366,8 +366,8 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       m, "StreamingMediaDecoder", py::module_local())
       .def(py::init<
            const std::string&,
-           const c10::optional<std::string>&,
-           const c10::optional<OptionDict>&>())
+           const std::optional<std::string>&,
+           const std::optional<OptionDict>&>())
       .def("num_src_streams", &StreamingMediaDecoder::num_src_streams)
       .def("num_out_streams", &StreamingMediaDecoder::num_out_streams)
       .def(
@@ -385,7 +385,7 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       .def("remove_stream", &StreamingMediaDecoder::remove_stream)
       .def(
           "process_packet",
-          py::overload_cast<const c10::optional<double>&, const double>(
+          py::overload_cast<const std::optional<double>&, const double>(
               &StreamingMediaDecoder::process_packet))
       .def("process_all_packets", &StreamingMediaDecoder::process_all_packets)
       .def("fill_buffer", &StreamingMediaDecoder::fill_buffer)
@@ -395,8 +395,8 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       m, "StreamingMediaDecoderFileObj", py::module_local())
       .def(py::init<
            py::object,
-           const c10::optional<std::string>&,
-           const c10::optional<OptionDict>&,
+           const std::optional<std::string>&,
+           const std::optional<OptionDict>&,
            int64_t>())
       .def("num_src_streams", &StreamingMediaDecoderFileObj::num_src_streams)
       .def("num_out_streams", &StreamingMediaDecoderFileObj::num_out_streams)
@@ -419,7 +419,7 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       .def("remove_stream", &StreamingMediaDecoderFileObj::remove_stream)
       .def(
           "process_packet",
-          py::overload_cast<const c10::optional<double>&, const double>(
+          py::overload_cast<const std::optional<double>&, const double>(
               &StreamingMediaDecoder::process_packet))
       .def(
           "process_all_packets",
@@ -431,8 +431,8 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       m, "StreamingMediaDecoderBytes", py::module_local())
       .def(py::init<
            std::string_view,
-           const c10::optional<std::string>&,
-           const c10::optional<OptionDict>&,
+           const std::optional<std::string>&,
+           const std::optional<OptionDict>&,
            int64_t>())
       .def("num_src_streams", &StreamingMediaDecoderBytes::num_src_streams)
       .def("num_out_streams", &StreamingMediaDecoderBytes::num_out_streams)
@@ -455,7 +455,7 @@ PYBIND11_MODULE(TORIO_FFMPEG_EXT_NAME, m) {
       .def("remove_stream", &StreamingMediaDecoderBytes::remove_stream)
       .def(
           "process_packet",
-          py::overload_cast<const c10::optional<double>&, const double>(
+          py::overload_cast<const std::optional<double>&, const double>(
               &StreamingMediaDecoder::process_packet))
       .def(
           "process_all_packets",

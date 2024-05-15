@@ -66,8 +66,8 @@ class StreamingMediaDecoder {
   /// (opening source).
   explicit StreamingMediaDecoder(
       AVIOContext* io_ctx,
-      const c10::optional<std::string>& format = c10::nullopt,
-      const c10::optional<OptionDict>& option = c10::nullopt);
+      const std::optional<std::string>& format = c10::nullopt,
+      const std::optional<OptionDict>& option = c10::nullopt);
 
   /// @endcond
 
@@ -81,8 +81,8 @@ class StreamingMediaDecoder {
   /// (opening source).
   explicit StreamingMediaDecoder(
       const std::string& src,
-      const c10::optional<std::string>& format = c10::nullopt,
-      const c10::optional<OptionDict>& option = c10::nullopt);
+      const std::optional<std::string>& format = c10::nullopt,
+      const std::optional<OptionDict>& option = c10::nullopt);
 
   ///@}
 
@@ -205,9 +205,9 @@ class StreamingMediaDecoder {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const c10::optional<std::string>& filter_desc = c10::nullopt,
-      const c10::optional<std::string>& decoder = c10::nullopt,
-      const c10::optional<OptionDict>& decoder_option = c10::nullopt);
+      const std::optional<std::string>& filter_desc = c10::nullopt,
+      const std::optional<std::string>& decoder = c10::nullopt,
+      const std::optional<OptionDict>& decoder_option = c10::nullopt);
   /// Define an output video stream.
   ///
   /// @param i,frames_per_chunk,num_chunks,filter_desc,decoder,decoder_option
@@ -226,10 +226,10 @@ class StreamingMediaDecoder {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const c10::optional<std::string>& filter_desc = c10::nullopt,
-      const c10::optional<std::string>& decoder = c10::nullopt,
-      const c10::optional<OptionDict>& decoder_option = c10::nullopt,
-      const c10::optional<std::string>& hw_accel = c10::nullopt);
+      const std::optional<std::string>& filter_desc = c10::nullopt,
+      const std::optional<std::string>& decoder = c10::nullopt,
+      const std::optional<OptionDict>& decoder_option = c10::nullopt,
+      const std::optional<std::string>& hw_accel = c10::nullopt);
 
   /// @cond
   /// Add a output packet stream.
@@ -255,8 +255,8 @@ class StreamingMediaDecoder {
       int frames_per_chunk,
       int num_chunks,
       const std::string& filter_desc,
-      const c10::optional<std::string>& decoder,
-      const c10::optional<OptionDict>& decoder_option,
+      const std::optional<std::string>& decoder,
+      const std::optional<OptionDict>& decoder_option,
       const torch::Device& device);
 
   //////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ class StreamingMediaDecoder {
   /// @cond
   // High-level method used by Python bindings.
   int process_packet(
-      const c10::optional<double>& timeout,
+      const std::optional<double>& timeout,
       const double backoff);
   /// @endcond
 
@@ -315,7 +315,7 @@ class StreamingMediaDecoder {
   /// @param timeout See `process_packet_block()`
   /// @param backoff See `process_packet_block()`
   int fill_buffer(
-      const c10::optional<double>& timeout = c10::nullopt,
+      const std::optional<double>& timeout = c10::nullopt,
       const double backoff = 10.);
 
   ///@}
@@ -331,7 +331,7 @@ class StreamingMediaDecoder {
   ///@{
 
   /// Pop one chunk from each output stream if it is available.
-  std::vector<c10::optional<Chunk>> pop_chunks();
+  std::vector<std::optional<Chunk>> pop_chunks();
 
   /// @cond
   /// Pop packets from buffer, if available.
@@ -379,11 +379,11 @@ class StreamingMediaDecoderCustomIO : private detail::CustomInput,
   /// @param option Custom option passed when initializing format context.
   StreamingMediaDecoderCustomIO(
       void* opaque,
-      const c10::optional<std::string>& format,
+      const std::optional<std::string>& format,
       int buffer_size,
       int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
       int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr,
-      const c10::optional<OptionDict>& option = c10::nullopt);
+      const std::optional<OptionDict>& option = c10::nullopt);
 };
 
 // For BC

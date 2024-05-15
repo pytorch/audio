@@ -22,7 +22,7 @@ EncodeProcess::EncodeProcess(
 
 void EncodeProcess::process(
     const torch::Tensor& tensor,
-    const c10::optional<double>& pts) {
+    const std::optional<double>& pts) {
   if (pts) {
     const double& pts_val = pts.value();
     TORCH_CHECK(
@@ -127,7 +127,7 @@ enum AVPixelFormat get_src_pix_fmt(const std::string& src) {
 ////////////////////////////////////////////////////////////////////////////////
 const AVCodec* get_codec(
     AVCodecID default_codec,
-    const c10::optional<std::string>& encoder) {
+    const std::optional<std::string>& encoder) {
   if (encoder) {
     const AVCodec* c = avcodec_find_encoder_by_name(encoder.value().c_str());
     TORCH_CHECK(c, "Unexpected codec: ", encoder.value());
@@ -151,7 +151,7 @@ AVCodecContextPtr get_codec_ctx(const AVCodec* codec, int flags) {
 
 void open_codec(
     AVCodecContext* codec_ctx,
-    const c10::optional<OptionDict>& option) {
+    const std::optional<OptionDict>& option) {
   AVDictionary* opt = get_option_dict(option);
 
   // Enable experimental feature if required
@@ -224,7 +224,7 @@ std::string get_supported_formats(const AVSampleFormat* sample_fmts) {
 
 AVSampleFormat get_enc_fmt(
     AVSampleFormat src_fmt,
-    const c10::optional<std::string>& encoder_format,
+    const std::optional<std::string>& encoder_format,
     const AVCodec* codec) {
   if (encoder_format) {
     auto& enc_fmt_val = encoder_format.value();
@@ -273,7 +273,7 @@ std::string get_supported_samplerates(const int* supported_samplerates) {
 
 int get_enc_sr(
     int src_sample_rate,
-    const c10::optional<int>& encoder_sample_rate,
+    const std::optional<int>& encoder_sample_rate,
     const AVCodec* codec) {
   // G.722 only supports 16000 Hz, but it does not list the sample rate in
   // supported_samplerates so we hard code it here.
@@ -325,7 +325,7 @@ std::string get_supported_channels(const uint64_t* channel_layouts) {
 
 uint64_t get_channel_layout(
     const uint64_t src_ch_layout,
-    const c10::optional<int> enc_num_channels,
+    const std::optional<int> enc_num_channels,
     const AVCodec* codec) {
   // If the override is presented, and if it is supported by codec, we use it.
   if (enc_num_channels) {
@@ -370,7 +370,7 @@ void configure_audio_codec_ctx(
     AVSampleFormat format,
     int sample_rate,
     uint64_t channel_layout,
-    const c10::optional<CodecConfig>& codec_config) {
+    const std::optional<CodecConfig>& codec_config) {
   codec_ctx->sample_fmt = format;
   codec_ctx->sample_rate = sample_rate;
   codec_ctx->time_base = av_inv_q(av_d2q(sample_rate, 1 << 24));
@@ -421,7 +421,7 @@ std::string get_supported_formats(const AVPixelFormat* pix_fmts) {
 
 AVPixelFormat get_enc_fmt(
     AVPixelFormat src_fmt,
-    const c10::optional<std::string>& encoder_format,
+    const std::optional<std::string>& encoder_format,
     const AVCodec* codec) {
   if (encoder_format) {
     const auto& val = encoder_format.value();
@@ -455,7 +455,7 @@ bool supported_frame_rate(AVRational rate, const AVRational* rates) {
 
 AVRational get_enc_rate(
     AVRational src_rate,
-    const c10::optional<double>& encoder_sample_rate,
+    const std::optional<double>& encoder_sample_rate,
     const AVCodec* codec) {
   if (encoder_sample_rate) {
     const double& enc_rate = encoder_sample_rate.value();
@@ -494,7 +494,7 @@ void configure_video_codec_ctx(
     AVRational frame_rate,
     int width,
     int height,
-    const c10::optional<CodecConfig>& codec_config) {
+    const std::optional<CodecConfig>& codec_config) {
   // TODO: Review other options and make them configurable?
   // https://ffmpeg.org/doxygen/4.1/muxing_8c_source.html#l00147
   //  - bit_rate_tolerance
@@ -596,7 +596,7 @@ FilterGraph get_audio_filter_graph(
     AVSampleFormat src_fmt,
     int src_sample_rate,
     uint64_t src_ch_layout,
-    const c10::optional<std::string>& filter_desc,
+    const std::optional<std::string>& filter_desc,
     AVSampleFormat enc_fmt,
     int enc_sample_rate,
     uint64_t enc_ch_layout,
@@ -639,7 +639,7 @@ FilterGraph get_video_filter_graph(
     AVRational src_rate,
     int src_width,
     int src_height,
-    const c10::optional<std::string>& filter_desc,
+    const std::optional<std::string>& filter_desc,
     AVPixelFormat enc_fmt,
     AVRational enc_rate,
     int enc_width,
@@ -743,13 +743,13 @@ EncodeProcess get_audio_encode_process(
     int src_sample_rate,
     int src_num_channels,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<int>& encoder_sample_rate,
-    const c10::optional<int>& encoder_num_channels,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc,
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<int>& encoder_sample_rate,
+    const std::optional<int>& encoder_num_channels,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc,
     bool disable_converter) {
   // 1. Check the source format, rate and channels
   TORCH_CHECK(
@@ -854,15 +854,15 @@ EncodeProcess get_video_encode_process(
     int src_width,
     int src_height,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<double>& encoder_frame_rate,
-    const c10::optional<int>& encoder_width,
-    const c10::optional<int>& encoder_height,
-    const c10::optional<std::string>& hw_accel,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc,
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<double>& encoder_frame_rate,
+    const std::optional<int>& encoder_width,
+    const std::optional<int>& encoder_height,
+    const std::optional<std::string>& hw_accel,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc,
     bool disable_converter) {
   // 1. Checkc the source format, rate and resolution
   TORCH_CHECK(

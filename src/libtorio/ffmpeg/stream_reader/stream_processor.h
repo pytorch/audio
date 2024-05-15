@@ -66,8 +66,8 @@ class StreamProcessor {
 
   void set_decoder(
       const AVCodecParameters* codecpar,
-      const c10::optional<std::string>& decoder_name,
-      const c10::optional<OptionDict>& decoder_option,
+      const std::optional<std::string>& decoder_name,
+      const std::optional<OptionDict>& decoder_option,
       const torch::Device& device);
 
   //////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ class StreamProcessor {
   //////////////////////////////////////////////////////////////////////////////
  public:
   // Get the chunk from the given filter result
-  c10::optional<Chunk> pop_chunk(KeyType key);
+  std::optional<Chunk> pop_chunk(KeyType key);
 };
 
 } // namespace io
