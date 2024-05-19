@@ -34,8 +34,8 @@ void forced_align_impl(
   // S * (T-L), we will use a safety margin of (T-L) to avoid reallocation
   std::vector<bool> backPtrBit0((S + 1) * (T - L), false);
   std::vector<bool> backPtrBit1((S + 1) * (T - L), false);
-  unsigned int backPtr_offset[T - 1];
-  unsigned int backPtr_seek[T - 1];
+  unsigned long long backPtr_offset[T - 1];
+  unsigned long long backPtr_seek[T - 1];
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
   auto paths_a = paths.accessor<target_t, 2>();
@@ -60,7 +60,7 @@ void forced_align_impl(
     auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
     alphas_a[0][i] = logProbs_a[batchIndex][0][labelIdx];
   }
-  unsigned int seek = 0;
+  unsigned long long seek = 0;
   for (auto t = 1; t < T; t++) {
     if (T - t <= L + R) {
       if ((start % 2 == 1) &&
