@@ -2,6 +2,7 @@
 
 import math
 import warnings
+import numpy as np
 from typing import Callable, Optional, Sequence, Tuple, Union
 
 import torch
@@ -636,7 +637,7 @@ class VQT(torch.nn.Module):
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
-        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``)
+        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of VQT frequency bins, starting at ``f_min``. (Default: ``84``)
         gamma (float, optional): Offset that controls VQT filter lengths. Larger values 
             increase the time resolution at lower frequencies. (Default: ``0``)
@@ -647,7 +648,7 @@ class VQT(torch.nn.Module):
         >>> transform = transforms.VQT(sample_rate)
         >>> vqt_specgram = transform(waveform)  # (channel, n_bins, time)
     """
-    __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_mels", "f_min"]
+    __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave"]
 
     def __init__(
         self,
@@ -660,8 +661,20 @@ class VQT(torch.nn.Module):
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
-
-        pass
+        
+        self.n_bins = n_bins
+        self.bins_per_octave = bins_per_octave
+        self.f_min = f_min
+        
+        self.n_octaves = math.ceil(self.n_bins / self.bins_per_octave)
+        n_filters = min(self.bins_per_octave, self.n_bins)
+        
+        frequencies = self.get_frequencies()
+        
+    def get_frequencies(self) -> list[float]:
+        r"""Return a set of frequencies that assumes an equal temperament tuning system."""
+        ratios = 2.0 ** (np.arange(0, self.bins_per_octave * self.n_octaves) / self.bins_per_octave)
+        return self.f_min * ratios[:self.n_bins]
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
