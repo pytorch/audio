@@ -671,6 +671,12 @@ class VQT(torch.nn.Module):
         
         frequencies = self.get_frequencies()
         
+        if frequencies[-1] > sample_rate / 2:
+            raise ValueError(
+                f"Maximum bin center frequency is {frequencies[-1]} and superior to the Nyquist frequency {sample_rate/2}. "
+                "Try to reduce the number of frequency bins."
+            )
+        
     def get_frequencies(self) -> list[float]:
         r"""Return a set of frequencies that assumes an equal temperament tuning system."""
         ratios = 2.0 ** (np.arange(0, self.bins_per_octave * self.n_octaves) / self.bins_per_octave)
