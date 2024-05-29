@@ -24,7 +24,7 @@ StreamingMediaEncoder
 
 .. doxygenclass:: torio::io::StreamingMediaEncoder
 
-.. doxygenfunction:: torio::io::StreamingMediaEncoder::StreamingMediaEncoder(const std::string &dst, const c10::optional<std::string> &format = {})
+.. doxygenfunction:: torio::io::StreamingMediaEncoder::StreamingMediaEncoder(const std::string &dst, const std::optional<std::string> &format = {})
 
 StreamingMediaEncoderCustomIO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

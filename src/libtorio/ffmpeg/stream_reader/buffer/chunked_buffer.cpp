@@ -105,7 +105,7 @@ void ChunkedBuffer::push_frame(torch::Tensor frame, int64_t pts_) {
   }
 }
 
-c10::optional<Chunk> ChunkedBuffer::pop_chunk() {
+std::optional<Chunk> ChunkedBuffer::pop_chunk() {
   using namespace torch::indexing;
   if (!num_buffered_frames) {
     return {};

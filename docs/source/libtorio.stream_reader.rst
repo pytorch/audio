@@ -24,7 +24,7 @@ StreamingMediaDecoder
 
 .. doxygenclass:: torio::io::StreamingMediaDecoder
 
-.. doxygenfunction:: torio::io::StreamingMediaDecoder::StreamingMediaDecoder(const std::string &src, const c10::optional<std::string> &format = {}, const c10::optional<OptionDict> &option = {})
+.. doxygenfunction:: torio::io::StreamingMediaDecoder::StreamingMediaDecoder(const std::string &src, const std::optional<std::string> &format = {}, const c10::optional<OptionDict> &option = {})
 
 StreamingMediaDecoderCustomIO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -26,7 +26,7 @@ class EncodeProcess {
 
   EncodeProcess(EncodeProcess&&) noexcept = default;
 
-  void process(const torch::Tensor& tensor, const c10::optional<double>& pts);
+  void process(const torch::Tensor& tensor, const std::optional<double>& pts);
 
   void process_frame(AVFrame* src);
 
@@ -38,13 +38,13 @@ EncodeProcess get_audio_encode_process(
     int sample_rate,
     int num_channels,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<int>& encoder_sample_rate,
-    const c10::optional<int>& encoder_num_channels,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc,
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<int>& encoder_sample_rate,
+    const std::optional<int>& encoder_num_channels,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc,
     bool disable_converter = false);
 
 EncodeProcess get_video_encode_process(
@@ -53,15 +53,15 @@ EncodeProcess get_video_encode_process(
     int width,
     int height,
     const std::string& format,
-    const c10::optional<std::string>& encoder,
-    const c10::optional<OptionDict>& encoder_option,
-    const c10::optional<std::string>& encoder_format,
-    const c10::optional<double>& encoder_frame_rate,
-    const c10::optional<int>& encoder_width,
-    const c10::optional<int>& encoder_height,
-    const c10::optional<std::string>& hw_accel,
-    const c10::optional<CodecConfig>& codec_config,
-    const c10::optional<std::string>& filter_desc,
+    const std::optional<std::string>& encoder,
+    const std::optional<OptionDict>& encoder_option,
+    const std::optional<std::string>& encoder_format,
+    const std::optional<double>& encoder_frame_rate,
+    const std::optional<int>& encoder_width,
+    const std::optional<int>& encoder_height,
+    const std::optional<std::string>& hw_accel,
+    const std::optional<CodecConfig>& codec_config,
+    const std::optional<std::string>& filter_desc,
     bool disable_converter = false);
 
 }; // namespace torio::io
