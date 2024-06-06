@@ -673,14 +673,14 @@ class VQT(torch.nn.Module):
         
         self.frequencies = self.get_frequencies()
         
-        if self.frequencies[-1] > sample_rate / 2:
+        self.alpha = self.compute_alpha()
+        self.wav_lengths, cutoff_freq = self.wavelet_lengths()
+        
+        if cutoff_freq > sample_rate / 2:
             raise ValueError(
-                f"Maximum bin center frequency is {self.frequencies[-1]} and superior to the Nyquist frequency {sample_rate/2}. "
+                f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the Nyquist frequency {sample_rate/2}. "
                 "Try to reduce the number of frequency bins."
             )
-        
-        self.alpha = self.compute_alpha()
-        self.wav_lengths = self.wavelet_lengths()
         
     def get_frequencies(self) -> Tensor:
         r"""Return a set of frequencies that assumes an equal temperament tuning system."""
@@ -709,8 +709,19 @@ class VQT(torch.nn.Module):
         
         return alpha
     
-    def wavelet_lengths(self):
-        r"""Length of each filter in a wavelet basis."""
+    def wavelet_lengths(self, window_bandwidth: float = 1.50018310546875) -> Tuple[Tensor, float]:
+        r"""Length of each filter in a wavelet basis.
+        
+        Sources:
+            * https://librosa.org/doc/main/_modules/librosa/filters.html
+        
+        Args:
+            window_bandwifth (float, optional): Equivalent noise bandwidth (ENBW) of a window function. (Default: ``1.50018310546875``, or the Hann window value)
+            
+        Returns:
+            Tensor: filter lengths.
+            float: cutoff frequency of highest bin.
+        """
         if self.gamma is None:
             # Specify gamma_ as: gamma[k] = 24.7 * alpha[k] / 0.108 when not defined
             # From: Glasberg, Brian R., and Brian CJ Moore.
@@ -723,11 +734,13 @@ class VQT(torch.nn.Module):
         # We assume filter_scale (librosa param) is 1
         Q = 1. / self.alpha
         
+        # Output cutoff frequency
+        cutoff_freq = max(self.frequencies * (1 + 0.5 * window_bandwidth / Q) + 0.5 * gamma_)
+        
         # Convert frequencies to filter lengths
         lengths = Q * self.sample_rate / (self.frequencies + gamma_ / self.alpha)
         
-        return lengths
-
+        return lengths, cutoff_freq
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
