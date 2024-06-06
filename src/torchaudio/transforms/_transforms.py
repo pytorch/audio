@@ -656,7 +656,7 @@ class VQT(torch.nn.Module):
         hop_length: int = 400,
         f_min: float = 32.703,
         n_bins: int = 84,
-        gamma: float = 0.,
+        gamma: Optional[float] = None,
         bins_per_octave: int = 12,
     ) -> None:
         super(VQT, self).__init__()
@@ -665,22 +665,69 @@ class VQT(torch.nn.Module):
         self.n_bins = n_bins
         self.bins_per_octave = bins_per_octave
         self.f_min = f_min
+        self.gamma = gamma
+        self.sample_rate = sample_rate
         
         self.n_octaves = math.ceil(self.n_bins / self.bins_per_octave)
         n_filters = min(self.bins_per_octave, self.n_bins)
         
-        frequencies = self.get_frequencies()
+        self.frequencies = self.get_frequencies()
         
-        if frequencies[-1] > sample_rate / 2:
+        if self.frequencies[-1] > sample_rate / 2:
             raise ValueError(
-                f"Maximum bin center frequency is {frequencies[-1]} and superior to the Nyquist frequency {sample_rate/2}. "
+                f"Maximum bin center frequency is {self.frequencies[-1]} and superior to the Nyquist frequency {sample_rate/2}. "
                 "Try to reduce the number of frequency bins."
             )
         
-    def get_frequencies(self) -> list[float]:
+        self.alpha = self.compute_alpha()
+        self.wav_lengths = self.wavelet_lengths()
+        
+    def get_frequencies(self) -> Tensor:
         r"""Return a set of frequencies that assumes an equal temperament tuning system."""
-        ratios = 2.0 ** (np.arange(0, self.bins_per_octave * self.n_octaves) / self.bins_per_octave)
+        ratios = 2.0 ** (torch.arange(0, self.bins_per_octave * self.n_octaves, dtype=float) / self.bins_per_octave)
         return self.f_min * ratios[:self.n_bins]
+    
+    def compute_alpha(self) -> Tensor:
+        r"""Compute relative bandwidths for specified frequencies."""
+        if self.n_bins > 1:
+            # Approximate local octave resolution around each frequency
+            bandpass_octave = torch.empty_like(self.frequencies)
+            log_frequencies = torch.log2(self.frequencies)
+            
+            # Reflect at the lowest and highest frequencies
+            bandpass_octave[0] = 1 / (log_frequencies[1] - log_frequencies[0])
+            bandpass_octave[-1] = 1 / (log_frequencies[-1] - log_frequencies[-2])
+            
+            # Centered difference
+            bandpass_octave[1:-1] = 2 / (log_frequencies[2:] - log_frequencies[:-2])
+            
+            alpha = (2. ** (2 / bandpass_octave) - 1) / (2. ** (2 / bandpass_octave) + 1)
+        else:
+            # Special case when single basis frequency is used
+            rel_band_coeff = 2. ** (1. / self.bins_per_octave)
+            alpha = torch.atleast_1d((rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1))
+        
+        return alpha
+    
+    def wavelet_lengths(self):
+        r"""Length of each filter in a wavelet basis."""
+        if self.gamma is None:
+            # Specify gamma_ as: gamma[k] = 24.7 * alpha[k] / 0.108 when not defined
+            # From: Glasberg, Brian R., and Brian CJ Moore.
+            #       "Derivation of auditory filter shapes from notched-noise data."
+            #       Hearing research 47.1-2 (1990): 103-138.
+            gamma_ = self.alpha * 24.7 / 0.108
+        else:
+            gamma_ = self.gamma
+        
+        # We assume filter_scale (librosa param) is 1
+        Q = 1. / self.alpha
+        
+        # Convert frequencies to filter lengths
+        lengths = Q * self.sample_rate / (self.frequencies + gamma_ / self.alpha)
+        
+        return lengths
+
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
