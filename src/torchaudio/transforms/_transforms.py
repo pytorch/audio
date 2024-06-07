@@ -656,9 +656,9 @@ class VQT(torch.nn.Module):
         hop_length: int = 400,
         f_min: float = 32.703,
         n_bins: int = 84,
-        gamma: Optional[float] = None,
+        gamma: float = 0.,
         bins_per_octave: int = 12,
-        window_bandwidth: float = 1.50018310546875,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
@@ -670,13 +670,16 @@ class VQT(torch.nn.Module):
         self.sample_rate = sample_rate
         self.hop_length = hop_length
         
+        # Function that creates new window function with length x
+        self.window_fn = lambda x: window_fn(x)
+        
         self.n_octaves = math.ceil(self.n_bins / self.bins_per_octave)
         self.n_filters = min(self.bins_per_octave, self.n_bins)
         
         self.frequencies = self.get_frequencies()
         
         self.alpha = self.compute_alpha()
-        self.wav_lengths, cutoff_freq = self.wavelet_lengths(window_bandwidth)
+        self.wav_lengths, cutoff_freq = self.wavelet_lengths(self.frequencies, self.sample_rate, self.alpha)
         nyquist = self.sample_rate / 2
         
         if cutoff_freq > nyquist:
@@ -727,38 +730,64 @@ class VQT(torch.nn.Module):
         
         return alpha
     
-    def wavelet_lengths(self, window_bandwidth: float) -> Tuple[Tensor, float]:
+    def wavelet_lengths(self, freqs, sr, alpha) -> Tuple[Tensor, float]:
         r"""Length of each filter in a wavelet basis.
         
         Sources:
             * https://librosa.org/doc/main/_modules/librosa/filters.html
-        
-        Args:
-            window_bandwidth (float, optional): Equivalent noise bandwidth (ENBW) of a window function. (Default: ``1.50018310546875``, or the Hann window value)
-            
+                    
         Returns:
             Tensor: filter lengths.
             float: cutoff frequency of highest bin.
         """
-        if self.gamma is None:
-            # Specify gamma_ as: gamma[k] = 24.7 * alpha[k] / 0.108 when not defined
-            # From: Glasberg, Brian R., and Brian CJ Moore.
-            #       "Derivation of auditory filter shapes from notched-noise data."
-            #       Hearing research 47.1-2 (1990): 103-138.
-            gamma_ = self.alpha * 24.7 / 0.108
-        else:
-            gamma_ = self.gamma
-        
         # We assume filter_scale (librosa param) is 1
-        Q = 1. / self.alpha
+        Q = 1. / alpha
         
-        # Output cutoff frequency
-        cutoff_freq = max(self.frequencies * (1 + 0.5 * window_bandwidth / Q) + 0.5 * gamma_)
+        # Output upper bound cutoff frequency
+        # 3.0 > all common window function bandwidths
+        # https://librosa.org/doc/main/_modules/librosa/filters.html
+        cutoff_freq = max(freqs * (1 + 0.5 * 3.0 / Q) + 0.5 * self.gamma)
         
         # Convert frequencies to filter lengths
-        lengths = Q * self.sample_rate / (self.frequencies + gamma_ / self.alpha)
+        lengths = Q * sr / (freqs + self.gamma / alpha)
         
         return lengths, cutoff_freq
+    
+    def wavelet(self, freqs: Tensor, sr: int, alpha: Tensor) -> Tuple[Tensor, Tensor]:
+        """Wavelet filterbank constructed from set of center frequencies."""
+        # First get filter lengths
+        lengths, _ = self.wavelet_lengths(freqs=freqs, sr=sr, alpha=alpha)
+        
+        # Next power of 2
+        pad_to_size = 1<<(int(max(lengths))-1).bit_length()
+        
+        filters = None
+        
+        for ilen, freq in zip(lengths, freqs):
+            # Build filter with length ceil(ilen)
+            t = torch.arange(-ilen // 2, ilen // 2, dtype=float) * 2 * torch.pi * freq / sr
+            sig = torch.cos(t) + 1j * torch.sin(t)
+            
+            # Multiply with window
+            sig_len = len(sig)
+            sig = sig * self.window_fn(sig_len)
+            
+            # L1 normalize
+            sig = torch.nn.functional.normalize(sig, p=1., dim=0)
+            
+            # Pad signal left and right to correct size
+            l_pad = math.ceil((pad_to_size - sig_len) / 2)
+            r_pad = math.floor((pad_to_size - sig_len) / 2)
+            sig = torch.nn.functional.pad(sig, (l_pad, r_pad), mode='constant', value=0.)
+            sig = sig.unsqueeze(0)
+            
+            if filters is None:
+                filters = sig
+            
+            else:
+                filters = torch.cat([filters, sig], dim=0)
+        
+        return filters, lengths
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -772,11 +801,21 @@ class VQT(torch.nn.Module):
         
         # Iterate down the octaves
         for oct_index in range(self.n_octaves - 1, -1, -1):
-            print(f"{temp_waveform.shape} -- {temp_sr} -- {temp_hop}")
             indices = slice(self.n_filters * oct_index, self.n_filters * (oct_index + 1))
             
             octave_freqs = self.frequencies[indices]
             octave_alphas = self.alpha[indices]
+            
+            basis, lengths = self.wavelet(octave_freqs, temp_sr, octave_alphas)
+            
+            # STFT matrix
+            D = torch.stft(
+                temp_waveform,
+                n_fft=512,
+                hop_length=self.hop_length,
+                pad_mode='constant',
+                return_complex=True,
+            )
             
             # Resampling
             if temp_hop % 2 == 0:
