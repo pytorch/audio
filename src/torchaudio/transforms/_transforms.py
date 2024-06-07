@@ -2,7 +2,6 @@
 
 import math
 import warnings
-import numpy as np
 from typing import Callable, Optional, Sequence, Tuple, Union
 
 import torch
@@ -669,15 +668,16 @@ class VQT(torch.nn.Module):
         self.f_min = f_min
         self.gamma = gamma
         self.sample_rate = sample_rate
+        self.hop_length = hop_length
         
         self.n_octaves = math.ceil(self.n_bins / self.bins_per_octave)
-        n_filters = min(self.bins_per_octave, self.n_bins)
+        self.n_filters = min(self.bins_per_octave, self.n_bins)
         
         self.frequencies = self.get_frequencies()
         
         self.alpha = self.compute_alpha()
         self.wav_lengths, cutoff_freq = self.wavelet_lengths(window_bandwidth)
-        nyquist = sample_rate / 2
+        nyquist = self.sample_rate / 2
         
         if cutoff_freq > nyquist:
             raise ValueError(
@@ -686,7 +686,7 @@ class VQT(torch.nn.Module):
             )
         
         # Number of zeros after first 1 in binary gives number of divisions by 2 before number becomes odd
-        num_hop_downsamples = len(str(bin(hop_length)).split('1')[-1])
+        num_hop_downsamples = len(str(bin(self.hop_length)).split('1')[-1])
         
         if num_hop_downsamples > self.n_octaves:
             warnings.warn(
@@ -768,7 +768,30 @@ class VQT(torch.nn.Module):
         Returns:
             Tensor: VQT spectrogram of size (..., ``n_bins``, time).
         """
-        pass
+        temp_waveform, temp_sr, temp_hop = waveform, self.sample_rate, self.hop_length
+        
+        # Iterate down the octaves
+        for oct_index in range(self.n_octaves - 1, -1, -1):
+            print(f"{temp_waveform.shape} -- {temp_sr} -- {temp_hop}")
+            indices = slice(self.n_filters * oct_index, self.n_filters * (oct_index + 1))
+            
+            octave_freqs = self.frequencies[indices]
+            octave_alphas = self.alpha[indices]
+            
+            # Resampling
+            if temp_hop % 2 == 0:
+                temp_waveform = torch.nn.functional.avg_pool1d(
+                    temp_waveform,
+                    kernel_size=2,
+                    stride=2,
+                    ceil_mode=True,
+                    # padding=0,
+                    count_include_pad=False,  ## Prevents edge effects
+                )
+                temp_sr //= 2.
+                temp_hop //= 2
+        
+        return
 
 
 class MFCC(torch.nn.Module):
