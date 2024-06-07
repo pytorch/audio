@@ -642,6 +642,7 @@ class VQT(torch.nn.Module):
         gamma (float, optional): Offset that controls VQT filter lengths. Larger values 
             increase the time resolution at lower frequencies. (Default: ``0``)
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
+        window_bandwidth (float, optional): Equivalent noise bandwidth (ENBW) of a window function. (Default: ``1.50018310546875``, or the Hann window value)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -658,6 +659,7 @@ class VQT(torch.nn.Module):
         n_bins: int = 84,
         gamma: Optional[float] = None,
         bins_per_octave: int = 12,
+        window_bandwidth: float = 1.50018310546875,
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
@@ -674,12 +676,28 @@ class VQT(torch.nn.Module):
         self.frequencies = self.get_frequencies()
         
         self.alpha = self.compute_alpha()
-        self.wav_lengths, cutoff_freq = self.wavelet_lengths()
+        self.wav_lengths, cutoff_freq = self.wavelet_lengths(window_bandwidth)
+        nyquist = sample_rate / 2
         
-        if cutoff_freq > sample_rate / 2:
+        if cutoff_freq > nyquist:
             raise ValueError(
-                f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the Nyquist frequency {sample_rate/2}. "
+                f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the Nyquist frequency {nyquist}. "
                 "Try to reduce the number of frequency bins."
+            )
+        
+        # Number of zeros after first 1 in binary gives number of divisions by 2 before number becomes odd
+        num_hop_downsamples = len(str(bin(hop_length)).split('1')[-1])
+        
+        if num_hop_downsamples > self.n_octaves:
+            warnings.warn(
+                f"Hop length can be divided {num_hop_downsamples} times by 2 before becoming odd. "
+                f"The VQT is however being computed for {self.n_octaves} octaves. Consider lowering the hop length or increasing the number of bins for more accurate results."
+            )
+        
+        if nyquist / cutoff_freq > 4:
+            warnings.warn(
+                f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's cutoff frequency {cutoff_freq}. "
+                "Consider resampling your signal to a lower sample rate or increasing the number of bins before VQT computation for more accurate results."
             )
         
     def get_frequencies(self) -> Tensor:
@@ -709,14 +727,14 @@ class VQT(torch.nn.Module):
         
         return alpha
     
-    def wavelet_lengths(self, window_bandwidth: float = 1.50018310546875) -> Tuple[Tensor, float]:
+    def wavelet_lengths(self, window_bandwidth: float) -> Tuple[Tensor, float]:
         r"""Length of each filter in a wavelet basis.
         
         Sources:
             * https://librosa.org/doc/main/_modules/librosa/filters.html
         
         Args:
-            window_bandwifth (float, optional): Equivalent noise bandwidth (ENBW) of a window function. (Default: ``1.50018310546875``, or the Hann window value)
+            window_bandwidth (float, optional): Equivalent noise bandwidth (ENBW) of a window function. (Default: ``1.50018310546875``, or the Hann window value)
             
         Returns:
             Tensor: filter lengths.
