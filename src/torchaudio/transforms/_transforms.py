@@ -643,7 +643,6 @@ class VQT(torch.nn.Module):
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        sparsity_quantile (float, optional): Quantile under which wavelet filter basis magnitudes are zeroed. (Default: ``0.01``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
@@ -661,7 +660,6 @@ class VQT(torch.nn.Module):
         gamma: float = 0.,
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
-        sparsity_quantile: float = 0.01,
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
@@ -672,7 +670,6 @@ class VQT(torch.nn.Module):
         self.gamma = gamma
         self.sample_rate = sample_rate
         self.hop_length = hop_length
-        self.sparsity_quantile = sparsity_quantile
         
         # Function that creates new window function with length x
         self.window_fn = lambda x: window_fn(x)
@@ -793,13 +790,6 @@ class VQT(torch.nn.Module):
                 filters = torch.cat([filters, sig], dim=0)
         
         return filters, lengths
-    
-    def sparsify_basis(self, basis: Tensor) -> Tensor:
-        """Set basis magnitudes under sparsity quantile to zero."""
-        magnitudes = torch.abs(basis)
-        mag_sums = magnitudes.sum(dim=-1, keepdim=True)
-        zeroed_values = torch.ge(magnitudes, mag_sums * self.sparsity_quantile)
-        return basis * zeroed_values
 
     def forward(self, waveform: Tensor) -> Optional[Tensor]:
         r"""
@@ -826,14 +816,13 @@ class VQT(torch.nn.Module):
             factors = lengths.unsqueeze(1) / float(n_fft)
             basis *= factors
             fft_basis = torch.fft.fft(basis, n=n_fft, dim=1)[:, :(n_fft//2) + 1]
-            fft_basis = self.sparsify_basis(fft_basis)
             fft_basis[:] *= math.sqrt(self.sample_rate / temp_sr)
             
             # STFT matrix
             dft = torch.stft(
                 temp_waveform,
                 n_fft=n_fft,
-                window=self.window_fn(n_fft),
+                window=torch.ones(n_fft),
                 hop_length=temp_hop,
                 pad_mode='constant',
                 return_complex=True,
