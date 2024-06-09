@@ -643,13 +643,15 @@ class VQT(torch.nn.Module):
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        resampling_method (str, optional): The resampling method to use.
+            Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.VQT(sample_rate)
         >>> vqt = transform(waveform)  # (channel, n_bins, time)
     """
-    __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave", "window_fn"]
+    __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave", "window_fn", "resampling_method"]
 
     def __init__(
         self,
@@ -660,6 +662,7 @@ class VQT(torch.nn.Module):
         gamma: float = 0.,
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
+        resampling_method: str = "sinc_interp_hann",
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
@@ -703,6 +706,8 @@ class VQT(torch.nn.Module):
                 f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's cutoff frequency {cutoff_freq}. "
                 "Consider resampling your signal to a lower sample rate or increasing the number of bins before VQT computation for more accurate results."
             )
+        
+        self.resample = Resample(2, 1, resampling_method)
         
     def get_frequencies(self) -> Tensor:
         r"""Return a set of frequencies that assumes an equal temperament tuning system."""
@@ -838,15 +843,8 @@ class VQT(torch.nn.Module):
             
             # Resampling
             if temp_hop % 2 == 0:
-                temp_waveform = torch.nn.functional.avg_pool1d(
-                    temp_waveform,
-                    kernel_size=2,
-                    stride=2,
-                    ceil_mode=True,
-                    # padding=0,
-                    count_include_pad=False,  ## Prevents edge effects
-                )
-                temp_sr //= 2.
+                temp_waveform = self.resample(temp_waveform)
+                temp_sr /= 2.
                 temp_hop //= 2
         
         # Scale VQT by square-root of the length of each channel's filter
