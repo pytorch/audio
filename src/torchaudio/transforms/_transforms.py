@@ -829,7 +829,7 @@ class VQT(torch.nn.Module):
             )
             
             # Compute octave vqt
-            temp_vqt = torch.matmul(fft_basis.unsqueeze(0), dft)
+            temp_vqt = torch.einsum('ij,...jk->...ik', fft_basis, dft)
             
             if vqt is None:
                 vqt = temp_vqt
