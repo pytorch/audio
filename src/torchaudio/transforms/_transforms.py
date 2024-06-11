@@ -639,7 +639,7 @@ class VQT(torch.nn.Module):
         f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of VQT frequency bins, starting at ``f_min``. (Default: ``84``)
         gamma (float, optional): Offset that controls VQT filter lengths. Larger values 
-            increase the time resolution at lower frequencies. (Default: ``0``)
+            increase the time resolution at lower frequencies. (Default: ``0.``)
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
@@ -649,7 +649,7 @@ class VQT(torch.nn.Module):
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.VQT(sample_rate)
-        >>> vqt = transform(waveform)  # (channel, n_bins, time)
+        >>> vqt = transform(waveform)  # (..., n_bins, time)
     """
     __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave", "window_fn", "resampling_method"]
 
@@ -667,24 +667,14 @@ class VQT(torch.nn.Module):
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
         
-        self.n_bins = n_bins
-        self.bins_per_octave = bins_per_octave
-        self.f_min = f_min
-        self.gamma = gamma
-        self.sample_rate = sample_rate
-        self.hop_length = hop_length
+        n_octaves = math.ceil(n_bins / bins_per_octave)
+        n_filters = min(bins_per_octave, n_bins)
         
-        # Function that creates new window function with length x
-        self.window_fn = lambda x: window_fn(x)
+        frequencies = self.get_frequencies(bins_per_octave, n_octaves, f_min, n_bins)
         
-        self.n_octaves = math.ceil(self.n_bins / self.bins_per_octave)
-        self.n_filters = min(self.bins_per_octave, self.n_bins)
-        
-        self.frequencies = self.get_frequencies()
-        
-        self.alpha = self.compute_alpha()
-        self.wav_lengths, cutoff_freq = self.wavelet_lengths(self.frequencies, self.sample_rate, self.alpha)
-        nyquist = self.sample_rate / 2
+        alpha = self.compute_alpha(frequencies, bins_per_octave, n_bins)
+        wav_lengths, cutoff_freq = self.wavelet_lengths(frequencies, sample_rate, alpha, gamma)
+        nyquist = sample_rate / 2
         
         if cutoff_freq > nyquist:
             raise ValueError(
@@ -693,12 +683,12 @@ class VQT(torch.nn.Module):
             )
         
         # Number of zeros after first 1 in binary gives number of divisions by 2 before number becomes odd
-        num_hop_downsamples = len(str(bin(self.hop_length)).split('1')[-1])
+        num_hop_downsamples = len(str(bin(hop_length)).split('1')[-1])
         
-        if num_hop_downsamples > self.n_octaves:
+        if num_hop_downsamples > n_octaves:
             warnings.warn(
                 f"Hop length can be divided {num_hop_downsamples} times by 2 before becoming odd. "
-                f"The VQT is however being computed for {self.n_octaves} octaves. Consider lowering the hop length or increasing the number of bins for more accurate results."
+                f"The VQT is however being computed for {n_octaves} octaves. Consider lowering the hop length or increasing the number of bins for more accurate results."
             )
         
         if nyquist / cutoff_freq > 4:
@@ -709,34 +699,66 @@ class VQT(torch.nn.Module):
         
         self.resample = Resample(2, 1, resampling_method)
         
-    def get_frequencies(self) -> Tensor:
+        # Pre-compute wavelet filter bases
+        self.forward_params = []
+        temp_sr, temp_hop = sample_rate, hop_length
+        register_index = 0
+        
+        for oct_index in range(n_octaves - 1, -1, -1):
+            indices = slice(n_filters * oct_index, n_filters * (oct_index + 1))
+            
+            octave_freqs = frequencies[indices]
+            octave_alphas = alpha[indices]
+            
+            basis, lengths = self.wavelet(octave_freqs, temp_sr, octave_alphas, gamma, window_fn)
+            n_fft = basis.shape[1]
+            
+            factors = lengths.unsqueeze(1) / float(n_fft)
+            basis *= factors
+            
+            fft_basis = torch.fft.fft(basis, n=n_fft, dim=1)[:, :(n_fft//2) + 1]
+            fft_basis[:] *= math.sqrt(sample_rate / temp_sr)
+            
+            self.register_buffer(f"fft_basis_{register_index}", fft_basis)
+            self.forward_params.append((temp_hop, n_fft))
+            
+            register_index += 1
+            
+            if temp_hop % 2 == 0:
+                temp_sr /= 2.
+                temp_hop //= 2
+        
+        self.register_buffer("expanded_lengths", wav_lengths.unsqueeze(0).unsqueeze(-1))
+        self.ones = lambda x: torch.ones(x, device=self.expanded_lengths.device)
+        
+    def get_frequencies(self, bins_per_octave: int, n_octaves: int, f_min: float, n_bins: int) -> Tensor:
         r"""Return a set of frequencies that assumes an equal temperament tuning system."""
-        ratios = 2.0 ** (torch.arange(0, self.bins_per_octave * self.n_octaves, dtype=float) / self.bins_per_octave)
-        return self.f_min * ratios[:self.n_bins]
+        ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=float) / bins_per_octave)
+        return f_min * ratios[:n_bins]
     
-    def compute_alpha(self) -> Tensor:
+    def compute_alpha(self, freqs: Tensor, bins_per_octave: int, n_bins: int) -> Tensor:
         r"""Compute relative bandwidths for specified frequencies."""
-        if self.n_bins > 1:
+        if n_bins > 1:
             # Approximate local octave resolution around each frequency
-            bandpass_octave = torch.empty_like(self.frequencies)
-            log_frequencies = torch.log2(self.frequencies)
+            bandpass_octave = torch.empty_like(freqs)
+            log_freqs = torch.log2(freqs)
             
             # Reflect at the lowest and highest frequencies
-            bandpass_octave[0] = 1 / (log_frequencies[1] - log_frequencies[0])
-            bandpass_octave[-1] = 1 / (log_frequencies[-1] - log_frequencies[-2])
+            bandpass_octave[0] = 1 / (log_freqs[1] - log_freqs[0])
+            bandpass_octave[-1] = 1 / (log_freqs[-1] - log_freqs[-2])
             
             # Centered difference
-            bandpass_octave[1:-1] = 2 / (log_frequencies[2:] - log_frequencies[:-2])
+            bandpass_octave[1:-1] = 2 / (log_freqs[2:] - log_freqs[:-2])
             
             alpha = (2. ** (2 / bandpass_octave) - 1) / (2. ** (2 / bandpass_octave) + 1)
         else:
             # Special case when single basis frequency is used
-            rel_band_coeff = 2. ** (1. / self.bins_per_octave)
+            rel_band_coeff = 2. ** (1. / bins_per_octave)
             alpha = torch.atleast_1d((rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1))
         
         return alpha
     
-    def wavelet_lengths(self, freqs, sr, alpha) -> Tuple[Tensor, float]:
+    def wavelet_lengths(self, freqs: Tensor, sr: int, alpha: Tensor, gamma: float) -> Tuple[Tensor, float]:
         r"""Length of each filter in a wavelet basis.
         
         Sources:
@@ -752,17 +774,17 @@ class VQT(torch.nn.Module):
         # Output upper bound cutoff frequency
         # 3.0 > all common window function bandwidths
         # https://librosa.org/doc/main/_modules/librosa/filters.html
-        cutoff_freq = max(freqs * (1 + 0.5 * 3.0 / Q) + 0.5 * self.gamma)
+        cutoff_freq = max(freqs * (1 + 0.5 * 3.0 / Q) + 0.5 * gamma)
         
         # Convert frequencies to filter lengths
-        lengths = Q * sr / (freqs + self.gamma / alpha)
+        lengths = Q * sr / (freqs + gamma / alpha)
         
         return lengths, cutoff_freq
     
-    def wavelet(self, freqs: Tensor, sr: int, alpha: Tensor) -> Tuple[Optional[Tensor], Tensor]:
+    def wavelet(self, freqs: Tensor, sr: int, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor]) -> Tuple[Optional[Tensor], Tensor]:
         """Wavelet filterbank constructed from set of center frequencies."""
         # First get filter lengths
-        lengths, _ = self.wavelet_lengths(freqs=freqs, sr=sr, alpha=alpha)
+        lengths, _ = self.wavelet_lengths(freqs=freqs, sr=sr, alpha=alpha, gamma=gamma)
         
         # Next power of 2
         pad_to_size = 1<<(int(max(lengths))-1).bit_length()
@@ -777,7 +799,7 @@ class VQT(torch.nn.Module):
             
             # Multiply with window
             sig_len = len(sig)
-            sig = sig * self.window_fn(sig_len)
+            sig = sig * window_fn(sig_len)
             
             # L1 normalize
             sig = torch.nn.functional.normalize(sig, p=1., dim=0)
@@ -804,37 +826,22 @@ class VQT(torch.nn.Module):
         Returns:
             Tensor: VQT spectrogram of size (..., ``n_bins``, time).
         """
-        temp_waveform, temp_sr, temp_hop = waveform, self.sample_rate, self.hop_length
         vqt = None
         
         # Iterate down the octaves
-        for oct_index in range(self.n_octaves - 1, -1, -1):
-            indices = slice(self.n_filters * oct_index, self.n_filters * (oct_index + 1))
-            
-            octave_freqs = self.frequencies[indices]
-            octave_alphas = self.alpha[indices]
-            
-            basis, lengths = self.wavelet(octave_freqs, temp_sr, octave_alphas)
-            n_fft = basis.shape[1]
-            
-            # Normalize wrt FFT window length and compute for basis
-            factors = lengths.unsqueeze(1) / float(n_fft)
-            basis *= factors
-            fft_basis = torch.fft.fft(basis, n=n_fft, dim=1)[:, :(n_fft//2) + 1]
-            fft_basis[:] *= math.sqrt(self.sample_rate / temp_sr)
-            
+        for register_index, (temp_hop, n_fft) in enumerate(self.forward_params):            
             # STFT matrix
             dft = torch.stft(
-                temp_waveform,
+                waveform,
                 n_fft=n_fft,
-                window=torch.ones(n_fft),
                 hop_length=temp_hop,
+                window=self.ones(n_fft),
                 pad_mode='constant',
                 return_complex=True,
             )
             
             # Compute octave vqt
-            temp_vqt = torch.einsum('ij,...jk->...ik', fft_basis, dft)
+            temp_vqt = torch.einsum('ij,...jk->...ik', getattr(self, f"fft_basis_{register_index}"), dft)
             
             if vqt is None:
                 vqt = temp_vqt
@@ -843,13 +850,10 @@ class VQT(torch.nn.Module):
             
             # Resampling
             if temp_hop % 2 == 0:
-                temp_waveform = self.resample(temp_waveform)
-                temp_sr /= 2.
-                temp_hop //= 2
+                waveform = self.resample(waveform)
         
         # Scale VQT by square-root of the length of each channel's filter
-        expanded_lengths = self.wav_lengths.unsqueeze(0).unsqueeze(-1)
-        vqt /= torch.sqrt(expanded_lengths)
+        vqt /= torch.sqrt(self.expanded_lengths)
         
         return vqt
 
