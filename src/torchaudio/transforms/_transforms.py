@@ -629,7 +629,7 @@ class VQT(torch.nn.Module):
     .. properties:: Autograd TorchScript
 
     Sources
-        * https://librosa.org/doc/main/_modules/librosa/core/constantq.html
+        * https://librosa.org/doc/main/generated/librosa.vqt.html
         * https://www.aes.org/e-lib/online/browse.cfm?elib=17112
         * https://newt.phys.unsw.edu.au/jw/notes.html
 
@@ -667,13 +667,18 @@ class VQT(torch.nn.Module):
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
         
-        n_octaves = math.ceil(n_bins / bins_per_octave)
         n_filters = min(bins_per_octave, n_bins)
+        frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave)
+        alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
+        freq_lengths, cutoff_freq = F.wavelet_lengths(frequencies, sample_rate, alpha, gamma)
         
-        frequencies = self.get_frequencies(bins_per_octave, n_octaves, f_min, n_bins)
+        self.resample = Resample(2, 1, resampling_method)
+        self.register_buffer("expanded_lengths", freq_lengths.unsqueeze(0).unsqueeze(-1))
+        self.ones = lambda x: torch.ones(x, device=self.expanded_lengths.device)
         
-        alpha = self.compute_alpha(frequencies, bins_per_octave, n_bins)
-        wav_lengths, cutoff_freq = self.wavelet_lengths(frequencies, sample_rate, alpha, gamma)
+        # Generate errors or warnings if needed
+        # Number of divisions by 2 before number becomes odd
+        num_hop_downsamples = len(str(bin(hop_length)).split('1')[-1])
         nyquist = sample_rate / 2
         
         if cutoff_freq > nyquist:
@@ -681,41 +686,38 @@ class VQT(torch.nn.Module):
                 f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the Nyquist frequency {nyquist}. "
                 "Try to reduce the number of frequency bins."
             )
-        
-        # Number of zeros after first 1 in binary gives number of divisions by 2 before number becomes odd
-        num_hop_downsamples = len(str(bin(hop_length)).split('1')[-1])
-        
         if num_hop_downsamples > n_octaves:
             warnings.warn(
                 f"Hop length can be divided {num_hop_downsamples} times by 2 before becoming odd. "
                 f"The VQT is however being computed for {n_octaves} octaves. Consider lowering the hop length or increasing the number of bins for more accurate results."
             )
-        
         if nyquist / cutoff_freq > 4:
             warnings.warn(
                 f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's cutoff frequency {cutoff_freq}. "
                 "Consider resampling your signal to a lower sample rate or increasing the number of bins before VQT computation for more accurate results."
             )
         
-        self.resample = Resample(2, 1, resampling_method)
-        
-        # Pre-compute wavelet filter bases
+        # Now pre-compute what's needed for forward loop
         self.forward_params = []
         temp_sr, temp_hop = float(sample_rate), hop_length
         register_index = 0
         
         for oct_index in range(n_octaves - 1, -1, -1):
+            # Slice out correct octave
             indices = slice(n_filters * oct_index, n_filters * (oct_index + 1))
             
             octave_freqs = frequencies[indices]
             octave_alphas = alpha[indices]
             
-            basis, lengths = self.wavelet(octave_freqs, temp_sr, octave_alphas, gamma, window_fn)
+            # Compute wavelet filterbanks
+            basis, lengths = F.wavelet_fbank(octave_freqs, temp_sr, octave_alphas, gamma, window_fn)
             n_fft = basis.shape[1]
             
+            # Normalize wrt FFT window length
             factors = lengths.unsqueeze(1) / float(n_fft)
             basis *= factors
             
+            # Wavelet basis FFT
             fft_basis = torch.fft.fft(basis, n=n_fft, dim=1)[:, :(n_fft//2) + 1]
             fft_basis[:] *= math.sqrt(sample_rate / temp_sr)
             
@@ -727,95 +729,6 @@ class VQT(torch.nn.Module):
             if temp_hop % 2 == 0:
                 temp_sr /= 2.
                 temp_hop //= 2
-        
-        self.register_buffer("expanded_lengths", wav_lengths.unsqueeze(0).unsqueeze(-1))
-        self.ones = lambda x: torch.ones(x, device=self.expanded_lengths.device)
-        
-    def get_frequencies(self, bins_per_octave: int, n_octaves: int, f_min: float, n_bins: int) -> Tensor:
-        r"""Return a set of frequencies that assumes an equal temperament tuning system."""
-        ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=float) / bins_per_octave)
-        return f_min * ratios[:n_bins]
-    
-    def compute_alpha(self, freqs: Tensor, bins_per_octave: int, n_bins: int) -> Tensor:
-        r"""Compute relative bandwidths for specified frequencies."""
-        if n_bins > 1:
-            # Approximate local octave resolution around each frequency
-            bandpass_octave = torch.empty_like(freqs)
-            log_freqs = torch.log2(freqs)
-            
-            # Reflect at the lowest and highest frequencies
-            bandpass_octave[0] = 1 / (log_freqs[1] - log_freqs[0])
-            bandpass_octave[-1] = 1 / (log_freqs[-1] - log_freqs[-2])
-            
-            # Centered difference
-            bandpass_octave[1:-1] = 2 / (log_freqs[2:] - log_freqs[:-2])
-            
-            alpha = (2. ** (2 / bandpass_octave) - 1) / (2. ** (2 / bandpass_octave) + 1)
-        else:
-            # Special case when single basis frequency is used
-            rel_band_coeff = 2. ** (1. / bins_per_octave)
-            alpha = torch.atleast_1d((rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1))
-        
-        return alpha
-    
-    def wavelet_lengths(self, freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tuple[Tensor, float]:
-        r"""Length of each filter in a wavelet basis.
-        
-        Sources:
-            * https://librosa.org/doc/main/_modules/librosa/filters.html
-                    
-        Returns:
-            Tensor: filter lengths.
-            float: cutoff frequency of highest bin.
-        """
-        # We assume filter_scale (librosa param) is 1
-        Q = 1. / alpha
-        
-        # Output upper bound cutoff frequency
-        # 3.0 > all common window function bandwidths
-        # https://librosa.org/doc/main/_modules/librosa/filters.html
-        cutoff_freq = max(freqs * (1 + 0.5 * 3.0 / Q) + 0.5 * gamma)
-        
-        # Convert frequencies to filter lengths
-        lengths = Q * sr / (freqs + gamma / alpha)
-        
-        return lengths, cutoff_freq
-    
-    def wavelet(self, freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor]) -> Tuple[Tensor, Tensor]:
-        """Wavelet filterbank constructed from set of center frequencies."""
-        # First get filter lengths
-        lengths, _ = self.wavelet_lengths(freqs=freqs, sr=sr, alpha=alpha, gamma=gamma)
-        
-        # Next power of 2
-        pad_to_size = 1<<(int(max(lengths))-1).bit_length()
-        
-        filters: Tensor
-        
-        for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
-            # Build filter with length ceil(ilen)
-            # Use float32 in order to output complex(float) numbers later
-            t = torch.arange(-ilen // 2, ilen // 2, dtype=torch.float32) * 2 * torch.pi * freq / sr
-            sig = torch.cos(t) + 1j * torch.sin(t)
-            
-            # Multiply with window
-            sig_len = len(sig)
-            sig = sig * window_fn(sig_len)
-            
-            # L1 normalize
-            sig = torch.nn.functional.normalize(sig, p=1., dim=0)
-            
-            # Pad signal left and right to correct size
-            l_pad = math.floor((pad_to_size - sig_len) / 2)
-            r_pad = math.ceil((pad_to_size - sig_len) / 2)
-            sig = torch.nn.functional.pad(sig, (l_pad, r_pad), mode='constant', value=0.)
-            sig = sig.unsqueeze(0)
-            
-            if index == 0:
-                filters = sig
-            else:
-                filters = torch.cat([filters, sig], dim=0)
-        
-        return filters, lengths
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -823,10 +736,9 @@ class VQT(torch.nn.Module):
             waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            Tensor: VQT spectrogram of size (..., ``n_bins``, time).
+            Tensor: variable-Q transform of size (..., ``n_bins``, time).
         """
-        # Mypy type
-        vqt: torch.Tensor
+        vqt: Tensor
         
         # Iterate down the octaves
         for register_index, (temp_hop, n_fft) in enumerate(self.forward_params):            
@@ -866,7 +778,7 @@ class CQT(torch.nn.Module):
     .. properties:: Autograd TorchScript
 
     Sources
-        * https://librosa.org/doc/main/_modules/librosa/core/constantq.html
+        * https://librosa.org/doc/main/generated/librosa.cqt.html
         * https://www.aes.org/e-lib/online/browse.cfm?elib=17112
         * https://newt.phys.unsw.edu.au/jw/notes.html
 
@@ -919,7 +831,7 @@ class CQT(torch.nn.Module):
             waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            Tensor: CQT spectrogram of size (..., ``n_bins``, time).
+            Tensor: constant-Q transform spectrogram of size (..., ``n_bins``, time).
         """
         return self.transform(waveform)
 

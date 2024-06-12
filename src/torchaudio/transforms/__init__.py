@@ -4,6 +4,7 @@ from ._transforms import (
     AmplitudeToDB,
     ComputeDeltas,
     Convolve,
+    CQT,
     Deemphasis,
     Fade,
     FFTConvolve,
@@ -32,6 +33,7 @@ from ._transforms import (
     TimeStretch,
     Vad,
     Vol,
+    VQT,
 )
 
 
@@ -40,6 +42,7 @@ __all__ = [
     "AmplitudeToDB",
     "ComputeDeltas",
     "Convolve",
+    "CQT",
     "Deemphasis",
     "Fade",
     "FFTConvolve",
@@ -72,4 +75,5 @@ __all__ = [
     "TimeStretch",
     "Vad",
     "Vol",
+    "VQT",
 ]
