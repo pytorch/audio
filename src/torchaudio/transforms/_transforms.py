@@ -622,7 +622,7 @@ class MelSpectrogram(torch.nn.Module):
 
 
 class VQT(torch.nn.Module):
-    r"""Create variable Q-transform for a raw audio signal.
+    r"""Create the variable Q-transform for a raw audio signal.
 
     .. devices:: CPU CUDA
 
@@ -701,7 +701,7 @@ class VQT(torch.nn.Module):
         
         # Pre-compute wavelet filter bases
         self.forward_params = []
-        temp_sr, temp_hop = sample_rate, hop_length
+        temp_sr, temp_hop = float(sample_rate), hop_length
         register_index = 0
         
         for oct_index in range(n_octaves - 1, -1, -1):
@@ -758,7 +758,7 @@ class VQT(torch.nn.Module):
         
         return alpha
     
-    def wavelet_lengths(self, freqs: Tensor, sr: int, alpha: Tensor, gamma: float) -> Tuple[Tensor, float]:
+    def wavelet_lengths(self, freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tuple[Tensor, float]:
         r"""Length of each filter in a wavelet basis.
         
         Sources:
@@ -781,7 +781,7 @@ class VQT(torch.nn.Module):
         
         return lengths, cutoff_freq
     
-    def wavelet(self, freqs: Tensor, sr: int, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor]) -> Tuple[Optional[Tensor], Tensor]:
+    def wavelet(self, freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor]) -> Tuple[Tensor, Tensor]:
         """Wavelet filterbank constructed from set of center frequencies."""
         # First get filter lengths
         lengths, _ = self.wavelet_lengths(freqs=freqs, sr=sr, alpha=alpha, gamma=gamma)
@@ -789,9 +789,9 @@ class VQT(torch.nn.Module):
         # Next power of 2
         pad_to_size = 1<<(int(max(lengths))-1).bit_length()
         
-        filters = None
+        filters: Tensor
         
-        for ilen, freq in zip(lengths, freqs):
+        for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
             # Build filter with length ceil(ilen)
             # Use float32 in order to output complex(float) numbers later
             t = torch.arange(-ilen // 2, ilen // 2, dtype=torch.float32) * 2 * torch.pi * freq / sr
@@ -810,15 +810,14 @@ class VQT(torch.nn.Module):
             sig = torch.nn.functional.pad(sig, (l_pad, r_pad), mode='constant', value=0.)
             sig = sig.unsqueeze(0)
             
-            if filters is None:
+            if index == 0:
                 filters = sig
-            
             else:
                 filters = torch.cat([filters, sig], dim=0)
         
         return filters, lengths
 
-    def forward(self, waveform: Tensor) -> Optional[Tensor]:
+    def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
             waveform (Tensor): Tensor of audio of dimension (..., time).
@@ -826,7 +825,8 @@ class VQT(torch.nn.Module):
         Returns:
             Tensor: VQT spectrogram of size (..., ``n_bins``, time).
         """
-        vqt = None
+        # Mypy type
+        vqt: torch.Tensor
         
         # Iterate down the octaves
         for register_index, (temp_hop, n_fft) in enumerate(self.forward_params):            
@@ -843,7 +843,7 @@ class VQT(torch.nn.Module):
             # Compute octave vqt
             temp_vqt = torch.einsum('ij,...jk->...ik', getattr(self, f"fft_basis_{register_index}"), dft)
             
-            if vqt is None:
+            if register_index == 0:
                 vqt = temp_vqt
             else:
                 vqt = torch.cat([temp_vqt, vqt], dim=-2)
@@ -856,6 +856,72 @@ class VQT(torch.nn.Module):
         vqt /= torch.sqrt(self.expanded_lengths)
         
         return vqt
+
+
+class CQT(torch.nn.Module):
+    r"""Create the constant Q-transform for a raw audio signal.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Sources
+        * https://librosa.org/doc/main/_modules/librosa/core/constantq.html
+        * https://www.aes.org/e-lib/online/browse.cfm?elib=17112
+        * https://newt.phys.unsw.edu.au/jw/notes.html
+
+    Args:
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        hop_length (int, optional): Length of hop between CQT windows. (Default: ``400``)
+        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
+        n_bins (int, optional): Number of CQT frequency bins, starting at ``f_min``. (Default: ``84``)
+        bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        resampling_method (str, optional): The resampling method to use.
+            Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> transform = transforms.CQT(sample_rate)
+        >>> cqt = transform(waveform)  # (..., n_bins, time)
+    """
+    __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "bins_per_octave", "window_fn", "resampling_method"]
+
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        hop_length: int = 400,
+        f_min: float = 32.703,
+        n_bins: int = 84,
+        bins_per_octave: int = 12,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        resampling_method: str = "sinc_interp_hann",
+    ) -> None:
+        super(CQT, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.CQT")
+        
+        # CQT corresponds to a VQT with gamma set to 0
+        self.transform = VQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            gamma=0.,
+            bins_per_octave=bins_per_octave,
+            window_fn=window_fn,
+            resampling_method=resampling_method,
+        )
+    
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: CQT spectrogram of size (..., ``n_bins``, time).
+        """
+        return self.transform(waveform)
 
 
 class MFCC(torch.nn.Module):
