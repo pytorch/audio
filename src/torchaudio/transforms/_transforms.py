@@ -733,24 +733,46 @@ class VQT(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., channels, time).
+                2D or 3D; batch dimension is optional.
 
         Returns:
-            Tensor: variable-Q transform of size (..., ``n_bins``, time).
+            Tensor: variable-Q transform of size (..., channels, ``n_bins``, time).
         """
         vqt: Tensor
         
         # Iterate down the octaves
-        for register_index, (temp_hop, n_fft) in enumerate(self.forward_params):            
+        for register_index, (temp_hop, n_fft) in enumerate(self.forward_params):
             # STFT matrix
-            dft = torch.stft(
-                waveform,
-                n_fft=n_fft,
-                hop_length=temp_hop,
-                window=self.ones(n_fft),
-                pad_mode='constant',
-                return_complex=True,
-            )
+            if waveform.ndim == 3:
+                dft: Tensor
+                
+                # torch stft does not support 3D computation yet
+                # iterate through channels for stft computation
+                for channel in range(waveform.shape[1]):
+                    channel_dft = torch.stft(
+                        waveform[:, channel, :],
+                        n_fft=n_fft,
+                        hop_length=temp_hop,
+                        window=self.ones(n_fft),
+                        pad_mode='constant',
+                        return_complex=True,
+                    )
+                    
+                    if channel == 0:
+                        dft = channel_dft.unsqueeze(1)
+                    else:
+                        dft = torch.cat([dft, channel_dft.unsqueeze(1)], dim=1)
+            
+            else: 
+                dft = torch.stft(
+                    waveform,
+                    n_fft=n_fft,
+                    hop_length=temp_hop,
+                    window=self.ones(n_fft),
+                    pad_mode='constant',
+                    return_complex=True,
+                )
             
             # Compute octave vqt
             temp_vqt = torch.einsum('ij,...jk->...ik', getattr(self, f"fft_basis_{register_index}"), dft)
@@ -834,6 +856,57 @@ class CQT(torch.nn.Module):
             Tensor: constant-Q transform spectrogram of size (..., ``n_bins``, time).
         """
         return self.transform(waveform)
+    
+
+class InverseCQT(torch.nn.Module):
+    r"""Compute the inverse constant Q-transform.
+
+    .. devices:: CPU CUDA
+
+    .. properties:: Autograd TorchScript
+
+    Sources
+        * https://librosa.org/doc/main/generated/librosa.icqt.html
+        * https://www.aes.org/e-lib/online/browse.cfm?elib=17112
+        * https://newt.phys.unsw.edu.au/jw/notes.html
+
+    Args:
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
+        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
+        bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        resampling_method (str, optional): The resampling method to use.
+            Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
+
+    Example
+        >>> transform = transforms.InverseCQT()
+        >>> waveform = transform(cqt)  # (..., time)
+    """
+    __constants__ = ["sample_rate", "hop_length", "f_min", "bins_per_octave", "window_fn", "resampling_method"]
+
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        hop_length: int = 400,
+        f_min: float = 32.703,
+        bins_per_octave: int = 12,
+        window_fn: Callable[..., Tensor] = torch.hann_window,
+        resampling_method: str = "sinc_interp_hann",
+    ) -> None:
+        super(InverseCQT, self).__init__()
+        torch._C._log_api_usage_once("torchaudio.transforms.InverseCQT")
+
+    def forward(self, cqt: Tensor) -> Tensor:
+        r"""
+        Args:
+            cqt (Tensor): Constant-q trasnform tensor of dimension (..., ``n_bins``, time).
+
+        Returns:
+            Tensor: waveform of size (..., time).
+        """
+        pass
 
 
 class MFCC(torch.nn.Module):
