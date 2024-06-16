@@ -900,10 +900,11 @@ class InverseCQT(torch.nn.Module):
         super(InverseCQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.InverseCQT")
         
+        self.sample_rate = sample_rate
         n_filters = min(bins_per_octave, n_bins)
         frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave)
         alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
-        freq_lengths, _ = F.wavelet_lengths(frequencies, sample_rate, alpha, 0.)
+        freq_lengths, _ = F.wavelet_lengths(frequencies, self.sample_rate, alpha, 0.)
         
         self.resampling_method = resampling_method
         self.register_buffer("c_scale", torch.sqrt(freq_lengths))
@@ -911,7 +912,7 @@ class InverseCQT(torch.nn.Module):
         
         sample_rates = []
         hop_lengths = []
-        temp_sr, temp_hop = float(sample_rate), hop_length
+        temp_sr, temp_hop = float(self.sample_rate), hop_length
         
         for _ in range(n_octaves - 1, -1, -1):
             sample_rates.append(temp_sr)
@@ -964,7 +965,7 @@ class InverseCQT(torch.nn.Module):
         waveform: Tensor
         
         # Iterate down the octaves
-        for buffer_index, (sr, hop, indices) in enumerate(self.forward_params):
+        for buffer_index, (temp_sr, temp_hop, indices) in enumerate(self.forward_params):
             temp_proj = torch.einsum(
                 'fc,c,c,...ct->...ft',
                 getattr(self, f"basis_inverse_{buffer_index}"),
@@ -972,6 +973,24 @@ class InverseCQT(torch.nn.Module):
                 getattr(self, f"frequency_pow_{buffer_index}"),
                 cqt[..., indices, :],
             )
+            n_fft = 2 * (temp_proj.shape[-2] - 1)
+            temp_waveform = torch.istft(
+                temp_proj,
+                n_fft=n_fft,
+                hop_length=temp_hop,
+                window=self.ones(n_fft),
+            )
+            temp_waveform = F.resample(
+                temp_waveform,
+                orig_freq=1,
+                new_freq=self.sample_rate//temp_sr,
+                resampling_method=self.resampling_method,
+            )
+            
+            if buffer_index == 0:
+                waveform = temp_waveform
+            else:
+                waveform[..., :temp_waveform.shape[-1]] += temp_waveform
         
         return waveform
 
