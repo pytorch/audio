@@ -874,6 +874,7 @@ class InverseCQT(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
         f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
+        n_bins (int, optional): Number of CQT frequency bins, starting at ``f_min``. (Default: ``84``)
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
@@ -891,12 +892,55 @@ class InverseCQT(torch.nn.Module):
         sample_rate: int = 16000,
         hop_length: int = 400,
         f_min: float = 32.703,
+        n_bins: int = 84,
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
     ) -> None:
         super(InverseCQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.InverseCQT")
+        
+        n_filters = min(bins_per_octave, n_bins)
+        frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave)
+        alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
+        freq_lengths, cutoff_freq = F.wavelet_lengths(frequencies, sample_rate, alpha, 0.)
+        cqt_scale = torch.sqrt(freq_lengths)
+        
+        self.sample_rates = []
+        self.hop_lengths = []
+        temp_sr, temp_hop = float(sample_rate), hop_length
+        
+        for _ in range(n_octaves - 1, -1, -1):
+            self.sample_rates.append(temp_sr)
+            self.hop_lengths.append(temp_hop)
+            
+            if temp_hop % 2 == 0:
+                temp_sr /= 2.
+                temp_hop //= 2
+        
+        self.sample_rates.reverse()
+        self.hop_lengths.reverse()
+        
+        for oct_index, (temp_sr, temp_hop) in enumerate(zip(self.sample_rates, self.hop_lengths)):
+            # Slice out correct octave
+            indices = slice(n_filters * oct_index, n_filters * (oct_index + 1))
+            
+            octave_freqs = frequencies[indices]
+            octave_alphas = alpha[indices]
+            
+            # Compute wavelet filterbanks
+            basis, lengths = F.wavelet_fbank(octave_freqs, temp_sr, octave_alphas, 0., window_fn)
+            n_fft = basis.shape[1]
+            
+            # Normalize wrt FFT window length
+            factors = lengths.unsqueeze(1) / float(n_fft)
+            basis *= factors
+            
+            # Wavelet basis FFT
+            fft_basis = torch.fft.fft(basis, n=n_fft, dim=1)[:, :(n_fft//2) + 1]
+            
+            # Transpose basis
+            basis_inverse = fft_basis.H
 
     def forward(self, cqt: Tensor) -> Tensor:
         r"""
