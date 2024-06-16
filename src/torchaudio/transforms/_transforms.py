@@ -903,8 +903,11 @@ class InverseCQT(torch.nn.Module):
         n_filters = min(bins_per_octave, n_bins)
         frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave)
         alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
-        freq_lengths, cutoff_freq = F.wavelet_lengths(frequencies, sample_rate, alpha, 0.)
-        cqt_scale = torch.sqrt(freq_lengths)
+        freq_lengths, _ = F.wavelet_lengths(frequencies, sample_rate, alpha, 0.)
+        
+        self.resampling_method = resampling_method
+        self.register_buffer("c_scale", torch.sqrt(freq_lengths))
+        self.ones = lambda x: torch.ones(x, device=self.c_scale.device)
         
         self.sample_rates = []
         self.hop_lengths = []
@@ -941,6 +944,12 @@ class InverseCQT(torch.nn.Module):
             
             # Transpose basis
             basis_inverse = fft_basis.H
+            squared_mag = torch.abs(basis_inverse)**2
+            frequency_pow = 1 / squared_mag.sum(dim=0)
+            frequency_pow *= n_fft / freq_lengths[indices]
+            
+            self.register_buffer(f"basis_inverse_{oct_index}", basis_inverse)
+            self.register_buffer(f"frequency_pow_{oct_index}", frequency_pow)
 
     def forward(self, cqt: Tensor) -> Tensor:
         r"""
