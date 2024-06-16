@@ -850,10 +850,11 @@ class CQT(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., channels, time).
+                2D or 3D; batch dimension is optional.
 
         Returns:
-            Tensor: constant-Q transform spectrogram of size (..., ``n_bins``, time).
+            Tensor: constant-Q transform spectrogram of size (..., channels, ``n_bins``, time).
         """
         return self.transform(waveform)
     
@@ -910,6 +911,7 @@ class InverseCQT(torch.nn.Module):
         self.register_buffer("c_scale", torch.sqrt(freq_lengths))
         self.ones = lambda x: torch.ones(x, device=self.c_scale.device)
         
+        # Get sample rates and hop lengths used during CQT downsampling
         sample_rates = []
         hop_lengths = []
         temp_sr, temp_hop = float(self.sample_rate), hop_length
@@ -924,6 +926,8 @@ class InverseCQT(torch.nn.Module):
         
         sample_rates.reverse()
         hop_lengths.reverse()
+        
+        # Now pre-compute what's needed for forward loop
         self.forward_params = []
         
         for oct_index, (temp_sr, temp_hop) in enumerate(zip(sample_rates, hop_lengths)):
@@ -946,8 +950,12 @@ class InverseCQT(torch.nn.Module):
             
             # Transpose basis
             basis_inverse = fft_basis.H
+            
+            # Compute filter power spectrum
             squared_mag = torch.abs(basis_inverse)**2
             frequency_pow = 1 / squared_mag.sum(dim=0)
+            
+            # Adjust by normalizing with lengths
             frequency_pow *= n_fft / freq_lengths[indices]
             
             self.register_buffer(f"basis_inverse_{oct_index}", basis_inverse)
@@ -957,15 +965,17 @@ class InverseCQT(torch.nn.Module):
     def forward(self, cqt: Tensor) -> Tensor:
         r"""
         Args:
-            cqt (Tensor): Constant-q trasnform tensor of dimension (..., ``n_bins``, time).
+            cqt (Tensor): Constant-q transform tensor of dimension (..., channels, ``n_bins``, time).
+                3D or 4D; batch dimension is optional.
 
         Returns:
-            Tensor: waveform of size (..., time).
+            Tensor: waveform of size (..., channels, time).
         """
         waveform: Tensor
         
         # Iterate down the octaves
         for buffer_index, (temp_sr, temp_hop, indices) in enumerate(self.forward_params):
+            # Inverse project the basis
             temp_proj = torch.einsum(
                 'fc,c,c,...ct->...ft',
                 getattr(self, f"basis_inverse_{buffer_index}"),
@@ -973,13 +983,36 @@ class InverseCQT(torch.nn.Module):
                 getattr(self, f"frequency_pow_{buffer_index}"),
                 cqt[..., indices, :],
             )
+            # Taken from librosa
             n_fft = 2 * (temp_proj.shape[-2] - 1)
-            temp_waveform = torch.istft(
-                temp_proj,
-                n_fft=n_fft,
-                hop_length=temp_hop,
-                window=self.ones(n_fft),
-            )
+            
+            if temp_proj.ndim == 4:
+                temp_waveform: Tensor
+                
+                # torch istft does not support 4D computation yet
+                # iterate through channels for stft computation
+                for channel in range(temp_proj.shape[1]):
+                    channel_waveform = torch.istft(
+                        temp_proj[:, channel, :, :],
+                        n_fft=n_fft,
+                        hop_length=temp_hop,
+                        window=self.ones(n_fft),
+                    )
+                
+                    if channel == 0:
+                        temp_waveform = channel_waveform.unsqueeze(1)
+                    else:
+                        temp_waveform = torch.cat([temp_waveform, channel_waveform.unsqueeze(1)], dim=1)
+            
+            else:
+                temp_waveform = torch.istft(
+                    temp_proj,
+                    n_fft=n_fft,
+                    hop_length=temp_hop,
+                    window=self.ones(n_fft),
+                )
+            
+            # Resample to desired output shape
             temp_waveform = F.resample(
                 temp_waveform,
                 orig_freq=1,
