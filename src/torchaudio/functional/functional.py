@@ -2554,7 +2554,7 @@ def frequency_set(f_min: float, n_bins: int, bins_per_octave: int) -> Tuple[Tens
         int: number of octaves
     """
     n_octaves = math.ceil(n_bins / bins_per_octave)
-    ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=float) / bins_per_octave)
+    ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=torch.float32) / bins_per_octave)
     return f_min * ratios[:n_bins], n_octaves
 
 
