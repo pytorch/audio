@@ -742,7 +742,7 @@ class VQT(torch.nn.Module):
         vqt: Tensor
         
         # Iterate down the octaves
-        for register_index, (temp_hop, n_fft) in enumerate(self.forward_params):
+        for buffer_index, (temp_hop, n_fft) in enumerate(self.forward_params):
             # STFT matrix
             if waveform.ndim == 3:
                 dft: Tensor
@@ -775,9 +775,9 @@ class VQT(torch.nn.Module):
                 )
             
             # Compute octave vqt
-            temp_vqt = torch.einsum('ij,...jk->...ik', getattr(self, f"fft_basis_{register_index}"), dft)
+            temp_vqt = torch.einsum('ij,...jk->...ik', getattr(self, f"fft_basis_{buffer_index}"), dft)
             
-            if register_index == 0:
+            if buffer_index == 0:
                 vqt = temp_vqt
             else:
                 vqt = torch.cat([temp_vqt, vqt], dim=-2)
@@ -909,22 +909,23 @@ class InverseCQT(torch.nn.Module):
         self.register_buffer("c_scale", torch.sqrt(freq_lengths))
         self.ones = lambda x: torch.ones(x, device=self.c_scale.device)
         
-        self.sample_rates = []
-        self.hop_lengths = []
+        sample_rates = []
+        hop_lengths = []
         temp_sr, temp_hop = float(sample_rate), hop_length
         
         for _ in range(n_octaves - 1, -1, -1):
-            self.sample_rates.append(temp_sr)
-            self.hop_lengths.append(temp_hop)
+            sample_rates.append(temp_sr)
+            hop_lengths.append(temp_hop)
             
             if temp_hop % 2 == 0:
                 temp_sr /= 2.
                 temp_hop //= 2
         
-        self.sample_rates.reverse()
-        self.hop_lengths.reverse()
+        sample_rates.reverse()
+        hop_lengths.reverse()
+        self.forward_params = []
         
-        for oct_index, (temp_sr, temp_hop) in enumerate(zip(self.sample_rates, self.hop_lengths)):
+        for oct_index, (temp_sr, temp_hop) in enumerate(zip(sample_rates, hop_lengths)):
             # Slice out correct octave
             indices = slice(n_filters * oct_index, n_filters * (oct_index + 1))
             
@@ -950,6 +951,7 @@ class InverseCQT(torch.nn.Module):
             
             self.register_buffer(f"basis_inverse_{oct_index}", basis_inverse)
             self.register_buffer(f"frequency_pow_{oct_index}", frequency_pow)
+            self.forward_params.append((temp_sr, temp_hop, indices))
 
     def forward(self, cqt: Tensor) -> Tensor:
         r"""
@@ -959,7 +961,19 @@ class InverseCQT(torch.nn.Module):
         Returns:
             Tensor: waveform of size (..., time).
         """
-        pass
+        waveform: Tensor
+        
+        # Iterate down the octaves
+        for buffer_index, (sr, hop, indices) in enumerate(self.forward_params):
+            temp_proj = torch.einsum(
+                'fc,c,c,...ct->...ft',
+                getattr(self, f"basis_inverse_{buffer_index}"),
+                self.c_scale[indices],
+                getattr(self, f"frequency_pow_{buffer_index}"),
+                cqt[..., indices, :],
+            )
+        
+        return waveform
 
 
 class MFCC(torch.nn.Module):
