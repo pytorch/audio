@@ -2,6 +2,7 @@ import unittest
 from distutils.version import StrictVersion
 
 import torch
+import math
 import torchaudio.functional as F
 from parameterized import param
 from torchaudio._internal.module_utils import is_module_available
@@ -117,6 +118,94 @@ class Functional(TestBaseMixin):
         result = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
         expected = librosa.core.amplitude_to_db(spec[0].cpu().numpy())[None, ...]
         self.assertEqual(result, torch.from_numpy(expected))
+    
+    def test_frequency_set(self):
+        f_min = 32.703
+        n_bins = 84
+        bins_per_octave = 12
+        
+        actual_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave)
+        expected_freqs = librosa.interval_frequencies(
+            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
+        ).astype(np.float32)
+        
+        self.assertEqual(actual_freqs, torch.from_numpy(expected_freqs))
+    
+    def test_single_bin_relative_bandwidths(self):
+        f_min = 32.703
+        n_bins = 1
+        bins_per_octave = 12
+        
+        torch_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave)
+        
+        # Compute expected_alpha
+        # __et_relative_bw: from https://librosa.org/doc/main/_modules/librosa/core/constantq.html
+        r = 2 ** (1 / bins_per_octave)
+        expected_alpha = np.atleast_1d((r**2 - 1) / (r**2 + 1)).astype(np.float32)
+        actual_alpha = F.relative_bandwidths(torch_freqs, n_bins, bins_per_octave)
+        
+        self.assertEqual(actual_alpha, torch.from_numpy(expected_alpha))
+    
+    def test_multi_bin_relative_bandwidths(self):
+        f_min = 32.703
+        n_bins = 84
+        bins_per_octave = 12
+        
+        np_freqs = librosa.interval_frequencies(
+            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
+        ).astype(np.float32)
+        torch_freqs = torch.from_numpy(np_freqs)
+        
+        expected_alpha = librosa.filters._relative_bandwidth(freqs=np_freqs)
+        actual_alpha = F.relative_bandwidths(torch_freqs, n_bins, bins_per_octave)
+                
+        self.assertEqual(actual_alpha, torch.from_numpy(expected_alpha))
+    
+    def test_wavelet_lengths(self):
+        f_min = 32.703
+        n_bins = 84
+        bins_per_octave = 12
+        sample_rate = 16000
+        gamma = 0.
+        
+        np_freqs = librosa.interval_frequencies(
+            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
+        ).astype(np.float32)
+        np_alpha = librosa.filters._relative_bandwidth(freqs=np_freqs)
+        
+        torch_freqs = torch.from_numpy(np_freqs)
+        torch_alpha = torch.from_numpy(np_alpha)
+        
+        librosa_lengths, _ = librosa.filters.wavelet_lengths(
+            freqs=np_freqs, sr=sample_rate, window='hann', filter_scale=1, gamma=0, alpha=np_alpha
+        )
+        torch_lengths, _ = F.wavelet_lengths(torch_freqs, sample_rate, torch_alpha, gamma)
+        
+        self.assertEqual(torch_lengths, torch.from_numpy(librosa_lengths))
+    
+    def test_wavelet_fbank(self):
+        f_min = 32.703
+        n_bins = 84
+        bins_per_octave = 12
+        sample_rate = 16000
+        gamma = 0.
+        window_fn = torch.hann_window
+        
+        np_freqs = librosa.interval_frequencies(
+            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
+        ).astype(np.float32)
+        np_alpha = librosa.filters._relative_bandwidth(freqs=np_freqs)
+        
+        torch_freqs = torch.from_numpy(np_freqs)
+        torch_alpha = torch.from_numpy(np_alpha)
+        
+        librosa_filters, librosa_lengths = librosa.filters.wavelet(
+            freqs=np_freqs, sr=sample_rate, window='hann', filter_scale=1, pad_fft=True, gamma=gamma, alpha=np_alpha
+        )
+        torch_filters, torch_lengths = F.wavelet_fbank(torch_freqs, sample_rate, torch_alpha, gamma, window_fn)
+        
+        self.assertEqual(torch_filters, torch.from_numpy(librosa_filters))
+        self.assertEqual(torch_lengths, torch.from_numpy(librosa_lengths))
 
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
