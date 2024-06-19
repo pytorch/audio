@@ -34,8 +34,8 @@ void forced_align_impl(
   // S * (T-L), we will use a safety margin of (T-L) to avoid reallocation
   std::vector<bool> backPtrBit0((S + 1) * (T - L), false);
   std::vector<bool> backPtrBit1((S + 1) * (T - L), false);
-  unsigned long long backPtr_offset[T - 1];
-  unsigned long long backPtr_seek[T - 1];
+  std::vector<unsigned long long> backPtr_offset(T - 1);
+  std::vector<unsigned long long> backPtr_seek(T - 1);
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
   auto paths_a = paths.accessor<target_t, 2>();
@@ -129,8 +129,9 @@ void forced_align_impl(
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
     // Calculate backPtr value from bits
-    auto backPtr_idx = backPtr_seek[std::max(t - 1, static_cast<long int>(0))] +
-        ltrIdx - backPtr_offset[std::max(t - 1, static_cast<long int>(0))];
+    auto t_minus_one = t - 1 >= 0 ? t - 1 : 0;
+    auto backPtr_idx = backPtr_seek[t_minus_one] +
+                       ltrIdx - backPtr_offset[t_minus_one];
     ltrIdx -= (backPtrBit1[backPtr_idx] << 1) | backPtrBit0[backPtr_idx];
   }
 }
