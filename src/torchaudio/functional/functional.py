@@ -2542,6 +2542,8 @@ def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):
 def frequency_set(f_min: float, n_bins: int, bins_per_octave: int) -> Tuple[Tensor, int]:
     r"""Return a set of frequencies that assumes an equal temperament tuning system.
     
+    .. devices:: CPU
+    
     Adapted from librosa: https://librosa.org/doc/main/generated/librosa.interval_frequencies.html
     
     Args:
@@ -2553,6 +2555,9 @@ def frequency_set(f_min: float, n_bins: int, bins_per_octave: int) -> Tuple[Tens
         torch.Tensor: frequencies.
         int: number of octaves
     """
+    if f_min < 0. or n_bins < 1 or bins_per_octave < 1:
+        raise ValueError("f_min must be positive. n_bins and bins_per_octave must be ints and superior to 1.")
+    
     n_octaves = math.ceil(n_bins / bins_per_octave)
     ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=torch.float32) / bins_per_octave)
     return f_min * ratios[:n_bins], n_octaves
@@ -2560,6 +2565,8 @@ def frequency_set(f_min: float, n_bins: int, bins_per_octave: int) -> Tuple[Tens
 
 def relative_bandwidths(freqs: Tensor, n_bins: int, bins_per_octave: int) -> Tensor:
     r"""Compute relative bandwidths for specified frequencies.
+    
+    .. devices:: CPU
     
     Adapted from librosa: https://librosa.org/doc/main/generated/librosa.filters.wavelet_lengths.html
     
@@ -2571,6 +2578,9 @@ def relative_bandwidths(freqs: Tensor, n_bins: int, bins_per_octave: int) -> Ten
     Returns:
         torch.Tensor: relative bandwidths for set of frequencies.
     """
+    if min(freqs) < 0. or n_bins < 1 or bins_per_octave < 1:
+        raise ValueError("freqs must be positive. n_bins and bins_per_octave must be ints and superior to 1.")
+    
     if n_bins > 1:
         # Approximate local octave resolution around each frequency
         bandpass_octave = torch.empty_like(freqs)
@@ -2588,13 +2598,15 @@ def relative_bandwidths(freqs: Tensor, n_bins: int, bins_per_octave: int) -> Ten
     else:
         # Special case when single basis frequency is used
         rel_band_coeff = 2. ** (1. / bins_per_octave)
-        alpha = torch.atleast_1d((rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1))
+        alpha = torch.tensor([(rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1)])
     
     return alpha
 
 
 def wavelet_lengths(freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tuple[Tensor, float]:
     r"""Length of each filter in a wavelet basis.
+    
+    .. devices:: CPU
     
     Source:
         * https://librosa.org/doc/main/generated/librosa.filters.wavelet_lengths.html
@@ -2609,6 +2621,12 @@ def wavelet_lengths(freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tu
         Tensor: filter lengths.
         float: cutoff frequency of highest bin.
     """
+    if gamma < 0. or sr < 0.:
+        raise ValueError("gamma and sr must be positive!")
+
+    if min(freqs) < 0. or min(alpha) < 0.:
+        raise ValueError("freqs and alpha must be positive!")
+    
     # We assume filter_scale (librosa param) is 1
     Q = 1. / alpha
     
@@ -2625,6 +2643,8 @@ def wavelet_lengths(freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tu
 
 def wavelet_fbank(freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor]) -> Tuple[Tensor, Tensor]:
     r"""Wavelet filterbank constructed from set of center frequencies.
+    
+    .. devices:: CPU
     
     Source:
         * https://librosa.org/doc/main/generated/librosa.filters.wavelet.html
@@ -2645,9 +2665,7 @@ def wavelet_fbank(freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_
     
     # Next power of 2
     pad_to_size = 1<<(int(max(lengths))-1).bit_length()
-    
-    filters: Tensor
-    
+        
     for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
         # Build filter with length ceil(ilen)
         # Use float32 in order to output complex(float) numbers later
