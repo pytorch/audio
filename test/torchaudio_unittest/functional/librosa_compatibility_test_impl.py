@@ -138,7 +138,6 @@ class Functional(TestBaseMixin):
         
         torch_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave)
         
-        # Compute expected_alpha
         # __et_relative_bw: from https://librosa.org/doc/main/_modules/librosa/core/constantq.html
         r = 2 ** (1 / bins_per_octave)
         expected_alpha = np.atleast_1d((r**2 - 1) / (r**2 + 1)).astype(np.float32)
