@@ -105,6 +105,26 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         transform = T.MelSpectrogram()
 
         self.assert_batch_consistency(transform, waveform)
+    
+    def test_batch_vqt(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = waveform.reshape(3, 2, -1)
+        transform = T.VQT(sample_rate=8000, hop_length=200, n_bins=72)
+
+        self.assert_batch_consistency(transform, waveform)
+        
+    def test_batch_cqt(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
+        waveform = waveform.reshape(3, 2, -1)
+        transform = T.CQT(sample_rate=8000, hop_length=200, n_bins=72)
+
+        self.assert_batch_consistency(transform, waveform)
+    
+    def test_batch_inverse_cqt(self):
+        cqt = torch.randn(3, 2, 72, 41, dtype=torch.cdouble)
+        transform = T.InverseCQT(sample_rate=8000, hop_length=200, n_bins=72, dtype=torch.double)
+
+        self.assert_batch_consistency(transform, cqt)
 
     def test_batch_mfcc(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=6)
