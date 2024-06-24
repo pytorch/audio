@@ -30,7 +30,11 @@ class AutogradTestMixin(TestBaseMixin):
         nondet_tol: float = 0.0,
         enable_all_grad: bool = True,
     ):
-        transform = transform.to(dtype=torch.float64, device=self.device)
+        # VQT, CQT, and InverseCQT have complex register buffers
+        # dtype is defined upon object creation
+        if not isinstance(transform, (T.VQT, T.CQT, T.InverseCQT)):
+            transform = transform.to(dtype=torch.float64)
+        transform = transform.to(device=self.device)
 
         # gradcheck and gradgradcheck only pass if the input tensors are of dtype `torch.double` or
         # `torch.cdouble`, when the default eps and tolerance values are used.
@@ -91,6 +95,59 @@ class AutogradTestMixin(TestBaseMixin):
         transform = T.MelSpectrogram(sample_rate=sample_rate)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+    
+    def test_vqt(self):
+        sample_rate = 8000
+        hop_length=200
+        n_bins=72
+        gamma=3.
+        
+        transform = T.VQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            n_bins=n_bins,
+            gamma=gamma,
+            dtype=torch.double,
+        )
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+    
+    def test_cqt(self):
+        sample_rate = 8000
+        hop_length=200
+        n_bins=72
+        
+        transform = T.CQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            n_bins=n_bins,
+            dtype=torch.double,
+        )
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+    
+    def test_inverse_cqt(self):
+        sample_rate = 8000
+        hop_length=200
+        n_bins=72
+        
+        transform = T.CQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            n_bins=n_bins,
+            dtype=torch.double,
+        )
+        inverse_transform = T.InverseCQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            n_bins=n_bins,
+            dtype=torch.double,
+        )
+        waveform = get_whitenoise(
+            sample_rate=sample_rate, duration=0.05, n_channels=2, dtype=torch.double
+        )
+        cqt = transform(waveform)
+        self.assert_grad(inverse_transform, [cqt])
 
     @nested_params(
         [0, 0.99],
