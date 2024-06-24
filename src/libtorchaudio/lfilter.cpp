@@ -168,7 +168,7 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
       da = F::conv1d(
                dyda.view({1, n_batch * n_channel, -1}),
-               dy.view({n_batch * n_channel, 1, -1}),
+               dy.reshape({n_batch * n_channel, 1, -1}),
                F::Conv1dFuncOptions().groups(n_batch * n_channel))
                .view({n_batch, n_channel, -1})
                .sum(0)
