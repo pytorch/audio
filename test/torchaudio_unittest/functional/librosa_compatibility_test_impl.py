@@ -124,10 +124,15 @@ class Functional(TestBaseMixin):
         n_bins = 84
         bins_per_octave = 12
         
-        actual_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave)
+        actual_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave, dtype=torch.double)
         expected_freqs = librosa.interval_frequencies(
-            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
-        ).astype(np.float32)
+            n_bins=n_bins,
+            fmin=f_min,
+            intervals="equal",
+            bins_per_octave=bins_per_octave,
+            tuning=0.0,
+            sort=True,
+        )
         
         self.assertEqual(actual_freqs, torch.from_numpy(expected_freqs))
     
@@ -136,11 +141,11 @@ class Functional(TestBaseMixin):
         n_bins = 1
         bins_per_octave = 12
         
-        torch_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave)
+        torch_freqs, _ = F.frequency_set(f_min, n_bins, bins_per_octave, dtype=torch.double)
         
         # __et_relative_bw: from https://librosa.org/doc/main/_modules/librosa/core/constantq.html
         r = 2 ** (1 / bins_per_octave)
-        expected_alpha = np.atleast_1d((r**2 - 1) / (r**2 + 1)).astype(np.float32)
+        expected_alpha = np.atleast_1d((r**2 - 1) / (r**2 + 1))
         actual_alpha = F.relative_bandwidths(torch_freqs, n_bins, bins_per_octave)
         
         self.assertEqual(actual_alpha, torch.from_numpy(expected_alpha))
@@ -151,8 +156,13 @@ class Functional(TestBaseMixin):
         bins_per_octave = 12
         
         np_freqs = librosa.interval_frequencies(
-            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
-        ).astype(np.float32)
+            n_bins=n_bins,
+            fmin=f_min,
+            intervals="equal",
+            bins_per_octave=bins_per_octave,
+            tuning=0.0,
+            sort=True,
+        )
         torch_freqs = torch.from_numpy(np_freqs)
         
         expected_alpha = librosa.filters._relative_bandwidth(freqs=np_freqs)
@@ -168,15 +178,25 @@ class Functional(TestBaseMixin):
         gamma = 0.
         
         np_freqs = librosa.interval_frequencies(
-            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
-        ).astype(np.float32)
+            n_bins=n_bins,
+            fmin=f_min,
+            intervals="equal",
+            bins_per_octave=bins_per_octave,
+            tuning=0.0,
+            sort=True,
+        )
         np_alpha = librosa.filters._relative_bandwidth(freqs=np_freqs)
         
         torch_freqs = torch.from_numpy(np_freqs)
         torch_alpha = torch.from_numpy(np_alpha)
         
         librosa_lengths, _ = librosa.filters.wavelet_lengths(
-            freqs=np_freqs, sr=sample_rate, window='hann', filter_scale=1, gamma=0, alpha=np_alpha
+            freqs=np_freqs,
+            sr=sample_rate,
+            window='hann',
+            filter_scale=1,
+            gamma=0,
+            alpha=np_alpha,
         )
         torch_lengths, _ = F.wavelet_lengths(torch_freqs, sample_rate, torch_alpha, gamma)
         
@@ -191,17 +211,31 @@ class Functional(TestBaseMixin):
         window_fn = torch.hann_window
         
         np_freqs = librosa.interval_frequencies(
-            n_bins=n_bins, fmin=f_min, intervals="equal", bins_per_octave=bins_per_octave, tuning=0.0, sort=True
-        ).astype(np.float32)
+            n_bins=n_bins,
+            fmin=f_min,
+            intervals="equal",
+            bins_per_octave=bins_per_octave,
+            tuning=0.0,
+            sort=True,
+        )
         np_alpha = librosa.filters._relative_bandwidth(freqs=np_freqs)
         
         torch_freqs = torch.from_numpy(np_freqs)
         torch_alpha = torch.from_numpy(np_alpha)
         
         librosa_filters, librosa_lengths = librosa.filters.wavelet(
-            freqs=np_freqs, sr=sample_rate, window='hann', filter_scale=1, pad_fft=True, gamma=gamma, alpha=np_alpha
+            freqs=np_freqs,
+            sr=sample_rate,
+            window='hann',
+            filter_scale=1,
+            pad_fft=True,
+            gamma=gamma,
+            alpha=np_alpha,
+            dtype=np.complex128,
         )
-        torch_filters, torch_lengths = F.wavelet_fbank(torch_freqs, sample_rate, torch_alpha, gamma, window_fn)
+        torch_filters, torch_lengths = F.wavelet_fbank(
+            torch_freqs, sample_rate, torch_alpha, gamma, window_fn, dtype=torch.double
+        )
         
         self.assertEqual(torch_filters, torch.from_numpy(librosa_filters))
         self.assertEqual(torch_lengths, torch.from_numpy(librosa_lengths))
