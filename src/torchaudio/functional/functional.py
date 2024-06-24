@@ -2539,7 +2539,7 @@ def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):
     return a + b - 2 * c
 
 
-def frequency_set(f_min: float, n_bins: int, bins_per_octave: int) -> Tuple[Tensor, int]:
+def frequency_set(f_min: float, n_bins: int, bins_per_octave: int, dtype: torch.dtype) -> Tuple[Tensor, int]:
     r"""Return a set of frequencies that assumes an equal temperament tuning system.
     
     .. devices:: CPU
@@ -2559,7 +2559,7 @@ def frequency_set(f_min: float, n_bins: int, bins_per_octave: int) -> Tuple[Tens
         raise ValueError("f_min must be positive. n_bins and bins_per_octave must be ints and superior to 1.")
     
     n_octaves = math.ceil(n_bins / bins_per_octave)
-    ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=torch.float32) / bins_per_octave)
+    ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=dtype) / bins_per_octave)
     return f_min * ratios[:n_bins], n_octaves
 
 
@@ -2598,7 +2598,7 @@ def relative_bandwidths(freqs: Tensor, n_bins: int, bins_per_octave: int) -> Ten
     else:
         # Special case when single basis frequency is used
         rel_band_coeff = 2. ** (1. / bins_per_octave)
-        alpha = torch.tensor([(rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1)])
+        alpha = torch.tensor([(rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1)], dtype=freqs.dtype)
     
     return alpha
 
@@ -2641,7 +2641,9 @@ def wavelet_lengths(freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tu
     return lengths, cutoff_freq
 
 
-def wavelet_fbank(freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor]) -> Tuple[Tensor, Tensor]:
+def wavelet_fbank(
+    freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor], dtype: torch.dtype,
+) -> Tuple[Tensor, Tensor]:
     r"""Wavelet filterbank constructed from set of center frequencies.
     
     .. devices:: CPU
@@ -2669,7 +2671,7 @@ def wavelet_fbank(freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_
     for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
         # Build filter with length ceil(ilen)
         # Use float32 in order to output complex(float) numbers later
-        t = torch.arange(-ilen // 2, ilen // 2, dtype=torch.float32) * 2 * torch.pi * freq / sr
+        t = torch.arange(-ilen // 2, ilen // 2, dtype=dtype) * 2 * torch.pi * freq / sr
         sig = torch.cos(t) + 1j * torch.sin(t)
         
         # Multiply with window

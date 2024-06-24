@@ -636,7 +636,8 @@ class VQT(torch.nn.Module):
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
-        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
+        f_min (float, optional): Minimum frequency, which corresponds to first note. 
+            (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of VQT frequency bins, starting at ``f_min``. (Default: ``84``)
         gamma (float, optional): Offset that controls VQT filter lengths. Larger values 
             increase the time resolution at lower frequencies. (Default: ``0.``)
@@ -645,13 +646,19 @@ class VQT(torch.nn.Module):
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
+        dtype (torch.device, optional):
+            Determines the precision that kernels are pre-computed and cached in. Note that complex bases 
+            are either cfloat or cdouble depending on provided precision.
+            Options: [``torch.float``, ``torch.double``] (Default: ``torch.float``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.VQT(sample_rate)
         >>> vqt = transform(waveform)  # (..., n_bins, time)
     """
-    __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave", "window_fn", "resampling_method"]
+    __constants__ = [
+        "sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave", "window_fn", "resampling_method",
+    ]
 
     def __init__(
         self,
@@ -663,16 +670,17 @@ class VQT(torch.nn.Module):
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
+        dtype: Optional[torch.dtype] = torch.float,
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
         
         n_filters = min(bins_per_octave, n_bins)
-        frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave)
+        frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave, dtype)
         alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
         freq_lengths, cutoff_freq = F.wavelet_lengths(frequencies, sample_rate, alpha, gamma)
         
-        self.resample = Resample(2, 1, resampling_method)
+        self.resample = Resample(2, 1, resampling_method, dtype=dtype)
         self.register_buffer("expanded_lengths", freq_lengths.unsqueeze(0).unsqueeze(-1))
         self.ones = lambda x: torch.ones(x, device=self.expanded_lengths.device)
         
@@ -683,18 +691,20 @@ class VQT(torch.nn.Module):
         
         if cutoff_freq > nyquist:
             raise ValueError(
-                f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the Nyquist frequency {nyquist}. "
-                "Try to reduce the number of frequency bins."
+                f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the "
+                f"Nyquist frequency {nyquist}. Try to reduce the number of frequency bins."
             )
         if num_hop_downsamples > n_octaves:
             warnings.warn(
-                f"Hop length can be divided {num_hop_downsamples} times by 2 before becoming odd. "
-                f"The VQT is however being computed for {n_octaves} octaves. Consider lowering the hop length or increasing the number of bins for more accurate results."
+                f"Hop length can be divided {num_hop_downsamples} times by 2 before becoming "
+                f"odd. The VQT is however being computed for {n_octaves} octaves. Consider lowering "
+                "the hop length or increasing the number of bins for more accurate results."
             )
         if nyquist / cutoff_freq > 4:
             warnings.warn(
-                f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's cutoff frequency {cutoff_freq}. "
-                "Consider resampling your signal to a lower sample rate or increasing the number of bins before VQT computation for more accurate results."
+                f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's "
+                f"cutoff frequency {cutoff_freq}. Consider resampling your signal to a lower sample "
+                "rate or increasing the number of bins before VQT computation for more accurate results."
             )
         
         # Now pre-compute what's needed for forward loop
@@ -710,7 +720,7 @@ class VQT(torch.nn.Module):
             octave_alphas = alpha[indices]
             
             # Compute wavelet filterbanks
-            basis, lengths = F.wavelet_fbank(octave_freqs, temp_sr, octave_alphas, gamma, window_fn)
+            basis, lengths = F.wavelet_fbank(octave_freqs, temp_sr, octave_alphas, gamma, window_fn, dtype)
             n_fft = basis.shape[1]
             
             # Normalize wrt FFT window length
@@ -719,7 +729,7 @@ class VQT(torch.nn.Module):
             
             # Wavelet basis FFT
             fft_basis = torch.fft.fft(basis, n=n_fft, dim=1)[:, :(n_fft//2) + 1]
-            fft_basis[:] *= math.sqrt(sample_rate / temp_sr)
+            fft_basis *= math.sqrt(sample_rate / temp_sr)
             
             self.register_buffer(f"fft_basis_{register_index}", fft_basis)
             self.forward_params.append((temp_hop, n_fft))
@@ -739,14 +749,10 @@ class VQT(torch.nn.Module):
         Returns:
             Tensor: variable-Q transform of size (..., channels, ``n_bins``, time).
         """
-        vqt: Tensor
-        
         # Iterate down the octaves
         for buffer_index, (temp_hop, n_fft) in enumerate(self.forward_params):
             # STFT matrix
             if waveform.ndim == 3:
-                dft: Tensor
-                
                 # torch stft does not support 3D computation yet
                 # iterate through channels for stft computation
                 for channel in range(waveform.shape[1]):
@@ -807,20 +813,27 @@ class CQT(torch.nn.Module):
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         hop_length (int, optional): Length of hop between CQT windows. (Default: ``400``)
-        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
+        f_min (float, optional): Minimum frequency, which corresponds to first note.
+            (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of CQT frequency bins, starting at ``f_min``. (Default: ``84``)
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
+        dtype (torch.device, optional):
+            Determines the precision that kernels are pre-computed and cached in. Note that complex bases 
+            are either cfloat or cdouble depending on provided precision.
+            Options: [``torch.float``, ``torch.double``] (Default: ``torch.float``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> transform = transforms.CQT(sample_rate)
         >>> cqt = transform(waveform)  # (..., n_bins, time)
     """
-    __constants__ = ["sample_rate", "hop_length", "f_min", "n_bins", "bins_per_octave", "window_fn", "resampling_method"]
+    __constants__ = [
+        "sample_rate", "hop_length", "f_min", "n_bins", "bins_per_octave", "window_fn", "resampling_method",
+    ]
 
     def __init__(
         self,
@@ -831,6 +844,7 @@ class CQT(torch.nn.Module):
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
+        dtype: Optional[torch.dtype] = torch.float,
     ) -> None:
         super(CQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.CQT")
@@ -845,6 +859,7 @@ class CQT(torch.nn.Module):
             bins_per_octave=bins_per_octave,
             window_fn=window_fn,
             resampling_method=resampling_method,
+            dtype=dtype,
         )
     
     def forward(self, waveform: Tensor) -> Tensor:
@@ -874,19 +889,26 @@ class InverseCQT(torch.nn.Module):
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
-        f_min (float, optional): Minimum frequency, which corresponds to first note. (Default: ``32.703``, or the frequency of C1 in Hz)
+        f_min (float, optional): Minimum frequency, which corresponds to first note.
+            (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of CQT frequency bins, starting at ``f_min``. (Default: ``84``)
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
+        dtype (torch.device, optional):
+            Determines the precision that kernels are pre-computed and cached in. 
+            Note that complex bases are either cfloat or cdouble depending on provided precision.
+            Options: [``torch.float``, ``torch.double``] (Default: ``torch.float``)
 
     Example
         >>> transform = transforms.InverseCQT()
         >>> waveform = transform(cqt)  # (..., time)
     """
-    __constants__ = ["sample_rate", "hop_length", "f_min", "bins_per_octave", "window_fn", "resampling_method"]
+    __constants__ = [
+        "sample_rate", "hop_length", "f_min", "bins_per_octave", "window_fn", "resampling_method",
+    ]
 
     def __init__(
         self,
@@ -897,13 +919,14 @@ class InverseCQT(torch.nn.Module):
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
+        dtype: Optional[torch.dtype] = torch.float,
     ) -> None:
         super(InverseCQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.InverseCQT")
         
         self.sample_rate = sample_rate
         n_filters = min(bins_per_octave, n_bins)
-        frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave)
+        frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave, dtype=dtype)
         alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
         freq_lengths, _ = F.wavelet_lengths(frequencies, self.sample_rate, alpha, 0.)
         
@@ -938,7 +961,7 @@ class InverseCQT(torch.nn.Module):
             octave_alphas = alpha[indices]
             
             # Compute wavelet filterbanks
-            basis, lengths = F.wavelet_fbank(octave_freqs, temp_sr, octave_alphas, 0., window_fn)
+            basis, lengths = F.wavelet_fbank(octave_freqs, temp_sr, octave_alphas, 0., window_fn, dtype=dtype)
             n_fft = basis.shape[1]
             
             # Normalize wrt FFT window length
@@ -971,8 +994,6 @@ class InverseCQT(torch.nn.Module):
         Returns:
             Tensor: waveform of size (..., channels, time).
         """
-        waveform: Tensor
-        
         # Iterate down the octaves
         for buffer_index, (temp_sr, temp_hop, indices) in enumerate(self.forward_params):
             # Inverse project the basis
@@ -983,12 +1004,9 @@ class InverseCQT(torch.nn.Module):
                 getattr(self, f"frequency_pow_{buffer_index}"),
                 cqt[..., indices, :],
             )
-            # Taken from librosa
             n_fft = 2 * (temp_proj.shape[-2] - 1)
             
             if temp_proj.ndim == 4:
-                temp_waveform: Tensor
-                
                 # torch istft does not support 4D computation yet
                 # iterate through channels for stft computation
                 for channel in range(temp_proj.shape[1]):
@@ -1006,10 +1024,7 @@ class InverseCQT(torch.nn.Module):
             
             else:
                 temp_waveform = torch.istft(
-                    temp_proj,
-                    n_fft=n_fft,
-                    hop_length=temp_hop,
-                    window=self.ones(n_fft),
+                    temp_proj, n_fft=n_fft, hop_length=temp_hop, window=self.ones(n_fft),
                 )
             
             # Resample to desired output shape
