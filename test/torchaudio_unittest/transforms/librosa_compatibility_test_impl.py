@@ -93,44 +93,6 @@ class TransformsTestBase(TestBaseMixin):
         ).to(self.device, self.dtype)(waveform)[0]
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
     
-    @nested_params(
-        [
-            param(sample_rate=2000, hop_length=200, n_bins=36, bins_per_octave=12, gamma=2., atol=0.7, rtol=0.7),
-            param(sample_rate=2000, hop_length=200, n_bins=3, bins_per_octave=1, gamma=4., atol=0.7, rtol=0.7),
-            param(sample_rate=1000, hop_length=100, n_bins=16, bins_per_octave=8, gamma=6., atol=0.35, rtol=0.35),
-            param(sample_rate=500, hop_length=50, n_bins=4, bins_per_octave=4, gamma=8., atol=1e-7, rtol=1e-7),
-        ],
-    )
-    def test_VQT(self, sample_rate, hop_length, n_bins, bins_per_octave, gamma, atol, rtol):
-        """
-        Differences in resampling, which occurs n_bins/bins_per_octave - 1 times, between torch and librosa
-        lead to diverging VQTs. This is likely as close as it can get.
-        """
-        f_min = 32.703
-        waveform = get_whitenoise(sample_rate=sample_rate, dtype=self.dtype).to(self.device)
-
-        expected = librosa.core.constantq.vqt(
-            y=waveform[0].cpu().numpy(),
-            sr=sample_rate,
-            hop_length=hop_length,
-            fmin=f_min,
-            n_bins=n_bins,
-            gamma=gamma,
-            bins_per_octave=bins_per_octave,
-            sparsity=0.,                        # torchaudio VQT implemeted with sparsity 0
-            res_type="sinc_best",               # torchaudio resampling roughly equivalent to sinc_best
-        )
-        result = T.VQT(
-            sample_rate=sample_rate,
-            hop_length=hop_length,
-            f_min=f_min,
-            n_bins=n_bins,
-            gamma=gamma,
-            bins_per_octave=bins_per_octave,
-            dtype=self.dtype,
-        ).to(self.device)(waveform)[0]
-        self.assertEqual(result, torch.from_numpy(expected), atol=atol, rtol=rtol)
-
     def test_magnitude_to_db(self):
         spectrogram = get_spectrogram(get_whitenoise(), n_fft=400, power=2).to(self.device, self.dtype)
         result = T.AmplitudeToDB("magnitude", 80.0).to(self.device, self.dtype)(spectrogram)[0]
@@ -194,3 +156,77 @@ class TransformsTestBase(TestBaseMixin):
             y=waveform[0].cpu().numpy(), sr=sample_rate, n_fft=n_fft, hop_length=hop_length, pad_mode="reflect"
         )
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
+
+    @nested_params(
+        [
+            param(sample_rate=1000, hop_length=100, n_bins=36, bins_per_octave=12, gamma=2., atol=0.3, rtol=0.3),
+            param(sample_rate=1000, hop_length=100, n_bins=3, bins_per_octave=1, gamma=4., atol=0.3, rtol=0.3),
+            param(sample_rate=500, hop_length=50, n_bins=16, bins_per_octave=8, gamma=6., atol=0.2, rtol=0.2),
+            param(sample_rate=250, hop_length=25, n_bins=4, bins_per_octave=4, gamma=8., atol=1e-7, rtol=1e-7),
+        ],
+    )
+    def test_VQT(self, sample_rate, hop_length, n_bins, bins_per_octave, gamma, atol, rtol):
+        """
+        Differences in resampling, which occurs n_bins/bins_per_octave - 1 times, between torch and librosa
+        lead to diverging VQTs. This is likely as close as it can get.
+        """
+        f_min = 32.703
+        waveform = get_whitenoise(sample_rate=sample_rate, dtype=self.dtype).to(self.device)
+
+        expected = librosa.core.constantq.vqt(
+            y=waveform[0].cpu().numpy(),
+            sr=sample_rate,
+            hop_length=hop_length,
+            fmin=f_min,
+            n_bins=n_bins,
+            gamma=gamma,
+            bins_per_octave=bins_per_octave,
+            sparsity=0.,                        # torchaudio VQT implemeted with sparsity 0
+            res_type="sinc_best",               # torchaudio resampling roughly equivalent to sinc_best
+        )
+        result = T.VQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            gamma=gamma,
+            bins_per_octave=bins_per_octave,
+            dtype=self.dtype,
+        ).to(self.device)(waveform)[0]
+        self.assertEqual(result, torch.from_numpy(expected), atol=atol, rtol=rtol)
+    
+    @nested_params(
+        [
+            param(sample_rate=1000, hop_length=100, n_bins=36, bins_per_octave=12, atol=0.3, rtol=0.3),
+            param(sample_rate=1000, hop_length=100, n_bins=3, bins_per_octave=1, atol=0.3, rtol=0.3),
+            param(sample_rate=500, hop_length=50, n_bins=16, bins_per_octave=8, atol=0.2, rtol=0.2),
+            param(sample_rate=250, hop_length=25, n_bins=4, bins_per_octave=4, atol=1e-7, rtol=1e-7),
+        ],
+    )
+    def test_CQT(self, sample_rate, hop_length, n_bins, bins_per_octave, atol, rtol):
+        """
+        Differences in resampling, which occurs n_bins/bins_per_octave - 1 times, between torch and librosa
+        lead to diverging CQTs. This is likely as close as it can get.
+        """
+        f_min = 32.703
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=2, dtype=self.dtype).to(self.device)
+
+        expected = librosa.cqt(
+            y=waveform[0].cpu().numpy(),
+            sr=sample_rate,
+            hop_length=hop_length,
+            fmin=f_min,
+            n_bins=n_bins,
+            bins_per_octave=bins_per_octave,
+            sparsity=0.,                        # torchaudio CQT implemeted with sparsity 0
+            res_type="sinc_best",               # torchaudio resampling roughly equivalent to sinc_best
+        )
+        result = T.CQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            bins_per_octave=bins_per_octave,
+            dtype=self.dtype,
+        ).to(self.device)(waveform)[0]
+        self.assertEqual(result, torch.from_numpy(expected), atol=atol, rtol=rtol)
