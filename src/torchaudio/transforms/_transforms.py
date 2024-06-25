@@ -670,7 +670,7 @@ class VQT(torch.nn.Module):
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
-        dtype: Optional[torch.dtype] = torch.float,
+        dtype: torch.dtype = torch.float,
     ) -> None:
         super(VQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.VQT")
@@ -844,7 +844,7 @@ class CQT(torch.nn.Module):
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
-        dtype: Optional[torch.dtype] = torch.float,
+        dtype: torch.dtype = torch.float,
     ) -> None:
         super(CQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.CQT")
@@ -919,7 +919,7 @@ class InverseCQT(torch.nn.Module):
         bins_per_octave: int = 12,
         window_fn: Callable[..., Tensor] = torch.hann_window,
         resampling_method: str = "sinc_interp_hann",
-        dtype: Optional[torch.dtype] = torch.float,
+        dtype: torch.dtype = torch.float,
     ) -> None:
         super(InverseCQT, self).__init__()
         torch._C._log_api_usage_once("torchaudio.transforms.InverseCQT")
