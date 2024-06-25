@@ -160,7 +160,7 @@ class TransformsTestBase(TestBaseMixin):
     @nested_params(
         [
             param(sample_rate=1000, hop_length=100, n_bins=36, bins_per_octave=12, gamma=2., atol=0.3, rtol=0.3),
-            param(sample_rate=1000, hop_length=100, n_bins=3, bins_per_octave=1, gamma=4., atol=0.3, rtol=0.3),
+            param(sample_rate=1000, hop_length=10, n_bins=3, bins_per_octave=1, gamma=4., atol=0.2, rtol=0.2),
             param(sample_rate=500, hop_length=50, n_bins=16, bins_per_octave=8, gamma=6., atol=0.2, rtol=0.2),
             param(sample_rate=250, hop_length=25, n_bins=4, bins_per_octave=4, gamma=8., atol=1e-7, rtol=1e-7),
         ],
@@ -198,7 +198,7 @@ class TransformsTestBase(TestBaseMixin):
     @nested_params(
         [
             param(sample_rate=1000, hop_length=100, n_bins=36, bins_per_octave=12, atol=0.3, rtol=0.3),
-            param(sample_rate=1000, hop_length=100, n_bins=3, bins_per_octave=1, atol=0.3, rtol=0.3),
+            param(sample_rate=1000, hop_length=10, n_bins=3, bins_per_octave=1, atol=0.2, rtol=0.2),
             param(sample_rate=500, hop_length=50, n_bins=16, bins_per_octave=8, atol=0.2, rtol=0.2),
             param(sample_rate=250, hop_length=25, n_bins=4, bins_per_octave=4, atol=1e-7, rtol=1e-7),
         ],
@@ -229,4 +229,48 @@ class TransformsTestBase(TestBaseMixin):
             bins_per_octave=bins_per_octave,
             dtype=self.dtype,
         ).to(self.device)(waveform)[0]
+        self.assertEqual(result, torch.from_numpy(expected), atol=atol, rtol=rtol)
+    
+    @nested_params(
+        [
+            param(sample_rate=1000, hop_length=100, n_bins=36, bins_per_octave=12, atol=0.02, rtol=0.02),
+            param(sample_rate=1000, hop_length=10, n_bins=3, bins_per_octave=1, atol=0.01, rtol=0.01),
+            param(sample_rate=500, hop_length=50, n_bins=16, bins_per_octave=8, atol=0.01, rtol=0.01),
+            param(sample_rate=250, hop_length=25, n_bins=4, bins_per_octave=4, atol=1e-7, rtol=1e-7),
+        ],
+    )
+    def test_InverseCQT(self, sample_rate, hop_length, n_bins, bins_per_octave, atol, rtol):
+        """
+        Differences in resampling, which occurs n_bins/bins_per_octave - 1 times, between torch and librosa
+        lead to diverging CQTs. This is likely as close as it can get.
+        """
+        f_min = 32.703
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=4, dtype=self.dtype).to(self.device)
+        
+        cqt = T.CQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            bins_per_octave=bins_per_octave,
+            dtype=self.dtype,
+        ).to(self.device)(waveform)
+        
+        expected = librosa.core.icqt(
+            C=cqt[0].cpu().numpy(),
+            sr=sample_rate,
+            hop_length=hop_length,
+            fmin=f_min,
+            bins_per_octave=bins_per_octave,
+            sparsity=0.,                        # torchaudio iCQT implemeted with sparsity 0
+            res_type="sinc_best",               # torchaudio resampling roughly equivalent to sinc_best
+        )
+        result = T.InverseCQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            bins_per_octave=bins_per_octave,
+            dtype=self.dtype,
+        ).to(self.device)(cqt)[0]
         self.assertEqual(result, torch.from_numpy(expected), atol=atol, rtol=rtol)
