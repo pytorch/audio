@@ -242,7 +242,7 @@ class TransformsTestBase(TestBaseMixin):
     def test_InverseCQT(self, sample_rate, hop_length, n_bins, bins_per_octave, atol, rtol):
         """
         Differences in resampling, which occurs n_bins/bins_per_octave - 1 times, between torch and librosa
-        lead to diverging CQTs. This is likely as close as it can get.
+        lead to diverging iCQTs. This is likely as close as it can get.
         """
         f_min = 32.703
         waveform = get_whitenoise(sample_rate=sample_rate, duration=4, dtype=self.dtype).to(self.device)
