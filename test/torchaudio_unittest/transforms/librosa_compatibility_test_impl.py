@@ -92,7 +92,7 @@ class TransformsTestBase(TestBaseMixin):
             mel_scale=mel_scale,
         ).to(self.device, self.dtype)(waveform)[0]
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
-    
+
     def test_magnitude_to_db(self):
         spectrogram = get_spectrogram(get_whitenoise(), n_fft=400, power=2).to(self.device, self.dtype)
         result = T.AmplitudeToDB("magnitude", 80.0).to(self.device, self.dtype)(spectrogram)[0]
