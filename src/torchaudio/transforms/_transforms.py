@@ -626,7 +626,7 @@ class VQT(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. properties:: Autograd TorchScript
+    .. properties:: Autograd
 
     Sources
         * https://librosa.org/doc/main/generated/librosa.vqt.html
@@ -636,10 +636,10 @@ class VQT(torch.nn.Module):
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
-        f_min (float, optional): Minimum frequency, which corresponds to first note. 
+        f_min (float, optional): Minimum frequency, which corresponds to first note.
             (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of VQT frequency bins, starting at ``f_min``. (Default: ``84``)
-        gamma (float, optional): Offset that controls VQT filter lengths. Larger values 
+        gamma (float, optional): Offset that controls VQT filter lengths. Larger values
             increase the time resolution at lower frequencies. (Default: ``0.``)
         bins_per_octave (int, optional): Number of bins per octave. (Default: ``12``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
@@ -647,8 +647,8 @@ class VQT(torch.nn.Module):
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
         dtype (torch.device, optional):
-            Determines the precision that kernels are pre-computed and cached in. Note that complex bases 
-            are either cfloat or cdouble depending on provided precision.
+            Determines the precision that kernels are pre-computed and cached in. Note that complex
+            bases are either cfloat or cdouble depending on provided precision.
             Options: [``torch.float``, ``torch.double``] (Default: ``torch.float``)
 
     Example
@@ -656,9 +656,7 @@ class VQT(torch.nn.Module):
         >>> transform = transforms.VQT(sample_rate)
         >>> vqt = transform(waveform)  # (..., n_bins, time)
     """
-    __constants__ = [
-        "sample_rate", "hop_length", "f_min", "n_bins", "gamma", "bins_per_octave", "window_fn", "resampling_method",
-    ]
+    __constants__ = ["resample", "forward_params"]
 
     def __init__(
         self,
@@ -678,11 +676,9 @@ class VQT(torch.nn.Module):
         n_filters = min(bins_per_octave, n_bins)
         frequencies, n_octaves = F.frequency_set(f_min, n_bins, bins_per_octave, dtype)
         alpha = F.relative_bandwidths(frequencies, n_bins, bins_per_octave)
-        freq_lengths, cutoff_freq = F.wavelet_lengths(frequencies, sample_rate, alpha, gamma)
+        _, cutoff_freq = F.wavelet_lengths(frequencies, sample_rate, alpha, gamma)
         
         self.resample = Resample(2, 1, resampling_method, dtype=dtype)
-        self.register_buffer("expanded_lengths", freq_lengths.unsqueeze(0).unsqueeze(-1))
-        self.ones = lambda x: torch.ones(x, device=self.expanded_lengths.device)
         
         # Generate errors or warnings if needed
         # Number of divisions by 2 before number becomes odd
@@ -691,18 +687,18 @@ class VQT(torch.nn.Module):
         
         if cutoff_freq > nyquist:
             raise ValueError(
-                f"Maximum bin cutoff frequency is {cutoff_freq} and superior to the "
+                f"Maximum bin cutoff frequency is approximately {cutoff_freq} and superior to the "
                 f"Nyquist frequency {nyquist}. Try to reduce the number of frequency bins."
             )
-        if num_hop_downsamples > n_octaves:
+        if n_octaves - 1 > num_hop_downsamples:
             warnings.warn(
                 f"Hop length can be divided {num_hop_downsamples} times by 2 before becoming "
-                f"odd. The VQT is however being computed for {n_octaves} octaves. Consider lowering "
-                "the hop length or increasing the number of bins for more accurate results."
+                f"odd. The VQT is however being computed for {n_octaves} octaves. Consider setting "
+                "the hop length to a ``more even'' number for more accurate results."
             )
         if nyquist / cutoff_freq > 4:
             warnings.warn(
-                f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's "
+                f"The Nyquist frequency {nyquist} is significantly higher than the highest filter's approximate "
                 f"cutoff frequency {cutoff_freq}. Consider resampling your signal to a lower sample "
                 "rate or increasing the number of bins before VQT computation for more accurate results."
             )
@@ -760,7 +756,7 @@ class VQT(torch.nn.Module):
                         waveform[:, channel, :],
                         n_fft=n_fft,
                         hop_length=temp_hop,
-                        window=self.ones(n_fft),
+                        window=torch.ones(n_fft),
                         pad_mode='constant',
                         return_complex=True,
                     )
@@ -775,7 +771,7 @@ class VQT(torch.nn.Module):
                     waveform,
                     n_fft=n_fft,
                     hop_length=temp_hop,
-                    window=self.ones(n_fft),
+                    window=torch.ones(n_fft),
                     pad_mode='constant',
                     return_complex=True,
                 )
@@ -788,12 +784,9 @@ class VQT(torch.nn.Module):
             else:
                 vqt = torch.cat([temp_vqt, vqt], dim=-2)
             
-            # Resampling
             if temp_hop % 2 == 0:
                 waveform = self.resample(waveform)
-        
-        # Scale VQT by square-root of the length of each channel's filter
-        vqt /= torch.sqrt(self.expanded_lengths)
+                waveform /= math.sqrt(0.5)
         
         return vqt
 
@@ -803,7 +796,7 @@ class CQT(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. properties:: Autograd TorchScript
+    .. properties:: Autograd
 
     Sources
         * https://librosa.org/doc/main/generated/librosa.cqt.html
@@ -822,8 +815,8 @@ class CQT(torch.nn.Module):
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
         dtype (torch.device, optional):
-            Determines the precision that kernels are pre-computed and cached in. Note that complex bases 
-            are either cfloat or cdouble depending on provided precision.
+            Determines the precision that kernels are pre-computed and cached in. Note that complex
+            bases are either cfloat or cdouble depending on provided precision.
             Options: [``torch.float``, ``torch.double``] (Default: ``torch.float``)
 
     Example
@@ -831,9 +824,7 @@ class CQT(torch.nn.Module):
         >>> transform = transforms.CQT(sample_rate)
         >>> cqt = transform(waveform)  # (..., n_bins, time)
     """
-    __constants__ = [
-        "sample_rate", "hop_length", "f_min", "n_bins", "bins_per_octave", "window_fn", "resampling_method",
-    ]
+    __constants__ = ["transform"]
 
     def __init__(
         self,
@@ -879,7 +870,7 @@ class InverseCQT(torch.nn.Module):
 
     .. devices:: CPU CUDA
 
-    .. properties:: Autograd TorchScript
+    .. properties:: Autograd
 
     Sources
         * https://librosa.org/doc/main/generated/librosa.icqt.html
@@ -888,7 +879,7 @@ class InverseCQT(torch.nn.Module):
 
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
-        hop_length (int, optional): Length of hop between VQT windows. (Default: ``400``)
+        hop_length (int, optional): Length of hop between CQT windows. (Default: ``400``)
         f_min (float, optional): Minimum frequency, which corresponds to first note.
             (Default: ``32.703``, or the frequency of C1 in Hz)
         n_bins (int, optional): Number of CQT frequency bins, starting at ``f_min``. (Default: ``84``)
@@ -898,17 +889,15 @@ class InverseCQT(torch.nn.Module):
         resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interp_hann``, ``sinc_interp_kaiser``] (Default: ``"sinc_interp_hann"``)
         dtype (torch.device, optional):
-            Determines the precision that kernels are pre-computed and cached in. 
-            Note that complex bases are either cfloat or cdouble depending on provided precision.
+            Determines the precision that kernels are pre-computed and cached in. Note that complex
+            bases are either cfloat or cdouble depending on provided precision.
             Options: [``torch.float``, ``torch.double``] (Default: ``torch.float``)
 
     Example
         >>> transform = transforms.InverseCQT()
         >>> waveform = transform(cqt)  # (..., time)
     """
-    __constants__ = [
-        "sample_rate", "hop_length", "f_min", "bins_per_octave", "window_fn", "resampling_method",
-    ]
+    __constants__ = ["sample_rate", "resampling_method", "forward_params"]
 
     def __init__(
         self,
@@ -931,8 +920,6 @@ class InverseCQT(torch.nn.Module):
         freq_lengths, _ = F.wavelet_lengths(frequencies, self.sample_rate, alpha, 0.)
         
         self.resampling_method = resampling_method
-        self.register_buffer("c_scale", torch.sqrt(freq_lengths))
-        self.ones = lambda x: torch.ones(x, device=self.c_scale.device)
         
         # Get sample rates and hop lengths used during CQT downsampling
         sample_rates = []
@@ -998,9 +985,8 @@ class InverseCQT(torch.nn.Module):
         for buffer_index, (temp_sr, temp_hop, indices) in enumerate(self.forward_params):
             # Inverse project the basis
             temp_proj = torch.einsum(
-                'fc,c,c,...ct->...ft',
+                'fc,c,...ct->...ft',
                 getattr(self, f"basis_inverse_{buffer_index}"),
-                self.c_scale[indices],
                 getattr(self, f"frequency_pow_{buffer_index}"),
                 cqt[..., indices, :],
             )
@@ -1014,7 +1000,7 @@ class InverseCQT(torch.nn.Module):
                         temp_proj[:, channel, :, :],
                         n_fft=n_fft,
                         hop_length=temp_hop,
-                        window=self.ones(n_fft),
+                        window=torch.ones(n_fft),
                     )
                 
                     if channel == 0:
@@ -1024,10 +1010,9 @@ class InverseCQT(torch.nn.Module):
             
             else:
                 temp_waveform = torch.istft(
-                    temp_proj, n_fft=n_fft, hop_length=temp_hop, window=self.ones(n_fft),
+                    temp_proj, n_fft=n_fft, hop_length=temp_hop, window=torch.ones(n_fft),
                 )
             
-            # Resample to desired output shape
             temp_waveform = F.resample(
                 temp_waveform,
                 orig_freq=1,

@@ -2579,7 +2579,7 @@ def relative_bandwidths(freqs: Tensor, n_bins: int, bins_per_octave: int) -> Ten
         torch.Tensor: relative bandwidths for set of frequencies.
     """
     if min(freqs) < 0. or n_bins < 1 or bins_per_octave < 1:
-        raise ValueError("freqs must be positive. n_bins and bins_per_octave must be ints and superior to 1.")
+        raise ValueError("freqs must be positive. n_bins and bins_per_octave must be positive ints.")
     
     if n_bins > 1:
         # Approximate local octave resolution around each frequency
@@ -2667,7 +2667,7 @@ def wavelet_fbank(
     
     # Next power of 2
     pad_to_size = 1<<(int(max(lengths))-1).bit_length()
-        
+    
     for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
         # Build filter with length ceil(ilen)
         # Use float32 in order to output complex(float) numbers later
