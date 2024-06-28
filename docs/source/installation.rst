@@ -56,11 +56,6 @@ Optional Dependencies
   the FFmpeg integration entirely by setting the environment variable
   ``TORIO_USE_FFMPEG=0``.
 
-  There are multiple ways to install FFmpeg libraries.
-  If you are using Anaconda Python distribution,
-  ``conda install -c conda-forge 'ffmpeg<7'`` will install
-  compatible FFmpeg libraries.
-
   .. note::
 
      When searching for FFmpeg installation, TorchAudio looks for library files
