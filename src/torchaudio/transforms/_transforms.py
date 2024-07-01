@@ -736,6 +736,9 @@ class VQT(torch.nn.Module):
                 temp_sr /= 2.
                 temp_hop //= 2
 
+        # Create ones on the correct device in the forward pass
+        self.ones = lambda x: torch.ones(x, device=self.fft_basis_0.device)
+
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
@@ -756,7 +759,7 @@ class VQT(torch.nn.Module):
                         waveform[:, channel, :],
                         n_fft=n_fft,
                         hop_length=temp_hop,
-                        window=torch.ones(n_fft),
+                        window=self.ones(n_fft),
                         pad_mode='constant',
                         return_complex=True,
                     )
@@ -771,7 +774,7 @@ class VQT(torch.nn.Module):
                     waveform,
                     n_fft=n_fft,
                     hop_length=temp_hop,
-                    window=torch.ones(n_fft),
+                    window=self.ones(n_fft),
                     pad_mode='constant',
                     return_complex=True,
                 )
@@ -972,6 +975,9 @@ class InverseCQT(torch.nn.Module):
             self.register_buffer(f"frequency_pow_{oct_index}", frequency_pow)
             self.forward_params.append((temp_sr, temp_hop, indices))
 
+        # Create ones on the correct device in the forward pass
+        self.ones = lambda x: torch.ones(x, device=self.basis_inverse_0.device)
+
     def forward(self, cqt: Tensor) -> Tensor:
         r"""
         Args:
@@ -1000,7 +1006,7 @@ class InverseCQT(torch.nn.Module):
                         temp_proj[:, channel, :, :],
                         n_fft=n_fft,
                         hop_length=temp_hop,
-                        window=torch.ones(n_fft),
+                        window=self.ones(n_fft),
                     )
                 
                     if channel == 0:
@@ -1010,7 +1016,7 @@ class InverseCQT(torch.nn.Module):
             
             else:
                 temp_waveform = torch.istft(
-                    temp_proj, n_fft=n_fft, hop_length=temp_hop, window=torch.ones(n_fft),
+                    temp_proj, n_fft=n_fft, hop_length=temp_hop, window=self.ones(n_fft),
                 )
             
             temp_waveform = F.resample(
