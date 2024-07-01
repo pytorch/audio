@@ -661,7 +661,7 @@ class VQT(torch.nn.Module):
     def __init__(
         self,
         sample_rate: int = 16000,
-        hop_length: int = 400,
+        hop_length: int = 256,
         f_min: float = 32.703,
         n_bins: int = 84,
         gamma: float = 0.,
@@ -829,7 +829,7 @@ class CQT(torch.nn.Module):
     def __init__(
         self,
         sample_rate: int = 16000,
-        hop_length: int = 400,
+        hop_length: int = 256,
         f_min: float = 32.703,
         n_bins: int = 84,
         bins_per_octave: int = 12,
@@ -902,7 +902,7 @@ class InverseCQT(torch.nn.Module):
     def __init__(
         self,
         sample_rate: int = 16000,
-        hop_length: int = 400,
+        hop_length: int = 256,
         f_min: float = 32.703,
         n_bins: int = 84,
         bins_per_octave: int = 12,

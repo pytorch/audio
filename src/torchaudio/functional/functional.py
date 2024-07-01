@@ -2670,7 +2670,6 @@ def wavelet_fbank(
     
     for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
         # Build filter with length ceil(ilen)
-        # Use float32 in order to output complex(float) numbers later
         t = torch.arange(-ilen // 2, ilen // 2, dtype=dtype) * 2 * torch.pi * freq / sr
         sig = torch.cos(t) + 1j * torch.sin(t)
         
