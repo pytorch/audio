@@ -737,7 +737,7 @@ class VQT(torch.nn.Module):
                 temp_hop //= 2
 
         # Create ones on the correct device in the forward pass
-        self.ones = lambda x: torch.ones(x, device=self.fft_basis_0.device)
+        self.ones = lambda x: torch.ones(x, dtype=dtype, device=self.fft_basis_0.device)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -976,7 +976,7 @@ class InverseCQT(torch.nn.Module):
             self.forward_params.append((temp_sr, temp_hop, indices))
 
         # Create ones on the correct device in the forward pass
-        self.ones = lambda x: torch.ones(x, device=self.basis_inverse_0.device)
+        self.ones = lambda x: torch.ones(x, dtype=dtype, device=self.basis_inverse_0.device)
 
     def forward(self, cqt: Tensor) -> Tensor:
         r"""
