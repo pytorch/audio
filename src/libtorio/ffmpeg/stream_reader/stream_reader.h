@@ -66,8 +66,8 @@ class StreamingMediaDecoder {
   /// (opening source).
   explicit StreamingMediaDecoder(
       AVIOContext* io_ctx,
-      const std::optional<std::string>& format = c10::nullopt,
-      const std::optional<OptionDict>& option = c10::nullopt);
+      const std::optional<std::string>& format = std::nullopt,
+      const std::optional<OptionDict>& option = std::nullopt);
 
   /// @endcond
 
@@ -81,8 +81,8 @@ class StreamingMediaDecoder {
   /// (opening source).
   explicit StreamingMediaDecoder(
       const std::string& src,
-      const std::optional<std::string>& format = c10::nullopt,
-      const std::optional<OptionDict>& option = c10::nullopt);
+      const std::optional<std::string>& format = std::nullopt,
+      const std::optional<OptionDict>& option = std::nullopt);
 
   ///@}
 
@@ -205,9 +205,9 @@ class StreamingMediaDecoder {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const std::optional<std::string>& filter_desc = c10::nullopt,
-      const std::optional<std::string>& decoder = c10::nullopt,
-      const std::optional<OptionDict>& decoder_option = c10::nullopt);
+      const std::optional<std::string>& filter_desc = std::nullopt,
+      const std::optional<std::string>& decoder = std::nullopt,
+      const std::optional<OptionDict>& decoder_option = std::nullopt);
   /// Define an output video stream.
   ///
   /// @param i,frames_per_chunk,num_chunks,filter_desc,decoder,decoder_option
@@ -226,10 +226,10 @@ class StreamingMediaDecoder {
       int64_t i,
       int64_t frames_per_chunk,
       int64_t num_chunks,
-      const std::optional<std::string>& filter_desc = c10::nullopt,
-      const std::optional<std::string>& decoder = c10::nullopt,
-      const std::optional<OptionDict>& decoder_option = c10::nullopt,
-      const std::optional<std::string>& hw_accel = c10::nullopt);
+      const std::optional<std::string>& filter_desc = std::nullopt,
+      const std::optional<std::string>& decoder = std::nullopt,
+      const std::optional<OptionDict>& decoder_option = std::nullopt,
+      const std::optional<std::string>& hw_accel = std::nullopt);
 
   /// @cond
   /// Add a output packet stream.
@@ -315,7 +315,7 @@ class StreamingMediaDecoder {
   /// @param timeout See `process_packet_block()`
   /// @param backoff See `process_packet_block()`
   int fill_buffer(
-      const std::optional<double>& timeout = c10::nullopt,
+      const std::optional<double>& timeout = std::nullopt,
       const double backoff = 10.);
 
   ///@}
@@ -383,7 +383,7 @@ class StreamingMediaDecoderCustomIO : private detail::CustomInput,
       int buffer_size,
       int (*read_packet)(void* opaque, uint8_t* buf, int buf_size),
       int64_t (*seek)(void* opaque, int64_t offset, int whence) = nullptr,
-      const std::optional<OptionDict>& option = c10::nullopt);
+      const std::optional<OptionDict>& option = std::nullopt);
 };
 
 // For BC
