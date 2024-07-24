@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.adsr\_envelope
+==============================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: adsr_envelope

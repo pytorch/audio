@@ -1,0 +1,6 @@
+torchaudio.prototype.models.emformer\_hubert\_model
+===================================================
+
+.. currentmodule:: torchaudio.prototype.models
+
+.. autofunction:: emformer_hubert_model

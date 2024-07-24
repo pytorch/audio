@@ -1,0 +1,6 @@
+torchaudio.models.hdemucs\_high
+===============================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hdemucs_high
