@@ -79,8 +79,8 @@ working with
 
  .. code-block:: none
 
-    2.5.0.dev20240627
-    2.4.0.dev20240628
+    2.6.0.dev20241008
+    2.5.0.dev20241010
 
 
 
@@ -140,7 +140,7 @@ In this tutorial, we only use CTC head of the model.
 
  .. code-block:: none
 
-      0%|          | 0.00/269M [00:00<?, ?B/s]     10%|#         | 27.9M/269M [00:00<00:00, 287MB/s]     24%|##3       | 63.9M/269M [00:00<00:00, 340MB/s]     36%|###5      | 96.4M/269M [00:00<00:00, 314MB/s]     47%|####7     | 127M/269M [00:00<00:00, 317MB/s]      59%|#####9    | 160M/269M [00:00<00:00, 326MB/s]     71%|#######1  | 192M/269M [00:00<00:00, 331MB/s]     83%|########3 | 224M/269M [00:00<00:00, 325MB/s]     96%|#########6| 259M/269M [00:00<00:00, 338MB/s]    100%|##########| 269M/269M [00:00<00:00, 324MB/s]
+      0%|          | 0.00/269M [00:00<?, ?B/s]     11%|#1        | 30.9M/269M [00:00<00:00, 323MB/s]     26%|##6       | 71.1M/269M [00:00<00:00, 381MB/s]     45%|####5     | 122M/269M [00:00<00:00, 448MB/s]      65%|######4   | 174M/269M [00:00<00:00, 489MB/s]     83%|########2 | 223M/269M [00:00<00:00, 496MB/s]    100%|##########| 269M/269M [00:00<00:00, 425MB/s]
 
 
 
@@ -169,7 +169,7 @@ We will load a sample from the LibriSpeech test-other dataset.
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 96.0MB/s]
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 90.0MB/s]
 
 
 .. raw:: html
@@ -247,7 +247,7 @@ index, or as a list of tokens, each mapping to a unique index.
 
  .. code-block:: none
 
-      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 93.7MB/s]
+      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 73.4MB/s]
     ['<blk>', '<sos/eos>', '<unk>', 'S', '▁THE', '▁A', 'T', '▁AND', 'ED', '▁OF', '▁TO', 'E', 'D', 'N', 'ING', '▁IN', 'Y', 'M', 'C', '▁I', 'A', 'P', '▁HE', 'R', 'O', 'L', 'RE', 'I', 'U', 'ER', '▁IT', 'LY', '▁THAT', '▁WAS', '▁', '▁S', 'AR', '▁BE', 'F', '▁C', 'IN', 'B', '▁FOR', 'OR', 'LE', "'", '▁HIS', '▁YOU', 'AL', '▁RE', 'V', '▁B', 'G', 'RI', '▁E', '▁WITH', '▁T', '▁AS', 'LL', '▁P', '▁HER', 'ST', '▁HAD', '▁SO', '▁F', 'W', 'CE', '▁IS', 'ND', '▁NOT', 'TH', '▁BUT', 'EN', '▁SHE', '▁ON', 'VE', 'ON', 'SE', '▁DE', 'UR', '▁G', 'CH', 'K', 'TER', '▁AT', 'IT', '▁ME', 'RO', 'NE', 'RA', 'ES', 'IL', 'NG', 'IC', '▁NO', '▁HIM', 'ENT', 'IR', '▁WE', 'H', '▁DO', '▁ALL', '▁HAVE', 'LO', '▁BY', '▁MY', '▁MO', '▁THIS', 'LA', '▁ST', '▁WHICH', '▁CON', '▁THEY', 'CK', 'TE', '▁SAID', '▁FROM', '▁GO', '▁WHO', '▁TH', '▁OR', '▁D', '▁W', 'VER', 'LI', '▁SE', '▁ONE', '▁CA', '▁AN', '▁LA', '▁WERE', 'EL', '▁HA', '▁MAN', '▁FA', '▁EX', 'AD', '▁SU', 'RY', '▁MI', 'AT', '▁BO', '▁WHEN', 'AN', 'THER', 'PP', 'ATION', '▁FI', '▁WOULD', '▁PRO', 'OW', 'ET', '▁O', '▁THERE', '▁HO', 'ION', '▁WHAT', '▁FE', '▁PA', 'US', 'MENT', '▁MA', 'UT', '▁OUT', '▁THEIR', '▁IF', '▁LI', '▁K', '▁WILL', '▁ARE', 'ID', '▁RO', 'DE', 'TION', '▁WA', 'PE', '▁UP', '▁SP', '▁PO', 'IGHT', '▁UN', 'RU', '▁LO', 'AS', 'OL', '▁LE', '▁BEEN', '▁SH', '▁RA', '▁SEE', 'KE', 'UL', 'TED', '▁SA', 'UN', 'UND', 'ANT', '▁NE', 'IS', '▁THEM', 'CI', 'GE', '▁COULD', '▁DIS', 'OM', 'ISH', 'HE', 'EST', '▁SOME', 'ENCE', 'ITY', 'IVE', '▁US', '▁MORE', '▁EN', 'ARD', 'ATE', '▁YOUR', '▁INTO', '▁KNOW', '▁CO', 'ANCE', '▁TIME', '▁WI', '▁YE', 'AGE', '▁NOW', 'TI', 'FF', 'ABLE', '▁VERY', '▁LIKE', 'AM', 'HI', 'Z', '▁OTHER', '▁THAN', '▁LITTLE', '▁DID', '▁LOOK', 'TY', 'ERS', '▁CAN', '▁CHA', '▁AR', 'X', 'FUL', 'UGH', '▁BA', '▁DAY', '▁ABOUT', 'TEN', 'IM', '▁ANY', '▁PRE', '▁OVER', 'IES', 'NESS', 'ME', 'BLE', '▁M', 'ROW', '▁HAS', '▁GREAT', '▁VI', 'TA', '▁AFTER', 'PER', '▁AGAIN', 'HO', 'SH', '▁UPON', '▁DI', '▁HAND', '▁COM', 'IST', 'TURE', '▁STA', '▁THEN', '▁SHOULD', '▁GA', 'OUS', 'OUR', '▁WELL', '▁ONLY', 'MAN', '▁GOOD', '▁TWO', '▁MAR', '▁SAY', '▁HU', 'TING', '▁OUR', 'RESS', '▁DOWN', 'IOUS', '▁BEFORE', '▁DA', '▁NA', 'QUI', '▁MADE', '▁EVERY', '▁OLD', '▁EVEN', 'IG', '▁COME', '▁GRA', '▁RI', '▁LONG', 'OT', 'SIDE', 'WARD', '▁FO', '▁WHERE', 'MO', 'LESS', '▁SC', '▁MUST', '▁NEVER', '▁HOW', '▁CAME', '▁SUCH', '▁RU', '▁TAKE', '▁WO', '▁CAR', 'UM', 'AK', '▁THINK', '▁MUCH', '▁MISTER', '▁MAY', '▁JO', '▁WAY', '▁COMP', '▁THOUGHT', '▁STO', '▁MEN', '▁BACK', '▁DON', 'J', '▁LET', '▁TRA', '▁FIRST', '▁JUST', '▁VA', '▁OWN', '▁PLA', '▁MAKE', 'ATED', '▁HIMSELF', '▁WENT', '▁PI', 'GG', 'RING', '▁DU', '▁MIGHT', '▁PART', '▁GIVE', '▁IMP', '▁BU', '▁PER', '▁PLACE', '▁HOUSE', '▁THROUGH', 'IAN', '▁SW', '▁UNDER', 'QUE', '▁AWAY', '▁LOVE', 'QUA', '▁LIFE', '▁GET', '▁WITHOUT', '▁PASS', '▁TURN', 'IGN', '▁HEAD', '▁MOST', '▁THOSE', '▁SHALL', '▁EYES', '▁COL', '▁STILL', '▁NIGHT', '▁NOTHING', 'ITION', 'HA', '▁TELL', '▁WORK', '▁LAST', '▁NEW', '▁FACE', '▁HI', '▁WORD', '▁FOUND', '▁COUNT', '▁OB', '▁WHILE', '▁SHA', '▁MEAN', '▁SAW', '▁PEOPLE', '▁FRIEND', '▁THREE', '▁ROOM', '▁SAME', '▁THOUGH', '▁RIGHT', '▁CHILD', '▁FATHER', '▁ANOTHER', '▁HEART', '▁WANT', '▁TOOK', 'OOK', '▁LIGHT', '▁MISSUS', '▁OPEN', '▁JU', '▁ASKED', 'PORT', '▁LEFT', '▁JA', '▁WORLD', '▁HOME', '▁WHY', '▁ALWAYS', '▁ANSWER', '▁SEEMED', '▁SOMETHING', '▁GIRL', '▁BECAUSE', '▁NAME', '▁TOLD', '▁NI', '▁HIGH', 'IZE', '▁WOMAN', '▁FOLLOW', '▁RETURN', '▁KNEW', '▁EACH', '▁KIND', '▁JE', '▁ACT', '▁LU', '▁CERTAIN', '▁YEARS', '▁QUITE', '▁APPEAR', '▁BETTER', '▁HALF', '▁PRESENT', '▁PRINCE', 'SHIP', '▁ALSO', '▁BEGAN', '▁HAVING', '▁ENOUGH', '▁PERSON', '▁LADY', '▁WHITE', '▁COURSE', '▁VOICE', '▁SPEAK', '▁POWER', '▁MORNING', '▁BETWEEN', '▁AMONG', '▁KEEP', '▁WALK', '▁MATTER', '▁TEA', '▁BELIEVE', '▁SMALL', '▁TALK', '▁FELT', '▁HORSE', '▁MYSELF', '▁SIX', '▁HOWEVER', '▁FULL', '▁HERSELF', '▁POINT', '▁STOOD', '▁HUNDRED', '▁ALMOST', '▁SINCE', '▁LARGE', '▁LEAVE', '▁PERHAPS', '▁DARK', '▁SUDDEN', '▁REPLIED', '▁ANYTHING', '▁WONDER', '▁UNTIL', 'Q']
 
 
@@ -564,7 +564,7 @@ From the above table, CUDA decoder could give a slight improvement in WER and a 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.543 seconds)
+   **Total running time of the script:** ( 0 minutes  2.136 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_cuda_ctc_decoder_tutorial.py:
