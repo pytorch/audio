@@ -1,0 +1,10 @@
+# Fallback
+*       @pytorch/team-audio-core
+
+/examples/avsr                          @mpc001
+/examples/asr                           @hwangjeff
+/examples/self_supervised_learning      @nateanl
+/examples/dnn_beamformer                @nateanl
+/examples/hubert                        @nateanl
+/examples/tutorials                     @mthrok
+/torchaudio                             @mthrok

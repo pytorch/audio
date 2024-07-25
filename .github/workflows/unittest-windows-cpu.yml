@@ -1,0 +1,52 @@
+name: Unittests on Windows CPU
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  unittests-windows-cpu:
+    uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
+    with:
+      repository: pytorch/audio
+      runner: windows.4xlarge
+      timeout: 180
+      script: |
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+
+        # Set up Environment Variables
+        export PYTHON_VERSION="3.8"
+        unset CUDA_VERSION
+
+        # Set CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export UPLOAD_CHANNEL=test
+        else
+          export UPLOAD_CHANNEL=nightly
+        fi
+
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_SOX=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_HW_ACCEL=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_KALDI=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_sentencepiece=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_AUDIO_OUT_DEVICE=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
+
+        .github/scripts/unittest-windows/setup_env.sh
+        .github/scripts/unittest-windows/install.sh
+        .github/scripts/unittest-windows/run_test.sh

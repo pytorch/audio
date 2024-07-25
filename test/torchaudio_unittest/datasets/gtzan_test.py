@@ -2,14 +2,7 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import gtzan
-
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    get_whitenoise,
-    save_wav,
-    normalize_wav,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 
 def get_mock_dataset(root_dir):
@@ -24,12 +17,12 @@ def get_mock_dataset(root_dir):
 
     seed = 0
     for genre in gtzan.gtzan_genres:
-        base_dir = os.path.join(root_dir, 'genres', genre)
+        base_dir = os.path.join(root_dir, "genres", genre)
         os.makedirs(base_dir, exist_ok=True)
         for i in range(100):
-            filename = f'{genre}.{i:05d}'
-            path = os.path.join(base_dir, f'{filename}.wav')
-            data = get_whitenoise(sample_rate=sample_rate, duration=0.01, n_channels=1, dtype='int16', seed=seed)
+            filename = f"{genre}.{i:05d}"
+            path = os.path.join(base_dir, f"{filename}.wav")
+            data = get_whitenoise(sample_rate=sample_rate, duration=0.01, n_channels=1, dtype="int16", seed=seed)
             save_wav(path, data, sample_rate)
             sample = (normalize_wav(data), sample_rate, genre)
             mocked_samples.append(sample)
@@ -44,7 +37,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestGTZAN(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
 
     root_dir = None
     samples = []
@@ -100,28 +92,28 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
         assert n_ite == len(self.testing)
 
     def test_training_str(self):
-        train_dataset = gtzan.GTZAN(self.root_dir, subset='training')
+        train_dataset = gtzan.GTZAN(self.root_dir, subset="training")
         self._test_training(train_dataset)
 
     def test_validation_str(self):
-        val_dataset = gtzan.GTZAN(self.root_dir, subset='validation')
+        val_dataset = gtzan.GTZAN(self.root_dir, subset="validation")
         self._test_validation(val_dataset)
 
     def test_testing_str(self):
-        test_dataset = gtzan.GTZAN(self.root_dir, subset='testing')
+        test_dataset = gtzan.GTZAN(self.root_dir, subset="testing")
         self._test_testing(test_dataset)
 
     def test_training_path(self):
         root_dir = Path(self.root_dir)
-        train_dataset = gtzan.GTZAN(root_dir, subset='training')
+        train_dataset = gtzan.GTZAN(root_dir, subset="training")
         self._test_training(train_dataset)
 
     def test_validation_path(self):
         root_dir = Path(self.root_dir)
-        val_dataset = gtzan.GTZAN(root_dir, subset='validation')
+        val_dataset = gtzan.GTZAN(root_dir, subset="validation")
         self._test_validation(val_dataset)
 
     def test_testing_path(self):
         root_dir = Path(self.root_dir)
-        test_dataset = gtzan.GTZAN(root_dir, subset='testing')
+        test_dataset = gtzan.GTZAN(root_dir, subset="testing")
         self._test_testing(test_dataset)

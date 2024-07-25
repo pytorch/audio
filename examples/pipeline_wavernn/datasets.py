@@ -1,16 +1,14 @@
 import random
 
 import torch
-from torch.utils.data.dataset import random_split
-from torchaudio.datasets import LJSPEECH, LIBRITTS
-from torchaudio.transforms import MuLawEncoding
-
 from processing import bits_to_normalized_waveform, normalized_waveform_to_bits
+from torch.utils.data.dataset import random_split
+from torchaudio.datasets import LIBRITTS, LJSPEECH
+from torchaudio.transforms import MuLawEncoding
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
-    r"""Wrap a dataset so that, whenever a new item is returned, it is saved to memory.
-    """
+    r"""Wrap a dataset so that, whenever a new item is returned, it is saved to memory."""
 
     def __init__(self, dataset):
         self.dataset = dataset
@@ -47,16 +45,16 @@ class Processed(torch.utils.data.Dataset):
 
 
 def split_process_dataset(args, transforms):
-    if args.dataset == 'ljspeech':
+    if args.dataset == "ljspeech":
         data = LJSPEECH(root=args.file_path, download=False)
 
         val_length = int(len(data) * args.val_ratio)
         lengths = [len(data) - val_length, val_length]
         train_dataset, val_dataset = random_split(data, lengths)
 
-    elif args.dataset == 'libritts':
-        train_dataset = LIBRITTS(root=args.file_path, url='train-clean-100', download=False)
-        val_dataset = LIBRITTS(root=args.file_path, url='dev-clean', download=False)
+    elif args.dataset == "libritts":
+        train_dataset = LIBRITTS(root=args.file_path, url="train-clean-100", download=False)
+        val_dataset = LIBRITTS(root=args.file_path, url="dev-clean", download=False)
 
     else:
         raise ValueError(f"Expected dataset: `ljspeech` or `libritts`, but found {args.dataset}")
@@ -88,14 +86,8 @@ def collate_factory(args):
         # random start postion in waveform
         wave_offsets = [(offset + pad) * args.hop_length for offset in spec_offsets]
 
-        waveform_combine = [
-            x[0][wave_offsets[i]: wave_offsets[i] + wave_length + 1]
-            for i, x in enumerate(batch)
-        ]
-        specgram = [
-            x[1][:, spec_offsets[i]: spec_offsets[i] + spec_length]
-            for i, x in enumerate(batch)
-        ]
+        waveform_combine = [x[0][wave_offsets[i] : wave_offsets[i] + wave_length + 1] for i, x in enumerate(batch)]
+        specgram = [x[1][:, spec_offsets[i] : spec_offsets[i] + spec_length] for i, x in enumerate(batch)]
 
         specgram = torch.stack(specgram)
         waveform_combine = torch.stack(waveform_combine)
@@ -107,7 +99,7 @@ def collate_factory(args):
         if args.loss == "crossentropy":
 
             if args.mulaw:
-                mulaw_encode = MuLawEncoding(2 ** args.n_bits)
+                mulaw_encode = MuLawEncoding(2**args.n_bits)
                 waveform = mulaw_encode(waveform)
                 target = mulaw_encode(target)
 

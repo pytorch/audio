@@ -1,6 +1,5 @@
 import torch
 import torchaudio.kaldi_io as kio
-
 from torchaudio_unittest import common_utils
 
 
@@ -9,13 +8,14 @@ class Test_KaldiIO(common_utils.TorchaudioTestCase):
     data2 = [[31, 32, 33], [41, 42, 43], [51, 52, 53]]
 
     def _test_helper(self, file_name, expected_data, fn, expected_dtype):
-        """ Takes a file_name to the input data and a function fn to extract the
+        """Takes a file_name to the input data and a function fn to extract the
         data. It compares the extracted data to the expected_data. The expected_dtype
         will be used to check that the extracted data is of the right type.
         """
         test_filepath = common_utils.get_asset_path(file_name)
-        expected_output = {'key' + str(idx + 1): torch.tensor(val, dtype=expected_dtype)
-                           for idx, val in enumerate(expected_data)}
+        expected_output = {
+            "key" + str(idx + 1): torch.tensor(val, dtype=expected_dtype) for idx, val in enumerate(expected_data)
+        }
 
         for key, vec in fn(test_filepath):
             self.assertTrue(key in expected_output)

@@ -38,36 +38,11 @@ to do this once to work on any of Facebook's open source projects.
 
 Complete your CLA here: <https://code.facebook.com/cla>
 
-## Development installation
+## Building torchaudio from source
 
-We recommend using a `conda` environment to contribute efficiently to
-torchaudio.
+Please refer to https://pytorch.org/audio/main/build.html
 
-### Install PyTorch Nightly
-
-```bash
-conda install pytorch -c pytorch-nightly
-```
-
-### Install Torchaudio
-
-```bash
-# Install build-time dependencies
-pip install cmake ninja pkgconfig
-```
-
-```bash
-# Build torchaudio
-git clone https://github.com/pytorch/audio.git
-cd audio
-python setup.py develop
-# or, for OSX
-# CC=clang CXX=clang++ python setup.py develop
-```
-
-Some environmnet variables that change the build behavior
-- `BUILD_SOX`: Deteremines whether build and bind libsox in non-Windows environments. (no effect in Windows as libsox integration is not available) Default value is 1 (build and bind). Use 0 for disabling it.
-- `USE_CUDA`: Determines whether build the custom CUDA kernel. Default to the availability of CUDA-compatible GPUs.
+## Running Test
 
 If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
@@ -92,6 +67,7 @@ Optional packages to install if you want to run related tests:
   source. Commit `e6eddd80` is known to work.)
 - `unidecode` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
 - `inflect` (dependency for testing text preprocessing functions for examples/pipeline_tacotron2)
+- `Pillow` (dependency for testing ffmpeg image processing)
 
 ## Development Process
 
@@ -133,6 +109,13 @@ make html
 ```
 
 The built docs should now be available in `docs/build/html`.
+If docstrings are mal-formed, warnings will be shown.
+In CI doc build job, `SPHINXOPTS=-W` option is enabled and warnings are treated as error.
+Please fix all the warnings when submitting a PR.
+(You can use `SPHINXOPTS=-W` in local env, but by default,
+tutorials are not built and it will be treated as error.
+To use the option, please set  `BUILD_GALLERY` as well.
+e.g. `BUILD_GALLERY=1 make 'SPHINXOPTS=-W' html`.)
 
 By default, the documentation only builds API reference.
 If you are working to add a new example/tutorial with sphinx-gallery then
@@ -179,7 +162,7 @@ The following are some of the conventions that we follow.
 - Tensor
   - We use an ellipsis "..." as a placeholder for the rest of the dimensions of a
     tensor, e.g. optional batching and channel dimensions. If batching, the
-    "batch" dimension should come in the first diemension.
+    "batch" dimension should come in the first dimension.
   - Tensors are assumed to have "channel" dimension coming before the "time"
     dimension. The bins in frequency domain (freq and mel) are assumed to come
     before the "time" dimension but after the "channel" dimension. These

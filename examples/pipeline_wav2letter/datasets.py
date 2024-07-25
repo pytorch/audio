@@ -51,7 +51,11 @@ class Processed(torch.utils.data.Dataset):
 
 
 def split_process_librispeech(
-    datasets, transforms, language_model, root, folder_in_archive,
+    datasets,
+    transforms,
+    language_model,
+    root,
+    folder_in_archive,
 ):
     def create(tags, cache=True):
 
@@ -66,7 +70,10 @@ def split_process_librispeech(
             [
                 Processed(
                     LIBRISPEECH(
-                        root, tag, folder_in_archive=folder_in_archive, download=False,
+                        root,
+                        tag,
+                        folder_in_archive=folder_in_archive,
+                        download=False,
                     ),
                     transform,
                     language_model.encode,

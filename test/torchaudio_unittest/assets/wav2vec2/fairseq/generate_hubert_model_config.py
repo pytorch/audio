@@ -32,8 +32,8 @@ python generate_hubert_model_config.py \
     > hubert_large_ll60k_finetune_ls960.json
 ```
 """
-import json
 import argparse
+import json
 
 
 def _parse_args():
@@ -42,12 +42,9 @@ def _parse_args():
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
-        '--model-file',
+        "--model-file",
         required=True,
-        help=(
-            'A pt file from '
-            'https://github.com/pytorch/fairseq/tree/main/examples/hubert'
-        )
+        help=("A pt file from " "https://github.com/pytorch/fairseq/tree/main/examples/hubert"),
     )
     return parser.parse_args()
 
@@ -66,27 +63,28 @@ def _main():
     args = _parse_args()
     model, cfg = _load(args.model_file)
 
-    if model.__class__.__name__ == 'HubertModel':
-        cfg['task']['data'] = '/foo/bar'
-        cfg['task']['label_dir'] = None
+    if model.__class__.__name__ == "HubertModel":
+        cfg["task"]["data"] = "/foo/bar"
+        cfg["task"]["label_dir"] = None
         conf = {
-            '_name': 'hubert',
-            'model': cfg['model'],
-            'task': cfg['task'],
-            'num_classes': model.num_classes,
+            "_name": "hubert",
+            "model": cfg["model"],
+            "task": cfg["task"],
+            "num_classes": model.num_classes,
         }
-    elif model.__class__.__name__ == 'HubertCtc':
-        conf = cfg['model']
-        del conf['w2v_path']
-        keep = ['_name', 'task', 'model']
-        for key in list(k for k in conf['w2v_args'] if k not in keep):
-            del conf['w2v_args'][key]
-        conf['data'] = '/foo/bar/'
-        conf['w2v_args']['task']['data'] = '/foo/bar'
-        conf['w2v_args']['task']['labels'] = []
-        conf['w2v_args']['task']['label_dir'] = '/foo/bar'
+    elif model.__class__.__name__ == "HubertCtc":
+        conf = cfg["model"]
+        del conf["w2v_path"]
+        keep = ["_name", "task", "model"]
+        for key in conf["w2v_args"]:
+            if key not in keep:
+                del conf["w2v_args"][key]
+        conf["data"] = "/foo/bar/"
+        conf["w2v_args"]["task"]["data"] = "/foo/bar"
+        conf["w2v_args"]["task"]["labels"] = []
+        conf["w2v_args"]["task"]["label_dir"] = "/foo/bar"
     print(json.dumps(conf, indent=4, sort_keys=True))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main()

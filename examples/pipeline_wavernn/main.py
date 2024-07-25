@@ -8,15 +8,13 @@ from typing import List
 
 import torch
 import torchaudio
-from torch.optim import Adam
-from torch.utils.data import DataLoader
-from torchaudio.datasets.utils import bg_iterator
-from torchaudio.models.wavernn import WaveRNN
-
 from datasets import collate_factory, split_process_dataset
 from losses import LongCrossEntropyLoss, MoLLoss
 from processing import NormalizeDB
-from utils import MetricLogger, count_parameters, save_checkpoint
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from torchaudio.models.wavernn import WaveRNN
+from utils import count_parameters, MetricLogger, save_checkpoint
 
 
 def parse_args():
@@ -43,9 +41,7 @@ def parse_args():
         metavar="N",
         help="number of total epochs to run",
     )
-    parser.add_argument(
-        "--start-epoch", default=0, type=int, metavar="N", help="manual epoch number"
-    )
+    parser.add_argument("--start-epoch", default=0, type=int, metavar="N", help="manual epoch number")
     parser.add_argument(
         "--print-freq",
         default=10,
@@ -60,11 +56,13 @@ def parse_args():
         type=str,
         help="select dataset to train with",
     )
+    parser.add_argument("--batch-size", default=256, type=int, metavar="N", help="mini-batch size")
     parser.add_argument(
-        "--batch-size", default=256, type=int, metavar="N", help="mini-batch size"
-    )
-    parser.add_argument(
-        "--learning-rate", default=1e-4, type=float, metavar="LR", help="learning rate",
+        "--learning-rate",
+        default=1e-4,
+        type=float,
+        metavar="LR",
+        help="learning rate",
     )
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=4.0)
     parser.add_argument(
@@ -73,9 +71,7 @@ def parse_args():
         action="store_true",
         help="if used, waveform is mulaw encoded",
     )
-    parser.add_argument(
-        "--jit", default=False, action="store_true", help="if used, model is jitted"
-    )
+    parser.add_argument("--jit", default=False, action="store_true", help="if used, model is jitted")
     parser.add_argument(
         "--upsample-scales",
         default=[5, 5, 11],
@@ -83,7 +79,10 @@ def parse_args():
         help="the list of upsample scales",
     )
     parser.add_argument(
-        "--n-bits", default=8, type=int, help="the bits of output waveform",
+        "--n-bits",
+        default=8,
+        type=int,
+        help="the bits of output waveform",
     )
     parser.add_argument(
         "--sample-rate",
@@ -98,10 +97,16 @@ def parse_args():
         help="the number of samples between the starts of consecutive frames",
     )
     parser.add_argument(
-        "--win-length", default=1100, type=int, help="the length of the STFT window",
+        "--win-length",
+        default=1100,
+        type=int,
+        help="the length of the STFT window",
     )
     parser.add_argument(
-        "--f-min", default=40.0, type=float, help="the minimum frequency",
+        "--f-min",
+        default=40.0,
+        type=float,
+        help="the minimum frequency",
     )
     parser.add_argument(
         "--min-level-db",
@@ -110,13 +115,22 @@ def parse_args():
         help="the minimum db value for spectrogam normalization",
     )
     parser.add_argument(
-        "--n-res-block", default=10, type=int, help="the number of ResBlock in stack",
+        "--n-res-block",
+        default=10,
+        type=int,
+        help="the number of ResBlock in stack",
     )
     parser.add_argument(
-        "--n-rnn", default=512, type=int, help="the dimension of RNN layer",
+        "--n-rnn",
+        default=512,
+        type=int,
+        help="the dimension of RNN layer",
     )
     parser.add_argument(
-        "--n-fc", default=512, type=int, help="the dimension of fully connected layer",
+        "--n-fc",
+        default=512,
+        type=int,
+        help="the dimension of fully connected layer",
     )
     parser.add_argument(
         "--kernel-size",
@@ -125,7 +139,10 @@ def parse_args():
         help="the number of kernel size in the first Conv1d layer",
     )
     parser.add_argument(
-        "--n-freq", default=80, type=int, help="the number of spectrogram bins to use",
+        "--n-freq",
+        default=80,
+        type=int,
+        help="the number of spectrogram bins to use",
     )
     parser.add_argument(
         "--n-hidden-melresnet",
@@ -134,10 +151,16 @@ def parse_args():
         help="the number of hidden dimensions of resblock in melresnet",
     )
     parser.add_argument(
-        "--n-output-melresnet", default=128, type=int, help="the output dimension of melresnet",
+        "--n-output-melresnet",
+        default=128,
+        type=int,
+        help="the output dimension of melresnet",
     )
     parser.add_argument(
-        "--n-fft", default=2048, type=int, help="the number of Fourier bins",
+        "--n-fft",
+        default=2048,
+        type=int,
+        help="the number of Fourier bins",
     )
     parser.add_argument(
         "--loss",
@@ -159,10 +182,16 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path", default="", type=str, help="the path of audio files",
+        "--file-path",
+        default="",
+        type=str,
+        help="the path of audio files",
     )
     parser.add_argument(
-        "--normalization", default=True, action="store_true", help="if True, spectrogram is normalized",
+        "--normalization",
+        default=True,
+        action="store_true",
+        help="if True, spectrogram is normalized",
     )
 
     args = parser.parse_args()
@@ -179,7 +208,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
     metric = MetricLogger("train_iteration")
     metric["epoch"] = epoch
 
-    for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
+    for waveform, specgram, target in data_loader:
 
         start2 = time()
 
@@ -199,9 +228,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
         loss.backward()
 
         if args.clip_grad > 0:
-            gradient = torch.nn.utils.clip_grad_norm_(
-                model.parameters(), args.clip_grad
-            )
+            gradient = torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad)
             sums["gradient"] += gradient.item()
             metric["gradient"] = gradient.item()
 
@@ -230,7 +257,7 @@ def validate(model, criterion, data_loader, device, epoch):
         sums = defaultdict(lambda: 0.0)
         start = time()
 
-        for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
+        for waveform, specgram, target in data_loader:
 
             waveform = waveform.to(device)
             specgram = specgram.to(device)
@@ -271,8 +298,8 @@ def main(args):
             sample_rate=args.sample_rate,
             n_mels=args.n_freq,
             f_min=args.f_min,
-            mel_scale='slaney',
-            norm='slaney',
+            mel_scale="slaney",
+            norm="slaney",
             **melkwargs,
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
@@ -304,7 +331,7 @@ def main(args):
         **loader_validation_params,
     )
 
-    n_classes = 2 ** args.n_bits if args.loss == "crossentropy" else 30
+    n_classes = 2**args.n_bits if args.loss == "crossentropy" else 30
 
     model = WaveRNN(
         upsample_scales=args.upsample_scales,
@@ -349,9 +376,7 @@ def main(args):
         model.load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer"])
 
-        logging.info(
-            f"Checkpoint: loaded '{args.checkpoint}' at epoch {checkpoint['epoch']}"
-        )
+        logging.info(f"Checkpoint: loaded '{args.checkpoint}' at epoch {checkpoint['epoch']}")
     else:
         logging.info("Checkpoint: not found")
 
@@ -369,7 +394,12 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
 
         train_one_epoch(
-            model, criterion, optimizer, train_loader, devices[0], epoch,
+            model,
+            criterion,
+            optimizer,
+            train_loader,
+            devices[0],
+            epoch,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:

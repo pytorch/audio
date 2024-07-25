@@ -1,9 +1,9 @@
-from typing import List
-from functools import partial
 from collections import namedtuple
+from functools import partial
+from typing import List
 
-from torchaudio.datasets import LibriMix
 import torch
+from torchaudio.datasets import LibriMix
 
 from . import wsj0mix
 
@@ -30,8 +30,8 @@ def _fix_num_frames(sample: wsj0mix.SampleType, target_num_frames: int, sample_r
     src = torch.cat(sample[2], 0)  # [num_sources, time]
 
     num_channels, num_frames = src.shape
-    num_seconds = torch.div(num_frames, sample_rate, rounding_mode='floor')
-    target_seconds = torch.div(target_num_frames, sample_rate, rounding_mode='floor')
+    num_seconds = torch.div(num_frames, sample_rate, rounding_mode="floor")
+    target_seconds = torch.div(target_num_frames, sample_rate, rounding_mode="floor")
     if num_frames >= target_num_frames:
         if random_start and num_frames > target_num_frames:
             start_frame = torch.randint(num_seconds - target_seconds + 1, [1]) * sample_rate
@@ -81,7 +81,7 @@ def collate_fn_wsj0mix_test(samples: List[wsj0mix.SampleType], sample_rate):
 def get_collate_fn(dataset_type, mode, sample_rate=None, duration=4):
     assert mode in ["train", "test"]
     if dataset_type in ["wsj0mix", "librimix"]:
-        if mode == 'train':
+        if mode == "train":
             if sample_rate is None:
                 raise ValueError("sample_rate is not given.")
             return partial(collate_fn_wsj0mix_train, sample_rate=sample_rate, duration=duration)

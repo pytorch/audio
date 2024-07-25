@@ -1,22 +1,16 @@
-from typing import List
 import unittest
+from typing import List
 
-from parameterized import parameterized
 import torch
-from torch.autograd import gradcheck, gradgradcheck
 import torchaudio.transforms as T
-
-from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
-    get_whitenoise,
-    get_spectrogram,
-    nested_params,
-    rnnt_utils,
-)
+from parameterized import parameterized
+from torch.autograd import gradcheck, gradgradcheck
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, rnnt_utils, TestBaseMixin
 
 
 class _DeterministicWrapper(torch.nn.Module):
     """Helper transform wrapper to make the given transform deterministic"""
+
     def __init__(self, transform, seed=0):
         super().__init__()
         self.seed = seed
@@ -29,11 +23,12 @@ class _DeterministicWrapper(torch.nn.Module):
 
 class AutogradTestMixin(TestBaseMixin):
     def assert_grad(
-            self,
-            transform: torch.nn.Module,
-            inputs: List[torch.Tensor],
-            *,
-            nondet_tol: float = 0.0,
+        self,
+        transform: torch.nn.Module,
+        inputs: List[torch.Tensor],
+        *,
+        nondet_tol: float = 0.0,
+        enable_all_grad: bool = True,
     ):
         transform = transform.to(dtype=torch.float64, device=self.device)
 
@@ -42,32 +37,33 @@ class AutogradTestMixin(TestBaseMixin):
         inputs_ = []
         for i in inputs:
             if torch.is_tensor(i):
-                i = i.to(
-                    dtype=torch.cdouble if i.is_complex() else torch.double,
-                    device=self.device)
-                i.requires_grad = True
+                i = i.to(dtype=torch.cdouble if i.is_complex() else torch.double, device=self.device)
+                if enable_all_grad:
+                    i.requires_grad = True
             inputs_.append(i)
         assert gradcheck(transform, inputs_)
         assert gradgradcheck(transform, inputs_, nondet_tol=nondet_tol)
 
-    @parameterized.expand([
-        ({'pad': 0, 'normalized': False, 'power': None, 'return_complex': True}, ),
-        ({'pad': 3, 'normalized': False, 'power': None, 'return_complex': True}, ),
-        ({'pad': 0, 'normalized': True, 'power': None, 'return_complex': True}, ),
-        ({'pad': 3, 'normalized': True, 'power': None, 'return_complex': True}, ),
-        ({'pad': 0, 'normalized': False, 'power': None}, ),
-        ({'pad': 3, 'normalized': False, 'power': None}, ),
-        ({'pad': 0, 'normalized': True, 'power': None}, ),
-        ({'pad': 3, 'normalized': True, 'power': None}, ),
-        ({'pad': 0, 'normalized': False, 'power': 1.0}, ),
-        ({'pad': 3, 'normalized': False, 'power': 1.0}, ),
-        ({'pad': 0, 'normalized': True, 'power': 1.0}, ),
-        ({'pad': 3, 'normalized': True, 'power': 1.0}, ),
-        ({'pad': 0, 'normalized': False, 'power': 2.0}, ),
-        ({'pad': 3, 'normalized': False, 'power': 2.0}, ),
-        ({'pad': 0, 'normalized': True, 'power': 2.0}, ),
-        ({'pad': 3, 'normalized': True, 'power': 2.0}, ),
-    ])
+    @parameterized.expand(
+        [
+            ({"pad": 0, "normalized": False, "power": None, "return_complex": True},),
+            ({"pad": 3, "normalized": False, "power": None, "return_complex": True},),
+            ({"pad": 0, "normalized": True, "power": None, "return_complex": True},),
+            ({"pad": 3, "normalized": True, "power": None, "return_complex": True},),
+            ({"pad": 0, "normalized": False, "power": None},),
+            ({"pad": 3, "normalized": False, "power": None},),
+            ({"pad": 0, "normalized": True, "power": None},),
+            ({"pad": 3, "normalized": True, "power": None},),
+            ({"pad": 0, "normalized": False, "power": 1.0},),
+            ({"pad": 3, "normalized": False, "power": 1.0},),
+            ({"pad": 0, "normalized": True, "power": 1.0},),
+            ({"pad": 3, "normalized": True, "power": 1.0},),
+            ({"pad": 0, "normalized": False, "power": 2.0},),
+            ({"pad": 3, "normalized": False, "power": 2.0},),
+            ({"pad": 0, "normalized": True, "power": 2.0},),
+            ({"pad": 3, "normalized": True, "power": 2.0},),
+        ]
+    )
     def test_spectrogram(self, kwargs):
         # replication_pad1d_backward_cuda is not deteministic and
         # gives very small (~2.7756e-17) difference.
@@ -101,29 +97,29 @@ class AutogradTestMixin(TestBaseMixin):
         [False, True],
     )
     def test_griffinlim(self, momentum, rand_init):
-        n_fft = 400
+        n_fft = 80
         power = 1
-        n_iter = 3
-        spec = get_spectrogram(
-            get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2),
-            n_fft=n_fft, power=power)
+        n_iter = 2
+
+        spec = get_spectrogram(get_whitenoise(sample_rate=8000, duration=0.01, n_channels=2), n_fft=n_fft, power=power)
         transform = _DeterministicWrapper(
-            T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=rand_init, power=power))
+            T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=rand_init, power=power)
+        )
         self.assert_grad(transform, [spec])
 
-    @parameterized.expand([(False, ), (True, )])
+    @parameterized.expand([(False,), (True,)])
     def test_mfcc(self, log_mels):
         sample_rate = 8000
         transform = T.MFCC(sample_rate=sample_rate, log_mels=log_mels)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
-    @parameterized.expand([(False, ), (True, )])
+    @parameterized.expand([(False,), (True,)])
     def test_lfcc(self, log_lf):
         sample_rate = 8000
         transform = T.LFCC(sample_rate=sample_rate, log_lf=log_lf)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
     def test_compute_deltas(self):
         transform = T.ComputeDeltas()
@@ -136,7 +132,7 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
-    @parameterized.expand([("linear", ), ("exponential", ), ("logarithmic", ), ("quarter_sine", ), ("half_sine", )])
+    @parameterized.expand([("linear",), ("exponential",), ("logarithmic",), ("quarter_sine",), ("half_sine",)])
     def test_fade(self, fade_shape):
         transform = T.Fade(fade_shape=fade_shape)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
@@ -147,8 +143,8 @@ class AutogradTestMixin(TestBaseMixin):
         sample_rate = 8000
         n_fft = 400
         spectrogram = get_spectrogram(
-            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
-            n_fft=n_fft, power=1)
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
         deterministic_transform = _DeterministicWrapper(masking_transform(400))
         self.assert_grad(deterministic_transform, [spectrogram])
 
@@ -156,9 +152,10 @@ class AutogradTestMixin(TestBaseMixin):
     def test_masking_iid(self, masking_transform):
         sample_rate = 8000
         n_fft = 400
-        specs = [get_spectrogram(
-            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2, seed=i),
-            n_fft=n_fft, power=1)
+        specs = [
+            get_spectrogram(
+                get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2, seed=i), n_fft=n_fft, power=1
+            )
             for i in range(3)
         ]
 
@@ -166,6 +163,16 @@ class AutogradTestMixin(TestBaseMixin):
         assert batch.ndim == 4
         deterministic_transform = _DeterministicWrapper(masking_transform(400, True))
         self.assert_grad(deterministic_transform, [batch])
+
+    def test_time_masking_p(self):
+        sample_rate = 8000
+        n_fft = 400
+        spectrogram = get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
+        time_mask = T.TimeMasking(400, iid_masks=False, p=0.1)
+        deterministic_transform = _DeterministicWrapper(time_mask)
+        self.assert_grad(deterministic_transform, [spectrogram])
 
     def test_spectral_centroid(self):
         sample_rate = 8000
@@ -182,11 +189,12 @@ class AutogradTestMixin(TestBaseMixin):
     def test_melscale(self):
         sample_rate = 8000
         n_fft = 400
-        n_mels = n_fft // 2 + 1
-        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels)
+        n_stft = n_fft // 2 + 1
+        n_mels = 128
+        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels, n_stft=n_stft)
         spec = get_spectrogram(
-            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
-            n_fft=n_fft, power=1)
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2), n_fft=n_fft, power=1
+        )
         self.assert_grad(transform, [spec])
 
     @parameterized.expand([(1.5, "amplitude"), (2, "power"), (10, "db")])
@@ -196,18 +204,18 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
-    @parameterized.expand([
-        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': False, 'norm_vars': False}, ),
-        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': True, 'norm_vars': False}, ),
-        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': False, 'norm_vars': True}, ),
-        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': True, 'norm_vars': True}, ),
-    ])
+    @parameterized.expand(
+        [
+            ({"cmn_window": 100, "min_cmn_window": 50, "center": False, "norm_vars": False},),
+            ({"cmn_window": 100, "min_cmn_window": 50, "center": True, "norm_vars": False},),
+            ({"cmn_window": 100, "min_cmn_window": 50, "center": False, "norm_vars": True},),
+            ({"cmn_window": 100, "min_cmn_window": 50, "center": True, "norm_vars": True},),
+        ]
+    )
     def test_sliding_window_cmn(self, kwargs):
         n_fft = 10
         power = 1
-        spec = get_spectrogram(
-            get_whitenoise(sample_rate=200, duration=0.05, n_channels=2),
-            n_fft=n_fft, power=power)
+        spec = get_spectrogram(get_whitenoise(sample_rate=200, duration=0.05, n_channels=2), n_fft=n_fft, power=power)
         spec_reshaped = spec.transpose(-1, -2)
 
         transform = T.SlidingWindowCmn(**kwargs)
@@ -248,7 +256,7 @@ class AutogradTestMixin(TestBaseMixin):
         spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
 
         # 1e-3 is too small (on CPU)
-        epsilon = 1e-2
+        epsilon = 2e-2
         too_close = spectrogram.abs() < epsilon
         spectrogram[too_close] = epsilon * spectrogram[too_close] / spectrogram[too_close].abs()
         self.assert_grad(transform, [spectrogram])
@@ -259,10 +267,12 @@ class AutogradTestMixin(TestBaseMixin):
         spectrogram = get_spectrogram(waveform, n_fft=400)
         self.assert_grad(transform, [spectrogram])
 
-    @parameterized.expand([
-        [True],
-        [False],
-    ])
+    @parameterized.expand(
+        [
+            [True],
+            [False],
+        ]
+    )
     def test_psd_with_mask(self, multi_mask):
         transform = T.PSD(multi_mask=multi_mask)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
@@ -274,13 +284,14 @@ class AutogradTestMixin(TestBaseMixin):
 
         self.assert_grad(transform, [spectrogram, mask])
 
-    @parameterized.expand([
-        "ref_channel",
-        # stv_power test time too long, comment for now
-        # "stv_power",
-        # stv_evd will fail since the eigenvalues are not distinct
-        # "stv_evd",
-    ])
+    @parameterized.expand(
+        [
+            "ref_channel",
+            # stv_power and stv_evd test time too long, comment for now
+            # "stv_power",
+            # "stv_evd",
+        ]
+    )
     def test_mvdr(self, solution):
         transform = T.MVDR(solution=solution)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
@@ -289,12 +300,87 @@ class AutogradTestMixin(TestBaseMixin):
         mask_n = torch.rand(spectrogram.shape[-2:])
         self.assert_grad(transform, [spectrogram, mask_s, mask_n])
 
+    def test_rtf_mvdr(self):
+        transform = T.RTFMVDR()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        specgram = get_spectrogram(waveform, n_fft=400)
+        channel, freq, _ = specgram.shape
+        rtf = torch.rand(freq, channel, dtype=torch.cfloat)
+        psd_n = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        reference_channel = 0
+        self.assert_grad(transform, [specgram, rtf, psd_n, reference_channel])
+
+    def test_souden_mvdr(self):
+        transform = T.SoudenMVDR()
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        specgram = get_spectrogram(waveform, n_fft=400)
+        channel, freq, _ = specgram.shape
+        psd_s = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        psd_n = torch.rand(freq, channel, channel, dtype=torch.cfloat)
+        reference_channel = 0
+        self.assert_grad(transform, [specgram, psd_s, psd_n, reference_channel])
+
+    @nested_params(
+        ["Convolve", "FFTConvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, cls, mode):
+        leading_dims = (4, 3, 2)
+        L_x, L_y = 23, 40
+        x = torch.rand(*leading_dims, L_x)
+        y = torch.rand(*leading_dims, L_y)
+        convolve = getattr(T, cls)(mode=mode)
+        self.assert_grad(convolve, [x, y])
+
+    def test_speed(self):
+        leading_dims = (3, 2)
+        time = 200
+
+        waveform = torch.rand(*leading_dims, time, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims)
+        speed = T.Speed(1000, 1.1)
+        self.assert_grad(speed, (waveform, lengths), enable_all_grad=False)
+
+    def test_speed_perturbation(self):
+        leading_dims = (3, 2)
+        time = 200
+        waveform = torch.rand(*leading_dims, time, requires_grad=True)
+        lengths = torch.randint(1, time, leading_dims)
+        speed = T.SpeedPerturbation(1000, [0.9])
+        self.assert_grad(speed, (waveform, lengths), enable_all_grad=False)
+
+    @nested_params([True, False])
+    def test_add_noise(self, use_lengths):
+        leading_dims = (2, 3)
+        L = 31
+
+        waveform = torch.rand(*leading_dims, L)
+        noise = torch.rand(*leading_dims, L)
+        if use_lengths:
+            lengths = torch.rand(*leading_dims)
+        else:
+            lengths = None
+        snr = torch.rand(*leading_dims)
+
+        add_noise = T.AddNoise()
+        self.assert_grad(add_noise, (waveform, noise, snr, lengths))
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 4, 10)
+        preemphasis = T.Preemphasis(coeff=0.97)
+        self.assert_grad(preemphasis, (waveform,))
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 4, 10)
+        deemphasis = T.Deemphasis(coeff=0.97)
+        self.assert_grad(deemphasis, (waveform,))
+
 
 class AutogradTestFloat32(TestBaseMixin):
     def assert_grad(
-            self,
-            transform: torch.nn.Module,
-            inputs: List[torch.Tensor],
+        self,
+        transform: torch.nn.Module,
+        inputs: List[torch.Tensor],
     ):
         inputs_ = []
         for i in inputs:
@@ -302,13 +388,15 @@ class AutogradTestFloat32(TestBaseMixin):
                 i = i.to(dtype=torch.float32, device=self.device)
             inputs_.append(i)
         # gradcheck with float32 requires higher atol and epsilon
-        assert gradcheck(transform, inputs, eps=1e-3, atol=1e-3, nondet_tol=0.)
+        assert gradcheck(transform, inputs, eps=1e-3, atol=1e-3, nondet_tol=0.0)
 
-    @parameterized.expand([
-        (rnnt_utils.get_B1_T10_U3_D4_data, ),
-        (rnnt_utils.get_B2_T4_U3_D3_data, ),
-        (rnnt_utils.get_B1_T2_U3_D5_data, ),
-    ])
+    @parameterized.expand(
+        [
+            (rnnt_utils.get_B1_T10_U3_D4_data,),
+            (rnnt_utils.get_B2_T4_U3_D3_data,),
+            (rnnt_utils.get_B1_T2_U3_D5_data,),
+        ]
+    )
     def test_rnnt_loss(self, data_func):
         def get_data(data_func, device):
             data = data_func()

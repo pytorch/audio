@@ -16,11 +16,11 @@ The module was modified in the following manner;
 The implementation of the retained functions and their formats are kept as-is.
 """
 
+from itertools import permutations
+
 # flake8: noqa
 
 import numpy as np
-from itertools import permutations
-
 import torch
 
 
@@ -31,22 +31,22 @@ def calc_sdr_torch(estimation, origin, mask=None):
     origin: (batch, nsample)
     mask: optional, (batch, nsample), binary
     """
-    
+
     if mask is not None:
         origin = origin * mask
         estimation = estimation * mask
-    
+
     origin_power = torch.pow(origin, 2).sum(1, keepdim=True) + 1e-8  # (batch, 1)
-    
-    scale = torch.sum(origin*estimation, 1, keepdim=True) / origin_power  # (batch, 1)
-    
+
+    scale = torch.sum(origin * estimation, 1, keepdim=True) / origin_power  # (batch, 1)
+
     est_true = scale * origin  # (batch, nsample)
     est_res = estimation - est_true  # (batch, nsample)
-    
+
     true_power = torch.pow(est_true, 2).sum(1)
     res_power = torch.pow(est_res, 2).sum(1)
-    
-    return 10*torch.log10(true_power) - 10*torch.log10(res_power)  # (batch, 1)
+
+    return 10 * torch.log10(true_power) - 10 * torch.log10(res_power)  # (batch, 1)
 
 
 def batch_SDR_torch(estimation, origin, mask=None):
@@ -56,43 +56,43 @@ def batch_SDR_torch(estimation, origin, mask=None):
     origin: (batch, nsource, nsample)
     mask: optional, (batch, nsample), binary
     """
-    
+
     batch_size_est, nsource_est, nsample_est = estimation.size()
     batch_size_ori, nsource_ori, nsample_ori = origin.size()
-    
+
     assert batch_size_est == batch_size_ori, "Estimation and original sources should have same shape."
     assert nsource_est == nsource_ori, "Estimation and original sources should have same shape."
     assert nsample_est == nsample_ori, "Estimation and original sources should have same shape."
-    
+
     assert nsource_est < nsample_est, "Axis 1 should be the number of sources, and axis 2 should be the signal."
-    
+
     batch_size = batch_size_est
     nsource = nsource_est
     nsample = nsample_est
-    
+
     # zero mean signals
     estimation = estimation - torch.mean(estimation, 2, keepdim=True).expand_as(estimation)
     origin = origin - torch.mean(origin, 2, keepdim=True).expand_as(estimation)
-    
+
     # possible permutations
     perm = list(set(permutations(np.arange(nsource))))
-    
+
     # pair-wise SDR
     SDR = torch.zeros((batch_size, nsource, nsource)).type(estimation.type())
     for i in range(nsource):
         for j in range(nsource):
-            SDR[:,i,j] = calc_sdr_torch(estimation[:,i], origin[:,j], mask)
-    
+            SDR[:, i, j] = calc_sdr_torch(estimation[:, i], origin[:, j], mask)
+
     # choose the best permutation
     SDR_max = []
     SDR_perm = []
     for permute in perm:
         sdr = []
         for idx in range(len(permute)):
-            sdr.append(SDR[:,idx,permute[idx]].view(batch_size,-1))
+            sdr.append(SDR[:, idx, permute[idx]].view(batch_size, -1))
         sdr = torch.sum(torch.cat(sdr, 1), 1)
         SDR_perm.append(sdr.view(batch_size, 1))
     SDR_perm = torch.cat(SDR_perm, 1)
     SDR_max, _ = torch.max(SDR_perm, dim=1)
-    
+
     return SDR_max / nsource

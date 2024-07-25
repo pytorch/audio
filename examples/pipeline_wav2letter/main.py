@@ -7,18 +7,16 @@ from time import time
 
 import torch
 import torchaudio
-from torch.optim import SGD, Adadelta, Adam, AdamW
-from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
-from torch.utils.data import DataLoader
-from torchaudio.datasets.utils import bg_iterator
-from torchaudio.functional import edit_distance
-from torchaudio.models.wav2letter import Wav2Letter
-
 from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
+from torch.optim import Adadelta, Adam, AdamW, SGD
+from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
+from torch.utils.data import DataLoader
+from torchaudio.functional import edit_distance
+from torchaudio.models.wav2letter import Wav2Letter
 from transforms import Normalize, UnsqueezeFirst
-from utils import MetricLogger, count_parameters, save_checkpoint
+from utils import count_parameters, MetricLogger, save_checkpoint
 
 
 def parse_args():
@@ -80,20 +78,14 @@ def parse_args():
         metavar="N",
         help="number of total epochs to run",
     )
-    parser.add_argument(
-        "--start-epoch", default=0, type=int, metavar="N", help="manual epoch number"
-    )
+    parser.add_argument("--start-epoch", default=0, type=int, metavar="N", help="manual epoch number")
     parser.add_argument(
         "--reduce-lr-valid",
         action="store_true",
         help="reduce learning rate based on validation loss",
     )
-    parser.add_argument(
-        "--normalize", action="store_true", help="normalize model input"
-    )
-    parser.add_argument(
-        "--progress-bar", action="store_true", help="use progress bar while training"
-    )
+    parser.add_argument("--normalize", action="store_true", help="normalize model input")
+    parser.add_argument("--progress-bar", action="store_true", help="use progress bar while training")
     parser.add_argument(
         "--decoder",
         metavar="D",
@@ -101,9 +93,7 @@ def parse_args():
         choices=["greedy"],
         help="decoder to use",
     )
-    parser.add_argument(
-        "--batch-size", default=128, type=int, metavar="N", help="mini-batch size"
-    )
+    parser.add_argument("--batch-size", default=128, type=int, metavar="N", help="mini-batch size")
     parser.add_argument(
         "--n-bins",
         default=13,
@@ -139,12 +129,10 @@ def parse_args():
         metavar="GAMMA",
         help="learning rate exponential decay constant",
     )
-    parser.add_argument(
-        "--momentum", default=0.8, type=float, metavar="M", help="momentum"
-    )
-    parser.add_argument(
-        "--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay"
-    )
+    parser.add_argument("--momentum", default=0.8, type=float, metavar="M", help="momentum")
+    parser.add_argument("--beta_1", default=0.9, type=float, metavar="BETA_1", help="beta_1")
+    parser.add_argument("--beta_2", default=0.999, type=float, metavar="BETA_2", help="beta_2")
+    parser.add_argument("--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay")
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
@@ -172,13 +160,9 @@ def parse_args():
         type=str,
         help="select which part of librispeech to validate with",
     )
-    parser.add_argument(
-        "--distributed", action="store_true", help="enable DistributedDataParallel"
-    )
+    parser.add_argument("--distributed", action="store_true", help="enable DistributedDataParallel")
     parser.add_argument("--seed", type=int, default=0, help="random seed")
-    parser.add_argument(
-        "--world-size", type=int, default=8, help="the world size to initiate DPP"
-    )
+    parser.add_argument("--world-size", type=int, default=8, help="the world size to initiate DPP")
     parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
@@ -263,9 +247,7 @@ def train_one_epoch(
     metric = MetricLogger("train", disable=disable_logger)
     metric["epoch"] = epoch
 
-    for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
-        data_loader, maxsize=2
-    ):
+    for inputs, targets, tensors_lengths, target_lengths in data_loader:
 
         start = time()
         inputs = inputs.to(device, non_blocking=True)
@@ -286,9 +268,7 @@ def train_one_epoch(
         loss.backward()
 
         if clip_grad > 0:
-            metric["gradient"] = torch.nn.utils.clip_grad_norm_(
-                model.parameters(), clip_grad
-            )
+            metric["gradient"] = torch.nn.utils.clip_grad_norm_(model.parameters(), clip_grad)
 
         optimizer.step()
 
@@ -335,9 +315,7 @@ def evaluate(
         metric = MetricLogger("validation", disable=disable_logger)
         metric["epoch"] = epoch
 
-        for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
-            data_loader, maxsize=2
-        ):
+        for inputs, targets, tensors_lengths, target_lengths in data_loader:
 
             inputs = inputs.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
@@ -351,9 +329,7 @@ def evaluate(
             # input_lengths: batch size
             # target_lengths: batch size
 
-            metric["cumulative loss"] += criterion(
-                outputs, targets, tensors_lengths, target_lengths
-            ).item()
+            metric["cumulative loss"] += criterion(outputs, targets, tensors_lengths, target_lengths).item()
 
             metric["dataset length"] += len(inputs)
             metric["iteration"] += 1
@@ -498,15 +474,17 @@ def main(rank, args):
         optimizer = Adam(
             model.parameters(),
             lr=args.learning_rate,
-            momentum=args.momentum,
+            betas=(args.beta_1, args.beta_2),
             weight_decay=args.weight_decay,
+            eps=args.eps,
         )
     elif args.optimizer == "adamw":
         optimizer = AdamW(
             model.parameters(),
             lr=args.learning_rate,
-            momentum=args.momentum,
+            betas=(args.beta_1, args.beta_2),
             weight_decay=args.weight_decay,
+            eps=args.eps,
         )
     else:
         raise ValueError("Selected optimizer not supported")
@@ -518,9 +496,7 @@ def main(rank, args):
     else:
         raise ValueError("Selected scheduler not supported")
 
-    criterion = torch.nn.CTCLoss(
-        blank=language_model.mapping[char_blank], zero_infinity=False
-    )
+    criterion = torch.nn.CTCLoss(blank=language_model.mapping[char_blank], zero_infinity=False)
 
     # Data Loader
 
@@ -569,9 +545,7 @@ def main(rank, args):
         optimizer.load_state_dict(checkpoint["optimizer"])
         scheduler.load_state_dict(checkpoint["scheduler"])
 
-        logging.info(
-            "Checkpoint: loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"]
-        )
+        logging.info("Checkpoint: loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"])
     else:
         logging.info("Checkpoint: not found")
 
@@ -649,9 +623,7 @@ def main(rank, args):
 
 def spawn_main(main, args):
     if args.distributed:
-        torch.multiprocessing.spawn(
-            main, args=(args,), nprocs=args.world_size, join=True
-        )
+        torch.multiprocessing.spawn(main, args=(args,), nprocs=args.world_size, join=True)
     else:
         main(0, args)
 

@@ -1,15 +1,15 @@
 from itertools import product
 
 import torch
-from torch.testing._internal.common_utils import TestCase
 from parameterized import parameterized
+from source_separation.utils import metrics
+from torch.testing._internal.common_utils import TestCase
 
 from . import sdr_reference
-from source_separation.utils import metrics
 
 
 class TestSDR(TestCase):
-    @parameterized.expand([(1, ), (2, ), (32, )])
+    @parameterized.expand([(1,), (2,), (32,)])
     def test_sdr(self, batch_size):
         """sdr produces the same result as the reference implementation"""
         num_frames = 256

@@ -1,0 +1,179 @@
+name: Build documentation
+
+# Documentation is deployed in the following ways
+# 1. Each time a commit is pushed to main branch
+# 2. Nightly (so that docs are updated even when there is no commit to main branch on the day)
+# 3. Manual trigger for release
+#    Because release requires changing the version number, which is used as a directory name,
+#    automating release doc deployment is tricky.
+#    There is no reliable way to know if there should have been a minor version bump.
+#
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    # Do not use matrix here to parameterize Python/CUDA versions.
+    # This job is required to pass for each PR.
+    # The name of the required job is sensitive to matrix parameter.
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      job-name: Build doc
+      runner: amz2023.linux.g5.4xlarge.nvidia.gpu
+      repository: pytorch/audio
+      gpu-arch-type: cuda
+      gpu-arch-version: "11.8"
+      timeout: 120
+      upload-artifact: docs
+
+      script: |
+        set -ex
+        # Set up Environment Variables
+        export PYTHON_VERSION="3.10"
+        export CU_VERSION="11.8"
+        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
+
+        # Set CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export CHANNEL=test
+          export BUILD_VERSION="$( cut -f 1 -d a version.txt )"
+        else
+          export CHANNEL=nightly
+          export BUILD_VERSION="$( cut -f 1 -d a version.txt )".dev"$(date "+%Y%m%d")"
+        fi
+
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
+        conda activate ./ci_env
+
+        echo "::endgroup::"
+        echo "::group::Install PyTorch"
+        conda install \
+          --yes \
+          --quiet \
+          -c "pytorch-${CHANNEL}" \
+          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
+          "${CUDATOOLKIT}"
+
+        echo "::endgroup::"
+        echo "::group::Install TorchAudio"
+        conda install --quiet --yes cmake>=3.18.0 ninja
+        pip3 install --progress-bar off -v -e . --no-use-pep517
+
+        echo "::endgroup::"
+        echo "::group::Build FFmpeg"
+        .github/scripts/ffmpeg/build_gpu.sh
+
+        echo "::endgroup::"
+        echo "::group::Install other dependencies"
+        conda install \
+          --quiet --yes \
+          -c conda-forge \
+          sox libvorbis pandoc doxygen pysoundfile
+        pip install --progress-bar off \
+            git+https://github.com/kpu/kenlm/ flashlight-text \
+            -r docs/requirements.txt -r docs/requirements-tutorials.txt
+
+        echo "::endgroup::"
+        echo "::group::Build documentation"
+        export BUILD_GALLERY=true
+        (cd docs && make html)
+
+        echo "::endgroup::"
+        echo "::group::Copy artifact"
+        cp -rf docs/build/html/* "${RUNNER_DOCS_DIR}"
+        mv docs/build/html /artifacts/
+
+  commit-main:
+    if: github.ref_name == 'main'
+    permissions:
+      # Required for `git push`
+      # Note:
+      #   This is not effective from fork.
+      #   When you debug this, make sure to make a branch on pytorch and
+      #   make PR from there.
+      contents: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+        fetch-depth: 5
+    - uses: actions/download-artifact@v3
+      with:
+        name: docs
+    - name: Update main doc
+      run: |
+        set -x
+
+        git config user.name "pytorchbot"
+        git config user.email "soumith+bot@pytorch.org"
+        # When `git clone`, `gh-pages` branch is fetched by default.
+        # The size of gh-pages grows significantly, so we use ammend and force push
+        # We add a new commit once a week
+        if [ "$(date +%d)" = "1" ]; then
+           git commit --allow-empty -m "placeholder"
+        fi
+
+        # TODO: add tag-based process (need to handle the main directory name)
+        # Update the main doc
+        rm -rf main
+        mv html main
+        git add --all main || true
+
+        git commit --amend -m "auto-generating sphinx docs" || true
+        git push -f
+
+  # Push for release
+  # Make sure that version.txt is updated first (alpha suffix is removed)
+  commit-release:
+    if: startsWith(github.ref_name, 'release/') && ( github.event_name == 'workflow_dispatch' )
+    permissions:
+      # Required for `git push`
+      # Note:
+      #   This is not effective from fork.
+      #   When you debug this, make sure to make a branch on pytorch and
+      #   make PR from there.
+      contents: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+        fetch-depth: 5
+    - uses: actions/checkout@v4
+      with:
+        path: _src
+    - uses: actions/download-artifact@v3
+      with:
+        name: docs
+    - name: Update doc
+      run: |
+        set -x
+
+        git config user.name "pytorchbot"
+        git config user.email "soumith+bot@pytorch.org"
+        # When `git clone`, `gh-pages` branch is fetched by default.
+        # The size of gh-pages grows significantly, so we use ammend and force push
+        # We add a new commit once a week
+        if [ "$(date +%d)" = "1" ]; then
+           git commit --allow-empty -m "placeholder"
+        fi
+
+        dirname="$(cat _src/version.txt)"
+        rm -rf "${dirname}"
+        mv html "${dirname}"
+        git add --all "${dirname}" || true
+
+        git commit --amend -m "auto-generating sphinx docs" || true
+        git push -f

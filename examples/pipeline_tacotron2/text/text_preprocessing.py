@@ -24,70 +24,75 @@
 Modified from https://github.com/keithito/tacotron
 """
 
-from typing import List, Union, Optional
 import re
+from typing import List, Optional, Union
 
-from unidecode import unidecode
 from torchaudio.datasets import CMUDict
+from unidecode import unidecode
 
 from .numbers import normalize_numbers
 
 
 # Regular expression matching whitespace:
-_whitespace_re = re.compile(r'\s+')
+_whitespace_re = re.compile(r"\s+")
 
 # List of (regular expression, replacement) pairs for abbreviations:
-_abbreviations = [(re.compile('\\b%s\\.' % x[0], re.IGNORECASE), x[1]) for x in [
-    ('mrs', 'misess'),
-    ('mr', 'mister'),
-    ('dr', 'doctor'),
-    ('st', 'saint'),
-    ('co', 'company'),
-    ('jr', 'junior'),
-    ('maj', 'major'),
-    ('gen', 'general'),
-    ('drs', 'doctors'),
-    ('rev', 'reverend'),
-    ('lt', 'lieutenant'),
-    ('hon', 'honorable'),
-    ('sgt', 'sergeant'),
-    ('capt', 'captain'),
-    ('esq', 'esquire'),
-    ('ltd', 'limited'),
-    ('col', 'colonel'),
-    ('ft', 'fort'),
-]]
+_abbreviations = [
+    (re.compile("\\b%s\\." % x[0], re.IGNORECASE), x[1])
+    for x in [
+        ("mrs", "misess"),
+        ("mr", "mister"),
+        ("dr", "doctor"),
+        ("st", "saint"),
+        ("co", "company"),
+        ("jr", "junior"),
+        ("maj", "major"),
+        ("gen", "general"),
+        ("drs", "doctors"),
+        ("rev", "reverend"),
+        ("lt", "lieutenant"),
+        ("hon", "honorable"),
+        ("sgt", "sergeant"),
+        ("capt", "captain"),
+        ("esq", "esquire"),
+        ("ltd", "limited"),
+        ("col", "colonel"),
+        ("ft", "fort"),
+    ]
+]
 
-_pad = '_'
-_punctuation = '!\'(),.:;? '
-_special = '-'
-_letters = 'abcdefghijklmnopqrstuvwxyz'
+_pad = "_"
+_punctuation = "!'(),.:;? "
+_special = "-"
+_letters = "abcdefghijklmnopqrstuvwxyz"
 
 symbols = [_pad] + list(_special) + list(_punctuation) + list(_letters)
 _phonemizer = None
 
 
-available_symbol_set = set(["english_characters", "english_phonemes"])
-available_phonemizers = set(["DeepPhonemizer"])
+available_symbol_set = {"english_characters", "english_phonemes"}
+available_phonemizers = {"DeepPhonemizer"}
 
 
-def get_symbol_list(symbol_list: str = "english_characters",
-                    cmudict_root: Optional[str] = "./") -> List[str]:
+def get_symbol_list(symbol_list: str = "english_characters", cmudict_root: Optional[str] = "./") -> List[str]:
     if symbol_list == "english_characters":
         return [_pad] + list(_special) + list(_punctuation) + list(_letters)
     elif symbol_list == "english_phonemes":
         return [_pad] + list(_special) + list(_punctuation) + CMUDict(cmudict_root).symbols
     else:
-        raise ValueError(f"The `symbol_list` {symbol_list} is not supported."
-                         f"Supported `symbol_list` includes {available_symbol_set}.")
+        raise ValueError(
+            f"The `symbol_list` {symbol_list} is not supported."
+            f"Supported `symbol_list` includes {available_symbol_set}."
+        )
 
 
 def word_to_phonemes(sent: str, phonemizer: str, checkpoint: str) -> List[str]:
     if phonemizer == "DeepPhonemizer":
         from dp.phonemizer import Phonemizer
+
         global _phonemizer
-        _other_symbols = ''.join(list(_special) + list(_punctuation))
-        _phone_symbols_re = r'(\[[A-Z]+?\]|' + '[' + _other_symbols + '])'  # [\[([A-Z]+?)\]|[-!'(),.:;? ]]
+        _other_symbols = "".join(list(_special) + list(_punctuation))
+        _phone_symbols_re = r"(\[[A-Z]+?\]|" + "[" + _other_symbols + "])"  # [\[([A-Z]+?)\]|[-!'(),.:;? ]]
 
         if _phonemizer is None:
             # using a global variable so that we don't have to relode checkpoint
@@ -97,7 +102,7 @@ def word_to_phonemes(sent: str, phonemizer: str, checkpoint: str) -> List[str]:
         # Example:
         # sent = "hello world!"
         # '[HH][AH][L][OW] [W][ER][L][D]!'
-        sent = _phonemizer(sent, lang='en_us')
+        sent = _phonemizer(sent, lang="en_us")
 
         # ['[HH]', '[AH]', '[L]', '[OW]', ' ', '[W]', '[ER]', '[L]', '[D]', '!']
         ret = re.findall(_phone_symbols_re, sent)
@@ -107,16 +112,19 @@ def word_to_phonemes(sent: str, phonemizer: str, checkpoint: str) -> List[str]:
 
         return ret
     else:
-        raise ValueError(f"The `phonemizer` {phonemizer} is not supported. "
-                         "Supported `symbol_list` includes `'DeepPhonemizer'`.")
+        raise ValueError(
+            f"The `phonemizer` {phonemizer} is not supported. " "Supported `symbol_list` includes `'DeepPhonemizer'`."
+        )
 
 
-def text_to_sequence(sent: str,
-                     symbol_list: Union[str, List[str]] = "english_characters",
-                     phonemizer: Optional[str] = "DeepPhonemizer",
-                     checkpoint: Optional[str] = "./en_us_cmudict_forward.pt",
-                     cmudict_root: Optional[str] = "./") -> List[int]:
-    r'''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
+def text_to_sequence(
+    sent: str,
+    symbol_list: Union[str, List[str]] = "english_characters",
+    phonemizer: Optional[str] = "DeepPhonemizer",
+    checkpoint: Optional[str] = "./en_us_cmudict_forward.pt",
+    cmudict_root: Optional[str] = "./",
+) -> List[int]:
+    r"""Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
 
     Args:
         sent (str): The input sentence to convert to a sequence.
@@ -138,19 +146,20 @@ def text_to_sequence(sent: str,
         [19, 16, 23, 23, 26, 11, 34, 26, 29, 23, 15, 2]
         >>> text_to_sequence("hello world!", "english_phonemes")
         [54, 20, 65, 69, 11, 92, 44, 65, 38, 2]
-    '''
+    """
     if symbol_list == "english_phonemes":
         if any(param is None for param in [phonemizer, checkpoint, cmudict_root]):
             raise ValueError(
                 "When `symbol_list` is 'english_phonemes', "
-                "all of `phonemizer`, `checkpoint`, and `cmudict_root` must be provided.")
+                "all of `phonemizer`, `checkpoint`, and `cmudict_root` must be provided."
+            )
 
     sent = unidecode(sent)  # convert to ascii
     sent = sent.lower()  # lower case
     sent = normalize_numbers(sent)  # expand numbers
     for regex, replacement in _abbreviations:  # expand abbreviations
         sent = re.sub(regex, replacement, sent)
-    sent = re.sub(_whitespace_re, ' ', sent)  # collapse whitespace
+    sent = re.sub(_whitespace_re, " ", sent)  # collapse whitespace
 
     if isinstance(symbol_list, list):
         symbols = symbol_list

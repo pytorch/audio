@@ -5,11 +5,7 @@ import torch
 
 
 def psd_numpy(
-        X: np.array,
-        mask: Optional[np.array],
-        multi_mask: bool = False,
-        normalize: bool = True,
-        eps: float = 1e-15
+    X: np.array, mask: Optional[np.array], multi_mask: bool = False, normalize: bool = True, eps: float = 1e-15
 ) -> np.array:
     X_conj = np.conj(X)
     psd_X = np.einsum("...cft,...eft->...ftce", X, X_conj)

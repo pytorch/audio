@@ -1,15 +1,16 @@
+import unittest
+
 import torch
 import torchaudio.functional as F
-import unittest
 from parameterized import parameterized
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoSox, TorchaudioTestCase
 
-from torchaudio_unittest.common_utils import PytorchTestCase, TorchaudioTestCase, skipIfNoSox
 from .functional_impl import Functional, FunctionalCPUOnly
 
 
 class TestFunctionalFloat32(Functional, FunctionalCPUOnly, PytorchTestCase):
     dtype = torch.float32
-    device = torch.device('cpu')
+    device = torch.device("cpu")
 
     @unittest.expectedFailure
     def test_lfilter_9th_order_filter_stability(self):
@@ -18,30 +19,22 @@ class TestFunctionalFloat32(Functional, FunctionalCPUOnly, PytorchTestCase):
 
 class TestFunctionalFloat64(Functional, PytorchTestCase):
     dtype = torch.float64
-    device = torch.device('cpu')
+    device = torch.device("cpu")
 
 
 @skipIfNoSox
 class TestApplyCodec(TorchaudioTestCase):
-    backend = "sox_io"
-
     def _smoke_test(self, format, compression, check_num_frames):
         """
         The purpose of this test suite is to verify that apply_codec functionalities do not exhibit
         abnormal behaviors.
         """
-        torch.random.manual_seed(42)
         sample_rate = 8000
         num_frames = 3 * sample_rate
         num_channels = 2
         waveform = torch.rand(num_channels, num_frames)
 
-        augmented = F.apply_codec(waveform,
-                                  sample_rate,
-                                  format,
-                                  True,
-                                  compression
-                                  )
+        augmented = F.apply_codec(waveform, sample_rate, format, True, compression)
         assert augmented.dtype == waveform.dtype
         assert augmented.shape[0] == num_channels
         if check_num_frames:

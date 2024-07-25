@@ -1,10 +1,9 @@
 from pathlib import Path
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import torch
-from torch.utils.data import Dataset
-
 import torchaudio
+from torch.utils.data import Dataset
 
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
@@ -21,6 +20,7 @@ class WSJ0Mix(Dataset):
             different sample rate, raises ``ValueError``.
         audio_ext (str, optional): The extension of audio files to find. (default: ".wav")
     """
+
     def __init__(
         self,
         root: Union[str, Path],
@@ -51,9 +51,7 @@ class WSJ0Mix(Dataset):
         for i, dir_ in enumerate(self.src_dirs):
             src = self._load_audio(str(dir_ / filename))
             if mixed.shape != src.shape:
-                raise ValueError(
-                    f"Different waveform shapes. mixed: {mixed.shape}, src[{i}]: {src.shape}"
-                )
+                raise ValueError(f"Different waveform shapes. mixed: {mixed.shape}, src[{i}]: {src.shape}")
             srcs.append(src)
         return self.sample_rate, mixed, srcs
 

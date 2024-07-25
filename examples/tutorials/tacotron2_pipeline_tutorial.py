@@ -2,8 +2,8 @@
 Text-to-Speech with Tacotron2
 =============================
 
-**Author** `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
-`Moto Hira <moto@fb.com>`__
+**Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__,
+`Moto Hira <moto@meta.com>`__
 
 """
 
@@ -23,17 +23,16 @@ Text-to-Speech with Tacotron2
 #
 # 2. Spectrogram generation
 #
-#    From the encoded text, a spectrogram is generated. We use ``Tacotron2``
+#    From the encoded text, a spectrogram is generated. We use the ``Tacotron2``
 #    model for this.
 #
 # 3. Time-domain conversion
 #
 #    The last step is converting the spectrogram into the waveform. The
-#    process to generate speech from spectrogram is also called Vocoder.
+#    process to generate speech from spectrogram is also called a Vocoder.
 #    In this tutorial, three different vocoders are used,
-#    `WaveRNN <https://pytorch.org/audio/stable/models/wavernn.html>`__,
-#    `Griffin-Lim <https://pytorch.org/audio/stable/transforms.html#griffinlim>`__,
-#    and
+#    :py:class:`~torchaudio.models.WaveRNN`,
+#    :py:class:`~torchaudio.transforms.GriffinLim`, and
 #    `Nvidia's WaveGlow <https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/>`__.
 #
 #
@@ -41,7 +40,7 @@ Text-to-Speech with Tacotron2
 #
 # .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png
 #
-# All the related components are bundled in :py:func:`torchaudio.pipelines.Tacotron2TTSBundle`,
+# All the related components are bundled in :py:class:`torchaudio.pipelines.Tacotron2TTSBundle`,
 # but this tutorial will also cover the process under the hood.
 
 ######################################################################
@@ -53,17 +52,14 @@ Text-to-Speech with Tacotron2
 # encoding.
 #
 
-# When running this example in notebook, install DeepPhonemizer
-# !pip3 install deep_phonemizer
+# %%
+#  .. code-block:: bash
+#
+#      %%bash
+#      pip3 install deep_phonemizer
 
 import torch
 import torchaudio
-import matplotlib
-import matplotlib.pyplot as plt
-
-import IPython
-
-matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
 torch.random.manual_seed(0)
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -71,6 +67,13 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(torch.__version__)
 print(torchaudio.__version__)
 print(device)
+
+
+######################################################################
+#
+
+import IPython
+import matplotlib.pyplot as plt
 
 
 ######################################################################
@@ -87,17 +90,13 @@ print(device)
 # works.
 #
 # Since the pre-trained Tacotron2 model expects specific set of symbol
-# tables, the same functionalities available in ``torchaudio``. This
-# section is more for the explanation of the basis of encoding.
+# tables, the same functionalities is available in ``torchaudio``. However,
+# we will first manually implement the encoding to aid in understanding.
 #
-# Firstly, we define the set of symbols. For example, we can use
+# First, we define the set of symbols
 # ``'_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'``. Then, we will map the
 # each character of the input text into the index of the corresponding
-# symbol in the table.
-#
-# The following is an example of such processing. In the example, symbols
-# that are not in the table are ignored.
-#
+# symbol in the table. Symbols that are not in the table are ignored.
 
 symbols = "_-!'(),.:;? abcdefghijklmnopqrstuvwxyz"
 look_up = {s: i for i, s in enumerate(symbols)}
@@ -115,8 +114,8 @@ print(text_to_sequence(text))
 
 ######################################################################
 # As mentioned in the above, the symbol table and indices must match
-# what the pretrained Tacotron2 model expects. ``torchaudio`` provides the
-# transform along with the pretrained model. For example, you can
+# what the pretrained Tacotron2 model expects. ``torchaudio`` provides the same
+# transform along with the pretrained model. You can
 # instantiate and use such transform as follow.
 #
 
@@ -130,12 +129,12 @@ print(lengths)
 
 
 ######################################################################
-# The ``processor`` object takes either a text or list of texts as inputs.
+# Note: The output of our manual encoding and the ``torchaudio`` ``text_processor`` output matches (meaning we correctly re-implemented what the library does internally). It takes either a text or list of texts as inputs.
 # When a list of texts are provided, the returned ``lengths`` variable
 # represents the valid length of each processed tokens in the output
 # batch.
 #
-# The intermediate representation can be retrieved as follow.
+# The intermediate representation can be retrieved as follows:
 #
 
 print([processor.tokens[i] for i in processed[0, : lengths[0]]])
@@ -149,7 +148,7 @@ print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 # uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
 # model.
 #
-# The detail of the G2P model is out of scope of this tutorial, we will
+# The detail of the G2P model is out of the scope of this tutorial, we will
 # just look at what the conversion looks like.
 #
 # Similar to the case of character-based encoding, the encoding process is
@@ -192,14 +191,15 @@ print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 # encoded text. For the detail of the model, please refer to `the
 # paper <https://arxiv.org/abs/1712.05884>`__.
 #
-# It is easy to instantiate a Tacotron2 model with pretrained weight,
+# It is easy to instantiate a Tacotron2 model with pretrained weights,
 # however, note that the input to Tacotron2 models need to be processed
 # by the matching text processor.
 #
-# :py:func:`torchaudio.pipelines.Tacotron2TTSBundle` bundles the matching
+# :py:class:`torchaudio.pipelines.Tacotron2TTSBundle` bundles the matching
 # models and processors together so that it is easy to create the pipeline.
 #
-# For the available bundles, and its usage, please refer to :py:mod:`torchaudio.pipelines`.
+# For the available bundles, and its usage, please refer to
+# :py:class:`~torchaudio.pipelines.Tacotron2TTSBundle`.
 #
 
 bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
@@ -215,21 +215,25 @@ with torch.inference_mode():
     spec, _, _ = tacotron2.infer(processed, lengths)
 
 
-plt.imshow(spec[0].cpu().detach())
+_ = plt.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
 
 
 ######################################################################
 # Note that ``Tacotron2.infer`` method perfoms multinomial sampling,
-# therefor, the process of generating the spectrogram incurs randomness.
+# therefore, the process of generating the spectrogram incurs randomness.
 #
 
-fig, ax = plt.subplots(3, 1, figsize=(16, 4.3 * 3))
-for i in range(3):
-    with torch.inference_mode():
-        spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
-    print(spec[0].shape)
-    ax[i].imshow(spec[0].cpu().detach())
-plt.show()
+
+def plot():
+    fig, ax = plt.subplots(3, 1)
+    for i in range(3):
+        with torch.inference_mode():
+            spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
+        print(spec[0].shape)
+        ax[i].imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
+
+
+plot()
 
 
 ######################################################################
@@ -237,7 +241,7 @@ plt.show()
 # -------------------
 #
 # Once the spectrogram is generated, the last process is to recover the
-# waveform from the spectrogram.
+# waveform from the spectrogram using a vocoder.
 #
 # ``torchaudio`` provides vocoders based on ``GriffinLim`` and
 # ``WaveRNN``.
@@ -245,8 +249,8 @@ plt.show()
 
 
 ######################################################################
-# WaveRNN
-# ~~~~~~~
+# WaveRNN Vocoder
+# ~~~~~~~~~~~~~~~
 #
 # Continuing from the previous section, we can instantiate the matching
 # WaveRNN model from the same bundle.
@@ -267,22 +271,32 @@ with torch.inference_mode():
     spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
     waveforms, lengths = vocoder(spec, spec_lengths)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-torchaudio.save(
-    "_assets/output_wavernn.wav", waveforms[0:1].cpu(), sample_rate=vocoder.sample_rate
-)
-IPython.display.Audio("_assets/output_wavernn.wav")
+
+def plot(waveforms, spec, sample_rate):
+    waveforms = waveforms.cpu().detach()
+
+    fig, [ax1, ax2] = plt.subplots(2, 1)
+    ax1.plot(waveforms[0])
+    ax1.set_xlim(0, waveforms.size(-1))
+    ax1.grid(True)
+    ax2.imshow(spec[0].cpu().detach(), origin="lower", aspect="auto")
+    return IPython.display.Audio(waveforms[0:1], rate=sample_rate)
+
+
+plot(waveforms, spec, vocoder.sample_rate)
 
 
 ######################################################################
-# Griffin-Lim
-# ~~~~~~~~~~~
+# Griffin-Lim Vocoder
+# ~~~~~~~~~~~~~~~~~~~
 #
 # Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
-# the vocode object with ``get_vocoder`` method and pass the spectrogram.
+# the vocoder object with
+# :py:func:`~torchaudio.pipelines.Tacotron2TTSBundle.get_vocoder`
+# method and pass the spectrogram.
 #
 
 bundle = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
@@ -298,24 +312,18 @@ with torch.inference_mode():
     spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
 waveforms, lengths = vocoder(spec, spec_lengths)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-torchaudio.save(
-    "_assets/output_griffinlim.wav",
-    waveforms[0:1].cpu(),
-    sample_rate=vocoder.sample_rate,
-)
-IPython.display.Audio("_assets/output_griffinlim.wav")
+plot(waveforms, spec, vocoder.sample_rate)
 
 
 ######################################################################
-# Waveglow
-# ~~~~~~~~
+# Waveglow Vocoder
+# ~~~~~~~~~~~~~~~~
 #
-# Waveglow is a vocoder published by Nvidia. The pretrained weight is
-# publishe on Torch Hub. One can instantiate the model using ``torch.hub``
+# Waveglow is a vocoder published by Nvidia. The pretrained weights are
+# published on Torch Hub. One can instantiate the model using ``torch.hub``
 # module.
 #
 
@@ -332,9 +340,7 @@ checkpoint = torch.hub.load_state_dict_from_url(
     progress=False,
     map_location=device,
 )
-state_dict = {
-    key.replace("module.", ""): value for key, value in checkpoint["state_dict"].items()
-}
+state_dict = {key.replace("module.", ""): value for key, value in checkpoint["state_dict"].items()}
 
 waveglow.load_state_dict(state_dict)
 waveglow = waveglow.remove_weightnorm(waveglow)
@@ -344,9 +350,7 @@ waveglow.eval()
 with torch.no_grad():
     waveforms = waveglow.infer(spec)
 
-fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(16, 9))
-ax1.imshow(spec[0].cpu().detach())
-ax2.plot(waveforms[0].cpu().detach())
+######################################################################
+#
 
-torchaudio.save("_assets/output_waveglow.wav", waveforms[0:1].cpu(), sample_rate=22050)
-IPython.display.Audio("_assets/output_waveglow.wav")
+plot(waveforms, spec, 22050)

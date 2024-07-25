@@ -5,6 +5,10 @@ body:
 - type: markdown
   attributes:
     value: >
+      <strong>PLEASE NOTE THAT THE TORCHAUDIO REPOSITORY IS NO LONGER ACTIVELY MONITORED.</strong> You will not likely get a response. For open discussions, visit https://discuss.pytorch.org/.
+- type: markdown
+  attributes:
+    value: >
       #### Before submitting a bug, please make sure the issue hasn't been already addressed by searching through [the existing and past issues](https://github.com/pytorch/audio/issues?q=is%3Aissue+sort%3Acreated-desc+).
 - type: textarea
   attributes:
@@ -50,7 +54,7 @@ body:
     description: |
       Please run the following and paste the output below.
       ```sh
-      wget https://raw.githubusercontent.com/pytorch/pytorch/master/torch/utils/collect_env.py
+      wget https://raw.githubusercontent.com/pytorch/pytorch/main/torch/utils/collect_env.py
       # For security purposes, please check the contents of collect_env.py before running it.
       python collect_env.py
       ```

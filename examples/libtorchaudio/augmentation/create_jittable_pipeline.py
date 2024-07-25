@@ -2,8 +2,8 @@
 """
 Create a data preprocess pipeline that can be run with libtorchaudio
 """
-import os
 import argparse
+import os
 
 import torch
 import torchaudio
@@ -14,10 +14,11 @@ class Pipeline(torch.nn.Module):
 
     This example load waveform from a file then apply effects and save it to a file.
     """
+
     def __init__(self, rir_path: str):
         super().__init__()
         rir, sample_rate = torchaudio.load(rir_path)
-        self.register_buffer('rir', rir)
+        self.register_buffer("rir", rir)
         self.rir_sample_rate: int = sample_rate
 
     def forward(self, input_path: str, output_path: str):
@@ -32,8 +33,9 @@ class Pipeline(torch.nn.Module):
 
         # 3. Reample the RIR filter to much the audio sample rate
         rir, _ = torchaudio.sox_effects.apply_effects_tensor(
-            self.rir, self.rir_sample_rate, effects=[["rate", str(sample_rate)]])
-        rir = rir / torch.norm(rir, p=2)
+            self.rir, self.rir_sample_rate, effects=[["rate", str(sample_rate)]]
+        )
+        rir = rir / torch.linalg.vector_norm(rir, ord=2)
         rir = torch.flip(rir, [1])
 
         # 4. Apply RIR filter
@@ -62,15 +64,9 @@ def _get_path(*paths):
 def _parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--rir-path",
-        default=_get_path("..", "data", "rir.wav"),
-        help="Audio dara for room impulse response."
+        "--rir-path", default=_get_path("..", "data", "rir.wav"), help="Audio dara for room impulse response."
     )
-    parser.add_argument(
-        "--output-path",
-        default=_get_path("pipeline.zip"),
-        help="Output JIT file."
-    )
+    parser.add_argument("--output-path", default=_get_path("pipeline.zip"), help="Output JIT file.")
     return parser.parse_args()
 
 
@@ -79,5 +75,5 @@ def _main():
     _create_jit_pipeline(args.rir_path, args.output_path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main()

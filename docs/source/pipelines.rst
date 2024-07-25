@@ -1,290 +1,301 @@
+.. py:module:: torchaudio.pipelines
+
 torchaudio.pipelines
 ====================
 
 .. currentmodule:: torchaudio.pipelines
-
-.. py:module:: torchaudio.pipelines
 		   
-The pipelines subpackage contains API to access the models with pretrained weights, and information/helper functions associated the pretrained weights.
+The ``torchaudio.pipelines`` module packages pre-trained models with support functions and meta-data into simple APIs tailored to perform specific tasks.
 
-wav2vec 2.0 / HuBERT - Representation Learning
-----------------------------------------------
+When using pre-trained models to perform a task, in addition to instantiating the model with pre-trained weights, the client code also needs to build pipelines for feature extractions and post processing in the same way they were done during the training. This requires to carrying over information used during the training, such as the type of transforms and the their parameters (for example, sampling rate the number of FFT bins).
 
-.. autoclass:: Wav2Vec2Bundle
-   :members: sample_rate
+To make this information tied to a pre-trained model and easily accessible, ``torchaudio.pipelines`` module uses the concept of a `Bundle` class, which defines a set of APIs to instantiate pipelines, and the interface of the pipelines.
 
-   .. automethod:: get_model
+The following figure illustrates this.
 
-WAV2VEC2_BASE
-~~~~~~~~~~~~~
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-intro.png
 
-.. container:: py attribute
+A pre-trained model and associated pipelines are expressed as an instance of ``Bundle``. Different instances of same ``Bundle`` share the interface, but their implementations are not constrained to be of same types. For example, :class:`SourceSeparationBundle` defines the interface for performing source separation, but its instance :data:`CONVTASNET_BASE_LIBRI2MIX` instantiates a model of :class:`~torchaudio.models.ConvTasNet` while :data:`HDEMUCS_HIGH_MUSDB` instantiates a model of :class:`~torchaudio.models.HDemucs`. Still, because they share the same interface, the usage is the same.
 
-   .. autodata:: WAV2VEC2_BASE
-      :no-value:
+.. note::
 
-WAV2VEC2_LARGE
-~~~~~~~~~~~~~~
+   Under the hood, the implementations of ``Bundle`` use components from other ``torchaudio`` modules, such as :mod:`torchaudio.models` and :mod:`torchaudio.transforms`, or even third party libraries like `SentencPiece <https://github.com/google/sentencepiece>`__ and `DeepPhonemizer <https://github.com/as-ideas/DeepPhonemizer>`__. But this implementation detail is abstracted away from library users.
 
-.. container:: py attribute
+.. _RNNT:
 
-   .. autodata:: WAV2VEC2_LARGE
-      :no-value:
+RNN-T Streaming/Non-Streaming ASR
+---------------------------------
 
-WAV2VEC2_LARGE_LV60K
-~~~~~~~~~~~~~~~~~~~~
+Interface
+~~~~~~~~~
 
-.. container:: py attribute
+``RNNTBundle`` defines ASR pipelines and consists of three steps: feature extraction, inference, and de-tokenization.
 
-   .. autodata:: WAV2VEC2_LARGE_LV60K
-      :no-value:
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-rnntbundle.png
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   RNNTBundle
+   RNNTBundle.FeatureExtractor
+   RNNTBundle.TokenProcessor
+
+.. rubric:: Tutorials using ``RNNTBundle``
+
+.. minigallery:: torchaudio.pipelines.RNNTBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   EMFORMER_RNNT_BASE_LIBRISPEECH
 
 
-WAV2VEC2_XLSR53
-~~~~~~~~~~~~~~~
+wav2vec 2.0 / HuBERT / WavLM - SSL
+----------------------------------
 
-.. container:: py attribute
+Interface
+~~~~~~~~~
 
-   .. autodata:: WAV2VEC2_XLSR53
-      :no-value:
+``Wav2Vec2Bundle`` instantiates models that generate acoustic features that can be used for downstream inference and fine-tuning.
 
-HUBERT_BASE
-~~~~~~~~~~~
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2bundle.png
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
 
-   .. autodata:: HUBERT_BASE
-      :no-value:
+   Wav2Vec2Bundle
 
-HUBERT_LARGE
-~~~~~~~~~~~~
+Pretrained Models
+~~~~~~~~~~~~~~~~~
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-   .. autodata:: HUBERT_LARGE
-      :no-value:
-
-HUBERT_XLARGE
-~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: HUBERT_XLARGE
-      :no-value:
+   WAV2VEC2_BASE
+   WAV2VEC2_LARGE
+   WAV2VEC2_LARGE_LV60K
+   WAV2VEC2_XLSR53
+   WAV2VEC2_XLSR_300M
+   WAV2VEC2_XLSR_1B
+   WAV2VEC2_XLSR_2B
+   HUBERT_BASE
+   HUBERT_LARGE
+   HUBERT_XLARGE
+   WAVLM_BASE
+   WAVLM_BASE_PLUS
+   WAVLM_LARGE
 
 wav2vec 2.0 / HuBERT - Fine-tuned ASR
 -------------------------------------
 
-Wav2Vec2ASRBundle
+Interface
+~~~~~~~~~
+
+``Wav2Vec2ASRBundle`` instantiates models that generate probability distribution over pre-defined labels, that can be used for ASR.
+
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2asrbundle.png
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   Wav2Vec2ASRBundle
+
+.. rubric:: Tutorials using ``Wav2Vec2ASRBundle``
+
+.. minigallery:: torchaudio.pipelines.Wav2Vec2ASRBundle
+
+Pretrained Models
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: Wav2Vec2ASRBundle
-   :members: sample_rate
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-   .. automethod:: get_model
+   WAV2VEC2_ASR_BASE_10M
+   WAV2VEC2_ASR_BASE_100H
+   WAV2VEC2_ASR_BASE_960H
+   WAV2VEC2_ASR_LARGE_10M
+   WAV2VEC2_ASR_LARGE_100H
+   WAV2VEC2_ASR_LARGE_960H
+   WAV2VEC2_ASR_LARGE_LV60K_10M
+   WAV2VEC2_ASR_LARGE_LV60K_100H
+   WAV2VEC2_ASR_LARGE_LV60K_960H
+   VOXPOPULI_ASR_BASE_10K_DE
+   VOXPOPULI_ASR_BASE_10K_EN
+   VOXPOPULI_ASR_BASE_10K_ES
+   VOXPOPULI_ASR_BASE_10K_FR
+   VOXPOPULI_ASR_BASE_10K_IT
+   HUBERT_ASR_LARGE
+   HUBERT_ASR_XLARGE
 
-   .. automethod:: get_labels
+wav2vec 2.0 / HuBERT - Forced Alignment
+---------------------------------------
 
-.. minigallery:: torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
-   :add-heading: Examples using ``Wav2Vec2ASRBundle``
-   :heading-level: ~
+Interface
+~~~~~~~~~
 
-WAV2VEC2_ASR_BASE_10M
-~~~~~~~~~~~~~~~~~~~~~
+``Wav2Vec2FABundle`` bundles pre-trained model and its associated dictionary. Additionally, it supports appending ``star`` token dimension.
 
-.. container:: py attribute
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-wav2vec2fabundle.png
 
-   .. autodata:: WAV2VEC2_ASR_BASE_10M
-      :no-value:
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
 
-WAV2VEC2_ASR_BASE_100H
-~~~~~~~~~~~~~~~~~~~~~~
-      
-.. container:: py attribute
+   Wav2Vec2FABundle
+   Wav2Vec2FABundle.Tokenizer
+   Wav2Vec2FABundle.Aligner
 
-   .. autodata:: WAV2VEC2_ASR_BASE_100H
-      :no-value:
+.. rubric:: Tutorials using ``Wav2Vec2FABundle``
 
-WAV2VEC2_ASR_BASE_960H
-~~~~~~~~~~~~~~~~~~~~~~
+.. minigallery:: torchaudio.pipelines.Wav2Vec2FABundle
 
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_BASE_960H
-      :no-value:
-
-WAV2VEC2_ASR_LARGE_10M
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_LARGE_10M
-      :no-value:
-
-WAV2VEC2_ASR_LARGE_100H
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_LARGE_100H
-      :no-value:
-
-WAV2VEC2_ASR_LARGE_960H
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_LARGE_960H
-      :no-value:
-
-WAV2VEC2_ASR_LARGE_LV60K_10M
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_10M
-      :no-value:
-
-WAV2VEC2_ASR_LARGE_LV60K_100H
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_100H
-      :no-value:
-
-WAV2VEC2_ASR_LARGE_LV60K_960H
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: WAV2VEC2_ASR_LARGE_LV60K_960H
-      :no-value:
-
-VOXPOPULI_ASR_BASE_10K_DE
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: VOXPOPULI_ASR_BASE_10K_DE
-      :no-value:
-
-VOXPOPULI_ASR_BASE_10K_EN
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: VOXPOPULI_ASR_BASE_10K_EN
-      :no-value:
-
-VOXPOPULI_ASR_BASE_10K_ES
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: VOXPOPULI_ASR_BASE_10K_ES
-      :no-value:
-
-VOXPOPULI_ASR_BASE_10K_FR
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: VOXPOPULI_ASR_BASE_10K_FR
-      :no-value:
-
-VOXPOPULI_ASR_BASE_10K_IT
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: VOXPOPULI_ASR_BASE_10K_IT
-      :no-value:
-
-HUBERT_ASR_LARGE
-~~~~~~~~~~~~~~~~
-
-.. container:: py attribute
-
-   .. autodata:: HUBERT_ASR_LARGE
-      :no-value:
-
-HUBERT_ASR_XLARGE
+Pertrained Models
 ~~~~~~~~~~~~~~~~~
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-   .. autodata:: HUBERT_ASR_XLARGE
-      :no-value:
+   MMS_FA
 
+.. _Tacotron2:
+   
 Tacotron2 Text-To-Speech
 ------------------------
 
-Tacotron2TTSBundle
-~~~~~~~~~~~~~~~~~~
+``Tacotron2TTSBundle`` defines text-to-speech pipelines and consists of three steps: tokenization, spectrogram generation and vocoder. The spectrogram generation is based on :class:`~torchaudio.models.Tacotron2` model.
 
-.. autoclass:: Tacotron2TTSBundle
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-tacotron2bundle.png
 
-   .. automethod:: get_text_processor
+``TextProcessor`` can be rule-based tokenization in the case of characters, or it can be a neural-netowrk-based G2P model that generates sequence of phonemes from input text.
 
-   .. automethod:: get_tacotron2
+Similarly ``Vocoder`` can be an algorithm without learning parameters, like `Griffin-Lim`, or a neural-network-based model like `Waveglow`.
 
-   .. automethod:: get_vocoder
+Interface
+~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   Tacotron2TTSBundle
+   Tacotron2TTSBundle.TextProcessor
+   Tacotron2TTSBundle.Vocoder
+
+.. rubric:: Tutorials using ``Tacotron2TTSBundle``
 
 .. minigallery:: torchaudio.pipelines.Tacotron2TTSBundle
-   :add-heading: Examples using ``Tacotron2TTSBundle``
-   :heading-level: ~
 
-Tacotron2TTSBundle - TextProcessor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pretrained Models
+~~~~~~~~~~~~~~~~~
 
-.. autoclass:: torchaudio.pipelines::Tacotron2TTSBundle.TextProcessor
-   :members: tokens
-   :special-members: __call__
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
+   TACOTRON2_WAVERNN_PHONE_LJSPEECH
+   TACOTRON2_WAVERNN_CHAR_LJSPEECH
+   TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
+   TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
 
-Tacotron2TTSBundle - Vocoder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Source Separation
+-----------------
 
-.. autoclass:: torchaudio.pipelines::Tacotron2TTSBundle.Vocoder
-   :members: sample_rate
-   :special-members: __call__
+Interface
+~~~~~~~~~
 
+``SourceSeparationBundle`` instantiates source separation models which take single channel audio and generates multi-channel audio.
 
-TACOTRON2_WAVERNN_PHONE_LJSPEECH
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-sourceseparationbundle.png
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
 
-   .. autodata:: TACOTRON2_WAVERNN_PHONE_LJSPEECH
-      :no-value:
+   SourceSeparationBundle
 
+.. rubric:: Tutorials using ``SourceSeparationBundle``
 
-TACOTRON2_WAVERNN_CHAR_LJSPEECH
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. minigallery:: torchaudio.pipelines.SourceSeparationBundle
 
-.. container:: py attribute
+Pretrained Models
+~~~~~~~~~~~~~~~~~
 
-   .. autodata:: TACOTRON2_WAVERNN_CHAR_LJSPEECH
-      :no-value:
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
 
-TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   CONVTASNET_BASE_LIBRI2MIX
+   HDEMUCS_HIGH_MUSDB_PLUS
+   HDEMUCS_HIGH_MUSDB
 
-.. container:: py attribute
+Squim Objective
+---------------
 
-   .. autodata:: TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
-      :no-value:
+Interface
+~~~~~~~~~
 
-TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:py:class:`SquimObjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **objecive** metric scores given the input waveform.
 
-.. container:: py attribute
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
 
-   .. autodata:: TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
-      :no-value:
+   SquimObjectiveBundle
 
-References
-----------
+Pretrained Models
+~~~~~~~~~~~~~~~~~
 
-.. footbibliography::
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_OBJECTIVE
+
+Squim Subjective
+----------------
+
+Interface
+~~~~~~~~~
+
+:py:class:`SquimSubjectiveBundle` defines speech quality and intelligibility measurement (SQUIM) pipeline that can predict **subjective** metric scores given the input waveform.
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_class.rst
+
+   SquimSubjectiveBundle
+
+Pretrained Models
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: autosummary/bundle_data.rst
+
+   SQUIM_SUBJECTIVE
