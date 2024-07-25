@@ -21,11 +21,7 @@ def _parse_args():
         description=__doc__,
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument(
-        'input_dir',
-        type=Path,
-        help='Directory where `*.trans.txt` files are searched.'
-    )
+    parser.add_argument("input_dir", type=Path, help="Directory where `*.trans.txt` files are searched.")
     return parser.parse_args()
 
 
@@ -34,22 +30,22 @@ def _parse_transcript(path):
         for line in trans_fileobj:
             line = line.strip()
             if line:
-                yield line.split(' ', maxsplit=1)
+                yield line.split(" ", maxsplit=1)
 
 
 def _parse_directory(root_dir: Path):
-    for trans_file in root_dir.glob('**/*.trans.txt'):
+    for trans_file in root_dir.glob("**/*.trans.txt"):
         trans_dir = trans_file.parent
         for id_, transcription in _parse_transcript(trans_file):
-            audio_path = trans_dir / f'{id_}.flac'
+            audio_path = trans_dir / f"{id_}.flac"
             yield id_, audio_path, transcription
 
 
 def _main():
     args = _parse_args()
     for id_, path, transcription in _parse_directory(args.input_dir):
-        print(f'{id_}\t{path}\t{transcription}')
+        print(f"{id_}\t{path}\t{transcription}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main()

@@ -1,20 +1,20 @@
+import pytest
 from torchaudio.pipelines import (
     TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH,
     TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH,
     TACOTRON2_WAVERNN_CHAR_LJSPEECH,
     TACOTRON2_WAVERNN_PHONE_LJSPEECH,
 )
-import pytest
 
 
 @pytest.mark.parametrize(
-    'bundle',
+    "bundle",
     [
         TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH,
         TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH,
         TACOTRON2_WAVERNN_CHAR_LJSPEECH,
         TACOTRON2_WAVERNN_PHONE_LJSPEECH,
-    ]
+    ],
 )
 def test_tts_models(bundle):
     """Smoke test of TTS pipeline"""

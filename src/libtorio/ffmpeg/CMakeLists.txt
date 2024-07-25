@@ -1,0 +1,93 @@
+set(
+  sources
+  ffmpeg.cpp
+  filter_graph.cpp
+  hw_context.cpp
+  stream_reader/buffer/chunked_buffer.cpp
+  stream_reader/buffer/unchunked_buffer.cpp
+  stream_reader/conversion.cpp
+  stream_reader/packet_buffer.cpp
+  stream_reader/post_process.cpp
+  stream_reader/stream_processor.cpp
+  stream_reader/stream_reader.cpp
+  stream_writer/encode_process.cpp
+  stream_writer/encoder.cpp
+  stream_writer/packet_writer.cpp
+  stream_writer/stream_writer.cpp
+  stream_writer/tensor_converter.cpp
+  )
+
+set(
+  ext_sources
+  pybind/pybind.cpp
+  )
+
+if (USE_CUDA)
+  set(
+    additional_lib
+    cuda_deps)
+endif()
+
+if (TARGET ffmpeg)
+  torio_library(
+    libtorio_ffmpeg
+    "${sources}"
+    ""
+    "torch;ffmpeg;${additional_lib}"
+    ""
+    )
+  if (BUILD_TORIO_PYTHON_EXTENSION)
+    torio_extension(
+      _torio_ffmpeg
+      "${ext_sources}"
+      ""
+      "libtorio_ffmpeg"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg"
+      )
+  endif()
+else()
+  torio_library(
+    libtorio_ffmpeg4
+    "${sources}"
+    ""
+    "torch;ffmpeg4;${additional_lib}"
+    ""
+    )
+  torio_library(
+    libtorio_ffmpeg5
+    "${sources}"
+    ""
+    "torch;ffmpeg5;${additional_lib}"
+    ""
+    )
+  torio_library(
+    libtorio_ffmpeg6
+    "${sources}"
+    ""
+    "torch;ffmpeg6;${additional_lib}"
+    ""
+    )
+  if (BUILD_TORIO_PYTHON_EXTENSION)
+    torio_extension(
+      _torio_ffmpeg4
+      "${ext_sources}"
+      ""
+      "libtorio_ffmpeg4"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg4"
+      )
+    torio_extension(
+      _torio_ffmpeg5
+      "${ext_sources}"
+      ""
+      "libtorio_ffmpeg5"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg5"
+      )
+    torio_extension(
+      _torio_ffmpeg6
+      "${ext_sources}"
+      ""
+      "libtorio_ffmpeg6"
+      "TORIO_FFMPEG_EXT_NAME=_torio_ffmpeg6"
+      )
+  endif ()
+endif()

@@ -1,25 +1,19 @@
 import time
-from typing import Tuple
 from collections import namedtuple
+from typing import Tuple
 
 import torch
 import torch.distributed as dist
-
 from utils import dist_utils, metrics
 
 _LG = dist_utils.getLogger(__name__)
 
 Metric = namedtuple("SNR", ["si_snri", "sdri"])
-Metric.__str__ = (
-    lambda self: f"SI-SNRi: {self.si_snri:10.3e}, SDRi: {self.sdri:10.3e}"
-)
+Metric.__str__ = lambda self: f"SI-SNRi: {self.si_snri:10.3e}, SDRi: {self.sdri:10.3e}"
 
 
 def si_sdr_improvement(
-    estimate: torch.Tensor,
-    reference: torch.Tensor,
-    mix: torch.Tensor,
-    mask: torch.Tensor
+    estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor, mask: torch.Tensor
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute the improvement of scale-invariant SDR. (SI-SNRi) and bare SDR (SDRi).
 
@@ -66,11 +60,7 @@ class OccasionalLogger:
 
     def log(self, metric, progress, force=False):
         now = time.monotonic()
-        if (
-            force
-            or now > self.last_time + self.time_interval
-            or progress > self.last_progress + self.progress_interval
-        ):
+        if force or now > self.last_time + self.time_interval or progress > self.last_progress + self.progress_interval:
             self.last_time = now
             self.last_progress = progress
             _LG.info_on_master("train: %s [%3d%%]", metric, 100 * progress)
@@ -117,9 +107,7 @@ class Trainer:
             loss = -si_snri
             self.optimizer.zero_grad()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                self.model.parameters(), self.grad_clip, norm_type=2.0
-            )
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip, norm_type=2.0)
             self.optimizer.step()
 
             metric = Metric(si_snri.item(), sdri.item())

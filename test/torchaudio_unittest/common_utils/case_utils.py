@@ -1,30 +1,31 @@
-import shutil
+import functools
 import os.path
+import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import unittest
+from itertools import zip_longest
 
 import torch
+import torchaudio
+import torio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-from torchaudio._internal.module_utils import (
-    is_module_available,
-    is_sox_available,
-    is_kaldi_available
-)
-
-from .backend_utils import set_audio_backend
+from torchaudio._internal.module_utils import eval_env, is_module_available
+from torchaudio.utils.ffmpeg_utils import get_video_decoders, get_video_encoders
 
 
 class TempDirMixin:
     """Mixin to provide easy access to temp dir"""
+
     temp_dir_ = None
 
     @classmethod
     def get_base_temp_dir(cls):
         # If TORCHAUDIO_TEST_TEMP_DIR is set, use it instead of temporary directory.
         # this is handy for debugging.
-        key = 'TORCHAUDIO_TEST_TEMP_DIR'
+        key = "TORCHAUDIO_TEST_TEMP_DIR"
         if key in os.environ:
             return os.environ[key]
         if cls.temp_dir_ is None:
@@ -33,10 +34,22 @@ class TempDirMixin:
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         if cls.temp_dir_ is not None:
-            cls.temp_dir_.cleanup()
-            cls.temp_dir_ = None
+            try:
+                cls.temp_dir_.cleanup()
+                cls.temp_dir_ = None
+            except PermissionError:
+                # On Windows there is a know issue with `shutil.rmtree`,
+                # which fails intermittenly.
+                #
+                # https://github.com/python/cpython/issues/74168
+                #
+                # We observed this on CircleCI, where Windows job raises
+                # PermissionError.
+                #
+                # Following the above thread, we ignore it.
+                pass
+        super().tearDownClass()
 
     def get_temp_path(self, *paths):
         temp_dir = os.path.join(self.get_base_temp_dir(), self.id())
@@ -51,16 +64,16 @@ class HttpServerMixin(TempDirMixin):
     This class creates temporary directory and serve the directory as HTTP service.
     The server is up through the execution of all the test suite defined under the subclass.
     """
+
     _proc = None
-    _port = 8000
+    _port = 12345
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls._proc = subprocess.Popen(
-            ['python', '-m', 'http.server', f'{cls._port}'],
-            cwd=cls.get_base_temp_dir(),
-            stderr=subprocess.DEVNULL)  # Disable server-side error log because it is confusing
+            ["python", "-m", "http.server", f"{cls._port}"], cwd=cls.get_base_temp_dir(), stderr=subprocess.DEVNULL
+        )  # Disable server-side error log because it is confusing
         time.sleep(2.0)
 
     @classmethod
@@ -73,51 +86,225 @@ class HttpServerMixin(TempDirMixin):
 
 
 class TestBaseMixin:
-    """Mixin to provide consistent way to define device/dtype/backend aware TestCase"""
+    """Mixin to provide consistent way to define device/dtype aware TestCase"""
+
     dtype = None
     device = None
-    backend = None
 
     def setUp(self):
         super().setUp()
-        set_audio_backend(self.backend)
+        torch.random.manual_seed(2434)
 
     @property
     def complex_dtype(self):
-        if self.dtype in ['float32', 'float', torch.float, torch.float32]:
+        if self.dtype in ["float32", "float", torch.float, torch.float32]:
             return torch.cfloat
-        if self.dtype in ['float64', 'double', torch.double, torch.float64]:
+        if self.dtype in ["float64", "double", torch.double, torch.float64]:
             return torch.cdouble
-        raise ValueError(f'No corresponding complex dtype for {self.dtype}')
+        raise ValueError(f"No corresponding complex dtype for {self.dtype}")
 
 
 class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
+_IS_FFMPEG_AVAILABLE = torio._extension.lazy_import_ffmpeg_ext().is_available()
+_IS_SOX_AVAILABLE = torchaudio._extension.lazy_import_sox_ext().is_available()
+_IS_CTC_DECODER_AVAILABLE = None
+_IS_CUDA_CTC_DECODER_AVAILABLE = None
+
+
+def is_ctc_decoder_available():
+    global _IS_CTC_DECODER_AVAILABLE
+    if _IS_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.models.decoder import CTCDecoder  # noqa: F401
+
+            _IS_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CTC_DECODER_AVAILABLE = False
+    return _IS_CTC_DECODER_AVAILABLE
+
+
+def is_cuda_ctc_decoder_available():
+    global _IS_CUDA_CTC_DECODER_AVAILABLE
+    if _IS_CUDA_CTC_DECODER_AVAILABLE is None:
+        try:
+            from torchaudio.models.decoder import CUCTCDecoder  # noqa: F401
+
+            _IS_CUDA_CTC_DECODER_AVAILABLE = True
+        except Exception:
+            _IS_CUDA_CTC_DECODER_AVAILABLE = False
+    return _IS_CUDA_CTC_DECODER_AVAILABLE
+
+
+def _fail(reason):
+    def deco(test_item):
+        if isinstance(test_item, type):
+            # whole class is decorated
+            def _f(self, *_args, **_kwargs):
+                raise RuntimeError(reason)
+
+            test_item.setUp = _f
+            return test_item
+
+        # A method is decorated
+        @functools.wraps(test_item)
+        def f(*_args, **_kwargs):
+            raise RuntimeError(reason)
+
+        return f
+
+    return deco
+
+
+def _pass(test_item):
+    return test_item
+
+
+_IN_CI = eval_env("CI", default=False)
+
+
+def _skipIf(condition, reason, key):
+    if not condition:
+        return _pass
+
+    # In CI, default to fail, so as to prevent accidental skip.
+    # In other env, default to skip
+    var = f"TORCHAUDIO_TEST_ALLOW_SKIP_IF_{key}"
+    skip_allowed = eval_env(var, default=not _IN_CI)
+    if skip_allowed:
+        return unittest.skip(reason)
+    return _fail(f"{reason} But the test cannot be skipped. (CI={_IN_CI}, {var}={skip_allowed}.)")
+
+
 def skipIfNoExec(cmd):
-    return unittest.skipIf(shutil.which(cmd) is None, f'`{cmd}` is not available')
+    return _skipIf(
+        shutil.which(cmd) is None,
+        f"`{cmd}` is not available.",
+        key=f"NO_CMD_{cmd.upper().replace('-', '_')}",
+    )
 
 
 def skipIfNoModule(module, display_name=None):
-    display_name = display_name or module
-    return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
+    return _skipIf(
+        not is_module_available(module),
+        f'"{display_name or module}" is not available.',
+        key=f"NO_MOD_{module.replace('.', '_')}",
+    )
 
 
-def skipIfNoCuda(test_item):
-    if torch.cuda.is_available():
-        return test_item
-    force_cuda_test = os.environ.get('TORCHAUDIO_TEST_FORCE_CUDA', '0')
-    if force_cuda_test not in ['0', '1']:
-        raise ValueError('"TORCHAUDIO_TEST_FORCE_CUDA" must be either "0" or "1".')
-    if force_cuda_test == '1':
-        raise RuntimeError('"TORCHAUDIO_TEST_FORCE_CUDA" is set but CUDA is not available.')
-    return unittest.skip('CUDA is not available.')(test_item)
-skipIfNoSox = unittest.skipIf(not is_sox_available(), reason='Sox not available')
-skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')
-skipIfRocm = unittest.skipIf(os.getenv('TORCHAUDIO_TEST_WITH_ROCM', '0') == '1',
-                             reason="test doesn't currently work on the ROCm stack")
-skipIfNoQengine = unittest.skipIf(
-    'fbgemm' not in torch.backends.quantized.supported_engines,
-    reason="`fbgemm` is not available."
+skipIfNoCuda = _skipIf(
+    not torch.cuda.is_available(),
+    reason="CUDA is not available.",
+    key="NO_CUDA",
 )
+# Skip test if CUDA memory is not enough
+# TODO: detect the real CUDA memory size and allow call site to configure how much the test needs
+skipIfCudaSmallMemory = _skipIf(
+    "CI" in os.environ and torch.cuda.is_available(),  # temporary
+    reason="CUDA does not have enough memory.",
+    key="CUDA_SMALL_MEMORY",
+)
+skipIfNoSox = _skipIf(
+    not _IS_SOX_AVAILABLE,
+    reason="Sox features are not available.",
+    key="NO_SOX",
+)
+
+
+def skipIfNoSoxDecoder(ext):
+    return _skipIf(
+        not _IS_SOX_AVAILABLE or ext not in torchaudio.utils.sox_utils.list_read_formats(),
+        f'sox does not handle "{ext}" for read.',
+        key="NO_SOX_DECODER",
+    )
+
+
+def skipIfNoSoxEncoder(ext):
+    return _skipIf(
+        not _IS_SOX_AVAILABLE or ext not in torchaudio.utils.sox_utils.list_write_formats(),
+        f'sox does not handle "{ext}" for write.',
+        key="NO_SOX_ENCODER",
+    )
+
+
+skipIfNoRIR = _skipIf(
+    not torchaudio._extension._IS_RIR_AVAILABLE,
+    reason="RIR features are not available.",
+    key="NO_RIR",
+)
+skipIfNoCtcDecoder = _skipIf(
+    not is_ctc_decoder_available(),
+    reason="CTC decoder not available.",
+    key="NO_CTC_DECODER",
+)
+skipIfNoCuCtcDecoder = _skipIf(
+    not is_cuda_ctc_decoder_available(),
+    reason="CUCTC decoder not available.",
+    key="NO_CUCTC_DECODER",
+)
+skipIfRocm = _skipIf(
+    eval_env("TORCHAUDIO_TEST_WITH_ROCM", default=False),
+    reason="The test doesn't currently work on the ROCm stack.",
+    key="ON_ROCM",
+)
+skipIfNoQengine = _skipIf(
+    "fbgemm" not in torch.backends.quantized.supported_engines,
+    reason="`fbgemm` is not available.",
+    key="NO_QUANTIZATION",
+)
+skipIfNoFFmpeg = _skipIf(
+    not _IS_FFMPEG_AVAILABLE,
+    reason="ffmpeg features are not available.",
+    key="NO_FFMPEG",
+)
+skipIfPy310 = _skipIf(
+    sys.version_info >= (3, 10, 0),
+    reason=(
+        "Test is known to fail for Python 3.10, disabling for now"
+        "See: https://github.com/pytorch/audio/pull/2224#issuecomment-1048329450"
+    ),
+    key="ON_PYTHON_310",
+)
+skipIfNoAudioDevice = _skipIf(
+    not (_IS_FFMPEG_AVAILABLE and torchaudio.utils.ffmpeg_utils.get_output_devices()),
+    reason="No output audio device is available.",
+    key="NO_AUDIO_OUT_DEVICE",
+)
+skipIfNoMacOS = _skipIf(
+    sys.platform != "darwin",
+    reason="This feature is only available for MacOS.",
+    key="NO_MACOS",
+)
+disabledInCI = _skipIf(
+    "CI" in os.environ,
+    reason="Tests are failing on CI consistently. Disabled while investigating.",
+    key="TEMPORARY_DISABLED",
+)
+
+
+def skipIfNoHWAccel(name):
+    key = "NO_HW_ACCEL"
+    if not _IS_FFMPEG_AVAILABLE:
+        return _skipIf(True, reason="ffmpeg features are not available.", key=key)
+    if not torch.cuda.is_available():
+        return _skipIf(True, reason="CUDA is not available.", key=key)
+    if torchaudio._extension._check_cuda_version() is None:
+        return _skipIf(True, "Torchaudio is not compiled with CUDA.", key=key)
+    if name not in get_video_decoders() and name not in get_video_encoders():
+        return _skipIf(True, f"{name} is not in the list of available decoders or encoders", key=key)
+    return _pass
+
+
+def zip_equal(*iterables):
+    """With the regular Python `zip` function, if one iterable is longer than the other,
+    the remainder portions are ignored.This is resolved in Python 3.10 where we can use
+    `strict=True` in the `zip` function
+    From https://github.com/pytorch/text/blob/c047efeba813ac943cb8046a49e858a8b529d577/test/torchtext_unittest/common/case_utils.py#L45-L54  # noqa: E501
+    """
+    sentinel = object()
+    for combo in zip_longest(*iterables, fillvalue=sentinel):
+        if sentinel in combo:
+            raise ValueError("Iterables have different lengths")
+        yield combo

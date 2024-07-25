@@ -28,7 +28,7 @@
 import logging
 import os
 import shutil
-from typing import List, Tuple, Callable
+from typing import Callable, List, Tuple
 
 import torch
 from torch import Tensor
@@ -53,21 +53,19 @@ def pad_sequences(batch: List[Tensor]) -> Tuple[Tensor, Tensor]:
 
     Modified from https://github.com/NVIDIA/DeepLearningExamples.
     """
-    input_lengths, ids_sorted_decreasing = torch.sort(
-        torch.LongTensor([len(x) for x in batch]), dim=0, descending=True)
+    input_lengths, ids_sorted_decreasing = torch.sort(torch.LongTensor([len(x) for x in batch]), dim=0, descending=True)
     max_input_len = input_lengths[0]
 
     text_padded = torch.LongTensor(len(batch), max_input_len)
     text_padded.zero_()
     for i in range(len(ids_sorted_decreasing)):
         text = batch[ids_sorted_decreasing[i]]
-        text_padded[i, :text.size(0)] = text
+        text_padded[i, : text.size(0)] = text
 
     return text_padded, input_lengths
 
 
-def prepare_input_sequence(texts: List[str],
-                           text_processor: Callable[[str], List[int]]) -> Tuple[Tensor, Tensor]:
+def prepare_input_sequence(texts: List[str], text_processor: Callable[[str], List[int]]) -> Tuple[Tensor, Tensor]:
     d = []
     for text in texts:
         d.append(torch.IntTensor(text_processor(text)[:]))

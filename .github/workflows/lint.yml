@@ -1,0 +1,40 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  python-source-and-configs:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      repository: pytorch/audio
+      script: |
+        set -euo pipefail
+
+        echo '::group::Setup environment'
+        eval "$("$(which conda)" shell.bash hook)"
+        # libcst does not have 3.11 pre-built binaries yet. Use python 3.10
+        conda create -y --name env python=3.10
+        conda activate env
+        pip3 install --progress-bar=off pre-commit
+        echo '::endgroup::'
+
+        set +e
+        pre-commit run --all-files --show-diff-on-failure
+        status=$?
+
+        echo '::group::Add Summry'
+        if [ $status -ne 0 ]; then
+          echo '### Lint failure'  >> $GITHUB_STEP_SUMMARY
+          echo '```diff'           >> $GITHUB_STEP_SUMMARY
+          git --no-pager diff      >> $GITHUB_STEP_SUMMARY
+          echo '```'               >> $GITHUB_STEP_SUMMARY
+        fi
+        echo '::endgroup::'
+        exit $status

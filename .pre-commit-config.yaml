@@ -1,0 +1,46 @@
+default_language_version:
+  node: 16.14.2
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-docstring-first
+      - id: check-toml
+      - id: check-yaml
+        exclude: packaging/.*
+      - id: end-of-file-fixer
+
+  - repo: https://github.com/omnilib/ufmt
+    rev: v1.3.2
+    hooks:
+      - id: ufmt
+        additional_dependencies:
+          - black == 22.3
+          - usort == 1.0.2
+          - libcst == 0.4.1
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v11.0.1
+    hooks:
+      - id: clang-format
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        args: ['src', 'test', 'tools', 'docs/source/conf.py', 'examples']
+        exclude: 'build|docs/src|third_party'
+        additional_dependencies:
+          - flake8-breakpoint == 1.1.0
+          - flake8-bugbear == 22.6.22
+          - flake8-comprehensions == 3.10.0
+          - flake8-pyi == 22.5.1
+          - mccabe == 0.6.0
+          - pycodestyle == 2.8.0
+
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        exclude: 'build|test|examples|third_party|docs|tools'

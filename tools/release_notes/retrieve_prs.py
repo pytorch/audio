@@ -24,22 +24,22 @@ Features = namedtuple(
 
 
 def _run_cmd(cmd):
-    return subprocess.check_output(cmd).decode('utf-8').strip()
+    return subprocess.check_output(cmd).decode("utf-8").strip()
 
 
 def commit_title(commit_hash):
-    cmd = ['git', 'log', '-n', '1', '--pretty=format:%s', f'{commit_hash}']
+    cmd = ["git", "log", "-n", "1", "--pretty=format:%s", f"{commit_hash}"]
     return _run_cmd(cmd)
 
 
-def parse_pr_number(commit_hash, title):
+def parse_pr_number(title):
     regex = r"(#[0-9]+)"
     matches = re.findall(regex, title)
     if len(matches) == 0:
-        print(f"[{commit_hash}: {title}] Could not parse PR number, ignoring PR")
+        print(f"[{title}] Could not parse PR number, ignoring PR")
         return None
     if len(matches) > 1:
-        print(f"[{commit_hash}: {title}] Got two PR numbers, using the last one")
+        print(f"[{title}] Got two PR numbers, using the last one")
         return matches[-1][1:]
     return matches[0][1:]
 
@@ -81,30 +81,43 @@ def gh_labels(pr_number):
     }}
     """
     query = run_query(query)
-    edges = query["data"]["repository"]["pullRequest"]["labels"]["edges"]
+    pr = query["data"]["repository"]["pullRequest"]
+    if not pr:
+        # to account for unrecognized PR numbers from commits originating from fb internal
+        return []
+    edges = pr["labels"]["edges"]
     return [edge["node"]["name"] for edge in edges]
 
 
 def get_features(commit_hash):
     title = commit_title(commit_hash)
-    pr_number = parse_pr_number(commit_hash, title)
+    pr_number = parse_pr_number(title)
     labels = []
     if pr_number is not None:
         labels = gh_labels(pr_number)
     return Features(title, pr_number, labels)
 
 
-def get_commits_between(base_version, new_version):
-    cmd = ['git', 'merge-base', f'{base_version}', f'{new_version}']
+def get_merge_base(base_version, new_version):
+    cmd = ["git", "merge-base", f"{base_version}", f"{new_version}"]
     merge_base = _run_cmd(cmd)
+    return merge_base
+
+
+def get_commits_between(base_version, new_version):
+    merge_base = get_merge_base(base_version, new_version)
 
     # Returns a list of items in the form
     # a7854f33 Add HuBERT model architectures (#1769)
-    cmd = ['git', 'log', '--reverse', '--oneline', f'{merge_base}..{new_version}']
-    commits = _run_cmd(cmd)
+    cmd = ["git", "log", "--reverse", "--oneline", f"{merge_base}..{base_version}"]
+    base_commits = _run_cmd(cmd).split("\n")
+    base_prs = [parse_pr_number(commit) for commit in base_commits]
 
-    log_lines = commits.split("\n")
-    hashes, titles = zip(*[log_line.split(" ", 1) for log_line in log_lines])
+    cmd = ["git", "log", "--reverse", "--oneline", f"{merge_base}..{new_version}"]
+    new_commits = _run_cmd(cmd).split("\n")
+
+    commits = [commit for commit in new_commits if parse_pr_number(commit) not in base_prs]
+    hashes, titles = zip(*[commit.split(" ", 1) for commit in commits])
     return hashes, titles
 
 

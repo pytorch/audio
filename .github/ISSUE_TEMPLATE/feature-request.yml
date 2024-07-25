@@ -2,6 +2,10 @@ name: 🚀 Feature request
 description: Submit a proposal/request for a new torchaudio feature
 
 body:
+- type: markdown
+  attributes:
+    value: >
+      <strong>PLEASE NOTE THAT THE TORCHAUDIO REPOSITORY IS NO LONGER ACTIVELY MONITORED.</strong> You may not get a response. For open discussions, visit https://discuss.pytorch.org/.
 - type: textarea
   attributes:
     label: 🚀 The feature

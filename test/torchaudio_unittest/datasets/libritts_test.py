@@ -1,22 +1,15 @@
 import os
 from pathlib import Path
 
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    get_whitenoise,
-    save_wav,
-    normalize_wav,
-)
-
 from torchaudio.datasets.libritts import LIBRITTS
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 _UTTERANCE_IDS = [
-    [19, 198, '000000', '000000'],
-    [26, 495, '000004', '000000'],
+    [19, 198, "000000", "000000"],
+    [26, 495, "000004", "000000"],
 ]
-_ORIGINAL_TEXT = 'this is the original text.'
-_NORMALIZED_TEXT = 'this is the normalized text.'
+_ORIGINAL_TEXT = "this is the original text."
+_NORMALIZED_TEXT = "this is the normalized text."
 
 
 def get_mock_dataset(root_dir):
@@ -24,31 +17,30 @@ def get_mock_dataset(root_dir):
     root_dir: directory to the mocked dataset
     """
     mocked_data = []
-    base_dir = os.path.join(root_dir, 'LibriTTS', 'train-clean-100')
+    base_dir = os.path.join(root_dir, "LibriTTS", "train-clean-100")
     for i, utterance_id in enumerate(_UTTERANCE_IDS):
         filename = f'{"_".join(str(u) for u in utterance_id)}.wav'
         file_dir = os.path.join(base_dir, str(utterance_id[0]), str(utterance_id[1]))
         os.makedirs(file_dir, exist_ok=True)
         path = os.path.join(file_dir, filename)
 
-        data = get_whitenoise(sample_rate=24000, duration=2, n_channels=1, dtype='int16', seed=i)
+        data = get_whitenoise(sample_rate=24000, duration=2, n_channels=1, dtype="int16", seed=i)
         save_wav(path, data, 24000)
         mocked_data.append(normalize_wav(data))
 
         original_text_filename = f'{"_".join(str(u) for u in utterance_id)}.original.txt'
         path_original = os.path.join(file_dir, original_text_filename)
-        with open(path_original, 'w') as file_:
+        with open(path_original, "w") as file_:
             file_.write(_ORIGINAL_TEXT)
 
         normalized_text_filename = f'{"_".join(str(u) for u in utterance_id)}.normalized.txt'
         path_normalized = os.path.join(file_dir, normalized_text_filename)
-        with open(path_normalized, 'w') as file_:
+        with open(path_normalized, "w") as file_:
             file_.write(_NORMALIZED_TEXT)
     return mocked_data, _UTTERANCE_IDS, _ORIGINAL_TEXT, _NORMALIZED_TEXT
 
 
 class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
 
     root_dir = None
     data = []
@@ -61,13 +53,15 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
 
     def _test_libritts(self, dataset):
         n_ites = 0
-        for i, (waveform,
-                sample_rate,
-                original_text,
-                normalized_text,
-                speaker_id,
-                chapter_id,
-                utterance_id) in enumerate(dataset):
+        for i, (
+            waveform,
+            sample_rate,
+            original_text,
+            normalized_text,
+            speaker_id,
+            chapter_id,
+            utterance_id,
+        ) in enumerate(dataset):
             expected_ids = self._utterance_ids[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)

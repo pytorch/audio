@@ -1,15 +1,8 @@
 from pathlib import Path
 
 import pytest
-
 from torchaudio.datasets import dr_vctk
-
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    get_whitenoise,
-    save_wav,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, save_wav, TempDirMixin, TorchaudioTestCase
 
 
 _SUBSETS = ["train", "test"]
@@ -57,11 +50,7 @@ def get_mock_dataset(root_dir):
                         data = {}
                         for condition in _CONDITIONS:
                             data[condition] = get_whitenoise(
-                                sample_rate=sample_rate,
-                                duration=0.01,
-                                n_channels=1,
-                                dtype='float32',
-                                seed=seed
+                                sample_rate=sample_rate, duration=0.01, n_channels=1, dtype="float32", seed=seed
                             )
                             audio_dir = dataset_dir / f"{condition}_{subset}set_wav_16k"
                             audio_file_path = audio_dir / filename
@@ -85,7 +74,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestDRVCTK(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
 
     root_dir = None
     samples = {}

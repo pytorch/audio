@@ -25,11 +25,10 @@
 #
 # *****************************************************************************
 
-from typing import Tuple, Callable, List
+from typing import Callable, List, Tuple
 
 import torch
 from torch import Tensor
-
 from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH
 
@@ -45,8 +44,7 @@ class InverseSpectralNormalization(torch.nn.Module):
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
-    r"""Wrap a dataset so that, whenever a new item is returned, it is saved to memory.
-    """
+    r"""Wrap a dataset so that, whenever a new item is returned, it is saved to memory."""
 
     def __init__(self, dataset):
         self.dataset = dataset
@@ -84,16 +82,17 @@ class Processed(torch.utils.data.Dataset):
         return text_norm, torch.squeeze(melspec, 0)
 
 
-def split_process_dataset(dataset: str,
-                          file_path: str,
-                          val_ratio: float,
-                          transforms: Callable,
-                          text_preprocessor: Callable[[str], List[int]],
-                          ) -> Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
+def split_process_dataset(
+    dataset: str,
+    file_path: str,
+    val_ratio: float,
+    transforms: Callable,
+    text_preprocessor: Callable[[str], List[int]],
+) -> Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Returns the Training and validation datasets.
 
     Args:
-        dataset (str): The dataset to use. Avaliable options: [`'ljspeech'`]
+        dataset (str): The dataset to use. Available options: [`'ljspeech'`]
         file_path (str): Path to the data.
         val_ratio (float): Path to the data.
         transforms (callable): A function/transform that takes in a waveform and
@@ -105,7 +104,7 @@ def split_process_dataset(dataset: str,
         train_dataset (`torch.utils.data.Dataset`): The training set.
         val_dataset (`torch.utils.data.Dataset`): The validation set.
     """
-    if dataset == 'ljspeech':
+    if dataset == "ljspeech":
         data = LJSPEECH(root=file_path, download=False)
 
         val_length = int(len(data) * val_ratio)
@@ -123,8 +122,9 @@ def split_process_dataset(dataset: str,
     return train_dataset, val_dataset
 
 
-def text_mel_collate_fn(batch: Tuple[Tensor, Tensor],
-                        n_frames_per_step: int = 1) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
+def text_mel_collate_fn(
+    batch: Tuple[Tensor, Tensor], n_frames_per_step: int = 1
+) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
     """The collate function padding and adjusting the data based on `n_frames_per_step`.
     Modified from https://github.com/NVIDIA/DeepLearningExamples
 
@@ -143,13 +143,14 @@ def text_mel_collate_fn(batch: Tuple[Tensor, Tensor],
             with shape (n_batch, max of ``mel_specgram_lengths``)
     """
     text_lengths, ids_sorted_decreasing = torch.sort(
-        torch.LongTensor([len(x[0]) for x in batch]), dim=0, descending=True)
+        torch.LongTensor([len(x[0]) for x in batch]), dim=0, descending=True
+    )
     max_input_len = text_lengths[0]
 
     text_padded = torch.zeros((len(batch), max_input_len), dtype=torch.int64)
     for i in range(len(ids_sorted_decreasing)):
         text = batch[ids_sorted_decreasing[i]][0]
-        text_padded[i, :text.size(0)] = text
+        text_padded[i, : text.size(0)] = text
 
     # Right zero-pad mel-spec
     num_mels = batch[0][1].size(0)
@@ -164,8 +165,8 @@ def text_mel_collate_fn(batch: Tuple[Tensor, Tensor],
     mel_specgram_lengths = torch.LongTensor(len(batch))
     for i in range(len(ids_sorted_decreasing)):
         mel = batch[ids_sorted_decreasing[i]][1]
-        mel_specgram_padded[i, :, :mel.size(1)] = mel
+        mel_specgram_padded[i, :, : mel.size(1)] = mel
         mel_specgram_lengths[i] = mel.size(1)
-        gate_padded[i, mel.size(1) - 1:] = 1
+        gate_padded[i, mel.size(1) - 1 :] = 1
 
     return text_padded, text_lengths, mel_specgram_padded, mel_specgram_lengths, gate_padded

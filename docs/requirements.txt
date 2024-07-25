@@ -1,7 +1,30 @@
-sphinx==3.5.4
--e git+https://github.com/pytorch/pytorch_sphinx_theme.git@b4d0005#egg=pytorch_sphinx_theme
-sphinxcontrib.katex
-sphinxcontrib.bibtex
-matplotlib
+Jinja2<3.1.0
+matplotlib<=3.8
 pyparsing<3,>=2.0.2
-sphinx_gallery
+
+# C++ docs
+breathe==4.34.0
+
+# Note:
+# When changing Sphinx-related packages, make sure that the custom behaviors in the following
+# locations are working as expected.
+# - source/_templates/layout.html
+# - source/_static/css/custom.css
+-e git+https://github.com/pytorch/pytorch_sphinx_theme.git@32a6550#egg=pytorch_sphinx_theme
+sphinx==5.1.1
+sphinxcontrib.katex==0.8.6
+sphinxcontrib.bibtex==2.4.2
+sphinx_gallery==0.11.1
+nbsphinx==0.8.8
+
+# https://github.com/bmcfee/resampy/issues/106
+# Since 2022-07-07 build_docs CI job started to fail.
+# Pinning resampy to 0.2.2 resolves this.
+# The real cause is not know at the moment but the use
+# of librosa seems to cause this
+# https://github.com/bmcfee/resampy/issues/106
+# In our case, the tutorial timed out is online_asr_tutorial,
+# which itself does not use resampy
+# However audio_feature_augmentation_tutorial is executed before that,
+# which uses librosa.
+resampy==0.2.2

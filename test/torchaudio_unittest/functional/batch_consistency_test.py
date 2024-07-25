@@ -1,49 +1,44 @@
 """Test numerical consistency among single input and batched input."""
 import itertools
 import math
+from functools import partial
 
-from parameterized import parameterized, parameterized_class
 import torch
 import torchaudio.functional as F
-
+from parameterized import parameterized, parameterized_class
 from torchaudio_unittest import common_utils
 
 
 def _name_from_args(func, _, params):
     """Return a parameterized test name, based on parameter values."""
-    return "{}_{}".format(
-        func.__name__,
-        "_".join(str(arg) for arg in params.args))
+    return "{}_{}".format(func.__name__, "_".join(str(arg) for arg in params.args))
 
 
-@parameterized_class([
-    # Single-item batch isolates problems that come purely from adding a
-    # dimension (rather than processing multiple items)
-    {"batch_size": 1},
-    {"batch_size": 3},
-])
+@parameterized_class(
+    [
+        # Single-item batch isolates problems that come purely from adding a
+        # dimension (rather than processing multiple items)
+        {"batch_size": 1},
+        {"batch_size": 3},
+    ]
+)
 class TestFunctional(common_utils.TorchaudioTestCase):
     """Test functions defined in `functional` module"""
-    backend = 'default'
 
-    def assert_batch_consistency(
-            self, functional, batch, *args, atol=1e-8, rtol=1e-5, seed=42,
-            **kwargs):
-        n = batch.size(0)
-
+    def assert_batch_consistency(self, functional, inputs, atol=1e-6, rtol=1e-5, seed=42):
+        n = inputs[0].size(0)
+        for i in range(1, len(inputs)):
+            self.assertEqual(inputs[i].size(0), n)
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
-        items_input = batch.clone()
-        items_result = torch.stack([
-            functional(items_input[i], *args, **kwargs) for i in range(n)
-        ])
+        items_input = [[ele[i].clone() for ele in inputs] for i in range(n)]
+        items_result = torch.stack([functional(*items_input[i]) for i in range(n)])
 
         # Batch the input and run
         torch.random.manual_seed(seed)
-        batch_input = batch.clone()
-        batch_result = functional(batch_input, *args, **kwargs)
+        batch_input = [ele.clone() for ele in inputs]
+        batch_result = functional(*batch_input)
 
-        self.assertEqual(items_input, batch_input, rtol=rtol, atol=atol)
         self.assertEqual(items_result, batch_result, rtol=rtol, atol=atol)
 
     def test_griffinlim(self):
@@ -55,46 +50,70 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         momentum = 0.99
         n_iter = 32
         length = 1000
-        torch.random.manual_seed(0)
         batch = torch.rand(self.batch_size, 1, 201, 6)
-        self.assert_batch_consistency(
-            F.griffinlim, batch, window, n_fft, hop, ws, power,
-            n_iter, momentum, length, 0, atol=5e-5)
+        kwargs = {
+            "window": window,
+            "n_fft": n_fft,
+            "hop_length": hop,
+            "win_length": ws,
+            "power": power,
+            "n_iter": n_iter,
+            "momentum": momentum,
+            "length": length,
+            "rand_init": False,
+        }
+        func = partial(F.griffinlim, **kwargs)
+        self.assert_batch_consistency(func, inputs=(batch,), atol=1e-4)
 
-    @parameterized.expand(list(itertools.product(
-        [8000, 16000, 44100],
-        [1, 2],
-    )), name_func=_name_from_args)
+    @parameterized.expand(
+        list(
+            itertools.product(
+                [8000, 16000, 44100],
+                [1, 2],
+            )
+        ),
+        name_func=_name_from_args,
+    )
     def test_detect_pitch_frequency(self, sample_rate, n_channels):
         # Use different frequencies to ensure each item in the batch returns a
         # different answer.
-        torch.manual_seed(0)
         frequencies = torch.randint(100, 1000, [self.batch_size])
-        waveforms = torch.stack([
-            common_utils.get_sinusoid(
-                frequency=frequency, sample_rate=sample_rate,
-                n_channels=n_channels, duration=5)
-            for frequency in frequencies
-        ])
-        self.assert_batch_consistency(
-            F.detect_pitch_frequency, waveforms, sample_rate)
+        waveforms = torch.stack(
+            [
+                common_utils.get_sinusoid(
+                    frequency=frequency, sample_rate=sample_rate, n_channels=n_channels, duration=5
+                )
+                for frequency in frequencies
+            ]
+        )
+        kwargs = {
+            "sample_rate": sample_rate,
+        }
+        func = partial(F.detect_pitch_frequency, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
-    def test_amplitude_to_DB(self):
-        torch.manual_seed(0)
+    @parameterized.expand(
+        [
+            (None,),
+            (40.0,),
+        ]
+    )
+    def test_amplitude_to_DB(self, top_db):
         spec = torch.rand(self.batch_size, 2, 100, 100) * 200
 
-        amplitude_mult = 20.
+        amplitude_mult = 20.0
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
-
+        kwargs = {
+            "multiplier": amplitude_mult,
+            "amin": amin,
+            "db_multiplier": db_mult,
+            "top_db": top_db,
+        }
+        func = partial(F.amplitude_to_DB, **kwargs)
         # Test with & without a `top_db` clamp
-        self.assert_batch_consistency(
-            F.amplitude_to_DB, spec, amplitude_mult,
-            amin, db_mult, top_db=None)
-        self.assert_batch_consistency(
-            F.amplitude_to_DB, spec, amplitude_mult,
-            amin, db_mult, top_db=40.)
+        self.assert_batch_consistency(func, inputs=(spec,))
 
     def test_amplitude_to_DB_itemwise_clamps(self):
         """Ensure that the clamps are separate for each spectrogram in a batch.
@@ -106,144 +125,358 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         https://github.com/pytorch/audio/issues/994
 
         """
-        amplitude_mult = 20.
+        amplitude_mult = 20.0
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
-        top_db = 20.
+        top_db = 20.0
 
         # Make a batch of noise
-        torch.manual_seed(0)
         spec = torch.rand([2, 2, 100, 100]) * 200
         # Make one item blow out the other
         spec[0] += 50
-
-        batchwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin,
-                                          db_mult, top_db=top_db)
-        itemwise_dbs = torch.stack([
-            F.amplitude_to_DB(item, amplitude_mult, amin,
-                              db_mult, top_db=top_db)
-            for item in spec
-        ])
-
-        self.assertEqual(batchwise_dbs, itemwise_dbs)
+        kwargs = {
+            "multiplier": amplitude_mult,
+            "amin": amin,
+            "db_multiplier": db_mult,
+            "top_db": top_db,
+        }
+        func = partial(F.amplitude_to_DB, **kwargs)
+        self.assert_batch_consistency(func, inputs=(spec,))
 
     def test_amplitude_to_DB_not_channelwise_clamps(self):
         """Check that clamps are applied per-item, not per channel."""
-        amplitude_mult = 20.
+        amplitude_mult = 20.0
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
-        top_db = 40.
+        top_db = 40.0
 
-        torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Make one channel blow out the other
         spec[:, 0] += 50
 
-        specwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin,
-                                         db_mult, top_db=top_db)
-        channelwise_dbs = torch.stack([
-            F.amplitude_to_DB(spec[:, i], amplitude_mult, amin,
-                              db_mult, top_db=top_db)
-            for i in range(spec.size(-3))
-        ])
+        specwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=top_db)
+        channelwise_dbs = torch.stack(
+            [F.amplitude_to_DB(spec[:, i], amplitude_mult, amin, db_mult, top_db=top_db) for i in range(spec.size(-3))]
+        )
 
         # Just check channelwise gives a different answer.
         difference = (specwise_dbs - channelwise_dbs).abs()
         assert (difference >= 1e-5).any()
 
     def test_contrast(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(
-            F.contrast, waveforms, enhancement_amount=80.)
+        kwargs = {
+            "enhancement_amount": 80.0,
+        }
+        func = partial(F.contrast, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_dcshift(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(
-            F.dcshift, waveforms, shift=0.5, limiter_gain=0.05)
+        kwargs = {
+            "shift": 0.5,
+            "limiter_gain": 0.05,
+        }
+        func = partial(F.dcshift, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_overdrive(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(
-            F.overdrive, waveforms, gain=45, colour=30)
+        kwargs = {
+            "gain": 45,
+            "colour": 30,
+        }
+        func = partial(F.overdrive, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_phaser(self):
-        sample_rate = 44100
+        sample_rate = 8000
         n_channels = 2
         waveform = common_utils.get_whitenoise(
-            sample_rate=sample_rate, n_channels=self.batch_size * n_channels,
-            duration=1)
+            sample_rate=sample_rate, n_channels=self.batch_size * n_channels, duration=1
+        )
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
-        self.assert_batch_consistency(F.phaser, batch, sample_rate)
+        kwargs = {
+            "sample_rate": sample_rate,
+        }
+        func = partial(F.phaser, **kwargs)
+        self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_flanger(self):
-        torch.random.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        sample_rate = 44100
-        self.assert_batch_consistency(F.flanger, waveforms, sample_rate)
+        sample_rate = 8000
+        kwargs = {
+            "sample_rate": sample_rate,
+        }
+        func = partial(F.flanger, **kwargs)
+        self.assert_batch_consistency(func, inputs=(waveforms,))
 
-    @parameterized.expand(list(itertools.product(
-        [True, False],  # center
-        [True, False],  # norm_vars
-    )), name_func=_name_from_args)
+    @parameterized.expand(
+        list(
+            itertools.product(
+                [True, False],  # center
+                [True, False],  # norm_vars
+            )
+        ),
+        name_func=_name_from_args,
+    )
     def test_sliding_window_cmn(self, center, norm_vars):
-        torch.manual_seed(0)
         spectrogram = torch.rand(self.batch_size, 2, 1024, 1024) * 200
-        self.assert_batch_consistency(
-            F.sliding_window_cmn, spectrogram, center=center,
-            norm_vars=norm_vars)
+        kwargs = {
+            "center": center,
+            "norm_vars": norm_vars,
+        }
+        func = partial(F.sliding_window_cmn, **kwargs)
+        self.assert_batch_consistency(func, inputs=(spectrogram,))
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
     def test_resample_waveform(self, resampling_method):
         num_channels = 3
         sr = 16000
         new_sr = sr // 2
-        multi_sound = common_utils.get_whitenoise(sample_rate=sr, n_channels=num_channels, duration=0.5,)
+        multi_sound = common_utils.get_whitenoise(
+            sample_rate=sr,
+            n_channels=num_channels,
+            duration=0.5,
+        )
+        kwargs = {
+            "orig_freq": sr,
+            "new_freq": new_sr,
+            "resampling_method": resampling_method,
+        }
+        func = partial(F.resample, **kwargs)
 
         self.assert_batch_consistency(
-            F.resample, multi_sound, orig_freq=sr, new_freq=new_sr,
-            resampling_method=resampling_method, rtol=1e-4, atol=1e-7)
-
-    @common_utils.skipIfNoKaldi
-    def test_compute_kaldi_pitch(self):
-        sample_rate = 44100
-        n_channels = 2
-        waveform = common_utils.get_whitenoise(
-            sample_rate=sample_rate, n_channels=self.batch_size * n_channels)
-        batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
-        self.assert_batch_consistency(
-            F.compute_kaldi_pitch, batch, sample_rate=sample_rate)
+            func,
+            inputs=(multi_sound,),
+            rtol=1e-4,
+            atol=1e-7,
+        )
 
     def test_lfilter(self):
         signal_length = 2048
-        torch.manual_seed(2434)
         x = torch.randn(self.batch_size, signal_length)
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
-
-        batchwise_output = F.lfilter(x, a, b, batching=True)
-        itemwise_output = torch.stack([
-            F.lfilter(x[i], a[i], b[i])
-            for i in range(self.batch_size)
-        ])
-
-        self.assertEqual(batchwise_output, itemwise_output)
+        self.assert_batch_consistency(F.lfilter, inputs=(x, a, b))
 
     def test_filtfilt(self):
         signal_length = 2048
-        torch.manual_seed(2434)
         x = torch.randn(self.batch_size, signal_length)
         a = torch.rand(self.batch_size, 3)
         b = torch.rand(self.batch_size, 3)
+        self.assert_batch_consistency(F.filtfilt, inputs=(x, a, b))
 
-        batchwise_output = F.filtfilt(x, a, b)
-        itemwise_output = torch.stack([
-            F.filtfilt(x[i], a[i], b[i])
-            for i in range(self.batch_size)
-        ])
+    def test_psd(self):
+        batch_size = 2
+        channel = 3
+        sample_rate = 44100
+        n_fft = 400
+        n_fft_bin = 201
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=batch_size * channel)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
+        self.assert_batch_consistency(F.psd, (specgram,))
 
-        self.assertEqual(batchwise_output, itemwise_output)
+    def test_psd_with_mask(self):
+        batch_size = 2
+        channel = 3
+        sample_rate = 44100
+        n_fft = 400
+        n_fft_bin = 201
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=batch_size * channel)
+        specgram = common_utils.get_spectrogram(waveform, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, channel, n_fft_bin, specgram.size(-1))
+        mask = torch.rand(batch_size, n_fft_bin, specgram.size(-1))
+        self.assert_batch_consistency(F.psd, (specgram, mask))
+
+    def test_mvdr_weights_souden(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+        }
+        func = partial(F.mvdr_weights_souden, **kwargs)
+        self.assert_batch_consistency(func, (psd_noise, psd_speech))
+
+    def test_mvdr_weights_souden_with_tensor(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_batch_consistency(F.mvdr_weights_souden, (psd_noise, psd_speech, reference_channel))
+
+    def test_mvdr_weights_rtf(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 129
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+        }
+        func = partial(F.mvdr_weights_rtf, **kwargs)
+        self.assert_batch_consistency(func, (rtf, psd_noise))
+
+    def test_mvdr_weights_rtf_with_tensor(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 129
+        rtf = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        self.assert_batch_consistency(F.mvdr_weights_rtf, (rtf, psd_noise, reference_channel))
+
+    def test_rtf_evd(self):
+        batch_size = 2
+        channel = 4
+        n_fft_bin = 5
+        spectrum = torch.rand(batch_size, n_fft_bin, channel, dtype=torch.cfloat)
+        psd = torch.einsum("...c,...d->...cd", spectrum, spectrum.conj())
+        self.assert_batch_consistency(F.rtf_evd, (psd,))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power(self, n_iter):
+        channel = 4
+        batch_size = 2
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        kwargs = {
+            "reference_channel": 0,
+            "n_iter": n_iter,
+        }
+        func = partial(F.rtf_power, **kwargs)
+        self.assert_batch_consistency(func, (psd_speech, psd_noise))
+
+    @parameterized.expand(
+        [
+            (1,),
+            (3,),
+        ]
+    )
+    def test_rtf_power_with_tensor(self, n_iter):
+        channel = 4
+        batch_size = 2
+        n_fft_bin = 10
+        psd_speech = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        psd_noise = torch.rand(batch_size, n_fft_bin, channel, channel, dtype=torch.cfloat)
+        reference_channel = torch.zeros(batch_size, channel)
+        reference_channel[..., 0].fill_(1)
+        kwargs = {
+            "n_iter": n_iter,
+        }
+        func = partial(F.rtf_power, **kwargs)
+        self.assert_batch_consistency(func, (psd_speech, psd_noise, reference_channel))
+
+    def test_apply_beamforming(self):
+        sr = 8000
+        n_fft = 400
+        batch_size, num_channels = 2, 3
+        n_fft_bin = n_fft // 2 + 1
+        x = common_utils.get_whitenoise(sample_rate=sr, duration=0.05, n_channels=batch_size * num_channels)
+        specgram = common_utils.get_spectrogram(x, n_fft=n_fft, hop_length=100)
+        specgram = specgram.view(batch_size, num_channels, n_fft_bin, specgram.size(-1))
+        beamform_weights = torch.rand(batch_size, n_fft_bin, num_channels, dtype=torch.cfloat)
+        self.assert_batch_consistency(F.apply_beamforming, (beamform_weights, specgram))
+
+    @common_utils.nested_params(
+        ["convolve", "fftconvolve"],
+        ["full", "valid", "same"],
+    )
+    def test_convolve(self, fn, mode):
+        leading_dims = (2, 3)
+        L_x, L_y = 89, 43
+        x = torch.rand(*leading_dims, L_x, dtype=self.dtype, device=self.device)
+        y = torch.rand(*leading_dims, L_y, dtype=self.dtype, device=self.device)
+
+        fn = getattr(F, fn)
+        actual = fn(x, y, mode)
+        expected = torch.stack(
+            [
+                torch.stack(
+                    [fn(x[i, j].unsqueeze(0), y[i, j].unsqueeze(0), mode).squeeze(0) for j in range(leading_dims[1])]
+                )
+                for i in range(leading_dims[0])
+            ]
+        )
+
+        self.assertEqual(expected, actual)
+
+    def test_add_noise(self):
+        leading_dims = (5, 2, 3)
+        L = 51
+
+        waveform = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        noise = torch.rand(*leading_dims, L, dtype=self.dtype, device=self.device)
+        lengths = torch.rand(*leading_dims, dtype=self.dtype, device=self.device)
+        snr = torch.rand(*leading_dims, dtype=self.dtype, device=self.device) * 10
+
+        actual = F.add_noise(waveform, noise, snr, lengths)
+
+        expected = []
+        for i in range(leading_dims[0]):
+            for j in range(leading_dims[1]):
+                for k in range(leading_dims[2]):
+                    expected.append(F.add_noise(waveform[i][j][k], noise[i][j][k], snr[i][j][k], lengths[i][j][k]))
+
+        self.assertEqual(torch.stack(expected), actual.reshape(-1, L))
+
+    def test_speed(self):
+        B = 5
+        orig_freq = 100
+        factor = 0.8
+        input_lengths = torch.randint(1, 1000, (B,), dtype=torch.int32)
+
+        unbatched_input = [torch.ones((int(length),)) * 1.0 for length in input_lengths]
+        batched_input = torch.nn.utils.rnn.pad_sequence(unbatched_input, batch_first=True)
+
+        output, output_lengths = F.speed(batched_input, orig_freq=orig_freq, factor=factor, lengths=input_lengths)
+
+        unbatched_output = []
+        unbatched_output_lengths = []
+        for idx in range(len(unbatched_input)):
+            w, l = F.speed(unbatched_input[idx], orig_freq=orig_freq, factor=factor, lengths=input_lengths[idx])
+            unbatched_output.append(w)
+            unbatched_output_lengths.append(l)
+
+        self.assertEqual(output_lengths, torch.stack(unbatched_output_lengths))
+        for idx in range(len(unbatched_output)):
+            w, l = output[idx], output_lengths[idx]
+            self.assertEqual(unbatched_output[idx], w[:l])
+
+    def test_preemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        actual = F.preemphasis(waveform, coeff=coeff)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            expected.append(F.preemphasis(waveform[i], coeff=coeff))
+
+        self.assertEqual(torch.stack(expected), actual)
+
+    def test_deemphasis(self):
+        waveform = torch.rand(3, 2, 100, device=self.device, dtype=self.dtype)
+        coeff = 0.9
+        actual = F.deemphasis(waveform, coeff=coeff)
+
+        expected = []
+        for i in range(waveform.size(0)):
+            expected.append(F.deemphasis(waveform[i], coeff=coeff))
+
+        self.assertEqual(torch.stack(expected), actual)

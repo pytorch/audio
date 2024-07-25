@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """Train Conv-TasNet"""
-import time
-import pathlib
 import argparse
+import pathlib
+import time
 
+import conv_tasnet
 import torch
 import torchaudio
 import torchaudio.models
-
-import conv_tasnet
 from utils import dist_utils
 from utils.dataset import utils as dataset_utils
 
@@ -16,15 +15,14 @@ _LG = dist_utils.getLogger(__name__)
 
 
 def _parse_args(args):
-    parser = argparse.ArgumentParser(description=__doc__,)
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug behavior. Each epoch will end with just one batch.")
-    group = parser.add_argument_group("Model Options")
-    group.add_argument(
-        "--num-speakers", required=True, type=int, help="The number of speakers."
+    parser = argparse.ArgumentParser(
+        description=__doc__,
     )
+    parser.add_argument(
+        "--debug", action="store_true", help="Enable debug behavior. Each epoch will end with just one batch."
+    )
+    group = parser.add_argument_group("Model Options")
+    group.add_argument("--num-speakers", required=True, type=int, help="The number of speakers.")
     group = parser.add_argument_group("Dataset Options")
     group.add_argument(
         "--sample-rate",
@@ -132,7 +130,8 @@ def _get_model(
     _LG.info_on_master(" - X: %d", msk_num_layers)
     _LG.info_on_master(" - R: %d", msk_num_stacks)
     _LG.info_on_master(
-        " - Receptive Field: %s [samples]", model.mask_generator.receptive_field,
+        " - Receptive Field: %s [samples]",
+        model.mask_generator.receptive_field,
     )
     return model
 
@@ -141,11 +140,9 @@ def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
         dataset_type, dataset_dir, num_speakers, sample_rate, task
     )
-    train_collate_fn = dataset_utils.get_collate_fn(
-        dataset_type, mode='train', sample_rate=sample_rate, duration=4
-    )
+    train_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="train", sample_rate=sample_rate, duration=4)
 
-    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test')
+    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="test")
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
@@ -173,8 +170,12 @@ def _get_dataloader(dataset_type, dataset_dir, num_speakers, sample_rate, batch_
 
 def _write_header(log_path, args):
     rows = [
-        [f"# torch: {torch.__version__}", ],
-        [f"# torchaudio: {torchaudio.__version__}", ]
+        [
+            f"# torch: {torch.__version__}",
+        ],
+        [
+            f"# torchaudio: {torchaudio.__version__}",
+        ],
     ]
     rows.append(["# arguments"])
     for key, item in vars(args).items():
@@ -212,9 +213,7 @@ def train(args):
     model = _get_model(num_sources=args.num_speakers)
     model.to(device)
 
-    model = torch.nn.parallel.DistributedDataParallel(
-        model, device_ids=[device] if torch.cuda.is_available() else None
-    )
+    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[device] if torch.cuda.is_available() else None)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     if args.resume:
@@ -222,13 +221,9 @@ def train(args):
         model.module.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
     else:
-        dist_utils.synchronize_params(
-            str(args.save_dir / "tmp.pt"), device, model, optimizer
-        )
+        dist_utils.synchronize_params(str(args.save_dir / "tmp.pt"), device, model, optimizer)
 
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="max", factor=0.5, patience=3
-    )
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=3)
 
     train_loader, valid_loader, eval_loader = _get_dataloader(
         args.dataset,

@@ -1,25 +1,14 @@
 #!/usr/bin/env python3
 
 # pyre-strict
-from pathlib import Path
 from argparse import ArgumentParser
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Mapping,
-    List,
-    Optional,
-    Tuple,
-    TypedDict,
-    Union,
-)
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, TypedDict, Union
 
 import torch
 import torchaudio
 from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from torch import nn
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
@@ -34,10 +23,7 @@ class Batch(TypedDict):
 
 
 def sisdri_metric(
-    estimate: torch.Tensor,
-    reference: torch.Tensor,
-    mix: torch.Tensor,
-    mask: torch.Tensor
+    estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor, mask: torch.Tensor
 ) -> torch.Tensor:
     """Compute the improvement of scale-invariant SDR. (SI-SDRi).
 
@@ -100,11 +86,7 @@ def sdri_metric(
     return sdri.mean().item()
 
 
-def si_sdr_loss(
-    estimate: torch.Tensor,
-    reference: torch.Tensor,
-    mask: torch.Tensor
-) -> torch.Tensor:
+def si_sdr_loss(estimate: torch.Tensor, reference: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     """Compute the Si-SDR loss.
 
     Args:
@@ -181,22 +163,16 @@ class ConvTasNetModule(LightningModule):
         """
         return self.model(x)
 
-    def training_step(
-        self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any
-    ) -> Dict[str, Any]:
+    def training_step(self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         return self._step(batch, batch_idx, "train")
 
-    def validation_step(
-        self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any
-    ) -> Dict[str, Any]:
+    def validation_step(self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """
         Operates on a single batch of data from the validation set.
         """
         return self._step(batch, batch_idx, "val")
 
-    def test_step(
-        self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any
-    ) -> Optional[Dict[str, Any]]:
+    def test_step(self, batch: Batch, batch_idx: int, *args: Any, **kwargs: Any) -> Optional[Dict[str, Any]]:
         """
         Operates on a single batch of data from the test set.
         """
@@ -222,11 +198,7 @@ class ConvTasNetModule(LightningModule):
         lr_scheduler = self.lr_scheduler
         if not lr_scheduler:
             return self.optim
-        epoch_schedulers = {
-            'scheduler': lr_scheduler,
-            'monitor': 'Losses/val_loss',
-            'interval': 'epoch'
-        }
+        epoch_schedulers = {"scheduler": lr_scheduler, "monitor": "Losses/val_loss", "interval": "epoch"}
         return [self.optim], [epoch_schedulers]
 
     def _compute_metrics(
@@ -305,11 +277,9 @@ def _get_dataloader(
     train_dataset, valid_dataset, eval_dataset = dataset_utils.get_dataset(
         dataset_type, root_dir, num_speakers, sample_rate, librimix_task, librimix_tr_split
     )
-    train_collate_fn = dataset_utils.get_collate_fn(
-        dataset_type, mode='train', sample_rate=sample_rate, duration=3
-    )
+    train_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="train", sample_rate=sample_rate, duration=3)
 
-    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode='test', sample_rate=sample_rate)
+    test_collate_fn = dataset_utils.get_collate_fn(dataset_type, mode="test", sample_rate=sample_rate)
 
     train_loader = DataLoader(
         train_dataset,
@@ -338,7 +308,7 @@ def _get_dataloader(
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--batch-size", default=6, type=int)
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0mix", "librimix"])
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -367,10 +337,7 @@ def cli_main():
         help="Sample rate of audio files in the given dataset. (default: 8000)",
     )
     parser.add_argument(
-        "--exp-dir",
-        default=Path("./exp"),
-        type=Path,
-        help="The directory to save checkpoints and logs."
+        "--exp-dir", default=Path("./exp"), type=Path, help="The directory to save checkpoints and logs."
     )
     parser.add_argument(
         "--epochs",
@@ -409,9 +376,7 @@ def cli_main():
     model = _get_model(num_sources=args.num_speakers)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=5
-    )
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=5)
     train_loader, valid_loader, eval_loader = _get_dataloader(
         args.dataset,
         args.root_dir,
@@ -438,12 +403,7 @@ def cli_main():
     )
     checkpoint_dir = args.exp_dir / "checkpoints"
     checkpoint = ModelCheckpoint(
-        checkpoint_dir,
-        monitor="Losses/val_loss",
-        mode="min",
-        save_top_k=5,
-        save_weights_only=True,
-        verbose=True
+        checkpoint_dir, monitor="Losses/val_loss", mode="min", save_top_k=5, save_weights_only=True, verbose=True
     )
     callbacks = [
         checkpoint,
@@ -452,10 +412,10 @@ def cli_main():
     trainer = Trainer(
         default_root_dir=args.exp_dir,
         max_epochs=args.epochs,
-        gpus=args.num_gpu,
         num_nodes=args.num_node,
-        accelerator="ddp",
-        plugins=DDPPlugin(find_unused_parameters=False),  # make sure there is no unused params
+        accelerator="gpu",
+        strategy="ddp_find_unused_parameters_false",
+        devices=args.num_gpu,
         limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,

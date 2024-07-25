@@ -69,8 +69,11 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/src/
+docs/source/cpp
 docs/source/tutorials
+docs/source/gen_images
 docs/source/gen_modules
+docs/source/generated
 
 # PyBuilder
 target/
@@ -116,7 +119,7 @@ ENV/
 
 # Generated Files
 test/assets/sinewave.wav
-torchaudio/version.py
+src/torchaudio/version.py
 gen.yml
 
 # Examples
@@ -127,4 +130,4 @@ examples/tutorials/_assets
 
 # third parties
 third_party/install/
-third_party/sox/archives/
+third_party/archives/

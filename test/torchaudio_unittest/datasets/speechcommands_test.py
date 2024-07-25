@@ -1,15 +1,8 @@
 import os
 from pathlib import Path
 
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    get_whitenoise,
-    normalize_wav,
-    save_wav,
-)
-
 from torchaudio.datasets import speechcommands
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 _LABELS = [
     "bed",
@@ -93,16 +86,15 @@ def get_mock_dataset(dataset_dir):
                     if j < 2:
                         mocked_train_samples.append(sample)
                     elif j < 4:
-                        valid.write(f'{label}/{filename}\n')
+                        valid.write(f"{label}/{filename}\n")
                         mocked_valid_samples.append(sample)
                     elif j < 6:
-                        test.write(f'{label}/{filename}\n')
+                        test.write(f"{label}/{filename}\n")
                         mocked_test_samples.append(sample)
     return mocked_samples, mocked_train_samples, mocked_valid_samples, mocked_test_samples
 
 
 class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples = []
@@ -113,16 +105,12 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        dataset_dir = os.path.join(
-            cls.root_dir, speechcommands.FOLDER_IN_ARCHIVE, speechcommands.URL
-        )
+        dataset_dir = os.path.join(cls.root_dir, speechcommands.FOLDER_IN_ARCHIVE, speechcommands.URL)
         cls.samples, cls.train_samples, cls.valid_samples, cls.test_samples = get_mock_dataset(dataset_dir)
 
     def _testSpeechCommands(self, dataset, data_samples):
         num_samples = 0
-        for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
-                dataset
-        ):
+        for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(dataset):
             self.assertEqual(data, data_samples[i][0], atol=5e-5, rtol=1e-8)
             assert sample_rate == data_samples[i][1]
             assert label == data_samples[i][2]

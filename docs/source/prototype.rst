@@ -1,28 +1,24 @@
-.. role:: hidden
-    :class: hidden-section
+torchaudio.prototype
+====================
 
-torchaudio.prototype.emformer
-=============================
+``torchaudio.prototype`` provides prototype features;
+they are at an early stage for feedback and testing.
+Their interfaces might be changed without prior notice.
 
-.. py:module:: torchaudio.prototype.emformer
+Most modules of prototypes are excluded from release.
+Please refer to `here <https://pytorch.org/audio>`_ for
+more information on prototype features.
 
-.. currentmodule:: torchaudio.prototype.emformer
+The modules under ``torchaudio.prototype`` must be
+imported explicitly, e.g.
 
-Emformer is a prototype feature; see `here <https://pytorch.org/audio>`_
-for more information on prototype features.
-It is available only within nightly builds and must be imported
-explicitly, e.g. via ``from torchaudio.prototype.emformer import Emformer``.
+.. code-block:: python
 
-Emformer
-~~~~~~~~
+   import torchaudio.prototype.models
 
-.. autoclass:: Emformer
-
-  .. automethod:: forward
-
-  .. automethod:: infer
-
-References
-~~~~~~~~~~
-
-.. footbibliography::
+.. toctree::
+   prototype.datasets
+   prototype.functional
+   prototype.models
+   prototype.pipelines
+   prototype.transforms

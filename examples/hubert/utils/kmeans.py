@@ -5,11 +5,8 @@
 # https://github.com/pytorch/fairseq/blob/265df7144c79446f5ea8d835bda6e727f54dad9d/LICENSE
 import logging
 from pathlib import Path
-from typing import (
-    Tuple,
-)
+from typing import Tuple
 
-import joblib
 import torch
 from sklearn.cluster import MiniBatchKMeans
 from torch import Tensor
@@ -23,12 +20,14 @@ def load_feature(
     feat_dir: Path,
     split: str,
     num_rank: int,
+    percent: float,
 ) -> Tuple[Tensor, Tensor]:
     r"""Loading features from pre-saved `.pt` files.
     Args:
         feat_dir (Path): The directory that stores the feature files.
         split (str): The split of data. Options: [``train``, ``valid``].
         num_rank (int): The number of ranks for multi-processing in feature extraction.
+        percent (float): The percent of data for training k-means model. If negative, use all data for training.
 
     Returns:
         (Tensor, Tensor)
@@ -37,12 +36,26 @@ def load_feature(
     """
     feats = []
     lens = []
-    for rank in range(num_rank):
+    for rank in range(1, num_rank + 1):
         feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
         feat = torch.load(feat_path)
-        length = torch.load(len_path)
-        feats.append(feat)
-        lens.append(length)
+        length = torch.load(len_path).int()
+        if percent < 0:
+            feats.append(feat)
+            lens.append(length)
+        else:
+            offsets = [0] + torch.cumsum(length, dim=0, dtype=torch.int).tolist()
+            nsample = int(length.shape[0] * percent)
+            indices = torch.randperm(length.shape[0])[0:nsample]
+            indices = torch.sort(indices)[0]
+            mask = []
+            for i in range(indices.shape[0]):
+                index = indices[i]
+                mask += list(range(offsets[index], offsets[index] + length[index]))
+            mask = torch.tensor(mask, dtype=torch.int)
+            feat = torch.index_select(feat, 0, mask)
+            feats.append(feat)
+            lens.append(length[indices])
     feats = torch.cat(feats)
     lens = torch.cat(lens)
     return feats, lens
@@ -54,6 +67,7 @@ def learn_kmeans(
     num_rank: int,
     km_dir: Path,
     n_clusters: int,
+    percent: float = -1,
     init: str = "k-means++",
     max_iter: int = 100,
     batch_size: int = 10000,
@@ -69,6 +83,8 @@ def learn_kmeans(
         num_rank (int): The number of ranks for multi-processing in feature extraction.
         km_dir (Path): The directory to store the KMeans clustering model.
         n_clusters (int): The number of clusters.
+        percent (float): The percent of data for training k-means model.
+            If negative, use all data for training. (Default: -1)
         init (str, optional): Method for initialization. Options: [``k-means++``, ``random``].
             (Default: ``k-means++``)
         max_iter (int, optional): Maximum number of iterations over the complete dataset. (Default: 100)
@@ -105,10 +121,13 @@ def learn_kmeans(
         feat_dir,
         split,
         num_rank,
+        percent,
     )
     feats = feats.numpy()
     km_model.fit(feats)
     km_path = _get_model_path(km_dir)
+    import joblib
+
     joblib.dump(km_model, km_path)
 
     inertia = -km_model.score(feats) / len(feats)
@@ -116,21 +135,19 @@ def learn_kmeans(
     _LG.info("Finished training the KMeans clustering model successfully")
 
 
-class ApplyKmeans(object):
+class ApplyKmeans:
     def __init__(self, km_path, device):
+        import joblib
+
         self.km_model = joblib.load(km_path)
         self.C_np = self.km_model.cluster_centers_.transpose()
-        self.Cnorm_np = (self.C_np ** 2).sum(0, keepdims=True)
+        self.Cnorm_np = (self.C_np**2).sum(0, keepdims=True)
 
         self.C = torch.from_numpy(self.C_np).to(device)
         self.Cnorm = torch.from_numpy(self.Cnorm_np).to(device)
 
     def __call__(self, x):
-        dist = (
-            x.pow(2).sum(1, keepdim=True)
-            - 2 * torch.matmul(x, self.C)
-            + self.Cnorm
-        )
+        dist = x.pow(2).sum(1, keepdim=True) - 2 * torch.matmul(x, self.C) + self.Cnorm
         return dist.argmin(dim=1).cpu().numpy()
 
 
@@ -160,19 +177,16 @@ def get_km_label(
     km_path = _get_model_path(km_dir)
     label_path = label_dir / f"label_{split}.pt"
     apply_kmeans = ApplyKmeans(km_path, device)
-    feats, lens = load_feature(
-        feat_dir,
-        split,
-        num_rank,
-    )
-    feats = feats
-    lens = lens.long()
-    offset = 0
-    assert feats.shape[0] == lens.sum()
     with open(label_path, "w") as f:
-        for i in range(lens.shape[0]):
-            feat = feats[offset:offset + lens[i]].to(device)
-            offset += lens[i]
-            label = apply_kmeans(feat).tolist()
-            f.write(" ".join(map(str, label)) + "\n")
+        for rank in range(1, num_rank + 1):
+            offset = 0
+            feat_path, len_path = _get_feat_lens_paths(feat_dir, split, rank, num_rank)
+            feats = torch.load(feat_path)
+            length = torch.load(len_path).int()
+            assert feats.shape[0] == length.sum()
+            labels = apply_kmeans(feats.to(device)).tolist()
+            for i in range(length.shape[0]):
+                label = labels[offset : offset + length[i]]
+                offset += length[i]
+                f.write(" ".join(map(str, label)) + "\n")
     _LG.info("Finished predicting labels successfully")

@@ -1,35 +1,29 @@
-.. _sox_effects:
+.. py:module:: torchaudio.sox_effects
 
 torchaudio.sox_effects
 ======================
 
-.. py:module:: torchaudio.sox_effects
-
 .. currentmodule:: torchaudio.sox_effects
 
-Resource initialization / shutdown
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: init_sox_effects
-
-.. autofunction:: shutdown_sox_effects
-
-Listing supported effects
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: effect_names
-
 Applying effects
-~~~~~~~~~~~~~~~~
+----------------
 
 Apply SoX effects chain on torch.Tensor or on file and load as torch.Tensor.
 
-Applying effects on Tensor
---------------------------
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
 
-.. autofunction:: apply_effects_tensor
+   apply_effects_tensor
+   apply_effects_file
 
-Applying effects on file
-------------------------
+.. minigallery:: torchaudio.sox_effects.apply_effects_tensor
+   
+Utilities
+---------
 
-.. autofunction:: apply_effects_file
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   effect_names

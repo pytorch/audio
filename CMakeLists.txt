@@ -16,6 +16,11 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.15.0)
   cmake_policy(SET CMP0092 NEW)
 endif()
 
+# Suppress warning about ExternalProject_Add timestamp
+if(NOT CMAKE_VERSION VERSION_LESS 3.24.0)
+  cmake_policy(SET CMP0135 OLD)
+endif()
+
 project(torchaudio)
 
 
@@ -24,19 +29,10 @@ string(FIND "${CMAKE_CXX_FLAGS}" "-std=c++" env_cxx_standard)
 if(env_cxx_standard GREATER -1)
   message(
       WARNING "C++ standard version definition detected in environment variable."
-      "PyTorch requires -std=c++14. Please remove -std=c++ settings in your environment.")
+      "PyTorch requires -std=c++17. Please remove -std=c++ settings in your environment.")
 endif()
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_C_STANDARD 11)
-
-# https://developercommunity.visualstudio.com/t/VS-16100-isnt-compatible-with-CUDA-11/1433342
-if(MSVC)
-  if(USE_CUDA)
-    set(CMAKE_CXX_STANDARD 17)
-  endif()
-endif()
-
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "The C++ standard whose features are requested to build this target.")
+set(CMAKE_C_STANDARD   11 CACHE STRING "The C standard whose features are requested to build this target.")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -57,13 +53,17 @@ endif()
 
 # Options
 option(BUILD_SOX "Build libsox statically" ON)
-option(BUILD_KALDI "Build kaldi statically" ON)
+option(BUILD_RIR "Enable RIR simulation" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
+option(BUILD_ALIGN "Enable forced alignment" ON)
+option(BUILD_CUDA_CTC_DECODER "Build CUCTC decoder" OFF)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
+option(USE_FFMPEG "Enable ffmpeg-based features" OFF)
 option(USE_CUDA "Enable CUDA support" OFF)
 option(USE_ROCM "Enable ROCM support" OFF)
 option(USE_OPENMP "Enable OpenMP support" OFF)
 
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # check that USE_CUDA and USE_ROCM are not set at the same time
 if(USE_CUDA AND USE_ROCM)
@@ -80,9 +80,17 @@ endif()
 
 if(USE_CUDA)
   enable_language(CUDA)
+  set(
+    CMAKE_CUDA_FLAGS
+    "${CMAKE_CUDA_FLAGS} \
+    -DCUDA_HAS_FP16=1 \
+    -D__CUDA_NO_HALF_OPERATORS__ \
+    -D__CUDA_NO_HALF_CONVERSIONS__ \
+    -D__CUDA_NO_HALF2_OPERATORS__"
+  )
 endif()
 
-find_package(Torch REQUIRED)
+include(cmake/TorchAudioHelper.cmake)
 
 # https://github.com/pytorch/pytorch/issues/54174
 function(CUDA_CONVERT_FLAGS EXISTING_TARGET)
@@ -108,7 +116,16 @@ if(MSVC)
       unsigned_compare_with_zero
       declared_but_not_referenced
       bad_friend_decl)
-      string(APPEND CMAKE_CUDA_FLAGS " -Xcudafe --diag_suppress=${diag}")
+      string(
+        APPEND
+        CMAKE_CUDA_FLAGS
+        " -Xcudafe \
+        --diag_suppress=${diag} \
+        -DCUDA_HAS_FP16=1 \
+        -D__CUDA_NO_HALF_OPERATORS__ \
+        -D__CUDA_NO_HALF_CONVERSIONS__ \
+        -D__CUDA_NO_HALF2_OPERATORS__"
+      )
     endforeach()
     CUDA_CONVERT_FLAGS(torch_cpu)
     if(TARGET torch_cuda)
@@ -128,7 +145,46 @@ if(USE_OPENMP)
 endif()
 
 # TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ${TORCH_CXX_FLAGS}")
+if (MSVC)
+  set(warning_flags /W4)
+  # the following line is added in order to export symbols when building on Windows
+  # this approach has some limitations as documented in https://github.com/pytorch/pytorch/pull/3650
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+else()
+  set(warning_flags -Wall)
+endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warning_flags} ${TORCH_CXX_FLAGS}")
 
-add_subdirectory(third_party)
-add_subdirectory(torchaudio/csrc)
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Found ccache")
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+else()
+  message(STATUS "Could not find ccache. Consider installing ccache to speed up compilation.")
+endif()
+
+add_subdirectory(src/libtorchaudio)
+if (BUILD_SOX)
+  add_subdirectory(third_party/sox)
+  add_subdirectory(src/libtorchaudio/sox)
+endif()
+if (USE_FFMPEG)
+  if (DEFINED ENV{FFMPEG_ROOT})
+    add_subdirectory(third_party/ffmpeg/single)
+  else()
+    message(STATUS "Building FFmpeg integration with multi version support")
+    add_subdirectory(third_party/ffmpeg/multi)
+  endif()
+  add_subdirectory(src/libtorio/ffmpeg)
+endif()
+if (BUILD_CUDA_CTC_DECODER)
+  if (NOT USE_CUDA)
+    message(FATAL "BUILD_CUDA_CTC_DECODER=1 but USE_CUDA=0.")
+  endif()
+  add_subdirectory(src/libtorchaudio/cuctc)
+endif()
+if (BUILD_CPP_TEST)
+  add_subdirectory(test/cpp)
+endif()

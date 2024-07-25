@@ -2,14 +2,7 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import cmuarctic
-
-from torchaudio_unittest.common_utils import (
-    TempDirMixin,
-    TorchaudioTestCase,
-    get_whitenoise,
-    save_wav,
-    normalize_wav,
-)
+from torchaudio_unittest.common_utils import get_whitenoise, normalize_wav, save_wav, TempDirMixin, TorchaudioTestCase
 
 
 def get_mock_dataset(root_dir):
@@ -54,7 +47,6 @@ def get_mock_dataset(root_dir):
 
 
 class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
 
     root_dir = None
     samples = []

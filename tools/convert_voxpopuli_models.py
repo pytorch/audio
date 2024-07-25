@@ -19,24 +19,19 @@ python convert_voxpopuli_models.py \
 
 def _parse_args():
     import argparse
+
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument(
-        '--input-file', required=True,
-        help='Input checkpoint file.'
-    )
-    parser.add_argument(
-        '--output-file', required=False,
-        help='Output model file.'
-    )
+    parser.add_argument("--input-file", required=True, help="Input checkpoint file.")
+    parser.add_argument("--output-file", required=False, help="Output model file.")
     return parser.parse_args()
 
 
 def _removeprefix(s, prefix):
     if s.startswith(prefix):
-        return s[len(prefix):]
+        return s[len(prefix) :]
     return s
 
 
@@ -45,13 +40,13 @@ def _load(input_file):
     from omegaconf import OmegaConf
 
     data = torch.load(input_file)
-    cfg = OmegaConf.to_container(data['cfg'])
+    cfg = OmegaConf.to_container(data["cfg"])
     for key in list(cfg.keys()):
-        if key != 'model':
+        if key != "model":
             del cfg[key]
-            if 'w2v_args' in cfg['model']:
-                del cfg['model']['w2v_args'][key]
-    state_dict = {_removeprefix(k, 'w2v_encoder.'): v for k, v in data['model'].items()}
+            if "w2v_args" in cfg["model"]:
+                del cfg["model"]["w2v_args"][key]
+    state_dict = {_removeprefix(k, "w2v_encoder."): v for k, v in data["model"].items()}
     return cfg, state_dict
 
 
@@ -75,9 +70,9 @@ def _parse_model_param(cfg, state_dict):
         "encoder_layerdrop": "encoder_layer_drop",
     }
     params = {}
-    src_dicts = [cfg['model']]
-    if 'w2v_args' in cfg['model']:
-        src_dicts.append(cfg['model']['w2v_args']['model'])
+    src_dicts = [cfg["model"]]
+    if "w2v_args" in cfg["model"]:
+        src_dicts.append(cfg["model"]["w2v_args"]["model"])
 
     for src, tgt in key_mapping.items():
         for model_cfg in src_dicts:
@@ -89,12 +84,13 @@ def _parse_model_param(cfg, state_dict):
     # the following line is commented out to resolve lint warning; uncomment before running script
     # params["extractor_conv_layer_config"] = eval(params["extractor_conv_layer_config"])
     assert len(params) == 15
-    params['aux_num_out'] = state_dict['proj.bias'].numel() if 'proj.bias' in state_dict else None
+    params["aux_num_out"] = state_dict["proj.bias"].numel() if "proj.bias" in state_dict else None
     return params
 
 
 def _main(args):
     import json
+
     import torch
     import torchaudio
     from torchaudio.models.wav2vec2.utils.import_fairseq import _convert_state_dict as _convert
@@ -107,5 +103,5 @@ def _main(args):
     torch.save(model.state_dict(), args.output_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main(_parse_args())

@@ -9,10 +9,7 @@ Data pre-processing: create tsv files for training (and valiation).
 import logging
 import re
 from pathlib import Path
-from typing import (
-    Tuple,
-    Union,
-)
+from typing import Dict, Tuple, Union
 
 import torch
 import torchaudio
@@ -37,7 +34,7 @@ def create_tsv(
             [``librispeech``, ``libri-light``]. (Default: ``librispeech``)
         valid_percent (float, optional): The percentage of data for validation. (Default: 0.01)
         seed (int): The seed for randomly selecting the validation files.
-        extension (str, optional): The extention of audio files. (Default: ``flac``)
+        extension (str, optional): The extension of audio files. (Default: ``flac``)
 
     Returns:
         None
@@ -51,11 +48,7 @@ def create_tsv(
     if not out_dir.exists():
         out_dir.mkdir()
 
-    valid_f = (
-        open(out_dir / f"{dataset}_valid.tsv", "w")
-        if valid_percent > 0
-        else None
-    )
+    valid_f = open(out_dir / f"{dataset}_valid.tsv", "w") if valid_percent > 0 else None
     search_pattern = ".*train.*"
     with open(out_dir / f"{dataset}_train.tsv", "w") as train_f:
         print(root_dir, file=train_f)
@@ -67,20 +60,13 @@ def create_tsv(
             if re.match(search_pattern, str(fname)):
                 frames = torchaudio.info(fname).num_frames
                 dest = train_f if torch.rand(1) > valid_percent else valid_f
-                print(
-                    f"{fname.relative_to(root_dir)}\t{frames}", file=dest
-                )
+                print(f"{fname.relative_to(root_dir)}\t{frames}", file=dest)
     if valid_f is not None:
         valid_f.close()
     _LG.info("Finished creating the file lists successfully")
 
 
-def _get_feat_lens_paths(
-    feat_dir: Path,
-    split: str,
-    rank: int,
-    num_rank: int
-) -> Tuple[Path, Path]:
+def _get_feat_lens_paths(feat_dir: Path, split: str, rank: int, num_rank: int) -> Tuple[Path, Path]:
     r"""Get the feature and lengths paths based on feature directory,
         data split, rank, and number of ranks.
     Args:
@@ -99,9 +85,7 @@ def _get_feat_lens_paths(
     return feat_path, len_path
 
 
-def _get_model_path(
-    km_dir: Path
-) -> Path:
+def _get_model_path(km_dir: Path) -> Path:
     r"""Get the file path of the KMeans clustering model
     Args:
         km_dir (Path): The directory to store the KMeans clustering model.
@@ -110,3 +94,17 @@ def _get_model_path(
         Path: The file path of the model.
     """
     return km_dir / "model.pt"
+
+
+def _get_id2label() -> Dict:
+    """Get the dictionary that maps indices of ASR model's last layer dimension to the corresponding labels."""
+    bundle = torchaudio.pipelines.HUBERT_ASR_LARGE
+    labels = bundle.get_labels()
+    return {i: char.lower() for i, char in enumerate(labels)}
+
+
+def _get_label2id() -> Dict:
+    """Get the dictionary that maps the labels to the corresponding indices in ASR model's last dimension."""
+    bundle = torchaudio.pipelines.HUBERT_ASR_LARGE
+    labels = bundle.get_labels()
+    return {char: i for i, char in enumerate(labels)}

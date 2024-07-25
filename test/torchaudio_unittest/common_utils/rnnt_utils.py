@@ -1,7 +1,8 @@
-import unittest
 import random
-import torch
+import unittest
+
 import numpy as np
+import torch
 from torchaudio.functional import rnnt_loss
 
 
@@ -84,9 +85,7 @@ class _NumpyTransducer(torch.autograd.Function):
         return beta, cost
 
     @staticmethod
-    def compute_gradients_one_sequence(
-        log_probs, alpha, beta, targets, blank=-1
-    ):
+    def compute_gradients_one_sequence(log_probs, alpha, beta, targets, blank=-1):
         max_T, max_U, D = log_probs.shape
         gradients = np.full(log_probs.shape, float("-inf"))
         cost = -beta[0, 0]
@@ -175,9 +174,7 @@ class NumpyTransducerLoss(torch.nn.Module):
 
 
 def compute_with_numpy_transducer(data):
-    costs = NumpyTransducerLoss(
-        blank=data["blank"],
-    )(
+    costs = NumpyTransducerLoss(blank=data["blank"],)(
         logits=data["logits"],
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],
@@ -192,13 +189,19 @@ def compute_with_numpy_transducer(data):
 
 
 def compute_with_pytorch_transducer(data):
+    fused_log_softmax = data.get("fused_log_softmax", True)
+    input = data["logits"]
+    if not fused_log_softmax:
+        input = torch.nn.functional.log_softmax(input, dim=-1)
+
     costs = rnnt_loss(
-        logits=data["logits"],
+        logits=input,
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],
         targets=data["targets"],
         blank=data["blank"],
         reduction="none",
+        fused_log_softmax=fused_log_softmax,
     )
 
     loss = torch.sum(costs)
@@ -254,6 +257,7 @@ def get_B1_T10_U3_D4_data(
 
     def grad_hook(grad):
         logits.saved_grad = grad.clone()
+
     logits.register_hook(grad_hook)
 
     data = {}
@@ -262,6 +266,7 @@ def get_B1_T10_U3_D4_data(
     data["target_lengths"] = torch.tensor([2, 2], dtype=torch.int32, device=device)
     data["targets"] = torch.tensor([[1, 2], [1, 2]], dtype=torch.int32, device=device)
     data["blank"] = 0
+    data["fused_log_softmax"] = False
 
     return data
 
@@ -307,6 +312,7 @@ def get_B1_T2_U3_D5_data(dtype=torch.float32, device=CPU_DEVICE):
 
     def grad_hook(grad):
         logits.saved_grad = grad.clone()
+
     logits.register_hook(grad_hook)
 
     targets = torch.tensor([[1, 2]], dtype=torch.int32, device=device)
@@ -447,6 +453,7 @@ def get_B2_T4_U3_D3_data(dtype=torch.float32, device=CPU_DEVICE):
 
     def grad_hook(grad):
         logits.saved_grad = grad.clone()
+
     logits.register_hook(grad_hook)
 
     targets = torch.tensor([[1, 2], [1, 1]], dtype=torch.int32, device=device)
@@ -552,6 +559,7 @@ def get_random_data(
     max_U=32,
     max_D=40,
     blank=-1,
+    fused_log_softmax=True,
     dtype=torch.float32,
     device=CPU_DEVICE,
     seed=None,
@@ -573,9 +581,7 @@ def get_random_data(
     max_src_length = torch.max(logit_lengths)
     max_tgt_length = torch.max(target_lengths)
 
-    targets = torch.randint(
-        low=0, high=D - 1, size=(B, max_tgt_length), dtype=torch.int32, device=device
-    )
+    targets = torch.randint(low=0, high=D - 1, size=(B, max_tgt_length), dtype=torch.int32, device=device)
     logits = torch.rand(
         size=(B, max_src_length, max_tgt_length + 1, D),
         dtype=dtype,
@@ -584,6 +590,7 @@ def get_random_data(
 
     def grad_hook(grad):
         logits.saved_grad = grad.clone()
+
     logits.register_hook(grad_hook)
 
     return {
@@ -592,6 +599,7 @@ def get_random_data(
         "logit_lengths": logit_lengths,
         "target_lengths": target_lengths,
         "blank": blank,
+        "fused_log_softmax": fused_log_softmax,
     }
 
 
