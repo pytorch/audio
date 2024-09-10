@@ -151,7 +151,6 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
     auto a_coeffs_normalized = saved[1];
     auto y = saved[2];
 
-    int64_t n_batch = x.size(0);
     int64_t n_channel = x.size(1);
     int64_t n_order = a_coeffs_normalized.size(1);
 
@@ -161,26 +160,24 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
     namespace F = torch::nn::functional;
 
-    if (a_coeffs_normalized.requires_grad()) {
-      auto dyda = F::pad(
-          DifferentiableIIR::apply(-y, a_coeffs_normalized),
-          F::PadFuncOptions({n_order - 1, 0}));
-
-      da = F::conv1d(
-               dyda.view({1, n_batch * n_channel, -1}),
-               dy.reshape({n_batch * n_channel, 1, -1}),
-               F::Conv1dFuncOptions().groups(n_batch * n_channel))
-               .view({n_batch, n_channel, -1})
-               .sum(0)
-               .flip(1);
-    }
+    auto tmp =
+        DifferentiableIIR::apply(dy.flip(2).contiguous(), a_coeffs_normalized)
+            .flip(2);
 
     if (x.requires_grad()) {
-      dx =
-          DifferentiableIIR::apply(dy.flip(2).contiguous(), a_coeffs_normalized)
-              .flip(2);
+      dx = tmp;
     }
 
+    if (a_coeffs_normalized.requires_grad()) {
+      da = -torch::matmul(
+                tmp.transpose(0, 1).reshape({n_channel, 1, -1}),
+                F::pad(y, F::PadFuncOptions({n_order - 1, 0}))
+                    .unfold(2, n_order, 1)
+                    .transpose(0, 1)
+                    .reshape({n_channel, -1, n_order}))
+                .squeeze(1)
+                .flip(1);
+    }
     return {dx, da};
   }
 };
