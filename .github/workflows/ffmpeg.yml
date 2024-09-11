@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@release/2.5
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -39,7 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@release/2.5
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -63,7 +63,7 @@ jobs:
       matrix:
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
         runner: ["macos-m1-stable", "macos-12"]
-    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@release/2.5
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -85,7 +85,7 @@ jobs:
       fail-fast: false
       matrix:
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
-    uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/windows_job.yml@release/2.5
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
