@@ -1000,7 +1000,7 @@ else:
 def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
     developed independently by *Yu et al.* :cite:`ismir_YuF23` and *Forgione et al.* :cite:`forgione2021dynonet`.
-    The gradients of `a_coeffs` are computed based on a faster algorithm from :cite:`ycy2024golf`.
+    The gradients of ``a_coeffs`` are computed based on a faster algorithm from :cite:`ycy2024golf`.
 
     .. devices:: CPU CUDA
 
