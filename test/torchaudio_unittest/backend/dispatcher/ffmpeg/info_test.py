@@ -404,6 +404,7 @@ class Unseekable:
 
 
 @skipIfNoExec("sox")
+@skipIfNoFFmpeg
 class TestFileObject(FileObjTestBase, PytorchTestCase):
     _info = partial(get_info_func(), backend="ffmpeg")
 
