@@ -2,7 +2,7 @@ def __getattr__(name: str):
     import warnings
 
     warnings.warn(
-        "Torchaudio's I/O functions now support par-call bakcend dispatch. "
+        "Torchaudio's I/O functions now support par-call backend dispatch. "
         "Importing backend implementation directly is no longer guaranteed to work. "
         "Please use `backend` keyword with load/save/info function, instead of "
         "calling the udnerlying implementation directly.",
