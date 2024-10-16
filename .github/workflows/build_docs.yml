@@ -25,7 +25,7 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       job-name: Build doc
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: amz2023.linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: "11.8"
