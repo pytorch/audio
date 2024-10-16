@@ -341,7 +341,7 @@ Now we build and install
    INSTALL ffmpeg
    INSTALL ffprobe
 
-Checking the intallation
+Checking the installation
 ------------------------
 
 To verify that the FFmpeg we built have CUDA support, we can check the list of available decoders and encoders.
