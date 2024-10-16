@@ -126,7 +126,11 @@ __device__ void ComputeAlphas(
 
 #pragma unroll
     for (int i = 1; i < warpSize; i <<= 1) {
+#ifndef USE_ROCM
       val = __shfl_up_sync(0xffffffff, skip_prob, i);
+#else
+      val = __shfl_up(skip_prob, i);
+#endif
       if (i <= threadIdx.x) {
         skip_prob = skip_prob + val;
       }
@@ -150,7 +154,11 @@ __device__ void ComputeAlphas(
     CAST_DTYPE out = val;
 
     for (int i = 1; i < warpSize; ++i) {
+#ifndef USE_ROCM
       val = __shfl_up_sync(0xffffffff, val, 1);
+#else
+      val = __shfl_up(val, 1);
+#endif
       if (i == threadIdx.x) {
         val = math::lse(val + skip_prob, emit);
         out = val;
@@ -225,7 +233,11 @@ __device__ void ComputeBetasCosts(
 
 #pragma unroll
     for (int i = 1; i < warpSize; i <<= 1) {
+#ifndef USE_ROCM
       val = __shfl_up_sync(0xffffffff, skip_prob, i);
+#else
+      val = __shfl_up(skip_prob, i);
+#endif
       if (i <= threadIdx.x) {
         skip_prob = skip_prob + val;
       }
@@ -248,7 +260,11 @@ __device__ void ComputeBetasCosts(
     CAST_DTYPE out = val;
 
     for (int i = 1; i < warpSize; ++i) {
+#ifndef USE_ROCM
       val = __shfl_up_sync(0xffffffff, val, 1);
+#else
+      val = __shfl_up(val, 1);
+#endif
       if (i == threadIdx.x) {
         val = math::lse(val + skip_prob, emit);
         out = val;
