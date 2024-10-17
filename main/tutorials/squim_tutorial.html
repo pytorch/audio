@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio &mdash; Torchaudio 2.5.0.dev20241017 documentation</title>
+  <title>Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio &mdash; Torchaudio 2.5.0.dev20241021 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241017 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241021 &#x25BC</span></a>
     </div>
     
 
@@ -505,8 +505,8 @@ through MOS using non-matching references.” Interspeech, 2022.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241016
-2.5.0.dev20241017
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241020
+2.5.0.dev20241021
 </pre></div>
 </div>
 </section>
@@ -588,7 +588,7 @@ plot data, pystoi, pesq for computing reference metrics.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/156k [00:00&lt;?, ?B/s]
-100%|##########| 156k/156k [00:00&lt;00:00, 65.4MB/s]
+100%|##########| 156k/156k [00:00&lt;00:00, 41.9MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_SPEECH</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_SPEECH</span></a><span class="p">)</span>
@@ -698,10 +698,7 @@ Resample the waveforms if necessary.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/28.2M [00:00&lt;?, ?B/s]
- 52%|#####2    | 14.8M/28.2M [00:00&lt;00:00, 31.9MB/s]
- 63%|######3   | 17.9M/28.2M [00:00&lt;00:00, 23.1MB/s]
- 96%|#########5| 27.0M/28.2M [00:01&lt;00:00, 27.9MB/s]
-100%|##########| 28.2M/28.2M [00:01&lt;00:00, 28.6MB/s]
+100%|##########| 28.2M/28.2M [00:00&lt;00:00, 531MB/s]
 </pre></div>
 </div>
 <p>Compare model outputs with ground truths for distorted speech with 20dB
@@ -772,16 +769,51 @@ SI-SDR: -5.016279220581055
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 11%|#1        | 40.5M/360M [00:00&lt;00:00, 424MB/s]
- 22%|##2       | 81.0M/360M [00:00&lt;00:00, 339MB/s]
- 32%|###1      | 114M/360M [00:00&lt;00:00, 341MB/s]
- 41%|####1     | 149M/360M [00:00&lt;00:00, 349MB/s]
- 52%|#####1    | 186M/360M [00:00&lt;00:00, 361MB/s]
- 61%|######1   | 220M/360M [00:00&lt;00:00, 347MB/s]
- 73%|#######2  | 262M/360M [00:00&lt;00:00, 377MB/s]
- 85%|########5 | 308M/360M [00:00&lt;00:00, 406MB/s]
- 96%|#########6| 347M/360M [00:00&lt;00:00, 407MB/s]
-100%|##########| 360M/360M [00:00&lt;00:00, 381MB/s]
+  1%|          | 2.12M/360M [00:00&lt;00:19, 19.7MB/s]
+  2%|1         | 6.38M/360M [00:00&lt;00:11, 32.4MB/s]
+  3%|2         | 9.50M/360M [00:00&lt;00:12, 30.5MB/s]
+  5%|4         | 16.5M/360M [00:00&lt;00:12, 29.5MB/s]
+  9%|8         | 31.1M/360M [00:00&lt;00:07, 46.1MB/s]
+ 10%|9         | 35.4M/360M [00:01&lt;00:08, 37.9MB/s]
+ 13%|#3        | 47.6M/360M [00:01&lt;00:06, 51.6MB/s]
+ 15%|#4        | 52.8M/360M [00:01&lt;00:07, 42.4MB/s]
+ 18%|#8        | 65.6M/360M [00:01&lt;00:06, 49.4MB/s]
+ 21%|##        | 74.0M/360M [00:01&lt;00:05, 54.2MB/s]
+ 22%|##2       | 80.4M/360M [00:01&lt;00:05, 55.2MB/s]
+ 24%|##3       | 85.9M/360M [00:02&lt;00:06, 46.0MB/s]
+ 27%|##6       | 96.8M/360M [00:02&lt;00:05, 46.2MB/s]
+ 28%|##8       | 101M/360M [00:02&lt;00:06, 44.3MB/s]
+ 32%|###1      | 114M/360M [00:02&lt;00:04, 52.7MB/s]
+ 33%|###3      | 119M/360M [00:02&lt;00:05, 45.3MB/s]
+ 36%|###6      | 130M/360M [00:03&lt;00:08, 28.3MB/s]
+ 37%|###7      | 134M/360M [00:03&lt;00:08, 27.7MB/s]
+ 41%|####      | 146M/360M [00:03&lt;00:05, 37.5MB/s]
+ 42%|####1     | 150M/360M [00:03&lt;00:06, 35.1MB/s]
+ 45%|####5     | 162M/360M [00:04&lt;00:04, 48.7MB/s]
+ 47%|####6     | 168M/360M [00:04&lt;00:04, 44.9MB/s]
+ 50%|####9     | 180M/360M [00:04&lt;00:04, 44.8MB/s]
+ 51%|#####1    | 184M/360M [00:04&lt;00:05, 34.3MB/s]
+ 55%|#####4    | 197M/360M [00:04&lt;00:04, 40.8MB/s]
+ 59%|#####8    | 211M/360M [00:05&lt;00:03, 48.1MB/s]
+ 60%|######    | 216M/360M [00:05&lt;00:03, 42.8MB/s]
+ 63%|######3   | 228M/360M [00:05&lt;00:03, 44.0MB/s]
+ 64%|######4   | 232M/360M [00:05&lt;00:03, 38.5MB/s]
+ 68%|######8   | 246M/360M [00:06&lt;00:02, 42.0MB/s]
+ 70%|#######   | 252M/360M [00:06&lt;00:02, 42.6MB/s]
+ 71%|#######1  | 257M/360M [00:06&lt;00:02, 43.2MB/s]
+ 73%|#######2  | 262M/360M [00:06&lt;00:02, 35.1MB/s]
+ 74%|#######3  | 265M/360M [00:06&lt;00:03, 32.8MB/s]
+ 77%|#######7  | 279M/360M [00:07&lt;00:01, 43.9MB/s]
+ 79%|#######8  | 283M/360M [00:07&lt;00:01, 43.2MB/s]
+ 80%|#######9  | 287M/360M [00:07&lt;00:01, 40.1MB/s]
+ 81%|########  | 291M/360M [00:07&lt;00:02, 34.2MB/s]
+ 82%|########1 | 295M/360M [00:07&lt;00:02, 31.4MB/s]
+ 86%|########6 | 310M/360M [00:07&lt;00:00, 57.6MB/s]
+ 88%|########8 | 317M/360M [00:07&lt;00:00, 47.1MB/s]
+ 91%|######### | 328M/360M [00:08&lt;00:00, 47.1MB/s]
+ 96%|#########5| 344M/360M [00:08&lt;00:00, 56.9MB/s]
+100%|#########9| 359M/360M [00:08&lt;00:00, 58.6MB/s]
+100%|##########| 360M/360M [00:08&lt;00:00, 43.5MB/s]
 </pre></div>
 </div>
 <p>Load a non-matching reference (NMR)</p>
@@ -833,7 +865,7 @@ Acoustics, Speech and Signal Processing (ICASSP), pp. 911-915. IEEE,
 where y axis represents the estimated MOS metric score, and x axis
 represents the corresponding ground truth.</p>
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png"><img alt="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" class="align-center" src="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" style="width: 500px;" /></a>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.261 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.388 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-squim-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c943e35bc7cad6e8d9b1df2a7034a8fc/squim_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">squim_tutorial.py</span></code></a></p>
