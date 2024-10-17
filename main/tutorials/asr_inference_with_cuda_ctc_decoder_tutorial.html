@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ASR Inference with CUDA CTC Decoder &mdash; Torchaudio 2.5.0.dev20241017 documentation</title>
+  <title>ASR Inference with CUDA CTC Decoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241017 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
     </div>
     
 
@@ -498,8 +498,8 @@ working with</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241016
-2.5.0.dev20241017
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241104
+2.5.0.dev20241105
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -530,12 +530,19 @@ In this tutorial, we only use CTC head of the model.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/269M [00:00&lt;?, ?B/s]
- 18%|#7        | 48.4M/269M [00:00&lt;00:00, 502MB/s]
- 36%|###5      | 96.2M/269M [00:00&lt;00:00, 494MB/s]
- 54%|#####3    | 145M/269M [00:00&lt;00:00, 502MB/s]
- 72%|#######1  | 193M/269M [00:00&lt;00:00, 487MB/s]
- 89%|########8 | 240M/269M [00:00&lt;00:00, 479MB/s]
-100%|##########| 269M/269M [00:00&lt;00:00, 481MB/s]
+  8%|7         | 20.2M/269M [00:00&lt;00:01, 210MB/s]
+ 15%|#5        | 40.9M/269M [00:00&lt;00:01, 213MB/s]
+ 23%|##3       | 62.4M/269M [00:00&lt;00:00, 218MB/s]
+ 31%|###       | 83.2M/269M [00:00&lt;00:00, 209MB/s]
+ 39%|###9      | 106M/269M [00:00&lt;00:00, 218MB/s]
+ 47%|####6     | 126M/269M [00:00&lt;00:00, 215MB/s]
+ 55%|#####4    | 148M/269M [00:00&lt;00:00, 219MB/s]
+ 63%|######3   | 170M/269M [00:00&lt;00:00, 222MB/s]
+ 71%|#######   | 191M/269M [00:00&lt;00:00, 222MB/s]
+ 79%|#######8  | 213M/269M [00:01&lt;00:00, 224MB/s]
+ 88%|########7 | 237M/269M [00:01&lt;00:00, 233MB/s]
+ 96%|#########6| 259M/269M [00:01&lt;00:00, 224MB/s]
+100%|##########| 269M/269M [00:01&lt;00:00, 219MB/s]
 </pre></div>
 </div>
 <p>We will load a sample from the LibriSpeech test-other dataset.</p>
@@ -546,7 +553,7 @@ In this tutorial, we only use CTC head of the model.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/441k [00:00&lt;?, ?B/s]
-100%|##########| 441k/441k [00:00&lt;00:00, 108MB/s]
+100%|##########| 441k/441k [00:00&lt;00:00, 135MB/s]
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -595,7 +602,7 @@ index, or as a list of tokens, each mapping to a unique index.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/239k [00:00&lt;?, ?B/s]
-100%|##########| 239k/239k [00:00&lt;00:00, 104MB/s]
+100%|##########| 239k/239k [00:00&lt;00:00, 97.0MB/s]
 [&#39;&lt;blk&gt;&#39;, &#39;&lt;sos/eos&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;S&#39;, &#39;▁THE&#39;, &#39;▁A&#39;, &#39;T&#39;, &#39;▁AND&#39;, &#39;ED&#39;, &#39;▁OF&#39;, &#39;▁TO&#39;, &#39;E&#39;, &#39;D&#39;, &#39;N&#39;, &#39;ING&#39;, &#39;▁IN&#39;, &#39;Y&#39;, &#39;M&#39;, &#39;C&#39;, &#39;▁I&#39;, &#39;A&#39;, &#39;P&#39;, &#39;▁HE&#39;, &#39;R&#39;, &#39;O&#39;, &#39;L&#39;, &#39;RE&#39;, &#39;I&#39;, &#39;U&#39;, &#39;ER&#39;, &#39;▁IT&#39;, &#39;LY&#39;, &#39;▁THAT&#39;, &#39;▁WAS&#39;, &#39;▁&#39;, &#39;▁S&#39;, &#39;AR&#39;, &#39;▁BE&#39;, &#39;F&#39;, &#39;▁C&#39;, &#39;IN&#39;, &#39;B&#39;, &#39;▁FOR&#39;, &#39;OR&#39;, &#39;LE&#39;, &quot;&#39;&quot;, &#39;▁HIS&#39;, &#39;▁YOU&#39;, &#39;AL&#39;, &#39;▁RE&#39;, &#39;V&#39;, &#39;▁B&#39;, &#39;G&#39;, &#39;RI&#39;, &#39;▁E&#39;, &#39;▁WITH&#39;, &#39;▁T&#39;, &#39;▁AS&#39;, &#39;LL&#39;, &#39;▁P&#39;, &#39;▁HER&#39;, &#39;ST&#39;, &#39;▁HAD&#39;, &#39;▁SO&#39;, &#39;▁F&#39;, &#39;W&#39;, &#39;CE&#39;, &#39;▁IS&#39;, &#39;ND&#39;, &#39;▁NOT&#39;, &#39;TH&#39;, &#39;▁BUT&#39;, &#39;EN&#39;, &#39;▁SHE&#39;, &#39;▁ON&#39;, &#39;VE&#39;, &#39;ON&#39;, &#39;SE&#39;, &#39;▁DE&#39;, &#39;UR&#39;, &#39;▁G&#39;, &#39;CH&#39;, &#39;K&#39;, &#39;TER&#39;, &#39;▁AT&#39;, &#39;IT&#39;, &#39;▁ME&#39;, &#39;RO&#39;, &#39;NE&#39;, &#39;RA&#39;, &#39;ES&#39;, &#39;IL&#39;, &#39;NG&#39;, &#39;IC&#39;, &#39;▁NO&#39;, &#39;▁HIM&#39;, &#39;ENT&#39;, &#39;IR&#39;, &#39;▁WE&#39;, &#39;H&#39;, &#39;▁DO&#39;, &#39;▁ALL&#39;, &#39;▁HAVE&#39;, &#39;LO&#39;, &#39;▁BY&#39;, &#39;▁MY&#39;, &#39;▁MO&#39;, &#39;▁THIS&#39;, &#39;LA&#39;, &#39;▁ST&#39;, &#39;▁WHICH&#39;, &#39;▁CON&#39;, &#39;▁THEY&#39;, &#39;CK&#39;, &#39;TE&#39;, &#39;▁SAID&#39;, &#39;▁FROM&#39;, &#39;▁GO&#39;, &#39;▁WHO&#39;, &#39;▁TH&#39;, &#39;▁OR&#39;, &#39;▁D&#39;, &#39;▁W&#39;, &#39;VER&#39;, &#39;LI&#39;, &#39;▁SE&#39;, &#39;▁ONE&#39;, &#39;▁CA&#39;, &#39;▁AN&#39;, &#39;▁LA&#39;, &#39;▁WERE&#39;, &#39;EL&#39;, &#39;▁HA&#39;, &#39;▁MAN&#39;, &#39;▁FA&#39;, &#39;▁EX&#39;, &#39;AD&#39;, &#39;▁SU&#39;, &#39;RY&#39;, &#39;▁MI&#39;, &#39;AT&#39;, &#39;▁BO&#39;, &#39;▁WHEN&#39;, &#39;AN&#39;, &#39;THER&#39;, &#39;PP&#39;, &#39;ATION&#39;, &#39;▁FI&#39;, &#39;▁WOULD&#39;, &#39;▁PRO&#39;, &#39;OW&#39;, &#39;ET&#39;, &#39;▁O&#39;, &#39;▁THERE&#39;, &#39;▁HO&#39;, &#39;ION&#39;, &#39;▁WHAT&#39;, &#39;▁FE&#39;, &#39;▁PA&#39;, &#39;US&#39;, &#39;MENT&#39;, &#39;▁MA&#39;, &#39;UT&#39;, &#39;▁OUT&#39;, &#39;▁THEIR&#39;, &#39;▁IF&#39;, &#39;▁LI&#39;, &#39;▁K&#39;, &#39;▁WILL&#39;, &#39;▁ARE&#39;, &#39;ID&#39;, &#39;▁RO&#39;, &#39;DE&#39;, &#39;TION&#39;, &#39;▁WA&#39;, &#39;PE&#39;, &#39;▁UP&#39;, &#39;▁SP&#39;, &#39;▁PO&#39;, &#39;IGHT&#39;, &#39;▁UN&#39;, &#39;RU&#39;, &#39;▁LO&#39;, &#39;AS&#39;, &#39;OL&#39;, &#39;▁LE&#39;, &#39;▁BEEN&#39;, &#39;▁SH&#39;, &#39;▁RA&#39;, &#39;▁SEE&#39;, &#39;KE&#39;, &#39;UL&#39;, &#39;TED&#39;, &#39;▁SA&#39;, &#39;UN&#39;, &#39;UND&#39;, &#39;ANT&#39;, &#39;▁NE&#39;, &#39;IS&#39;, &#39;▁THEM&#39;, &#39;CI&#39;, &#39;GE&#39;, &#39;▁COULD&#39;, &#39;▁DIS&#39;, &#39;OM&#39;, &#39;ISH&#39;, &#39;HE&#39;, &#39;EST&#39;, &#39;▁SOME&#39;, &#39;ENCE&#39;, &#39;ITY&#39;, &#39;IVE&#39;, &#39;▁US&#39;, &#39;▁MORE&#39;, &#39;▁EN&#39;, &#39;ARD&#39;, &#39;ATE&#39;, &#39;▁YOUR&#39;, &#39;▁INTO&#39;, &#39;▁KNOW&#39;, &#39;▁CO&#39;, &#39;ANCE&#39;, &#39;▁TIME&#39;, &#39;▁WI&#39;, &#39;▁YE&#39;, &#39;AGE&#39;, &#39;▁NOW&#39;, &#39;TI&#39;, &#39;FF&#39;, &#39;ABLE&#39;, &#39;▁VERY&#39;, &#39;▁LIKE&#39;, &#39;AM&#39;, &#39;HI&#39;, &#39;Z&#39;, &#39;▁OTHER&#39;, &#39;▁THAN&#39;, &#39;▁LITTLE&#39;, &#39;▁DID&#39;, &#39;▁LOOK&#39;, &#39;TY&#39;, &#39;ERS&#39;, &#39;▁CAN&#39;, &#39;▁CHA&#39;, &#39;▁AR&#39;, &#39;X&#39;, &#39;FUL&#39;, &#39;UGH&#39;, &#39;▁BA&#39;, &#39;▁DAY&#39;, &#39;▁ABOUT&#39;, &#39;TEN&#39;, &#39;IM&#39;, &#39;▁ANY&#39;, &#39;▁PRE&#39;, &#39;▁OVER&#39;, &#39;IES&#39;, &#39;NESS&#39;, &#39;ME&#39;, &#39;BLE&#39;, &#39;▁M&#39;, &#39;ROW&#39;, &#39;▁HAS&#39;, &#39;▁GREAT&#39;, &#39;▁VI&#39;, &#39;TA&#39;, &#39;▁AFTER&#39;, &#39;PER&#39;, &#39;▁AGAIN&#39;, &#39;HO&#39;, &#39;SH&#39;, &#39;▁UPON&#39;, &#39;▁DI&#39;, &#39;▁HAND&#39;, &#39;▁COM&#39;, &#39;IST&#39;, &#39;TURE&#39;, &#39;▁STA&#39;, &#39;▁THEN&#39;, &#39;▁SHOULD&#39;, &#39;▁GA&#39;, &#39;OUS&#39;, &#39;OUR&#39;, &#39;▁WELL&#39;, &#39;▁ONLY&#39;, &#39;MAN&#39;, &#39;▁GOOD&#39;, &#39;▁TWO&#39;, &#39;▁MAR&#39;, &#39;▁SAY&#39;, &#39;▁HU&#39;, &#39;TING&#39;, &#39;▁OUR&#39;, &#39;RESS&#39;, &#39;▁DOWN&#39;, &#39;IOUS&#39;, &#39;▁BEFORE&#39;, &#39;▁DA&#39;, &#39;▁NA&#39;, &#39;QUI&#39;, &#39;▁MADE&#39;, &#39;▁EVERY&#39;, &#39;▁OLD&#39;, &#39;▁EVEN&#39;, &#39;IG&#39;, &#39;▁COME&#39;, &#39;▁GRA&#39;, &#39;▁RI&#39;, &#39;▁LONG&#39;, &#39;OT&#39;, &#39;SIDE&#39;, &#39;WARD&#39;, &#39;▁FO&#39;, &#39;▁WHERE&#39;, &#39;MO&#39;, &#39;LESS&#39;, &#39;▁SC&#39;, &#39;▁MUST&#39;, &#39;▁NEVER&#39;, &#39;▁HOW&#39;, &#39;▁CAME&#39;, &#39;▁SUCH&#39;, &#39;▁RU&#39;, &#39;▁TAKE&#39;, &#39;▁WO&#39;, &#39;▁CAR&#39;, &#39;UM&#39;, &#39;AK&#39;, &#39;▁THINK&#39;, &#39;▁MUCH&#39;, &#39;▁MISTER&#39;, &#39;▁MAY&#39;, &#39;▁JO&#39;, &#39;▁WAY&#39;, &#39;▁COMP&#39;, &#39;▁THOUGHT&#39;, &#39;▁STO&#39;, &#39;▁MEN&#39;, &#39;▁BACK&#39;, &#39;▁DON&#39;, &#39;J&#39;, &#39;▁LET&#39;, &#39;▁TRA&#39;, &#39;▁FIRST&#39;, &#39;▁JUST&#39;, &#39;▁VA&#39;, &#39;▁OWN&#39;, &#39;▁PLA&#39;, &#39;▁MAKE&#39;, &#39;ATED&#39;, &#39;▁HIMSELF&#39;, &#39;▁WENT&#39;, &#39;▁PI&#39;, &#39;GG&#39;, &#39;RING&#39;, &#39;▁DU&#39;, &#39;▁MIGHT&#39;, &#39;▁PART&#39;, &#39;▁GIVE&#39;, &#39;▁IMP&#39;, &#39;▁BU&#39;, &#39;▁PER&#39;, &#39;▁PLACE&#39;, &#39;▁HOUSE&#39;, &#39;▁THROUGH&#39;, &#39;IAN&#39;, &#39;▁SW&#39;, &#39;▁UNDER&#39;, &#39;QUE&#39;, &#39;▁AWAY&#39;, &#39;▁LOVE&#39;, &#39;QUA&#39;, &#39;▁LIFE&#39;, &#39;▁GET&#39;, &#39;▁WITHOUT&#39;, &#39;▁PASS&#39;, &#39;▁TURN&#39;, &#39;IGN&#39;, &#39;▁HEAD&#39;, &#39;▁MOST&#39;, &#39;▁THOSE&#39;, &#39;▁SHALL&#39;, &#39;▁EYES&#39;, &#39;▁COL&#39;, &#39;▁STILL&#39;, &#39;▁NIGHT&#39;, &#39;▁NOTHING&#39;, &#39;ITION&#39;, &#39;HA&#39;, &#39;▁TELL&#39;, &#39;▁WORK&#39;, &#39;▁LAST&#39;, &#39;▁NEW&#39;, &#39;▁FACE&#39;, &#39;▁HI&#39;, &#39;▁WORD&#39;, &#39;▁FOUND&#39;, &#39;▁COUNT&#39;, &#39;▁OB&#39;, &#39;▁WHILE&#39;, &#39;▁SHA&#39;, &#39;▁MEAN&#39;, &#39;▁SAW&#39;, &#39;▁PEOPLE&#39;, &#39;▁FRIEND&#39;, &#39;▁THREE&#39;, &#39;▁ROOM&#39;, &#39;▁SAME&#39;, &#39;▁THOUGH&#39;, &#39;▁RIGHT&#39;, &#39;▁CHILD&#39;, &#39;▁FATHER&#39;, &#39;▁ANOTHER&#39;, &#39;▁HEART&#39;, &#39;▁WANT&#39;, &#39;▁TOOK&#39;, &#39;OOK&#39;, &#39;▁LIGHT&#39;, &#39;▁MISSUS&#39;, &#39;▁OPEN&#39;, &#39;▁JU&#39;, &#39;▁ASKED&#39;, &#39;PORT&#39;, &#39;▁LEFT&#39;, &#39;▁JA&#39;, &#39;▁WORLD&#39;, &#39;▁HOME&#39;, &#39;▁WHY&#39;, &#39;▁ALWAYS&#39;, &#39;▁ANSWER&#39;, &#39;▁SEEMED&#39;, &#39;▁SOMETHING&#39;, &#39;▁GIRL&#39;, &#39;▁BECAUSE&#39;, &#39;▁NAME&#39;, &#39;▁TOLD&#39;, &#39;▁NI&#39;, &#39;▁HIGH&#39;, &#39;IZE&#39;, &#39;▁WOMAN&#39;, &#39;▁FOLLOW&#39;, &#39;▁RETURN&#39;, &#39;▁KNEW&#39;, &#39;▁EACH&#39;, &#39;▁KIND&#39;, &#39;▁JE&#39;, &#39;▁ACT&#39;, &#39;▁LU&#39;, &#39;▁CERTAIN&#39;, &#39;▁YEARS&#39;, &#39;▁QUITE&#39;, &#39;▁APPEAR&#39;, &#39;▁BETTER&#39;, &#39;▁HALF&#39;, &#39;▁PRESENT&#39;, &#39;▁PRINCE&#39;, &#39;SHIP&#39;, &#39;▁ALSO&#39;, &#39;▁BEGAN&#39;, &#39;▁HAVING&#39;, &#39;▁ENOUGH&#39;, &#39;▁PERSON&#39;, &#39;▁LADY&#39;, &#39;▁WHITE&#39;, &#39;▁COURSE&#39;, &#39;▁VOICE&#39;, &#39;▁SPEAK&#39;, &#39;▁POWER&#39;, &#39;▁MORNING&#39;, &#39;▁BETWEEN&#39;, &#39;▁AMONG&#39;, &#39;▁KEEP&#39;, &#39;▁WALK&#39;, &#39;▁MATTER&#39;, &#39;▁TEA&#39;, &#39;▁BELIEVE&#39;, &#39;▁SMALL&#39;, &#39;▁TALK&#39;, &#39;▁FELT&#39;, &#39;▁HORSE&#39;, &#39;▁MYSELF&#39;, &#39;▁SIX&#39;, &#39;▁HOWEVER&#39;, &#39;▁FULL&#39;, &#39;▁HERSELF&#39;, &#39;▁POINT&#39;, &#39;▁STOOD&#39;, &#39;▁HUNDRED&#39;, &#39;▁ALMOST&#39;, &#39;▁SINCE&#39;, &#39;▁LARGE&#39;, &#39;▁LEAVE&#39;, &#39;▁PERHAPS&#39;, &#39;▁DARK&#39;, &#39;▁SUDDEN&#39;, &#39;▁REPLIED&#39;, &#39;▁ANYTHING&#39;, &#39;▁WONDER&#39;, &#39;▁UNTIL&#39;, &#39;Q&#39;]
 </pre></div>
 </div>
@@ -725,7 +732,7 @@ of 3 provides the same output as beam size 10.</p>
     <span class="n">print_decoded</span><span class="p">(</span><span class="n">beam_search_decoder</span><span class="p">,</span> <span class="n">bpe_model</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">log_prob</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">encoder_out_lens</span></a><span class="p">,</span> <span class="s2">&quot;beam size&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beam_size</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size 1  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -1.35; 0.0010 secs)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>beam size 1  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -1.35; 0.0009 secs)
 beam size 2  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.21; 0.0009 secs)
 beam size 3  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0009 secs)
 beam size 10 : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0010 secs)
@@ -802,7 +809,7 @@ To reproduce below benchmark results, you may refer <a class="reference external
 </tbody>
 </table>
 <p>From the above table, CUDA decoder could give a slight improvement in WER and a significant increase in throughput.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.783 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.683 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-asr-inference-with-cuda-ctc-decoder-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3956cf493d21711e687e9610c91f9cd1/asr_inference_with_cuda_ctc_decoder_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">asr_inference_with_cuda_ctc_decoder_tutorial.py</span></code></a></p>

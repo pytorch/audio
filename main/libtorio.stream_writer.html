@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torio::io::StreamingMediaEncoder &mdash; Torchaudio 2.5.0.dev20241017 documentation</title>
+  <title>torio::io::StreamingMediaEncoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
   
 
   
@@ -223,7 +223,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241017 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
     </div>
     
 
@@ -458,218 +458,85 @@ When working with custom I/O, such as in-memory data, <code class="docutils lite
 <dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoderE">
 <span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Encode and write audio/video streams chunk by chunk </p>
-<p>Subclassed by <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoderCustomIO"><span class="std std-ref">torio::io::StreamingMediaEncoderCustomIO</span></a></p>
 </dd></dl>
 
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder21StreamingMediaEncoderERKNSt6stringERKNSt8optionalINSt6stringEEE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1a6f34d0b9887f3af40c4d4ec421ffe1d3"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dst</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder21StreamingMediaEncoderERKNSt6stringERKNSt8optionalINSt6stringEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Construct <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder"><span class="std std-ref">StreamingMediaEncoder</span></a> from destination URI</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dst</strong> – Destination where encoded data are written. </p></li>
-<li><p><strong>format</strong> – Specify output format. If not provided, it is guessed from <code class="docutils literal notranslate"><span class="pre">dst</span></code>. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::StreamingMediaEncoder” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="streamingmediaencodercustomio">
 <h3>StreamingMediaEncoderCustomIO<a class="headerlink" href="#streamingmediaencodercustomio" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io29StreamingMediaEncoderCustomIOE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoderCustomIO"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaEncoderCustomIO</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CustomOutput</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><a class="headerlink" href="#_CPPv4N5torio2io29StreamingMediaEncoderCustomIOE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>A subclass of <a class="reference internal" href="libtorio.stream_reader.html#classtorio_1_1io_1_1StreamingMediaDecoder"><span class="std std-ref">StreamingMediaDecoder</span></a> which works with custom read function. Can be used for encoding media into memory or custom object. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io29StreamingMediaEncoderCustomIO29StreamingMediaEncoderCustomIOEPvRKNSt8optionalINSt6stringEEEiPFiPvP7uint8_tiEPF7int64_tPv7int64_tiE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoderCustomIO_1adbb9bd5b9630d44dfbc20a1f4f24dcd7"></span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io29StreamingMediaEncoderCustomIOE" title="torio::io::StreamingMediaEncoderCustomIO"><span class="n"><span class="pre">StreamingMediaEncoderCustomIO</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StreamingMediaEncoderCustomIO</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">opaque</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">buffer_size</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">write_packet</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opaque</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buf</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">buf_size</span></span><span class="p"><span class="pre">)</span></span>, <span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">seek</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">opaque</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">whence</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io29StreamingMediaEncoderCustomIO29StreamingMediaEncoderCustomIOEPvRKNSt8optionalINSt6stringEEEiPFiPvP7uint8_tiEPF7int64_tPv7int64_tiE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Construct <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoderCustomIO"><span class="std std-ref">StreamingMediaEncoderCustomIO</span></a> with custom write and seek functions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>opaque</strong> – Custom data used by <code class="docutils literal notranslate"><span class="pre">write_packet</span></code> and <code class="docutils literal notranslate"><span class="pre">seek</span></code> functions. </p></li>
-<li><p><strong>format</strong> – Specify output format. </p></li>
-<li><p><strong>buffer_size</strong> – The size of the intermediate buffer, which FFmpeg uses to pass data to write_packet function. </p></li>
-<li><p><strong>write_packet</strong> – Custom write function that is called from FFmpeg to actually write data to the custom destination. </p></li>
-<li><p><strong>seek</strong> – Optional seek function that is used to seek the destination. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenclass: Cannot find class “torio::io::StreamingMediaEncoderCustomIO” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoderCustomIO::StreamingMediaEncoderCustomIO” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 </section>
 <section id="config-methods">
 <h2>Config methods<a class="headerlink" href="#config-methods" title="Permalink to this heading">¶</a></h2>
 <section id="add-audio-stream">
 <h3>add_audio_stream<a class="headerlink" href="#add-audio-stream" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder16add_audio_streamEiiRKNSt6stringERKNSt8optionalINSt6stringEEERKNSt8optionalI10OptionDictEERKNSt8optionalINSt6stringEEERKNSt8optionalIiEERKNSt8optionalIiEERKNSt8optionalI11CodecConfigEERKNSt8optionalINSt6stringEEE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1a7c1f0d545d84b6dcfe27655abfb23484"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add_audio_stream</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sample_rate</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_channels</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_format</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_sample_rate</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_num_channels</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">CodecConfig</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">codec_config</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filter_desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder16add_audio_streamEiiRKNSt6stringERKNSt8optionalINSt6stringEEERKNSt8optionalI10OptionDictEERKNSt8optionalINSt6stringEEERKNSt8optionalIiEERKNSt8optionalIiEERKNSt8optionalI11CodecConfigEERKNSt8optionalINSt6stringEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Add an output audio stream.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_rate</strong> – The sample rate. </p></li>
-<li><p><strong>num_channels</strong> – The number of channels. </p></li>
-<li><p><strong>format</strong> – Input sample format, which determines the dtype of the input tensor. <p></p>
-<p><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;u8&quot;</span></code>: The input tensor must be <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code> type.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;s16&quot;</span></code>: The input tensor must be <code class="docutils literal notranslate"><span class="pre">torch.int16</span></code> type.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;s32&quot;</span></code>: The input tensor must be <code class="docutils literal notranslate"><span class="pre">torch.int32</span></code> type.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;s64&quot;</span></code>: The input tensor must be <code class="docutils literal notranslate"><span class="pre">torch.int64</span></code> type.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;flt&quot;</span></code>: The input tensor must be <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> type.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;dbl&quot;</span></code>: The input tensor must be <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code> type.</p></li>
-</ul>
-</p>
-<p>Default: <code class="docutils literal notranslate"><span class="pre">&quot;flt&quot;</span></code>. </p>
-</p></li>
-<li><p><strong>encoder</strong> – The name of the encoder to be used. <p>When provided, use the specified encoder instead of the default one.</p>
-<p>To list the available encoders, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-encoders</span></code> command. </p>
-</p></li>
-<li><p><strong>encoder_option</strong> – Options passed to encoder. To list encoder options for a encoder, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">encoder=&lt;ENCODER&gt;</span></code>. </p></li>
-<li><p><strong>encoder_format</strong> – Format used to encode media. When encoder supports multiple formats, passing this argument will override the format used for encoding. To list supported formats for the encoder, you can use <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">encoder=&lt;ENCODER&gt;</span></code> command. </p></li>
-<li><p><strong>encoder_sample_rate</strong> – If provided, perform resampling before encoding. </p></li>
-<li><p><strong>encoder_num_channels</strong> – If provided, change channel configuration before encoding. </p></li>
-<li><p><strong>codec_config</strong> – Codec configuration. </p></li>
-<li><p><strong>filter_desc</strong> – Additional processing to apply before encoding the input data </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::add_audio_stream” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="add-video-stream">
 <h3>add_video_stream<a class="headerlink" href="#add-video-stream" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder16add_video_streamEdiiRKNSt6stringERKNSt8optionalINSt6stringEEERKNSt8optionalI10OptionDictEERKNSt8optionalINSt6stringEEERKNSt8optionalIdEERKNSt8optionalIiEERKNSt8optionalIiEERKNSt8optionalINSt6stringEEERKNSt8optionalI11CodecConfigEERKNSt8optionalINSt6stringEEE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1ab8dbb3b62454618d83a25fb255de91df"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add_video_stream</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frame_rate</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">width</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">format</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_option</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_format</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_frame_rate</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_width</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">encoder_height</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw_accel</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">CodecConfig</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">codec_config</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filter_desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder16add_video_streamEdiiRKNSt6stringERKNSt8optionalINSt6stringEEERKNSt8optionalI10OptionDictEERKNSt8optionalINSt6stringEEERKNSt8optionalIdEERKNSt8optionalIiEERKNSt8optionalIiEERKNSt8optionalINSt6stringEEERKNSt8optionalI11CodecConfigEERKNSt8optionalINSt6stringEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Add an output video stream.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>frame_rate</strong> – Frame rate </p></li>
-<li><p><strong>width</strong> – Width </p></li>
-<li><p><strong>height</strong> – Height </p></li>
-<li><p><strong>format</strong> – Input pixel format, which determines the color channel order of the input tensor. <p></p>
-<p><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;gray8&quot;</span></code>: One channel, grayscale.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;rgb24&quot;</span></code>: Three channels in the order of RGB.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;bgr24&quot;</span></code>: Three channels in the order of BGR.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;yuv444p&quot;</span></code>: Three channels in the order of YUV.</p></li>
-</ul>
-</p>
-<p>In either case, the input tensor has to be <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code> type and the shape must be (frame, channel, height, width). </p>
-</p></li>
-<li><p><strong>encoder</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder_1a7c1f0d545d84b6dcfe27655abfb23484"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>. </p></li>
-<li><p><strong>encoder_option</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder_1a7c1f0d545d84b6dcfe27655abfb23484"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>. </p></li>
-<li><p><strong>encoder_format</strong> – See <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder_1a7c1f0d545d84b6dcfe27655abfb23484"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code>. </p></li>
-<li><p><strong>encoder_frame_rate</strong> – If provided, change frame rate before encoding. </p></li>
-<li><p><strong>encoder_width</strong> – If provided, resize image before encoding. </p></li>
-<li><p><strong>encoder_height</strong> – If provided, resize image before encoding. </p></li>
-<li><p><strong>hw_accel</strong> – Enable hardware acceleration. </p></li>
-<li><p><strong>codec_config</strong> – Codec configuration. <p>When video is encoded on CUDA hardware, for example <code class="docutils literal notranslate"><span class="pre">encoder=&quot;h264_nvenc&quot;</span></code>, passing CUDA device indicator to <code class="docutils literal notranslate"><span class="pre">hw_accel</span></code> (i.e. <code class="docutils literal notranslate"><span class="pre">hw_accel=&quot;cuda:0&quot;</span></code>) will make <a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder"><span class="std std-ref">StreamingMediaEncoder</span></a> expect video chunk to be a CUDA Tensor. Passing CPU Tensor will result in an error.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the video chunk Tensor has to be a CPU Tensor. </p>
-</p></li>
-<li><p><strong>filter_desc</strong> – Additional processing to apply before encoding the input data </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::add_video_stream” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="set-metadata">
 <h3>set_metadata<a class="headerlink" href="#set-metadata" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder12set_metadataERK10OptionDict">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1a9a0a1eb7632782ca3505f4c006e63351"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">set_metadata</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">OptionDict</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">metadata</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder12set_metadataERK10OptionDict" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Set file-level metadata </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>metadata</strong> – metadata. </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::set_metadata” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 </section>
 <section id="write-methods">
 <h2>Write methods<a class="headerlink" href="#write-methods" title="Permalink to this heading">¶</a></h2>
 <section id="open">
 <h3>open<a class="headerlink" href="#open" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder4openERKNSt8optionalI10OptionDictEE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1a7785f86ab22716b0d6fcab72b43e0eea"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">OptionDict</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder4openERKNSt8optionalI10OptionDictEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Open the output file / device and write the header.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>opt</strong> – Private options for protocol, device and muxer. </p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::open” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="close">
 <h3>close<a class="headerlink" href="#close" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder5closeEv">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1ad4b54cba53a7564bb058ede079ff6530"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder5closeEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Close the output file / device and finalize metadata. </p>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::close” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="write-audio-chunk">
 <h3>write_audio_chunk<a class="headerlink" href="#write-audio-chunk" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder17write_audio_chunkEiRKN5torch6TensorERKNSt8optionalIdEE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1aac942a7abc08bc215fd0a62233f623da"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">write_audio_chunk</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">torch</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frames</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder17write_audio_chunkEiRKN5torch6TensorERKNSt8optionalIdEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Write audio data </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>i</strong> – Stream index. </p></li>
-<li><p><strong>frames</strong> – Waveform tensor. Shape: <code class="docutils literal notranslate"><span class="pre">(frame,</span> <span class="pre">channel)</span></code>. The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must match what was passed to <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder_1a7c1f0d545d84b6dcfe27655abfb23484"><span class="std std-ref"><span class="pre">add_audio_stream()</span></span></a></code> method. </p></li>
-<li><p><strong>pts</strong> – <p>Presentation timestamp. If provided, it overwrites the PTS of the first frame with the provided one. Otherwise, PTS are incremented per an inverse of sample rate. Only values exceed the PTS values processed internally.</p>
-<p><strong>NOTE</strong>: The provided value is converted to integer value expressed in basis of sample rate. Therefore, it is truncated to the nearest value of <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">sample_rate</span></code>. </p>
-</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::write_audio_chunk” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="write-video-chunk">
 <h3>write_video_chunk<a class="headerlink" href="#write-video-chunk" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder17write_video_chunkEiRKN5torch6TensorERKNSt8optionalIdEE">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1a0e21811fac24de6266ad31ef36c7175a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">write_video_chunk</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">torch</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frames</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">c10</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder17write_video_chunkEiRKN5torch6TensorERKNSt8optionalIdEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Write video data </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>i</strong> – Stream index. </p></li>
-<li><p><strong>frames</strong> – Video/image tensor. Shape: <code class="docutils literal notranslate"><span class="pre">(time,</span> <span class="pre">channel,</span> <span class="pre">height,</span> <span class="pre">width)</span></code>. The <code class="docutils literal notranslate"><span class="pre">dtype</span></code> must be <code class="docutils literal notranslate"><span class="pre">torch.uint8</span></code>. The shape <code class="docutils literal notranslate"><span class="pre">(height,</span> <span class="pre">width</span> <span class="pre">and</span> <span class="pre">the</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">channels)</span></code> must match what was configured when calling <code class="docutils literal notranslate"><a class="reference internal" href="#classtorio_1_1io_1_1StreamingMediaEncoder_1ab8dbb3b62454618d83a25fb255de91df"><span class="std std-ref"><span class="pre">add_video_stream()</span></span></a></code>. </p></li>
-<li><p><strong>pts</strong> – <p>Presentation timestamp. If provided, it overwrites the PTS of the first frame with the provided one. Otherwise, PTS are incremented per an inverse of frame rate. Only values exceed the PTS values processed internally.</p>
-<p><strong>NOTE</strong>: The provided value is converted to integer value expressed in basis of frame rate. Therefore, it is truncated to the nearest value of <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">frame_rate</span></code>. </p>
-</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::write_video_chunk” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 <section id="flush">
 <h3>flush<a class="headerlink" href="#flush" title="Permalink to this heading">¶</a></h3>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5torio2io21StreamingMediaEncoder5flushEv">
-<span class="target" id="classtorio_1_1io_1_1StreamingMediaEncoder_1ac192ea68a58042c6ffe5001f3ef8b49b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">torio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5torio2io21StreamingMediaEncoderE" title="torio::io::StreamingMediaEncoder"><span class="n"><span class="pre">StreamingMediaEncoder</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">flush</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5torio2io21StreamingMediaEncoder5flushEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Flush the frames from encoders and write the frames to the destination. </p>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygenfunction: Cannot find function “torio::io::StreamingMediaEncoder::flush” in doxygen xml output for project “libtorio” from directory: cpp/xml</p>
+</div>
 </section>
 </section>
 </section>

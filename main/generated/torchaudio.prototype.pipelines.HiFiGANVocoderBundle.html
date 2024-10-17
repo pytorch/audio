@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>HiFiGANVocoderBundle &mdash; Torchaudio 2.5.0.dev20241017 documentation</title>
+  <title>HiFiGANVocoderBundle &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241017 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
     </div>
     
 
@@ -529,7 +529,7 @@ to generate mel spectrogram from text. Please see below for the code example.</p
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform">
-<span class="sig-prename descclassname"><span class="pre">HiFiGANVocoderBundle.</span></span><span class="sig-name descname"><span class="pre">get_mel_transform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.4)"><span class="pre">Module</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/pipelines/hifigan_pipeline.html#HiFiGANVocoderBundle.get_mel_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">HiFiGANVocoderBundle.</span></span><span class="sig-name descname"><span class="pre">get_mel_transform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.5)"><span class="pre">Module</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/pipelines/hifigan_pipeline.html#HiFiGANVocoderBundle.get_mel_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an object which transforms waveforms into mel spectrograms.</p>
 </dd></dl>
 
@@ -543,10 +543,10 @@ to generate mel spectrogram from text. Please see below for the code example.</p
 <span class="sig-prename descclassname"><span class="pre">HiFiGANVocoderBundle.</span></span><span class="sig-name descname"><span class="pre">get_vocoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="torchaudio.prototype.models.HiFiGANVocoder.html#torchaudio.prototype.models.HiFiGANVocoder" title="torchaudio.prototype.models.hifi_gan.HiFiGANVocoder"><span class="pre">HiFiGANVocoder</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/pipelines/hifigan_pipeline.html#HiFiGANVocoderBundle.get_vocoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_vocoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the HiFiGAN Generator model, which can be used a vocoder, and load the pretrained weight.</p>
 <p>The weight file is downloaded from the internet and cached with
-<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
+<a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>dl_kwargs</strong> (<em>dictionary of keyword arguments</em>) – Passed to <a class="reference external" href="https://pytorch.org/docs/stable/hub.html#torch.hub.load_state_dict_from_url" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.hub.load_state_dict_from_url()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Variation of <a class="reference internal" href="torchaudio.prototype.models.HiFiGANVocoder.html#torchaudio.prototype.models.HiFiGANVocoder" title="torchaudio.prototype.models.HiFiGANVocoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoder</span></code></a>.</p>

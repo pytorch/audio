@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio &mdash; Torchaudio 2.5.0.dev20241017 documentation</title>
+  <title>Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
   
 
   
@@ -224,7 +224,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241017 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
     </div>
     
 
@@ -505,8 +505,8 @@ through MOS using non-matching references.” Interspeech, 2022.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241016
-2.5.0.dev20241017
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241104
+2.5.0.dev20241105
 </pre></div>
 </div>
 </section>
@@ -588,7 +588,7 @@ plot data, pystoi, pesq for computing reference metrics.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/156k [00:00&lt;?, ?B/s]
-100%|##########| 156k/156k [00:00&lt;00:00, 65.4MB/s]
+100%|##########| 156k/156k [00:00&lt;00:00, 17.6MB/s]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">WAVEFORM_SPEECH</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_RATE_SPEECH</span></a> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SAMPLE_SPEECH</span></a><span class="p">)</span>
@@ -698,10 +698,7 @@ Resample the waveforms if necessary.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/28.2M [00:00&lt;?, ?B/s]
- 52%|#####2    | 14.8M/28.2M [00:00&lt;00:00, 31.9MB/s]
- 63%|######3   | 17.9M/28.2M [00:00&lt;00:00, 23.1MB/s]
- 96%|#########5| 27.0M/28.2M [00:01&lt;00:00, 27.9MB/s]
-100%|##########| 28.2M/28.2M [00:01&lt;00:00, 28.6MB/s]
+100%|##########| 28.2M/28.2M [00:00&lt;00:00, 383MB/s]
 </pre></div>
 </div>
 <p>Compare model outputs with ground truths for distorted speech with 20dB
@@ -772,16 +769,16 @@ SI-SDR: -5.016279220581055
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/360M [00:00&lt;?, ?B/s]
- 11%|#1        | 40.5M/360M [00:00&lt;00:00, 424MB/s]
- 22%|##2       | 81.0M/360M [00:00&lt;00:00, 339MB/s]
- 32%|###1      | 114M/360M [00:00&lt;00:00, 341MB/s]
- 41%|####1     | 149M/360M [00:00&lt;00:00, 349MB/s]
- 52%|#####1    | 186M/360M [00:00&lt;00:00, 361MB/s]
- 61%|######1   | 220M/360M [00:00&lt;00:00, 347MB/s]
- 73%|#######2  | 262M/360M [00:00&lt;00:00, 377MB/s]
- 85%|########5 | 308M/360M [00:00&lt;00:00, 406MB/s]
- 96%|#########6| 347M/360M [00:00&lt;00:00, 407MB/s]
-100%|##########| 360M/360M [00:00&lt;00:00, 381MB/s]
+ 10%|9         | 35.2M/360M [00:00&lt;00:00, 369MB/s]
+ 20%|#9        | 70.5M/360M [00:00&lt;00:00, 351MB/s]
+ 29%|##8       | 104M/360M [00:00&lt;00:00, 339MB/s]
+ 39%|###9      | 141M/360M [00:00&lt;00:00, 355MB/s]
+ 51%|#####     | 183M/360M [00:00&lt;00:00, 385MB/s]
+ 63%|######2   | 226M/360M [00:00&lt;00:00, 409MB/s]
+ 75%|#######4  | 270M/360M [00:00&lt;00:00, 425MB/s]
+ 87%|########7 | 314M/360M [00:00&lt;00:00, 436MB/s]
+ 99%|#########9| 358M/360M [00:00&lt;00:00, 444MB/s]
+100%|##########| 360M/360M [00:00&lt;00:00, 409MB/s]
 </pre></div>
 </div>
 <p>Load a non-matching reference (NMR)</p>
@@ -833,7 +830,7 @@ Acoustics, Speech and Signal Processing (ICASSP), pp. 911-915. IEEE,
 where y axis represents the estimated MOS metric score, and x axis
 represents the corresponding ground truth.</p>
 <a class="reference internal image-reference" href="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png"><img alt="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" class="align-center" src="https://download.pytorch.org/torchaudio/tutorial-assets/subjective_plot.png" style="width: 500px;" /></a>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.261 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.495 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-squim-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c943e35bc7cad6e8d9b1df2a7034a8fc/squim_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">squim_tutorial.py</span></code></a></p>

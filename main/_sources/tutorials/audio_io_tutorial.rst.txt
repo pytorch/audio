@@ -51,8 +51,8 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 
  .. code-block:: none
 
-    2.6.0.dev20241016
-    2.5.0.dev20241017
+    2.6.0.dev20241104
+    2.5.0.dev20241105
 
 
 
@@ -114,8 +114,8 @@ First, we import the modules and download the audio assets we use in this tutori
 
  .. code-block:: none
 
-      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 10.8MB/s]
-      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 41.5MB/s]
+      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 14.6MB/s]
+      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 31.7MB/s]
 
 
 
@@ -467,7 +467,7 @@ The following examples illustrate this.
 
  .. code-block:: none
 
-      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 77.8MB/s]
+      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 50.5MB/s]
 
 
 
@@ -654,7 +654,7 @@ the provided data fit
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmppsxw0re9/save_example_default.wav
+    Source: /tmp/tmp27vfrdta/save_example_default.wav
     ----------
      - File size: 108878 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -687,7 +687,7 @@ The resulting file occupies half the storage but loses precision
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmpm3m4q8ju/save_example_PCM_S16.wav
+    Source: /tmp/tmpx2saso8q/save_example_PCM_S16.wav
     ----------
      - File size: 108878 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -743,7 +743,7 @@ To name a few:
  .. code-block:: none
 
     ----------
-    Source: /tmp/tmpu53r7fzy/save_example.flac
+    Source: /tmp/tmpy9v0ju27/save_example.flac
     ----------
      - File size: 45262 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=16, encoding=FLAC)
@@ -792,7 +792,7 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.624 seconds)
+   **Total running time of the script:** ( 0 minutes  2.193 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:
