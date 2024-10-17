@@ -23,12 +23,13 @@
 // OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <float.h>
 #include <algorithm>
+#include "../include/ctc_prefix_decoder_host.h"
 #include "ctc_fast_divmod.cuh"
 #include "cub/cub.cuh"
 #include "device_data_wrap.h"
 #include "device_log_prob.cuh"
-#include "include/ctc_prefix_decoder_host.h"
 
 #include "bitonic_topk/warpsort_topk.cuh"
 
@@ -630,7 +631,8 @@ int CTC_prob_first_step_V2(
           num_of_subwarp, beam));
   int smem_size =
       block_sort_smem_size + beam * sizeof(float) + beam * sizeof(int);
-  FirstMatrixFuns[fun_idx]<<<grid, threads_per_block, smem_size, stream>>>(
+  auto kernel = FirstMatrixFuns[fun_idx];
+  kernel<<<grid, threads_per_block, smem_size, stream>>>(
       (*log_prob_struct),
       step,
       pprev,
@@ -766,7 +768,8 @@ int CTC_prob_topK_V2(
   int num_of_subwarp = threads_per_block0 / std::min<int>(32, actual_capacity);
   int smem_size = cu_ctc::topk::calc_smem_size_for_block_wide<float, int>(
       num_of_subwarp, beam);
-  BitonicTopkFuns[fun_idx]<<<grid, block, smem_size, stream>>>(
+  auto kernel = BitonicTopkFuns[fun_idx];
+  kernel<<<grid, block, smem_size, stream>>>(
       (*log_prob_struct),
       step,
       ptable,

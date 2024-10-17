@@ -25,8 +25,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cuda_runtime.h>
 
-#include "include/ctc_prefix_decoder.h"
-#include "include/ctc_prefix_decoder_host.h"
+#include "../include/ctc_prefix_decoder.h"
+#include "../include/ctc_prefix_decoder_host.h"
 
 #include "device_data_wrap.h"
 #include "device_log_prob.cuh"
