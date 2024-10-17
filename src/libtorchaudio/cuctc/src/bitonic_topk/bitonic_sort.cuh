@@ -16,9 +16,13 @@ constexpr inline __host__ __device__ bool isPo2(IntType num) {
 }
 
 inline __device__ int laneId() {
+#ifndef USE_ROCM
   int id;
   asm("mov.s32 %0, %%laneid;" : "=r"(id));
   return id;
+#else
+  return __lane_id();
+#endif
 }
 /**
  * @brief Shuffle the data inside a warp
