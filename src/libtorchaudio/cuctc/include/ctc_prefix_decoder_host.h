@@ -26,24 +26,6 @@
 #ifndef __ctc_prefix_decoder_host_h_
 #define __ctc_prefix_decoder_host_h_
 
-#include <cuda_runtime.h>
-
-#define CUDA_CHECK(X)                                   \
-  do {                                                  \
-    auto result = X;                                    \
-    if (result != cudaSuccess) {                        \
-      const char* p_err_str = cudaGetErrorName(result); \
-      fprintf(                                          \
-          stderr,                                       \
-          "File %s Line %d %s returned %s.\n",          \
-          __FILE__,                                     \
-          __LINE__,                                     \
-          #X,                                           \
-          p_err_str);                                   \
-      abort();                                          \
-    }                                                   \
-  } while (0)
-
 #define CHECK(X, ERROR_INFO)                        \
   do {                                              \
     auto result = (X);                              \
