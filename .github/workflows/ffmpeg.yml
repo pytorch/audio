@@ -44,7 +44,7 @@ jobs:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
       repository: pytorch/audio
-      runner: linux.arm64.2xlarge
+      runner: amz2023.linux.arm64.2xlarge
       docker-image: pytorch/manylinuxaarch64-builder:cpu-aarch64
       script: |
         export FFMPEG_VERSION="${{ matrix.ffmpeg_version }}"
