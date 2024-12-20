@@ -1662,8 +1662,8 @@ def vad(
             flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
             break
     # end for window
-    if not has_triggered:
-        return waveform[..., :0].view(shape[:-1] + torch.Size([0]))
+    if not has_triggered and shape[-1] >= fixed_pre_trigger_len_ns:
+        return waveform[..., :fixed_pre_trigger_len_ns].view(shape[:-1] + torch.Size([fixed_pre_trigger_len_ns]))
 
     res = waveform[:, max(pos - samplesLen_ns + flushedLen_ns, 0) :]
     # unpack batch
