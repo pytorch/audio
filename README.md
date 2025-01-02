@@ -99,15 +99,15 @@ waveform, sample_rate = torchaudio.load("path_to_audio_file")
 Step 4: Define the SoX Effects and apply the effects to input audio. In this example, I apply time_stretch, loudness, and high-pass filter adjustment.
    
 effects = [
-  ["tempo", "1.25"], # Increase the playback speed (tempo) by 25%
-  ["gain", "10"], # Amplify the audio by 10 dB
-  ["highpass", "1000"], # Apply a high-pass filter with a cutoff frequency of 1000 Hz
+  ["tempo", "1.25"], # Increase the playback speed (tempo) by 25%  
+  ["gain", "10"], # Amplify the audio by 10 dB  
+  ["highpass", "1000"], # Apply a high-pass filter with a cutoff frequency of 1000 Hz  
 ]
 
 augmented_waveform, augmented_sample_rate = sox_effects.apply_effects_tensor(
-    waveform,   
-    sample_rate,
-    effects
+    waveform,     
+    sample_rate,  
+    effects  
 )
 
 Step 5: Save the Augmented Audio
