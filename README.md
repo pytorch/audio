@@ -83,3 +83,33 @@ The pre-trained models provided in this library may have their own licenses or t
 For instance, SquimSubjective model is released under the Creative Commons Attribution Non Commercial 4.0 International (CC-BY-NC 4.0) license. See [the link](https://zenodo.org/record/4660670#.ZBtWPOxuerN) for additional details.
 
 Other pre-trained models that have different license are noted in documentation. Please checkout the [documentation page](https://pytorch.org/audio/main/).
+
+Audio augmentation using sox_effect
+-------------------------
+Step 1: Install torchaudio            
+pip install torchaudio   
+
+Step 2: Import Necessary Libraries
+import torchaudio
+import torchaudio.sox_effects as sox_effects
+      
+Step 3: Load an Audio File  
+waveform, sample_rate = torchaudio.load("path_to_audio_file")    
+ 
+Step 4: Define the SoX Effects and apply the effects to input audio. In this example, I apply time_stretch, loudness, and high-pass filter adjustment.
+   
+effects = [
+  ["tempo", "1.25"], # Increase the playback speed (tempo) by 25%
+  ["gain", "10"], # Amplify the audio by 10 dB
+  ["highpass", "1000"], # Apply a high-pass filter with a cutoff frequency of 1000 Hz
+]
+
+augmented_waveform, augmented_sample_rate = sox_effects.apply_effects_tensor(
+    waveform,   
+    sample_rate,
+    effects
+)
+
+Step 5: Save the Augmented Audio
+
+torchaudio.save("augmented_audio.wav", augmented_waveform, augmented_sample_rate)
