@@ -23,6 +23,9 @@ jobs:
     # This job is required to pass for each PR.
     # The name of the required job is sensitive to matrix parameter.
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       job-name: Build doc
       runner: linux.g5.4xlarge.nvidia.gpu
