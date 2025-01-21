@@ -19,6 +19,9 @@ jobs:
       matrix:
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
@@ -40,6 +43,9 @@ jobs:
       matrix:
         ffmpeg_version: ["4.4.4", "5.1.4", "6.1.1", "master"]
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       job-name: Build
       upload-artifact: ffmpeg-lgpl
