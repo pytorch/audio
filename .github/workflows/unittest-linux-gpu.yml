@@ -17,6 +17,9 @@ jobs:
         cuda_arch_version: ["11.8"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
