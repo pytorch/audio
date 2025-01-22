@@ -16,6 +16,9 @@ jobs:
         python_version: ["3.8", "3.9", "3.10"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       runner: linux.12xlarge
       repository: pytorch/audio
