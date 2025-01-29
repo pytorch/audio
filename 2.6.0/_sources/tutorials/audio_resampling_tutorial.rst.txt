@@ -46,8 +46,8 @@ This tutorial shows how to use torchaudio's resampling API.
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
 
 
 
@@ -657,7 +657,7 @@ in ``torchaudio``.
 
  .. code-block:: none
 
-    torchaudio: 2.5.0
+    torchaudio: 2.6.0
     librosa: 0.10.0
     resampy: 0.2.2
 

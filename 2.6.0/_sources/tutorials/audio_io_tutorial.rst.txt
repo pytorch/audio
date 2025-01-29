@@ -51,8 +51,8 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
 
 
 

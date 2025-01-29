@@ -52,8 +52,8 @@ At the end, we synthesize noisy speech over phone from clean speech.
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
 
 
 

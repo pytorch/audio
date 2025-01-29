@@ -82,8 +82,8 @@ Preparation
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
     FFmpeg library versions
       libavcodec: (60, 3, 100)
       libavdevice: (60, 1, 100)

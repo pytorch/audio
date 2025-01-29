@@ -55,8 +55,8 @@ model, tokenizer and aligner, to perform the forced alignment with less code.
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
     cuda
 
 

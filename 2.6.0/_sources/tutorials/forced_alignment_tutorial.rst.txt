@@ -72,8 +72,8 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
     cuda
 
 

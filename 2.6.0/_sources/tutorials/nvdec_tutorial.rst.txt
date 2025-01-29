@@ -59,8 +59,8 @@ with TorchAudio, and how it improves the performance of video decoding.
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
 
 
 

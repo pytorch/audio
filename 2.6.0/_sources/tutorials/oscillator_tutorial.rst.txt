@@ -53,8 +53,8 @@ This tutorial shows how to synthesize various waveforms using
 
  .. code-block:: none
 
-    2.5.0
-    2.5.0
+    2.6.0
+    2.6.0
 
 
 
