@@ -1,0 +1,1189 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.prototype.functional._rir &mdash; Torchaudio 2.6.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../torio.utils.html">torio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../../../index.html">Module code</a> &gt;</li>
+        
+      <li>torchaudio.prototype.functional._rir &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torchaudio.prototype.functional._rir</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+
+
+<span class="k">def</span> <span class="nf">_compute_image_sources</span><span class="p">(</span>
+    <span class="n">room</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">absorption</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">scatter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute image sources in a shoebox-like room.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        room (torch.Tensor): The 1D Tensor to determine the room size. The shape is</span>
+<span class="sd">            `(D,)`, where ``D`` is 2 if room is a 2D room, or 3 if room is a 3D room.</span>
+<span class="sd">        source (torch.Tensor): The coordinate of the sound source. Tensor with dimensions</span>
+<span class="sd">            `(D)`.</span>
+<span class="sd">        max_order (int): The maximum number of reflections of the source.</span>
+<span class="sd">        absorption (torch.Tensor): The absorption coefficients of wall materials.</span>
+<span class="sd">            ``absorption`` is a Tensor with dimensions `(num_band, num_wall)`.</span>
+<span class="sd">            The shape options are ``[(1, 4), (1, 6), (7, 4), (7, 6)]``.</span>
+<span class="sd">            ``num_band`` is `1` if the coefficients is the same for all frequencies, or is `7`</span>
+<span class="sd">            if the coefficients are different to different frequencies. `7` refers to the default number</span>
+<span class="sd">            of octave bands. (See note in `simulate_rir_ism` method).</span>
+<span class="sd">            ``num_wall`` is `4` if the room is a 2D room, representing absorption coefficients</span>
+<span class="sd">            of ``&quot;west&quot;``, ``&quot;east&quot;``, ``&quot;south&quot;``, and ``&quot;north&quot;`` walls, respectively.</span>
+<span class="sd">            Or it is `6` if the room is a 3D room, representing absorption coefficients</span>
+<span class="sd">            of ``&quot;west&quot;``, ``&quot;east&quot;``, ``&quot;south&quot;``, ``&quot;north&quot;``, ``&quot;floor&quot;``, and ``&quot;ceiling&quot;``, respectively.</span>
+<span class="sd">        scatter (torch.Tensor): The scattering coefficients of wall materials.</span>
+<span class="sd">            The shape of ``scatter`` must match that of ``absorption``. If ``None``, it is not</span>
+<span class="sd">            used in image source computation. (Default: ``None``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The coordinates of all image sources within ``max_order`` number of reflections.</span>
+<span class="sd">            Tensor with dimensions `(num_image_source, D)`.</span>
+<span class="sd">        (torch.Tensor): The attenuation of corresponding image sources. Tensor with dimensions</span>
+<span class="sd">            `(num_band, num_image_source)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">scatter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">absorption</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">absorption</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">scatter</span><span class="p">)</span>
+
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">max_order</span><span class="p">,</span> <span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">room</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">XYZ</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">XYZ</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+    <span class="n">XYZ</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">XYZ</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">XYZ</span> <span class="o">=</span> <span class="n">XYZ</span><span class="p">[</span><span class="n">XYZ</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_order</span><span class="p">]</span>
+
+    <span class="c1"># compute locations of image sources</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">room</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">img_loc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">XYZ</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">XYZ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s</span><span class="p">,</span> <span class="n">d</span> <span class="o">*</span> <span class="n">XYZ</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
+
+    <span class="c1"># attenuation</span>
+    <span class="n">exp_lo</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">XYZ</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+    <span class="n">exp_hi</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">XYZ</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">t_lo</span> <span class="o">=</span> <span class="n">tr</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">XYZ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># (num_band, left walls)</span>
+    <span class="n">t_hi</span> <span class="o">=</span> <span class="n">tr</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">XYZ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># (num_band, right walls)</span>
+    <span class="n">att</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">prod</span><span class="p">((</span><span class="n">t_lo</span><span class="o">**</span><span class="n">exp_lo</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t_hi</span><span class="o">**</span><span class="n">exp_hi</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (num_band, num_image_source)</span>
+    <span class="k">return</span> <span class="n">img_loc</span><span class="p">,</span> <span class="n">att</span>
+
+
+<span class="k">def</span> <span class="nf">_hann</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Hann window where the values are truncated based on window length.</span>
+<span class="sd">    torch.hann_window can only sample window function at integer points, the method is to sample</span>
+<span class="sd">    continuous window function at non-integer points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (torch.Tensor): The fractional component of time delay Tensor.</span>
+<span class="sd">        T (torch.Tensor): The window length of sinc function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The hann window Tensor where values outside</span>
+<span class="sd">            the sinc window (`T`) is set to zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">T</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">T</span><span class="p">)),</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">y</span>
+
+
+<span class="k">def</span> <span class="nf">_frac_delay</span><span class="p">(</span><span class="n">delay</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">delay_i</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">delay_filter_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute fractional delay of impulse response signal.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        delay (torch.Tensor): The time delay Tensor in samples.</span>
+<span class="sd">        delay_i (torch.Tensor): The integer part of delay.</span>
+<span class="sd">        delay_filter_length (int): The window length for sinc function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The impulse response Tensor for all image sources.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">delay_filter_length</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The filter length must be odd&quot;</span><span class="p">)</span>
+
+    <span class="n">pad</span> <span class="o">=</span> <span class="n">delay_filter_length</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">delay</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">+</span> <span class="n">delay_i</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">delay</span> <span class="o">=</span> <span class="n">delay</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">delay</span><span class="p">)</span> <span class="o">*</span> <span class="n">_hann</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">delay</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_adjust_coeff</span><span class="p">(</span><span class="n">coeffs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validates and converts absorption or scattering parameters to a tensor with appropriate shape</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coeff (float or torch.Tensor): The absorption coefficients of wall materials.</span>
+
+<span class="sd">            If the dtype is ``float``, the absorption coefficient is identical for all walls and</span>
+<span class="sd">            all frequencies.</span>
+
+<span class="sd">            If ``absorption`` is a 1D Tensor, the shape must be `(2*dim,)`,</span>
+<span class="sd">            where the values represent absorption coefficients of ``&quot;west&quot;``, ``&quot;east&quot;``,</span>
+<span class="sd">            ``&quot;south&quot;``, ``&quot;north&quot;``, ``&quot;floor&quot;``, and ``&quot;ceiling&quot;``, respectively.</span>
+
+<span class="sd">            If ``absorption`` is a 2D Tensor, the shape must be `(7, 2*dim)`,</span>
+<span class="sd">            where 7 represents the number of octave bands.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The expanded coefficient.</span>
+<span class="sd">            The shape is `(1, 6)` for single octave band case, and</span>
+<span class="sd">            `(7, 6)` for multi octave band case.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_walls</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">coeffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be non-negative. Found: </span><span class="si">{</span><span class="n">coeffs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_walls</span><span class="p">),</span> <span class="n">coeffs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">coeffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be non-negative. Found: </span><span class="si">{</span><span class="n">coeffs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">!=</span> <span class="n">num_walls</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The shape of `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be (</span><span class="si">{</span><span class="n">num_walls</span><span class="si">}</span><span class="s2">,) when it is a 1D Tensor. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Found the shape </span><span class="si">{</span><span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">num_walls</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The shape of `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be (NUM_BANDS, </span><span class="si">{</span><span class="n">num_walls</span><span class="si">}</span><span class="s2">) when it &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;is a 2D Tensor. Found: </span><span class="si">{</span><span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">coeffs</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be float or Tensor.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_inputs</span><span class="p">(</span>
+    <span class="n">room</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">mic_array</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate dimensions of input arguments, and normalize different kinds of absorption into the same dimension.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        room (torch.Tensor): The size of the room. width, length (and height)</span>
+<span class="sd">        source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(dim,)`.</span>
+<span class="sd">        mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, dim)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">room</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`room` must be a 1D Tensor with 3 elements. Found </span><span class="si">{</span><span class="n">room</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">source</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`source` must be 1D Tensor with 3 elements. Found </span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mic_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">mic_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`mic_array` must be a 2D Tensor with shape (num_channels, 3). Found </span><span class="si">{</span><span class="n">mic_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="simulate_rir_ism"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.simulate_rir_ism.html#torchaudio.prototype.functional.simulate_rir_ism">[docs]</a><span class="k">def</span> <span class="nf">simulate_rir_ism</span><span class="p">(</span>
+    <span class="n">room</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">mic_array</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">absorption</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">output_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">delay_filter_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">81</span><span class="p">,</span>
+    <span class="n">center_frequency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sound_speed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">343.0</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">16000.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute Room Impulse Response (RIR) based on the *image source method* :cite:`allen1979image`.</span>
+<span class="sd">    The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.</span>
+
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        room (torch.Tensor): Room coordinates. The shape of `room` must be `(3,)` which represents</span>
+<span class="sd">            three dimensions of the room.</span>
+<span class="sd">        source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(3,)`.</span>
+<span class="sd">        mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, 3)`.</span>
+<span class="sd">        max_order (int): The maximum number of reflections of the source.</span>
+<span class="sd">        absorption (float or torch.Tensor): The *absorption* :cite:`wiki:Absorption_(acoustics)`</span>
+<span class="sd">            coefficients of wall materials for sound energy.</span>
+<span class="sd">            If the dtype is ``float``, the absorption coefficient is identical for all walls and</span>
+<span class="sd">            all frequencies.</span>
+<span class="sd">            If ``absorption`` is a 1D Tensor, the shape must be `(6,)`, where the values represent</span>
+<span class="sd">            absorption coefficients of ``&quot;west&quot;``, ``&quot;east&quot;``, ``&quot;south&quot;``, ``&quot;north&quot;``, ``&quot;floor&quot;``,</span>
+<span class="sd">            and ``&quot;ceiling&quot;``, respectively.</span>
+<span class="sd">            If ``absorption`` is a 2D Tensor, the shape must be `(7, 6)`, where 7 represents the number of octave bands.</span>
+<span class="sd">        output_length (int or None, optional): The output length of simulated RIR signal. If ``None``,</span>
+<span class="sd">            the length is defined as</span>
+
+<span class="sd">            .. math::</span>
+<span class="sd">                \frac{\text{max\_d} \cdot \text{sample\_rate}}{\text{sound\_speed}} + \text{delay\_filter\_length}</span>
+
+<span class="sd">            where ``max_d`` is the maximum distance between image sources and microphones.</span>
+<span class="sd">        delay_filter_length (int, optional): The filter length for computing sinc function. (Default: ``81``)</span>
+<span class="sd">        center_frequency (torch.Tensor, optional): The center frequencies of octave bands for multi-band walls.</span>
+<span class="sd">            Only used when ``absorption`` is a 2D Tensor.</span>
+<span class="sd">        sound_speed (float, optional): The speed of sound. (Default: ``343.0``)</span>
+<span class="sd">        sample_rate (float, optional): The sample rate of the generated room impulse response signal.</span>
+<span class="sd">            (Default: ``16000.0``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The simulated room impulse response waveform. Tensor with dimensions</span>
+<span class="sd">        `(channel, rir_length)`.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        If ``absorption`` is a 2D Tensor and ``center_frequency`` is set to ``None``, the center frequencies</span>
+<span class="sd">        of octave bands are fixed to ``[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]``.</span>
+<span class="sd">        Users need to tune the values of ``absorption`` to the corresponding frequencies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_validate_inputs</span><span class="p">(</span><span class="n">room</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">mic_array</span><span class="p">)</span>
+    <span class="n">absorption</span> <span class="o">=</span> <span class="n">_adjust_coeff</span><span class="p">(</span><span class="n">absorption</span><span class="p">,</span> <span class="s2">&quot;absorption&quot;</span><span class="p">)</span>
+    <span class="n">img_location</span><span class="p">,</span> <span class="n">att</span> <span class="o">=</span> <span class="n">_compute_image_sources</span><span class="p">(</span><span class="n">room</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">max_order</span><span class="p">,</span> <span class="n">absorption</span><span class="p">)</span>
+
+    <span class="c1"># compute distances between image sources and microphones</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">img_location</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">mic_array</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (image_source, channel)</span>
+
+    <span class="n">img_src_att</span> <span class="o">=</span> <span class="n">att</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">/</span> <span class="n">dist</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>  <span class="c1"># (band, image_source, channel)</span>
+
+    <span class="c1"># separate delays in integer / frac part</span>
+    <span class="n">delay</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">*</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="n">sound_speed</span>  <span class="c1"># distance to delay in samples</span>
+    <span class="n">delay_i</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>  <span class="c1"># integer part</span>
+
+    <span class="c1"># compute the shorts IRs corresponding to each image source</span>
+    <span class="n">irs</span> <span class="o">=</span> <span class="n">img_src_att</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">_frac_delay</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">delay_i</span><span class="p">,</span> <span class="n">delay_filter_length</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+    <span class="n">rir_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">delay_i</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">irs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">rir</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_simulate_rir</span><span class="p">(</span><span class="n">irs</span><span class="p">,</span> <span class="n">delay_i</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">rir_length</span><span class="p">)</span>
+
+    <span class="c1"># multi-band processing</span>
+    <span class="k">if</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">center_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span><span class="mf">125.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">,</span> <span class="mf">4000.0</span><span class="p">,</span> <span class="mf">8000.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">room</span><span class="o">.</span><span class="n">device</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">center_frequency</span>
+        <span class="c1"># n_fft is set to 512 by default.</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_make_rir_filter</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">rir</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="n">filters</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">)</span>
+
+    <span class="c1"># sum up rir signals of all image sources into one waveform.</span>
+    <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">output_length</span> <span class="o">&gt;</span> <span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">rir</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">output_length</span> <span class="o">-</span> <span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">output_length</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">rir</span></div>
+
+
+<div class="viewcode-block" id="ray_tracing"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.ray_tracing.html#torchaudio.prototype.functional.ray_tracing">[docs]</a><span class="k">def</span> <span class="nf">ray_tracing</span><span class="p">(</span>
+    <span class="n">room</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">mic_array</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">num_rays</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">absorption</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">scattering</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">mic_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">sound_speed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">343.0</span><span class="p">,</span>
+    <span class="n">energy_thres</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">time_thres</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">hist_bin_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.004</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute energy histogram via ray tracing.</span>
+
+<span class="sd">    The implementation is based on *pyroomacoustics* :cite:`scheibler2018pyroomacoustics`.</span>
+
+<span class="sd">    ``num_rays`` rays are casted uniformly in all directions from the source;</span>
+<span class="sd">    when a ray intersects a wall, it is reflected and part of its energy is absorbed.</span>
+<span class="sd">    It is also scattered (sent directly to the microphone(s)) according to the ``scattering``</span>
+<span class="sd">    coefficient.</span>
+<span class="sd">    When a ray is close to the microphone, its current energy is recorded in the output</span>
+<span class="sd">    histogram for that given time slot.</span>
+
+<span class="sd">    .. devices:: CPU</span>
+
+<span class="sd">    .. properties:: TorchScript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        room (torch.Tensor): Room coordinates. The shape of `room` must be `(3,)` which represents</span>
+<span class="sd">            three dimensions of the room.</span>
+<span class="sd">        source (torch.Tensor): Sound source coordinates. Tensor with dimensions `(3,)`.</span>
+<span class="sd">        mic_array (torch.Tensor): Microphone coordinates. Tensor with dimensions `(channel, 3)`.</span>
+<span class="sd">        absorption (float or torch.Tensor, optional): The absorption coefficients of wall materials.</span>
+<span class="sd">            (Default: ``0.0``).</span>
+<span class="sd">            If the type is ``float``, the absorption coefficient is identical to all walls and</span>
+<span class="sd">            all frequencies.</span>
+<span class="sd">            If ``absorption`` is a 1D Tensor, the shape must be `(6,)`, representing absorption</span>
+<span class="sd">            coefficients of ``&quot;west&quot;``, ``&quot;east&quot;``, ``&quot;south&quot;``, ``&quot;north&quot;``, ``&quot;floor&quot;``, and</span>
+<span class="sd">            ``&quot;ceiling&quot;``, respectively.</span>
+<span class="sd">            If ``absorption`` is a 2D Tensor, the shape must be  `(num_bands, 6)`.</span>
+<span class="sd">            ``num_bands`` is the number of frequency bands (usually 7).</span>
+<span class="sd">        scattering(float or torch.Tensor, optional): The scattering coefficients of wall materials. (Default: ``0.0``)</span>
+<span class="sd">            The shape and type of this parameter is the same as for ``absorption``.</span>
+<span class="sd">        mic_radius(float, optional): The radius of the microphone in meters. (Default: 0.5)</span>
+<span class="sd">        sound_speed (float, optional): The speed of sound in meters per second. (Default: ``343.0``)</span>
+<span class="sd">        energy_thres (float, optional): The energy level below which we stop tracing a ray. (Default: ``1e-7``)</span>
+<span class="sd">            The initial energy of each ray is ``2 / num_rays``.</span>
+<span class="sd">        time_thres (float, optional): The maximal duration for which rays are traced. (Unit: seconds) (Default: 10.0)</span>
+<span class="sd">        hist_bin_size (float, optional): The size of each bin in the output histogram. (Unit: seconds) (Default: 0.004)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor): The 3D histogram(s) where the energy of the traced ray is recorded.</span>
+<span class="sd">            Each bin corresponds to a given time slot.</span>
+<span class="sd">            The shape is `(channel, num_bands, num_bins)`, where</span>
+<span class="sd">            ``num_bins = ceil(time_thres / hist_bin_size)``.</span>
+<span class="sd">            If both ``absorption`` and ``scattering`` are floats, then ``num_bands == 1``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">time_thres</span> <span class="o">&lt;</span> <span class="n">hist_bin_size</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`time_thres` must be greater than `hist_bin_size`. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: hist_bin_size=</span><span class="si">{</span><span class="n">hist_bin_size</span><span class="si">}</span><span class="s2">, time_thres=</span><span class="si">{</span><span class="n">time_thres</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">room</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">source</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">mic_array</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;dtype of `room`, `source` and `mic_array` must match. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Found: `room` (</span><span class="si">{</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">), `source` (</span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">) and &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;`mic_array` (</span><span class="si">{</span><span class="n">mic_array</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">_validate_inputs</span><span class="p">(</span><span class="n">room</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">mic_array</span><span class="p">)</span>
+    <span class="n">absorption</span> <span class="o">=</span> <span class="n">_adjust_coeff</span><span class="p">(</span><span class="n">absorption</span><span class="p">,</span> <span class="s2">&quot;absorption&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">scattering</span> <span class="o">=</span> <span class="n">_adjust_coeff</span><span class="p">(</span><span class="n">scattering</span><span class="p">,</span> <span class="s2">&quot;scattering&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># Bring absorption and scattering to the same shape</span>
+    <span class="k">if</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">absorption</span> <span class="o">=</span> <span class="n">absorption</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">scattering</span> <span class="o">=</span> <span class="n">scattering</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">absorption</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`absorption` and `scattering` must be broadcastable to the same number of bands and walls. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Inferred shapes absorption=</span><span class="si">{</span><span class="n">absorption</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and scattering=</span><span class="si">{</span><span class="n">scattering</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">histograms</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">ray_tracing</span><span class="p">(</span>
+        <span class="n">room</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">,</span>
+        <span class="n">mic_array</span><span class="p">,</span>
+        <span class="n">num_rays</span><span class="p">,</span>
+        <span class="n">absorption</span><span class="p">,</span>
+        <span class="n">scattering</span><span class="p">,</span>
+        <span class="n">mic_radius</span><span class="p">,</span>
+        <span class="n">sound_speed</span><span class="p">,</span>
+        <span class="n">energy_thres</span><span class="p">,</span>
+        <span class="n">time_thres</span><span class="p">,</span>
+        <span class="n">hist_bin_size</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">histograms</span></div>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+         <script src="../../../../_static/jquery.js"></script>
+         <script src="../../../../_static/underscore.js"></script>
+         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../../../../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../../../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>
