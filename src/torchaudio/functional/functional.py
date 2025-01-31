@@ -230,14 +230,14 @@ def inverse_spectrogram(
 
 def _get_spec_norms(normalized: Union[str, bool]):
     frame_length_norm, window_norm = False, False
-    if torch.jit.isinstance(normalized, str):
+    if isinstance(normalized, str):
         if normalized not in ["frame_length", "window"]:
             raise ValueError("Invalid normalized parameter: {}".format(normalized))
         if normalized == "frame_length":
             frame_length_norm = True
         elif normalized == "window":
             window_norm = True
-    elif torch.jit.isinstance(normalized, bool):
+    elif isinstance(normalized, bool):
         if normalized:
             window_norm = True
     else:
