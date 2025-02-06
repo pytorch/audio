@@ -48,8 +48,5 @@ jobs:
 
 
         .github/scripts/unittest-windows/setup_env.sh
-        ./packaging/windows/internal/cuda_install.bat
-        ./packaging/windows/internal/driver_update.bat
-
         .github/scripts/unittest-windows/install.sh
         .github/scripts/unittest-windows/run_test.sh
