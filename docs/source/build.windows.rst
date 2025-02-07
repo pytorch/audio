@@ -15,8 +15,8 @@ Please follow the instruction at https://visualstudio.microsoft.com/downloads/, 
 
 .. note::
 
-   The official binary distribution are compiled with MSVC 2019.
-   The following section uses path from MSVC 2019 Community Edition.
+   The official binary distribution are compiled with MSVC 2022.
+   The following section uses path from MSVC 2022 Community Edition.
 
 Conda
 ~~~~~
@@ -66,7 +66,7 @@ The following combination is known to work.
 
    .. code-block::
 
-      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 
    Please makes sure that ``cl`` command is recognized.
 
