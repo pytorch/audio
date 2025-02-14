@@ -29,6 +29,8 @@ jobs:
         echo '::endgroup::'
 
         set +e
+        ls -las
+        pwd
         pre-commit run --all-files --show-diff-on-failure
         status=$?
 
