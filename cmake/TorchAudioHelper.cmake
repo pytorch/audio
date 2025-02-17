@@ -58,7 +58,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
 
   if (WIN32)
     message(PYTHON_VERSION="${PYTHON_VERSION}")
-    find_package(Python3 3.13 EXACT COMPONENTS Development)
+    find_package(Python3 3.13 COMPONENTS Development)
     set(ADDITIONAL_ITEMS Python3::Python)
   endif()
   function(_extension destination name sources include_dirs libraries definitions)
