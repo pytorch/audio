@@ -57,6 +57,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
   if (WIN32)
+    set (Python3_FIND_ABI "ANY" "ANY" "ANY" "ANY")
     find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
     set(ADDITIONAL_ITEMS Python3::Python)
   endif()
