@@ -139,96 +139,213 @@ macro(find_package_and_print_version PACKAGE_NAME)
   message("${PACKAGE_NAME} VERSION: ${${PACKAGE_NAME}_VERSION}")
 endmacro()
 
-# Find the HIP Package
-find_package_and_print_version(HIP 1.0)
+if(UNIX)
+  # Find the HIP Package
+  find_package_and_print_version(HIP 1.0)
 
-if(HIP_FOUND)
-  set(PYTORCH_FOUND_HIP TRUE)
+  if(HIP_FOUND)
+    set(PYTORCH_FOUND_HIP TRUE)
 
-  # Find ROCM version for checks
-  file(READ "${ROCM_PATH}/.info/version-dev" ROCM_VERSION_DEV_RAW)
-  string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)-.*$" ROCM_VERSION_DEV_MATCH ${ROCM_VERSION_DEV_RAW})
-  if(ROCM_VERSION_DEV_MATCH)
-    set(ROCM_VERSION_DEV_MAJOR ${CMAKE_MATCH_1})
-    set(ROCM_VERSION_DEV_MINOR ${CMAKE_MATCH_2})
-    set(ROCM_VERSION_DEV_PATCH ${CMAKE_MATCH_3})
-    set(ROCM_VERSION_DEV "${ROCM_VERSION_DEV_MAJOR}.${ROCM_VERSION_DEV_MINOR}.${ROCM_VERSION_DEV_PATCH}")
+    # Find ROCM version for checks
+    file(READ "${ROCM_PATH}/.info/version-dev" ROCM_VERSION_DEV_RAW)
+    string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)-.*$" ROCM_VERSION_DEV_MATCH ${ROCM_VERSION_DEV_RAW})
+    if(ROCM_VERSION_DEV_MATCH)
+      set(ROCM_VERSION_DEV_MAJOR ${CMAKE_MATCH_1})
+      set(ROCM_VERSION_DEV_MINOR ${CMAKE_MATCH_2})
+      set(ROCM_VERSION_DEV_PATCH ${CMAKE_MATCH_3})
+      set(ROCM_VERSION_DEV "${ROCM_VERSION_DEV_MAJOR}.${ROCM_VERSION_DEV_MINOR}.${ROCM_VERSION_DEV_PATCH}")
+    endif()
+    message("\n***** ROCm version from ${ROCM_PATH}/.info/version-dev ****\n")
+    message("ROCM_VERSION_DEV: ${ROCM_VERSION_DEV}")
+    message("ROCM_VERSION_DEV_MAJOR: ${ROCM_VERSION_DEV_MAJOR}")
+    message("ROCM_VERSION_DEV_MINOR: ${ROCM_VERSION_DEV_MINOR}")
+    message("ROCM_VERSION_DEV_PATCH: ${ROCM_VERSION_DEV_PATCH}")
+
+    message("\n***** Library versions from dpkg *****\n")
+    execute_process(COMMAND dpkg -l COMMAND grep rocm-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep rocm-libs COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep hsakmt-roct COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep rocr-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep -w hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep hip_base COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep hip_hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
+
+    message("\n***** Library versions from cmake find_package *****\n")
+
+    set(CMAKE_HCC_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    set(CMAKE_HCC_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+    ### Remove setting of Flags when FindHIP.CMake PR #558 is accepted.###
+
+    set(hip_DIR ${HIP_PATH}/lib/cmake/hip)
+    set(hsa-runtime64_DIR ${ROCM_PATH}/lib/cmake/hsa-runtime64)
+    set(AMDDeviceLibs_DIR ${ROCM_PATH}/lib/cmake/AMDDeviceLibs)
+    set(amd_comgr_DIR ${ROCM_PATH}/lib/cmake/amd_comgr)
+    set(rocrand_DIR ${ROCRAND_PATH}/lib/cmake/rocrand)
+    set(hiprand_DIR ${HIPRAND_PATH}/lib/cmake/hiprand)
+    set(rocblas_DIR ${ROCBLAS_PATH}/lib/cmake/rocblas)
+    set(miopen_DIR ${MIOPEN_PATH}/lib/cmake/miopen)
+    set(rocfft_DIR ${ROCFFT_PATH}/lib/cmake/rocfft)
+    set(hipfft_DIR ${HIPFFT_PATH}/lib/cmake/hipfft)
+    set(hipsparse_DIR ${HIPSPARSE_PATH}/lib/cmake/hipsparse)
+    set(rccl_DIR ${RCCL_PATH}/lib/cmake/rccl)
+    set(rocprim_DIR ${ROCPRIM_PATH}/lib/cmake/rocprim)
+    set(hipcub_DIR ${HIPCUB_PATH}/lib/cmake/hipcub)
+    set(rocthrust_DIR ${ROCTHRUST_PATH}/lib/cmake/rocthrust)
+
+    find_package_and_print_version(hip REQUIRED)
+    find_package_and_print_version(hsa-runtime64 REQUIRED)
+    find_package_and_print_version(amd_comgr REQUIRED)
+    find_package_and_print_version(rocrand REQUIRED)
+    find_package_and_print_version(hiprand REQUIRED)
+    find_package_and_print_version(rocblas REQUIRED)
+    find_package_and_print_version(miopen REQUIRED)
+    find_package_and_print_version(rocfft REQUIRED)
+    if(ROCM_VERSION_DEV VERSION_GREATER_EQUAL "4.1.0")
+      find_package_and_print_version(hipfft REQUIRED)
+    endif()
+    find_package_and_print_version(hipsparse REQUIRED)
+    find_package_and_print_version(rccl)
+    find_package_and_print_version(rocprim REQUIRED)
+    find_package_and_print_version(hipcub REQUIRED)
+    find_package_and_print_version(rocthrust REQUIRED)
+
+    if(HIP_COMPILER STREQUAL clang)
+      set(hip_library_name amdhip64)
+    else()
+      set(hip_library_name hip_hcc)
+    endif()
+    message("HIP library name: ${hip_library_name}")
+
+    # TODO: hip_hcc has an interface include flag "-hc" which is only
+    # recognizable by hcc, but not gcc and clang. Right now in our
+    # setup, hcc is only used for linking, but it should be used to
+    # compile the *_hip.cc files as well.
+    find_library(PYTORCH_HIP_HCC_LIBRARIES ${hip_library_name} HINTS ${HIP_PATH}/lib)
+    # TODO: miopen_LIBRARIES should return fullpath to the library file,
+    # however currently it's just the lib name
+    find_library(PYTORCH_MIOPEN_LIBRARIES ${miopen_LIBRARIES} HINTS ${MIOPEN_PATH}/lib)
+    # TODO: rccl_LIBRARIES should return fullpath to the library file,
+    # however currently it's just the lib name
+    find_library(PYTORCH_RCCL_LIBRARIES ${rccl_LIBRARIES} HINTS ${RCCL_PATH}/lib)
+    # hiprtc is part of HIP
+    find_library(ROCM_HIPRTC_LIB ${hip_library_name} HINTS ${HIP_PATH}/lib)
+    # roctx is part of roctracer
+    find_library(ROCM_ROCTX_LIB roctx64 HINTS ${ROCTRACER_PATH}/lib)
+    set(roctracer_INCLUDE_DIRS ${ROCTRACER_PATH}/include)
   endif()
-  message("\n***** ROCm version from ${ROCM_PATH}/.info/version-dev ****\n")
-  message("ROCM_VERSION_DEV: ${ROCM_VERSION_DEV}")
-  message("ROCM_VERSION_DEV_MAJOR: ${ROCM_VERSION_DEV_MAJOR}")
-  message("ROCM_VERSION_DEV_MINOR: ${ROCM_VERSION_DEV_MINOR}")
-  message("ROCM_VERSION_DEV_PATCH: ${ROCM_VERSION_DEV_PATCH}")
+elseif(WIN32)
+  # Find the HIP Package
+  find_package_and_print_version(hip CONFIG)
 
-  message("\n***** Library versions from dpkg *****\n")
-  execute_process(COMMAND dpkg -l COMMAND grep rocm-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep rocm-libs COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep hsakmt-roct COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep rocr-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep -w hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep hip_base COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep hip_hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
+  if(hip_FOUND)
+    set(PYTORCH_FOUND_HIP TRUE)
+    set(FOUND_HIP_VERSION_H FALSE)
 
-  message("\n***** Library versions from cmake find_package *****\n")
+    set(PROJECT_RANDOM_BINARY_DIR "${PROJECT_BINARY_DIR}")
+    set(file "${PROJECT_BINARY_DIR}/detect_hip_version.cc")
+    # Find HIP version - since we can't use ${ROCM_PATH}/.info/version-dev on Windows for HIP version
+    if(EXISTS ${hip_INCLUDE_DIRS}/hip/hip_version.h)
+      set(FOUND_HIP_VERSION_H TRUE)
+      file(WRITE ${file} ""
+        "#include <hip/hip_version.h>\n"
+        )
+    else()
+      message("********************* hip_version.h couldnt be found ******************\n")
+    endif()
 
-  set(CMAKE_HCC_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-  set(CMAKE_HCC_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  ### Remove setting of Flags when FindHIP.CMake PR #558 is accepted.###
+    if(FOUND_HIP_VERSION_H)
+      file(APPEND ${file} ""
+        "#include <cstdio>\n"
 
-  set(hip_DIR ${HIP_PATH}/lib/cmake/hip)
-  set(hsa-runtime64_DIR ${ROCM_PATH}/lib/cmake/hsa-runtime64)
-  set(AMDDeviceLibs_DIR ${ROCM_PATH}/lib/cmake/AMDDeviceLibs)
-  set(amd_comgr_DIR ${ROCM_PATH}/lib/cmake/amd_comgr)
-  set(rocrand_DIR ${ROCRAND_PATH}/lib/cmake/rocrand)
-  set(hiprand_DIR ${HIPRAND_PATH}/lib/cmake/hiprand)
-  set(rocblas_DIR ${ROCBLAS_PATH}/lib/cmake/rocblas)
-  set(miopen_DIR ${MIOPEN_PATH}/lib/cmake/miopen)
-  set(rocfft_DIR ${ROCFFT_PATH}/lib/cmake/rocfft)
-  set(hipfft_DIR ${HIPFFT_PATH}/lib/cmake/hipfft)
-  set(hipsparse_DIR ${HIPSPARSE_PATH}/lib/cmake/hipsparse)
-  set(rccl_DIR ${RCCL_PATH}/lib/cmake/rccl)
-  set(rocprim_DIR ${ROCPRIM_PATH}/lib/cmake/rocprim)
-  set(hipcub_DIR ${HIPCUB_PATH}/lib/cmake/hipcub)
-  set(rocthrust_DIR ${ROCTHRUST_PATH}/lib/cmake/rocthrust)
+        "#ifndef HIP_VERSION_PATCH\n"
+        "#define HIP_VERSION_PATCH 0\n"
+        "#endif\n"
+        "#define STRINGIFYHELPER(x) #x\n"
+        "#define STRINGIFY(x) STRINGIFYHELPER(x)\n"
+        "int main() {\n"
+        "  printf(\"%d.%d.%s\", HIP_VERSION_MAJOR, HIP_VERSION_MINOR, STRINGIFY(HIP_VERSION_PATCH));\n"
+        "  return 0;\n"
+        "}\n"
+        )
 
-  find_package_and_print_version(hip REQUIRED)
-  find_package_and_print_version(hsa-runtime64 REQUIRED)
-  find_package_and_print_version(amd_comgr REQUIRED)
-  find_package_and_print_version(rocrand REQUIRED)
-  find_package_and_print_version(hiprand REQUIRED)
-  find_package_and_print_version(rocblas REQUIRED)
-  find_package_and_print_version(miopen REQUIRED)
-  find_package_and_print_version(rocfft REQUIRED)
-  if(ROCM_VERSION_DEV VERSION_GREATER_EQUAL "4.1.0")
-    find_package_and_print_version(hipfft REQUIRED)
-  endif()
-  find_package_and_print_version(hipsparse REQUIRED)
-  find_package_and_print_version(rccl)
-  find_package_and_print_version(rocprim REQUIRED)
-  find_package_and_print_version(hipcub REQUIRED)
-  find_package_and_print_version(rocthrust REQUIRED)
+      try_run(run_result compile_result ${PROJECT_RANDOM_BINARY_DIR} ${file}
+        CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${HIP_INCLUDE_DIRS}"
+        RUN_OUTPUT_VARIABLE hip_version_from_header
+        COMPILE_OUTPUT_VARIABLE output_var
+        )
+      # We expect the compile to be successful if the include directory exists.
+      if(NOT compile_result)
+        message(FATAL_ERROR "Couldn't determine version from header: " ${output_var})
+      endif()
+      message(STATUS "Header version is: " ${hip_version_from_header})
+      set(HIP_VERSION_DEV_RAW ${hip_version_from_header})
+      message("\n***** HIP version from hip_version.h ****\n")
+    endif()
 
-  if(HIP_COMPILER STREQUAL clang)
-    set(hip_library_name amdhip64)
-  else()
-    set(hip_library_name hip_hcc)
-  endif()
-  message("HIP library name: ${hip_library_name}")
+    string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+).*$" HIP_VERSION_DEV_MATCH ${HIP_VERSION_DEV_RAW})
+    
+    if(HIP_VERSION_DEV_MATCH)
+      set(HIP_VERSION_DEV_MAJOR ${CMAKE_MATCH_1})
+      set(HIP_VERSION_DEV_MINOR ${CMAKE_MATCH_2})
+      set(HIP_VERSION_DEV_PATCH ${CMAKE_MATCH_3})
+      set(HIP_VERSION_DEV "${HIP_VERSION_DEV_MAJOR}.${HIP_VERSION_DEV_MINOR}.${HIP_VERSION_DEV_PATCH}")
+    endif()
+    
+    message("HIP_VERSION_DEV: ${HIP_VERSION_DEV}")
+    message("HIP_VERSION_DEV_MAJOR: ${HIP_VERSION_DEV_MAJOR}")
+    message("HIP_VERSION_DEV_MINOR: ${HIP_VERSION_DEV_MINOR}")
+    message("HIP_VERSION_DEV_PATCH: ${HIP_VERSION_DEV_PATCH}")
 
-  # TODO: hip_hcc has an interface include flag "-hc" which is only
-  # recognizable by hcc, but not gcc and clang. Right now in our
-  # setup, hcc is only used for linking, but it should be used to
-  # compile the *_hip.cc files as well.
-  find_library(PYTORCH_HIP_HCC_LIBRARIES ${hip_library_name} HINTS ${HIP_PATH}/lib)
-  # TODO: miopen_LIBRARIES should return fullpath to the library file,
-  # however currently it's just the lib name
-  find_library(PYTORCH_MIOPEN_LIBRARIES ${miopen_LIBRARIES} HINTS ${MIOPEN_PATH}/lib)
-  # TODO: rccl_LIBRARIES should return fullpath to the library file,
-  # however currently it's just the lib name
-  find_library(PYTORCH_RCCL_LIBRARIES ${rccl_LIBRARIES} HINTS ${RCCL_PATH}/lib)
-  # hiprtc is part of HIP
-  find_library(ROCM_HIPRTC_LIB ${hip_library_name} HINTS ${HIP_PATH}/lib)
-  # roctx is part of roctracer
-  find_library(ROCM_ROCTX_LIB roctx64 HINTS ${ROCTRACER_PATH}/lib)
-  set(roctracer_INCLUDE_DIRS ${ROCTRACER_PATH}/include)
-endif()
+    message("\n***** Library versions from cmake find_package *****\n")
+
+    set(CMAKE_HCC_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    set(CMAKE_HCC_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+    ### Remove setting of Flags when FindHIP.CMake PR #558 is accepted.###
+
+    set(hip_DIR ${HIP_PATH}/lib/cmake/hip)
+    set(amd_comgr_DIR ${ROCM_PATH}/lib/cmake/amd_comgr)
+    set(rocrand_DIR ${ROCRAND_PATH}/lib/cmake/rocrand)
+    set(hiprand_DIR ${HIPRAND_PATH}/lib/cmake/hiprand)
+    set(rocblas_DIR ${ROCBLAS_PATH}/lib/cmake/rocblas)
+    set(miopen_DIR ${MIOPEN_PATH}/lib/cmake/miopen)
+    set(rocfft_DIR ${ROCFFT_PATH}/lib/cmake/rocfft)
+    set(hipfft_DIR ${HIPFFT_PATH}/lib/cmake/hipfft)
+    set(hipsparse_DIR ${HIPSPARSE_PATH}/lib/cmake/hipsparse)
+    set(rocprim_DIR ${ROCPRIM_PATH}/lib/cmake/rocprim)
+    set(hipcub_DIR ${HIPCUB_PATH}/lib/cmake/hipcub)
+    set(rocthrust_DIR ${ROCTHRUST_PATH}/lib/cmake/rocthrust)
+
+    find_package_and_print_version(hip REQUIRED)
+    find_package_and_print_version(amd_comgr REQUIRED)
+    find_package_and_print_version(rocrand REQUIRED)
+    find_package_and_print_version(hiprand REQUIRED)
+    find_package_and_print_version(rocblas REQUIRED)
+    find_package_and_print_version(miopen REQUIRED)
+    find_package_and_print_version(rocfft REQUIRED)
+    if(HIP_VERSION_DEV VERSION_GREATER_EQUAL "4.1.0")
+      find_package_and_print_version(hipfft REQUIRED)
+    endif()
+    find_package_and_print_version(hipsparse REQUIRED)
+    find_package_and_print_version(rocprim REQUIRED)
+    find_package_and_print_version(hipcub REQUIRED)
+    find_package_and_print_version(rocthrust REQUIRED)
+
+    if(HIP_COMPILER STREQUAL clang)
+      set(hip_library_name amdhip64)
+    else()
+      set(hip_library_name hip_hcc)
+    endif()
+    message("HIP library name: ${hip_library_name}")
+
+    # TODO: hip_hcc has an interface include flag "-hc" which is only
+    # recognizable by hcc, but not gcc and clang. Right now in our
+    # setup, hcc is only used for linking, but it should be used to
+    # compile the *_hip.cc files as well.
+    find_library(PYTORCH_HIP_HCC_LIBRARIES ${hip_library_name} HINTS ${HIP_PATH}/lib)
+    # TODO: miopen_LIBRARIES should return fullpath to the library file,
+    # however currently it's just the lib name
+    find_library(PYTORCH_MIOPEN_LIBRARIES ${miopen_LIBRARIES} HINTS ${MIOPEN_PATH}/lib)
+    # hiprtc is part of HIP
+    find_library(ROCM_HIPRTC_LIB ${hip_library_name} HINTS ${HIP_PATH}/lib)
+  endif(hip_FOUND)
+endif(UNIX)
