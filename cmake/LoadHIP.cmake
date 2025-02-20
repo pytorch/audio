@@ -137,11 +137,9 @@ else()
 endif()
 
 # Add HIP to the CMAKE Module Path
-if(UNIX)
-  set(CMAKE_MODULE_PATH ${HIP_PATH}/cmake ${CMAKE_MODULE_PATH})
-else() #Win32
-  set(CMAKE_MODULE_PATH ${HIP_PATH}/lib/cmake/hip ${CMAKE_MODULE_PATH})
-endif()
+# needed because the find_package call to this module uses the Module mode search
+# https://cmake.org/cmake/help/latest/command/find_package.html#search-modes
+set(CMAKE_MODULE_PATH ${HIP_PATH}/lib/cmake/hip ${CMAKE_MODULE_PATH})
 
 # Disable Asserts In Code (Can't use asserts on HIP stack.)
 add_definitions(-DNDEBUG)
