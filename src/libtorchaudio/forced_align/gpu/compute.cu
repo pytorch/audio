@@ -1,4 +1,5 @@
 #include <type_traits>
+#include <string>
 #include <ATen/core/TensorAccessor.h>
 #include <ATen/cuda/CUDAContext.h>
 #include <c10/cuda/CUDAException.h>
