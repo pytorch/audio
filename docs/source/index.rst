@@ -7,6 +7,11 @@ Torchaudio is a library for audio and signal processing with PyTorch.
 It provides I/O, signal and data processing functions, datasets,
 model implementations and application components.
 
+This documentation is versioned. Use the version control in the
+upper-left of this page to select the version that matches your
+Torchaudio build. The *nightly* build is the most recent--and
+unstable--release.
+
 ..
    Generate Table Of Contents (left navigation bar)
    NOTE: If you are adding tutorials, add entries to toctree and customcarditem below
