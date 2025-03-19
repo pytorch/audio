@@ -1,5 +1,4 @@
 #include <libtorchaudio/rnnt/compute.h>
-#include <torch/script.h>
 
 namespace torchaudio {
 namespace rnnt {
