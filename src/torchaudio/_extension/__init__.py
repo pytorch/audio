@@ -21,7 +21,7 @@ __all__ = [
 ]
 
 
-if os.name == "nt" and (3, 8) <= sys.version_info < (3, 9):
+if os.name == "nt" and (3, 8) <= sys.version_info:
     _init_dll_path()
 
 
