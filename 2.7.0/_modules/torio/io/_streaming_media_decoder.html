@@ -1,0 +1,1788 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torio.io._streaming_media_decoder &mdash; Torchaudio 2.7.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../../../versions.html"><span style="font-size:110%">2.7.0 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.utils.html">torio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../../index.html">Module code</a> &gt;</li>
+        
+      <li>torio.io._streaming_media_decoder &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torio.io._streaming_media_decoder</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torio</span>
+<span class="kn">from</span> <span class="nn">torch.utils._pytree</span> <span class="kn">import</span> <span class="n">tree_map</span>
+
+<span class="n">ffmpeg_ext</span> <span class="o">=</span> <span class="n">torio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">lazy_import_ffmpeg_ext</span><span class="p">()</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;StreamingMediaDecoder&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="SourceStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.SourceStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SourceStream</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of a source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.</span>
+
+<span class="sd">    This class is used when representing streams of media type other than `audio` or `video`.</span>
+
+<span class="sd">    When source stream is `audio` or `video` type, :class:`SourceAudioStream` and</span>
+<span class="sd">    :class:`SourceVideoStream`, which reports additional media-specific attributes,</span>
+<span class="sd">    are used respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">media_type</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The type of the stream.</span>
+<span class="sd">    One of ``&quot;audio&quot;``, ``&quot;video&quot;``, ``&quot;data&quot;``, ``&quot;subtitle&quot;``, ``&quot;attachment&quot;`` and empty string.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       Only audio and video streams are supported for output.</span>
+<span class="sd">    .. note::</span>
+<span class="sd">       Still images, such as PNG and JPEG formats are reported as video.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">codec</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Short name of the codec. Such as ``&quot;pcm_s16le&quot;`` and ``&quot;h264&quot;``.&quot;&quot;&quot;</span>
+    <span class="n">codec_long_name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detailed name of the codec.</span>
+
+<span class="sd">    Such as &quot;`PCM signed 16-bit little-endian`&quot; and &quot;`H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10`&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media format. Such as ``&quot;s16&quot;`` and ``&quot;yuv420p&quot;``.</span>
+
+<span class="sd">    Commonly found audio values are;</span>
+
+<span class="sd">    - ``&quot;u8&quot;``, ``&quot;u8p&quot;``: Unsigned 8-bit unsigned interger.</span>
+<span class="sd">    - ``&quot;s16&quot;``, ``&quot;s16p&quot;``: 16-bit signed integer.</span>
+<span class="sd">    - ``&quot;s32&quot;``, ``&quot;s32p&quot;``: 32-bit signed integer.</span>
+<span class="sd">    - ``&quot;flt&quot;``, ``&quot;fltp&quot;``: 32-bit floating-point.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">       `p` at the end indicates the format is `planar`.</span>
+<span class="sd">       Channels are grouped together instead of interspersed in memory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bit_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bit rate of the stream in bits-per-second.</span>
+<span class="sd">    This is an estimated values based on the initial few frames of the stream.</span>
+<span class="sd">    For container formats and variable bit rate, it can be 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The number of frames in the stream&quot;&quot;&quot;</span>
+    <span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the number of valid bits in each output sample.</span>
+<span class="sd">    For compressed format, it can be 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata attached to the source stream.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SourceAudioStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.SourceAudioStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SourceAudioStream</span><span class="p">(</span><span class="n">SourceStream</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of an audio source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.</span>
+
+<span class="sd">    This class is used when representing audio stream.</span>
+
+<span class="sd">    In addition to the attributes reported by :class:`SourceStream`,</span>
+<span class="sd">    the following attributes are reported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample rate of the audio.&quot;&quot;&quot;</span>
+    <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of channels.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SourceVideoStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.SourceVideoStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SourceVideoStream</span><span class="p">(</span><span class="n">SourceStream</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The metadata of a video source stream, returned by :meth:`~torio.io.StreamingMediaDecoder.get_src_stream_info`.</span>
+
+<span class="sd">    This class is used when representing video stream.</span>
+
+<span class="sd">    In addition to the attributes reported by :class:`SourceStream`,</span>
+<span class="sd">    the following attributes are reported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Width of the video frame in pixel.&quot;&quot;&quot;</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Height of the video frame in pixel.&quot;&quot;&quot;</span>
+    <span class="n">frame_rate</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Frame rate.&quot;&quot;&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">_parse_si</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+    <span class="n">media_type</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">media_type</span>
+    <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SourceAudioStream</span><span class="p">(</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+            <span class="n">codec</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_name</span><span class="p">,</span>
+            <span class="n">codec_long_name</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_long_name</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">bit_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span>
+            <span class="n">num_frames</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_frames</span><span class="p">,</span>
+            <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bits_per_sample</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">num_channels</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SourceVideoStream</span><span class="p">(</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+            <span class="n">codec</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_name</span><span class="p">,</span>
+            <span class="n">codec_long_name</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_long_name</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">bit_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">,</span>
+            <span class="n">num_frames</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_frames</span><span class="p">,</span>
+            <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">bits_per_sample</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">frame_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">frame_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">SourceStream</span><span class="p">(</span>
+        <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+        <span class="n">codec</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_name</span><span class="p">,</span>
+        <span class="n">codec_long_name</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">codec_long_name</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bit_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_frames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="OutputStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.OutputStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OutputStream</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Output stream configured on :class:`StreamingMediaDecoder`,</span>
+<span class="sd">    returned by :meth:`~torio.io.StreamingMediaDecoder.get_out_stream_info`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">source_index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Index of the source stream that this output stream is connected.&quot;&quot;&quot;</span>
+    <span class="n">filter_description</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Description of filter graph applied to the source stream.&quot;&quot;&quot;</span>
+    <span class="n">media_type</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The type of the stream. ``&quot;audio&quot;`` or ``&quot;video&quot;``.&quot;&quot;&quot;</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media format. Such as ``&quot;s16&quot;`` and ``&quot;yuv420p&quot;``.</span>
+
+<span class="sd">    Commonly found audio values are;</span>
+
+<span class="sd">    - ``&quot;u8&quot;``, ``&quot;u8p&quot;``: Unsigned 8-bit unsigned interger.</span>
+<span class="sd">    - ``&quot;s16&quot;``, ``&quot;s16p&quot;``: 16-bit signed integer.</span>
+<span class="sd">    - ``&quot;s32&quot;``, ``&quot;s32p&quot;``: 32-bit signed integer.</span>
+<span class="sd">    - ``&quot;flt&quot;``, ``&quot;fltp&quot;``: 32-bit floating-point.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">       `p` at the end indicates the format is `planar`.</span>
+<span class="sd">       Channels are grouped together instead of interspersed in memory.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="OutputAudioStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.OutputAudioStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OutputAudioStream</span><span class="p">(</span><span class="n">OutputStream</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about an audio output stream configured with</span>
+<span class="sd">    :meth:`~torio.io.StreamingMediaDecoder.add_audio_stream` or</span>
+<span class="sd">    :meth:`~torio.io.StreamingMediaDecoder.add_basic_audio_stream`.</span>
+
+<span class="sd">    In addition to the attributes reported by :class:`OutputStream`,</span>
+<span class="sd">    the following attributes are reported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample rate of the audio.&quot;&quot;&quot;</span>
+    <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of channels.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="OutputVideoStream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.OutputVideoStream">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OutputVideoStream</span><span class="p">(</span><span class="n">OutputStream</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about a video output stream configured with</span>
+<span class="sd">    :meth:`~torio.io.StreamingMediaDecoder.add_video_stream` or</span>
+<span class="sd">    :meth:`~torio.io.StreamingMediaDecoder.add_basic_video_stream`.</span>
+
+<span class="sd">    In addition to the attributes reported by :class:`OutputStream`,</span>
+<span class="sd">    the following attributes are reported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Width of the video frame in pixel.&quot;&quot;&quot;</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Height of the video frame in pixel.&quot;&quot;&quot;</span>
+    <span class="n">frame_rate</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Frame rate.&quot;&quot;&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">_parse_oi</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+    <span class="n">media_type</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">media_type</span>
+    <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OutputAudioStream</span><span class="p">(</span>
+            <span class="n">source_index</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span>
+            <span class="n">filter_description</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">filter_description</span><span class="p">,</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">num_channels</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">media_type</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OutputVideoStream</span><span class="p">(</span>
+            <span class="n">source_index</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span>
+            <span class="n">filter_description</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">filter_description</span><span class="p">,</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">frame_rate</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">frame_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected media_type: </span><span class="si">{</span><span class="n">i</span><span class="o">.</span><span class="n">media_type</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">num_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">sample_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aresample=</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">num_channels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">fmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample_fmts=</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_channels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;channel_layouts=</span><span class="si">{</span><span class="n">num_channels</span><span class="si">}</span><span class="s2">c&quot;</span><span class="p">)</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aformat=</span><span class="si">{</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">frame_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fps=</span><span class="si">{</span><span class="n">frame_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">scales</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scales</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;width=</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scales</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;height=</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scales</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scale=</span><span class="si">{</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;format=pix_fmts=</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descs</span><span class="p">)</span> <span class="k">if</span> <span class="n">descs</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="c1"># Base class for ChunkTensor</span>
+<span class="c1"># Based off of TrivialTensorViaComposition</span>
+<span class="c1"># https://github.com/albanD/subclass_zoo/blob/0eeb1d68fb59879029c610bc407f2997ae43ba0a/trivial_tensors.py#L83</span>
+<span class="k">class</span> <span class="nc">ChunkTensorBase</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="n">__torch_function__</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_disabled_torch_function_impl</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_elem</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_elem</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__torch_dispatch__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">unwrap</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">_elem</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">else</span> <span class="n">t</span>
+
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">tree_map</span><span class="p">(</span><span class="n">unwrap</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span> <span class="o">**</span><span class="n">tree_map</span><span class="p">(</span><span class="n">unwrap</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="ChunkTensor"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.ChunkTensor">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ChunkTensor</span><span class="p">(</span><span class="n">ChunkTensorBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decoded media frames with metadata.</span>
+
+<span class="sd">    The instance of this class represents the decoded video/audio frames with</span>
+<span class="sd">    metadata, and the instance itself behave like :py:class:`~torch.Tensor`.</span>
+
+<span class="sd">    Client codes can pass instance of this class as-if it&#39;s</span>
+<span class="sd">    :py:class:`~torch.Tensor` class, or call the methods defined on</span>
+<span class="sd">    :py:class:`~torch.Tensor` class.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # Define input streams</span>
+<span class="sd">        &gt;&gt;&gt; reader = StreamingMediaDecoder(...)</span>
+<span class="sd">        &gt;&gt;&gt; reader.add_audio_stream(frames_per_chunk=4000, sample_rate=8000)</span>
+<span class="sd">        &gt;&gt;&gt; reader.add_video_stream(frames_per_chunk=7, frame_rate=28)</span>
+<span class="sd">        &gt;&gt;&gt; # Decode the streams and fetch frames</span>
+<span class="sd">        &gt;&gt;&gt; reader.fill_buffer()</span>
+<span class="sd">        &gt;&gt;&gt; audio_chunk, video_chunk = reader.pop_chunks()</span>
+
+<span class="sd">        &gt;&gt;&gt; # Access metadata</span>
+<span class="sd">        &gt;&gt;&gt; (audio_chunk.pts, video_chunks.pts)</span>
+<span class="sd">        (0.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # The second time the PTS is different</span>
+<span class="sd">        &gt;&gt;&gt; reader.fill_buffer()</span>
+<span class="sd">        &gt;&gt;&gt; audio_chunk, video_chunk = reader.pop_chunks()</span>
+<span class="sd">        &gt;&gt;&gt; (audio_chunk.pts, video_chunks.pts)</span>
+<span class="sd">        (0.5, 0.25)</span>
+
+<span class="sd">        &gt;&gt;&gt; # Call PyTorch ops on chunk</span>
+<span class="sd">        &gt;&gt;&gt; audio_chunk.shape</span>
+<span class="sd">        torch.Size([4000, 2]</span>
+<span class="sd">        &gt;&gt;&gt; power = torch.pow(video_chunk, 2)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # the result is a plain torch.Tensor class</span>
+<span class="sd">        &gt;&gt;&gt; type(power)</span>
+<span class="sd">        &lt;class &#39;torch.Tensor&#39;&gt;</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Metadata is not available on the result</span>
+<span class="sd">        &gt;&gt;&gt; power.pts</span>
+<span class="sd">        AttributeError: &#39;Tensor&#39; object has no attribute &#39;pts&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Keep it private for now</span>
+    <span class="n">_elem</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+
+    <span class="n">pts</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Presentation time stamp of the first frame in the chunk.</span>
+
+<span class="sd">    Unit: second.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">_format_doc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">return</span> <span class="n">decorator</span>
+
+
+<span class="n">_frames_per_chunk</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Number of frames returned as one chunk.</span>
+<span class="s2">                If the source stream is exhausted before enough frames are buffered,</span>
+<span class="s2">                then the chunk is returned as-is.</span>
+
+<span class="s2">                Providing ``-1`` disables chunking and :py:func:`pop_chunks` method</span>
+<span class="s2">                will concatenate all the buffered frames and return it.&quot;&quot;&quot;</span>
+
+<span class="n">_buffer_chunk_size</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Internal buffer size.</span>
+<span class="s2">                When the number of chunks buffered exceeds this number, old frames are</span>
+<span class="s2">                dropped. For example, if ``frames_per_chunk`` is 5 and ``buffer_chunk_size`` is</span>
+<span class="s2">                3, then frames older than ``15`` are dropped.</span>
+<span class="s2">                Providing ``-1`` disables this behavior.</span>
+
+<span class="s2">                Default: ``3``.&quot;&quot;&quot;</span>
+
+<span class="n">_audio_stream_index</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The source audio stream index.</span>
+<span class="s2">                If omitted, :py:attr:`default_audio_stream` is used.&quot;&quot;&quot;</span>
+
+
+<span class="n">_video_stream_index</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The source video stream index.</span>
+<span class="s2">                If omitted, :py:attr:`default_video_stream` is used.&quot;&quot;&quot;</span>
+
+<span class="n">_decoder</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The name of the decoder to be used.</span>
+<span class="s2">                When provided, use the specified decoder instead of the default one.</span>
+
+<span class="s2">                To list the available decoders, please use</span>
+<span class="s2">                :py:func:`~torio.utils.ffmpeg_utils.get_audio_decoders` for audio, and</span>
+<span class="s2">                :py:func:`~torio.utils.ffmpeg_utils.get_video_decoders` for video.</span>
+
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+<span class="n">_decoder_option</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Options passed to decoder.</span>
+<span class="s2">                Mapping from str to str. (Default: ``None``)</span>
+
+<span class="s2">                To list decoder options for a decoder, you can use</span>
+<span class="s2">                ``ffmpeg -h decoder=&lt;DECODER&gt;`` command.</span>
+
+<span class="s2">                |</span>
+
+<span class="s2">                In addition to decoder-specific options, you can also pass options related</span>
+<span class="s2">                to multithreading. They are effective only if the decoder support them.</span>
+<span class="s2">                If neither of them are provided, StreamingMediaDecoder defaults to single thread.</span>
+
+<span class="s2">                ``&quot;threads&quot;``: The number of threads (in str).</span>
+<span class="s2">                Providing the value ``&quot;0&quot;`` will let FFmpeg decides based on its heuristics.</span>
+
+<span class="s2">                ``&quot;thread_type&quot;``: Which multithreading method to use.</span>
+<span class="s2">                The valid values are ``&quot;frame&quot;`` or ``&quot;slice&quot;``.</span>
+<span class="s2">                Note that each decoder supports different set of methods.</span>
+<span class="s2">                If not provided, a default value is used.</span>
+
+<span class="s2">                - ``&quot;frame&quot;``: Decode more than one frame at once.</span>
+<span class="s2">                  Each thread handles one frame.</span>
+<span class="s2">                  This will increase decoding delay by one frame per thread</span>
+<span class="s2">                - ``&quot;slice&quot;``: Decode more than one part of a single frame at once.</span>
+
+<span class="s2">                |</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+
+<span class="n">_hw_accel</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Enable hardware acceleration.</span>
+
+<span class="s2">                When video is decoded on CUDA hardware, for example</span>
+<span class="s2">                `decoder=&quot;h264_cuvid&quot;`, passing CUDA device indicator to `hw_accel`</span>
+<span class="s2">                (i.e. `hw_accel=&quot;cuda:0&quot;`) will make StreamingMediaDecoder place the resulting</span>
+<span class="s2">                frames directly on the specified CUDA device as CUDA tensor.</span>
+
+<span class="s2">                If `None`, the frame will be moved to CPU memory.</span>
+<span class="s2">                Default: ``None``.&quot;&quot;&quot;</span>
+
+
+<span class="n">_format_audio_args</span> <span class="o">=</span> <span class="n">_format_doc</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="n">_frames_per_chunk</span><span class="p">,</span>
+    <span class="n">buffer_chunk_size</span><span class="o">=</span><span class="n">_buffer_chunk_size</span><span class="p">,</span>
+    <span class="n">stream_index</span><span class="o">=</span><span class="n">_audio_stream_index</span><span class="p">,</span>
+    <span class="n">decoder</span><span class="o">=</span><span class="n">_decoder</span><span class="p">,</span>
+    <span class="n">decoder_option</span><span class="o">=</span><span class="n">_decoder_option</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">_format_video_args</span> <span class="o">=</span> <span class="n">_format_doc</span><span class="p">(</span>
+    <span class="n">frames_per_chunk</span><span class="o">=</span><span class="n">_frames_per_chunk</span><span class="p">,</span>
+    <span class="n">buffer_chunk_size</span><span class="o">=</span><span class="n">_buffer_chunk_size</span><span class="p">,</span>
+    <span class="n">stream_index</span><span class="o">=</span><span class="n">_video_stream_index</span><span class="p">,</span>
+    <span class="n">decoder</span><span class="o">=</span><span class="n">_decoder</span><span class="p">,</span>
+    <span class="n">decoder_option</span><span class="o">=</span><span class="n">_decoder_option</span><span class="p">,</span>
+    <span class="n">hw_accel</span><span class="o">=</span><span class="n">_hw_accel</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">InputStreamTypes</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;InputStream&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">SourceStream</span><span class="p">)</span>
+<span class="n">OutputStreamTypes</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;OutputStream&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">OutputStream</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="StreamingMediaDecoder"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder">[docs]</a><span class="k">class</span> <span class="nc">StreamingMediaDecoder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch and decode audio/video streams chunk by chunk.</span>
+
+<span class="sd">    For the detailed usage of this class, please refer to the tutorial.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src (str, path-like, bytes or file-like object): The media source.</span>
+<span class="sd">            If string-type, it must be a resource indicator that FFmpeg can</span>
+<span class="sd">            handle. This includes a file path, URL, device identifier or</span>
+<span class="sd">            filter expression. The supported value depends on the FFmpeg found</span>
+<span class="sd">            in the system.</span>
+
+<span class="sd">            If bytes, it must be an encoded media data in contiguous memory.</span>
+
+<span class="sd">            If file-like object, it must support `read` method with the signature</span>
+<span class="sd">            `read(size: int) -&gt; bytes`.</span>
+<span class="sd">            Additionally, if the file-like object has `seek` method, it uses</span>
+<span class="sd">            the method when parsing media metadata. This improves the reliability</span>
+<span class="sd">            of codec detection. The signagure of `seek` method must be</span>
+<span class="sd">            `seek(offset: int, whence: int) -&gt; int`.</span>
+
+<span class="sd">            Please refer to the following for the expected signature and behavior</span>
+<span class="sd">            of `read` and `seek` method.</span>
+
+<span class="sd">            - https://docs.python.org/3/library/io.html#io.BufferedIOBase.read</span>
+<span class="sd">            - https://docs.python.org/3/library/io.html#io.IOBase.seek</span>
+
+<span class="sd">        format (str or None, optional):</span>
+<span class="sd">            Override the input format, or specify the source sound device.</span>
+<span class="sd">            Default: ``None`` (no override nor device input).</span>
+
+<span class="sd">            This argument serves two different usecases.</span>
+
+<span class="sd">            1) Override the source format.</span>
+<span class="sd">               This is useful when the input data do not contain a header.</span>
+
+<span class="sd">            2) Specify the input source device.</span>
+<span class="sd">               This allows to load media stream from hardware devices,</span>
+<span class="sd">               such as microphone, camera and screen, or a virtual device.</span>
+
+
+<span class="sd">            .. note::</span>
+
+<span class="sd">               This option roughly corresponds to ``-f`` option of ``ffmpeg`` command.</span>
+<span class="sd">               Please refer to the ffmpeg documentations for the possible values.</span>
+
+<span class="sd">               https://ffmpeg.org/ffmpeg-formats.html#Demuxers</span>
+
+<span class="sd">               Please use :py:func:`~torio.utils.ffmpeg_utils.get_demuxers` to list the</span>
+<span class="sd">               demultiplexers available in the current environment.</span>
+
+<span class="sd">               For device access, the available values vary based on hardware (AV device) and</span>
+<span class="sd">               software configuration (ffmpeg build).</span>
+
+<span class="sd">               https://ffmpeg.org/ffmpeg-devices.html#Input-Devices</span>
+
+<span class="sd">               Please use :py:func:`~torio.utils.ffmpeg_utils.get_input_devices` to list</span>
+<span class="sd">               the input devices available in the current environment.</span>
+
+<span class="sd">        option (dict of str to str, optional):</span>
+<span class="sd">            Custom option passed when initializing format context (opening source).</span>
+
+<span class="sd">            You can use this argument to change the input source before it is passed to decoder.</span>
+
+<span class="sd">            Default: ``None``.</span>
+
+<span class="sd">        buffer_size (int):</span>
+<span class="sd">            The internal buffer size in byte. Used only when `src` is file-like object.</span>
+
+<span class="sd">            Default: `4096`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">src</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">],</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">StreamingMediaDecoderBytes</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">StreamingMediaDecoderFileObj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_be</span> <span class="o">=</span> <span class="n">ffmpeg_ext</span><span class="o">.</span><span class="n">StreamingMediaDecoder</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="nb">format</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">find_best_audio_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_audio_stream</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">find_best_video_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_video_stream</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">i</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_src_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of streams found in the provided media source.</span>
+
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">num_src_streams</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_out_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of output streams configured by client code.</span>
+
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">num_out_streams</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default_audio_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The index of default audio stream. ``None`` if there is no audio stream</span>
+
+<span class="sd">        :type: Optional[int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_audio_stream</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default_video_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The index of default video stream. ``None`` if there is no video stream</span>
+
+<span class="sd">        :type: Optional[int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_video_stream</span>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.get_metadata"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of the source media.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.get_src_stream_info"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_src_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_src_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InputStreamTypes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of source stream</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            i (int): Stream index.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            InputStreamTypes:</span>
+<span class="sd">                Information about the source stream.</span>
+<span class="sd">                If the source stream is audio type, then</span>
+<span class="sd">                :class:`~torio.io._stream_reader.SourceAudioStream` is returned.</span>
+<span class="sd">                If it is video type, then</span>
+<span class="sd">                :class:`~torio.io._stream_reader.SourceVideoStream` is returned.</span>
+<span class="sd">                Otherwise :class:`~torio.io._stream_reader.SourceStream` class is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_parse_si</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.get_out_stream_info"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.get_out_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputStreamTypes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the metadata of output stream</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            i (int): Stream index.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            OutputStreamTypes</span>
+<span class="sd">                Information about the output stream.</span>
+<span class="sd">                If the output stream is audio type, then</span>
+<span class="sd">                :class:`~torio.io._stream_reader.OutputAudioStream` is returned.</span>
+<span class="sd">                If it is video type, then</span>
+<span class="sd">                :class:`~torio.io._stream_reader.OutputVideoStream` is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">get_out_stream_info</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_parse_oi</span><span class="p">(</span><span class="n">info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.seek"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;precise&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Seek the stream to the given timestamp [second]</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timestamp (float): Target time in second.</span>
+<span class="sd">            mode (str): Controls how seek is done.</span>
+<span class="sd">                Valid choices are;</span>
+
+<span class="sd">                * &quot;key&quot;: Seek into the nearest key frame before the given timestamp.</span>
+<span class="sd">                * &quot;any&quot;: Seek into any frame (including non-key frames) before the given timestamp.</span>
+<span class="sd">                * &quot;precise&quot;: First seek into the nearest key frame before the given timestamp, then</span>
+<span class="sd">                  decode frames until it reaches the closes frame to the given timestamp.</span>
+
+<span class="sd">                Note:</span>
+<span class="sd">                   All the modes invalidate and reset the internal state of decoder.</span>
+<span class="sd">                   When using &quot;any&quot; mode and if it ends up seeking into non-key frame,</span>
+<span class="sd">                   the image decoded may be invalid due to lack of key frame.</span>
+<span class="sd">                   Using &quot;precise&quot; will workaround this issue by decoding frames from previous</span>
+<span class="sd">                   key frame, but will be slower.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">modes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;any&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;precise&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The value of mode must be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">modes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">. Found: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">modes</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.add_basic_audio_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_basic_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
+    <span class="k">def</span> <span class="nf">add_basic_audio_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fltp&quot;</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add output audio stream</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
+
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
+
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            format (str, optional): Output sample format (precision).</span>
+
+<span class="sd">                If ``None``, the output chunk has dtype corresponding to</span>
+<span class="sd">                the precision of the source audio.</span>
+
+<span class="sd">                Otherwise, the sample is converted and the output dtype is changed</span>
+<span class="sd">                as following.</span>
+
+<span class="sd">                - ``&quot;u8p&quot;``: The output is ``torch.uint8`` type.</span>
+<span class="sd">                - ``&quot;s16p&quot;``: The output is ``torch.int16`` type.</span>
+<span class="sd">                - ``&quot;s32p&quot;``: The output is ``torch.int32`` type.</span>
+<span class="sd">                - ``&quot;s64p&quot;``: The output is ``torch.int64`` type.</span>
+<span class="sd">                - ``&quot;fltp&quot;``: The output is ``torch.float32`` type.</span>
+<span class="sd">                - ``&quot;dblp&quot;``: The output is ``torch.float64`` type.</span>
+
+<span class="sd">                Default: ``&quot;fltp&quot;``.</span>
+
+<span class="sd">            sample_rate (int or None, optional): If provided, resample the audio.</span>
+
+<span class="sd">            num_channels (int, or None, optional): If provided, change the number of channels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span>
+            <span class="n">buffer_chunk_size</span><span class="p">,</span>
+            <span class="n">stream_index</span><span class="o">=</span><span class="n">stream_index</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="o">=</span><span class="n">_get_afilter_desc</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.add_basic_video_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_basic_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
+    <span class="k">def</span> <span class="nf">add_basic_video_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
+        <span class="n">frame_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add output video stream</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
+
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
+
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            format (str, optional): Change the format of image channels. Valid values are,</span>
+
+<span class="sd">                - ``&quot;rgb24&quot;``: 8 bits * 3 channels (R, G, B)</span>
+<span class="sd">                - ``&quot;bgr24&quot;``: 8 bits * 3 channels (B, G, R)</span>
+<span class="sd">                - ``&quot;yuv420p&quot;``: 8 bits * 3 channels (Y, U, V)</span>
+<span class="sd">                - ``&quot;gray&quot;``: 8 bits * 1 channels</span>
+
+<span class="sd">                Default: ``&quot;rgb24&quot;``.</span>
+
+<span class="sd">            frame_rate (int or None, optional): If provided, change the frame rate.</span>
+
+<span class="sd">            width (int or None, optional): If provided, change the image width. Unit: Pixel.</span>
+
+<span class="sd">            height (int or None, optional): If provided, change the image height. Unit: Pixel.</span>
+
+<span class="sd">            hw_accel (str or None, optional): {hw_accel}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span>
+            <span class="n">buffer_chunk_size</span><span class="p">,</span>
+            <span class="n">stream_index</span><span class="o">=</span><span class="n">stream_index</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span><span class="o">=</span><span class="n">decoder_option</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="o">=</span><span class="n">_get_vfilter_desc</span><span class="p">(</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">),</span>
+            <span class="n">hw_accel</span><span class="o">=</span><span class="n">hw_accel</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.add_audio_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_audio_stream">[docs]</a>    <span class="nd">@_format_audio_args</span>
+    <span class="k">def</span> <span class="nf">add_audio_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add output audio stream</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
+
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
+
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            filter_desc (str or None, optional): Filter description.</span>
+<span class="sd">                The list of available filters can be found at</span>
+<span class="sd">                https://ffmpeg.org/ffmpeg-filters.html</span>
+<span class="sd">                Note that complex filters are not supported.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_audio_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There is no audio stream.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span>
+            <span class="n">i</span><span class="p">,</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span>
+            <span class="n">buffer_chunk_size</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.add_video_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.add_video_stream">[docs]</a>    <span class="nd">@_format_video_args</span>
+    <span class="k">def</span> <span class="nf">add_video_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">buffer_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">stream_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decoder_option</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filter_desc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hw_accel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add output video stream</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            frames_per_chunk (int): {frames_per_chunk}</span>
+
+<span class="sd">            buffer_chunk_size (int, optional): {buffer_chunk_size}</span>
+
+<span class="sd">            stream_index (int or None, optional): {stream_index}</span>
+
+<span class="sd">            decoder (str or None, optional): {decoder}</span>
+
+<span class="sd">            decoder_option (dict or None, optional): {decoder_option}</span>
+
+<span class="sd">            hw_accel (str or None, optional): {hw_accel}</span>
+
+<span class="sd">            filter_desc (str or None, optional): Filter description.</span>
+<span class="sd">                The list of available filters can be found at</span>
+<span class="sd">                https://ffmpeg.org/ffmpeg-filters.html</span>
+<span class="sd">                Note that complex filters are not supported.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_video_stream</span> <span class="k">if</span> <span class="n">stream_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_index</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There is no video stream.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">add_video_stream</span><span class="p">(</span>
+            <span class="n">i</span><span class="p">,</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span>
+            <span class="n">buffer_chunk_size</span><span class="p">,</span>
+            <span class="n">filter_desc</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="p">,</span>
+            <span class="n">decoder_option</span> <span class="ow">or</span> <span class="p">{},</span>
+            <span class="n">hw_accel</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.remove_stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.remove_stream">[docs]</a>    <span class="k">def</span> <span class="nf">remove_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove an output stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            i (int): Index of the output stream to be removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">remove_stream</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.process_packet"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.process_packet">[docs]</a>    <span class="k">def</span> <span class="nf">process_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the source media and process one packet.</span>
+
+<span class="sd">        If a packet is read successfully, then the data in the packet will</span>
+<span class="sd">        be decoded and passed to corresponding output stream processors.</span>
+
+<span class="sd">        If the packet belongs to a source stream that is not connected to</span>
+<span class="sd">        an output stream, then the data are discarded.</span>
+
+<span class="sd">        When the source reaches EOF, then it triggers all the output stream</span>
+<span class="sd">        processors to enter drain mode. All the output stream processors</span>
+<span class="sd">        flush the pending frames.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (float or None, optional): Timeout in milli seconds.</span>
+
+<span class="sd">                This argument changes the retry behavior when it failed to</span>
+<span class="sd">                process a packet due to the underlying media resource being</span>
+<span class="sd">                temporarily unavailable.</span>
+
+<span class="sd">                When using a media device such as a microphone, there are cases</span>
+<span class="sd">                where the underlying buffer is not ready.</span>
+<span class="sd">                Calling this function in such case would cause the system to report</span>
+<span class="sd">                `EAGAIN (resource temporarily unavailable)`.</span>
+
+<span class="sd">                * ``&gt;=0``: Keep retrying until the given time passes.</span>
+
+<span class="sd">                * ``0&lt;``: Keep retrying forever.</span>
+
+<span class="sd">                * ``None`` : No retrying and raise an exception immediately.</span>
+
+<span class="sd">                Default: ``None``.</span>
+
+<span class="sd">                Note:</span>
+
+<span class="sd">                    The retry behavior is applicable only when the reason is the</span>
+<span class="sd">                    unavailable resource. It is not invoked if the reason of failure is</span>
+<span class="sd">                    other.</span>
+
+<span class="sd">            backoff (float, optional): Time to wait before retrying in milli seconds.</span>
+
+<span class="sd">                This option is effective only when `timeout` is effective. (not ``None``)</span>
+
+<span class="sd">                When `timeout` is effective, this `backoff` controls how long the function</span>
+<span class="sd">                should wait before retrying. Default: ``10.0``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int:</span>
+<span class="sd">                ``0``</span>
+<span class="sd">                A packet was processed properly. The caller can keep</span>
+<span class="sd">                calling this function to buffer more frames.</span>
+
+<span class="sd">                ``1``</span>
+<span class="sd">                The streamer reached EOF. All the output stream processors</span>
+<span class="sd">                flushed the pending frames. The caller should stop calling</span>
+<span class="sd">                this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_packet</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.process_all_packets"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.process_all_packets">[docs]</a>    <span class="k">def</span> <span class="nf">process_all_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process packets until it reaches EOF.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">process_all_packets</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.is_buffer_ready"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.is_buffer_ready">[docs]</a>    <span class="k">def</span> <span class="nf">is_buffer_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if all the output streams have at least one chunk filled.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">is_buffer_ready</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.pop_chunks"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.pop_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">pop_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pop one chunk from all the output stream buffers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[Optional[ChunkTensor]]:</span>
+<span class="sd">                Buffer contents.</span>
+<span class="sd">                If a buffer does not contain any frame, then `None` is returned instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChunkTensor</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">pts</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.fill_buffer"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.fill_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">fill_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep processing packets until all buffers have at least one chunk</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            timeout (float or None, optional): See</span>
+<span class="sd">                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``None``)</span>
+
+<span class="sd">            backoff (float, optional): See</span>
+<span class="sd">                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``10.0``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int:</span>
+<span class="sd">                ``0``</span>
+<span class="sd">                Packets are processed properly and buffers are</span>
+<span class="sd">                ready to be popped once.</span>
+
+<span class="sd">                ``1``</span>
+<span class="sd">                The streamer reached EOF. All the output stream processors</span>
+<span class="sd">                flushed the pending frames. The caller should stop calling</span>
+<span class="sd">                this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_be</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingMediaDecoder.stream"><a class="viewcode-back" href="../../../generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ChunkTensor</span><span class="p">],</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterator that generates output tensors</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            timeout (float or None, optional): See</span>
+<span class="sd">                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``None``)</span>
+
+<span class="sd">            backoff (float, optional): See</span>
+<span class="sd">                :py:func:`~StreamingMediaDecoder.process_packet`. (Default: ``10.0``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Iterator[Tuple[Optional[ChunkTensor], ...]]:</span>
+<span class="sd">                Iterator that yields a tuple of chunks that correspond to the output</span>
+<span class="sd">                streams defined by client code.</span>
+<span class="sd">                If an output stream is exhausted, then the chunk Tensor is substituted</span>
+<span class="sd">                with ``None``.</span>
+<span class="sd">                The iterator stops if all the output streams are exhausted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_out_streams</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No output stream is configured.&quot;</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_buffer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">backoff</span><span class="p">):</span>
+                <span class="k">break</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="k">yield</span> <span class="n">chunks</span></div></div>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+         <script src="../../../_static/jquery.js"></script>
+         <script src="../../../_static/underscore.js"></script>
+         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../../../_static/doctools.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>
