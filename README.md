@@ -7,6 +7,13 @@ torchaudio: an audio library for PyTorch
 
 ![TorchAudio Logo](docs/source/_static/img/logo.png)
 
+**We are in the process of refactoring TorchAudio and transitioning it into a
+  maintenance phase. This process will include removing some user-facing
+  features. Our main goals are to reduce redundancies with the rest of the
+  PyTorch ecosystem, make it easier to maintain, and create a version of
+  TorchAudio that is more tightly scoped to its strengths: processing audio
+  data for ML. Please see [our community message](#3902) for more details.**
+
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
