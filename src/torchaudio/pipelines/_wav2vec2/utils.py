@@ -38,7 +38,7 @@ class _Wav2Vec2Model(nn.Module):
         if self.apply_log_softmax:
             output = torch.nn.functional.log_softmax(output, dim=-1)
         if self.append_star:
-            star_dim = torch.zeros((1, output.size(1), 1), dtype=output.dtype, device=output.device)
+            star_dim = torch.zeros((output.size(0), output.size(1), 1), dtype=output.dtype, device=output.device)
             output = torch.cat((output, star_dim), dim=-1)
         return output, output_lengths
 
