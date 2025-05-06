@@ -86,7 +86,7 @@ The following combination is known to work.
 
 3. Install PyTorch
 ------------------
-
+.. needs update
 Please refer to https://pytorch.org/get-started/locally/ for the up-to-date way to install PyTorch.
 
 The following command installs the nightly build version of PyTorch.
@@ -159,7 +159,7 @@ To build single version FFmpeg extension, FFmpeg binaries must be provided by us
    conda install -c conda-forge ffmpeg
    FFMPEG_ROOT=${CONDA_PREFIX}/Library python setup.py develop
 
-   
+
 [Optional] Building FFmpeg from source
 --------------------------------------
 
