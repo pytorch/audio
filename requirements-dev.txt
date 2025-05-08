@@ -1,0 +1,6 @@
+# Testing dependencies
+typing
+pytest
+scipy
+numpy
+parameterized
