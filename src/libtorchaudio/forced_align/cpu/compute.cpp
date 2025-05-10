@@ -28,12 +28,18 @@ void forced_align_impl(
                                  .device(logProbs.device())
                                  .dtype(logProbs.dtype()))
                              .fill_(kNegInfinity);
-  torch::Tensor backPtr = torch::empty({T, S}, torch::kInt8).fill_(-1);
+
+  // Replace backPtr tensor with two std::vector<bool>
+  // allocate memory based on the expected needed size which is approximately
+  // S * (T-L), we will use a safety margin of (T-L) to avoid reallocation
+  std::vector<bool> backPtrBit0((S + 1) * (T - L), false);
+  std::vector<bool> backPtrBit1((S + 1) * (T - L), false);
+  std::vector<unsigned long long> backPtr_offset(T - 1);
+  std::vector<unsigned long long> backPtr_seek(T - 1);
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
   auto paths_a = paths.accessor<target_t, 2>();
   auto alphas_a = alphas.accessor<scalar_t, 2>();
-  auto backPtr_a = backPtr.accessor<int8_t, 2>();
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
@@ -54,6 +60,7 @@ void forced_align_impl(
     auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
     alphas_a[0][i] = logProbs_a[batchIndex][0][labelIdx];
   }
+  unsigned long long seek = 0;
   for (auto t = 1; t < T; t++) {
     if (T - t <= L + R) {
       if ((start % 2 == 1) &&
@@ -77,11 +84,13 @@ void forced_align_impl(
     for (auto j = 0; j < S; ++j) {
       alphas_a[curIdxOffset][j] = -std::numeric_limits<scalar_t>::infinity();
     }
+    backPtr_seek[t - 1] = seek;
+    backPtr_offset[t - 1] = start;
     if (start == 0) {
       alphas_a[curIdxOffset][0] =
           alphas_a[prevIdxOffset][0] + logProbs_a[batchIndex][t][blank];
-      backPtr_a[t][0] = 0;
       startloop += 1;
+      seek += 1;
     }
 
     for (auto i = startloop; i < end; i++) {
@@ -102,16 +111,16 @@ void forced_align_impl(
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        backPtr_a[t][i] = 2;
+        backPtrBit1[seek + i - startloop] = true;
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
-        backPtr_a[t][i] = 1;
+        backPtrBit0[seek + i - startloop] = true;
       } else {
         result = x0;
-        backPtr_a[t][i] = 0;
       }
       alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     }
+    seek += (end - startloop);
   }
   auto idx1 = (T - 1) % 2;
   auto ltrIdx = alphas_a[idx1][S - 1] > alphas_a[idx1][S - 2] ? S - 1 : S - 2;
@@ -119,7 +128,11 @@ void forced_align_impl(
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
-    ltrIdx -= backPtr_a[t][ltrIdx];
+    // Calculate backPtr value from bits
+    auto t_minus_one = t - 1 >= 0 ? t - 1 : 0;
+    auto backPtr_idx = backPtr_seek[t_minus_one] +
+                       ltrIdx - backPtr_offset[t_minus_one];
+    ltrIdx -= (backPtrBit1[backPtr_idx] << 1) | backPtrBit0[backPtr_idx];
   }
 }
 
