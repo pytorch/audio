@@ -12,10 +12,10 @@ Please folllow the instruction at https://docs.conda.io/en/latest/miniconda.html
 Please select the version of PyTorch you want to install from https://pytorch.org/get-started/locally/
 
 Here, we install nightly build.
-.. needs update
+
 .. code-block::
 
-   conda install pytorch -c pytorch-nightly
+   pip install --pre --index-url https://download.pytorch.org/whl/nightly/cpu
 
 3. Install build tools
 ----------------------
