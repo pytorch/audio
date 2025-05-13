@@ -195,7 +195,7 @@ torch::Tensor convert_to_tensor(
 }
 
 const std::string get_filetype(const std::string& path) {
-  std::string ext = path.substr(path.find_last_of(".") + 1);
+  std::string ext = path.substr(path.find_last_of('.') + 1);
   std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
   return ext;
 }
