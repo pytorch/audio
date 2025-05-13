@@ -15,7 +15,7 @@ Here, we install nightly build.
 
 .. code-block::
 
-   conda install pytorch -c pytorch-nightly
+   pip install --pre --index-url https://download.pytorch.org/whl/nightly/cpu
 
 3. Install build tools
 ----------------------

@@ -86,20 +86,7 @@ The following combination is known to work.
 
 3. Install PyTorch
 ------------------
-
 Please refer to https://pytorch.org/get-started/locally/ for the up-to-date way to install PyTorch.
-
-The following command installs the nightly build version of PyTorch.
-
-.. code-block::
-
-   # CPU-only
-   conda install pytorch cpuonly -c pytorch-nightly
-
-   # With CUDA support
-   conda install pytorch pytorch-cuda=11.7 -c pytorch-nightly -c nvidia
-
-When installing CUDA-enabled version, it also install CUDA toolkit.
 
 4. [Optional] cuDNN
 -------------------
@@ -159,7 +146,7 @@ To build single version FFmpeg extension, FFmpeg binaries must be provided by us
    conda install -c conda-forge ffmpeg
    FFMPEG_ROOT=${CONDA_PREFIX}/Library python setup.py develop
 
-   
+
 [Optional] Building FFmpeg from source
 --------------------------------------
 
