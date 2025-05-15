@@ -1,7 +1,6 @@
 #include <c10/util/Exception.h>
 #include <libtorio/ffmpeg/ffmpeg.h>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
