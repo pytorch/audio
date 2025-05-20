@@ -234,12 +234,10 @@ void forced_align_impl(
       alphasCpu_a[curIdxOffset][S - 1] > alphasCpu_a[curIdxOffset][S - 2]
       ? S - 1
       : S - 2;
-  int indexScores = 0;
   for (int t = T - 1; t >= 0; --t) {
     auto lbl_idx =
         ltrIdx % 2 == 0 ? blank : targetsCpu_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
-    ++indexScores;
     ltrIdx -= backPtrCpu_a[t][ltrIdx];
   }
 }
