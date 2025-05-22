@@ -580,7 +580,7 @@ def melscale_fbanks(
         enorm = 2.0 / (f_pts[2 : n_mels + 2] - f_pts[:n_mels])
         fb *= enorm.unsqueeze(0)
 
-    if (fb.max(dim=0).values == 0.0).any():
+    if not torch.compiler.is_compiling() and (fb.max(dim=0).values == 0.0).any():
         warnings.warn(
             "At least one mel filterbank has all zero values. "
             f"The value for `n_mels` ({n_mels}) may be set too high. "
