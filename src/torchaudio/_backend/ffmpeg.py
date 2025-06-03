@@ -69,7 +69,7 @@ def _load_audio(
     s.process_all_packets()
     chunk = s.pop_chunks()[0]
     if chunk is None:
-        raise RuntimeError("Failed to decode audio.")
+        raise RuntimeError(f"Failed to decode audio source: {s.src}")
     waveform = chunk._elem
     return waveform.T if channels_first else waveform
 
