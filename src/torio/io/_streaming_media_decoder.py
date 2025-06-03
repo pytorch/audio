@@ -338,7 +338,8 @@ class ChunkTensor(ChunkTensorBase):
 
 def _format_doc(**kwargs):
     def decorator(obj):
-        obj.__doc__ = obj.__doc__.format(**kwargs)
+        if obj.__doc__ is not None:
+            obj.__doc__ = obj.__doc__.format(**kwargs)
         return obj
 
     return decorator
