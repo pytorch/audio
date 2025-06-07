@@ -11,11 +11,10 @@ class WarmupCosineScheduler(torch.optim.lr_scheduler._LRScheduler):
         total_epochs: int,
         steps_per_epoch: int,
         last_epoch=-1,
-        verbose=False,
     ):
         self.warmup_steps = warmup_epochs * steps_per_epoch
         self.total_steps = total_epochs * steps_per_epoch
-        super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
+        super().__init__(optimizer, last_epoch=last_epoch)
 
     def get_lr(self):
         if self._step_count < self.warmup_steps:

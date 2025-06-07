@@ -93,7 +93,7 @@ class GlobalStatsNormalization(torch.nn.Module):
 
 
 class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
-    def __init__(self, optimizer, warmup_updates, last_epoch=-1, verbose=False):
+    def __init__(self, optimizer, warmup_updates, last_epoch=-1):
         self.warmup_updates = warmup_updates
         super().__init__(optimizer, last_epoch=last_epoch)
 
