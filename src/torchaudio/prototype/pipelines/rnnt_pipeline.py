@@ -6,7 +6,7 @@ from torchaudio.pipelines import RNNTBundle
 
 EMFORMER_RNNT_BASE_MUSTC = RNNTBundle(
     _rnnt_path="models/emformer_rnnt_base_mustc.pt",
-    _rnnt_factory_func=partial(emformer_rnnt_base, num_symbols=501),
+    _rnnt_factory_func=staticmethod(partial(emformer_rnnt_base, num_symbols=501)),
     _global_stats_path="pipeline-assets/global_stats_rnnt_mustc.json",
     _sp_model_path="pipeline-assets/spm_bpe_500_mustc.model",
     _right_padding=4,
@@ -33,7 +33,7 @@ Please refer to :py:class:`torchaudio.pipelines.RNNTBundle` for usage instructio
 
 EMFORMER_RNNT_BASE_TEDLIUM3 = RNNTBundle(
     _rnnt_path="models/emformer_rnnt_base_tedlium3.pt",
-    _rnnt_factory_func=partial(emformer_rnnt_base, num_symbols=501),
+    _rnnt_factory_func=staticmethod(partial(emformer_rnnt_base, num_symbols=501)),
     _global_stats_path="pipeline-assets/global_stats_rnnt_tedlium3.json",
     _sp_model_path="pipeline-assets/spm_bpe_500_tedlium3.model",
     _right_padding=4,

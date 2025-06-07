@@ -84,6 +84,6 @@ def get_collate_fn(dataset_type, mode, sample_rate=None, duration=4):
         if mode == "train":
             if sample_rate is None:
                 raise ValueError("sample_rate is not given.")
-            return partial(collate_fn_wsj0mix_train, sample_rate=sample_rate, duration=duration)
-        return partial(collate_fn_wsj0mix_test, sample_rate=sample_rate)
+            return staticmethod(partial(collate_fn_wsj0mix_train, sample_rate=sample_rate, duration=duration))
+        return staticmethod(partial(collate_fn_wsj0mix_test, sample_rate=sample_rate))
     raise ValueError(f"Unexpected dataset: {dataset_type}")

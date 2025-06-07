@@ -21,7 +21,7 @@ if _mod_utils.is_module_available("soundfile"):
 
 
 class MockedSaveTest(PytorchTestCase):
-    _save = partial(get_save_func(), backend="soundfile")
+    _save = staticmethod(partial(get_save_func(), backend="soundfile"))
 
     @nested_params(
         ["float32", "int32", "int16", "uint8"],
@@ -168,7 +168,7 @@ class MockedSaveTest(PytorchTestCase):
 
 @skipIfNoModule("soundfile")
 class SaveTestBase(TempDirMixin, PytorchTestCase):
-    _save = partial(get_save_func(), backend="soundfile")
+    _save = staticmethod(partial(get_save_func(), backend="soundfile"))
 
     def assert_wav(self, dtype, sample_rate, num_channels, num_frames):
         """`self._save` can save wav format."""
@@ -264,7 +264,7 @@ class TestSave(SaveTestBase):
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `self._save`"""
 
-    _save = partial(get_save_func(), backend="soundfile")
+    _save = staticmethod(partial(get_save_func(), backend="soundfile"))
 
     @parameterize([True, False])
     def test_channels_first(self, channels_first):
@@ -279,7 +279,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
 
 @skipIfNoModule("soundfile")
 class TestFileObject(TempDirMixin, PytorchTestCase):
-    _save = partial(get_save_func(), backend="soundfile")
+    _save = staticmethod(partial(get_save_func(), backend="soundfile"))
 
     def _test_fileobj(self, ext):
         """Saving audio to file-like object works"""

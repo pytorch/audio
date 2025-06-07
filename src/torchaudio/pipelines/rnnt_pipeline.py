@@ -356,7 +356,7 @@ class RNNTBundle:
 
 EMFORMER_RNNT_BASE_LIBRISPEECH = RNNTBundle(
     _rnnt_path="models/emformer_rnnt_base_librispeech.pt",
-    _rnnt_factory_func=partial(emformer_rnnt_base, num_symbols=4097),
+    _rnnt_factory_func=staticmethod(partial(emformer_rnnt_base, num_symbols=4097)),
     _global_stats_path="pipeline-assets/global_stats_rnnt_librispeech.json",
     _sp_model_path="pipeline-assets/spm_bpe_4096_librispeech.model",
     _right_padding=4,

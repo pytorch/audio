@@ -79,20 +79,20 @@ class LibriSpeechRNNTModule(LightningModule):
         self.train_data_pipeline = torch.nn.Sequential(
             FunctionalModule(piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
-            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
+            FunctionalModule(staticmethod(partial(torch.transpose, dim0=1, dim1=2))),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.FrequencyMasking(27),
             torchaudio.transforms.TimeMasking(100, p=0.2),
             torchaudio.transforms.TimeMasking(100, p=0.2),
-            FunctionalModule(partial(torch.nn.functional.pad, pad=(0, 4))),
-            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
+            FunctionalModule(staticmethod(partial(torch.nn.functional.pad, pad=(0, 4)))),
+            FunctionalModule(staticmethod(partial(torch.transpose, dim0=1, dim1=2))),
         )
         self.valid_data_pipeline = torch.nn.Sequential(
             FunctionalModule(piecewise_linear_log),
             GlobalStatsNormalization(global_stats_path),
-            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
-            FunctionalModule(partial(torch.nn.functional.pad, pad=(0, 4))),
-            FunctionalModule(partial(torch.transpose, dim0=1, dim1=2)),
+            FunctionalModule(staticmethod(partial(torch.transpose, dim0=1, dim1=2))),
+            FunctionalModule(staticmethod(partial(torch.nn.functional.pad, pad=(0, 4)))),
+            FunctionalModule(staticmethod(partial(torch.transpose, dim0=1, dim1=2))),
         )
 
         self.librispeech_path = librispeech_path

@@ -61,7 +61,7 @@ class SourceSeparationBundle:
 
 CONVTASNET_BASE_LIBRI2MIX = SourceSeparationBundle(
     _model_path="models/conv_tasnet_base_libri2mix.pt",
-    _model_factory_func=partial(conv_tasnet_base, num_sources=2),
+    _model_factory_func=staticmethod(partial(conv_tasnet_base, num_sources=2)),
     _sample_rate=8000,
 )
 CONVTASNET_BASE_LIBRI2MIX.__doc__ = """Pre-trained Source Separation pipeline with *ConvTasNet*
@@ -78,7 +78,7 @@ Please refer to :class:`SourceSeparationBundle` for usage instructions.
 
 HDEMUCS_HIGH_MUSDB_PLUS = SourceSeparationBundle(
     _model_path="models/hdemucs_high_trained.pt",
-    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"]),
+    _model_factory_func=staticmethod(partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"])),
     _sample_rate=44100,
 )
 HDEMUCS_HIGH_MUSDB_PLUS.__doc__ = """Pre-trained music source separation pipeline with
@@ -96,7 +96,7 @@ Please refer to :class:`SourceSeparationBundle` for usage instructions.
 
 HDEMUCS_HIGH_MUSDB = SourceSeparationBundle(
     _model_path="models/hdemucs_high_musdbhq_only.pt",
-    _model_factory_func=partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"]),
+    _model_factory_func=staticmethod(partial(hdemucs_high, sources=["drums", "bass", "other", "vocals"])),
     _sample_rate=44100,
 )
 HDEMUCS_HIGH_MUSDB.__doc__ = """Pre-trained music source separation pipeline with

@@ -253,12 +253,14 @@ def main(args):
         raise ValueError("Both --checkpoint-path and --checkpoint-name are specified, " "can only specify one.")
 
     n_symbols = len(get_symbol_list(args.text_preprocessor))
-    text_preprocessor = partial(
-        text_to_sequence,
-        symbol_list=args.text_preprocessor,
-        phonemizer=args.phonemizer,
-        checkpoint=args.phonemizer_checkpoint,
-        cmudict_root=args.cmudict_root,
+    text_preprocessor = staticmethod(
+        partial(
+            text_to_sequence,
+            symbol_list=args.text_preprocessor,
+            phonemizer=args.phonemizer,
+            checkpoint=args.phonemizer_checkpoint,
+            cmudict_root=args.cmudict_root,
+        )
     )
 
     if args.checkpoint_path is not None:
