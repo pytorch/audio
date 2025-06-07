@@ -11,11 +11,10 @@ class LinearDecayLRScheduler(torch.optim.lr_scheduler._LRScheduler):
         warmup_updates: int,
         max_updates: int,
         last_epoch: int = -1,
-        verbose: bool = False,
     ):
         self.warmup_updates = warmup_updates
         self.max_updates = max_updates
-        super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
+        super().__init__(optimizer, last_epoch=last_epoch)
 
     def get_lr(self):
         if self._step_count <= self.warmup_updates:
