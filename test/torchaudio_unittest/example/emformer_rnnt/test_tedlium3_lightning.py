@@ -33,7 +33,9 @@ class MockTEDLIUM:
 
 @contextmanager
 def get_lightning_module():
-    with patch("sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=500)), patch(
+    with patch(
+        "sentencepiece.SentencePieceProcessor", new=staticmethod(partial(MockSentencePieceProcessor, num_symbols=500))
+    ), patch(
         "asr.emformer_rnnt.tedlium3.lightning.GlobalStatsNormalization", new=torch.nn.Identity
     ), patch("torchaudio.datasets.TEDLIUM", new=MockTEDLIUM), patch(
         "asr.emformer_rnnt.tedlium3.lightning.CustomDataset", new=MockCustomDataset

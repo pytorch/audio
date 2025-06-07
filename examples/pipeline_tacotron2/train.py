@@ -273,12 +273,14 @@ def log_additional_info(writer, model, loader, epoch):
 
 
 def get_datasets(args):
-    text_preprocessor = partial(
-        text_to_sequence,
-        symbol_list=args.text_preprocessor,
-        phonemizer=args.phonemizer,
-        checkpoint=args.phonemizer_checkpoint,
-        cmudict_root=args.cmudict_root,
+    text_preprocessor = staticmethod(
+        partial(
+            text_to_sequence,
+            symbol_list=args.text_preprocessor,
+            phonemizer=args.phonemizer,
+            checkpoint=args.phonemizer_checkpoint,
+            cmudict_root=args.cmudict_root,
+        )
     )
 
     transforms = torch.nn.Sequential(
@@ -391,7 +393,7 @@ def train(rank, world_size, args):
         "shuffle": False,
         "pin_memory": True,
         "drop_last": False,
-        "collate_fn": partial(text_mel_collate_fn, n_frames_per_step=args.n_frames_per_step),
+        "collate_fn": staticmethod(partial(text_mel_collate_fn, n_frames_per_step=args.n_frames_per_step)),
     }
 
     train_loader = DataLoader(trainset, sampler=train_sampler, **loader_params)

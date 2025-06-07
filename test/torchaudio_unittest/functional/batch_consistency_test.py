@@ -62,7 +62,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "length": length,
             "rand_init": False,
         }
-        func = partial(F.griffinlim, **kwargs)
+        func = staticmethod(partial(F.griffinlim, **kwargs))
         self.assert_batch_consistency(func, inputs=(batch,), atol=1e-4)
 
     @parameterized.expand(
@@ -89,7 +89,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        func = partial(F.detect_pitch_frequency, **kwargs)
+        func = staticmethod(partial(F.detect_pitch_frequency, **kwargs))
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     @parameterized.expand(
@@ -111,7 +111,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "db_multiplier": db_mult,
             "top_db": top_db,
         }
-        func = partial(F.amplitude_to_DB, **kwargs)
+        func = staticmethod(partial(F.amplitude_to_DB, **kwargs))
         # Test with & without a `top_db` clamp
         self.assert_batch_consistency(func, inputs=(spec,))
 
@@ -141,7 +141,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "db_multiplier": db_mult,
             "top_db": top_db,
         }
-        func = partial(F.amplitude_to_DB, **kwargs)
+        func = staticmethod(partial(F.amplitude_to_DB, **kwargs))
         self.assert_batch_consistency(func, inputs=(spec,))
 
     def test_amplitude_to_DB_not_channelwise_clamps(self):
@@ -170,7 +170,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "enhancement_amount": 80.0,
         }
-        func = partial(F.contrast, **kwargs)
+        func = staticmethod(partial(F.contrast, **kwargs))
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_dcshift(self):
@@ -179,7 +179,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "shift": 0.5,
             "limiter_gain": 0.05,
         }
-        func = partial(F.dcshift, **kwargs)
+        func = staticmethod(partial(F.dcshift, **kwargs))
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_overdrive(self):
@@ -188,7 +188,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "gain": 45,
             "colour": 30,
         }
-        func = partial(F.overdrive, **kwargs)
+        func = staticmethod(partial(F.overdrive, **kwargs))
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     def test_phaser(self):
@@ -201,7 +201,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        func = partial(F.phaser, **kwargs)
+        func = staticmethod(partial(F.phaser, **kwargs))
         self.assert_batch_consistency(func, inputs=(batch,))
 
     def test_flanger(self):
@@ -210,7 +210,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "sample_rate": sample_rate,
         }
-        func = partial(F.flanger, **kwargs)
+        func = staticmethod(partial(F.flanger, **kwargs))
         self.assert_batch_consistency(func, inputs=(waveforms,))
 
     @parameterized.expand(
@@ -228,7 +228,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "center": center,
             "norm_vars": norm_vars,
         }
-        func = partial(F.sliding_window_cmn, **kwargs)
+        func = staticmethod(partial(F.sliding_window_cmn, **kwargs))
         self.assert_batch_consistency(func, inputs=(spectrogram,))
 
     @parameterized.expand([("sinc_interp_hann"), ("sinc_interp_kaiser")])
@@ -246,7 +246,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "new_freq": new_sr,
             "resampling_method": resampling_method,
         }
-        func = partial(F.resample, **kwargs)
+        func = staticmethod(partial(F.resample, **kwargs))
 
         self.assert_batch_consistency(
             func,
@@ -301,7 +301,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "reference_channel": 0,
         }
-        func = partial(F.mvdr_weights_souden, **kwargs)
+        func = staticmethod(partial(F.mvdr_weights_souden, **kwargs))
         self.assert_batch_consistency(func, (psd_noise, psd_speech))
 
     def test_mvdr_weights_souden_with_tensor(self):
@@ -323,7 +323,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "reference_channel": 0,
         }
-        func = partial(F.mvdr_weights_rtf, **kwargs)
+        func = staticmethod(partial(F.mvdr_weights_rtf, **kwargs))
         self.assert_batch_consistency(func, (rtf, psd_noise))
 
     def test_mvdr_weights_rtf_with_tensor(self):
@@ -360,7 +360,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             "reference_channel": 0,
             "n_iter": n_iter,
         }
-        func = partial(F.rtf_power, **kwargs)
+        func = staticmethod(partial(F.rtf_power, **kwargs))
         self.assert_batch_consistency(func, (psd_speech, psd_noise))
 
     @parameterized.expand(
@@ -380,7 +380,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         kwargs = {
             "n_iter": n_iter,
         }
-        func = partial(F.rtf_power, **kwargs)
+        func = staticmethod(partial(F.rtf_power, **kwargs))
         self.assert_batch_consistency(func, (psd_speech, psd_noise, reference_channel))
 
     def test_apply_beamforming(self):

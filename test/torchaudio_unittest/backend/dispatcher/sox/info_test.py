@@ -31,7 +31,7 @@ if _mod_utils.is_module_available("requests"):
 @skipIfNoExec("sox")
 @skipIfNoSox
 class TestInfo(TempDirMixin, PytorchTestCase):
-    _info = partial(get_info_func(), backend="sox")
+    _info = staticmethod(partial(get_info_func(), backend="sox"))
 
     @parameterized.expand(
         list(
@@ -262,7 +262,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
 @disabledInCI
 @skipIfNoSoxDecoder("opus")
 class TestInfoOpus(PytorchTestCase):
-    _info = partial(get_info_func(), backend="sox")
+    _info = staticmethod(partial(get_info_func(), backend="sox"))
 
     @parameterized.expand(
         list(
@@ -321,7 +321,7 @@ class Unseekable:
 @skipIfNoSox
 @skipIfNoExec("sox")
 class TestFileObject(FileObjTestBase, PytorchTestCase):
-    _info = partial(get_info_func(), backend="sox")
+    _info = staticmethod(partial(get_info_func(), backend="sox"))
 
     def _query_fileobj(self, ext, dtype, sample_rate, num_channels, num_frames, *, comments=None):
         path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
@@ -353,7 +353,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
-    _info = partial(get_info_func(), backend="sox")
+    _info = staticmethod(partial(get_info_func(), backend="sox"))
 
     def _query_http(self, ext, dtype, sample_rate, num_channels, num_frames):
         audio_path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
@@ -387,7 +387,7 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
 
 @skipIfNoSox
 class TestInfoNoSuchFile(PytorchTestCase):
-    _info = partial(get_info_func(), backend="sox")
+    _info = staticmethod(partial(get_info_func(), backend="sox"))
 
     def test_info_fail(self):
         """

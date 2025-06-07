@@ -34,7 +34,7 @@ class MockLIBRISPEECH:
 @contextmanager
 def get_lightning_module():
     with patch(
-        "sentencepiece.SentencePieceProcessor", new=partial(MockSentencePieceProcessor, num_symbols=4096)
+        "sentencepiece.SentencePieceProcessor", new=staticmethod(partial(MockSentencePieceProcessor, num_symbols=4096))
     ), patch("asr.emformer_rnnt.librispeech.lightning.GlobalStatsNormalization", new=torch.nn.Identity), patch(
         "torchaudio.datasets.LIBRISPEECH", new=MockLIBRISPEECH
     ), patch(

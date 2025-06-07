@@ -115,11 +115,13 @@ def run_train(args):
             f"Found {args.model_name}."
         )
     model = getattr(torchaudio.models, args.model_name)()
-    loss_fn = partial(
-        hubert_loss,
-        masked_weight=args.masked_weight,
-        unmasked_weight=args.unmasked_weight,
-        feature_weight=args.feature_weight,
+    loss_fn = staticmethod(
+        partial(
+            hubert_loss,
+            masked_weight=args.masked_weight,
+            unmasked_weight=args.unmasked_weight,
+            feature_weight=args.feature_weight,
+        )
     )
     optimizer = torch.optim.AdamW(
         model.parameters(),

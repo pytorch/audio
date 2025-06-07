@@ -65,7 +65,7 @@ class Autograd(TestBaseMixin):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=3)
         a = torch.tensor([[0.7, 0.2, 0.6], [0.8, 0.2, 0.9]])
         b = torch.tensor([[0.4, 0.2, 0.9], [0.7, 0.2, 0.6]])
-        self.assert_grad(partial(F.lfilter, batching=False), (x, a, b))
+        self.assert_grad(staticmethod(partial(F.lfilter, batching=False)), (x, a, b))
 
     def test_lfilter_batching(self):
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
