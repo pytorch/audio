@@ -22,7 +22,7 @@ from .common import name_func
 
 
 class LoadTestBase(TempDirMixin, PytorchTestCase):
-    _load = partial(get_load_func(), backend="sox")
+    _load = staticmethod(partial(get_load_func(), backend="sox"))
 
     def assert_format(
         self,
@@ -293,7 +293,7 @@ class TestLoad(LoadTestBase):
 class TestLoadParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of frame parameters of `sox_io_backend.load`"""
 
-    _load = partial(get_load_func(), backend="sox")
+    _load = staticmethod(partial(get_load_func(), backend="sox"))
 
     def _test(self, func, frame_offset, num_frames, channels_first, normalize):
         original = get_wav_data("int16", num_channels=2, normalize=False)
@@ -329,7 +329,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
     because `load` function is rigrously tested for file path inputs to match libsox's result,
     """
 
-    _load = partial(get_load_func(), backend="sox")
+    _load = staticmethod(partial(get_load_func(), backend="sox"))
 
     @parameterized.expand(
         [
@@ -360,7 +360,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
 
 @skipIfNoSox
 class TestLoadNoSuchFile(PytorchTestCase):
-    _load = partial(get_load_func(), backend="sox")
+    _load = staticmethod(partial(get_load_func(), backend="sox"))
 
     def test_load_fail(self):
         """

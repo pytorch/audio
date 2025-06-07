@@ -97,7 +97,7 @@ class SoundFileMock:
 
 
 class MockedLoadTest(PytorchTestCase):
-    _load = partial(get_load_func(), backend="soundfile")
+    _load = staticmethod(partial(get_load_func(), backend="soundfile"))
 
     def assert_dtype(self, ext, dtype, sample_rate, num_channels, normalize, channels_first):
         """When format is WAV or NIST, normalize=False will return the native dtype Tensor, otherwise float32"""
@@ -143,7 +143,7 @@ class MockedLoadTest(PytorchTestCase):
 
 
 class LoadTestBase(TempDirMixin, PytorchTestCase):
-    _load = partial(get_load_func(), backend="soundfile")
+    _load = staticmethod(partial(get_load_func(), backend="soundfile"))
 
     def assert_wav(
         self,
@@ -272,7 +272,7 @@ class TestLoad(LoadTestBase):
 class TestLoadFormat(TempDirMixin, PytorchTestCase):
     """Given `format` parameter, `so.load` can load files without extension"""
 
-    _load = partial(get_load_func(), backend="soundfile")
+    _load = staticmethod(partial(get_load_func(), backend="soundfile"))
     original = None
     path = None
 
@@ -314,7 +314,7 @@ class TestLoadFormat(TempDirMixin, PytorchTestCase):
 
 @skipIfNoModule("soundfile")
 class TestFileObject(TempDirMixin, PytorchTestCase):
-    _load = partial(get_load_func(), backend="soundfile")
+    _load = staticmethod(partial(get_load_func(), backend="soundfile"))
 
     def _test_fileobj(self, ext):
         """Loading audio via file-like object works"""

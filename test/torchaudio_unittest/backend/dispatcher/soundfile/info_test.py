@@ -24,7 +24,7 @@ if _mod_utils.is_module_available("soundfile"):
 
 @skipIfNoModule("soundfile")
 class TestInfo(TempDirMixin, PytorchTestCase):
-    _info = partial(get_info_func(), backend="soundfile")
+    _info = staticmethod(partial(get_info_func(), backend="soundfile"))
 
     @parameterize(
         ["float32", "int32", "int16", "uint8"],
@@ -127,7 +127,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
 
 @skipIfNoModule("soundfile")
 class TestFileObject(TempDirMixin, PytorchTestCase):
-    _info = partial(get_info_func(), backend="soundfile")
+    _info = staticmethod(partial(get_info_func(), backend="soundfile"))
 
     def _test_fileobj(self, ext, subtype, bits_per_sample):
         """Query audio via file-like object works"""

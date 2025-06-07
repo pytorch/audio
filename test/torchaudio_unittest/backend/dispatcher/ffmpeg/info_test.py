@@ -34,7 +34,7 @@ if _mod_utils.is_module_available("requests"):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestInfo(TempDirMixin, PytorchTestCase):
-    _info = partial(get_info_func(), backend="ffmpeg")
+    _info = staticmethod(partial(get_info_func(), backend="ffmpeg"))
 
     def test_pathlike(self):
         """FFmpeg dispatcher can query audio data from pathlike object"""
@@ -315,7 +315,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestInfoOpus(PytorchTestCase):
-    _info = partial(get_info_func(), backend="ffmpeg")
+    _info = staticmethod(partial(get_info_func(), backend="ffmpeg"))
 
     @parameterized.expand(
         list(
@@ -341,7 +341,7 @@ class TestInfoOpus(PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadWithoutExtension(PytorchTestCase):
-    _info = partial(get_info_func(), backend="ffmpeg")
+    _info = staticmethod(partial(get_info_func(), backend="ffmpeg"))
 
     def test_mp3(self):
         """MP3 file without extension can be loaded
@@ -405,7 +405,7 @@ class Unseekable:
 
 @skipIfNoExec("sox")
 class TestFileObject(FileObjTestBase, PytorchTestCase):
-    _info = partial(get_info_func(), backend="ffmpeg")
+    _info = staticmethod(partial(get_info_func(), backend="ffmpeg"))
 
     def _query_fileobj(self, ext, dtype, sample_rate, num_channels, num_frames, *, comments=None):
         path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames, comments=comments)
@@ -557,7 +557,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
-    _info = partial(get_info_func(), backend="ffmpeg")
+    _info = staticmethod(partial(get_info_func(), backend="ffmpeg"))
 
     def _query_http(self, ext, dtype, sample_rate, num_channels, num_frames):
         audio_path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
@@ -600,7 +600,7 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestInfoNoSuchFile(PytorchTestCase):
-    _info = partial(get_info_func(), backend="ffmpeg")
+    _info = staticmethod(partial(get_info_func(), backend="ffmpeg"))
 
     def test_info_fail(self):
         """

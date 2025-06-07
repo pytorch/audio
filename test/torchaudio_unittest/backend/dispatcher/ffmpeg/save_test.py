@@ -41,7 +41,7 @@ def _convert_audio_file(src_path, dst_path, muxer=None, encoder=None, sample_fmt
 
 
 class SaveTestBase(TempDirMixin, TorchaudioTestCase):
-    _save = partial(get_save_func(), backend="ffmpeg")
+    _save = staticmethod(partial(get_save_func(), backend="ffmpeg"))
 
     def assert_save_consistency(
         self,
@@ -398,7 +398,7 @@ class SaveTest(SaveTestBase):
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `self._save`"""
 
-    _save = partial(get_save_func(), backend="ffmpeg")
+    _save = staticmethod(partial(get_save_func(), backend="ffmpeg"))
 
     @parameterized.expand([(True,), (False,)], name_func=name_func)
     def test_save_channels_first(self, channels_first):
@@ -444,7 +444,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestSaveNonExistingDirectory(PytorchTestCase):
-    _save = partial(get_save_func(), backend="ffmpeg")
+    _save = staticmethod(partial(get_save_func(), backend="ffmpeg"))
 
     def test_save_fail(self):
         """

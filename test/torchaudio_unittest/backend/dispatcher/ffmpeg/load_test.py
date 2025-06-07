@@ -33,7 +33,7 @@ if _mod_utils.is_module_available("requests"):
 
 
 class LoadTestBase(TempDirMixin, PytorchTestCase):
-    _load = partial(get_load_func(), backend="ffmpeg")
+    _load = staticmethod(partial(get_load_func(), backend="ffmpeg"))
 
     def assert_format(
         self,
@@ -324,7 +324,7 @@ class TestLoad(LoadTestBase):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadWithoutExtension(PytorchTestCase):
-    _load = partial(get_load_func(), backend="ffmpeg")
+    _load = staticmethod(partial(get_load_func(), backend="ffmpeg"))
 
     def test_mp3(self):
         """MP3 file without extension can be loaded
@@ -364,7 +364,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
     because `load` function is rigrously tested for file path inputs to match libsox's result,
     """
 
-    _load = partial(get_load_func(), backend="ffmpeg")
+    _load = staticmethod(partial(get_load_func(), backend="ffmpeg"))
 
     @parameterized.expand(
         [
@@ -541,7 +541,7 @@ class Unseekable:
 @skipIfNoExec("sox")
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
-    _load = partial(get_load_func(), backend="ffmpeg")
+    _load = staticmethod(partial(get_load_func(), backend="ffmpeg"))
 
     @parameterized.expand(
         [
@@ -606,7 +606,7 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
 @skipIfNoExec("sox")
 @skipIfNoFFmpeg
 class TestLoadNoSuchFile(PytorchTestCase):
-    _load = partial(get_load_func(), backend="ffmpeg")
+    _load = staticmethod(partial(get_load_func(), backend="ffmpeg"))
 
     def test_load_fail(self):
         """
