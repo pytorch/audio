@@ -13,8 +13,9 @@ jobs:
   tests:
     strategy:
       matrix:
-        python_version: ["3.8", "3.9", "3.10"]
-        cuda_arch_version: ["11.8"]
+        # TODO add up to 3.13
+        python_version: ["3.9", "3.10"]
+        cuda_arch_version: ["12.6"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:

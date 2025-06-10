@@ -21,8 +21,8 @@ jobs:
         git config --global --add safe.directory /__w/audio/audio
 
         # Set up Environment Variables
-        export PYTHON_VERSION="3.8"
-        export CUDA_VERSION=11.8
+        export PYTHON_VERSION="3.9"
+        export CUDA_VERSION=12.6
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
