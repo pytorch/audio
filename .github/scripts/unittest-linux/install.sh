@@ -24,7 +24,7 @@ esac
 conda create -n ci -y python="${PYTHON_VERSION}"
 conda activate ci
 
-# # 1. Install PyTorch
+# 1. Install PyTorch
 # if [ -z "${CUDA_VERSION:-}" ] ; then
 #     if [ "${os}" == MacOSX ] ; then
 #         cudatoolkit=''
@@ -57,6 +57,25 @@ conda activate ci
 #         conda install pytorch ${cudatoolkit} ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia  $MKL_CONSTRAINT
 #     fi
 # )
+
+export GPU_ARCH_TYPE="cpu"  # TODO change this
+
+case $GPU_ARCH_TYPE in
+  cpu)
+    GPU_ARCH_ID="cpu"
+    ;;
+  cuda)
+    VERSION_WITHOUT_DOT=$(echo "${GPU_ARCH_VERSION}" | sed 's/\.//')
+    GPU_ARCH_ID="cu${VERSION_WITHOUT_DOT}"
+    ;;
+  *)
+    echo "Unknown GPU_ARCH_TYPE=${GPU_ARCH_TYPE}"
+    exit 1
+    ;;
+esac
+PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
+pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+
 
 # 2. Install torchaudio
 conda install --quiet -y ninja cmake
