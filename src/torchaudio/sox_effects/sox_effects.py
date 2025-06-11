@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 
 import torch
 import torchaudio
-from torchaudio._internal.module_utils import deprecated
+from torchaudio._internal.module_utils import deprecated, dropping_support
 from torchaudio.utils.sox_utils import list_effects
 
 
@@ -39,6 +39,7 @@ def shutdown_sox_effects():
     pass
 
 
+@dropping_support
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -52,6 +53,7 @@ def effect_names() -> List[str]:
     return list(list_effects().keys())
 
 
+@dropping_support
 def apply_effects_tensor(
     tensor: torch.Tensor,
     sample_rate: int,
@@ -156,6 +158,7 @@ def apply_effects_tensor(
     return sox_ext.apply_effects_tensor(tensor, sample_rate, effects, channels_first)
 
 
+@dropping_support
 def apply_effects_file(
     path: str,
     effects: List[List[str]],

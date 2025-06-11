@@ -1,4 +1,6 @@
-from ._alignment import forced_align, merge_tokens, TokenSpan
+from torchaudio._internal.module_utils import dropping_support
+
+from ._alignment import forced_align as _forced_align, merge_tokens, TokenSpan
 from .filtering import (
     allpass_biquad,
     band_biquad,
@@ -23,6 +25,9 @@ from .filtering import (
     treble_biquad,
     vad,
 )
+
+forced_align = dropping_support(_forced_align)
+
 from .functional import (
     add_noise,
     amplitude_to_DB,
@@ -53,7 +58,7 @@ from .functional import (
     preemphasis,
     psd,
     resample,
-    rnnt_loss,
+    rnnt_loss as _rnnt_loss,
     rtf_evd,
     rtf_power,
     sliding_window_cmn,
@@ -61,6 +66,8 @@ from .functional import (
     spectrogram,
     speed,
 )
+
+rnnt_loss = dropping_support(_rnnt_loss)
 
 __all__ = [
     "amplitude_to_DB",
