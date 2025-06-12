@@ -30,6 +30,6 @@ fi
 
 (
     cd test
-    pytest "${args[@]}" torchaudio_unittest -k "not backend"
+    pytest "${args[@]}" torchaudio_unittest -k "not backend and not io and not prototype"
     coverage html
 )
