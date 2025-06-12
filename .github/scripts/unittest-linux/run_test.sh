@@ -17,7 +17,6 @@ declare -a args=(
     '--cov=torchaudio'
     "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
     '--durations' '20'
-    '-k "not backend"'
 )
 
 if [[ "${CUDA_TESTS_ONLY}" = "1" ]]; then
@@ -31,6 +30,6 @@ fi
 
 (
     cd test
-    pytest "${args[@]}" torchaudio_unittest
+    pytest "${args[@]}" torchaudio_unittest -k "not backend"
     coverage html
 )
