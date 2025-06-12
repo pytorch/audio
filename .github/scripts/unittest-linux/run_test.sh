@@ -17,7 +17,7 @@ declare -a args=(
     '--cov=torchaudio'
     "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
     '--durations' '20'
-    '--ignore-glob="*backend*"'
+    '-k "not backend"'
 )
 
 if [[ "${CUDA_TESTS_ONLY}" = "1" ]]; then
