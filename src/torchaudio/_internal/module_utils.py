@@ -59,6 +59,7 @@ def requires_module(*modules: str):
 
     return decorator
 
+UNSUPPORTED = []
 
 def deprecated(direction: str, version: Optional[str] = None, remove: bool = False):
     """Decorator to add deprecation message
@@ -90,6 +91,7 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
        {direction}
         """
 
+        UNSUPPORTED.append(wrapped)
         return wrapped
 
     return decorator
