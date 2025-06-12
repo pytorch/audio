@@ -4,3 +4,10 @@ pytest
 scipy
 numpy
 parameterized
+flashlight 
+flashlight-text 
+kenlm 
+sentencepiece 
+deep-phonemizer
+librosa>=0.4.3 
+scikit-learn
