@@ -3,8 +3,13 @@
 #ifdef USE_CUDA
 
 #include <libtorchaudio/rnnt/workspace.h>
+#ifdef __HIP_PLATFORM_AMD__
+#include <libtorchaudio/rnnt/hip/gpu_kernel_utils_hip.cuh>
+#include <libtorchaudio/rnnt/hip/gpu_kernels_hip.cuh>
+#else
 #include <libtorchaudio/rnnt/gpu/gpu_kernel_utils.cuh>
 #include <libtorchaudio/rnnt/gpu/gpu_kernels.cuh>
+#endif
 
 namespace torchaudio {
 namespace rnnt {

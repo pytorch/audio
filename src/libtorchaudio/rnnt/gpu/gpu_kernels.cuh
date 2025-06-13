@@ -4,9 +4,15 @@
 
 #include <cassert>
 
+#ifdef __HIP_PLATFORM_AMD__
+#include <libtorchaudio/rnnt/hip/kernel_utils.h>
+#include <libtorchaudio/rnnt/hip/kernels.h>
+#include <libtorchaudio/rnnt/hip/math_hip.cuh>
+#else
 #include <libtorchaudio/rnnt/gpu/kernel_utils.h>
 #include <libtorchaudio/rnnt/gpu/kernels.h>
 #include <libtorchaudio/rnnt/gpu/math.cuh>
+#endif
 
 namespace torchaudio {
 namespace rnnt {
