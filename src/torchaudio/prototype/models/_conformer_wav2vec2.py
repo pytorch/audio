@@ -7,6 +7,7 @@ from torchaudio.models import Wav2Vec2Model
 from torchaudio.models.conformer import ConformerLayer
 from torchaudio.models.rnnt import _TimeReduction
 from torchaudio.models.wav2vec2 import components
+from torchaudio._internal.module_utils import dropping_support
 
 
 def _buffered_arange(max) -> Tensor:
@@ -437,6 +438,7 @@ def _get_conformer_negativer_sampler(
     return NegativeSampler(preprocessor, num_negatives, cross_sample_negatives)
 
 
+@dropping_support
 def conformer_wav2vec2_model(
     extractor_input_dim: int,
     extractor_output_dim: int,
@@ -501,6 +503,7 @@ def conformer_wav2vec2_model(
     return Wav2Vec2Model(feature_extractor, encoder)
 
 
+@dropping_support
 def conformer_wav2vec2_base(
     extractor_input_dim: int = 64,
     extractor_output_dim: int = 256,
@@ -536,6 +539,7 @@ def conformer_wav2vec2_base(
     )
 
 
+@dropping_support
 def conformer_wav2vec2_pretrain_model(
     extractor_input_dim: int,
     extractor_output_dim: int,
@@ -672,6 +676,7 @@ def conformer_wav2vec2_pretrain_model(
     )
 
 
+@dropping_support
 def conformer_wav2vec2_pretrain_base(
     extractor_input_dim: int = 64,
     extractor_output_dim: int = 256,
@@ -733,6 +738,7 @@ def conformer_wav2vec2_pretrain_base(
     )
 
 
+@dropping_support
 def conformer_wav2vec2_pretrain_large(
     extractor_input_dim: int = 64,
     extractor_output_dim: int = 256,

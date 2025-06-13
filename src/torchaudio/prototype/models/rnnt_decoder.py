@@ -4,6 +4,8 @@ import torch
 from torchaudio.models import RNNT
 from torchaudio.prototype.models.rnnt import TrieNode
 
+from torchaudio._internal.module_utils import dropping_support
+
 __all__ = ["Hypothesis", "RNNTBeamSearchBiasing"]
 
 
@@ -96,6 +98,7 @@ class RNNTBeamSearchBiasing(torch.nn.Module):
         biasing (bool, optional): If true, do biasing, otherwise use standard RNN-T support
     """
 
+    @dropping_support
     def __init__(
         self,
         model: RNNT,

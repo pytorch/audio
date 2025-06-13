@@ -4,8 +4,10 @@ from typing import List, Optional, Union
 import torch
 
 from torchaudio.functional import fftconvolve
+from torchaudio._internal.module_utils import dropping_support
 
 
+@dropping_support
 def oscillator_bank(
     frequencies: torch.Tensor,
     amplitudes: torch.Tensor,
@@ -81,6 +83,7 @@ def oscillator_bank(
     return waveform
 
 
+@dropping_support
 def adsr_envelope(
     num_frames: int,
     *,
@@ -182,6 +185,7 @@ def adsr_envelope(
     return out
 
 
+@dropping_support
 def extend_pitch(
     base: torch.Tensor,
     pattern: Union[int, List[float], torch.Tensor],
@@ -249,6 +253,7 @@ def extend_pitch(
     return h_freq
 
 
+@dropping_support
 def sinc_impulse_response(cutoff: torch.Tensor, window_size: int = 513, high_pass: bool = False):
     """Create windowed-sinc impulse response for given cutoff frequencies.
 
@@ -288,6 +293,7 @@ def sinc_impulse_response(cutoff: torch.Tensor, window_size: int = 513, high_pas
     return filt
 
 
+@dropping_support
 def frequency_impulse_response(magnitudes):
     """Create filter from desired frequency response
 
@@ -319,6 +325,7 @@ def _overlap_and_add(waveform, stride):
     return buffer
 
 
+@dropping_support
 def filter_waveform(waveform: torch.Tensor, kernels: torch.Tensor, delay_compensation: int = -1):
     """Applies filters along time axis of the given waveform.
 
@@ -404,6 +411,7 @@ def filter_waveform(waveform: torch.Tensor, kernels: torch.Tensor, delay_compens
     return result
 
 
+@dropping_support
 def exp_sigmoid(
     input: torch.Tensor, exponent: float = 10.0, max_value: float = 2.0, threshold: float = 1e-7
 ) -> torch.Tensor:
