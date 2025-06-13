@@ -5,6 +5,7 @@ import torchaudio.prototype.functional as F
 from parameterized import parameterized
 from torch.autograd import gradcheck
 from torchaudio_unittest.common_utils import TestBaseMixin
+from torch.utils.cpp_extension import ROCM_HOME
 
 
 class AutogradTestImpl(TestBaseMixin):
@@ -24,7 +25,10 @@ class AutogradTestImpl(TestBaseMixin):
         )
         amps = torch.linspace(-5, 5, numel, dtype=self.dtype, device=self.device, requires_grad=True).reshape(shape)
 
-        assert gradcheck(F.oscillator_bank, (freq, amps, sample_rate))
+        atol = 1e-05
+        if ROCM_HOME is not None:
+            atol = 1e-04
+        assert gradcheck(F.oscillator_bank, (freq, amps, sample_rate), atol=atol)
 
     def test_extend_pitch(self):
         num_frames, num_pitches = 5, 7
