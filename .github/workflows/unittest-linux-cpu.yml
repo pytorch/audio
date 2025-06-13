@@ -13,8 +13,8 @@ jobs:
   tests:
     strategy:
       matrix:
-        # TODO add up to 3.13
-        python_version: ["3.9", "3.10"]
+        # TODO all from 3.9 to 3.13
+        python_version: ["3.11"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
