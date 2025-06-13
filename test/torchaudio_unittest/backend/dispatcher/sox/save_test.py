@@ -34,7 +34,7 @@ def _get_sox_encoding(encoding):
 
 
 class SaveTestBase(TempDirMixin, TorchaudioTestCase):
-    _save = partial(get_save_func(), backend="sox")
+    _save = staticmethod(partial(get_save_func(), backend="sox"))
 
     def assert_save_consistency(
         self,
@@ -361,7 +361,7 @@ class SaveTest(SaveTestBase):
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `self._save`"""
 
-    _save = partial(get_save_func(), backend="sox")
+    _save = staticmethod(partial(get_save_func(), backend="sox"))
 
     @parameterized.expand([(True,), (False,)], name_func=name_func)
     def test_save_channels_first(self, channels_first):
@@ -405,7 +405,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
 
 @skipIfNoSox
 class TestSaveNonExistingDirectory(PytorchTestCase):
-    _save = partial(get_save_func(), backend="sox")
+    _save = staticmethod(partial(get_save_func(), backend="sox"))
 
     def test_save_fail(self):
         """
