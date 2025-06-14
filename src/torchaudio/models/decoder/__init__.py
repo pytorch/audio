@@ -1,3 +1,4 @@
+from torchaudio._internal.module_utils import dropping_support
 _CTC_DECODERS = [
     "CTCHypothesis",
     "CTCDecoder",
@@ -33,7 +34,7 @@ def __getattr__(name: str):
                 "To use CUCTC decoder, please set BUILD_CUDA_CTC_DECODER=1 when building from source."
             ) from err
 
-        item = getattr(_cuda_ctc_decoder, name)
+        item = dropping_support(getattr(_cuda_ctc_decoder, name))
         globals()[name] = item
         return item
     raise AttributeError(f"module {__name__} has no attribute {name}")

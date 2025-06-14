@@ -59,6 +59,7 @@ def requires_module(*modules: str):
 
     return decorator
 
+UNSUPPORTED = []
 
 def deprecated(direction: str, version: Optional[str] = None, remove: bool = False):
     """Decorator to add deprecation message
@@ -90,10 +91,14 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
        {direction}
         """
 
+        UNSUPPORTED.append(wrapped)
         return wrapped
 
     return decorator
 
+dropping_support = deprecated(
+    "As TorchAudio is no longer being actively developed, this function can no longer be supported."
+    "See https://github.com/pytorch/audio/issues/3902 for more details.", version="2.9", remove=True)
 
 def fail_with_message(message):
     """Generate decorator to give users message about missing TorchAudio extension."""
