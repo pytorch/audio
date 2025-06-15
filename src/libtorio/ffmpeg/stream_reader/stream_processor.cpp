@@ -1,6 +1,5 @@
 #include <libtorio/ffmpeg/hw_context.h>
 #include <libtorio/ffmpeg/stream_reader/stream_processor.h>
-#include <stdexcept>
 #include <string_view>
 
 namespace torio::io {
