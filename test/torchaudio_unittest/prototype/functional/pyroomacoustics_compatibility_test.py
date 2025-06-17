@@ -55,7 +55,7 @@ def _pra_ray_tracing(
     )
     room.set_sound_speed(sound_speed)
     room.compute_rir()
-    hist_pra = np.array(room.rt_histograms, dtype=np.float32)[:, 0, 0]
+    hist_pra = np.array(room.rt_histograms, dtype=float32)[:, 0, 0]
 
     # PRA continues the simulation beyond time threshold, but torchaudio does not.
     num_bins = math.ceil(time_thres / hist_bin_size)
