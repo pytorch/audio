@@ -1,6 +1,23 @@
 ################################################################################
 # libtorchaudio
 ################################################################################
+
+if(USE_ROCM)
+  list (APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
+  FIND_PACKAGE(HIP REQUIRED)
+  MESSAGE(STATUS "hip found ${ROCM_FOUND}")
+
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/third_party/hipify_torch/cmake")
+  include(Hipify)
+
+  set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE})
+  set(CMAKE_CXX_LINKER ${HIP_HIPCC_EXECUTABLE})
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  list( APPEND CMAKE_INSTALL_RPATH "/opt/rocm/llvm/lib" )
+
+endif()
+
+
 set(
   sources
   lfilter.cpp
@@ -39,6 +56,23 @@ if(BUILD_RNNT)
       rnnt/gpu/compute.cu
       )
   endif()
+
+  if (USE_ROCM)
+    hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src/libtorchaudio/rnnt/gpu HIP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src/libtorchaudio/rnnt/hip)
+    if ( NOT HIP_ADD_LIBRARY_FOUND )
+      list(APPEND CMAKE_MODULE_PATH /opt/rocm/hip/cmake)
+      find_package(HIP REQUIRED)
+    endif()
+
+    list(
+      APPEND
+      sources 
+      rnnt/hip/compute_alphas.hip
+      rnnt/hip/compute_betas.hip
+      rnnt/hip/compute.hip
+      )
+  endif()
+
 endif()
 
 if(BUILD_RIR)
@@ -76,12 +110,29 @@ if(USE_CUDA)
     )
 endif()
 
-if(OpenMP_CXX_FOUND)
+if(USE_ROCM)
   list(
     APPEND
-    additional_libs
-    OpenMP::OpenMP_CXX
+    additional_libs 
+    hip::host
+    hip::device
     )
+  list(
+    APPEND
+    compile_definitions 
+    USE_ROCM
+  )
+endif()
+
+
+if(USE_CUDA)
+  if(OpenMP_CXX_FOUND)
+    list(
+      APPEND
+      additional_libs
+      OpenMP::OpenMP_CXX
+      )
+  endif()
 endif()
 
 #------------------------------------------------------------------------------#
