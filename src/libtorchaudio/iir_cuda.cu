@@ -1,3 +1,5 @@
+#include <type_traits>
+#include <string>
 #include <c10/cuda/CUDAException.h>
 #include <c10/cuda/CUDAGuard.h>
 #include <torch/torch.h>
