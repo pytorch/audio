@@ -29,6 +29,8 @@ jobs:
                 # Mark Build Directory Safe
                 git config --global --add safe.directory /__w/audio/audio
 
+                chmod 777 -R /tmp && chmod o+t -R /tmp
+
                 # Set up Environment Variables
                 export PYTHON_VERSION="${{ matrix.python_version }}"
                 export CUDA_TESTS_ONLY="0"
