@@ -56,7 +56,7 @@ class Functional(TestBaseMixin):
             octwidth=octwidth,
             norm=norm,
             base_c=True,
-            dtype=float,
+            dtype=np.float32,
         )
 
         self.assertEqual(torchaudio_fbank, librosa_fbank.T)
