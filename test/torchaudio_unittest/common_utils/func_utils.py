@@ -5,8 +5,6 @@ import torch
 
 def torch_script(obj):
     """TorchScript the given function or Module"""
-    if hasattr(obj, '__wrapped__'):
-        obj = obj.__wrapped__
     buffer = io.BytesIO()
     torch.jit.save(torch.jit.script(obj), buffer)
     buffer.seek(0)

@@ -10,6 +10,7 @@ from torch.nn.modules.lazy import LazyModuleMixin
 from torch.nn.parameter import UninitializedParameter
 
 from torchaudio import functional as F
+from torchaudio.functional.functional import rnnt_loss
 from torchaudio.functional.functional import (
     _apply_sinc_resample_kernel,
     _check_convolve_mode,
@@ -1846,7 +1847,7 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(
+        return rnnt_loss(
             logits,
             targets,
             logit_lengths,
