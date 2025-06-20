@@ -68,7 +68,6 @@ from .functional import (
 )
 
 rnnt_loss = dropping_support(_rnnt_loss)
-
 __all__ = [
     "amplitude_to_DB",
     "compute_deltas",
