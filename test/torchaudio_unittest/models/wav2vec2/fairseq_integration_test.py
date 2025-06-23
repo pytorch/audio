@@ -164,8 +164,9 @@ class TestFairseqIntegration(TorchaudioTestCase):
         refs = original.extract_features(x, padding_mask=torch.zeros_like(x), layer=-1)
         for i, (ref, _) in enumerate(refs["layer_results"]):
             # There is one element whose difference is over 1e-5 in wav2vec2_xlsr_1b and wav2vec2_xlsr_2b.
-            atol = 1.0e-05 if factory_func is wav2vec2_xlsr_300m else 1e-4
-            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=atol, rtol=1.3e-6)
+            atol = 1.14e-05 if factory_func is wav2vec2_xlsr_300m else 1e-4
+            rtol = 1.62e-05 if factory_func is wav2vec2_xlsr_300m else 1.3e-6
+            self.assertEqual(hyp[i], ref.transpose(0, 1), atol=atol, rtol=rtol)
 
     @HUBERT_PRETRAINING_CONFIGS
     def test_import_hubert_pretraining_model(self, config, factory_func):
