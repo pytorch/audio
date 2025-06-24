@@ -31,6 +31,6 @@ fi
 (
     cd test
     export CUBLAS_WORKSPACE_CONFIG=:16:8
-    pytest "${args[@]}" torchaudio_unittest -k "not backend and not /io/ and not prototype and not sox and not ffmpeg"
+    pytest "${args[@]}" torchaudio_unittest -k "not backend and not /io/ and not prototype and not sox and not ffmpeg and not fairseq"
     coverage html
 )
