@@ -31,6 +31,5 @@ fi
 (
     cd test
     export CUBLAS_WORKSPACE_CONFIG=:16:8
-    pytest torchaudio_unittest -k "not backend and not /io/ and not prototype and not sox and not ffmpeg and not fairseq and not test_batch_InverseMelScale"
-    coverage html
+    pytest torchaudio_unittest -k "not backend and not /io/ and not prototype and not sox and not ffmpeg and not fairseq
 )
