@@ -104,7 +104,7 @@ fi
 git clone https://github.com/pytorch/fairseq
 cd fairseq
 grep -rl 'np.float' ./ | xargs sed -i 's/np.float/float/g'
-sed -i s/omegaconf<2.1/omegaconf/ setup.py
-sed -i s/hydra-core<1.1/hydra-core/ setup.py
+sed -i s/omegaconf\<2.1/omegaconf/ setup.py
+sed -i s/hydra-core\<1.1/hydra-core/ setup.py
 git checkout e47a4c8
 pip install .
