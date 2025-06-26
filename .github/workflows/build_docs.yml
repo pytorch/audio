@@ -31,7 +31,7 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
-      gpu-arch-version: "12.6"
+      gpu-arch-version: "12.6"  # See GPU_ARCH_ID below
       timeout: 120
       upload-artifact: docs
 
@@ -59,12 +59,16 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
-        conda install \
-          --yes \
-          --quiet \
-          -c "pytorch-${CHANNEL}" \
-          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
-          "${CUDATOOLKIT}"
+        # conda install \
+        #   --yes \
+        #   --quiet \
+        #   -c "pytorch-${CHANNEL}" \
+        #   -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
+        #   "${CUDATOOLKIT}"
+
+        GPU_ARCH_ID=cu126  # This is hard-coded and must be consistent with gpu-arch-version.
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${CHANNEL}/${GPU_ARCH_ID}"
+        pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
 
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
