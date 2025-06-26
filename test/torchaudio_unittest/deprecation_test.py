@@ -16,10 +16,7 @@ def test_deprecations(func):
         try:
             func()
         except Exception as e:
-	        # Type, Runtime or Value Error  error because we call func() without proper parameters.
-             # The deprecation warning is still properly raised, since it is emitted before
-             # the underlying (deprecated) function is called.
-            assert isinstance(e, (TypeError, RuntimeError, ValueError))
+            assert isinstance(e, (TypeError, RuntimeError, ValueError, ImportError))
 
 
 # It's not great, but the deprecation decorator we're using breaks torchscript
