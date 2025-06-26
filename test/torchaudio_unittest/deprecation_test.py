@@ -9,6 +9,7 @@ from torchaudio.sox_effects import apply_effects_tensor
 # corresponding APIs in the UNSUPPORTED register.
 from torchaudio.prototype import datasets, functional, models, pipelines, transforms
 
+
 @pytest.mark.parametrize("func", UNSUPPORTED)
 def test_deprecations(func):
     with pytest.warns(UserWarning, match="deprecated"):
@@ -21,6 +22,10 @@ def test_deprecations(func):
             assert isinstance(e, (TypeError, RuntimeError, ValueError))
 
 
+# It's not great, but the deprecation decorator we're using breaks torchscript
+# This test just illustrates this behavior. Ideally, we wouldn't break
+# torchscript users. But oh well, torchscript is supposed to have been
+# deprecated for years.
 @pytest.mark.parametrize("scripted", (True, False))
 def test_torchscript_fails(scripted):
     f = apply_effects_tensor
@@ -29,3 +34,4 @@ def test_torchscript_fails(scripted):
         f = torch.jit.script(f)
     _, out_sample_rate = f(torch.rand(2, 1000), sample_rate=16_000, effects=[["rate", "8000"]])
     assert out_sample_rate == 8000
+
