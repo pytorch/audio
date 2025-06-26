@@ -16,7 +16,7 @@ jobs:
         # TODO all from 3.9 to 3.13
         python_version: ["3.11"]
       fail-fast: false
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@release/2.8
     permissions:
       id-token: write
       contents: read
