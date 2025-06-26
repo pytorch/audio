@@ -92,11 +92,10 @@ if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
     # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
     NUMBA_DEV_CHANNEL="-c numba/label/dev"
 fi
-# Note: installing librosa via pip fail because it will try to compile numba.
 (
     set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} sox libvorbis librosa parameterized 'requests>=2.20' 'ffmpeg>=6,<7'
-    pip install kaldi-io SoundFile coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} sox libvorbis parameterized 'requests>=2.20' 'ffmpeg>=6,<7'
+    pip install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 
     # TODO: might be better to fix the single call to `pip install` above
     pip install "pillow<10.0" "scipy<1.10" "numpy<2.0"
