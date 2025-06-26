@@ -2,7 +2,12 @@
 
 #ifdef USE_CUDA
 #include <cuda_runtime.h>
+typedef cudaStream_t gpuStream_t;
 #endif // USE_CUDA
+#ifdef USE_ROCM
+#include <hip/hip_runtime.h>
+typedef hipStream_t gpuStream_t;
+#endif // USE_ROCM
 
 #include <libtorchaudio/rnnt/types.h>
 #include <ostream>
@@ -13,9 +18,9 @@ namespace rnnt {
 struct Options {
   // the device to compute transducer loss.
   device_t device_;
-#ifdef USE_CUDA
+#if defined(USE_CUDA) || defined(USE_ROCM)
   // the stream to launch kernels in when using GPU.
-  cudaStream_t stream_;
+  gpuStream_t stream_;
 #endif
   // The maximum number of threads that can be used.
   int numThreads_;
