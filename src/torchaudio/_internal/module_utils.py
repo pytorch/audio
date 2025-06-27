@@ -61,6 +61,16 @@ def requires_module(*modules: str):
 
 UNSUPPORTED = []
 
+def wrap_deprecated(func, name, direction: str, version: Optional[str] = None, remove: bool = False):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        message = f"{name} has been deprecated. {direction}"
+        if remove:
+            message += f' It will be removed from {"a future" if version is None else "the " + str(version)} release. '
+        warnings.warn(message, stacklevel=2)
+        return func(*args, **kwargs)
+    return wrapped
+
 def deprecated(direction: str, version: Optional[str] = None, remove: bool = False):
     """Decorator to add deprecation message
 
@@ -71,13 +81,7 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
     """
 
     def decorator(func):
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            message = f"{func.__module__}.{func.__name__} has been deprecated. {direction}"
-            if remove:
-                message += f' It will be removed from {"future" if version is None else version} release. '
-            warnings.warn(message, stacklevel=2)
-            return func(*args, **kwargs)
+        wrapped = wrap_deprecated(func, f"{func.__module__}.{func.__name__}", direction, version=version, remove=remove)
 
         message = "This function has been deprecated. "
         if remove:
@@ -96,9 +100,24 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
 
     return decorator
 
-dropping_support = deprecated(
-    "As TorchAudio is no longer being actively developed, this function can no longer be supported."
-    "See https://github.com/pytorch/audio/issues/3902 for more details.", version="2.9", remove=True)
+DEPRECATION_MSG = (
+    "As TorchAudio is no longer being actively developed, this functionality can no longer be supported. "
+    "See https://github.com/pytorch/audio/issues/3902 for more details.")
+
+dropping_support = deprecated(DEPRECATION_MSG, version="2.9", remove=True)
+
+def dropping_class_support(c):
+    c.__init__ = wrap_deprecated(c.__init__, f"{c.__module__}.{c.__name__}", DEPRECATION_MSG, version="2.9", remove=True)
+    c.__doc__ = f"""DEPRECATED: {c.__doc__}
+
+.. warning::
+
+    This class has been deprecated. It will be removed from the 2.9 release.
+    {DEPRECATION_MSG}
+    """
+
+    UNSUPPORTED.append(c)
+    return c
 
 def fail_with_message(message):
     """Generate decorator to give users message about missing TorchAudio extension."""
