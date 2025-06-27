@@ -437,7 +437,6 @@ _format_video_args = _format_doc(
 InputStreamTypes = TypeVar("InputStream", bound=SourceStream)
 OutputStreamTypes = TypeVar("OutputStream", bound=OutputStream)
 
-
 class StreamingMediaDecoder:
     """Fetch and decode audio/video streams chunk by chunk.
 
