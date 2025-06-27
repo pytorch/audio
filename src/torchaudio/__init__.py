@@ -4,16 +4,21 @@ from torchaudio._internal.module_utils import dropping_support
 from . import _extension  # noqa  # usort: skip
 from ._backend import (  # noqa  # usort: skip
     AudioMetaData,
-    get_audio_backend,
-    info,
-    list_audio_backends,
+    get_audio_backend as _get_audio_backend,
+    info as _info,
+    list_audio_backends as _list_audio_backends,
     load as _load,
     save as _save,
-    set_audio_backend,
+    set_audio_backend as _set_audio_backend,
 )
 
+AudioMetaData.__init__ = dropping_support(AudioMetaData.__init__)
+get_audio_backend = dropping_support(_get_audio_backend)
+info = dropping_support(_info)
+list_audio_backends = dropping_support(_list_audio_backends)
 load = dropping_support(_load)
 save = dropping_support(_save)
+set_audio_backend = dropping_support(_set_audio_backend)
 
 from . import (  # noqa: F401
     compliance,
