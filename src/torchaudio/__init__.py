@@ -1,4 +1,4 @@
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_io_support
 
 # Initialize extension and backend first
 from . import _extension  # noqa  # usort: skip
@@ -12,8 +12,8 @@ from ._backend import (  # noqa  # usort: skip
     set_audio_backend,
 )
 
-load = dropping_support(_load)
-save = dropping_support(_save)
+load = dropping_io_support(_load)
+save = dropping_io_support(_save)
 
 from . import (  # noqa: F401
     compliance,

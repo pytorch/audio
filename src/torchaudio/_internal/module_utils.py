@@ -100,6 +100,10 @@ dropping_support = deprecated(
     "As TorchAudio is no longer being actively developed, this function can no longer be supported."
     "See https://github.com/pytorch/audio/issues/3902 for more details.", version="2.9", remove=True)
 
+dropping_io_support = deprecated(
+    "This functionality has been superseded by `AudioDecoder` from the TorchCodec library."
+    "See https://github.com/pytorch/audio/issues/3902 for more details.", version="2.9", remove=True)
+
 def fail_with_message(message):
     """Generate decorator to give users message about missing TorchAudio extension."""
 
