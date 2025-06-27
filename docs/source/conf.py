@@ -49,7 +49,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinxcontrib.katex",
+    # "sphinxcontrib.katex",
     "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
     "nbsphinx",
