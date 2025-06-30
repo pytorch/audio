@@ -91,7 +91,7 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Build documentation"
-        # export BUILD_GALLERY=true  # TODO put this back?
+        export BUILD_GALLERY=true
         (cd docs && make html)
 
         echo "::endgroup::"
