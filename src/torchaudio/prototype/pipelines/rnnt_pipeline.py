@@ -2,6 +2,8 @@ from functools import partial
 
 from torchaudio.models import emformer_rnnt_base
 from torchaudio.pipelines import RNNTBundle
+from torchaudio._internal.module_utils import dropping_const_support
+
 
 
 EMFORMER_RNNT_BASE_MUSTC = RNNTBundle(
@@ -29,6 +31,7 @@ with ``num_symbols=501``.
 
 Please refer to :py:class:`torchaudio.pipelines.RNNTBundle` for usage instructions.
 """
+dropping_const_support(EMFORMER_RNNT_BASE_MUSTC)
 
 
 EMFORMER_RNNT_BASE_TEDLIUM3 = RNNTBundle(
