@@ -4,6 +4,7 @@ import torch
 from torchaudio.models import Wav2Vec2Model
 from torchaudio.models.emformer import Emformer
 from torchaudio.models.rnnt import _TimeReduction
+from torchaudio._internal.module_utils import dropping_support
 
 
 
@@ -218,6 +219,7 @@ def _get_emformer_encoder(
     return EmformerEncoder(emformer, output_linear, layer_norm)
 
 
+@dropping_support
 def emformer_hubert_model(
     extractor_input_dim: int,
     extractor_output_dim: int,
@@ -293,6 +295,7 @@ def emformer_hubert_model(
     return Wav2Vec2Model(feature_extractor, emformer, aux)
 
 
+@dropping_support
 def emformer_hubert_base(
     extractor_input_dim: int = 80,
     extractor_output_dim: int = 128,

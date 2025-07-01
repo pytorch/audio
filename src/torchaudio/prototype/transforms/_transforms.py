@@ -3,7 +3,7 @@ from typing import Callable, Optional
 import torch
 from torchaudio.prototype.functional import barkscale_fbanks, chroma_filterbank
 from torchaudio.transforms import Spectrogram
-from torchaudio._internal.module_utils import dropping_class_support
+from torchaudio._internal.module_utils import dropping_support, dropping_class_support
 
 @dropping_class_support
 class BarkScale(torch.nn.Module):
@@ -71,6 +71,7 @@ class BarkScale(torch.nn.Module):
         bark_specgram = torch.matmul(specgram.transpose(-1, -2), self.fb).transpose(-1, -2)
 
         return bark_specgram
+
 
 @dropping_class_support
 class InverseBarkScale(torch.nn.Module):
@@ -188,6 +189,7 @@ class InverseBarkScale(torch.nn.Module):
         specgram = specgram.view(shape[:-2] + (freq, time))
         return specgram
 
+
 @dropping_class_support
 class BarkSpectrogram(torch.nn.Module):
     r"""Create BarkSpectrogram for a raw audio signal.
@@ -238,7 +240,6 @@ class BarkSpectrogram(torch.nn.Module):
     """
     __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_barks", "f_min"]
 
-    @dropping_support
     def __init__(
         self,
         sample_rate: int = 16000,
@@ -330,7 +331,6 @@ class ChromaScale(torch.nn.Module):
         generate the filter bank.
     """
 
-    @dropping_support
     def __init__(
         self,
         sample_rate: int,
@@ -402,7 +402,6 @@ class ChromaSpectrogram(torch.nn.Module):
         >>> chromagram = transform(waveform)  # (channel, n_chroma, time)
     """
 
-    @dropping_support
     def __init__(
         self,
         sample_rate: int,

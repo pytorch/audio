@@ -28,7 +28,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Conv1d, ConvTranspose1d
+from torchaudio._internal.module_utils import dropping_class_support, dropping_support
 
+
+@dropping_class_support
 class HiFiGANVocoder(torch.nn.Module):
     """Generator part of *HiFi GAN* :cite:`NEURIPS2020_c5d73680`.
     Source: https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75
@@ -245,6 +248,7 @@ def get_padding(kernel_size, dilation=1):
     return int((kernel_size * dilation - dilation) / 2)
 
 
+@dropping_support
 def hifigan_vocoder(
     in_channels: int,
     upsample_rates: Tuple[int, ...],
@@ -281,6 +285,7 @@ def hifigan_vocoder(
     )
 
 
+@dropping_support
 def hifigan_vocoder_v1() -> HiFiGANVocoder:
     r"""Builds HiFiGAN Vocoder with V1 architecture :cite:`NEURIPS2020_c5d73680`.
 
@@ -299,6 +304,7 @@ def hifigan_vocoder_v1() -> HiFiGANVocoder:
     )
 
 
+@dropping_support
 def hifigan_vocoder_v2() -> HiFiGANVocoder:
     r"""Builds HiFiGAN Vocoder with V2 architecture :cite:`NEURIPS2020_c5d73680`.
 
@@ -317,6 +323,7 @@ def hifigan_vocoder_v2() -> HiFiGANVocoder:
     )
 
 
+@dropping_support
 def hifigan_vocoder_v3() -> HiFiGANVocoder:
     r"""Builds HiFiGAN Vocoder with V3 architecture :cite:`NEURIPS2020_c5d73680`.
 

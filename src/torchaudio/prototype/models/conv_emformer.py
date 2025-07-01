@@ -3,6 +3,8 @@ from typing import List, Optional, Tuple
 
 import torch
 from torchaudio.models.emformer import _EmformerAttention, _EmformerImpl, _get_weight_init_gains
+from torchaudio._internal.module_utils import dropping_class_support, dropping_support
+
 
 
 def _get_activation_module(activation: str) -> torch.nn.Module:
@@ -441,6 +443,7 @@ class _ConvEmformerLayer(torch.nn.Module):
         return output_utterance, output_right_context, output_state, next_m
 
 
+@dropping_class_support
 class ConvEmformer(_EmformerImpl):
     r"""Implements the convolution-augmented streaming transformer architecture introduced in
     *Streaming Transformer Transducer based Speech Recognition Using Non-Causal Convolution*
@@ -476,6 +479,7 @@ class ConvEmformer(_EmformerImpl):
         >>> output, lengths, states = conv_emformer.infer(input, lengths, None)
     """
 
+    @dropping_support
     def __init__(
         self,
         input_dim: int,

@@ -124,7 +124,6 @@ def dropping_class_support(c, msg=DEPRECATION_MSG):
     return c
 
 def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
-    c.__forward__ = wrap_deprecated(c.__init__, name or f"{c.__module__}.{c.__name__}", msg, version="2.9", remove=True)
     c.__doc__ = f"""DEPRECATED: {c.__doc__}
 
 .. warning::
