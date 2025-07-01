@@ -218,7 +218,7 @@ class VGGish(torch.nn.Module):
 
         return self.embedding_network(x)
 
-
+@dropping_class_support
 class VGGishInputProcessor:
     """Converts raw waveforms to batches of examples to use as inputs to VGGish."""
 

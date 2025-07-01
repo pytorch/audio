@@ -124,7 +124,7 @@ def dropping_class_support(c, msg=DEPRECATION_MSG):
     return c
 
 def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
-    c.__doc__ = f"""DEPRECATED: {c.__doc__}
+    c.__doc__ = f"""[DEPRECATED] {c.__doc__}
 
 .. warning::
 
