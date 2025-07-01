@@ -5,8 +5,6 @@ import torch
 from torchaudio.models import Conformer, RNNT
 from torchaudio.models.rnnt import _Joiner, _Predictor, _TimeReduction, _Transcriber
 
-from torchaudio._internal.module_utils import dropping_support
-
 
 TrieNode = Tuple[Dict[int, "TrieNode"], int, Optional[Tuple[int, int]]]
 
@@ -474,7 +472,6 @@ class RNNTBiasing(RNNT):
         return output, source_lengths, jointer_activation
 
 
-@dropping_support
 def conformer_rnnt_model(
     *,
     input_dim: int,
@@ -547,7 +544,6 @@ def conformer_rnnt_model(
     return RNNT(encoder, predictor, joiner)
 
 
-@dropping_support
 def conformer_rnnt_base() -> RNNT:
     r"""Builds basic version of Conformer RNN-T model.
 
@@ -576,7 +572,6 @@ def conformer_rnnt_base() -> RNNT:
     )
 
 
-@dropping_support
 def conformer_rnnt_biasing(
     *,
     input_dim: int,
@@ -682,7 +677,6 @@ def conformer_rnnt_biasing(
     )
 
 
-@dropping_support
 def conformer_rnnt_biasing_base(charlist=None, biasing=True) -> RNNT:
     r"""Builds basic version of Conformer RNN-T model with TCPGen.
 

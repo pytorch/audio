@@ -3,8 +3,6 @@ from typing import List, Optional, Tuple
 
 import torch
 from torchaudio.models.emformer import _EmformerAttention, _EmformerImpl, _get_weight_init_gains
-from torchaudio._internal.module_utils import dropping_support
-
 
 
 def _get_activation_module(activation: str) -> torch.nn.Module:
@@ -478,7 +476,6 @@ class ConvEmformer(_EmformerImpl):
         >>> output, lengths, states = conv_emformer.infer(input, lengths, None)
     """
 
-    @dropping_support
     def __init__(
         self,
         input_dim: int,

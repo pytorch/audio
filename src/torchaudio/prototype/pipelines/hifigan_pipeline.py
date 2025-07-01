@@ -9,8 +9,6 @@ from torchaudio._internal import load_state_dict_from_url
 from torchaudio.prototype.models.hifi_gan import hifigan_vocoder, HiFiGANVocoder
 from torchaudio.transforms import MelSpectrogram
 
-from torchaudio._internal.module_utils import dropping_support
-
 
 @dataclass
 class HiFiGANVocoderBundle:
@@ -84,7 +82,6 @@ class HiFiGANVocoderBundle:
         state_dict = load_state_dict_from_url(url, **dl_kwargs)
         return state_dict
 
-    @dropping_support
     def get_vocoder(self, *, dl_kwargs=None) -> HiFiGANVocoder:
         """Construct the HiFiGAN Generator model, which can be used a vocoder, and load the pretrained weight.
 
@@ -102,7 +99,6 @@ class HiFiGANVocoderBundle:
         model.eval()
         return model
 
-    @dropping_support
     def get_mel_transform(self) -> Module:
         """Construct an object which transforms waveforms into mel spectrograms."""
         return _HiFiGANMelSpectrogram(
