@@ -4,6 +4,10 @@ CTC forced alignment API tutorial
 
 **Author**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__, `Moto Hira <moto@meta.com>`__
 
+.. warning::
+    As TorchAudio is no longer being actively developed, this functionality will no longer be supported.
+    See https://github.com/pytorch/audio/issues/3902 for more details.
+
 The forced alignment is a process to align transcript with speech.
 This tutorial shows how to align transcripts to speech using
 :py:func:`torchaudio.functional.forced_align` which was developed along the work of
