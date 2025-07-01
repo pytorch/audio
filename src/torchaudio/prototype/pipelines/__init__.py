@@ -6,7 +6,7 @@ from .rnnt_pipeline import (
 )
 from torchaudio._internal.module_utils import dropping_const_support
 
-EMFORMER_RNNT_BASE_MUSTC = _EMFORMER_RNNT_BASE_MUSTC
+EMFORMER_RNNT_BASE_MUSTC = dropping_const_support(_EMFORMER_RNNT_BASE_MUSTC)
 EMFORMER_RNNT_BASE_TEDLIUM3 = dropping_const_support(_EMFORMER_RNNT_BASE_TEDLIUM3)
 HIFIGAN_VOCODER_V3_LJSPEECH = dropping_const_support(_HIFIGAN_VOCODER_V3_LJSPEECH)
 
