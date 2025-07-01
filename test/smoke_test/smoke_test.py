@@ -5,7 +5,6 @@ import logging
 
 
 def base_smoke_test():
-    import torchaudio  # noqa: F401
     import torchaudio.compliance.kaldi  # noqa: F401
     import torchaudio.datasets  # noqa: F401
     import torchaudio.functional  # noqa: F401
