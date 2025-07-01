@@ -131,9 +131,8 @@ def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
     This object has been deprecated. It will be removed from the 2.9 release.
     {msg}
     """
-
-    UNSUPPORTED.append(c)
     return c
+
 dropping_class_io_support = partial(dropping_class_support, msg=IO_DEPRECATION_MSG)
 
 dropping_io_support = deprecated(IO_DEPRECATION_MSG, version="2.9", remove=True)
