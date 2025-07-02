@@ -4,6 +4,10 @@ AudioEffector Usages
 
 **Author**: `Moto Hira <moto@meta.com>`__
 
+.. warning::
+    As TorchAudio is no longer being actively developed, this functionality will no longer be supported.
+    See https://github.com/pytorch/audio/issues/3902 for more details.
+
 This tutorial shows how to use :py:class:`torchaudio.io.AudioEffector` to
 apply various effects and codecs to waveform tensor.
 

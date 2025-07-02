@@ -9,9 +9,10 @@ from torchaudio._internal import load_state_dict_from_url
 from torchaudio.prototype.models.hifi_gan import hifigan_vocoder, HiFiGANVocoder
 from torchaudio.transforms import MelSpectrogram
 
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_support, dropping_class_support
 
 
+@dropping_class_support
 @dataclass
 class HiFiGANVocoderBundle:
     """Data class that bundles associated information to use pretrained

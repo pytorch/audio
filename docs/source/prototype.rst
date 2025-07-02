@@ -1,6 +1,10 @@
 torchaudio.prototype
 ====================
 
+.. warning::
+    As TorchAudio is no longer being actively developed, this functionality will no longer be supported.
+    See https://github.com/pytorch/audio/issues/3902 for more details.
+
 ``torchaudio.prototype`` provides prototype features;
 they are at an early stage for feedback and testing.
 Their interfaces might be changed without prior notice.
