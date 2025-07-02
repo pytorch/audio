@@ -87,13 +87,15 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
         if remove:
             message += f'It will be removed from {"future" if version is None else version} release. '
 
-        wrapped.__doc__ = f"""DEPRECATED: {func.__doc__}
+        wrapped.__doc__ = f"""DEPRECATED
 
     .. warning::
 
        {message}
        {direction}
-        """
+
+    {func.__doc__}
+    """
 
         UNSUPPORTED.append(wrapped)
         return wrapped
@@ -115,24 +117,26 @@ dropping_support = deprecated(DEPRECATION_MSG, version="2.9", remove=True)
 
 def dropping_class_support(c, msg=DEPRECATION_MSG):
     c.__init__ = wrap_deprecated(c.__init__, f"{c.__module__}.{c.__name__}", msg, version="2.9", remove=True)
-    c.__doc__ = f"""DEPRECATED: {c.__doc__}
+    c.__doc__ = f"""DEPRECATED
 
 .. warning::
 
     This class is deprecated from version 2.8. It will be removed in the 2.9 release.
     {msg}
-    """
+{c.__doc__}
+"""
 
     UNSUPPORTED.append(c)
     return c
 
 def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
-    c.__doc__ = f"""[DEPRECATED] {c.__doc__}
+    c.__doc__ = f"""[DEPRECATED]
 
 .. warning::
 
     This object is deprecated deprecated from version 2.8. It will be removed in the 2.9 release.
     {msg}
+{c.__doc__}
     """
     return c
 
