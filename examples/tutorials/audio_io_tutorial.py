@@ -9,10 +9,8 @@ This tutorial shows how to use TorchAudio's basic I/O API to inspect audio data,
 load them into PyTorch Tensors and save PyTorch Tensors.
 
 .. warning::
-
-   There are multiple changes planned/made to audio I/O in recent releases.
-   For the detail of these changes please refer to
-   :ref:`Introduction of Dispatcher <dispatcher_migration>`.
+    IO functionality within TorchAudio has been superseded by `AudioDecoder` from the TorchCodec library.
+    See https://github.com/pytorch/audio/issues/3902 for more details.`.
 
 """
 
