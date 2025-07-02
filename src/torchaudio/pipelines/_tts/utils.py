@@ -161,6 +161,7 @@ def _load_phonemizer(file, dl_kwargs):
         raise RuntimeError("DeepPhonemizer is not installed. Please install it.")
 
     from dp.phonemizer import Phonemizer
+    from dp.preprocessing.text import Preprocessor, LanguageTokenizer, SequenceTokenizer
 
     # By default, dp issues DEBUG level log.
     logger = logging.getLogger("dp")
@@ -174,7 +175,8 @@ def _load_phonemizer(file, dl_kwargs):
         if not os.path.exists(path):
             dl_kwargs = {} if dl_kwargs is None else dl_kwargs
             download_url_to_file(url, path, **dl_kwargs)
-        return Phonemizer.from_checkpoint(path)
+        with torch.serialization.safe_globals([Preprocessor, LanguageTokenizer, SequenceTokenizer]):
+            return Phonemizer.from_checkpoint(path)
     finally:
         logger.setLevel(orig_level)
 

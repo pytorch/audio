@@ -4,13 +4,13 @@ from typing import Tuple, Union
 import torch
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import _load_waveform
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_support, dropping_class_support
 
 
 _SUBSETS = ["music", "noise", "speech"]
 _SAMPLE_RATE = 16_000
 
-
+@dropping_class_support
 class Musan(Dataset):
     r"""*MUSAN* :cite:`musan2015` dataset.
 
@@ -19,7 +19,6 @@ class Musan(Dataset):
         subset (str): Subset of the dataset to use. Options: [``"music"``, ``"noise"``, ``"speech"``].
     """
 
-    @dropping_support
     def __init__(self, root: Union[str, Path], subset: str):
         if subset not in _SUBSETS:
             raise ValueError(f"Invalid subset '{subset}' given. Please provide one of {_SUBSETS}")

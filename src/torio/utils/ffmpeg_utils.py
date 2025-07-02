@@ -1,6 +1,16 @@
 """Module to change the configuration of FFmpeg libraries (such as libavformat).
 
 It affects functionalities in :py:mod:`torio.io`.
+
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - Some APIs are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
 """
 from typing import Dict, List, Tuple
 
@@ -9,6 +19,10 @@ import torio
 ffmpeg_ext = torio._extension.lazy_import_ffmpeg_ext()
 
 
+from torchaudio._internal.module_utils import dropping_support
+
+
+@dropping_support
 def get_versions() -> Dict[str, Tuple[int]]:
     """Get the versions of FFmpeg libraries
 
@@ -19,6 +33,7 @@ def get_versions() -> Dict[str, Tuple[int]]:
     return ffmpeg_ext.get_versions()
 
 
+@dropping_support
 def get_log_level() -> int:
     """Get the log level of FFmpeg.
 
@@ -27,6 +42,7 @@ def get_log_level() -> int:
     return ffmpeg_ext.get_log_level()
 
 
+@dropping_support
 def set_log_level(level: int):
     """Set the log level of FFmpeg (libavformat etc)
 
@@ -63,6 +79,7 @@ def set_log_level(level: int):
     ffmpeg_ext.set_log_level(level)
 
 
+@dropping_support
 def get_demuxers() -> Dict[str, str]:
     """Get the available demuxers.
 
@@ -80,6 +97,7 @@ def get_demuxers() -> Dict[str, str]:
     return ffmpeg_ext.get_demuxers()
 
 
+@dropping_support
 def get_muxers() -> Dict[str, str]:
     """Get the available muxers.
 
@@ -98,6 +116,7 @@ def get_muxers() -> Dict[str, str]:
     return ffmpeg_ext.get_muxers()
 
 
+@dropping_support
 def get_audio_decoders() -> Dict[str, str]:
     """Get the available audio decoders.
 
@@ -116,6 +135,7 @@ def get_audio_decoders() -> Dict[str, str]:
     return ffmpeg_ext.get_audio_decoders()
 
 
+@dropping_support
 def get_audio_encoders() -> Dict[str, str]:
     """Get the available audio encoders.
 
@@ -135,6 +155,7 @@ def get_audio_encoders() -> Dict[str, str]:
     return ffmpeg_ext.get_audio_encoders()
 
 
+@dropping_support
 def get_video_decoders() -> Dict[str, str]:
     """Get the available video decoders.
 
@@ -154,6 +175,7 @@ def get_video_decoders() -> Dict[str, str]:
     return ffmpeg_ext.get_video_decoders()
 
 
+@dropping_support
 def get_video_encoders() -> Dict[str, str]:
     """Get the available video encoders.
 
@@ -174,6 +196,7 @@ def get_video_encoders() -> Dict[str, str]:
     return ffmpeg_ext.get_video_encoders()
 
 
+@dropping_support
 def get_input_devices() -> Dict[str, str]:
     """Get the available input devices.
 
@@ -189,6 +212,7 @@ def get_input_devices() -> Dict[str, str]:
     return ffmpeg_ext.get_input_devices()
 
 
+@dropping_support
 def get_output_devices() -> Dict[str, str]:
     """Get the available output devices.
 
@@ -203,6 +227,7 @@ def get_output_devices() -> Dict[str, str]:
     return ffmpeg_ext.get_output_devices()
 
 
+@dropping_support
 def get_input_protocols() -> List[str]:
     """Get the supported input protocols.
 
@@ -216,6 +241,7 @@ def get_input_protocols() -> List[str]:
     return ffmpeg_ext.get_input_protocols()
 
 
+@dropping_support
 def get_output_protocols() -> List[str]:
     """Get the supported output protocols.
 
@@ -229,6 +255,7 @@ def get_output_protocols() -> List[str]:
     return ffmpeg_ext.get_output_protocols()
 
 
+@dropping_support
 def get_build_config() -> str:
     """Get the FFmpeg build configuration
 
@@ -242,6 +269,7 @@ def get_build_config() -> str:
     return ffmpeg_ext.get_build_config()
 
 
+@dropping_support
 def clear_cuda_context_cache():
     """Clear the CUDA context used by CUDA Hardware accelerated video decoding"""
     ffmpeg_ext.clear_cuda_context_cache()

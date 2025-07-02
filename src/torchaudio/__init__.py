@@ -1,19 +1,24 @@
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_io_support, dropping_class_io_support
 
 # Initialize extension and backend first
 from . import _extension  # noqa  # usort: skip
 from ._backend import (  # noqa  # usort: skip
-    AudioMetaData,
-    get_audio_backend,
-    info,
-    list_audio_backends,
+    AudioMetaData as _AudioMetaData,
+    get_audio_backend as _get_audio_backend,
+    info as _info,
+    list_audio_backends as _list_audio_backends,
     load as _load,
     save as _save,
-    set_audio_backend,
+    set_audio_backend as _set_audio_backend,
 )
 
-load = dropping_support(_load)
-save = dropping_support(_save)
+AudioMetaData = dropping_class_io_support(_AudioMetaData)
+get_audio_backend = dropping_io_support(_get_audio_backend)
+info = dropping_io_support(_info)
+list_audio_backends = dropping_io_support(_list_audio_backends)
+load = dropping_io_support(_load)
+save = dropping_io_support(_save)
+set_audio_backend = dropping_io_support(_set_audio_backend)
 
 from . import (  # noqa: F401
     compliance,

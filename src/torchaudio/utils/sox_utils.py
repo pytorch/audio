@@ -1,5 +1,15 @@
 """Module to change the configuration of libsox, which is used by I/O functions like
 :py:mod:`~torchaudio.backend.sox_io_backend` and :py:mod:`~torchaudio.sox_effects`.
+
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - Some APIs are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
 """
 
 from typing import Dict, List
@@ -8,7 +18,9 @@ import torchaudio
 
 sox_ext = torchaudio._extension.lazy_import_sox_ext()
 
+from torchaudio._internal.module_utils import dropping_support
 
+@dropping_support
 def set_seed(seed: int):
     """Set libsox's PRNG
 
@@ -21,6 +33,7 @@ def set_seed(seed: int):
     sox_ext.set_seed(seed)
 
 
+@dropping_support
 def set_verbosity(verbosity: int):
     """Set libsox's verbosity
 
@@ -38,6 +51,7 @@ def set_verbosity(verbosity: int):
     sox_ext.set_verbosity(verbosity)
 
 
+@dropping_support
 def set_buffer_size(buffer_size: int):
     """Set buffer size for sox effect chain
 
@@ -50,6 +64,7 @@ def set_buffer_size(buffer_size: int):
     sox_ext.set_buffer_size(buffer_size)
 
 
+@dropping_support
 def set_use_threads(use_threads: bool):
     """Set multithread option for sox effect chain
 
@@ -63,6 +78,7 @@ def set_use_threads(use_threads: bool):
     sox_ext.set_use_threads(use_threads)
 
 
+@dropping_support
 def list_effects() -> Dict[str, str]:
     """List the available sox effect names
 
@@ -72,6 +88,7 @@ def list_effects() -> Dict[str, str]:
     return dict(sox_ext.list_effects())
 
 
+@dropping_support
 def list_read_formats() -> List[str]:
     """List the supported audio formats for read
 
@@ -81,6 +98,7 @@ def list_read_formats() -> List[str]:
     return sox_ext.list_read_formats()
 
 
+@dropping_support
 def list_write_formats() -> List[str]:
     """List the supported audio formats for write
 
@@ -90,6 +108,7 @@ def list_write_formats() -> List[str]:
     return sox_ext.list_write_formats()
 
 
+@dropping_support
 def get_buffer_size() -> int:
     """Get buffer size for sox effect chain
 

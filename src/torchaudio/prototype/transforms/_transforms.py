@@ -3,9 +3,9 @@ from typing import Callable, Optional
 import torch
 from torchaudio.prototype.functional import barkscale_fbanks, chroma_filterbank
 from torchaudio.transforms import Spectrogram
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_support, dropping_class_support
 
-
+@dropping_class_support
 class BarkScale(torch.nn.Module):
     r"""Turn a normal STFT into a bark frequency STFT with triangular filter banks.
 
@@ -36,7 +36,6 @@ class BarkScale(torch.nn.Module):
     """
     __constants__ = ["n_barks", "sample_rate", "f_min", "f_max"]
 
-    @dropping_support
     def __init__(
         self,
         n_barks: int = 128,
@@ -74,6 +73,7 @@ class BarkScale(torch.nn.Module):
         return bark_specgram
 
 
+@dropping_class_support
 class InverseBarkScale(torch.nn.Module):
     r"""Estimate a STFT in normal frequency domain from bark frequency domain.
 
@@ -113,7 +113,6 @@ class InverseBarkScale(torch.nn.Module):
         "sgdargs",
     ]
 
-    @dropping_support
     def __init__(
         self,
         n_stft: int,
@@ -191,6 +190,7 @@ class InverseBarkScale(torch.nn.Module):
         return specgram
 
 
+@dropping_class_support
 class BarkSpectrogram(torch.nn.Module):
     r"""Create BarkSpectrogram for a raw audio signal.
 
@@ -240,7 +240,6 @@ class BarkSpectrogram(torch.nn.Module):
     """
     __constants__ = ["sample_rate", "n_fft", "win_length", "hop_length", "pad", "n_barks", "f_min"]
 
-    @dropping_support
     def __init__(
         self,
         sample_rate: int = 16000,
@@ -301,6 +300,7 @@ class BarkSpectrogram(torch.nn.Module):
         return bark_specgram
 
 
+@dropping_class_support
 class ChromaScale(torch.nn.Module):
     r"""Converts spectrogram to chromagram.
 
@@ -331,7 +331,6 @@ class ChromaScale(torch.nn.Module):
         generate the filter bank.
     """
 
-    @dropping_support
     def __init__(
         self,
         sample_rate: int,
@@ -361,6 +360,7 @@ class ChromaScale(torch.nn.Module):
         return torch.matmul(x.transpose(-1, -2), self.fb).transpose(-1, -2)
 
 
+@dropping_class_support
 class ChromaSpectrogram(torch.nn.Module):
     r"""Generates chromagram for audio signal.
 
@@ -402,7 +402,6 @@ class ChromaSpectrogram(torch.nn.Module):
         >>> chromagram = transform(waveform)  # (channel, n_chroma, time)
     """
 
-    @dropping_support
     def __init__(
         self,
         sample_rate: int,

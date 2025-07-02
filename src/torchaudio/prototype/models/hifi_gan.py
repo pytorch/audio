@@ -28,9 +28,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Conv1d, ConvTranspose1d
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_class_support, dropping_support
 
 
+@dropping_class_support
 class HiFiGANVocoder(torch.nn.Module):
     """Generator part of *HiFi GAN* :cite:`NEURIPS2020_c5d73680`.
     Source: https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/models.py#L75

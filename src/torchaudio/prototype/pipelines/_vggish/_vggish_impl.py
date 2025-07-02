@@ -18,7 +18,7 @@ import math
 
 import torch
 
-from torchaudio._internal.module_utils import dropping_support
+from torchaudio._internal.module_utils import dropping_class_support
 
 
 _MEL_BREAK_FREQUENCY_HERTZ = 700.0
@@ -193,10 +193,10 @@ def _waveform_to_examples(data):
     return log_mel_examples.unsqueeze(1)
 
 
+@dropping_class_support
 class VGGish(torch.nn.Module):
     """Implementation of VGGish model :cite:`45611`."""
 
-    @dropping_support
     def __init__(self):
         super().__init__()
 
@@ -218,7 +218,7 @@ class VGGish(torch.nn.Module):
 
         return self.embedding_network(x)
 
-
+@dropping_class_support
 class VGGishInputProcessor:
     """Converts raw waveforms to batches of examples to use as inputs to VGGish."""
 

@@ -1,7 +1,13 @@
-.. warning::
-   TorchAudio's C++ API is prototype feature.
-   API/ABI backward compatibility is not guaranteed.
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - ``torio`` is deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
 .. note::
    The top-level namespace has been changed from ``torchaudio`` to ``torio``.

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, Dict
 
-import torch
-import torchaudio
+from torchaudio._internal.module_utils import dropping_class_support
 
 
 from ._vggish_impl import _SAMPLE_RATE, VGGish as _VGGish, VGGishInputProcessor as _VGGishInputProcessor
@@ -13,6 +12,7 @@ def _get_state_dict():
     return torch.load(path)
 
 
+@dropping_class_support
 @dataclass
 class VGGishBundle:
     """VGGish :cite:`45611` inference pipeline ported from
