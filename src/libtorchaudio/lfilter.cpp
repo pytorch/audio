@@ -100,10 +100,9 @@ void lfilter_core_generic_loop(
   }
 }
 
-class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
+class DifferentiableIIR{
  public:
   static torch::Tensor forward(
-      torch::autograd::AutogradContext* ctx,
       const torch::Tensor& waveform,
       const torch::Tensor& a_coeffs_normalized) {
     auto device = waveform.device();
@@ -139,14 +138,14 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
          torch::indexing::Slice(),
          torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-    ctx->save_for_backward({waveform, a_coeffs_normalized, output});
-    return output;
+    auto stuff_for_backward = {waveform, a_coeffs_normalized, output};
+    return output, stuff_for_backward;
   }
 
-  static torch::autograd::tensor_list backward(
-      torch::autograd::AutogradContext* ctx,
-      torch::autograd::tensor_list grad_outputs) {
-    auto saved = ctx->get_saved_variables();
+  static tuple backward(
+      auto stuff_for_iir_backward,  // technically this should be 3 parameters.
+      torch::Tensor grad_output) {
+    auto saved = stuff_for_iir_backward,
     auto x = saved[0];
     auto a_coeffs_normalized = saved[1];
     auto y = saved[2];
@@ -156,7 +155,7 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
     auto dx = torch::Tensor();
     auto da = torch::Tensor();
-    auto dy = grad_outputs[0];
+    auto dy = grad_output;
 
     namespace F = torch::nn::functional;
 
@@ -182,10 +181,9 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
   }
 };
 
-class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
+class DifferentiableFIR {
  public:
   static torch::Tensor forward(
-      torch::autograd::AutogradContext* ctx,
       const torch::Tensor& waveform,
       const torch::Tensor& b_coeffs) {
     int64_t n_order = b_coeffs.size(1);
@@ -201,14 +199,14 @@ class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
         b_coeff_flipped.unsqueeze(1),
         F::Conv1dFuncOptions().groups(n_channel));
 
-    ctx->save_for_backward({waveform, b_coeffs, output});
-    return output;
+    auto stuff_for_backward = {waveform, b_coeffs, output};
+    return output, stuff_for_backward;
   }
 
-  static torch::autograd::tensor_list backward(
-      torch::autograd::AutogradContext* ctx,
-      torch::autograd::tensor_list grad_outputs) {
-    auto saved = ctx->get_saved_variables();
+  static tuple backward(
+      auto stuff_for_backward_fir, // technically this should be 3 parmaeters
+      torch::Tensor grad_output) {
+    auto saved = stuff_for_backward_fir,
     auto x = saved[0];
     auto b_coeffs = saved[1];
     auto y = saved[2];
@@ -219,7 +217,7 @@ class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
 
     auto dx = torch::Tensor();
     auto db = torch::Tensor();
-    auto dy = grad_outputs[0];
+    auto dy = grad_output;
 
     namespace F = torch::nn::functional;
 
@@ -245,7 +243,7 @@ class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
   }
 };
 
-torch::Tensor lfilter_core(
+torch::Tensor lfilter_core_forward(
     const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
@@ -261,18 +259,28 @@ torch::Tensor lfilter_core(
 
   TORCH_INTERNAL_ASSERT(n_order > 0);
 
-  auto filtered_waveform = DifferentiableFIR::apply(
+  auto filtered_waveform, stuff_for_backward_fir = DifferentiableFIR::forward(
       waveform,
       b_coeffs /
           a_coeffs.index(
               {torch::indexing::Slice(), torch::indexing::Slice(0, 1)}));
 
-  auto output = DifferentiableIIR::apply(
+  auto output, stuff_for_backward_iir = DifferentiableIIR::forward(
       filtered_waveform,
       a_coeffs /
           a_coeffs.index(
               {torch::indexing::Slice(), torch::indexing::Slice(0, 1)}));
-  return output;
+  return output, stuff_for_backward_fir, stuff_for_backward_iir;
+}
+
+torch::Tensor lfilter_core_backward(
+    auto stuff_for_backward_fir
+    auto stuff_for_backward_iir
+    auto grad_output,
+) {
+    // not sure that's really correct, I'm just winging it.
+    auto out = DifferentiableIIR::backward(stuff_for_backward_iir, grad_output)
+    return DifferentiableFIR::backward(stuff_for_backward_fir, out)
 }
 
 } // namespace
@@ -288,6 +296,13 @@ TORCH_LIBRARY(torchaudio, m) {
       "torchaudio::_lfilter(Tensor waveform, Tensor a_coeffs, Tensor b_coeffs) -> Tensor");
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, CompositeImplicitAutograd, m) {
-  m.impl("torchaudio::_lfilter", lfilter_core);
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("torchaudio::_lfilter_forward", &lfilter_forward);
 }
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("torchaudio::_lfilter_backward", &lfilter_backward);
+}
+
+// TODO need schema of input/output for both  forward and backward, e.g.
+//   m.def(
+//       "torchaudio::_lfilter_forward(Tensor waveform, Tensor a_coeffs, Tensor b_coeffs) -> Tensor + <the stuff needed for backward here>);
