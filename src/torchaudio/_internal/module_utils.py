@@ -101,12 +101,15 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
     return decorator
 
 DEPRECATION_MSG = (
-    "As TorchAudio is no longer being actively developed, this functionality can no longer be supported. "
-    "See https://github.com/pytorch/audio/issues/3902 for more details.")
+    "This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. "
+    "Please see https://github.com/pytorch/audio/issues/3902 for more information."
+)
 
 IO_DEPRECATION_MSG = (
-    "This functionality has been superseded by `AudioDecoder` from the TorchCodec library. "
-    "See https://github.com/pytorch/audio/issues/3902 for more details.")
+    "This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. "
+    "The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. "
+    "Please see https://github.com/pytorch/audio/issues/3902 for more information."
+)
 
 dropping_support = deprecated(DEPRECATION_MSG, version="2.9", remove=True)
 
@@ -116,7 +119,7 @@ def dropping_class_support(c, msg=DEPRECATION_MSG):
 
 .. warning::
 
-    This class has been deprecated. It will be removed from the 2.9 release.
+    This class is deprecated from version 2.8. It will be removed in the 2.9 release.
     {msg}
     """
 
@@ -128,7 +131,7 @@ def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
 
 .. warning::
 
-    This object has been deprecated. It will be removed from the 2.9 release.
+    This object is deprecated deprecated from version 2.8. It will be removed in the 2.9 release.
     {msg}
     """
     return c
