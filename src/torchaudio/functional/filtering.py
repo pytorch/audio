@@ -990,9 +990,26 @@ def _lfilter_core(
     output = padded_output_waveform[:, :, n_order - 1 :]
     return output
 
+class _LfilterInCppAndAutogradInPython(torch.autograd.Function):
+    # This class calls the C++ implementation of lfilter for both forward and
+    # backward, while handling the autograd logic of saving the relevant context
+    # tensors in Python.
+    # This requires updating the C++ ops to remove any call to
+    # `save_for_backward(stuff_for_backward)`. We now need the op to return
+    # `stuff_for_backward` all the way back to Python.
+
+    def forward(self, waveform, a_coeffs, b_coeffs):
+        output, stuff_for_backward_fir, stuff_for_backward_iir = torch.ops.torchaudio._lfilter_forward(waveform, a_coeffs, b_coeffs)
+        ctx.save_for_backward(stuff_for_backward_fir)
+        ctx.save_for_backward(stuff_for_backward_iir)
+        return output
+
+    def backward(self, ctx, grad_outputs):
+        return torch.ops.torchaudio._lfilter_backward(*ctx.saved_tensors, grad_outputs[0])
+
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter = torch.ops.torchaudio._lfilter
+    _lfilter = _LfilterInCppAndAutogradInPython()
 else:
     _lfilter = _lfilter_core
 
