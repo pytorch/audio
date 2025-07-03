@@ -2,8 +2,9 @@ torchaudio.prototype
 ====================
 
 .. warning::
-    As TorchAudio is no longer being actively developed, this functionality will no longer be supported.
-    See https://github.com/pytorch/audio/issues/3902 for more details.
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result, the ``prototype`` module is
+    deprecated in 2.8 and will be removed in 2.9.
 
 ``torchaudio.prototype`` provides prototype features;
 they are at an early stage for feedback and testing.

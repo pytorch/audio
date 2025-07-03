@@ -8,6 +8,11 @@ torchaudio.kaldi_io
 
 .. currentmodule:: torchaudio.kaldi_io
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result, the ``kaldi_io`` module is
+    deprecated in 2.8 and will be removed in 2.9.
+
 To use this module, the dependency kaldi_io_ needs to be installed.
 This is a light wrapper around ``kaldi_io`` that returns :class:`torch.Tensor`.
 
