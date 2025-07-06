@@ -42,6 +42,7 @@ from .functional import (
     edit_distance,
     fftconvolve,
     frechet_distance,
+    frequency_set,
     griffinlim,
     inverse_spectrogram,
     linear_fbanks,
@@ -57,6 +58,7 @@ from .functional import (
     pitch_shift,
     preemphasis,
     psd,
+    relative_bandwidths,
     resample,
     rnnt_loss as _rnnt_loss,
     rtf_evd,
@@ -65,6 +67,8 @@ from .functional import (
     spectral_centroid,
     spectrogram,
     speed,
+    wavelet_fbank,
+    wavelet_lengths,
 )
 
 rnnt_loss = dropping_support(_rnnt_loss)
@@ -130,4 +134,8 @@ __all__ = [
     "preemphasis",
     "deemphasis",
     "frechet_distance",
+    "frequency_set",
+    "relative_bandwidths",
+    "wavelet_lengths",
+    "wavelet_fbank",
 ]
