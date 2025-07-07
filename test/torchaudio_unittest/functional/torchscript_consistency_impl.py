@@ -285,7 +285,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             device=waveform.device,
             dtype=waveform.dtype,
         )
-        self._assert_consistency(F.lfilter, (waveform, a_coeffs, b_coeffs, True, True))
+        self._assert_consistency(F.filtering._lfilter_deprecated, (waveform, a_coeffs, b_coeffs, True, True))
 
     def test_filtfilt(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000)
@@ -485,7 +485,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         def func(tensor):
             a = torch.tensor([0.7, 0.2, 0.6], device=tensor.device, dtype=tensor.dtype)
             b = torch.tensor([0.4, 0.2, 0.9], device=tensor.device, dtype=tensor.dtype)
-            return F.lfilter(tensor, a, b)
+            return F.filtering._lfilter_deprecated(tensor, a, b)
 
         self._assert_consistency(func, (waveform,))
 
@@ -530,7 +530,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         def func(tensor):
             gain = 30.0
             colour = 50.0
-            return F.overdrive(tensor, gain, colour)
+            return F.filtering._overdrive_deprecated(tensor, gain, colour)
 
         self._assert_consistency(func, (waveform,))
 
@@ -803,7 +803,7 @@ class FunctionalFloat32Only(TestBaseMixin):
             targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
             logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
             target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
-            return rnnt_loss(tensor, targets, logit_lengths, target_lengths)
+            return F.functional._rnnt_loss(tensor, targets, logit_lengths, target_lengths)
 
         logits = torch.tensor(
             [
