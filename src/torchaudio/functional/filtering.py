@@ -6,6 +6,7 @@ import torch
 from torch import Tensor
 
 from torchaudio._extension import _IS_TORCHAUDIO_EXT_AVAILABLE
+from torchaudio._internal.module_utils import dropping_support
 
 
 def _dB2Linear(x: float) -> float:
@@ -997,6 +998,7 @@ else:
     _lfilter = _lfilter_core
 
 
+@dropping_support
 def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
     developed separately by *Yu et al.* :cite:`ismir_YuF23` and *Forgione et al.* :cite:`forgione2021dynonet`.
@@ -1115,6 +1117,7 @@ else:
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
+@dropping_support
 def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
 

@@ -9,7 +9,8 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal.module_utils import deprecated
+from torchaudio._internal.module_utils import deprecated, dropping_support
+
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -1760,6 +1761,7 @@ def _fix_waveform_shape(
     return waveform_shift
 
 
+@dropping_support
 def rnnt_loss(
     logits: Tensor,
     targets: Tensor,
