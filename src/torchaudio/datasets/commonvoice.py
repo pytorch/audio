@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple, Union
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
+from torchaudio.utils import load_torchcodec
 
 
 def load_commonvoice_item(
@@ -20,7 +21,7 @@ def load_commonvoice_item(
     filename = os.path.join(path, folder_audio, fileid)
     if not filename.endswith(ext_audio):
         filename += ext_audio
-    waveform, sample_rate = torchaudio.load(filename)
+    waveform, sample_rate = load_torchcodec(filename)
 
     dic = dict(zip(header, line))
 

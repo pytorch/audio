@@ -3,6 +3,7 @@ import os
 import tarfile
 import zipfile
 from typing import Any, List, Optional
+from torchaudio.utils import load_torchcodec
 
 import torchaudio
 
@@ -48,7 +49,7 @@ def _load_waveform(
     exp_sample_rate: int,
 ):
     path = os.path.join(root, filename)
-    waveform, sample_rate = torchaudio.load(path)
+    waveform, sample_rate = load_torchcodec(path)
     if exp_sample_rate != sample_rate:
         raise ValueError(f"sample rate should be {exp_sample_rate}, but got {sample_rate}")
     return waveform

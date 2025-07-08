@@ -7,6 +7,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_tar
+from torchaudio.utils import load_torchcodec
 
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriTTS"
@@ -41,7 +42,7 @@ def load_libritts_item(
     file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
 
     # Load audio
-    waveform, sample_rate = torchaudio.load(file_audio)
+    waveform, sample_rate = load_torchcodec(file_audio)
 
     # Load original text
     with open(original_text) as ft:

@@ -7,6 +7,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_tar
+from torchaudio.utils import load_torchcodec
 
 
 _RELEASE_CONFIGS = {
@@ -163,12 +164,7 @@ class TEDLIUM(Dataset):
         Returns:
             [Tensor, int]: Audio tensor representation and sample rate
         """
-        start_time = int(float(start_time) * sample_rate)
-        end_time = int(float(end_time) * sample_rate)
-
-        kwargs = {"frame_offset": start_time, "num_frames": end_time - start_time}
-
-        return torchaudio.load(path, **kwargs)
+        return load_torchcodec(path, start_seconds=float(start_time), stop_seconds=float(end_time))
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.

@@ -1,5 +1,6 @@
 # Minimum runtime dependencies
 torch
+torchcodec
 
 # Optional runtime dependencies
 kaldi_io

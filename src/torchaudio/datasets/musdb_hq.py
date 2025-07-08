@@ -7,6 +7,7 @@ import torchaudio
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_zip
+from torchaudio.utils import load_torchcodec
 
 _URL = "https://zenodo.org/record/3338373/files/musdb18hq.zip"
 _CHECKSUM = "baac80d0483c61d74b2e5f3be75fa557eec52898339e6aa45c1fa48833c5d21d"
@@ -87,7 +88,7 @@ class MUSDB_HQ(Dataset):
         num_frames = None
         for source in self.sources:
             track = self._get_track(name, source)
-            wav, sr = torchaudio.load(str(track))
+            wav, sr = load_torchcodec(str(track))
             if sr != _SAMPLE_RATE:
                 raise ValueError(f"expected sample rate {_SAMPLE_RATE}, but got {sr}")
             if num_frames is None:
