@@ -68,8 +68,6 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.transforms`](./transforms/transforms_test.py)
 - [`torchaudio.compliance.kaldi`](./compliance_kaldi_test.py)
 - [`torchaudio.kaldi_io`](./kaldi_io_test.py)
-- [`torchaudio.sox_effects`](./sox_effect)
-- [`torchaudio.backend`](./backend)
 
 ### Test modules that do not fall into the above categories
 - [test_dataloader.py](./dataloader_test.py)
