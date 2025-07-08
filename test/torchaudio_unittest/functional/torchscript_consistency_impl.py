@@ -285,6 +285,11 @@ class Functional(TempDirMixin, TestBaseMixin):
             device=waveform.device,
             dtype=waveform.dtype,
         )
+        # This is hack for those functions which are deprecated with decorators
+        # like @deprecated or @dropping_support. Adding the decorators breaks
+        # TorchScript. So here we use the private function which make the tests
+        # pass, but that's a lie: the public (deprecated) function doesn't
+        # support torchscript anymore
         self._assert_consistency(F.filtering._lfilter_deprecated, (waveform, a_coeffs, b_coeffs, True, True))
 
     def test_filtfilt(self):
@@ -530,6 +535,11 @@ class Functional(TempDirMixin, TestBaseMixin):
         def func(tensor):
             gain = 30.0
             colour = 50.0
+            # This is hack for those functions which are deprecated with decorators
+            # like @deprecated or @dropping_support. Adding the decorators breaks
+            # TorchScript. So here we use the private function which make the tests
+            # pass, but that's a lie: the public (deprecated) function doesn't
+            # support torchscript anymore
             return F.filtering._overdrive_deprecated(tensor, gain, colour)
 
         self._assert_consistency(func, (waveform,))
@@ -803,6 +813,11 @@ class FunctionalFloat32Only(TestBaseMixin):
             targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
             logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
             target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
+            # This is hack for those functions which are deprecated with decorators
+            # like @deprecated or @dropping_support. Adding the decorators breaks
+            # TorchScript. So here we use the private function which make the tests
+            # pass, but that's a lie: the public (deprecated) function doesn't
+            # support torchscript anymore
             return F.functional._rnnt_loss(tensor, targets, logit_lengths, target_lengths)
 
         logits = torch.tensor(
