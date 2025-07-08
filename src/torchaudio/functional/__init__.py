@@ -58,7 +58,7 @@ from .functional import (
     preemphasis,
     psd,
     resample,
-    rnnt_loss as _rnnt_loss,
+    rnnt_loss,
     rtf_evd,
     rtf_power,
     sliding_window_cmn,
@@ -67,7 +67,6 @@ from .functional import (
     speed,
 )
 
-rnnt_loss = dropping_support(_rnnt_loss)
 __all__ = [
     "amplitude_to_DB",
     "compute_deltas",
