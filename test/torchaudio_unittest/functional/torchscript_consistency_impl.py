@@ -285,12 +285,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             device=waveform.device,
             dtype=waveform.dtype,
         )
-        # This is hack for those functions which are deprecated with decorators
-        # like @deprecated or @dropping_support. Adding the decorators breaks
-        # TorchScript. So here we use the private function which make the tests
-        # pass, but that's a lie: the public (deprecated) function doesn't
-        # support torchscript anymore
-        self._assert_consistency(F.filtering._lfilter_deprecated, (waveform, a_coeffs, b_coeffs, True, True))
+        self._assert_consistency(F.lfilter, (waveform, a_coeffs, b_coeffs, True, True))
 
     def test_filtfilt(self):
         waveform = common_utils.get_whitenoise(sample_rate=8000)
@@ -535,12 +530,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         def func(tensor):
             gain = 30.0
             colour = 50.0
-            # This is hack for those functions which are deprecated with decorators
-            # like @deprecated or @dropping_support. Adding the decorators breaks
-            # TorchScript. So here we use the private function which make the tests
-            # pass, but that's a lie: the public (deprecated) function doesn't
-            # support torchscript anymore
-            return F.filtering._overdrive_deprecated(tensor, gain, colour)
+            return F.overdrive(tensor, gain, colour)
 
         self._assert_consistency(func, (waveform,))
 
