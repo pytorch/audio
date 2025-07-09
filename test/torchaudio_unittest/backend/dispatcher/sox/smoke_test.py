@@ -19,9 +19,9 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
     however without such tools, the correctness of each function cannot be verified.
     """
 
-    _info = partial(get_info_func(), backend="sox")
-    _load = partial(get_load_func(), backend="sox")
-    _save = partial(get_save_func(), backend="sox")
+    _info = staticmethod(partial(get_info_func(), backend="sox"))
+    _load = staticmethod(partial(get_load_func(), backend="sox"))
+    _save = staticmethod(partial(get_save_func(), backend="sox"))
 
     def run_smoke_test(self, ext, sample_rate, num_channels, *, dtype="float32"):
         duration = 1

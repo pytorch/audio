@@ -13,8 +13,8 @@ from .common import get_enc_params, name_func
 class TestRoundTripIO(TempDirMixin, PytorchTestCase):
     """save/load round trip should not degrade data for lossless formats"""
 
-    _load = partial(get_load_func(), backend="sox")
-    _save = partial(get_save_func(), backend="sox")
+    _load = staticmethod(partial(get_load_func(), backend="sox"))
+    _save = staticmethod(partial(get_save_func(), backend="sox"))
 
     @parameterized.expand(
         list(
