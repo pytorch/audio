@@ -7,6 +7,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_tar
+from torchaudio.utils import load_torchcodec
 
 # The following lists prefixed with `filtered_` provide a filtered split
 # that:
@@ -990,7 +991,7 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 
     # Read wav
     file_audio = os.path.join(path, label, fileid + ext_audio)
-    waveform, sample_rate = torchaudio.load(file_audio)
+    waveform, sample_rate = load_torchcodec(file_audio)
 
     return waveform, sample_rate, label
 

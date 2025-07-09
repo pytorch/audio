@@ -6,6 +6,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_zip
+from torchaudio.utils import load_torchcodec
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 _CHECKSUMS = {
@@ -98,7 +99,7 @@ class VCTK_092(Dataset):
             return file_path.readlines()[0]
 
     def _load_audio(self, file_path) -> Tuple[Tensor, int]:
-        return torchaudio.load(file_path)
+        return load_torchcodec(file_path)
 
     def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> SampleType:
         transcript_path = os.path.join(self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt")

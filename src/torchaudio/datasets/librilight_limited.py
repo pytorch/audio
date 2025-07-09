@@ -8,6 +8,7 @@ from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.librispeech import _get_librispeech_metadata
 from torchaudio.datasets.utils import _extract_tar
+from torchaudio.utils import load_torchcodec
 
 
 _ARCHIVE_NAME = "librispeech_finetuning"
@@ -104,7 +105,7 @@ class LibriLightLimited(Dataset):
         """
         file_path, fileid = self._fileids_paths[n]
         metadata = _get_librispeech_metadata(fileid, self._path, file_path, self._ext_audio, self._ext_txt)
-        waveform, _ = torchaudio.load(os.path.join(self._path, metadata[0]))
+        waveform, _ = load_torchcodec(os.path.join(self._path, metadata[0]))
         return (waveform,) + metadata[1:]
 
     def __len__(self) -> int:
