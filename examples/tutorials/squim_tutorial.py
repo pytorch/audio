@@ -62,6 +62,7 @@ Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -158,8 +159,8 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 #
 #
 
-WAVEFORM_SPEECH, SAMPLE_RATE_SPEECH = torchaudio.load(SAMPLE_SPEECH)
-WAVEFORM_NOISE, SAMPLE_RATE_NOISE = torchaudio.load(SAMPLE_NOISE)
+WAVEFORM_SPEECH, SAMPLE_RATE_SPEECH = load_torchcodec(SAMPLE_SPEECH)
+WAVEFORM_NOISE, SAMPLE_RATE_NOISE = load_torchcodec(SAMPLE_NOISE)
 WAVEFORM_NOISE = WAVEFORM_NOISE[0:1, :]
 
 
@@ -328,7 +329,7 @@ subjective_model = SQUIM_SUBJECTIVE.get_model()
 
 NMR_SPEECH = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
-WAVEFORM_NMR, SAMPLE_RATE_NMR = torchaudio.load(NMR_SPEECH)
+WAVEFORM_NMR, SAMPLE_RATE_NMR = load_torchcodec(NMR_SPEECH)
 if SAMPLE_RATE_NMR != 16000:
     WAVEFORM_NMR = F.resample(WAVEFORM_NMR, SAMPLE_RATE_NMR, 16000)
 

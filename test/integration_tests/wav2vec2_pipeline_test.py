@@ -2,6 +2,7 @@ import os
 
 import pytest
 import torchaudio
+from torchaudio.utils import load_torchcodec
 from torchaudio.pipelines import (
     HUBERT_ASR_LARGE,
     HUBERT_ASR_XLARGE,
@@ -113,7 +114,7 @@ def test_finetune_asr_model(
 ):
     """Smoke test of downloading weights for fine-tuning models and simple transcription"""
     model = bundle.get_model().eval()
-    waveform, sample_rate = torchaudio.load(sample_speech)
+    waveform, sample_rate = load_torchcodec(sample_speech)
     emission, _ = model(waveform)
     decoder = ctc_decoder(bundle.get_labels())
     result = decoder(emission[0])

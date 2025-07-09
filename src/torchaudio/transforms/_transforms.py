@@ -54,7 +54,8 @@ class Spectrogram(torch.nn.Module):
             Deprecated and not used.
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = torchaudio.transforms.Spectrogram(n_fft=800)
         >>> spectrogram = transform(waveform)
 
@@ -315,7 +316,8 @@ class AmplitudeToDB(torch.nn.Module):
             number is 80. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.AmplitudeToDB(stype="amplitude", top_db=80)
         >>> waveform_db = transform(waveform)
     """
@@ -364,7 +366,8 @@ class MelScale(torch.nn.Module):
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
         >>> spectrogram = spectrogram_transform(waveform)
         >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
@@ -438,7 +441,8 @@ class InverseMelScale(torch.nn.Module):
             (Default: ``"gels``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> mel_spectrogram_transform = transforms.MelSpectrogram(sample_rate, n_fft=1024)
         >>> mel_spectrogram = mel_spectrogram_transform(waveform)
         >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024 // 2 + 1)
@@ -544,7 +548,8 @@ class MelSpectrogram(torch.nn.Module):
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.MelSpectrogram(sample_rate)
         >>> mel_specgram = transform(waveform)  # (channel, n_mels, time)
 
@@ -646,7 +651,8 @@ class MFCC(torch.nn.Module):
         melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.MFCC(
         >>>     sample_rate=sample_rate,
         >>>     n_mfcc=13,
@@ -736,7 +742,8 @@ class LFCC(torch.nn.Module):
         speckwargs (dict or None, optional): arguments for Spectrogram. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.LFCC(
         >>>     sample_rate=sample_rate,
         >>>     n_lfcc=13,
@@ -836,7 +843,8 @@ class MuLawEncoding(torch.nn.Module):
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
 
     Example
-       >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+       >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
        >>> transform = torchaudio.transforms.MuLawEncoding(quantization_channels=512)
        >>> mulawtrans = transform(waveform)
 
@@ -875,7 +883,8 @@ class MuLawDecoding(torch.nn.Module):
         quantization_channels (int, optional): Number of channels. (Default: ``256``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = torchaudio.transforms.MuLawDecoding(quantization_channels=512)
         >>> mulawtrans = transform(waveform)
     """
@@ -928,7 +937,8 @@ class Resample(torch.nn.Module):
             carried out on ``torch.float64``.
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.Resample(sample_rate, sample_rate/10)
         >>> waveform = transform(waveform)
     """
@@ -1098,7 +1108,8 @@ class Fade(torch.nn.Module):
             (Default: ``"linear"``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.Fade(fade_in_len=sample_rate, fade_out_len=2 * sample_rate, fade_shape="linear")
         >>> faded_waveform = transform(waveform)
     """
@@ -1359,7 +1370,9 @@ class Loudness(torch.nn.Module):
         sample_rate (int): Sample rate of audio signal.
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>>
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.Loudness(sample_rate)
         >>> loudness = transform(waveform)
 
@@ -1398,7 +1411,9 @@ class Vol(torch.nn.Module):
         gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>>
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.Vol(gain=0.5, gain_type="amplitude")
         >>> quieter_waveform = transform(waveform)
     """
@@ -1448,7 +1463,9 @@ class SlidingWindowCmn(torch.nn.Module):
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>>
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.SlidingWindowCmn(cmn_window=1000)
         >>> cmn_waveform = transform(waveform)
     """
@@ -1528,7 +1545,9 @@ class Vad(torch.nn.Module):
             in the detector algorithm. (Default: 2000.0)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>>
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> waveform_reversed, sample_rate = apply_effects_tensor(waveform, sample_rate, [["reverse"]])
         >>> transform = transforms.Vad(sample_rate=sample_rate, trigger_level=7.5)
         >>> waveform_reversed_front_trim = transform(waveform_reversed)
@@ -1631,7 +1650,9 @@ class SpectralCentroid(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>>
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.SpectralCentroid(sample_rate)
         >>> spectral_centroid = transform(waveform)  # (channel, time)
     """
@@ -1690,7 +1711,9 @@ class PitchShift(LazyModuleMixin, torch.nn.Module):
             If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>>
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.PitchShift(sample_rate, 4)
         >>> waveform_shift = transform(waveform)  # (channel, time)
     """

@@ -8,6 +8,7 @@ import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
 from utils import CollateFnL3DAS22
+from torchaudio.utils import load_torchcodec
 
 _PREFIX = "L3DAS22_Task1_"
 _SUBSETS = {
@@ -46,10 +47,10 @@ class L3DAS22(Dataset):
         noisy_path_B = str(noisy_path_A).replace("_A.wav", "_B.wav")
         clean_path = noisy_path_A.parent.parent / "labels" / noisy_path_A.name.replace("_A.wav", ".wav")
         transcript_path = str(clean_path).replace("wav", "txt")
-        waveform_noisy_A, sample_rate1 = torchaudio.load(noisy_path_A)
-        waveform_noisy_B, sample_rate2 = torchaudio.load(noisy_path_B)
+        waveform_noisy_A, sample_rate1 = load_torchcodec(noisy_path_A)
+        waveform_noisy_B, sample_rate2 = load_torchcodec(noisy_path_B)
         waveform_noisy = torch.cat((waveform_noisy_A, waveform_noisy_B), dim=0)
-        waveform_clean, sample_rate3 = torchaudio.load(clean_path)
+        waveform_clean, sample_rate3 = load_torchcodec(clean_path)
         assert sample_rate1 == _SAMPLE_RATE and sample_rate2 == _SAMPLE_RATE and sample_rate3 == _SAMPLE_RATE
         with open(transcript_path, "r") as f:
             transcript = f.readline()

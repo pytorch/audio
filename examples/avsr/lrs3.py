@@ -3,6 +3,7 @@ import os
 import torchaudio
 import torchvision
 from torch.utils.data import Dataset
+from torchaudio.utils import load_torchcodec
 
 
 def _load_list(args, *filenames):
@@ -31,7 +32,7 @@ def load_audio(path):
     """
     rtype: torch, T x 1
     """
-    waveform, sample_rate = torchaudio.load(path, normalize=True)
+    waveform, sample_rate = load_torchcodec(path, normalize=True)
     return waveform.transpose(1, 0)
 
 

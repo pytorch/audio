@@ -8,6 +8,7 @@ import torch.distributed as dist
 import torchaudio
 from torch import Tensor
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler
+from torchaudio.utils import load_torchcodec
 
 from ..lightning_modules import Batch
 
@@ -295,7 +296,7 @@ class HuBERTDataSet(Dataset):
             (Tensor): The corresponding waveform Tensor.
         """
         wav_path = self.f_list[index]
-        waveform, sample_rate = torchaudio.load(wav_path)
+        waveform, sample_rate = load_torchcodec(wav_path)
         assert waveform.shape[1] == self.len_list[index]
         return waveform
 

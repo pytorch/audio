@@ -1,5 +1,6 @@
 import pytest
 import torchaudio
+from torchaudio.utils import load_torchcodec
 from torchaudio.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 
 
@@ -16,7 +17,7 @@ def test_squim_objective_pretrained_weights(lang, expected, sample_speech):
     # Get SquimObjective model
     model = bundle.get_model()
     # Create a synthetic waveform
-    waveform, sample_rate = torchaudio.load(sample_speech)
+    waveform, sample_rate = load_torchcodec(sample_speech)
     scores = model(waveform)
     for i in range(3):
         assert abs(scores[i].item() - expected[i]) < 1e-5
@@ -35,9 +36,9 @@ def test_squim_subjective_pretrained_weights(task, expected, mixture_source, cle
     # Get SquimObjective model
     model = bundle.get_model()
     # Load input mixture audio
-    waveform, sample_rate = torchaudio.load(mixture_source)
+    waveform, sample_rate = load_torchcodec(mixture_source)
     for i, source in enumerate(clean_sources):
         # Load clean reference
-        clean_waveform, sample_rate = torchaudio.load(source)
+        clean_waveform, sample_rate = load_torchcodec(source)
         score = model(waveform, clean_waveform)
         assert abs(score.item() - expected[i]) < 1e-5

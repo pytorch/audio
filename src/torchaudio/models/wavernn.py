@@ -222,7 +222,8 @@ class WaveRNN(nn.Module):
 
     Example
         >>> wavernn = WaveRNN(upsample_scales=[5,5,8], n_classes=512, hop_length=200)
-        >>> waveform, sample_rate = torchaudio.load(file)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec(file)
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
         >>> output = wavernn(waveform, specgram)

@@ -117,8 +117,8 @@ def import_huggingface_model(original: Module) -> Wav2Vec2Model:
         >>>
         >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
         >>> model = import_huggingface_model(original)
-        >>>
-        >>> waveforms, _ = torchaudio.load("audio.wav")
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveforms, _ = load_torchcodec("audio.wav")
         >>> logits, _ = model(waveforms)
     """
     _LG.info("Importing model.")
