@@ -485,7 +485,7 @@ class Functional(TempDirMixin, TestBaseMixin):
         def func(tensor):
             a = torch.tensor([0.7, 0.2, 0.6], device=tensor.device, dtype=tensor.dtype)
             b = torch.tensor([0.4, 0.2, 0.9], device=tensor.device, dtype=tensor.dtype)
-            return F.filtering._lfilter_deprecated(tensor, a, b)
+            return F.lfilter(tensor, a, b)
 
         self._assert_consistency(func, (waveform,))
 
