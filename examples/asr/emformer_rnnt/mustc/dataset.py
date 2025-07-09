@@ -4,6 +4,7 @@ from typing import Union
 import torch
 import torchaudio
 import yaml
+from torchaudio.utils import load_torchcodec
 
 
 FOLDER_IN_ARCHIVE = "en-de"
@@ -39,7 +40,7 @@ class MUSTC(torch.utils.data.Dataset):
 
     def _get_mustc_item(self, idx):
         file_path, offset, duration = self.wav_list[idx]
-        waveform, sr = torchaudio.load(file_path, frame_offset=offset, num_frames=duration)
+        waveform, sr = load_torchcodec(file_path, frame_offset=offset, num_frames=duration)
         assert sr == SAMPLE_RATE
         transcript = self.trans_list[idx].replace("\n", "")
         return (waveform, transcript)

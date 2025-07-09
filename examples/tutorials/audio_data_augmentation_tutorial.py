@@ -15,6 +15,7 @@ At the end, we synthesize noisy speech over phone from clean speech.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 import torchaudio.functional as F
 
 print(torch.__version__)
@@ -52,7 +53,7 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 #
 
 # Load the data
-waveform1, sample_rate = torchaudio.load(SAMPLE_WAV, channels_first=False)
+waveform1, sample_rate = load_torchcodec(SAMPLE_WAV, channels_first=False)
 
 # Define effects
 effect = ",".join(
@@ -159,7 +160,7 @@ Audio(waveform2.T, rate=sample_rate)
 # and clap your hands.
 #
 
-rir_raw, sample_rate = torchaudio.load(SAMPLE_RIR)
+rir_raw, sample_rate = load_torchcodec(SAMPLE_RIR)
 plot_waveform(rir_raw, sample_rate, title="Room Impulse Response (raw)")
 plot_specgram(rir_raw, sample_rate, title="Room Impulse Response (raw)")
 Audio(rir_raw, rate=sample_rate)
@@ -179,7 +180,7 @@ plot_waveform(rir, sample_rate, title="Room Impulse Response")
 # we convolve the speech signal with the RIR.
 #
 
-speech, _ = torchaudio.load(SAMPLE_SPEECH)
+speech, _ = load_torchcodec(SAMPLE_SPEECH)
 augmented = F.fftconvolve(speech, rir)
 
 ######################################################################
@@ -219,8 +220,8 @@ Audio(augmented, rate=sample_rate)
 # To add noise to audio data per SNRs, we
 # use :py:func:`torchaudio.functional.add_noise`.
 
-speech, _ = torchaudio.load(SAMPLE_SPEECH)
-noise, _ = torchaudio.load(SAMPLE_NOISE)
+speech, _ = load_torchcodec(SAMPLE_SPEECH)
+noise, _ = load_torchcodec(SAMPLE_NOISE)
 noise = noise[:, : speech.shape[1]]
 
 snr_dbs = torch.tensor([20, 10, 3])
@@ -275,7 +276,7 @@ Audio(noisy_speech, rate=sample_rate)
 # a Tensor object.
 #
 
-waveform, sample_rate = torchaudio.load(SAMPLE_SPEECH, channels_first=False)
+waveform, sample_rate = load_torchcodec(SAMPLE_SPEECH, channels_first=False)
 
 
 def apply_codec(waveform, sample_rate, format, encoder=None):
@@ -332,7 +333,7 @@ Audio(vorbis.T, rate=sample_rate)
 #
 
 sample_rate = 16000
-original_speech, sample_rate = torchaudio.load(SAMPLE_SPEECH)
+original_speech, sample_rate = load_torchcodec(SAMPLE_SPEECH)
 
 plot_specgram(original_speech, sample_rate, title="Original")
 
@@ -345,7 +346,7 @@ plot_specgram(rir_applied, sample_rate, title="RIR Applied")
 # Because the noise is recorded in the actual environment, we consider that
 # the noise contains the acoustic feature of the environment. Therefore, we add
 # the noise after RIR application.
-noise, _ = torchaudio.load(SAMPLE_NOISE)
+noise, _ = load_torchcodec(SAMPLE_NOISE)
 noise = noise[:, : rir_applied.shape[1]]
 
 snr_db = torch.tensor([8])

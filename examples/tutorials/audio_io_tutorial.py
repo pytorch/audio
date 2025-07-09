@@ -22,6 +22,7 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -151,7 +152,7 @@ print(metadata)
 # Loading audio data
 # ------------------
 #
-# To load audio data, you can use :py:func:`torchaudio.load`.
+# To load audio data, you can use :py:func:`load_torchcodec`.
 #
 # This function accepts a path-like object or file-like object as input.
 #
@@ -165,7 +166,7 @@ print(metadata)
 # documentation <https://pytorch.org/audio>`__.
 #
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 
 ######################################################################
@@ -234,7 +235,7 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 # Load audio data as HTTP request
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 with requests.get(url, stream=True) as response:
-    waveform, sample_rate = torchaudio.load(_hide_seek(response.raw))
+    waveform, sample_rate = load_torchcodec(_hide_seek(response.raw))
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
 ######################################################################
@@ -245,7 +246,7 @@ tar_path = download_asset("tutorial-assets/VOiCES_devkit.tar.gz")
 tar_item = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 with tarfile.open(tar_path, mode="r") as tarfile_:
     fileobj = tarfile_.extractfile(tar_item)
-    waveform, sample_rate = torchaudio.load(fileobj)
+    waveform, sample_rate = load_torchcodec(fileobj)
 plot_specgram(waveform, sample_rate, title="TAR file")
 
 ######################################################################
@@ -256,7 +257,7 @@ bucket = "pytorch-tutorial-assets"
 key = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=bucket, Key=key)
-waveform, sample_rate = torchaudio.load(_hide_seek(response["Body"]))
+waveform, sample_rate = load_torchcodec(_hide_seek(response["Body"]))
 plot_specgram(waveform, sample_rate, title="From S3")
 
 
@@ -290,13 +291,13 @@ frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 print("Fetching all the data...")
 with requests.get(url, stream=True) as response:
-    waveform1, sample_rate1 = torchaudio.load(_hide_seek(response.raw))
+    waveform1, sample_rate1 = load_torchcodec(_hide_seek(response.raw))
     waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
     print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Fetching until the requested frames are available...")
 with requests.get(url, stream=True) as response:
-    waveform2, sample_rate2 = torchaudio.load(
+    waveform2, sample_rate2 = load_torchcodec(
         _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames
     )
     print(f" - Fetched {response.raw.tell()} bytes")
@@ -331,7 +332,7 @@ print("matched!")
 #    resulting file size but also precision.
 #
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 
 ######################################################################
@@ -383,7 +384,7 @@ formats = [
 
 ######################################################################
 #
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV_8000)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV_8000)
 with tempfile.TemporaryDirectory() as tempdir:
     for format in formats:
         path = f"{tempdir}/save_example.{format}"
@@ -400,7 +401,7 @@ with tempfile.TemporaryDirectory() as tempdir:
 #
 
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 # Saving to bytes buffer
 buffer_ = io.BytesIO()

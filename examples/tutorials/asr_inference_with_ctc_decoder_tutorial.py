@@ -65,6 +65,7 @@ import IPython
 import matplotlib.pyplot as plt
 from torchaudio.models.decoder import ctc_decoder
 from torchaudio.utils import download_asset
+from torchaudio.utils import load_torchcodec
 
 ######################################################################
 #
@@ -98,7 +99,7 @@ IPython.display.Audio(speech_file)
 #    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 #
 
-waveform, sample_rate = torchaudio.load(speech_file)
+waveform, sample_rate = load_torchcodec(speech_file)
 
 if sample_rate != bundle.sample_rate:
     waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)

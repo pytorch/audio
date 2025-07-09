@@ -4,6 +4,7 @@ from typing import List, Tuple, Union
 import torch
 import torchaudio
 from torch.utils.data import Dataset
+from torchaudio.utils import load_torchcodec
 
 SampleType = Tuple[int, torch.Tensor, List[torch.Tensor]]
 
@@ -37,7 +38,7 @@ class WSJ0Mix(Dataset):
         self.files.sort()
 
     def _load_audio(self, path) -> torch.Tensor:
-        waveform, sample_rate = torchaudio.load(path)
+        waveform, sample_rate = load_torchcodec(path)
         if sample_rate != self.sample_rate:
             raise ValueError(
                 f"The dataset contains audio file of sample rate {sample_rate}, "

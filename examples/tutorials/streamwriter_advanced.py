@@ -64,6 +64,7 @@ play audio and video.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -128,7 +129,7 @@ VIDEO_PATH = download_asset(
 #
 
 # Prepare sample audio
-waveform, sample_rate = torchaudio.load(AUDIO_PATH, channels_first=False, normalize=False)
+waveform, sample_rate = load_torchcodec(AUDIO_PATH, channels_first=False, normalize=False)
 num_frames, num_channels = waveform.shape
 
 ######################################################################

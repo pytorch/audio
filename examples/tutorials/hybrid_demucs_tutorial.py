@@ -41,6 +41,7 @@ perform music separation
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -187,7 +188,7 @@ def plot_spectrogram(stft, title="Spectrogram"):
 
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
 SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
-waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
+waveform, sample_rate = load_torchcodec(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
 waveform = waveform.to(device)
 mixture = waveform
 
@@ -267,16 +268,16 @@ vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
 other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
 
 drums_spec = audios["drums"][:, frame_start:frame_end].cpu()
-drums, sample_rate = torchaudio.load(drums_original)
+drums, sample_rate = load_torchcodec(drums_original)
 
 bass_spec = audios["bass"][:, frame_start:frame_end].cpu()
-bass, sample_rate = torchaudio.load(bass_original)
+bass, sample_rate = load_torchcodec(bass_original)
 
 vocals_spec = audios["vocals"][:, frame_start:frame_end].cpu()
-vocals, sample_rate = torchaudio.load(vocals_original)
+vocals, sample_rate = load_torchcodec(vocals_original)
 
 other_spec = audios["other"][:, frame_start:frame_end].cpu()
-other, sample_rate = torchaudio.load(other_original)
+other, sample_rate = load_torchcodec(other_original)
 
 mix_spec = mixture[:, frame_start:frame_end].cpu()
 

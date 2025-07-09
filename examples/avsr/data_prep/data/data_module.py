@@ -7,7 +7,7 @@
 import torch
 import torchaudio
 import torchvision
-
+from torchaudio.utils import load_torchcodec
 
 class AVSRDataLoader:
     def __init__(self, modality, detector="retinaface", resize=None):
@@ -39,7 +39,7 @@ class AVSRDataLoader:
             return video
 
     def load_audio(self, data_filename):
-        waveform, sample_rate = torchaudio.load(data_filename, normalize=True)
+        waveform, sample_rate = load_torchcodec(data_filename, normalize=True)
         return waveform, sample_rate
 
     def load_video(self, data_filename):
