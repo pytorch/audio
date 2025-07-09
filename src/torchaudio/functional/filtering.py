@@ -6,7 +6,6 @@ import torch
 from torch import Tensor
 
 from torchaudio._extension import _IS_TORCHAUDIO_EXT_AVAILABLE
-from torchaudio._internal.module_utils import dropping_support
 
 
 def _dB2Linear(x: float) -> float:
@@ -325,7 +324,7 @@ def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: flo
     a1 = torch.as_tensor(a1, dtype=dtype, device=device).view(1)
     a2 = torch.as_tensor(a2, dtype=dtype, device=device).view(1)
 
-    output_waveform = _lfilter_deprecated(
+    output_waveform = lfilter(
         waveform,
         torch.cat([a0, a1, a2]),
         torch.cat([b0, b1, b2]),
@@ -699,8 +698,8 @@ def filtfilt(
         Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``
         are 2D Tensors, or `(..., time)` otherwise.
     """
-    forward_filtered = _lfilter_deprecated(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
-    backward_filtered = _lfilter_deprecated(
+    forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
+    backward_filtered = lfilter(
         forward_filtered.flip(-1),
         a_coeffs,
         b_coeffs,
@@ -998,7 +997,7 @@ else:
     _lfilter = _lfilter_core
 
 
-def _lfilter_deprecated(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
+def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
     developed separately by *Yu et al.* :cite:`ismir_YuF23` and *Forgione et al.* :cite:`forgione2021dynonet`.
     The gradients of ``a_coeffs`` are computed based on a faster algorithm from :cite:`ycy2024diffapf`.
@@ -1067,7 +1066,6 @@ def _lfilter_deprecated(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, cl
 
     return output
 
-lfilter = dropping_support(_lfilter_deprecated)
 
 def lowpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
@@ -1117,7 +1115,7 @@ else:
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
-def _overdrive_deprecated(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
+def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
 
     .. devices:: CPU CUDA
@@ -1172,7 +1170,6 @@ def _overdrive_deprecated(waveform: Tensor, gain: float = 20, colour: float = 20
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
-overdrive = dropping_support(_overdrive_deprecated)
 
 def phaser(
     waveform: Tensor,

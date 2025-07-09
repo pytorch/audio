@@ -2476,7 +2476,7 @@ def preemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     return waveform
 
 
-def _deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
+def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     r"""De-emphasizes a waveform along its last dimension.
     Inverse of :meth:`preemphasis`. Concretely, for each signal
     :math:`x` in ``waveform``, computes output :math:`y` as
@@ -2498,9 +2498,8 @@ def _deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     """
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
-    return torchaudio.functional.filtering._lfilter_deprecated(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+    return torchaudio.functional.filtering.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
 
-deemphasis = dropping_support(_deemphasis)
 
 def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):
     r"""Computes the Fréchet distance between two multivariate normal distributions :cite:`dowson1982frechet`.
