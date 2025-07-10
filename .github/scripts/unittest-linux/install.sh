@@ -85,7 +85,7 @@ pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHE
 # python setup.py install
 
 # 3. Install Test tools
-conda install -y -c conda-forge "ffmpeg=4.4.2"
+conda install -y "ffmpeg<5"
 # python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
 python -c "import torch; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
 
