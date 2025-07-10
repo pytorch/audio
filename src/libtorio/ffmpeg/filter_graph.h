@@ -47,7 +47,7 @@ class FilterGraph {
       AVSampleFormat format,
       AVRational time_base,
       int sample_rate,
-      uint64_t channel_layout);
+      int nb_channels);
 
   void add_video_src(
       AVPixelFormat format,
