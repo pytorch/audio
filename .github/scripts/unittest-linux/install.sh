@@ -78,15 +78,16 @@ pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHE
 
 
 # 2. Install torchaudio
-conda install --quiet -y ninja cmake
+# conda install --quiet -y ninja cmake
 
-printf "* Installing torchaudio\n"
-export BUILD_CPP_TEST=1
-python setup.py install
+# printf "* Installing torchaudio\n"
+# export BUILD_CPP_TEST=1
+# python setup.py install
 
 # 3. Install Test tools
 conda install -y -c conda-forge "ffmpeg=6.1.1"
 python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
+
 # printf "* Installing test tools\n"
 # NUMBA_DEV_CHANNEL=""
 # if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
