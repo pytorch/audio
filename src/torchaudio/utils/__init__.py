@@ -4,7 +4,6 @@ from . import sox_utils
 from .download import download_asset
 import os
 from torchcodec.decoders import AudioDecoder
-import pytest
 
 def load_torchcodec(file, **args):
     try:
@@ -16,6 +15,7 @@ def load_torchcodec(file, **args):
         return (samples.data, samples.sample_rate)
     except Exception as e:
         if "buggy FFmpeg version" in str(e) and "PYTEST_CURRENT_TEST" in os.environ:
+            import pytest
             pytest.skip()
         else:
             raise e
