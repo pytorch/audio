@@ -65,6 +65,6 @@ jobs:
         ./.github/scripts/unittest-linux/install.sh
         echo '::endgroup::'
 
-        # echo '::group::Run Tests'
-        # ./.github/scripts/unittest-linux/run_test.sh
-        # echo '::endgroup::'
+        echo '::group::Run Tests'
+        ./.github/scripts/unittest-linux/run_test.sh
+        echo '::endgroup::'
