@@ -956,7 +956,7 @@ class DifferentiableFIR(torch.autograd.Function):
         n_channel = x.size(1)
         n_order = b_coeffs.size(1)
         db = F.conv1d(
-                F.pad(x, (n_order - 1, 0)).view(n_batch * n_channel, 1, -1),
+                F.pad(x, (n_order - 1, 0)).view(1, n_batch * n_channel, -1),
                 dy.view(n_batch * n_channel, 1, -1),
                 groups=n_batch * n_channel
             ).view(
@@ -981,7 +981,7 @@ class DifferentiableIIR(torch.autograd.Function):
             device=waveform.device, dtype=waveform.dtype)
         _lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform)
         output = padded_output_waveform[:,:,n_order - 1:]
-        ctx.save_for_backward(waveform, a_coeff_flipped, output)
+        ctx.save_for_backward(waveform, a_coeffs_normalized, output)
         return output
 
     @staticmethod
@@ -998,11 +998,20 @@ class DifferentiableIIR(torch.autograd.Function):
         return (dx, da)
 
 
-def _lfilter(waveform, a_coeffs, b_coeffs):
+def _lfilter1(waveform, a_coeffs, b_coeffs):
+    n_order = b_coeffs.size(1)
+    filtered_waveform = torch.ops.torchaudio.fir(waveform, b_coeffs / a_coeffs[:, 0:1])
+    return torch.ops.torchaudio.iir(filtered_waveform, a_coeffs / a_coeffs[:, 0:1])
+
+def _lfilter2(waveform, a_coeffs, b_coeffs):
     n_order = b_coeffs.size(1)
     filtered_waveform = DifferentiableFIR.apply(waveform, b_coeffs / a_coeffs[:, 0:1])
     return DifferentiableIIR.apply(filtered_waveform, a_coeffs / a_coeffs[:, 0:1])
 
+_lfilter = _lfilter2
+
+def fir_part(waveform, a_coeffs, b_coeffs):
+    return DifferentiableFIR.apply(waveform, b_coeffs / a_coeffs[:, 0:1])
 
 def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
