@@ -933,6 +933,9 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
+    _differentiable_iir_apply = torch.ops.torchaudio._differentiable_iir_apply
+    _fir_forward = torch.ops.torchaudio._fir_forward
+    _fir_backward = torch.ops.torchaudio._fir_backward
 else:
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
@@ -991,8 +994,49 @@ def _lfilter_core(
     return output
 
 
+class _DifferentiableFIRFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, waveform, b_coeffs):
+        ctx.save_for_backward(waveform, b_coeffs)
+        
+        output = _fir_forward(waveform, b_coeffs)
+        return output
+    
+    @staticmethod
+    def backward(ctx, grad_output):
+        # Retrieve saved inputs
+        waveform, b_coeffs = ctx.saved_tensors
+        
+        # Call C++ backward function
+        grad_waveform, grad_b_coeffs = _fir_backward(grad_output, waveform, b_coeffs)
+        
+        return grad_waveform, grad_b_coeffs
+
+
+def _lfilter_core_python(
+    waveform: Tensor,
+    a_coeffs: Tensor,
+    b_coeffs: Tensor,
+) -> Tensor:
+    """Python implementation of lfilter_core using C++ DifferentiableFIR and DifferentiableIIR."""
+
+    # TODO here: input validation checks
+
+    a0 = a_coeffs[:, 0:1]  # Keep dimension for broadcasting
+    b_coeffs_normalized = b_coeffs / a0
+    a_coeffs_normalized = a_coeffs / a0
+    
+    # Apply FIR filter using Python autograd function
+    filtered_waveform = _DifferentiableFIRFunction.apply(waveform, b_coeffs_normalized)
+    
+    # Apply IIR filter (still using C++ autograd)
+    output = _differentiable_iir_apply(filtered_waveform, a_coeffs_normalized)
+    
+    return output
+
+
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter = torch.ops.torchaudio._lfilter
+    _lfilter = _lfilter_core_python
 else:
     _lfilter = _lfilter_core
 
