@@ -234,8 +234,8 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 
 # Load audio data as HTTP request
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-with requests.get(url, stream=True) as response:
-    waveform, sample_rate = load_torchcodec(_hide_seek(response.raw))
+with requests.get(url, stream=False) as response:
+    waveform, sample_rate = load_torchcodec(response.content)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
 ######################################################################
@@ -257,7 +257,7 @@ bucket = "pytorch-tutorial-assets"
 key = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=bucket, Key=key)
-waveform, sample_rate = load_torchcodec(_hide_seek(response["Body"]))
+waveform, sample_rate = load_torchcodec(response["Body"])
 plot_specgram(waveform, sample_rate, title="From S3")
 
 
