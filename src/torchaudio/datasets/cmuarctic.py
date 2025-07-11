@@ -9,7 +9,6 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_tar
-from torchaudio.utils.wav_utils import load_wav
 
 URL = "aew"
 FOLDER_IN_ARCHIVE = "ARCTIC"
