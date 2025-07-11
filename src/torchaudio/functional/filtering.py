@@ -933,9 +933,10 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
-    _differentiable_iir_apply = torch.ops.torchaudio._differentiable_iir_apply
     _fir_forward = torch.ops.torchaudio._fir_forward
     _fir_backward = torch.ops.torchaudio._fir_backward
+    _iir_forward = torch.ops.torchaudio._iir_forward
+    _iir_backward = torch.ops.torchaudio._iir_backward
 else:
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
@@ -1013,6 +1014,31 @@ class _DifferentiableFIRFunction(torch.autograd.Function):
         return grad_waveform, grad_b_coeffs
 
 
+class _DifferentiableIIRFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, waveform, a_coeffs_normalized):
+        # Save inputs for backward pass
+        ctx.save_for_backward(waveform, a_coeffs_normalized)
+        
+        # Call C++ forward function
+        output = _iir_forward(waveform, a_coeffs_normalized)
+        
+        # Save output for backward pass (needed for IIR gradient computation)
+        ctx.save_for_backward(waveform, a_coeffs_normalized, output)
+        
+        return output
+    
+    @staticmethod
+    def backward(ctx, grad_output):
+        # Retrieve saved inputs and output
+        waveform, a_coeffs_normalized, output = ctx.saved_tensors
+        
+        # Call C++ backward function
+        grad_waveform, grad_a_coeffs = _iir_backward(grad_output, waveform, a_coeffs_normalized, output)
+        
+        return grad_waveform, grad_a_coeffs
+
+
 def _lfilter_core_python(
     waveform: Tensor,
     a_coeffs: Tensor,
@@ -1029,8 +1055,8 @@ def _lfilter_core_python(
     # Apply FIR filter using Python autograd function
     filtered_waveform = _DifferentiableFIRFunction.apply(waveform, b_coeffs_normalized)
     
-    # Apply IIR filter (still using C++ autograd)
-    output = _differentiable_iir_apply(filtered_waveform, a_coeffs_normalized)
+    # Apply IIR filter using Python autograd function
+    output = _DifferentiableIIRFunction.apply(filtered_waveform, a_coeffs_normalized)
     
     return output
 

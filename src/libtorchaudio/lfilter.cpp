@@ -100,87 +100,79 @@ void lfilter_core_generic_loop(
   }
 }
 
-class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
- public:
-  static torch::Tensor forward(
-      torch::autograd::AutogradContext* ctx,
-      const torch::Tensor& waveform,
-      const torch::Tensor& a_coeffs_normalized) {
-    auto device = waveform.device();
-    auto dtype = waveform.dtype();
-    int64_t n_batch = waveform.size(0);
-    int64_t n_channel = waveform.size(1);
-    int64_t n_sample = waveform.size(2);
-    int64_t n_order = a_coeffs_normalized.size(1);
-    int64_t n_sample_padded = n_sample + n_order - 1;
+// IIR filter forward and backward functions (no autograd inheritance)
+torch::Tensor iir_forward(
+    const torch::Tensor& waveform,
+    const torch::Tensor& a_coeffs_normalized) {
+  auto device = waveform.device();
+  auto dtype = waveform.dtype();
+  int64_t n_batch = waveform.size(0);
+  int64_t n_channel = waveform.size(1);
+  int64_t n_sample = waveform.size(2);
+  int64_t n_order = a_coeffs_normalized.size(1);
+  int64_t n_sample_padded = n_sample + n_order - 1;
 
-    auto a_coeff_flipped = a_coeffs_normalized.flip(1).contiguous();
+  auto a_coeff_flipped = a_coeffs_normalized.flip(1).contiguous();
 
-    auto options = torch::TensorOptions().dtype(dtype).device(device);
-    auto padded_output_waveform =
-        torch::zeros({n_batch, n_channel, n_sample_padded}, options);
+  auto options = torch::TensorOptions().dtype(dtype).device(device);
+  auto padded_output_waveform =
+      torch::zeros({n_batch, n_channel, n_sample_padded}, options);
 
-    if (device.is_cpu()) {
-      cpu_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
-    } else if (device.is_cuda()) {
+  if (device.is_cpu()) {
+    cpu_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
+  } else if (device.is_cuda()) {
 #ifdef USE_CUDA
-      cuda_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
+    cuda_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
 #else
-      lfilter_core_generic_loop(
-          waveform, a_coeff_flipped, padded_output_waveform);
+    lfilter_core_generic_loop(
+        waveform, a_coeff_flipped, padded_output_waveform);
 #endif
-    } else {
-      lfilter_core_generic_loop(
-          waveform, a_coeff_flipped, padded_output_waveform);
-    }
-
-    auto output = padded_output_waveform.index(
-        {torch::indexing::Slice(),
-         torch::indexing::Slice(),
-         torch::indexing::Slice(n_order - 1, torch::indexing::None)});
-
-    ctx->save_for_backward({waveform, a_coeffs_normalized, output});
-    return output;
+  } else {
+    lfilter_core_generic_loop(
+        waveform, a_coeff_flipped, padded_output_waveform);
   }
 
-  static torch::autograd::tensor_list backward(
-      torch::autograd::AutogradContext* ctx,
-      torch::autograd::tensor_list grad_outputs) {
-    auto saved = ctx->get_saved_variables();
-    auto x = saved[0];
-    auto a_coeffs_normalized = saved[1];
-    auto y = saved[2];
+  auto output = padded_output_waveform.index(
+      {torch::indexing::Slice(),
+       torch::indexing::Slice(),
+       torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-    int64_t n_channel = x.size(1);
-    int64_t n_order = a_coeffs_normalized.size(1);
+  return output;
+}
 
-    auto dx = torch::Tensor();
-    auto da = torch::Tensor();
-    auto dy = grad_outputs[0];
+std::tuple<torch::Tensor, torch::Tensor> iir_backward(
+    const torch::Tensor& grad_output,
+    const torch::Tensor& waveform,
+    const torch::Tensor& a_coeffs_normalized,
+    const torch::Tensor& output) {
+  int64_t n_channel = waveform.size(1);
+  int64_t n_order = a_coeffs_normalized.size(1);
 
-    namespace F = torch::nn::functional;
+  auto dx = torch::Tensor();
+  auto da = torch::Tensor();
 
-    auto tmp =
-        DifferentiableIIR::apply(dy.flip(2).contiguous(), a_coeffs_normalized)
-            .flip(2);
+  namespace F = torch::nn::functional;
 
-    if (x.requires_grad()) {
-      dx = tmp;
-    }
+  // Compute tmp using recursive IIR forward (equivalent to DifferentiableIIR::apply)
+  auto tmp = iir_forward(grad_output.flip(2).contiguous(), a_coeffs_normalized).flip(2);
 
-    if (a_coeffs_normalized.requires_grad()) {
-      da = -torch::matmul(
-                tmp.transpose(0, 1).reshape({n_channel, 1, -1}),
-                F::pad(y, F::PadFuncOptions({n_order - 1, 0}))
-                    .unfold(2, n_order, 1)
-                    .transpose(0, 1)
-                    .reshape({n_channel, -1, n_order}))
-                .squeeze(1)
-                .flip(1);
-    }
-    return {dx, da};
+  if (waveform.requires_grad()) {
+    dx = tmp;
   }
-};
+
+  if (a_coeffs_normalized.requires_grad()) {
+    da = -torch::matmul(
+              tmp.transpose(0, 1).reshape({n_channel, 1, -1}),
+              F::pad(output, F::PadFuncOptions({n_order - 1, 0}))
+                  .unfold(2, n_order, 1)
+                  .transpose(0, 1)
+                  .reshape({n_channel, -1, n_order}))
+              .squeeze(1)
+              .flip(1);
+  }
+
+  return std::make_tuple(dx, da);
+}
 
 // FIR filter forward and backward functions (no autograd inheritance)
 torch::Tensor fir_forward(
@@ -238,11 +230,6 @@ std::tuple<torch::Tensor, torch::Tensor> fir_backward(
   return std::make_tuple(dx, db);
 }
 
-torch::Tensor differentiable_iir_apply(
-    const torch::Tensor& waveform,
-    const torch::Tensor& a_coeffs_normalized) {
-  return DifferentiableIIR::apply(waveform, a_coeffs_normalized);
-}
 
 } // namespace
 
@@ -259,10 +246,15 @@ TORCH_LIBRARY(torchaudio, m) {
       "torchaudio::_fir_forward(Tensor waveform, Tensor b_coeffs) -> Tensor");
   m.def(
       "torchaudio::_fir_backward(Tensor grad_output, Tensor waveform, Tensor b_coeffs) -> (Tensor, Tensor)");
+  m.def(
+      "torchaudio::_iir_forward(Tensor waveform, Tensor a_coeffs_normalized) -> Tensor");
+  m.def(
+      "torchaudio::_iir_backward(Tensor grad_output, Tensor waveform, Tensor a_coeffs_normalized, Tensor output) -> (Tensor, Tensor)");
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CompositeImplicitAutograd, m) {
-  m.impl("torchaudio::_differentiable_iir_apply", differentiable_iir_apply);
   m.impl("torchaudio::_fir_forward", fir_forward);
   m.impl("torchaudio::_fir_backward", fir_backward);
+  m.impl("torchaudio::_iir_forward", iir_forward);
+  m.impl("torchaudio::_iir_backward", iir_backward);
 }
