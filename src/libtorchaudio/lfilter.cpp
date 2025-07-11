@@ -245,34 +245,16 @@ class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
   }
 };
 
-torch::Tensor lfilter_core(
+torch::Tensor differentiable_fir_apply(
     const torch::Tensor& waveform,
-    const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
-  TORCH_CHECK(waveform.device() == a_coeffs.device());
-  TORCH_CHECK(b_coeffs.device() == a_coeffs.device());
-  TORCH_CHECK(a_coeffs.sizes() == b_coeffs.sizes());
+  return DifferentiableFIR::apply(waveform, b_coeffs);
+}
 
-  TORCH_INTERNAL_ASSERT(waveform.sizes().size() == 3);
-  TORCH_INTERNAL_ASSERT(a_coeffs.sizes().size() == 2);
-  TORCH_INTERNAL_ASSERT(a_coeffs.size(0) == waveform.size(1));
-
-  int64_t n_order = b_coeffs.size(1);
-
-  TORCH_INTERNAL_ASSERT(n_order > 0);
-
-  auto filtered_waveform = DifferentiableFIR::apply(
-      waveform,
-      b_coeffs /
-          a_coeffs.index(
-              {torch::indexing::Slice(), torch::indexing::Slice(0, 1)}));
-
-  auto output = DifferentiableIIR::apply(
-      filtered_waveform,
-      a_coeffs /
-          a_coeffs.index(
-              {torch::indexing::Slice(), torch::indexing::Slice(0, 1)}));
-  return output;
+torch::Tensor differentiable_iir_apply(
+    const torch::Tensor& waveform,
+    const torch::Tensor& a_coeffs_normalized) {
+  return DifferentiableIIR::apply(waveform, a_coeffs_normalized);
 }
 
 } // namespace
@@ -286,8 +268,13 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
 TORCH_LIBRARY(torchaudio, m) {
   m.def(
       "torchaudio::_lfilter(Tensor waveform, Tensor a_coeffs, Tensor b_coeffs) -> Tensor");
+  m.def(
+      "torchaudio::_differentiable_fir_apply(Tensor waveform, Tensor b_coeffs) -> Tensor");
+  m.def(
+      "torchaudio::_differentiable_iir_apply(Tensor waveform, Tensor a_coeffs_normalized) -> Tensor");
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CompositeImplicitAutograd, m) {
-  m.impl("torchaudio::_lfilter", lfilter_core);
+  m.impl("torchaudio::_differentiable_fir_apply", differentiable_fir_apply);
+  m.impl("torchaudio::_differentiable_iir_apply", differentiable_iir_apply);
 }
