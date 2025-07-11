@@ -23,6 +23,7 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 import torch
 import torchaudio
 from torchaudio.utils import load_torchcodec
+from io import BytesIO
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -257,7 +258,7 @@ bucket = "pytorch-tutorial-assets"
 key = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=bucket, Key=key)
-waveform, sample_rate = load_torchcodec(response["Body"])
+waveform, sample_rate = load_torchcodec(BytesIO(response['Body'].read()))
 plot_specgram(waveform, sample_rate, title="From S3")
 
 
