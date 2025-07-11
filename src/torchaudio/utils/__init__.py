@@ -7,7 +7,10 @@ import os
 def load_torchcodec(file, normalize=True, channels_first=True, **args):
     if not normalize:
         raise Exception("Torchcodec does not support non-normalized file reading")
-    from torchcodec.decoders import AudioDecoder
+    try:
+        from torchcodec.decoders import AudioDecoder
+    except:
+         raise Exception("To use this feature, you must install torchcodec. See https://github.com/pytorch/torchcodec for installation instructions")
     decoder = AudioDecoder(file)
     if 'start_seconds' in args or 'stop_seconds' in args:
         samples = decoder.get_samples_played_in_range(**args)
