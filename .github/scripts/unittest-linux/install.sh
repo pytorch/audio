@@ -85,6 +85,9 @@ export BUILD_CPP_TEST=1
 python setup.py install
 
 # 3. Install Test tools
+conda install -y "ffmpeg<5"
+python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
+
 printf "* Installing test tools\n"
 NUMBA_DEV_CHANNEL=""
 if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
@@ -94,7 +97,7 @@ if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
 fi
 (
     set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} sox libvorbis parameterized 'requests>=2.20' 'ffmpeg>=6,<7'
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} sox libvorbis parameterized 'requests>=2.20' 
     pip install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 
     # TODO: might be better to fix the single call to `pip install` above

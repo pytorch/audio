@@ -2158,4 +2158,4 @@ class Deemphasis(torch.nn.Module):
         Returns:
             torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
         """
-        return F.functional._deemphasis(waveform, coeff=self.coeff)
+        return F.functional.deemphasis(waveform, coeff=self.coeff)
