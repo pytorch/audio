@@ -1,4 +1,3 @@
-torchcodec
 IPython
 deep-phonemizer
 boto3
@@ -10,3 +9,5 @@ pandoc
 mir_eval
 pesq
 pystoi
+-i https://download.pytorch.org/whl/nightly/cpu
+torchcodec
