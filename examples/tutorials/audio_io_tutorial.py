@@ -263,51 +263,6 @@ plot_specgram(waveform, sample_rate, title="From S3")
 
 
 ######################################################################
-# Tips on slicing
-# ---------------
-#
-# Providing ``num_frames`` and ``frame_offset`` arguments restricts
-# decoding to the corresponding segment of the input.
-#
-# The same result can be achieved using vanilla Tensor slicing,
-# (i.e. ``waveform[:, frame_offset:frame_offset+num_frames]``). However,
-# providing ``num_frames`` and ``frame_offset`` arguments is more
-# efficient.
-#
-# This is because the function will end data acquisition and decoding
-# once it finishes decoding the requested frames. This is advantageous
-# when the audio data are transferred via network as the data transfer will
-# stop as soon as the necessary amount of data is fetched.
-#
-# The following example illustrates this.
-#
-
-# Illustration of two different decoding methods.
-# The first one will fetch all the data and decode them, while
-# the second one will stop fetching data once it completes decoding.
-# The resulting waveforms are identical.
-
-frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
-
-url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-print("Fetching all the data...")
-with requests.get(url, stream=True) as response:
-    waveform1, sample_rate1 = load_torchcodec(_hide_seek(response.raw))
-    waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
-    print(f" - Fetched {response.raw.tell()} bytes")
-
-print("Fetching until the requested frames are available...")
-with requests.get(url, stream=True) as response:
-    waveform2, sample_rate2 = load_torchcodec(
-        _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames
-    )
-    print(f" - Fetched {response.raw.tell()} bytes")
-
-print("Checking the resulting waveform ... ", end="")
-assert (waveform1 == waveform2).all()
-print("matched!")
-
-######################################################################
 # Saving audio to file
 # --------------------
 #
