@@ -3,9 +3,9 @@ from torio.utils import ffmpeg_utils
 from . import sox_utils
 from .download import download_asset
 import os
-from torchcodec.decoders import AudioDecoder
 
 def load_torchcodec(file, **args):
+    from torchcodec.decoders import AudioDecoder
     try:
         decoder = AudioDecoder(file)
         if 'start_seconds' in args or 'stop_seconds' in args:
