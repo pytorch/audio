@@ -1760,6 +1760,21 @@ def _fix_waveform_shape(
     waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
     return waveform_shift
 
+class RnntLoss(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, *args):
+        output, saved = torch.ops.torchaudio.rnnt_loss_forward(*args)
+        ctx.save_for_backward(saved)
+        return output
+
+    @staticmethod
+    def backward(ctx, dy):
+        grad = ctx.saved_tensors[0]
+        grad_out = dy.view((-1, 1, 1, 1))
+        result = grad * grad_out;
+        return (result, None, None, None, None, None, None, None)
+
+torch.ops.torchaudio.rnnt_loss_forward
 
 def _rnnt_loss(
     logits: Tensor,
@@ -1803,7 +1818,7 @@ def _rnnt_loss(
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
 
-    costs, _ = torch.ops.torchaudio.rnnt_loss(
+    costs = RnntLoss.apply(
         logits=logits,
         targets=targets,
         logit_lengths=logit_lengths,
