@@ -1,3 +1,4 @@
+torchcodec
 IPython
 deep-phonemizer
 boto3
