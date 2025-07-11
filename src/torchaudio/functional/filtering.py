@@ -997,21 +997,10 @@ class DifferentiableIIR(torch.autograd.Function):
             ).squeeze(1).flip(1) if a_coeffs_normalized.requires_grad else None
         return (dx, da)
 
-
-def _lfilter1(waveform, a_coeffs, b_coeffs):
-    n_order = b_coeffs.size(1)
-    filtered_waveform = torch.ops.torchaudio.fir(waveform, b_coeffs / a_coeffs[:, 0:1])
-    return torch.ops.torchaudio.iir(filtered_waveform, a_coeffs / a_coeffs[:, 0:1])
-
-def _lfilter2(waveform, a_coeffs, b_coeffs):
+def _lfilter(waveform, a_coeffs, b_coeffs):
     n_order = b_coeffs.size(1)
     filtered_waveform = DifferentiableFIR.apply(waveform, b_coeffs / a_coeffs[:, 0:1])
     return DifferentiableIIR.apply(filtered_waveform, a_coeffs / a_coeffs[:, 0:1])
-
-_lfilter = _lfilter2
-
-def fir_part(waveform, a_coeffs, b_coeffs):
-    return DifferentiableFIR.apply(waveform, b_coeffs / a_coeffs[:, 0:1])
 
 def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
