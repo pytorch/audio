@@ -6,19 +6,12 @@ import os
 
 def load_torchcodec(file, **args):
     from torchcodec.decoders import AudioDecoder
-    try:
-        decoder = AudioDecoder(file)
-        if 'start_seconds' in args or 'stop_seconds' in args:
-            samples = decoder.get_samples_played_in_range(**args)
-        else:
-            samples = decoder.get_all_samples()
-        return (samples.data, samples.sample_rate)
-    except Exception as e:
-        if "buggy FFmpeg version" in str(e) and "PYTEST_CURRENT_TEST" in os.environ:
-            import pytest
-            pytest.skip()
-        else:
-            raise e
+    decoder = AudioDecoder(file)
+    if 'start_seconds' in args or 'stop_seconds' in args:
+        samples = decoder.get_samples_played_in_range(**args)
+    else:
+        samples = decoder.get_all_samples()
+    return (samples.data, samples.sample_rate)
 
 __all__ = [
     "load_torchcodec",
