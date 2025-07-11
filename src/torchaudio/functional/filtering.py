@@ -933,6 +933,8 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
+    _differentiable_fir_apply = torch.ops.torchaudio._differentiable_fir_apply
+    _differentiable_iir_apply = torch.ops.torchaudio._differentiable_iir_apply
 else:
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
@@ -991,8 +993,26 @@ def _lfilter_core(
     return output
 
 
+# TODO find a better name for this, possibly renaming the existing `_lfilter_core`
+def _lfilter_core_in_python_calling_into_cpp_FIR_and_IIR(
+    waveform: Tensor,
+    a_coeffs: Tensor,
+    b_coeffs: Tensor,
+) -> Tensor:
+    """Python implementation of lfilter_core using C++ DifferentiableFIR and DifferentiableIIR."""
+
+    # TODO here: input validation checks
+
+    a0 = a_coeffs[:, 0:1]  # Keep dimension for broadcasting
+    b_coeffs_normalized = b_coeffs / a0
+    a_coeffs_normalized = a_coeffs / a0
+
+    filtered_waveform = _differentiable_fir_apply(waveform, b_coeffs_normalized)
+    return _differentiable_iir_apply(filtered_waveform, a_coeffs_normalized)
+
+
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter = torch.ops.torchaudio._lfilter
+    _lfilter = _lfilter_core_in_python_calling_into_cpp_FIR_and_IIR
 else:
     _lfilter = _lfilter_core
 
