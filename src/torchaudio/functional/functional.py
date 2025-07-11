@@ -1774,8 +1774,6 @@ class RnntLoss(torch.autograd.Function):
         result = grad * grad_out;
         return (result, None, None, None, None, None, None, None)
 
-torch.ops.torchaudio.rnnt_loss_forward
-
 def _rnnt_loss(
     logits: Tensor,
     targets: Tensor,
