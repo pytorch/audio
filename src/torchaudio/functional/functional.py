@@ -1819,13 +1819,13 @@ def _rnnt_loss(
         blank = logits.shape[-1] + blank
 
     costs = RnntLoss.apply(
-        logits=logits,
-        targets=targets,
-        logit_lengths=logit_lengths,
-        target_lengths=target_lengths,
-        blank=blank,
-        clamp=clamp,
-        fused_log_softmax=fused_log_softmax,
+        logits,
+        targets,
+        logit_lengths,
+        target_lengths,
+        blank,
+        clamp,
+        fused_log_softmax
     )
 
     if reduction == "mean":
