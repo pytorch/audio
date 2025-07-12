@@ -151,7 +151,8 @@ def apply_effects_tensor(
         >>> transform = torch.jit.load(path)
         >>>
         >>>> # Run transform
-        >>> waveform, input_sample_rate = torchaudio.load("input.wav")
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, input_sample_rate = load_torchcodec("input.wav")
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """

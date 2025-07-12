@@ -43,6 +43,7 @@ apply various effects and codecs to waveform tensor.
 #
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -92,7 +93,7 @@ for k, v in torchaudio.utils.ffmpeg_utils.get_versions().items():
 #
 
 src = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-waveform, sr = torchaudio.load(src, channels_first=False)
+waveform, sr = load_torchcodec(src, channels_first=False)
 
 
 ######################################################################

@@ -52,6 +52,7 @@ encode and save audio/video data into various formats/destinations.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -74,7 +75,7 @@ from IPython.display import Audio, Video
 from torchaudio.utils import download_asset
 
 SAMPLE_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-WAVEFORM, SAMPLE_RATE = torchaudio.load(SAMPLE_PATH, channels_first=False)
+WAVEFORM, SAMPLE_RATE = load_torchcodec(SAMPLE_PATH, channels_first=False)
 NUM_FRAMES, NUM_CHANNELS = WAVEFORM.shape
 
 _BASE_DIR = tempfile.TemporaryDirectory()

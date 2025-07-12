@@ -21,6 +21,7 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -103,7 +104,7 @@ def plot_fbank(fbank, title=None):
 #
 
 # Load audio
-SPEECH_WAVEFORM, SAMPLE_RATE = torchaudio.load(SAMPLE_SPEECH)
+SPEECH_WAVEFORM, SAMPLE_RATE = load_torchcodec(SAMPLE_SPEECH)
 
 # Define transform
 spectrogram = T.Spectrogram(n_fft=512)

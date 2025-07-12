@@ -37,6 +37,7 @@ pre-trained models from wav2vec 2.0
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -114,7 +115,7 @@ IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################
-# To load data, we use :py:func:`torchaudio.load`.
+# To load data, we use :py:func:`load_torchcodec`.
 #
 # If the sampling rate is different from what the pipeline expects, then
 # we can use :py:func:`torchaudio.functional.resample` for resampling.
@@ -126,7 +127,7 @@ IPython.display.Audio(SPEECH_FILE)
 #      using :py:class:`torchaudio.transforms.Resample` might improve the performace.
 #
 
-waveform, sample_rate = torchaudio.load(SPEECH_FILE)
+waveform, sample_rate = load_torchcodec(SPEECH_FILE)
 waveform = waveform.to(device)
 
 if sample_rate != bundle.sample_rate:
