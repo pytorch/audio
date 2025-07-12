@@ -51,24 +51,12 @@ model implementations and application components.
    :hidden:
 
    tutorials/audio_io_tutorial
-   tutorials/streamreader_basic_tutorial
-   tutorials/streamreader_advanced_tutorial
-   tutorials/streamwriter_basic_tutorial
-   tutorials/streamwriter_advanced
-   tutorials/nvdec_tutorial
-   tutorials/nvenc_tutorial
 
-   tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
    tutorials/ctc_forced_alignment_api_tutorial
-
-   tutorials/oscillator_tutorial
-   tutorials/additive_synthesis_tutorial
-   tutorials/filter_design_tutorial
-   tutorials/subtractive_synthesis_tutorial
 
    tutorials/audio_datasets_tutorial
 
@@ -107,46 +95,14 @@ model implementations and application components.
    :hidden:
 
    torchaudio
-   io
    functional
    transforms
    datasets
    models
    models.decoder
    pipelines
-   sox_effects
-   compliance.kaldi
-   kaldi_io
    utils
 
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-
-   torio
-   torio.io
-   torio.utils
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Python Prototype API Reference
-   :hidden:
-
-   prototype
-   prototype.datasets
-   prototype.functional
-   prototype.models
-   prototype.pipelines
-   prototype.transforms
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C++ Prototype API Reference
-   :hidden:
-
-   libtorio
-   libtorio.stream_reader
-   libtorio.stream_writer
 
 .. toctree::
    :maxdepth: 1
@@ -182,7 +138,7 @@ Tutorials
 
 .. customcarditem::
    :header: Loading waveform Tensors from files and saving them
-   :card_description: Learn how to query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.
+   :card_description: Learn how to query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.utils.load_torchcodec</code> and <code>torchaudio.save</code> functions.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_io_tutorial.png
    :link: tutorials/audio_io_tutorial.html
    :tags: I/O
@@ -328,13 +284,6 @@ Tutorials
    :tags: Pipelines,ASR,wav2vec2,CTC-Decoder
 
 .. customcarditem::
-   :header: Online ASR with Emformer RNN-T
-   :card_description: Learn how to perform online ASR with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/online_asr_tutorial.gif
-   :link: tutorials/online_asr_tutorial.html
-   :tags: Pipelines,ASR,RNNT,StreamReader
-
-.. customcarditem::
    :header: Real-time microphone ASR with Emformer RNN-T
    :card_description: Learn how to transcribe speech fomr microphone with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/device_asr.png
@@ -399,7 +348,7 @@ In BibTeX format:
 .. code-block:: bibtex
 
    @misc{hwang2023torchaudio,
-      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch},
       author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
       year={2023},
       eprint={2310.17864},

@@ -10,10 +10,8 @@ from itertools import zip_longest
 
 import torch
 import torchaudio
-import torio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import eval_env, is_module_available
-from torchaudio.utils.ffmpeg_utils import get_video_decoders, get_video_encoders
 
 
 class TempDirMixin:
@@ -108,8 +106,6 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
-_IS_FFMPEG_AVAILABLE = torio._extension.lazy_import_ffmpeg_ext().is_available()
-_IS_SOX_AVAILABLE = torchaudio._extension.lazy_import_sox_ext().is_available()
 _IS_CTC_DECODER_AVAILABLE = None
 _IS_CUDA_CTC_DECODER_AVAILABLE = None
 
@@ -207,7 +203,7 @@ skipIfCudaSmallMemory = _skipIf(
     key="CUDA_SMALL_MEMORY",
 )
 skipIfNoSox = _skipIf(
-    not _IS_SOX_AVAILABLE,
+    True,
     reason="Sox features are not available.",
     key="NO_SOX",
 )
@@ -255,7 +251,7 @@ skipIfNoQengine = _skipIf(
     key="NO_QUANTIZATION",
 )
 skipIfNoFFmpeg = _skipIf(
-    not _IS_FFMPEG_AVAILABLE,
+    True,
     reason="ffmpeg features are not available.",
     key="NO_FFMPEG",
 )
@@ -268,7 +264,7 @@ skipIfPy310 = _skipIf(
     key="ON_PYTHON_310",
 )
 skipIfNoAudioDevice = _skipIf(
-    not (_IS_FFMPEG_AVAILABLE and torchaudio.utils.ffmpeg_utils.get_output_devices()),
+    True,
     reason="No output audio device is available.",
     key="NO_AUDIO_OUT_DEVICE",
 )

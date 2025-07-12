@@ -42,6 +42,7 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -106,7 +107,7 @@ bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
 model = bundle.get_model().to(device)
 labels = bundle.get_labels()
 with torch.inference_mode():
-    waveform, _ = torchaudio.load(SPEECH_FILE)
+    waveform, _ = load_torchcodec(SPEECH_FILE)
     emissions, _ = model(waveform.to(device))
     emissions = torch.log_softmax(emissions, dim=-1)
 

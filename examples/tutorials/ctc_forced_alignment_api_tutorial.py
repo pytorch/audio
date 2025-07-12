@@ -39,6 +39,7 @@ illustrate how to align non-English transcripts.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -63,7 +64,7 @@ import torchaudio.functional as F
 #
 
 SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-waveform, _ = torchaudio.load(SPEECH_FILE)
+waveform, _ = load_torchcodec(SPEECH_FILE)
 TRANSCRIPT = "i had that curiosity beside me at this moment".split()
 
 

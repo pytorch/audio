@@ -22,6 +22,8 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
+from io import BytesIO
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -151,7 +153,7 @@ print(metadata)
 # Loading audio data
 # ------------------
 #
-# To load audio data, you can use :py:func:`torchaudio.load`.
+# To load audio data, you can use :py:func:`load_torchcodec`.
 #
 # This function accepts a path-like object or file-like object as input.
 #
@@ -165,7 +167,7 @@ print(metadata)
 # documentation <https://pytorch.org/audio>`__.
 #
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 
 ######################################################################
@@ -233,8 +235,8 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 
 # Load audio data as HTTP request
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-with requests.get(url, stream=True) as response:
-    waveform, sample_rate = torchaudio.load(_hide_seek(response.raw))
+with requests.get(url, stream=False) as response:
+    waveform, sample_rate = load_torchcodec(response.content)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
 ######################################################################
@@ -245,7 +247,7 @@ tar_path = download_asset("tutorial-assets/VOiCES_devkit.tar.gz")
 tar_item = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 with tarfile.open(tar_path, mode="r") as tarfile_:
     fileobj = tarfile_.extractfile(tar_item)
-    waveform, sample_rate = torchaudio.load(fileobj)
+    waveform, sample_rate = load_torchcodec(fileobj)
 plot_specgram(waveform, sample_rate, title="TAR file")
 
 ######################################################################
@@ -256,155 +258,5 @@ bucket = "pytorch-tutorial-assets"
 key = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=bucket, Key=key)
-waveform, sample_rate = torchaudio.load(_hide_seek(response["Body"]))
+waveform, sample_rate = load_torchcodec(BytesIO(response['Body'].read()))
 plot_specgram(waveform, sample_rate, title="From S3")
-
-
-######################################################################
-# Tips on slicing
-# ---------------
-#
-# Providing ``num_frames`` and ``frame_offset`` arguments restricts
-# decoding to the corresponding segment of the input.
-#
-# The same result can be achieved using vanilla Tensor slicing,
-# (i.e. ``waveform[:, frame_offset:frame_offset+num_frames]``). However,
-# providing ``num_frames`` and ``frame_offset`` arguments is more
-# efficient.
-#
-# This is because the function will end data acquisition and decoding
-# once it finishes decoding the requested frames. This is advantageous
-# when the audio data are transferred via network as the data transfer will
-# stop as soon as the necessary amount of data is fetched.
-#
-# The following example illustrates this.
-#
-
-# Illustration of two different decoding methods.
-# The first one will fetch all the data and decode them, while
-# the second one will stop fetching data once it completes decoding.
-# The resulting waveforms are identical.
-
-frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
-
-url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-print("Fetching all the data...")
-with requests.get(url, stream=True) as response:
-    waveform1, sample_rate1 = torchaudio.load(_hide_seek(response.raw))
-    waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
-    print(f" - Fetched {response.raw.tell()} bytes")
-
-print("Fetching until the requested frames are available...")
-with requests.get(url, stream=True) as response:
-    waveform2, sample_rate2 = torchaudio.load(
-        _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames
-    )
-    print(f" - Fetched {response.raw.tell()} bytes")
-
-print("Checking the resulting waveform ... ", end="")
-assert (waveform1 == waveform2).all()
-print("matched!")
-
-######################################################################
-# Saving audio to file
-# --------------------
-#
-# To save audio data in formats interpretable by common applications,
-# you can use :py:func:`torchaudio.save`.
-#
-# This function accepts a path-like object or file-like object.
-#
-# When passing a file-like object, you also need to provide argument ``format``
-# so that the function knows which format it should use. In the
-# case of a path-like object, the function will infer the format from
-# the extension. If you are saving to a file without an extension, you need
-# to provide argument ``format``.
-#
-# When saving WAV-formatted data, the default encoding for ``float32`` Tensor
-# is 32-bit floating-point PCM. You can provide arguments ``encoding`` and
-# ``bits_per_sample`` to change this behavior. For example, to save data
-# in 16-bit signed integer PCM, you can do the following.
-#
-# .. note::
-#
-#    Saving data in encodings with a lower bit depth reduces the
-#    resulting file size but also precision.
-#
-
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
-
-
-######################################################################
-#
-
-
-def inspect_file(path):
-    print("-" * 10)
-    print("Source:", path)
-    print("-" * 10)
-    print(f" - File size: {os.path.getsize(path)} bytes")
-    print(f" - {torchaudio.info(path)}")
-    print()
-
-
-######################################################################
-#
-# Save without any encoding option.
-# The function will pick up the encoding which
-# the provided data fit
-with tempfile.TemporaryDirectory() as tempdir:
-    path = f"{tempdir}/save_example_default.wav"
-    torchaudio.save(path, waveform, sample_rate)
-    inspect_file(path)
-
-######################################################################
-#
-# Save as 16-bit signed integer Linear PCM
-# The resulting file occupies half the storage but loses precision
-with tempfile.TemporaryDirectory() as tempdir:
-    path = f"{tempdir}/save_example_PCM_S16.wav"
-    torchaudio.save(path, waveform, sample_rate, encoding="PCM_S", bits_per_sample=16)
-    inspect_file(path)
-
-
-######################################################################
-# :py:func:`torchaudio.save` can also handle other formats.
-# To name a few:
-#
-
-formats = [
-    "flac",
-    # "vorbis",
-    # "sph",
-    # "amb",
-    # "amr-nb",
-    # "gsm",
-]
-
-######################################################################
-#
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV_8000)
-with tempfile.TemporaryDirectory() as tempdir:
-    for format in formats:
-        path = f"{tempdir}/save_example.{format}"
-        torchaudio.save(path, waveform, sample_rate, format=format)
-        inspect_file(path)
-
-######################################################################
-# Saving to file-like object
-# --------------------------
-#
-# Similar to the other I/O functions, you can save audio to file-like
-# objects. When saving to a file-like object, argument ``format`` is
-# required.
-#
-
-
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
-
-# Saving to bytes buffer
-buffer_ = io.BytesIO()
-torchaudio.save(buffer_, waveform, sample_rate, format="wav")
-
-buffer_.seek(0)
-print(buffer_.read(16))

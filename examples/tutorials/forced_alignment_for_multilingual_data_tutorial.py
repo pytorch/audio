@@ -26,6 +26,7 @@ model, tokenizer and aligner, to perform the forced alignment with less code.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -244,7 +245,7 @@ text_raw = "aber seit ich bei ihnen das brot hole"
 text_normalized = "aber seit ich bei ihnen das brot hole"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/10349_8674_000087.flac"
-waveform, sample_rate = torchaudio.load(
+waveform, sample_rate = load_torchcodec(
     url, frame_offset=int(0.5 * bundle.sample_rate), num_frames=int(2.5 * bundle.sample_rate)
 )
 
@@ -326,7 +327,7 @@ text_normalized = "guan fuwu gaoduan chanpin reng chuyu gongbuyingqiu de jumian"
 #
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/mvdr/clean_speech.wav"
-waveform, sample_rate = torchaudio.load(url)
+waveform, sample_rate = load_torchcodec(url)
 waveform = waveform[0:1]
 
 ######################################################################
@@ -400,7 +401,7 @@ text_raw = "wtedy ujrzałem na jego brzuchu okrągłą czarną ranę"
 text_normalized = "wtedy ujrzalem na jego brzuchu okragla czarna rane"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/5090_1447_000088.flac"
-waveform, sample_rate = torchaudio.load(url, num_frames=int(4.5 * bundle.sample_rate))
+waveform, sample_rate = load_torchcodec(url, num_frames=int(4.5 * bundle.sample_rate))
 
 ######################################################################
 #
@@ -467,7 +468,7 @@ text_raw = "na imensa extensão onde se esconde o inconsciente imortal"
 text_normalized = "na imensa extensao onde se esconde o inconsciente imortal"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/6566_5323_000027.flac"
-waveform, sample_rate = torchaudio.load(
+waveform, sample_rate = load_torchcodec(
     url, frame_offset=int(bundle.sample_rate), num_frames=int(4.6 * bundle.sample_rate)
 )
 
@@ -542,7 +543,7 @@ text_raw = "elle giacean per terra tutte quante"
 text_normalized = "elle giacean per terra tutte quante"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/642_529_000025.flac"
-waveform, sample_rate = torchaudio.load(url, num_frames=int(4 * bundle.sample_rate))
+waveform, sample_rate = load_torchcodec(url, num_frames=int(4 * bundle.sample_rate))
 
 ######################################################################
 #

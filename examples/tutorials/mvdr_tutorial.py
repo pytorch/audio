@@ -31,6 +31,7 @@ Speech Enhancement with MVDR Beamforming
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 import torchaudio.functional as F
 
 print(torch.__version__)
@@ -170,8 +171,8 @@ def evaluate(estimate, reference):
 # ~~~~~~~~~~~~~~~~~~~~
 #
 
-waveform_clean, sr = torchaudio.load(SAMPLE_CLEAN)
-waveform_noise, sr2 = torchaudio.load(SAMPLE_NOISE)
+waveform_clean, sr = load_torchcodec(SAMPLE_CLEAN)
+waveform_noise, sr2 = load_torchcodec(SAMPLE_NOISE)
 assert sr == sr2 == SAMPLE_RATE
 # The mixture waveform is a combination of clean and noise waveforms with a desired SNR.
 target_snr = 3

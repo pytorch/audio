@@ -1,6 +1,7 @@
 Jinja2<3.1.0
 matplotlib<=3.8
 pyparsing<3,>=2.0.2
+torchcodec
 
 # C++ docs
 breathe==4.34.0
