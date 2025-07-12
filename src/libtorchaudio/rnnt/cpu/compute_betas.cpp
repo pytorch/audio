@@ -60,7 +60,7 @@ torch::Tensor compute_betas(
       /*logits=*/logits.data_ptr<float>(),
       /*targets=*/targets.data_ptr<int>(),
       /*logit_lengths=*/logit_lengths.data_ptr<int>(),
-      /*target_lengths=*/target_lengths.data_ptr<int>(),
+      /*tgtLengths=*/target_lengths.data_ptr<int>(),
       /*costs=*/costs.data_ptr<float>(),
       /*betas=*/betas.data_ptr<float>());
   return betas;
