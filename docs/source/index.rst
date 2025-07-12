@@ -68,7 +68,6 @@ model implementations and application components.
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/asr_inference_with_ctc_decoder_tutorial
    tutorials/asr_inference_with_cuda_ctc_decoder_tutorial
-   tutorials/online_asr_tutorial
    tutorials/device_asr
    tutorials/device_avsr
    tutorials/forced_alignment_tutorial

@@ -30,12 +30,6 @@ on laptop.
 #
 # We use streaming API to fetch audio from audio device (microphone)
 # chunk by chunk, then run inference using Emformer RNN-T.
-#
-# For the basic usage of the streaming API and Emformer RNN-T
-# please refer to
-# `StreamReader Basic Usage <./streamreader_basic_tutorial.html>`__ and
-# `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
-#
 
 ######################################################################
 # 2. Checking the supported devices
