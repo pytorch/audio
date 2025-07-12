@@ -51,24 +51,12 @@ model implementations and application components.
    :hidden:
 
    tutorials/audio_io_tutorial
-   tutorials/streamreader_basic_tutorial
-   tutorials/streamreader_advanced_tutorial
-   tutorials/streamwriter_basic_tutorial
-   tutorials/streamwriter_advanced
-   tutorials/nvdec_tutorial
-   tutorials/nvenc_tutorial
 
-   tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
    tutorials/audio_feature_augmentation_tutorial
    tutorials/ctc_forced_alignment_api_tutorial
-
-   tutorials/oscillator_tutorial
-   tutorials/additive_synthesis_tutorial
-   tutorials/filter_design_tutorial
-   tutorials/subtractive_synthesis_tutorial
 
    tutorials/audio_datasets_tutorial
 
@@ -107,46 +95,14 @@ model implementations and application components.
    :hidden:
 
    torchaudio
-   io
    functional
    transforms
    datasets
    models
    models.decoder
    pipelines
-   sox_effects
-   compliance.kaldi
-   kaldi_io
    utils
 
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-
-   torio
-   torio.io
-   torio.utils
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Python Prototype API Reference
-   :hidden:
-
-   prototype
-   prototype.datasets
-   prototype.functional
-   prototype.models
-   prototype.pipelines
-   prototype.transforms
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C++ Prototype API Reference
-   :hidden:
-
-   libtorio
-   libtorio.stream_reader
-   libtorio.stream_writer
 
 .. toctree::
    :maxdepth: 1
@@ -326,13 +282,6 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/asr_inference_with_ctc_decoder_tutorial.png
    :link: tutorials/asr_inference_with_ctc_decoder_tutorial.html
    :tags: Pipelines,ASR,wav2vec2,CTC-Decoder
-
-.. customcarditem::
-   :header: Online ASR with Emformer RNN-T
-   :card_description: Learn how to perform online ASR with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/online_asr_tutorial.gif
-   :link: tutorials/online_asr_tutorial.html
-   :tags: Pipelines,ASR,RNNT,StreamReader
 
 .. customcarditem::
    :header: Real-time microphone ASR with Emformer RNN-T
