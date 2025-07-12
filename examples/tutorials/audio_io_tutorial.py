@@ -235,8 +235,7 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 
 # Load audio data as HTTP request
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-with requests.get(url, stream=False) as response:
-    waveform, sample_rate = load_torchcodec(response.content)
+waveform, sample_rate = load_torchcodec(url)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
 ######################################################################
