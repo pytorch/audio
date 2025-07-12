@@ -148,8 +148,6 @@ Verify the installation by checking the version and CUDA device accessibility.
 
    print(torchaudio.__version__)
 
-   torchaudio.utils.ffmpeg_utils.get_build_config()
-
 .. code-block::
 
    2.0.0a0+2ead941
