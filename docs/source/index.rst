@@ -157,55 +157,6 @@ Tutorials
    :tags: Forced-Alignment
 
 .. customcarditem::
-   :header: Streaming media decoding with StreamReader
-   :card_description: Learn how to load audio/video to Tensors using <code>torchaudio.io.StreamReader</code> class.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamreader_basic_tutorial.png
-   :link: tutorials/streamreader_basic_tutorial.html
-   :tags: I/O,StreamReader
-
-.. customcarditem::
-   :header: Device input, synthetic audio/video, and filtering with StreamReader
-   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and apply filters to them with <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamreader_advanced_tutorial.gif
-   :link: tutorials/streamreader_advanced_tutorial.html
-   :tags: I/O,StreamReader
-
-.. customcarditem::
-   :header: Streaming media encoding with StreamWriter
-   :card_description: Learn how to save audio/video with <code>torchaudio.io.StreamWriter</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamwriter_basic_tutorial.gif
-   :link: tutorials/streamwriter_basic_tutorial.html
-   :tags: I/O,StreamWriter
-
-.. customcarditem::
-   :header: Playing media with StreamWriter
-   :card_description: Learn how to play audio/video with <code>torchaudio.io.StreamWriter</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamwriter_advanced.gif
-   :link: tutorials/streamwriter_advanced.html
-   :tags: I/O,StreamWriter
-
-.. customcarditem::
-   :header: Hardware accelerated video decoding with NVDEC
-   :card_description: Learn how to use HW video decoder.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
-   :link: tutorials/nvdec_tutorial.html
-   :tags: I/O,StreamReader
-
-.. customcarditem::
-   :header: Hardware accelerated video encoding with NVENC
-   :card_description: Learn how to use HW video encoder.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
-   :link: tutorials/nvenc_tutorial.html
-   :tags: I/O,StreamWriter
-
-.. customcarditem::
-   :header: Apply effects and codecs to waveform
-   :card_description: Learn how to apply effects and codecs to waveform using <code>torchaudio.io.AudioEffector</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/effector_tutorial.png
-   :link: tutorials/effector_tutorial.html
-   :tags: Preprocessing
-
-.. customcarditem::
    :header: Audio resampling with bandlimited sinc interpolation
    :card_description: Learn how to resample audio tensor with <code>torchaudio.functional.resample</code> and <code>torchaudio.transforms.Resample</code>.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_resampling_tutorial.png
@@ -282,12 +233,6 @@ Tutorials
    :link: tutorials/asr_inference_with_ctc_decoder_tutorial.html
    :tags: Pipelines,ASR,wav2vec2,CTC-Decoder
 
-.. customcarditem::
-   :header: Real-time microphone ASR with Emformer RNN-T
-   :card_description: Learn how to transcribe speech fomr microphone with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/device_asr.png
-   :link: tutorials/device_asr.html
-   :tags: Pipelines,ASR,RNNT,StreamReader
 
 .. customcarditem::
    :header: Forced Alignment with Wav2Vec2
