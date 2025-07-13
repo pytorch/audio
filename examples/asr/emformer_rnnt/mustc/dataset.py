@@ -32,15 +32,15 @@ class MUSTC(torch.utils.data.Dataset):
         self.idx_target_lengths = []
         self.wav_list = []
         for idx, item in enumerate(file_list):
-            offset = int(item["offset"] * SAMPLE_RATE)
-            duration = int(item["duration"] * SAMPLE_RATE)
+            offset = item["offset"]
+            duration = item["duration"]
             self.idx_target_lengths.append((idx, item["duration"]))
             file_path = wav_dir / item["wav"]
             self.wav_list.append((file_path, offset, duration))
 
     def _get_mustc_item(self, idx):
         file_path, offset, duration = self.wav_list[idx]
-        waveform, sr = load_torchcodec(file_path, frame_offset=offset, num_frames=duration)
+        waveform, sr = load_torchcodec(file_path, start_seconds=offset, stop_seconds=offset + duration)
         assert sr == SAMPLE_RATE
         transcript = self.trans_list[idx].replace("\n", "")
         return (waveform, transcript)

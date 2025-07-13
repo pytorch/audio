@@ -246,7 +246,7 @@ text_normalized = "aber seit ich bei ihnen das brot hole"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/10349_8674_000087.flac"
 waveform, sample_rate = load_torchcodec(
-    url, frame_offset=int(0.5 * bundle.sample_rate), num_frames=int(2.5 * bundle.sample_rate)
+    url, start_seconds=0.5, stop_seconds=3)
 )
 
 ######################################################################
@@ -468,9 +468,7 @@ text_raw = "na imensa extensão onde se esconde o inconsciente imortal"
 text_normalized = "na imensa extensao onde se esconde o inconsciente imortal"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/6566_5323_000027.flac"
-waveform, sample_rate = load_torchcodec(
-    url, frame_offset=int(bundle.sample_rate), num_frames=int(4.6 * bundle.sample_rate)
-)
+waveform, sample_rate = load_torchcodec(url, start_seconds=1, stop_seconds=4.6)
 
 ######################################################################
 #
