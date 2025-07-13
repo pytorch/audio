@@ -221,10 +221,10 @@ plot_specgram(waveform, sample_rate)
 Audio(waveform.numpy()[0], rate=sample_rate)
 
 ######################################################################
-# Loading from file-like object
+# Loading from URLs and file-like object
 # -----------------------------
 #
-# The I/O functions support file-like objects.
+# The I/O functions support URLs and file-like objects.
 # This allows for fetching and decoding audio data from locations
 # within and beyond the local file system.
 # The following examples illustrate this.
@@ -233,7 +233,7 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 ######################################################################
 #
 
-# Load audio data as HTTP request
+# Load audio data from an HTTP request
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 waveform, sample_rate = load_torchcodec(url)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
@@ -296,7 +296,7 @@ print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Fetching until the requested frames are available...")
 waveform2, sample_rate2 = load_torchcodec(
-    url, frame_offset=frame_offset, num_frames=num_frames
+    url, start_seconds=1, stop_seconds=2
 )
 print(f" - Fetched {response.raw.tell()} bytes")
 
