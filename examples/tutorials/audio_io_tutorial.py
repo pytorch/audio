@@ -292,13 +292,11 @@ url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-
 print("Fetching all the data...")
 waveform1, sample_rate1 = load_torchcodec(url)
 waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
-print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Fetching until the requested frames are available...")
 waveform2, sample_rate2 = load_torchcodec(
     url, start_seconds=1, stop_seconds=2
 )
-print(f" - Fetched {response.raw.tell()} bytes")
 
 print("Checking the resulting waveform ... ", end="")
 assert (waveform1 == waveform2).all()

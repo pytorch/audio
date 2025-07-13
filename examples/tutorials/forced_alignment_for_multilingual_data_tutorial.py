@@ -247,7 +247,6 @@ text_normalized = "aber seit ich bei ihnen das brot hole"
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/10349_8674_000087.flac"
 waveform, sample_rate = load_torchcodec(
     url, start_seconds=0.5, stop_seconds=3)
-)
 
 ######################################################################
 #
