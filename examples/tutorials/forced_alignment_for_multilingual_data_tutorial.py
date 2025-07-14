@@ -400,7 +400,7 @@ text_raw = "wtedy ujrzałem na jego brzuchu okrągłą czarną ranę"
 text_normalized = "wtedy ujrzalem na jego brzuchu okragla czarna rane"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/5090_1447_000088.flac"
-waveform, sample_rate = load_torchcodec(url, num_frames=int(4.5 * bundle.sample_rate))
+waveform, sample_rate = load_torchcodec(url, stop_seconds=4.5)
 
 ######################################################################
 #
@@ -540,7 +540,7 @@ text_raw = "elle giacean per terra tutte quante"
 text_normalized = "elle giacean per terra tutte quante"
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/642_529_000025.flac"
-waveform, sample_rate = load_torchcodec(url, num_frames=int(4 * bundle.sample_rate))
+waveform, sample_rate = load_torchcodec(url, stop_seconds=4)
 
 ######################################################################
 #
