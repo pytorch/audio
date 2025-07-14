@@ -59,7 +59,7 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install Pytorch"
-        pip3 install --pre torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cu128"
+        pip3 install --pre torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/${CHANNEL}/cu128"
 
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
