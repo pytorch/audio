@@ -116,3 +116,7 @@ TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("torchaudio::_lfilter_core_loop", &cuda_lfilter_core_loop);
 }
 #endif
+
+TORCH_LIBRARY_IMPL(torchaudio, CompositeExplicitAutograd, m) {
+  m.impl("torchaudio::_lfilter_core_loop", &lfilter_core_generic_loop);
+}
