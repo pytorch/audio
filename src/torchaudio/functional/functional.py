@@ -9,7 +9,8 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal.module_utils import deprecated
+from torchaudio._internal.module_utils import deprecated, dropping_support
+
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -1760,7 +1761,7 @@ def _fix_waveform_shape(
     return waveform_shift
 
 
-def rnnt_loss(
+def _rnnt_loss(
     logits: Tensor,
     targets: Tensor,
     logit_lengths: Tensor,
@@ -1864,6 +1865,9 @@ def psd(
     psd = psd.sum(dim=-3)
     return psd
 
+# Expose both deprecated wrapper as well as original because torchscript breaks on
+# wrapped functions.
+rnnt_loss = dropping_support(_rnnt_loss)
 
 def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
@@ -2494,7 +2498,7 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     """
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
-    return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+    return torchaudio.functional.filtering.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
 
 
 def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):

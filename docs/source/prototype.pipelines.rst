@@ -5,6 +5,11 @@ torchaudio.prototype.pipelines
 .. py:module:: torchaudio.prototype.pipelines
 .. currentmodule:: torchaudio.prototype.pipelines
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result, the ``prototype`` module is
+    deprecated in 2.8 and will be removed in 2.9.
+
 The pipelines subpackage contains APIs to models with pretrained weights and relevant utilities.
 
 RNN-T Streaming/Non-Streaming ASR
