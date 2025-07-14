@@ -16,18 +16,8 @@ def base_smoke_test():
     import torchaudio.utils  # noqa: F401
 
 
-def ffmpeg_test():
-    from torchaudio.io import StreamReader  # noqa: F401
-
-
 def _run_smoke_test(check_ffmpeg):
     base_smoke_test()
-
-    if not check_ffmpeg:
-        print("Skipping ffmpeg test.")
-    else:
-        ffmpeg_test()
-
     print("Smoke test passed.")
 
 

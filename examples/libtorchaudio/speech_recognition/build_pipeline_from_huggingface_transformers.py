@@ -8,6 +8,7 @@ import torch
 import torchaudio
 from greedy_decoder import Decoder
 from torchaudio.models.wav2vec2.utils.import_huggingface import import_huggingface_model
+from torchaudio.utils import load_torchcodec
 
 TORCH_VERSION: Tuple[int, ...] = tuple(int(x) for x in torch.__version__.split(".")[:2])
 if TORCH_VERSION >= (1, 10):
@@ -49,7 +50,7 @@ def _parse_args():
 
 class Loader(torch.nn.Module):
     def forward(self, audio_path: str) -> torch.Tensor:
-        waveform, sample_rate = torchaudio.load(audio_path)
+        waveform, sample_rate = load_torchcodec(audio_path)
         if sample_rate != 16000:
             waveform = torchaudio.functional.resample(waveform, float(sample_rate), 16000.0)
         return waveform

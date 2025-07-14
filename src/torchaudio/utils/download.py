@@ -30,9 +30,6 @@ def _get_hash(path, hash, chunk_size=1028):
             data = file.read(chunk_size)
     return m.hexdigest()
 
-from torchaudio._internal.module_utils import dropping_support
-
-@dropping_support
 def download_asset(
     key: str,
     hash: str = "",

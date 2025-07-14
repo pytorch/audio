@@ -14,7 +14,6 @@ import torchaudio
 from common import MODEL_TYPE_LIBRISPEECH, MODEL_TYPE_MUSTC, MODEL_TYPE_TEDLIUM3
 from librispeech.lightning import LibriSpeechRNNTModule
 from mustc.lightning import MuSTCRNNTModule
-from tedlium3.lightning import TEDLIUM3RNNTModule
 
 
 logger = logging.getLogger(__name__)
@@ -42,11 +41,6 @@ def run_eval(model, model_type):
     if model_type == MODEL_TYPE_LIBRISPEECH:
         dataloader = model.test_dataloader()
         run_eval_subset(model, dataloader, "test")
-    elif model_type == MODEL_TYPE_TEDLIUM3:
-        dev_loader = model.dev_dataloader()
-        test_loader = model.test_dataloader()
-        run_eval_subset(model, dev_loader, "dev")
-        run_eval_subset(model, test_loader, "test")
     elif model_type == MODEL_TYPE_MUSTC:
         dev_loader = model.dev_dataloader()
         test_common_loader = model.test_common_dataloader()
@@ -63,13 +57,6 @@ def get_lightning_module(args):
         return LibriSpeechRNNTModule.load_from_checkpoint(
             args.checkpoint_path,
             librispeech_path=str(args.dataset_path),
-            sp_model_path=str(args.sp_model_path),
-            global_stats_path=str(args.global_stats_path),
-        )
-    elif args.model_type == MODEL_TYPE_TEDLIUM3:
-        return TEDLIUM3RNNTModule.load_from_checkpoint(
-            args.checkpoint_path,
-            tedlium_path=str(args.dataset_path),
             sp_model_path=str(args.sp_model_path),
             global_stats_path=str(args.global_stats_path),
         )
