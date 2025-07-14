@@ -22,6 +22,8 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
+from io import BytesIO
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -151,7 +153,7 @@ print(metadata)
 # Loading audio data
 # ------------------
 #
-# To load audio data, you can use :py:func:`torchaudio.load`.
+# To load audio data, you can use :py:func:`load_torchcodec`.
 #
 # This function accepts a path-like object or file-like object as input.
 #
@@ -165,7 +167,7 @@ print(metadata)
 # documentation <https://pytorch.org/audio>`__.
 #
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 
 ######################################################################
@@ -219,10 +221,10 @@ plot_specgram(waveform, sample_rate)
 Audio(waveform.numpy()[0], rate=sample_rate)
 
 ######################################################################
-# Loading from file-like object
+# Loading from URLs and file-like object
 # -----------------------------
 #
-# The I/O functions support file-like objects.
+# The I/O functions support URLs and file-like objects.
 # This allows for fetching and decoding audio data from locations
 # within and beyond the local file system.
 # The following examples illustrate this.
@@ -231,10 +233,9 @@ Audio(waveform.numpy()[0], rate=sample_rate)
 ######################################################################
 #
 
-# Load audio data as HTTP request
+# Load audio data from an HTTP request
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
-with requests.get(url, stream=True) as response:
-    waveform, sample_rate = torchaudio.load(_hide_seek(response.raw))
+waveform, sample_rate = load_torchcodec(url)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
 ######################################################################
@@ -245,7 +246,7 @@ tar_path = download_asset("tutorial-assets/VOiCES_devkit.tar.gz")
 tar_item = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 with tarfile.open(tar_path, mode="r") as tarfile_:
     fileobj = tarfile_.extractfile(tar_item)
-    waveform, sample_rate = torchaudio.load(fileobj)
+    waveform, sample_rate = load_torchcodec(fileobj)
 plot_specgram(waveform, sample_rate, title="TAR file")
 
 ######################################################################
@@ -256,7 +257,7 @@ bucket = "pytorch-tutorial-assets"
 key = "VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=bucket, Key=key)
-waveform, sample_rate = torchaudio.load(_hide_seek(response["Body"]))
+waveform, sample_rate = load_torchcodec(BytesIO(response['Body'].read()))
 plot_specgram(waveform, sample_rate, title="From S3")
 
 
@@ -289,17 +290,13 @@ frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
 
 url = "https://download.pytorch.org/torchaudio/tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
 print("Fetching all the data...")
-with requests.get(url, stream=True) as response:
-    waveform1, sample_rate1 = torchaudio.load(_hide_seek(response.raw))
-    waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
-    print(f" - Fetched {response.raw.tell()} bytes")
+waveform1, sample_rate1 = load_torchcodec(url)
+waveform1 = waveform1[:, frame_offset : frame_offset + num_frames]
 
 print("Fetching until the requested frames are available...")
-with requests.get(url, stream=True) as response:
-    waveform2, sample_rate2 = torchaudio.load(
-        _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames
-    )
-    print(f" - Fetched {response.raw.tell()} bytes")
+waveform2, sample_rate2 = load_torchcodec(
+    url, start_seconds=1, stop_seconds=2
+)
 
 print("Checking the resulting waveform ... ", end="")
 assert (waveform1 == waveform2).all()
@@ -331,7 +328,7 @@ print("matched!")
 #    resulting file size but also precision.
 #
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 
 ######################################################################
@@ -383,7 +380,7 @@ formats = [
 
 ######################################################################
 #
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV_8000)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV_8000)
 with tempfile.TemporaryDirectory() as tempdir:
     for format in formats:
         path = f"{tempdir}/save_example.{format}"
@@ -400,7 +397,7 @@ with tempfile.TemporaryDirectory() as tempdir:
 #
 
 
-waveform, sample_rate = torchaudio.load(SAMPLE_WAV)
+waveform, sample_rate = load_torchcodec(SAMPLE_WAV)
 
 # Saving to bytes buffer
 buffer_ = io.BytesIO()

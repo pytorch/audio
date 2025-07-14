@@ -54,6 +54,7 @@ model from `Next-gen Kaldi <https://nadirapovey.com/next-gen-kaldi-what-is-it>`_
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -96,7 +97,7 @@ model_path = download_asset_external(model_link, "cuda_ctc_decoder/cpu_jit.pt")
 #
 
 speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
-waveform, sample_rate = torchaudio.load(speech_file)
+waveform, sample_rate = load_torchcodec(speech_file)
 assert sample_rate == 16000
 IPython.display.Audio(speech_file)
 

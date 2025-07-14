@@ -5,6 +5,7 @@ import pytest
 
 import torch
 import torchaudio
+from torchaudio.utils import load_torchcodec
 import torchaudio.functional as F
 
 
@@ -40,7 +41,7 @@ def test_loudness(tmp_path, filename, url, expected):
     with zipfile.ZipFile(zippath) as file:
         file.extractall(zippath.parent)
 
-    waveform, sample_rate = torchaudio.load(zippath.with_suffix(".wav"))
+    waveform, sample_rate = load_torchcodec(zippath.with_suffix(".wav"))
     loudness = F.loudness(waveform, sample_rate)
     expected = torch.tensor(expected, dtype=loudness.dtype, device=loudness.device)
     assert torch.allclose(loudness, expected, rtol=0.01, atol=0.1)

@@ -22,12 +22,12 @@ class VGGishBundle:
     Example:
         >>> import torchaudio
         >>> from torchaudio.prototype.pipelines import VGGISH
-        >>>
+        >>> from torchaudio.utils import load_torchcodec
         >>> input_sr = VGGISH.sample_rate
         >>> input_proc = VGGISH.get_input_processor()
         >>> model = VGGISH.get_model()
         >>>
-        >>> waveform, sr = torchaudio.load(
+        >>> waveform, sr = load_torchcodec(
         >>>     "Chopin_Ballade_-1_In_G_Minor,_Op._23.mp3",
         >>> )
         >>> waveform = waveform.squeeze(0)

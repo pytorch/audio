@@ -24,7 +24,8 @@ class BarkScale(torch.nn.Module):
         bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
         >>> spectrogram = spectrogram_transform(waveform)
         >>> barkscale_transform = transforms.BarkScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
@@ -95,7 +96,8 @@ class InverseBarkScale(torch.nn.Module):
         bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> mel_spectrogram_transform = transforms.BarkSpectrogram(sample_rate, n_fft=1024)
         >>> mel_spectrogram = bark_spectrogram_transform(waveform)
         >>> inverse_barkscale_transform = transforms.InverseBarkScale(n_stft=1024 // 2 + 1)
@@ -230,7 +232,8 @@ class BarkSpectrogram(torch.nn.Module):
         bark_scale (str, optional): Scale to use: ``traunmuller``, ``schroeder`` or ``wang``. (Default: ``traunmuller``)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.BarkSpectrogram(sample_rate)
         >>> bark_specgram = transform(waveform)  # (channel, n_barks, time)
 
@@ -320,7 +323,8 @@ class ChromaScale(torch.nn.Module):
         base_c (bool, optional): If True, then start filter bank at C. Otherwise, start at A. (Default: True)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
         >>> spectrogram = spectrogram_transform(waveform)
         >>> chroma_transform = transforms.ChromaScale(sample_rate=sample_rate, n_freqs=1024 // 2 + 1)
@@ -397,7 +401,8 @@ class ChromaSpectrogram(torch.nn.Module):
         base_c (bool, optional): If True, then start filter bank at C. Otherwise, start at A. (Default: True)
 
     Example
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
+        >>> from torchaudio.utils import load_torchcodec
+        >>> waveform, sample_rate = load_torchcodec("test.wav", normalize=True)
         >>> transform = transforms.ChromaSpectrogram(sample_rate=sample_rate, n_fft=400)
         >>> chromagram = transform(waveform)  # (channel, n_chroma, time)
     """

@@ -13,6 +13,7 @@ from torch import Tensor
 from torch.nn import Module
 
 from .common_utils import _get_feat_lens_paths
+from torchaudio.utils import load_torchcodec
 
 _LG = logging.getLogger(__name__)
 _DEFAULT_DEVICE = torch.device("cpu")
@@ -53,7 +54,7 @@ def extract_feature_mfcc(
     Returns:
         Tensor: The desired feature tensor of the given audio file.
     """
-    waveform, sr = torchaudio.load(path)
+    waveform, sr = load_torchcodec(path)
     assert sr == sample_rate
     feature_extractor = torchaudio.transforms.MFCC(
         sample_rate=sample_rate, n_mfcc=13, melkwargs={"n_fft": 400, "hop_length": 160, "center": False}
@@ -88,7 +89,7 @@ def extract_feature_hubert(
     Returns:
         Tensor: The desired feature tensor of the given audio file.
     """
-    waveform, sr = torchaudio.load(path)
+    waveform, sr = load_torchcodec(path)
     assert sr == sample_rate
     waveform = waveform.to(device)
     with torch.inference_mode():

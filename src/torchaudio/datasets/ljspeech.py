@@ -8,7 +8,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio._internal import download_url_to_file
 from torchaudio.datasets.utils import _extract_tar
-
+from torchaudio.utils import load_torchcodec
 
 _RELEASE_CONFIGS = {
     "release1": {
@@ -94,7 +94,7 @@ class LJSPEECH(Dataset):
         fileid_audio = self._path / (fileid + ".wav")
 
         # Load audio
-        waveform, sample_rate = torchaudio.load(fileid_audio)
+        waveform, sample_rate = load_torchcodec(fileid_audio)
 
         return (
             waveform,

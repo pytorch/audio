@@ -140,7 +140,7 @@ def import_fairseq_model(original: Module) -> Wav2Vec2Model:
 
     Example - Loading pretrain-only model
         >>> from torchaudio.models.wav2vec2.utils import import_fairseq_model
-        >>>
+        >>> from torchaudio.utils import load_torchcodec
         >>> # Load model using fairseq
         >>> model_file = 'wav2vec_small.pt'
         >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
@@ -148,7 +148,7 @@ def import_fairseq_model(original: Module) -> Wav2Vec2Model:
         >>> imported = import_fairseq_model(original)
         >>>
         >>> # Perform feature extraction
-        >>> waveform, _ = torchaudio.load('audio.wav')
+        >>> waveform, _ = load_torchcodec('audio.wav')
         >>> features, _ = imported.extract_features(waveform)
         >>>
         >>> # Compare result with the original model from fairseq
@@ -157,7 +157,7 @@ def import_fairseq_model(original: Module) -> Wav2Vec2Model:
 
     Example - Fine-tuned model
         >>> from torchaudio.models.wav2vec2.utils import import_fairseq_model
-        >>>
+        >>> from torchaudio.utils import load_torchcodec
         >>> # Load model using fairseq
         >>> model_file = 'wav2vec_small_960h.pt'
         >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
@@ -165,7 +165,7 @@ def import_fairseq_model(original: Module) -> Wav2Vec2Model:
         >>> imported = import_fairseq_model(original.w2v_encoder)
         >>>
         >>> # Perform encoding
-        >>> waveform, _ = torchaudio.load('audio.wav')
+        >>> waveform, _ = load_torchcodec('audio.wav')
         >>> emission, _ = imported(waveform)
         >>>
         >>> # Compare result with the original model from fairseq

@@ -7,7 +7,7 @@ import os
 
 import torch
 import torchaudio
-
+from torchaudio.utils import load_torchcodec
 
 class Pipeline(torch.nn.Module):
     """Example audio process pipeline.
@@ -17,7 +17,7 @@ class Pipeline(torch.nn.Module):
 
     def __init__(self, rir_path: str):
         super().__init__()
-        rir, sample_rate = torchaudio.load(rir_path)
+        rir, sample_rate = load_torchcodec(rir_path)
         self.register_buffer("rir", rir)
         self.rir_sample_rate: int = sample_rate
 
@@ -25,7 +25,7 @@ class Pipeline(torch.nn.Module):
         torchaudio.sox_effects.init_sox_effects()
 
         # 1. load audio
-        waveform, sample_rate = torchaudio.load(input_path)
+        waveform, sample_rate = load_torchcodec(input_path)
 
         # 2. Add background noise
         alpha = 0.01
