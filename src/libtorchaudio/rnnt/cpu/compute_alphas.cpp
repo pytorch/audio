@@ -37,9 +37,11 @@ RAIIATH compute_alphas(
   options.blank_ = blank;
   options.clamp_ = clamp;
 
-  // TORCH_CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
-  options.device_ = CPU;
+  int32_t logits_device_type;
+  aoti_torch_get_device_type(logits.get(), &logits_device_type);
+  AOTI_TORCH_CHECK(logits_device_type == aoti_torch_device_type_cpu());
 
+  options.device_ = CPU;
 
   int32_t logits_device;
   aoti_torch_get_device_type(logits.get(), &logits_device);
