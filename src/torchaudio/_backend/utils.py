@@ -252,6 +252,14 @@ def get_save_func():
     ):
         """Save audio data to file.
 
+        .. warning::
+            In 2.9, this function's implementation will be changed to use
+            :func:`~torchaudio.save_with_torchcodec` under the hood. Some
+            parameters like format, encoding, bits_per_sample, buffer_size, and
+            ``backend`` will be ignored. We recommend that you port your code to
+            rely directly on TorchCodec's decoder instead:
+            https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.encoders.AudioEncoder
+
         Note:
             The formats this function can handle depend on the availability of backends.
             Please use the following functions to fetch the supported formats.

@@ -20,15 +20,16 @@ def load_with_torchcodec(
     
     .. note::
         
-        This function supports the same API as ``torchaudio.load()``, and relies
-        on TorchCodec's decoding capabilities under the hood. It is provided for
-        convenience, but we do recommend that you port your code to natively use
-        ``torchcodec``'s ``AudioDecoder`` class for better performance:
+        This function supports the same API as :func:`~torchaudio.load`, and
+        relies on TorchCodec's decoding capabilities under the hood. It is
+        provided for convenience, but we do recommend that you port your code to
+        natively use ``torchcodec``'s ``AudioDecoder`` class for better
+        performance:
         https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.
-        In TorchAudio 2.9, ``torchaudio.load()`` will be relying on
-        ``load_with_torchcodec``. Note that some parameters of
-        ``torchaudio.load()``, like ``normalize``, ``buffer_size``, and
-        ``backend``, are ignored by ``load_with_torchcodec``.
+        In TorchAudio 2.9, :func:`~torchaudio.load` will be relying on
+        :func:`~torchaudio.load_with_torchcodec`. Note that some parameters of
+        :func:`~torchaudio.load`, like ``normalize``, ``buffer_size``, and
+        ``backend``, are ignored by :func:`~torchaudio.load_with_torchcodec`.
     
     
     Args:
@@ -174,6 +175,20 @@ def save_with_torchcodec(
     compression: Optional[Union[float, int]] = None,
 ) -> None:
     """Save audio data to file using TorchCodec's AudioEncoder.
+
+   .. note::
+        
+        This function supports the same API as :func:`~torchaudio.save`, and
+        relies on TorchCodec's encoding capabilities under the hood. It is
+        provided for convenience, but we do recommend that you port your code to
+        natively use ``torchcodec``'s ``AudioEncoder`` class for better
+        performance:
+        https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.encoders.AudioEncoder.
+        In TorchAudio 2.9, :func:`~torchaudio.save` will be relying on
+        :func:`~torchaudio.save_with_torchcodec`. Note that some parameters of
+        :func:`~torchaudio.save`, like ``format``, ``encoding``,
+        ``bits_per_sample``, ``buffer_size``, and ``backend``, are ignored by
+        are ignored by :func:`~torchaudio.save_with_torchcodec`.
     
     This function provides a TorchCodec-based alternative to torchaudio.save
     with the same API. TorchCodec's AudioEncoder provides efficient encoding
