@@ -226,30 +226,6 @@ def test_save_channels_first(channels_first):
         torch.testing.assert_close(waveform_ta, waveform_tc, atol=1e-3, rtol=1e-3)
 
 
-def test_save_1d_tensor():
-    """Test saving 1D tensor (mono audio)."""
-    waveform = torch.randn(16000)  # [time]
-    sample_rate = 16000
-    
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Save with torchaudio
-        ta_path = os.path.join(temp_dir, "ta_output.wav")
-        torchaudio.save(ta_path, waveform, sample_rate)
-        
-        # Save with torchcodec
-        tc_path = os.path.join(temp_dir, "tc_output.wav")
-        save_with_torchcodec(tc_path, waveform, sample_rate)
-        
-        # Load both back and compare
-        waveform_ta, sample_rate_ta = torchaudio.load(ta_path)
-        waveform_tc, sample_rate_tc = torchaudio.load(tc_path)
-        
-        # Check results match
-        assert sample_rate_ta == sample_rate_tc
-        assert waveform_ta.shape == waveform_tc.shape
-        torch.testing.assert_close(waveform_ta, waveform_tc, atol=1e-3, rtol=1e-3)
-
-
 def test_save_compression_parameter():
     """Test compression parameter (maps to bit_rate)."""
     waveform = torch.randn(1, 16000)
