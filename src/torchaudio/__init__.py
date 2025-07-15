@@ -11,7 +11,7 @@ from ._backend import (  # noqa  # usort: skip
     save as _save,
     set_audio_backend as _set_audio_backend,
 )
-from ._torchcodec import load_with_torchcodec
+from ._torchcodec import load_with_torchcodec, save_with_torchcodec
 
 AudioMetaData = dropping_class_io_support(_AudioMetaData)
 get_audio_backend = dropping_io_support(_get_audio_backend)
@@ -46,6 +46,7 @@ __all__ = [
     "AudioMetaData",
     "load",
     "load_with_torchcodec",
+    "save_with_torchcodec",
     "info",
     "save",
     "io",
