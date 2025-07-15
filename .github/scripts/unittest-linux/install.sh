@@ -74,7 +74,8 @@ case $GPU_ARCH_TYPE in
     ;;
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+pip install --progress-bar=off --pre torchcodec --index-url="https://download.pytorch.org/whl/nightly/cpu"
 
 
 # 2. Install torchaudio
