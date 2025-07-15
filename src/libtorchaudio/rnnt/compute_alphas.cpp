@@ -1,4 +1,3 @@
-#include <torch/script.h>
 #include <torch/csrc/stable/library.h>
 
 STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {

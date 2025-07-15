@@ -1,5 +1,4 @@
 #include <libtorchaudio/rnnt/cpu/cpu_transducer.h>
-#include <torch/script.h>
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
 #include <torch/csrc/inductor/aoti_runtime/utils.h>
 #include <torch/csrc/stable/library.h>
@@ -63,7 +62,7 @@ RAIIATH compute_alphas(
   aoti_torch_empty_strided(1, sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace);
 
   AtenTensorHandle float_workspace;
-  aoti_torch_empty_strided(1, sizes, strides, aoti_torch_dtype_float32(), logits_device, logits_device_index, &int_workspace);
+  aoti_torch_empty_strided(1, sizes, strides, aoti_torch_dtype_float32(), logits_device, logits_device_index, &float_workspace);
 
   int64_t float_numel;
   aoti_torch_get_numel(float_workspace, &float_numel);
