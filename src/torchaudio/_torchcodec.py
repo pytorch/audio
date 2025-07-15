@@ -176,7 +176,7 @@ def save_with_torchcodec(
 ) -> None:
     """Save audio data to file using TorchCodec's AudioEncoder.
 
-   .. note::
+    .. note::
         
         This function supports the same API as :func:`~torchaudio.save`, and
         relies on TorchCodec's encoding capabilities under the hood. It is
