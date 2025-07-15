@@ -7,9 +7,11 @@ torchaudio
     Starting with version 2.8, we are refactoring TorchAudio to transition it
     into a maintenance phase. As a result:
 
-    - The APIs listed below are deprecated in 2.8 and will be removed in 2.9.
+    - Most APIs listed below are deprecated in 2.8 and will be removed in 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
-      are being consolidated into TorchCodec.
+      are being consolidated into TorchCodec. We provide
+      ``torchaudio.load_with_torchcodec()`` as a replacement for
+      ``torchaudio.load()``.
 
     Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
@@ -26,6 +28,7 @@ it easy to handle audio data.
 
    info
    load
+   load_with_torchcodec
    save
    list_audio_backends
 

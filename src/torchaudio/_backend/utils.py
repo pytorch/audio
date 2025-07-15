@@ -1,6 +1,7 @@
 import os
 from functools import lru_cache
 from typing import BinaryIO, Dict, Optional, Tuple, Type, Union
+import warnings
 
 import torch
 
@@ -127,6 +128,14 @@ def get_load_func():
     ) -> Tuple[torch.Tensor, int]:
         """Load audio data from source.
 
+        .. warning::
+            In 2.9, this function's implementation will be changed to use
+            :func:`~torchaudio.load_with_torchcodec` under the hood. Some
+            parameters like ``normalize``, ``format``, ``buffer_size``, and
+            ``backend`` will be ignored. We recommend that you port your code to
+            rely directly on TorchCodec's decoder instead:
+            https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+
         By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with
         ``float32`` dtype, and the shape of `[channel, time]`.
 
@@ -201,6 +210,14 @@ def get_load_func():
                 integer type, else ``float32`` type. If ``channels_first=True``, it has
                 `[channel, time]` else `[time, channel]`.
         """
+        warnings.warn(
+            "In 2.9, this function's implementation will be changed to use "
+            "torchaudio.load_with_torchcodec` under the hood. Some "
+            "parameters like ``normalize``, ``format``, ``buffer_size``, and "
+            "``backend`` will be ignored. We recommend that you port your code to "
+            "rely directly on TorchCodec's decoder instead: "
+            "https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder."
+        )
         backend = dispatcher(uri, format, backend)
         return backend.load(uri, frame_offset, num_frames, normalize, channels_first, format, buffer_size)
 

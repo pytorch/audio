@@ -74,7 +74,7 @@ case $GPU_ARCH_TYPE in
     ;;
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
 
 
 # 2. Install torchaudio
@@ -86,6 +86,10 @@ python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
+# On this CI, for whatever reason, we're only able to install ffmpeg 4.
+conda install -y "ffmpeg<5"
+python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
+
 NUMBA_DEV_CHANNEL=""
 if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
     # Numba isn't available for Python 3.9 and 3.10 except on the numba dev channel and building from source fails
@@ -94,7 +98,7 @@ if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
 fi
 (
     set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} sox libvorbis parameterized 'requests>=2.20' 'ffmpeg>=6,<7'
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} sox libvorbis parameterized 'requests>=2.20'
     pip install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 
     # TODO: might be better to fix the single call to `pip install` above

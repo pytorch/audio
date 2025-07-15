@@ -7,16 +7,16 @@ from ._backend import (  # noqa  # usort: skip
     get_audio_backend as _get_audio_backend,
     info as _info,
     list_audio_backends as _list_audio_backends,
-    load as _load,
+    load,
     save as _save,
     set_audio_backend as _set_audio_backend,
 )
+from ._torchcodec import load_with_torchcodec
 
 AudioMetaData = dropping_class_io_support(_AudioMetaData)
 get_audio_backend = dropping_io_support(_get_audio_backend)
 info = dropping_io_support(_info)
 list_audio_backends = dropping_io_support(_list_audio_backends)
-load = dropping_io_support(_load)
 save = dropping_io_support(_save)
 set_audio_backend = dropping_io_support(_set_audio_backend)
 
@@ -45,6 +45,7 @@ except ImportError:
 __all__ = [
     "AudioMetaData",
     "load",
+    "load_with_torchcodec",
     "info",
     "save",
     "io",
