@@ -7,8 +7,6 @@ from ._backend import (  # noqa  # usort: skip
     get_audio_backend as _get_audio_backend,
     info as _info,
     list_audio_backends as _list_audio_backends,
-    load,
-    save,
     set_audio_backend as _set_audio_backend,
 )
 from ._torchcodec import load_with_torchcodec, save_with_torchcodec
@@ -39,6 +37,13 @@ try:
     from .version import __version__, git_version  # noqa: F401
 except ImportError:
     pass
+
+
+def load(*args, **kwargs):
+    return load_with_torchcodec(*args, **kwargs)
+
+def save(*args, **kwargs):
+    return save_with_torchcodec(*args, **kwargs)
 
 
 __all__ = [
