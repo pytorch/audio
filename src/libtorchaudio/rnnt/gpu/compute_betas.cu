@@ -46,8 +46,8 @@ RAIIATH compute_betas(
   int32_t logits_dtype;
   aoti_torch_get_dtype(logits.get(), &logits_dtype);
 
-  aoti_torch_get_current_cuda_stream(logits_device_index, &options.stream_);
-  cudaSetDevice(logits_device)
+  aoti_torch_get_current_cuda_stream(logits_device_index, (void**)&options.stream_);
+  cudaSetDevice(logits_device);
   options.device_ = GPU;
 
   int64_t cost_sizes[1] = {options.batchSize_};
