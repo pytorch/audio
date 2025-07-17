@@ -1,6 +1,6 @@
-#include <torch/script.h>
+#include <torch/csrc/stable/library.h>
 
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
       "rnnt_loss_betas(Tensor logits,"
       "Tensor targets,"
