@@ -1763,7 +1763,7 @@ def _fix_waveform_shape(
 class RnntLoss(torch.autograd.Function):
     @staticmethod
     def forward(ctx, *args):
-        output, saved = torch.ops.torchaudio.rnnt_loss_forward(*args)
+        output, saved = torch.ops.torchaudio.rnnt_loss(*args)
         ctx.save_for_backward(saved)
         return output
 
