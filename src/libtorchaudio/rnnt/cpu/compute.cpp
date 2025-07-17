@@ -206,7 +206,7 @@ void boxed_compute(StableIValue* stack, uint64_t num_args, uint64_t num_outputs)
 }
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("torchaudio::rnnt_loss", &boxed_compute);
+  m.impl("rnnt_loss", &boxed_compute);
 }
 
 } // namespace cpu
