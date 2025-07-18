@@ -279,34 +279,6 @@ Tutorials
    :tags: Preprocessing
 
 .. customcarditem::
-   :header: Generating waveforms with oscillator
-   :card_description:
-   :image: _images/sphx_glr_oscillator_tutorial_003.png
-   :link: tutorials/oscillator_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Additive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
-   :link: tutorials/additive_synthesis_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Designing digital filters
-   :card_description:
-   :image: _images/sphx_glr_filter_design_tutorial_001.png
-   :link: tutorials/filter_design_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Subtractive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_subtractive_synthesis_tutorial_002.png
-   :link: tutorials/subtractive_synthesis_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
    :header: Audio dataset
    :card_description: Learn how to use <code>torchaudio.datasets</code> module.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_datasets_tutorial.png
@@ -399,7 +371,7 @@ In BibTeX format:
 .. code-block:: bibtex
 
    @misc{hwang2023torchaudio,
-      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch},
       author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
       year={2023},
       eprint={2310.17864},
