@@ -7,6 +7,17 @@ Torchaudio is a library for audio and signal processing with PyTorch.
 It provides I/O, signal and data processing functions, datasets,
 model implementations and application components.
 
+.. note::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - Some APIs are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
+
 ..
    Generate Table Of Contents (left navigation bar)
    NOTE: If you are adding tutorials, add entries to toctree and customcarditem below
@@ -39,15 +50,6 @@ model implementations and application components.
    :caption: API Tutorials
    :hidden:
 
-   tutorials/audio_io_tutorial
-   tutorials/streamreader_basic_tutorial
-   tutorials/streamreader_advanced_tutorial
-   tutorials/streamwriter_basic_tutorial
-   tutorials/streamwriter_advanced
-   tutorials/nvdec_tutorial
-   tutorials/nvenc_tutorial
-
-   tutorials/effector_tutorial
    tutorials/audio_resampling_tutorial
    tutorials/audio_data_augmentation_tutorial
    tutorials/audio_feature_extractions_tutorial
@@ -170,13 +172,6 @@ Tutorials
    :tags: I/O,Pipelines,RNNT
 
 .. customcarditem::
-   :header: Loading waveform Tensors from files and saving them
-   :card_description: Learn how to query/load audio files and save waveform tensors to files, using <code>torchaudio.info</code>, <code>torchaudio.load</code> and <code>torchaudio.save</code> functions.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_io_tutorial.png
-   :link: tutorials/audio_io_tutorial.html
-   :tags: I/O
-
-.. customcarditem::
    :header: CTC Forced Alignment API
    :card_description: Learn how to use TorchAudio's CTC forced alignment API (<code>torchaudio.functional.forced_align</code>).
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/ctc_forced_alignment_api_tutorial.png
@@ -189,55 +184,6 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/forced_alignment_for_multilingual_data_tutorial.png
    :link: tutorials/forced_alignment_for_multilingual_data_tutorial.html
    :tags: Forced-Alignment
-
-.. customcarditem::
-   :header: Streaming media decoding with StreamReader
-   :card_description: Learn how to load audio/video to Tensors using <code>torchaudio.io.StreamReader</code> class.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamreader_basic_tutorial.png
-   :link: tutorials/streamreader_basic_tutorial.html
-   :tags: I/O,StreamReader
-
-.. customcarditem::
-   :header: Device input, synthetic audio/video, and filtering with StreamReader
-   :card_description: Learn how to load media from hardware devices, generate synthetic audio/video, and apply filters to them with <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamreader_advanced_tutorial.gif
-   :link: tutorials/streamreader_advanced_tutorial.html
-   :tags: I/O,StreamReader
-
-.. customcarditem::
-   :header: Streaming media encoding with StreamWriter
-   :card_description: Learn how to save audio/video with <code>torchaudio.io.StreamWriter</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamwriter_basic_tutorial.gif
-   :link: tutorials/streamwriter_basic_tutorial.html
-   :tags: I/O,StreamWriter
-
-.. customcarditem::
-   :header: Playing media with StreamWriter
-   :card_description: Learn how to play audio/video with <code>torchaudio.io.StreamWriter</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/streamwriter_advanced.gif
-   :link: tutorials/streamwriter_advanced.html
-   :tags: I/O,StreamWriter
-
-.. customcarditem::
-   :header: Hardware accelerated video decoding with NVDEC
-   :card_description: Learn how to use HW video decoder.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
-   :link: tutorials/nvdec_tutorial.html
-   :tags: I/O,StreamReader
-
-.. customcarditem::
-   :header: Hardware accelerated video encoding with NVENC
-   :card_description: Learn how to use HW video encoder.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/hw_acceleration_tutorial.png
-   :link: tutorials/nvenc_tutorial.html
-   :tags: I/O,StreamWriter
-
-.. customcarditem::
-   :header: Apply effects and codecs to waveform
-   :card_description: Learn how to apply effects and codecs to waveform using <code>torchaudio.io.AudioEffector</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/effector_tutorial.png
-   :link: tutorials/effector_tutorial.html
-   :tags: Preprocessing
 
 .. customcarditem::
    :header: Audio resampling with bandlimited sinc interpolation
@@ -266,34 +212,6 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_feature_augmentation_tutorial.png
    :link: tutorials/audio_feature_augmentation_tutorial.html
    :tags: Preprocessing
-
-.. customcarditem::
-   :header: Generating waveforms with oscillator
-   :card_description:
-   :image: _images/sphx_glr_oscillator_tutorial_003.png
-   :link: tutorials/oscillator_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Additive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
-   :link: tutorials/additive_synthesis_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Designing digital filters
-   :card_description:
-   :image: _images/sphx_glr_filter_design_tutorial_001.png
-   :link: tutorials/filter_design_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Subtractive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_subtractive_synthesis_tutorial_002.png
-   :link: tutorials/subtractive_synthesis_tutorial.html
-   :tags: DSP
 
 .. customcarditem::
    :header: Audio dataset
@@ -388,7 +306,7 @@ In BibTeX format:
 .. code-block:: bibtex
 
    @misc{hwang2023torchaudio,
-      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch},
       author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
       year={2023},
       eprint={2310.17864},
