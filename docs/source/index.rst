@@ -214,34 +214,6 @@ Tutorials
    :tags: Preprocessing
 
 .. customcarditem::
-   :header: Generating waveforms with oscillator
-   :card_description:
-   :image: _images/sphx_glr_oscillator_tutorial_003.png
-   :link: tutorials/oscillator_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Additive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_additive_synthesis_tutorial_001.png
-   :link: tutorials/additive_synthesis_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Designing digital filters
-   :card_description:
-   :image: _images/sphx_glr_filter_design_tutorial_001.png
-   :link: tutorials/filter_design_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
-   :header: Subtractive Synthesis
-   :card_description:
-   :image: _images/sphx_glr_subtractive_synthesis_tutorial_002.png
-   :link: tutorials/subtractive_synthesis_tutorial.html
-   :tags: DSP
-
-.. customcarditem::
    :header: Audio dataset
    :card_description: Learn how to use <code>torchaudio.datasets</code> module.
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/audio_datasets_tutorial.png
