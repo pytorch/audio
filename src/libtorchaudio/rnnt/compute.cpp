@@ -30,4 +30,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       "int blank,"
       "float clamp,"
       "bool fused_log_softmax) -> (Tensor, Tensor?)");
+  m.def("torchaudio::rnnt_loss_forward", &rnnt_loss);
 }

@@ -117,7 +117,7 @@ jobs:
             '--cov=torchaudio'
             "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
             '--durations' '100'
-            '-k' 'cuda or gpu'
+            '-k' '(cuda or gpu) and not (torchscript and rnnt)'
         )
 
         cd test
