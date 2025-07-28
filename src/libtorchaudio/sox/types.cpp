@@ -68,25 +68,32 @@ std::string to_string(Encoding v) {
 }
 
 Encoding get_encoding_from_option(const std::optional<std::string>& encoding) {
-  if (!encoding.has_value())
+  if (!encoding.has_value()) {
     return Encoding::NOT_PROVIDED;
+  }
   std::string v = encoding.value();
-  if (v == "PCM_S")
+  if (v == "PCM_S") {
     return Encoding::PCM_SIGNED;
-  if (v == "PCM_U")
+  }
+  if (v == "PCM_U") {
     return Encoding::PCM_UNSIGNED;
-  if (v == "PCM_F")
+  }
+  if (v == "PCM_F") {
     return Encoding::PCM_FLOAT;
-  if (v == "ULAW")
+  }
+  if (v == "ULAW") {
     return Encoding::ULAW;
-  if (v == "ALAW")
+  }
+  if (v == "ALAW") {
     return Encoding::ALAW;
+  }
   TORCH_CHECK(false, "Internal Error: unexpected encoding value: ", v);
 }
 
 BitDepth get_bit_depth_from_option(const std::optional<int64_t>& bit_depth) {
-  if (!bit_depth.has_value())
+  if (!bit_depth.has_value()) {
     return BitDepth::NOT_PROVIDED;
+  }
   int64_t v = bit_depth.value();
   switch (v) {
     case 8:
