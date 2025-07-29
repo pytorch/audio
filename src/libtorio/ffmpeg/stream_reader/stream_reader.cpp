@@ -2,7 +2,6 @@
 #include <libtorio/ffmpeg/stream_reader/stream_reader.h>
 #include <chrono>
 #include <sstream>
-#include <stdexcept>
 #include <thread>
 
 namespace torio::io {
