@@ -46,8 +46,6 @@ VIDEO_URL = f"{base_url}/stream-api/NASAs_Most_Scientifically_Complex_Space_Obse
 # .. seealso::
 #
 #    - `Accelerated Video Decoding with NVDEC <../hw_acceleration_tutorial.html>`__.
-#    - `Online ASR with Emformer RNN-T <./online_asr_tutorial.html>`__.
-#    - `Device ASR with Emformer RNN-T <./device_asr.html>`__.
 #
 # Given that the system has proper media devices and libavdevice is
 # configured to use the devices, the streaming API can

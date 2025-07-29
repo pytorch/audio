@@ -80,9 +80,6 @@ model implementations and application components.
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/asr_inference_with_ctc_decoder_tutorial
    tutorials/asr_inference_with_cuda_ctc_decoder_tutorial
-   tutorials/online_asr_tutorial
-   tutorials/device_asr
-   tutorials/device_avsr
    tutorials/forced_alignment_tutorial
    tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/tacotron2_pipeline_tutorial
@@ -172,13 +169,6 @@ Tutorials
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/asr_inference_with_ctc_decoder_tutorial.png
    :link: tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html
    :tags: Pipelines,ASR,CTC-Decoder,CUDA-CTC-Decoder
-
-.. customcarditem::
-   :header: On device audio-visual automatic speech recognition
-   :card_description: Learn how to stream audio and video from laptop webcam and perform audio-visual automatic speech recognition using Emformer-RNNT model.
-   :image: https://download.pytorch.org/torchaudio/doc-assets/avsr/transformed.gif
-   :link: tutorials/device_avsr.html
-   :tags: I/O,Pipelines,RNNT
 
 .. customcarditem::
    :header: Loading waveform Tensors from files and saving them
@@ -328,20 +318,6 @@ Tutorials
    :tags: Pipelines,ASR,wav2vec2,CTC-Decoder
 
 .. customcarditem::
-   :header: Online ASR with Emformer RNN-T
-   :card_description: Learn how to perform online ASR with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/online_asr_tutorial.gif
-   :link: tutorials/online_asr_tutorial.html
-   :tags: Pipelines,ASR,RNNT,StreamReader
-
-.. customcarditem::
-   :header: Real-time microphone ASR with Emformer RNN-T
-   :card_description: Learn how to transcribe speech fomr microphone with Emformer RNN-T (<code>torchaudio.pipelines.RNNTBundle</code>) and <code>torchaudio.io.StreamReader</code>.
-   :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/device_asr.png
-   :link: tutorials/device_asr.html
-   :tags: Pipelines,ASR,RNNT,StreamReader
-
-.. customcarditem::
    :header: Forced Alignment with Wav2Vec2
    :card_description: Learn how to align text to speech with Wav2Vec 2 (<code>torchaudio.pipelines.Wav2Vec2ASRBundle</code>).
    :image: https://download.pytorch.org/torchaudio/tutorial-assets/thumbnails/forced_alignment_tutorial.png
@@ -399,7 +375,7 @@ In BibTeX format:
 .. code-block:: bibtex
 
    @misc{hwang2023torchaudio,
-      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch},
       author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
       year={2023},
       eprint={2310.17864},
