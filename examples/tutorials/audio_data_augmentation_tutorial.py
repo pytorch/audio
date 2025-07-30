@@ -222,24 +222,3 @@ snr_db, noisy_speech = snr_dbs[2], noisy_speeches[2:3]
 plot_waveform(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 plot_specgram(noisy_speech, sample_rate, title=f"SNR: {snr_db} [dB]")
 Audio(noisy_speech, rate=sample_rate)
-
-######################################################################
-# Original speech
-# ~~~~~~~~~~~~~~~
-#
-
-Audio(original_speech, rate=sample_rate)
-
-######################################################################
-# RIR applied
-# ~~~~~~~~~~~
-#
-
-Audio(rir_applied, rate=sample_rate)
-
-######################################################################
-# Background noise added
-# ~~~~~~~~~~~~~~~~~~~~~~
-#
-
-Audio(bg_added, rate=sample_rate)
