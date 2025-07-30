@@ -27,6 +27,7 @@ import librosa
 import matplotlib.pyplot as plt
 from IPython.display import Audio
 from torchaudio.utils import download_asset
+import torchaudio
 
 ######################################################################
 # In this tutorial, we will use a speech data from
@@ -36,20 +37,11 @@ from torchaudio.utils import download_asset
 SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
-def _get_sample(path, resample=None):
-    effects = [["remix", "1"]]
-    if resample:
-        effects.extend(
-            [
-                ["lowpass", f"{resample // 2}"],
-                ["rate", f"{resample}"],
-            ]
-        )
-    return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
+def _get_sample(path):
+    return torchaudio.load(path)
 
-
-def get_speech_sample(*, resample=None):
-    return _get_sample(SAMPLE_WAV_SPEECH_PATH, resample=resample)
+def get_speech_sample():
+    return _get_sample(SAMPLE_WAV_SPEECH_PATH)
 
 
 def get_spectrogram(
