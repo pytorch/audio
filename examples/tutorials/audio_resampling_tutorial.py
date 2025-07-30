@@ -28,12 +28,9 @@ import timeit
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-import pandas as pd
-from IPython.display import Audio
-
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
-
+import resampy
+from IPython.display import Audio, HTML, display
+import numpy as np
 
 DEFAULT_OFFSET = 201
 
@@ -420,21 +417,34 @@ def benchmark(sample_rate, resample_rate):
     t_time = benchmark_resample_transforms(*args, **kwargs)
     times.append([f_time, t_time])
     rows.append("kaiser_fast")
-
-    df = pd.DataFrame(times, columns=["functional", "transforms"], index=rows)
-    return df
+    return (np.array(times), ["functional", "transforms"], rows)
 
 
 ######################################################################
 #
-def plot(df):
-    print(df.round(2))
-    ax = df.plot(kind="bar")
+
+def bar_plot(data, cols, rows):
+    fig, ax = plt.subplots()
+    x_data = np.arange(len(rows))
+    bar_width = 0.8 / len(cols)
+    for (i, (c, d)) in enumerate(zip(cols, data.T)):
+        x_pos = x_data + (i - len(cols)/2 + 0.5) * bar_width
+        ax.bar(x_pos, d, bar_width, label=c)
+    ax.legend()
+    ax.set_xticks(x_data)
+    ax.set_xticklabels(rows)
     plt.ylabel("Time Elapsed [ms]")
-    plt.xticks(rotation=0, fontsize=10)
-    for cont, col, color in zip(ax.containers, df.columns, mcolors.TABLEAU_COLORS):
-        label = ["N/A" if v != v else str(v) for v in df[col].round(2)]
-        ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")
+    return ax
+
+def html_table(rows, col_labels, row_labels):
+    header = '<tr><th></th>' + ''.join(f'<th>{c}</th>' for c in col_labels) + '</tr>'
+    data_rows = ''.join(f'<tr><th>{row_labels[i]}</th>' +
+                        ''.join(f'<td>{cell}</td>' for cell in row) + '</tr>' for i, row in enumerate(rows))
+    return HTML(f'<table>{header}{data_rows}</table>')
+
+def plot(data, cols, rows):
+    display(html_table(data, cols, rows))
+    bar_plot(data, cols, rows)
 
 
 ######################################################################
@@ -443,7 +453,7 @@ def plot(df):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(48_000, 44_100)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
@@ -451,7 +461,7 @@ plot(df)
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(16_000, 8_000)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
@@ -459,7 +469,7 @@ plot(df)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(44_100, 48_000)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
@@ -467,7 +477,7 @@ plot(df)
 # ~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(8_000, 16_000)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
