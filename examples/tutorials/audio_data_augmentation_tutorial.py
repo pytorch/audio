@@ -31,12 +31,12 @@ import matplotlib.pyplot as plt
 
 from IPython.display import Audio
 
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
-SAMPLE_WAV = download_asset("tutorial-assets/steam-train-whistle-daniel_simon.wav")
-SAMPLE_RIR = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo-8000hz.wav")
-SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042-8000hz.wav")
-SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo-8000hz.wav")
+SAMPLE_WAV = _download_asset("tutorial-assets/steam-train-whistle-daniel_simon.wav")
+SAMPLE_RIR = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo-8000hz.wav")
+SAMPLE_SPEECH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042-8000hz.wav")
+SAMPLE_NOISE = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo-8000hz.wav")
 
 
 ######################################################################

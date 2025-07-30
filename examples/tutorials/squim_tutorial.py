@@ -109,7 +109,7 @@ import matplotlib.pyplot as plt
 
 import torchaudio.functional as F
 from IPython.display import Audio
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 
 def si_snr(estimate, reference, epsilon=1e-8):
@@ -150,8 +150,8 @@ def plot(waveform, title, sample_rate=16000):
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
-SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo.wav")
+SAMPLE_SPEECH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SAMPLE_NOISE = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo.wav")
 
 
 ######################################################################
@@ -326,7 +326,7 @@ subjective_model = SQUIM_SUBJECTIVE.get_model()
 # Load a non-matching reference (NMR)
 #
 
-NMR_SPEECH = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+NMR_SPEECH = _download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 WAVEFORM_NMR, SAMPLE_RATE_NMR = torchaudio.load(NMR_SPEECH)
 if SAMPLE_RATE_NMR != 16000:

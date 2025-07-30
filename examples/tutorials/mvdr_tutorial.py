@@ -63,7 +63,7 @@ from IPython.display import Audio
 
 from pesq import pesq
 from pystoi import stoi
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 ######################################################################
 # 2.2. Download audio data
@@ -88,8 +88,8 @@ from torchaudio.utils import download_asset
 #
 
 SAMPLE_RATE = 16000
-SAMPLE_CLEAN = download_asset("tutorial-assets/mvdr/clean_speech.wav")
-SAMPLE_NOISE = download_asset("tutorial-assets/mvdr/noise.wav")
+SAMPLE_CLEAN = _download_asset("tutorial-assets/mvdr/clean_speech.wav")
+SAMPLE_NOISE = _download_asset("tutorial-assets/mvdr/noise.wav")
 
 
 ######################################################################
