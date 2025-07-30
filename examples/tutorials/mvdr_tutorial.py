@@ -128,6 +128,27 @@ def generate_mixture(waveform_clean, waveform_noise, target_snr):
     waveform_noise *= 10 ** (-(target_snr - current_snr) / 20)
     return waveform_clean + waveform_noise
 
+# If you have mir_eval installed, you can use it to evaluate the separation quality of the estimated sources.
+# You can also evaluate the intelligibility of the speech with the Short-Time Objective Intelligibility (STOI) metric
+# available in the `pystoi` package, or the Perceptual Evaluation of Speech Quality (PESQ) metric available in the `pesq` package.
+def evaluate(estimate, reference):
+    from pesq import pesq
+    from pystoi import stoi
+    import mir_eval
+
+    si_snr_score = si_snr(estimate, reference)
+    (
+        sdr,
+        _,
+        _,
+        _,
+    ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    pesq_mix = pesq(SAMPLE_RATE, estimate[0].numpy(), reference[0].numpy(), "wb")
+    stoi_mix = stoi(reference[0].numpy(), estimate[0].numpy(), SAMPLE_RATE, extended=False)
+    print(f"SDR score: {sdr[0]}")
+    print(f"Si-SNR score: {si_snr_score}")
+    print(f"PESQ score: {pesq_mix}")
+    print(f"STOI score: {stoi_mix}")
 
 ######################################################################
 # 3. Generate Ideal Ratio Masks (IRMs)
