@@ -28,8 +28,7 @@ import timeit
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-import resampy
-from IPython.display import Audio, HTML, display
+from IPython.display import Audio
 import numpy as np
 
 DEFAULT_OFFSET = 201
@@ -423,7 +422,7 @@ def benchmark(sample_rate, resample_rate):
 ######################################################################
 #
 
-def bar_plot(data, cols, rows):
+def plot(data, cols, rows):
     fig, ax = plt.subplots()
     x_data = np.arange(len(rows))
     bar_width = 0.8 / len(cols)
@@ -435,16 +434,6 @@ def bar_plot(data, cols, rows):
     ax.set_xticklabels(rows)
     plt.ylabel("Time Elapsed [ms]")
     return ax
-
-def html_table(rows, col_labels, row_labels):
-    header = '<tr><th></th>' + ''.join(f'<th>{c}</th>' for c in col_labels) + '</tr>'
-    data_rows = ''.join(f'<tr><th>{row_labels[i]}</th>' +
-                        ''.join(f'<td>{cell}</td>' for cell in row) + '</tr>' for i, row in enumerate(rows))
-    return HTML(f'<table>{header}{data_rows}</table>')
-
-def plot(data, cols, rows):
-    display(html_table(data, cols, rows))
-    bar_plot(data, cols, rows)
 
 
 ######################################################################
