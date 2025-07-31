@@ -70,7 +70,6 @@ model implementations and application components.
 
    tutorials/speech_recognition_pipeline_tutorial
    tutorials/asr_inference_with_ctc_decoder_tutorial
-   tutorials/asr_inference_with_cuda_ctc_decoder_tutorial
    tutorials/forced_alignment_tutorial
    tutorials/forced_alignment_for_multilingual_data_tutorial
    tutorials/tacotron2_pipeline_tutorial

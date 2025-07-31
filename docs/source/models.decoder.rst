@@ -20,19 +20,3 @@ CTC Decoder
 .. rubric:: Tutorials using CTC Decoder
 
 .. minigallery:: torchaudio.models.decoder.CTCDecoder
-
-CUDA CTC Decoder
-----------------
-
-.. autosummary::
-   :toctree: generated
-   :nosignatures:
-   :template: autosummary/cuda_ctc_decoder_class.rst
-
-   CUCTCDecoder
-   cuda_ctc_decoder
-
-
-.. rubric:: Tutorials using CUDA CTC Decoder
-
-.. minigallery:: torchaudio.models.decoder.CUCTCDecoder
