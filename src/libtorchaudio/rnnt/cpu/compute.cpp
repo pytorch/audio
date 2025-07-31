@@ -102,14 +102,18 @@ std::tuple<Tensor, Tensor> compute(
 
   Options options;
   options.batchSize_ = (int)logit_lengths_size;
-  options.nHypos_ = (int)target_lengths_size;
-  options.nHypos_ /= options.batchSize_;
+  options.nHypos_ = (int)(target_lengths_size / options.batchSize_);
   aoti_torch_get_size(logits.get(), 1, &int_tmp);
   options.maxSrcLen_ = (int)int_tmp;
   aoti_torch_get_size(logits.get(), 2, &int_tmp);
   options.maxTgtLen_ = (int)int_tmp;
   aoti_torch_get_size(logits.get(), 3, &int_tmp);
   options.numTargets_ = (int)int_tmp;
+  printf("src %d\n", options.maxSrcLen_);
+  printf("tgt %d\n", options.maxTgtLen_);
+  printf("nh %d\n", options.nHypos_);
+  printf("bs %d\n", options.batchSize_);
+  # TODO: check what these should be
   options.blank_ = blank;
   options.clamp_ = clamp;
   options.fusedLogSmax_ = fused_log_softmax;
@@ -130,6 +134,7 @@ std::tuple<Tensor, Tensor> compute(
 
   AtenTensorHandle int_workspace;
   int64_t sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
+  printf("SIZES: %ld\n", sizes[0]);
   int64_t strides[1] = {1};
   aoti_torch_empty_strided(1, sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace);
 
@@ -144,6 +149,7 @@ std::tuple<Tensor, Tensor> compute(
   aoti_torch_get_data_ptr(float_workspace, &float_workspace_ptr);
   int64_t int_numel;
   aoti_torch_get_numel(int_workspace, &int_numel);
+  printf("Numel is %ld\n", int_numel);
 
   Workspace<float> workspace(
       /*options=*/options,
