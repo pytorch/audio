@@ -1,5 +1,4 @@
 #include <libtorio/ffmpeg/filter_graph.h>
-#include <stdexcept>
 
 namespace torio::io {
 

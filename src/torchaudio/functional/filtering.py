@@ -4,9 +4,9 @@ from typing import Optional
 
 import torch
 from torch import Tensor
+import torch.nn.functional as F
 
 from torchaudio._extension import _IS_TORCHAUDIO_EXT_AVAILABLE
-from torchaudio._internal.module_utils import dropping_support
 
 
 def _dB2Linear(x: float) -> float:
@@ -325,7 +325,7 @@ def biquad(waveform: Tensor, b0: float, b1: float, b2: float, a0: float, a1: flo
     a1 = torch.as_tensor(a1, dtype=dtype, device=device).view(1)
     a2 = torch.as_tensor(a2, dtype=dtype, device=device).view(1)
 
-    output_waveform = _lfilter_deprecated(
+    output_waveform = lfilter(
         waveform,
         torch.cat([a0, a1, a2]),
         torch.cat([b0, b1, b2]),
@@ -699,8 +699,8 @@ def filtfilt(
         Tensor: Waveform with dimension of either `(..., num_filters, time)` if ``a_coeffs`` and ``b_coeffs``
         are 2D Tensors, or `(..., time)` otherwise.
     """
-    forward_filtered = _lfilter_deprecated(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
-    backward_filtered = _lfilter_deprecated(
+    forward_filtered = lfilter(waveform, a_coeffs, b_coeffs, clamp=False, batching=True)
+    backward_filtered = lfilter(
         forward_filtered.flip(-1),
         a_coeffs,
         b_coeffs,
@@ -933,72 +933,76 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
+    _lfilter_core_loop = torch.ops.torchaudio._lfilter_core_loop
 else:
-    _lfilter_core_cpu_loop = _lfilter_core_generic_loop
+    _lfilter_core_loop = _lfilter_core_generic_loop
 
 
-def _lfilter_core(
-    waveform: Tensor,
-    a_coeffs: Tensor,
-    b_coeffs: Tensor,
-) -> Tensor:
+class DifferentiableFIR(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, waveform, b_coeffs):
+        n_order = b_coeffs.size(1)
+        n_channel = b_coeffs.size(0)
+        b_coeff_flipped = b_coeffs.flip(1).contiguous()
+        padded_waveform = F.pad(waveform, (n_order - 1, 0))
+        output = F.conv1d(padded_waveform, b_coeff_flipped.unsqueeze(1), groups=n_channel)
+        ctx.save_for_backward(waveform, b_coeffs, output)
+        return output
 
-    if a_coeffs.size() != b_coeffs.size():
-        raise ValueError(
-            "Expected coeffs to be the same size."
-            f"Found a_coeffs size: {a_coeffs.size()}, b_coeffs size: {b_coeffs.size()}"
-        )
-    if waveform.ndim != 3:
-        raise ValueError(f"Expected waveform to be 3 dimensional. Found: {waveform.ndim}")
-    if not (waveform.device == a_coeffs.device == b_coeffs.device):
-        raise ValueError(
-            "Expected waveform and coeffs to be on the same device."
-            f"Found: waveform device:{waveform.device}, a_coeffs device: {a_coeffs.device}, "
-            f"b_coeffs device: {b_coeffs.device}"
-        )
+    @staticmethod
+    def backward(ctx, dy):
+        x, b_coeffs, y = ctx.saved_tensors
+        n_batch = x.size(0)
+        n_channel = x.size(1)
+        n_order = b_coeffs.size(1)
+        db = F.conv1d(
+                F.pad(x, (n_order - 1, 0)).view(1, n_batch * n_channel, -1),
+                dy.view(n_batch * n_channel, 1, -1),
+                groups=n_batch * n_channel
+            ).view(
+                n_batch, n_channel, -1
+            ).sum(0).flip(1) if b_coeffs.requires_grad else None
+        dx = F.conv1d(
+                F.pad(dy, (0, n_order - 1)),
+                b_coeffs.unsqueeze(1),
+                groups=n_channel
+            ) if x.requires_grad else None
+        return (dx, db)
 
-    n_batch, n_channel, n_sample = waveform.size()
-    n_order = a_coeffs.size(1)
-    if n_order <= 0:
-        raise ValueError(f"Expected n_order to be positive. Found: {n_order}")
+class DifferentiableIIR(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, waveform, a_coeffs_normalized):
+        n_batch, n_channel, n_sample = waveform.shape
+        n_order = a_coeffs_normalized.size(1)
+        n_sample_padded = n_sample + n_order - 1
 
-    # Pad the input and create output
+        a_coeff_flipped = a_coeffs_normalized.flip(1).contiguous();
+        padded_output_waveform = torch.zeros(n_batch, n_channel, n_sample_padded,
+            device=waveform.device, dtype=waveform.dtype)
+        _lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform)
+        output = padded_output_waveform[:,:,n_order - 1:]
+        ctx.save_for_backward(waveform, a_coeffs_normalized, output)
+        return output
 
-    padded_waveform = torch.nn.functional.pad(waveform, [n_order - 1, 0])
-    padded_output_waveform = torch.zeros_like(padded_waveform)
+    @staticmethod
+    def backward(ctx, dy):
+        x, a_coeffs_normalized, y = ctx.saved_tensors
+        n_channel = x.size(1)
+        n_order = a_coeffs_normalized.size(1)
+        tmp = DifferentiableIIR.apply(dy.flip(2).contiguous(), a_coeffs_normalized).flip(2)
+        dx = tmp if x.requires_grad else None
+        da = -(tmp.transpose(0, 1).reshape(n_channel, 1, -1) @
+                F.pad(y, (n_order - 1, 0)).unfold(2, n_order, 1).transpose(0,1)
+                .reshape(n_channel, -1, n_order)
+            ).squeeze(1).flip(1) if a_coeffs_normalized.requires_grad else None
+        return (dx, da)
 
-    # Set up the coefficients matrix
-    # Flip coefficients' order
-    a_coeffs_flipped = a_coeffs.flip(1)
-    b_coeffs_flipped = b_coeffs.flip(1)
+def _lfilter(waveform, a_coeffs, b_coeffs):
+    n_order = b_coeffs.size(1)
+    filtered_waveform = DifferentiableFIR.apply(waveform, b_coeffs / a_coeffs[:, 0:1])
+    return DifferentiableIIR.apply(filtered_waveform, a_coeffs / a_coeffs[:, 0:1])
 
-    # calculate windowed_input_signal in parallel using convolution
-    input_signal_windows = torch.nn.functional.conv1d(padded_waveform, b_coeffs_flipped.unsqueeze(1), groups=n_channel)
-
-    input_signal_windows.div_(a_coeffs[:, :1])
-    a_coeffs_flipped.div_(a_coeffs[:, :1])
-
-    if (
-        input_signal_windows.device == torch.device("cpu")
-        and a_coeffs_flipped.device == torch.device("cpu")
-        and padded_output_waveform.device == torch.device("cpu")
-    ):
-        _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
-    else:
-        _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
-
-    output = padded_output_waveform[:, :, n_order - 1 :]
-    return output
-
-
-if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter = torch.ops.torchaudio._lfilter
-else:
-    _lfilter = _lfilter_core
-
-
-def _lfilter_deprecated(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
+def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
     developed separately by *Yu et al.* :cite:`ismir_YuF23` and *Forgione et al.* :cite:`forgione2021dynonet`.
     The gradients of ``a_coeffs`` are computed based on a faster algorithm from :cite:`ycy2024diffapf`.
@@ -1067,8 +1071,6 @@ def _lfilter_deprecated(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, cl
 
     return output
 
-lfilter = dropping_support(_lfilter_deprecated)
-
 def lowpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
@@ -1117,7 +1119,7 @@ else:
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
-def _overdrive_deprecated(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
+def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
 
     .. devices:: CPU CUDA
@@ -1172,7 +1174,6 @@ def _overdrive_deprecated(waveform: Tensor, gain: float = 20, colour: float = 20
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
-overdrive = dropping_support(_overdrive_deprecated)
 
 def phaser(
     waveform: Tensor,
