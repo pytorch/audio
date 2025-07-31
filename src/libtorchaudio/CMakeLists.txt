@@ -22,19 +22,13 @@ if(BUILD_RNNT)
   list(
     APPEND
     sources
-    rnnt/cpu/compute_alphas.cpp
-    rnnt/cpu/compute_betas.cpp
     rnnt/cpu/compute.cpp
-    rnnt/compute_alphas.cpp
-    rnnt/compute_betas.cpp
     rnnt/compute.cpp
     )
   if (USE_CUDA)
     list(
       APPEND
       sources
-      rnnt/gpu/compute_alphas.cu
-      rnnt/gpu/compute_betas.cu
       rnnt/gpu/compute.cu
       )
   endif()
