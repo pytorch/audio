@@ -195,10 +195,10 @@ std::tuple<Tensor, Tensor> compute(
 }
 
 void boxed_compute(StableIValue* stack, uint64_t num_args, uint64_t num_outputs) {
-  RAIIATH t1(to<AtenTensorHandle>(stack[0]));
-  RAIIATH t2(to<AtenTensorHandle>(stack[1]));
-  RAIIATH t3(to<AtenTensorHandle>(stack[2]));
-  RAIIATH t4(to<AtenTensorHandle>(stack[3]));
+  Tensor t1(to<AtenTensorHandle>(stack[0]));
+  Tensor t2(to<AtenTensorHandle>(stack[1]));
+  Tensor t3(to<AtenTensorHandle>(stack[2]));
+  Tensor t4(to<AtenTensorHandle>(stack[3]));
   int64_t blank = to<int64_t>(stack[4]);
   double clamp = to<double>(stack[5]);
   bool fused_log_softmax = to<bool>(stack[6]);
