@@ -622,6 +622,13 @@ class Functional(TestBaseMixin):
         loss = F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
         loss.backward()
 
+    def test_mytest(self):
+        print("Got here")
+        logits, targets, logit_lengths, target_lengths = rnnt_utils.get_basic_data(self.device)
+        result = F.rnnt_loss(logits, targets, logit_lengths, target_lengths)
+        print("DONE")
+        # result.sum().backward()
+
     def test_rnnt_loss_basic_forward_no_grad(self):
         """In early stage, calls to `rnnt_loss` resulted in segmentation fault when
         `logits` have `requires_grad = False`. This test makes sure that this no longer

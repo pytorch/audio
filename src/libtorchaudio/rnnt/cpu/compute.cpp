@@ -1,20 +1,23 @@
 #include <libtorchaudio/rnnt/cpu/cpu_transducer.h>
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
-#include <torch/csrc/inductor/aoti_runtime/utils.h>
 #include <torch/csrc/stable/library.h>
+#include <torch/csrc/stable/tensor.h>
+
+
+#include <stdio.h>
 
 namespace torchaudio {
 namespace rnnt {
 namespace cpu {
 
-using RAIIATH = torch::aot_inductor::RAIIAtenTensorHandle;
+using torch::stable::Tensor;
 
 // Entry point into RNNT Loss
-std::tuple<RAIIATH, RAIIATH> compute(
-    const RAIIATH logits,
-    const RAIIATH targets,
-    const RAIIATH logit_lengths,
-    const RAIIATH target_lengths,
+std::tuple<Tensor, Tensor> compute(
+    const Tensor logits,
+    const Tensor targets,
+    const Tensor logit_lengths,
+    const Tensor target_lengths,
     int64_t blank,
     double clamp,
     bool fused_log_softmax = true) {
@@ -187,23 +190,24 @@ std::tuple<RAIIATH, RAIIATH> compute(
           /*gradients=*/(c10::Half*)grads_ptr);
     }
 
-  return std::make_tuple(RAIIATH(costs), RAIIATH(gradients));
+  return std::make_tuple(Tensor(costs), Tensor(gradients));
 }
 
 void boxed_compute(StableIValue* stack, uint64_t num_args, uint64_t num_outputs) {
-  RAIIATH t1(to<AtenTensorHandle>(stack[0]));
-  RAIIATH t2(to<AtenTensorHandle>(stack[1]));
-  RAIIATH t3(to<AtenTensorHandle>(stack[2]));
-  RAIIATH t4(to<AtenTensorHandle>(stack[3]));
+  Tensor t1(to<AtenTensorHandle>(stack[0]));
+  Tensor t2(to<AtenTensorHandle>(stack[1]));
+  Tensor t3(to<AtenTensorHandle>(stack[2]));
+  Tensor t4(to<AtenTensorHandle>(stack[3]));
   int64_t blank = to<int64_t>(stack[4]);
   double clamp = to<double>(stack[5]);
   bool fused_log_softmax = to<bool>(stack[6]);
   auto result = compute(
       std::move(t1), std::move(t2), std::move(t3), std::move(t4),
       blank, clamp, fused_log_softmax);
-  stack[0] = from((std::get<0>(result)).release());
-  stack[1] = from((std::get<1>(result)).release());
+  stack[0] = from(std::get<0>(result));
+  stack[1] = from(std::get<1>(result));
 }
+
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
   m.impl("rnnt_loss", &boxed_compute);
