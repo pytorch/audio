@@ -7,13 +7,10 @@ Audio Feature Augmentation
 
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
-# !pip install torchaudio librosa
-
 import torch
 import torchaudio
 import torchaudio.transforms as T
+import numpy as np
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -23,7 +20,6 @@ print(torchaudio.__version__)
 # -----------
 #
 
-import librosa
 import matplotlib.pyplot as plt
 from IPython.display import Audio
 from torchaudio.utils import _download_asset
@@ -98,10 +94,16 @@ spec_09 = stretch(spec, overriding_rate=0.9)
 ######################################################################
 # Visualization
 # ~~~~~~~~~~~~~
+
+def power_to_db(S):
+    S = np.asarray(S)
+    return 10.0 * np.log10(np.maximum(1e-10, S))
+
+
 def plot():
     def plot_spec(ax, spec, title):
         ax.set_title(title)
-        ax.imshow(librosa.amplitude_to_db(spec), origin="lower", aspect="auto")
+        ax.imshow(power_to_db(spec**2), origin="lower", aspect="auto")
 
     fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
     plot_spec(axes[0], torch.abs(spec_12[0]), title="Stretched x1.2")
@@ -157,7 +159,7 @@ freq_masked = freq_masking(spec)
 def plot():
     def plot_spec(ax, spec, title):
         ax.set_title(title)
-        ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
+        ax.imshow(power_to_db(spec), origin="lower", aspect="auto")
 
     fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
     plot_spec(axes[0], spec[0], title="Original")

@@ -48,13 +48,8 @@ print(torchaudio.__version__)
 import matplotlib.pyplot as plt
 
 ######################################################################
-# In addition to ``torchaudio``, ``mir_eval`` is required to perform
-# signal-to-distortion ratio (SDR) calculations. To install ``mir_eval``
-# please use ``pip3 install mir_eval``.
-#
 
 from IPython.display import Audio
-from mir_eval import separation
 from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
 from torchaudio.utils import _download_asset
 
@@ -247,10 +242,8 @@ stft = torchaudio.transforms.Spectrogram(
 
 
 def output_results(original_source: torch.Tensor, predicted_source: torch.Tensor, source: str):
-    print(
-        "SDR score is:",
-        separation.bss_eval_sources(original_source.detach().numpy(), predicted_source.detach().numpy())[0].mean(),
-    )
+    # If you have installed the mir_eval package, you can calculate the SDR score with
+    # `mir_eval.separation.bss_eval_sources(original_source.detach().numpy(), predicted_source.detach().numpy())[0].mean()`
     plot_spectrogram(stft(predicted_source)[0], f"Spectrogram - {source}")
     return Audio(predicted_source, rate=sample_rate)
 
