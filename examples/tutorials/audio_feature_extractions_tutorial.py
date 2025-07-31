@@ -45,15 +45,7 @@ import matplotlib.pyplot as plt
 ######################################################################
 # Preparation
 # -----------
-#
-# .. note::
-#
-#    When running this tutorial in Google Colab, install the required packages
-#
-#    .. code::
-#
-#       !pip install librosa
-#
+
 from IPython.display import Audio
 from matplotlib.patches import Rectangle
 from torchaudio.utils import download_asset
@@ -284,31 +276,6 @@ mel_filters = F.melscale_fbanks(
 
 plot_fbank(mel_filters, "Mel Filter Bank - torchaudio")
 
-######################################################################
-# Comparison against librosa
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# For reference, here is the equivalent way to get the mel filter bank
-# with ``librosa``.
-#
-
-mel_filters_librosa = librosa.filters.mel(
-    sr=sample_rate,
-    n_fft=n_fft,
-    n_mels=n_mels,
-    fmin=0.0,
-    fmax=sample_rate / 2.0,
-    norm="slaney",
-    htk=True,
-).T
-
-######################################################################
-#
-
-plot_fbank(mel_filters_librosa, "Mel Filter Bank - librosa")
-
-mse = torch.square(mel_filters - mel_filters_librosa).mean().item()
-print("Mean Square Difference: ", mse)
 
 ######################################################################
 # MelSpectrogram
@@ -345,35 +312,6 @@ melspec = mel_spectrogram(SPEECH_WAVEFORM)
 
 plot_spectrogram(melspec[0], title="MelSpectrogram - torchaudio", ylabel="mel freq")
 
-######################################################################
-# Comparison against librosa
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# For reference, here is the equivalent means of generating mel-scale
-# spectrograms with ``librosa``.
-#
-
-melspec_librosa = librosa.feature.melspectrogram(
-    y=SPEECH_WAVEFORM.numpy()[0],
-    sr=sample_rate,
-    n_fft=n_fft,
-    hop_length=hop_length,
-    win_length=win_length,
-    center=True,
-    pad_mode="reflect",
-    power=2.0,
-    n_mels=n_mels,
-    norm="slaney",
-    htk=True,
-)
-
-######################################################################
-#
-
-plot_spectrogram(melspec_librosa, title="MelSpectrogram - librosa", ylabel="mel freq")
-
-mse = torch.square(melspec - melspec_librosa).mean().item()
-print("Mean Square Difference: ", mse)
 
 ######################################################################
 # MFCC
@@ -403,37 +341,6 @@ mfcc = mfcc_transform(SPEECH_WAVEFORM)
 #
 
 plot_spectrogram(mfcc[0], title="MFCC")
-
-######################################################################
-# Comparison against librosa
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-
-melspec = librosa.feature.melspectrogram(
-    y=SPEECH_WAVEFORM.numpy()[0],
-    sr=sample_rate,
-    n_fft=n_fft,
-    win_length=win_length,
-    hop_length=hop_length,
-    n_mels=n_mels,
-    htk=True,
-    norm=None,
-)
-
-mfcc_librosa = librosa.feature.mfcc(
-    S=librosa.core.spectrum.power_to_db(melspec),
-    n_mfcc=n_mfcc,
-    dct_type=2,
-    norm="ortho",
-)
-
-######################################################################
-#
-
-plot_spectrogram(mfcc_librosa, title="MFCC (librosa)")
-
-mse = torch.square(mfcc - mfcc_librosa).mean().item()
-print("Mean Square Difference: ", mse)
 
 ######################################################################
 # LFCC
