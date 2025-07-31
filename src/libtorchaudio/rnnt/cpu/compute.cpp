@@ -109,12 +109,6 @@ std::tuple<Tensor, Tensor> compute(
   options.maxTgtLen_ = (int)int_tmp;
   aoti_torch_get_size(logits.get(), 3, &int_tmp);
   options.numTargets_ = (int)int_tmp;
-  printf("src %d\n", options.maxSrcLen_);
-  printf("tgt %d\n", options.maxTgtLen_);
-  printf("nh %d\n", options.nHypos_);
-  printf("bs %d\n", options.batchSize_);
-  // should be 2,3,1,1
-  // TODO: It is! so why is sizes zero? Unless it IS zero and needed_size is zero too?
   options.blank_ = blank;
   options.clamp_ = clamp;
   options.fusedLogSmax_ = fused_log_softmax;
@@ -150,7 +144,6 @@ std::tuple<Tensor, Tensor> compute(
   aoti_torch_get_data_ptr(float_workspace, &float_workspace_ptr);
   int64_t int_numel;
   aoti_torch_get_numel(int_workspace, &int_numel);
-  printf("Numel is %ld\n", int_numel);
 
   Workspace<float> workspace(
       /*options=*/options,
