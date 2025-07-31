@@ -130,12 +130,13 @@ std::tuple<Tensor, Tensor> compute(
   aoti_torch_zero_(gradients);
 
   AtenTensorHandle int_workspace;
-  int64_t sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
+  int64_t int_sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
   int64_t strides[1] = {1};
-  aoti_torch_empty_strided(1, sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace);
+  aoti_torch_empty_strided(1, int_sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace);
 
   AtenTensorHandle float_workspace;
-  aoti_torch_empty_strided(1, sizes, strides, aoti_torch_dtype_float32(), logits_device, logits_device_index, &float_workspace);
+  int64_t float_sizes[1] = {DtypeWorkspace<float>::ComputeSizeFromOptions(options)};
+  aoti_torch_empty_strided(1, float_sizes, strides, aoti_torch_dtype_float32(), logits_device, logits_device_index, &float_workspace);
 
   int64_t float_numel;
   aoti_torch_get_numel(float_workspace, &float_numel);
