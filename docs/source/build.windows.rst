@@ -119,12 +119,12 @@ Now that we have everything ready, we can build TorchAudio.
 .. code-block::
 
    # In Command Prompt
-   python setup.py develop
+   pip install -e . -v --no-build-isolation
 
 .. code-block::
 
    # In Bash
-   python setup.py develop
+   pip install -e . -v --no-build-isolation
 
 .. note::
    Due to the complexity of build process, TorchAudio only supports in-place build.
@@ -144,7 +144,7 @@ To build single version FFmpeg extension, FFmpeg binaries must be provided by us
 .. code-block::
 
    conda install -c conda-forge ffmpeg
-   FFMPEG_ROOT=${CONDA_PREFIX}/Library python setup.py develop
+   FFMPEG_ROOT=${CONDA_PREFIX}/Library pip install -e . -v --no-build-isolation
 
 
 [Optional] Building FFmpeg from source
