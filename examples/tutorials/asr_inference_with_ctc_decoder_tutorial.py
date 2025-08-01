@@ -64,7 +64,7 @@ from typing import List
 import IPython
 import matplotlib.pyplot as plt
 from torchaudio.models.decoder import ctc_decoder
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 ######################################################################
 #
@@ -85,7 +85,7 @@ acoustic_model = bundle.get_model()
 # We will load a sample from the LibriSpeech test-other dataset.
 #
 
-speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+speech_file = _download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 IPython.display.Audio(speech_file)
 

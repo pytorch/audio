@@ -7,13 +7,10 @@ Audio Feature Augmentation
 
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
-# !pip install torchaudio librosa
-
 import torch
 import torchaudio
 import torchaudio.transforms as T
+import numpy as np
 
 print(torch.__version__)
 print(torchaudio.__version__)
@@ -23,33 +20,24 @@ print(torchaudio.__version__)
 # -----------
 #
 
-import librosa
 import matplotlib.pyplot as plt
 from IPython.display import Audio
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
+import torchaudio
 
 ######################################################################
 # In this tutorial, we will use a speech data from
 # `VOiCES dataset <https://iqtlabs.github.io/voices/>`__,
 # which is licensed under Creative Commos BY 4.0.
 
-SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SAMPLE_WAV_SPEECH_PATH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
-def _get_sample(path, resample=None):
-    effects = [["remix", "1"]]
-    if resample:
-        effects.extend(
-            [
-                ["lowpass", f"{resample // 2}"],
-                ["rate", f"{resample}"],
-            ]
-        )
-    return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
+def _get_sample(path):
+    return torchaudio.load(path)
 
-
-def get_speech_sample(*, resample=None):
-    return _get_sample(SAMPLE_WAV_SPEECH_PATH, resample=resample)
+def get_speech_sample():
+    return _get_sample(SAMPLE_WAV_SPEECH_PATH)
 
 
 def get_spectrogram(
@@ -98,10 +86,16 @@ spec_09 = stretch(spec, overriding_rate=0.9)
 ######################################################################
 # Visualization
 # ~~~~~~~~~~~~~
+
+def power_to_db(S):
+    S = np.asarray(S)
+    return 10.0 * np.log10(np.maximum(1e-10, S))
+
+
 def plot():
     def plot_spec(ax, spec, title):
         ax.set_title(title)
-        ax.imshow(librosa.amplitude_to_db(spec), origin="lower", aspect="auto")
+        ax.imshow(power_to_db(spec**2), origin="lower", aspect="auto")
 
     fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
     plot_spec(axes[0], torch.abs(spec_12[0]), title="Stretched x1.2")
@@ -157,7 +151,7 @@ freq_masked = freq_masking(spec)
 def plot():
     def plot_spec(ax, spec, title):
         ax.set_title(title)
-        ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
+        ax.imshow(power_to_db(spec), origin="lower", aspect="auto")
 
     fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
     plot_spec(axes[0], spec[0], title="Original")

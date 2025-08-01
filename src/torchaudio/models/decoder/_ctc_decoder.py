@@ -25,7 +25,7 @@ from flashlight.lib.text.dictionary import (
     Dictionary as _Dictionary,
     load_words as _load_words,
 )
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 try:
     from flashlight.lib.text.decoder.kenlm import KenLM as _KenLM
@@ -554,10 +554,10 @@ def download_pretrained_files(model: str) -> _PretrainedFiles:
     """
 
     files = _get_filenames(model)
-    lexicon_file = download_asset(files.lexicon)
-    tokens_file = download_asset(files.tokens)
+    lexicon_file = _download_asset(files.lexicon)
+    tokens_file = _download_asset(files.tokens)
     if files.lm is not None:
-        lm_file = download_asset(files.lm)
+        lm_file = _download_asset(files.lm)
     else:
         lm_file = None
 
