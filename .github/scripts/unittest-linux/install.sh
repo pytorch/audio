@@ -102,7 +102,7 @@ fi
     pip install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 
     # TODO: might be better to fix the single call to `pip install` above
-    pip install "pillow<10.0" "scipy<1.10" "numpy<2.0"
+    pip install pillo scipy numpy
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
