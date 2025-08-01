@@ -187,11 +187,7 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
       });
   return std::make_tuple(
       paths,
-      logProbs.index(
-          {torch::indexing::Slice(),
-           torch::linspace(
-               0, T - 1, T, torch::TensorOptions().dtype(paths.dtype())),
-           paths.index({0})}));
+      torch::narrow(torch::select(logProbs, 2, paths.index({0})), 1,0,T));
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {

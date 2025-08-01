@@ -82,15 +82,9 @@ void lfilter_core_generic_loop(
   auto coeff = a_coeff_flipped.unsqueeze(2);
   for (int64_t i_sample = 0; i_sample < n_samples_input; i_sample++) {
     auto windowed_output_signal =
-        padded_output_waveform
-            .index(
-                {torch::indexing::Slice(),
-                 torch::indexing::Slice(),
-                 torch::indexing::Slice(i_sample, i_sample + n_order)})
-            .transpose(0, 1);
+      torch::narrow(padded_output_waveform, 2, i_sample, i_sample + n_order).transpose(0, 1);
     auto o0 =
-        input_signal_windows.index(
-            {torch::indexing::Slice(), torch::indexing::Slice(), i_sample}) -
+        torch.select(input_signal_windows, 2, i_sample) -
         at::matmul(windowed_output_signal, coeff).squeeze(2).transpose(0, 1);
     padded_output_waveform.index_put_(
         {torch::indexing::Slice(),
