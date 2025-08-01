@@ -1,6 +1,8 @@
 import subprocess
 
 import torch
+import os
+from pathlib import Path
 
 
 def convert_args(**kwargs):
@@ -14,7 +16,7 @@ def convert_args(**kwargs):
     return args
 
 
-def run_kaldi(command, input_type, input_value):
+def run_kaldi(request, command, input_type, input_value):
     """Run provided Kaldi command, pass a tensor and get the resulting tensor
 
     Args:
@@ -23,6 +25,9 @@ def run_kaldi(command, input_type, input_value):
         input_value (Tensor for 'ark', string for 'scp'): The input to pass.
             Must be a path to an audio file for 'scp'.
     """
+    path = Path(f"torchaudio_unittest/assets/kaldi_expected_results/{request}.pt")
+    if os.path.exists(path):
+        return torch.load(path)
     import kaldi_io
 
     key = "foo"
@@ -35,4 +40,7 @@ def run_kaldi(command, input_type, input_value):
         raise NotImplementedError("Unexpected type")
     process.stdin.close()
     result = dict(kaldi_io.read_mat_ark(process.stdout))["foo"]
-    return torch.from_numpy(result.copy())  # copy supresses some torch warning
+    torch_result = torch.from_numpy(result.copy())  # copy supresses some torch warning
+    path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(torch_result, path)
+    return torch_result

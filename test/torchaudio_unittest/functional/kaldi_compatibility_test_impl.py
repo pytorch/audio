@@ -1,10 +1,10 @@
 import torch
 import torchaudio.functional as F
-from torchaudio_unittest.common_utils import skipIfNoExec, TempDirMixin, TestBaseMixin
+from torchaudio_unittest.common_utils import skipIfNoExec, TempDirMixin, TestBaseMixin, RequestMixin
 from torchaudio_unittest.common_utils.kaldi_utils import convert_args, run_kaldi
 
 
-class Kaldi(TempDirMixin, TestBaseMixin):
+class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
     def assert_equal(self, output, *, expected, rtol=None, atol=None):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
@@ -22,5 +22,5 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         tensor = torch.randn(40, 10, dtype=self.dtype, device=self.device)
         result = F.sliding_window_cmn(tensor, **kwargs)
         command = ["apply-cmvn-sliding"] + convert_args(**kwargs) + ["ark:-", "ark:-"]
-        kaldi_result = run_kaldi(command, "ark", tensor)
+        kaldi_result = run_kaldi(self.request, command, "ark", tensor)
         self.assert_equal(result, expected=kaldi_result)

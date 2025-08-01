@@ -30,6 +30,12 @@ from .func_utils import torch_script
 from .image_utils import get_image, rgb_to_gray, rgb_to_yuv_ccir, save_image
 from .parameterized_utils import load_params, nested_params
 from .wav_utils import get_wav_data, load_wav, normalize_wav, save_wav
+import pytest
+
+class RequestMixin:
+    @pytest.fixture(autouse=True)
+    def inject_request(self, request):
+        self.request = request.node.nodeid
 
 __all__ = [
     "get_asset_path",
@@ -40,6 +46,7 @@ __all__ = [
     "HttpServerMixin",
     "TestBaseMixin",
     "PytorchTestCase",
+    "RequestMixin",
     "TorchaudioTestCase",
     "skipIfNoAudioDevice",
     "skipIfNoCtcDecoder",
