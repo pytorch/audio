@@ -11,20 +11,12 @@ import numpy as np
 import pytest
 
 
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin, RequestMixin
 
-@pytest.fixture(autouse=True)
-def inject_request(request, self=None):
-    if self:
-        self.request = request
-
-class Functional(TestBaseMixin):
+class Functional(TestBaseMixin, RequestMixin):
     """Test suite for functions in `functional` module."""
 
     dtype = torch.float64
-
-    def stopTestRun(self):
-        librosa_mock.save_cache()
 
     @nested_params([0, 0.99])
     def test_griffinlim(self, momentum):
@@ -123,7 +115,7 @@ class Functional(TestBaseMixin):
         self.assertEqual(result, torch.from_numpy(expected))
 
 
-class FunctionalComplex(TestBaseMixin):
+class FunctionalComplex(TestBaseMixin, RequestMixin):
     @nested_params([0.5, 1.01, 1.3])
     def test_phase_vocoder(self, rate):
         hop_length = 256
