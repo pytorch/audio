@@ -68,7 +68,7 @@ jobs:
 
         GPU_ARCH_ID=cu126  # This is hard-coded and must be consistent with gpu-arch-version.
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${CHANNEL}/${GPU_ARCH_ID}"
-        pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
 
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
