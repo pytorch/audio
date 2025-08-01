@@ -121,7 +121,7 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
         ).to(self.device, self.dtype)(waveform)[0]
 
         melspec = librosa_mock.mel_spectrogram(
-            (self.request, 0),
+            f"{self.request}_0",
             y=waveform[0].cpu().numpy(),
             sr=sample_rate,
             n_fft=n_fft,
@@ -133,7 +133,7 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
             pad_mode="reflect",
         )
         expected = librosa_mock.mfcc(
-            (self.request, 1),
+            f"{self.request}_1",
             S=librosa_mock.power_to_db(None,melspec), n_mfcc=n_mfcc, dct_type=2, norm="ortho"
         )
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
