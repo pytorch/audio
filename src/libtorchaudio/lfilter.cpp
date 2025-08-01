@@ -84,7 +84,7 @@ void lfilter_core_generic_loop(
     auto windowed_output_signal =
       torch::narrow(padded_output_waveform, 2, i_sample, i_sample + n_order).transpose(0, 1);
     auto o0 =
-        torch.select(input_signal_windows, 2, i_sample) -
+        torch::select(input_signal_windows, 2, i_sample) -
         at::matmul(windowed_output_signal, coeff).squeeze(2).transpose(0, 1);
     padded_output_waveform.index_put_(
         {torch::indexing::Slice(),
