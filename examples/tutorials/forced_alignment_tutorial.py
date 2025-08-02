@@ -88,7 +88,7 @@ SPEECH_FILE = torchaudio.utils._download_asset("tutorial-assets/Lab41-SRI-VOiCES
 # Generate frame-wise label probability
 # -------------------------------------
 #
-# The first step is to generate the label class porbability of each audio
+# The first step is to generate the label class probability of each audio
 # frame. We can use a Wav2Vec2 model that is trained for ASR. Here we use
 # :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
 #
@@ -153,7 +153,7 @@ plot()
 # :math:`c_j` at :math:`t` and it transitioned to the next label
 # :math:`c_{j+1}` at :math:`t+1`.
 #
-# The follwoing diagram illustrates this transition.
+# The following diagram illustrates this transition.
 #
 # .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/ctc-forward.png
 #
