@@ -1,7 +1,9 @@
 import subprocess
 import sys
 import warnings
-
+import shutil
+from pathlib import Path
+import os
 
 def get_encoding(dtype):
     encodings = {
@@ -103,8 +105,13 @@ def _flattern(effects):
     return [item for sublist in effects for item in sublist]
 
 
-def run_sox_effect(input_file, output_file, effect, *, output_sample_rate=None, output_bitdepth=None):
-    """Run sox effects"""
+def run_sox_effect(request, input_file, output_file, effect, *, output_sample_rate=None, output_bitdepth=None):
+    """Save or load the result of running sox effects for the test-id `request`."""
+
+    path = Path(f"torchaudio_unittest/assets/sox_expected_results/{request}.wav")
+    if os.path.exists(path):
+        shutil.copyfile(path, output_file)
+
     effect = _flattern(effect)
     command = ["sox", "-V", "--no-dither", input_file]
     if output_bitdepth:
@@ -114,3 +121,5 @@ def run_sox_effect(input_file, output_file, effect, *, output_sample_rate=None, 
         command += ["rate", str(output_sample_rate)]
     print(" ".join(command))
     subprocess.run(command, check=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(output_file, path)
