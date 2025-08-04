@@ -187,8 +187,12 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
       });
   return std::make_tuple(
       paths,
-      torch::narrow(torch::index_select(logProbs, 2, paths.index({0})), 1,0,T));
+      logProbs
+      );
 }
+
+
+
 
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
   m.impl("forced_align", &compute);
