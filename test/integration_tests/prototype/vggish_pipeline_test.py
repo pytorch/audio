@@ -1,7 +1,8 @@
 import torchaudio
 from torchaudio.prototype.pipelines import VGGISH
+from torchaudio_unittest.common_utils import skipIfNoExec
 
-
+@skipIfNoExec("ffmpeg")
 def test_vggish():
     input_sr = VGGISH.sample_rate
     input_proc = VGGISH.get_input_processor()
