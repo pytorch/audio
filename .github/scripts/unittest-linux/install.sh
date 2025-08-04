@@ -103,6 +103,12 @@ fi
 
     # TODO: might be better to fix the single call to `pip install` above
     pip install pillow scipy numpy
+    echo
+    echo  ====================
+    echo HERE ARE ALL THE PACKAGES INSTALLED:
+    pip list
+    echo ====================
+
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
