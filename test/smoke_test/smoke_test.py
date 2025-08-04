@@ -9,6 +9,7 @@ def base_smoke_test():
     import torchaudio.datasets  # noqa: F401
     import torchaudio.functional  # noqa: F401
     import torchaudio.models  # noqa: F401
+    import torchaudio.pipelines  # noqa: F401
     import torchaudio.transforms  # noqa: F401
     import torchaudio.utils  # noqa: F401
 
@@ -30,7 +31,8 @@ def main(args=None) -> None:
 def _parse_args(args):
     parser = argparse.ArgumentParser()
 
-    # Warning: Please note this option should not be widely used, only use it when absolutely necessary
+    # Warning: Please note this option does nothing and only exists for backward compatibility.
+    parser.add_argument("--no-ffmpeg", dest="ffmpeg", action="store_false")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging.")
 
     return parser.parse_args(args)
