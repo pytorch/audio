@@ -52,7 +52,7 @@ class SourceSeparationBundle:
     def get_model(self) -> torch.nn.Module:
         """Construct the model and load the pretrained weight."""
         model = self._model_factory_func()
-        path = torchaudio.utils.download_asset(self._model_path)
+        path = torchaudio.utils._download_asset(self._model_path)
         state_dict = torch.load(path)
         model.load_state_dict(state_dict)
         model.eval()

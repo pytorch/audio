@@ -22,7 +22,7 @@ print(torchaudio.__version__)
 
 import matplotlib.pyplot as plt
 from IPython.display import Audio
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 import torchaudio
 
 ######################################################################
@@ -30,7 +30,7 @@ import torchaudio
 # `VOiCES dataset <https://iqtlabs.github.io/voices/>`__,
 # which is licensed under Creative Commos BY 4.0.
 
-SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SAMPLE_WAV_SPEECH_PATH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 def _get_sample(path):
