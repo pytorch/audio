@@ -35,7 +35,7 @@ import pytest
 class RequestMixin:
     @pytest.fixture(autouse=True)
     def inject_request(self, request):
-        self.request = request.node.nodeid
+        self.request = request.node.nodeid.replace(":", "_")
 
 __all__ = [
     "get_asset_path",
