@@ -14,17 +14,27 @@ namespace torchaudio {
 namespace alignment {
 namespace cpu {
 
+// Compute strides for row-major indexing
+template<unsigned int k>
+void reverse_cumprod(int64_t (&strides)[k]) {
+  // Convert dimensions to strides: stride[i] = product of dimensions [i+1..k-1]
+  for (int i = k - 2; i >= 0; i--) {
+    strides[i] = strides[i] * strides[i + 1];
+  }
+}
+
 template<unsigned int k, typename T>
 class Accessor {
-  int64_t shape[k];
+  int64_t strides[k-1];
   T *data;
 
 public:
   Accessor(const torch::Tensor& tensor) {
     data = tensor.data_ptr<T>();
-    for (int i = 0; i < k; i++) {
-      shape[i] = tensor.size(i);
+    for (int i = 1; i < k; i++) {
+      strides[i-1] = tensor.size(i);
     }
+    reverse_cumprod<k-1>(strides);
   }
 
   T index(...) {
@@ -35,42 +45,41 @@ public:
       if (i == k - 1)
         ix += va_arg(args, int);
       else
-        ix += shape[i+1] * va_arg(args, int);
+        ix += strides[i] * va_arg(args, int);
     }
     va_end(args);
     return data[ix];
   }
 };
 
-
 template<unsigned int k, typename T>
 class MutAccessor {
-  int64_t shape[k];
+  int64_t strides[k-1];
   T *data;
 
 public:
- MutAccessor(torch::Tensor& tensor) {
+  MutAccessor(torch::Tensor& tensor) {
     data = tensor.data_ptr<T>();
-    for (int i = 0; i < k; i++) {
-      shape[i] = tensor.size(i);
+    for (int i = 1; i < k; i++) {
+      strides[i-1] = tensor.size(i);
     }
+    reverse_cumprod<k-1>(strides);
   }
 
-  void set_index(T value,...) {
+  void set_index(T value, ...) {
     va_list args;
-    va_start(args, k);
+    va_start(args, value);
     int64_t ix = 0;
     for (int i = 0; i < k; i++) {
       if (i == k - 1)
         ix += va_arg(args, int);
       else
-        ix += shape[i+1] * va_arg(args, int);
+        ix += strides[i] * va_arg(args, int);
     }
     va_end(args);
     data[ix] = value;
   }
 };
-
 
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
