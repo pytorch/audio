@@ -82,7 +82,7 @@ conda install --quiet -y ninja cmake
 
 printf "* Installing torchaudio\n"
 export BUILD_CPP_TEST=1
-python setup.py install
+pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"

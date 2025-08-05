@@ -62,7 +62,7 @@ import torchaudio.functional as F
 # to use.
 #
 
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SPEECH_FILE = torchaudio.utils._download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 waveform, _ = torchaudio.load(SPEECH_FILE)
 TRANSCRIPT = "i had that curiosity beside me at this moment".split()
 

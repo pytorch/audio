@@ -54,7 +54,7 @@ pip install -r requirements.txt
  # Install the following only if running tests
 if [[ "$SKIP_INSTALL" != "true" ]]; then
      # TorchAudio CPP Extensions
-    python setup.py install
+    python -m pip install . -vv --no-build-isolation
 fi
 
 if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then

@@ -37,7 +37,7 @@ Here, we install nightly build.
 
 .. code-block::
 
-   python setup.py develop
+   pip install -e . -v --no-build-isolation
 
 .. note::
    Due to the complexity of build process, TorchAudio only supports in-place build.
@@ -57,4 +57,4 @@ To build single version FFmpeg extension, FFmpeg binaries must be provided by us
 .. code-block::
 
    conda install -c conda-forge ffmpeg
-   FFMPEG_ROOT=${CONDA_PREFIX} python setup.py develop
+   FFMPEG_ROOT=${CONDA_PREFIX} pip install -e . -v --no-build-isolation
