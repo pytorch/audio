@@ -40,21 +40,37 @@ public:
     va_end(args);
     return data[ix];
   }
-
-  // void set_index(T val,...) {
-  //   va_list args;
-  //   va_start(args, k);
-  //   int64_t ix = 0;
-  //   for (int i = 0; i < k; i++) {
-  //     if (i == k - 1)
-  //       ix += va_arg(args, int);
-  //     else
-  //       ix += shape[i+1] * va_arg(args, int);
-  //   }
-  //   va_end(args);
-  //   data[ix] = val;
-  // }
 };
+
+
+template<unsigned int k, typename T>
+class MutAccessor {
+  int64_t shape[k];
+  T *data;
+
+public:
+ MutAccessor(torch::Tensor& tensor) {
+    data = tensor.data_ptr<T>();
+    for (int i = 0; i < k; i++) {
+      shape[i] = tensor.size(i);
+    }
+  }
+
+  void set_index(T value,...) {
+    va_list args;
+    va_start(args, k);
+    int64_t ix = 0;
+    for (int i = 0; i < k; i++) {
+      if (i == k - 1)
+        ix += va_arg(args, int);
+      else
+        ix += shape[i+1] * va_arg(args, int);
+    }
+    va_end(args);
+    data[ix] = value;
+  }
+};
+
 
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
@@ -86,7 +102,7 @@ void forced_align_impl(
 
   auto logProbs_a = Accessor<3, scalar_t>(logProbs);
   auto targets_a = Accessor<2, target_t>(targets);
-  auto paths_a = paths.accessor<target_t, 2>();
+  auto paths_a = MutAccessor<2, target_t>(paths);
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a.index(batchIndex, i) == targets_a.index(batchIndex, i - 1)) {
@@ -171,7 +187,7 @@ void forced_align_impl(
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a.index(batchIndex, ltrIdx / 2);
-    paths_a[batchIndex][t] = lbl_idx;
+    paths_a.set_index(lbl_idx, batchIndex, t);
     ltrIdx -= backPtr_a[t * S + ltrIdx];
   }
 }
