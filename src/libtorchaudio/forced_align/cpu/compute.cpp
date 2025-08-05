@@ -14,27 +14,17 @@ namespace torchaudio {
 namespace alignment {
 namespace cpu {
 
-// Compute strides for row-major indexing
-template<unsigned int k>
-void reverse_cumprod(int64_t (&strides)[k]) {
-  // Convert dimensions to strides: stride[i] = product of dimensions [i+1..k-1]
-  for (int i = k - 2; i >= 0; i--) {
-    strides[i] = strides[i] * strides[i + 1];
-  }
-}
-
 template<unsigned int k, typename T>
 class Accessor {
-  int64_t strides[k-1];
+  int64_t strides[k];
   T *data;
 
 public:
   Accessor(const torch::Tensor& tensor) {
     data = tensor.data_ptr<T>();
-    for (int i = 1; i < k; i++) {
-      strides[i-1] = tensor.size(i);
+    for (int i = 0; i < k; i++) {
+      strides[i] = tensor.stride(i);
     }
-    reverse_cumprod<k-1>(strides);
   }
 
   T index(...) {
@@ -42,9 +32,6 @@ public:
     va_start(args, k);
     int64_t ix = 0;
     for (int i = 0; i < k; i++) {
-      if (i == k - 1)
-        ix += va_arg(args, int);
-      else
         ix += strides[i] * va_arg(args, int);
     }
     va_end(args);
@@ -54,16 +41,15 @@ public:
 
 template<unsigned int k, typename T>
 class MutAccessor {
-  int64_t strides[k-1];
+  int64_t strides[k];
   T *data;
 
 public:
   MutAccessor(torch::Tensor& tensor) {
     data = tensor.data_ptr<T>();
-    for (int i = 1; i < k; i++) {
-      strides[i-1] = tensor.size(i);
+    for (int i = 0; i < k; i++) {
+      strides[i] = tensor.stride(i);
     }
-    reverse_cumprod<k-1>(strides);
   }
 
   void set_index(T value, ...) {
@@ -71,9 +57,6 @@ public:
     va_start(args, value);
     int64_t ix = 0;
     for (int i = 0; i < k; i++) {
-      if (i == k - 1)
-        ix += va_arg(args, int);
-      else
         ix += strides[i] * va_arg(args, int);
     }
     va_end(args);
