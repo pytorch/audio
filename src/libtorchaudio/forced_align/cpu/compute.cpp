@@ -4,12 +4,58 @@
 #include <torch/csrc/stable/tensor.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
+#include <torch/csrc/inductor/aoti_torch/utils.h>
+#include <cstdarg>
+
 
 using namespace std;
 
 namespace torchaudio {
 namespace alignment {
 namespace cpu {
+
+template<unsigned int k, typename T>
+class Accessor {
+  int64_t shape[k];
+  T *data;
+
+public:
+  Accessor(const torch::Tensor& tensor) {
+    data = tensor.data_ptr<T>();
+    for (int i = 0; i < k; i++) {
+      shape[i] = tensor.size(i);
+    }
+  }
+
+  T index(...) {
+    va_list args;
+    va_start(args, k);
+    int64_t ix = 0;
+    for (int i = 0; i < k; i++) {
+      if (i == k - 1)
+        ix += va_arg(args, int);
+      else
+        ix += shape[i+1] * va_arg(args, int);
+    }
+    va_end(args);
+    return data[ix];
+  }
+
+  // void set_index(T val,...) {
+  //   va_list args;
+  //   va_start(args, k);
+  //   int64_t ix = 0;
+  //   for (int i = 0; i < k; i++) {
+  //     if (i == k - 1)
+  //       ix += va_arg(args, int);
+  //     else
+  //       ix += shape[i+1] * va_arg(args, int);
+  //   }
+  //   va_end(args);
+  //   data[ix] = val;
+  // }
+};
+
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
 template <typename scalar_t, at::ScalarType target_scalar_type>
@@ -38,12 +84,12 @@ void forced_align_impl(
     backPtr_a[i] = -1;
   }
 
-  auto logProbs_a = logProbs.accessor<scalar_t, 3>();
-  auto targets_a = targets.accessor<target_t, 2>();
+  auto logProbs_a = Accessor<3, scalar_t>(logProbs);
+  auto targets_a = Accessor<2, target_t>(targets);
   auto paths_a = paths.accessor<target_t, 2>();
   auto R = 0;
   for (auto i = 1; i < L; i++) {
-    if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
+    if (targets_a.index(batchIndex, i) == targets_a.index(batchIndex, i - 1)) {
       ++R;
     }
   }
@@ -58,22 +104,22 @@ void forced_align_impl(
   auto start = T - (L + R) > 0 ? 0 : 1;
   auto end = (S == 1) ? 1 : 2;
   for (auto i = start; i < end; i++) {
-    auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
-    alphas_a[i][0] = logProbs_a[batchIndex][0][labelIdx];
+    auto labelIdx = (i % 2 == 0) ? blank : targets_a.index(batchIndex, i / 2);
+    alphas_a[i][0] = logProbs_a.index(batchIndex,0,labelIdx);
   }
   for (auto t = 1; t < T; t++) {
     if (T - t <= L + R) {
       if ((start % 2 == 1) &&
-          targets_a[batchIndex][start / 2] !=
-              targets_a[batchIndex][start / 2 + 1]) {
+          targets_a.index(batchIndex, start / 2) !=
+              targets_a.index(batchIndex, start / 2 + 1)) {
         start = start + 1;
       }
       start = start + 1;
     }
     if (t <= L + R) {
       if (end % 2 == 0 && end < 2 * L &&
-          targets_a[batchIndex][end / 2 - 1] !=
-              targets_a[batchIndex][end / 2]) {
+          targets_a.index(batchIndex, end / 2 - 1) !=
+              targets_a.index(batchIndex, end / 2)) {
         end = end + 1;
       }
       end = end + 1;
@@ -86,7 +132,7 @@ void forced_align_impl(
     }
     if (start == 0) {
       alphas_a[0][curIdxOffset] =
-          alphas_a[0][prevIdxOffset] + logProbs_a[batchIndex][t][blank];
+          alphas_a[0][prevIdxOffset] + logProbs_a.index(batchIndex, t, blank);
       backPtr_a[S * t] = 0;
       startloop += 1;
     }
@@ -96,14 +142,14 @@ void forced_align_impl(
       auto x1 = alphas_a[i - 1][prevIdxOffset];
       auto x2 = -std::numeric_limits<scalar_t>::infinity();
 
-      auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
+      auto labelIdx = (i % 2 == 0) ? blank : targets_a.index(batchIndex, i / 2);
 
       // In CTC, the optimal path may optionally chose to skip a blank label.
       // x2 represents skipping a letter, and can only happen if we're not
       // currently on a blank_label, and we're not on a repeat letter
       // (i != 1) just ensures we don't access targets[i - 2] if its i < 2
       if (i % 2 != 0 && i != 1 &&
-          targets_a[batchIndex][i / 2] != targets_a[batchIndex][i / 2 - 1]) {
+          targets_a.index(batchIndex, i / 2) != targets_a.index(batchIndex, i / 2 - 1)) {
         x2 = alphas_a[i - 2][prevIdxOffset];
       }
       scalar_t result = 0.0;
@@ -117,14 +163,14 @@ void forced_align_impl(
         result = x0;
         backPtr_a[t * S + i] = 0;
       }
-      alphas_a[i][curIdxOffset] = result + logProbs_a[batchIndex][t][labelIdx];
+      alphas_a[i][curIdxOffset] = result + logProbs_a.index(batchIndex, t, labelIdx);
     }
   }
   auto idx1 = (T - 1) % 2;
   auto ltrIdx = alphas_a[S - 1][idx1] > alphas_a[S - 2][idx1] ? S - 1 : S - 2;
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
-    auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
+    auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a.index(batchIndex, ltrIdx / 2);
     paths_a[batchIndex][t] = lbl_idx;
     ltrIdx -= backPtr_a[t * S + ltrIdx];
   }
