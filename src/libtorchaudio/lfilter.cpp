@@ -73,27 +73,6 @@ void cpu_lfilter_core_loop(
       });
 }
 
-void lfilter_core_generic_loop(
-    const torch::Tensor& input_signal_windows,
-    const torch::Tensor& a_coeff_flipped,
-    torch::Tensor& padded_output_waveform) {
-  int64_t n_samples_input = input_signal_windows.size(2);
-  int64_t n_order = a_coeff_flipped.size(1);
-  auto coeff = a_coeff_flipped.unsqueeze(2);
-  for (int64_t i_sample = 0; i_sample < n_samples_input; i_sample++) {
-    auto windowed_output_signal =
-        torch::narrow(padded_output_waveform, 2, i_sample, i_sample + n_order)
-            .transpose(0, 1);
-    auto o0 = torch::select(input_signal_windows, 2, i_sample) -
-        at::matmul(windowed_output_signal, coeff).squeeze(2).transpose(0, 1);
-    padded_output_waveform.index_put_(
-        {torch::indexing::Slice(),
-         torch::indexing::Slice(),
-         i_sample + n_order - 1},
-        o0);
-  }
-}
-
 } // namespace
 
 TORCH_LIBRARY(torchaudio, m) {
@@ -110,7 +89,3 @@ TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("torchaudio::_lfilter_core_loop", &cuda_lfilter_core_loop);
 }
 #endif
-
-TORCH_LIBRARY_IMPL(torchaudio, CompositeExplicitAutograd, m) {
-  m.impl("torchaudio::_lfilter_core_loop", &lfilter_core_generic_loop);
-}
