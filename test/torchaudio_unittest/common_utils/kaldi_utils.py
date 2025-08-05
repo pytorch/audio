@@ -17,7 +17,9 @@ def convert_args(**kwargs):
 
 
 def run_kaldi(request, command, input_type, input_value):
-    """Run provided Kaldi command, pass a tensor and get the resulting tensor
+    """Get the precomputed result of running a Kaldi command.
+    If the result has not yet been computed, run the provided Kaldi command,
+    pass a tensor and get the resulting tensor
 
     Args:
         command (list of str): The command with arguments
