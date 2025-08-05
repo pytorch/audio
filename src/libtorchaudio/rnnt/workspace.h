@@ -123,10 +123,10 @@ class IntWorkspace {
   inline void ResetAlphaBetaCounters() {
 #ifdef USE_CUDA
     if (data_ != nullptr && options_.device_ == GPU) {
-      cudaMemset(
-          GetPointerToAlphaCounters(),
-          0,
-          ComputeSizeForAlphaCounters(options_) * sizeof(int));
+      // cudaMemset(
+      //     GetPointerToAlphaCounters(),
+      //     0,
+      //     ComputeSizeForAlphaCounters(options_) * sizeof(int));
       cudaMemset(
           GetPointerToBetaCounters(),
           0,

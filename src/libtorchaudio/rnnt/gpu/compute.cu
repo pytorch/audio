@@ -124,6 +124,7 @@ std::tuple<Tensor, Tensor> compute(
   int64_t stride1[1] = {1};
   AtenTensorHandle costs;
   aoti_torch_empty_strided(1, cost_sizes, stride1, logits_dtype, logits_device, logits_device_index, &costs);
+  aoti_torch_zero_(costs);
 
   AtenTensorHandle gradients;
   aoti_torch_clone(logits.get(), &gradients);
@@ -172,25 +173,25 @@ std::tuple<Tensor, Tensor> compute(
   void *grads_ptr;
   aoti_torch_get_data_ptr(gradients, &grads_ptr);
 
-  if (logits_dtype == aoti_torch_dtype_float32()) {
-      Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
-          /*workspace=*/workspace,
-          /*logits=*/(float*)logit_ptr,
-          /*targets=*/(int*)target_ptr,
-          /*logit_lengths=*/(int*)logit_len_ptr,
-          /*target_lengths=*/(int*)target_len_ptr,
-          /*costs=*/(float*)costs_ptr,
-          /*gradients=*/(float*)grads_ptr);
-    } else {
-      Compute</*DTYPE=*/c10::Half, /*CAST_DTYPE=*/float>(
-          /*workspace=*/workspace,
-          /*logits=*/(c10::Half*)logit_ptr,
-          /*targets=*/(int*)target_ptr,
-          /*logit_lengths=*/(int*)logit_len_ptr,
-          /*target_lengths=*/(int*)target_len_ptr,
-          /*costs=*/(c10::Half*)costs_ptr,
-          /*gradients=*/(c10::Half*)grads_ptr);
-    }
+  // if (logits_dtype == aoti_torch_dtype_float32()) {
+  //     Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
+  //         /*workspace=*/workspace,
+  //         /*logits=*/(float*)logit_ptr,
+  //         /*targets=*/(int*)target_ptr,
+  //         /*logit_lengths=*/(int*)logit_len_ptr,
+  //         /*target_lengths=*/(int*)target_len_ptr,
+  //         /*costs=*/(float*)costs_ptr,
+  //         /*gradients=*/(float*)grads_ptr);
+  //   } else {
+  //     Compute</*DTYPE=*/c10::Half, /*CAST_DTYPE=*/float>(
+  //         /*workspace=*/workspace,
+  //         /*logits=*/(c10::Half*)logit_ptr,
+  //         /*targets=*/(int*)target_ptr,
+  //         /*logit_lengths=*/(int*)logit_len_ptr,
+  //         /*target_lengths=*/(int*)target_len_ptr,
+  //         /*costs=*/(c10::Half*)costs_ptr,
+  //         /*gradients=*/(c10::Half*)grads_ptr);
+  //   }
 
   return std::make_tuple(Tensor(costs), Tensor(gradients));
 }
