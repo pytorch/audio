@@ -4,6 +4,10 @@ from pathlib import Path
 import torch
 
 def mock_function(f):
+    """
+    Create a mocked version of a function from the librosa library that loads a precomputed result
+    if it exists, otherwise computes the result and saves it for future use.
+    """
     prefix = "torchaudio_unittest/assets/librosa_expected_results/"
     def wrapper(request, *args, **kwargs):
         if request is not None:
