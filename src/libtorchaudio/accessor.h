@@ -1,8 +1,10 @@
 #pragma once
 
-#include <torch/torch.h>
+#include <torch/csrc/stable/tensor.h>
 #include <type_traits>
 #include <cstdarg>
+
+using torch::stable::Tensor;
 
 template<unsigned int k, typename T, bool IsConst = true>
 class Accessor {
@@ -10,7 +12,7 @@ class Accessor {
   T *data;
 
 public:
-  using tensor_type = typename std::conditional<IsConst, const torch::Tensor&, torch::Tensor&>::type;
+  using tensor_type = typename std::conditional<IsConst, const Tensor&, Tensor&>::type;
 
   Accessor(tensor_type tensor) {
     data = tensor.template data_ptr<T>();

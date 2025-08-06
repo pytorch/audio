@@ -14,19 +14,17 @@ namespace torchaudio {
 namespace alignment {
 namespace cpu {
 
-
+using torch::stable::Tensor;
 
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
-template <typename scalar_t, at::ScalarType target_scalar_type>
+template <typename scalar_t, typename target_t>
 void forced_align_impl(
-    const torch::Tensor& logProbs,
-    const torch::Tensor& targets,
-    const int64_t blank,
-    torch::Tensor& paths) {
+    const Tensor logProbs,
+    const Tensor targets,
+    const Tensor blank,
+    Tensor paths) {
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
-  using target_t = typename std::
-      conditional<target_scalar_type == torch::kInt, int, int64_t>::type;
   const auto batchIndex =
       0; // TODO: support batch version and use the real batch index
   const auto T = logProbs.size(1);
@@ -136,11 +134,11 @@ void forced_align_impl(
   }
 }
 
-std::tuple<torch::Tensor, torch::Tensor> compute(
-    const torch::Tensor& logProbs,
-    const torch::Tensor& targets,
-    const torch::Tensor& inputLengths,
-    const torch::Tensor& targetLengths,
+std::tuple<Tensor, Tensor> compute(
+    const Tensor& logProbs,
+    const Tensor& targets,
+    const Tensor& inputLengths,
+    const Tensor& targetLengths,
     const int64_t blank) {
   TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
   TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
@@ -185,19 +183,31 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
 
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
-  auto paths = torch::zeros(
-      {B, T},
-      torch::TensorOptions().device(targets.device()).dtype(targets.dtype()));
-  AT_DISPATCH_FLOATING_TYPES_AND_HALF(
-      logProbs.scalar_type(), "forced_align_impl", [&] {
-        if (targets.scalar_type() == torch::kInt64) {
-          forced_align_impl<scalar_t, torch::kInt64>(
-              logProbs, targets, blank, paths);
-        } else {
-          forced_align_impl<scalar_t, torch::kInt32>(
-              logProbs, targets, blank, paths);
-        }
-      });
+
+  int64_t paths_size[2] = {B, T};
+  int64_t paths_stride[2] = {T, 1};
+  AtenTensorHandle paths_h;
+  aoti_torch_empty_strided(1, paths_size, paths_stride, targets_dtype, targets_device, targets_device_index, &paths_h);
+  auto paths = Tensor(paths_h);
+
+
+  if (targets.scalar_type() == aoti_torch_dtype_int64()) {
+    if (logProbs.scalar_type() == aoti_torch_dtype_float64()) {
+      forced_align_impl<float64, int64>(logProbs, targets, blank, paths);
+    } else if (logProbs.scalar_type() == aoti_torch_dtype_float32()) {
+      forced_align_impl<float32, int64>(logProbs, targets, blank, paths);
+    } else if (logProbs.scalar_type() == aoti_torch_dtype_float16()) {
+      forced_align_impl<float16, int64>(logProbs, targets, blank, paths);
+    }
+  } else if (targets.scalar_type() == aoti_torch_dtype_int32()) {
+    if (logProbs.scalar_type() == aoti_torch_dtype_float64()) {
+      forced_align_impl<float64, int32>(logProbs, targets, blank, paths);
+    } else if (logProbs.scalar_type() == aoti_torch_dtype_float32()) {
+      forced_align_impl<float32, int32>(logProbs, targets, blank, paths);
+    } else if (logProbs.scalar_type() == aoti_torch_dtype_float16()) {
+      forced_align_impl<float16, int32>(logProbs, targets, blank, paths);
+    }
+  }
   return std::make_tuple(
       paths,
       logProbs.index(
@@ -207,8 +217,21 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
            paths.index({0})}));
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("forced_align", &compute);
+
+void boxed_compute(StableIValue* stack, uint64_t num_args, uint64_t num_outputs) {
+  Tensor t1(to<AtenTensorHandle>(stack[0]));
+  Tensor t2(to<AtenTensorHandle>(stack[1]));
+  Tensor t3(to<AtenTensorHandle>(stack[2]));
+  Tensor t4(to<AtenTensorHandle>(stack[3]));
+  int64_t blank = to<int64_t>(stack[4]);
+  auto result = compute(
+      std::move(t1), std::move(t2), std::move(t3), std::move(t4), blank);
+  stack[0] = from(std::get<0>(result));
+  stack[1] = from(std::get<1>(result));
+}
+
+STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
+  m.impl("forced_align", &boxed_compute);
 }
 
 } // namespace cpu
