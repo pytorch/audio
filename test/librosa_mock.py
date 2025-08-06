@@ -6,7 +6,9 @@ import torch
 def mock_function(f):
     """
     Create a mocked version of a function from the librosa library that loads a precomputed result
-    if it exists, otherwise computes the result and saves it for future use.
+    if it exists, otherwise computes the result and saves it for future use. This is used to compare
+    torchaudio functionality to the equivalent functionalty in librosa without depending on librosa
+    after results are precomputed.
     """
     prefix = "torchaudio_unittest/assets/librosa_expected_results/"
     def wrapper(request, *args, **kwargs):
