@@ -6,6 +6,7 @@ set(
   lfilter.cpp
   overdrive.cpp
   utils.cpp
+  accessor_tests.cpp
   )
 
 set(
