@@ -27,7 +27,7 @@ void forced_align_impl(
   const auto L = targets.size(1);
   const auto S = 2 * L + 1;
 
-  auto alphas_a = new scalar_t[S][2];
+  auto alphas_a = new scalar_t[S][2]; // scalar_t is just logProbs.dtype()
   for (int i = 0; i < S; i++) {
     alphas_a[i][0] = kNegInfinity;
     alphas_a[i][1] = kNegInfinity;
