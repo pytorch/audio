@@ -306,11 +306,7 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
       });
   return std::make_tuple(
       paths.to(logProbs.device()),
-      logProbs.index(
-          {torch::indexing::Slice(),
-           torch::linspace(
-               0, T - 1, T, torch::TensorOptions().dtype(paths.dtype())),
-           paths.index({0})}));
+      logProbs);
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {

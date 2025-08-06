@@ -191,7 +191,7 @@ std::tuple<Tensor, Tensor> compute(
   auto paths = Tensor(paths_h);
 
 
-  if (targets.scalar_type() == aoti_torch_dtype_int64()) {
+  if (targets.dtype() == aoti_torch_dtype_int64()) {
     if (logProbs.scalar_type() == aoti_torch_dtype_float64()) {
       forced_align_impl<float64, int64>(logProbs, targets, blank, paths);
     } else if (logProbs.scalar_type() == aoti_torch_dtype_float32()) {
@@ -210,11 +210,8 @@ std::tuple<Tensor, Tensor> compute(
   }
   return std::make_tuple(
       paths,
-      logProbs.index(
-          {torch::indexing::Slice(),
-           torch::linspace(
-               0, T - 1, T, torch::TensorOptions().dtype(paths.dtype())),
-           paths.index({0})}));
+      logProbs
+      );
 }
 
 
