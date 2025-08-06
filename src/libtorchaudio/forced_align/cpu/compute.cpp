@@ -87,7 +87,7 @@ void forced_align_impl(
     if (start == 0) {
       alphas_a[0][curIdxOffset] =
           alphas_a[0][prevIdxOffset] + logProbs_a[batchIndex][t][blank];
-      backPtr_a[S * t] = 0;
+      backPtr_a[S * t] = 0; // backPtr_a[t][0] = 0
       startloop += 1;
     }
 
@@ -109,13 +109,13 @@ void forced_align_impl(
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        backPtr_a[t * S + i] = 2;
+        backPtr_a[t * S + i] = 2; // backPtr_a[t][i] = 2
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
-        backPtr_a[t * S + i] = 1;
+        backPtr_a[t * S + i] = 1; // backPtr_a[t][i] = 1
       } else {
         result = x0;
-        backPtr_a[t * S + i] = 0;
+        backPtr_a[t * S + i] = 0; // backPtr_a[t][i] = 0
       }
       alphas_a[i][curIdxOffset] = result + logProbs_a[batchIndex][t][labelIdx];
     }
@@ -126,7 +126,7 @@ void forced_align_impl(
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
-    ltrIdx -= backPtr_a[t * S + ltrIdx];
+    ltrIdx -= backPtr_a[t * S + ltrIdx]; // backPtr_a[t][ltrIdx]
   }
 }
 
